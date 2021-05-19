@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
@@ -28,106 +29,109 @@ public class PostgresExporter {
 
     public void export(String csvPath) throws IOException {
 
-        //String runID = config.controler().getRunId();
+        String overwriteRun = new PostgresExporterConfigGroup().getOverwriteRun().toString();
+        String runID = "007"; // String runID = config.controler().getRunId();
 
+        String[] stringValues = {"person", "trip_id", "mode", "start_link", "end_link", "access_stop_id", "egress_stop_id", "transit_line", "transit_route", "trip_id", "main_mode", "longest_distance_mode", "modes", "start_activity_type", "end_activity_type", "start_facility_id", "start_link", "end_facility_id", "end_link", "first_pt_boarding_stop", "last_pt_egress_stop"};
+        String[] longValues = {"trip_number"};
+        String[] floatValues = {"traveled_distance", "euclidean_distance", "start_x", "start_y", "end_x", "end_y", "distance"};
+        String[] timeValues = {"dep_time", "trav_time", "wait_time"};
+
+        // Set the database and the table name
+        // The table name is automatic the a part from the input file
+        String databaseName = "testitest_schema";
         String tableName = csvPath.split("/")[csvPath.split("/").length - 1].split("\\.")[csvPath.split("/")[csvPath.split("/").length - 1].split("\\.").length - 3];
-        String sqlCreateTable = "CREATE TABLE IF NOT EXISTS testitest_schema." + tableName + " (id serial PRIMARY KEY, "; // id serial PRIMARAY KEY,
-        String columnList = "(";
-        String insertStatement;
-        String outputCsv = csvPath.substring(0, csvPath.length() - 3);
 
-        decompressGzip(Paths.get(csvPath), Paths.get(outputCsv));
+        // the run_id is already defined becuase the run_id is not included in the .csv file
+        StringBuilder sqlCreateTable = new StringBuilder("CREATE TABLE IF NOT EXISTS " + databaseName + "." + tableName + " (id serial PRIMARY KEY, run_id VARCHAR"); // id serial PRIMARAY KEY,
+        StringBuilder columnList = new StringBuilder("(run_id");
+        StringBuilder insertStatement = new StringBuilder("INSERT INTO " + databaseName + "." + tableName + " ");
 
+        // Input stream for the input .gz file
         GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(csvPath));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
-        // get column names
+        // Read the first row with the column names and split them at the ";"
         String columns = br.readLine();
-        String firstRow = br.readLine();
-
         String[] columnsArray = columns.split(";", -1);
-        String[] firstRowArray = firstRow.split(";", -1);
-        
-        String[] types = new String[columnsArray.length];
 
-        // Analysis of the first line with values to define the data types
-        for (int i = 0; i < firstRowArray.length; i++) {
-            if (i != firstRowArray.length - 1) {  // -1
-                if (isInteger(firstRowArray[i])) {
-                    sqlCreateTable = sqlCreateTable + columnsArray[i] + " VARCHAR, ";
-                    columnList = columnList + columnsArray[i] + ", ";
-                    types[i] = "VARCHAR";
-                } else if (isFloat(firstRowArray[i])) {
-                    sqlCreateTable = sqlCreateTable + columnsArray[i] + " VARCHAR, ";
-                    columnList = columnList + columnsArray[i] + ", ";
-                    types[i] = "VARCHAR";
-                } else {
-                    sqlCreateTable = sqlCreateTable + columnsArray[i] + " VARCHAR, ";
-                    columnList = columnList + columnsArray[i] + ", ";
-                    types[i] = "VARCHAR";
-                }
+        // The filledColumns Array stores for each column the datatype
+        // the first datatype is for the run_id becuase the run_id
+        // is not included in the csv file
+        String[] filledColumns = new String[columnsArray.length + 1];
+        filledColumns[0] = "VARCHAR"; // datatype for runID
+
+        // Analyze the datatypes for each column and store the type in the filledColumns Array
+        for (int i = 0; i < columnsArray.length; i++) {
+            String name = columnsArray[i];
+            if (Arrays.asList(stringValues).contains(name)) {
+                sqlCreateTable.append(", ").append(name).append(" VARCHAR");
+                columnList.append(", ").append(name);
+                filledColumns[i + 1] = "VARCHAR";
+            } else if (Arrays.asList(longValues).contains(name)) {
+                sqlCreateTable.append(", ").append(name).append(" LONG");
+                columnList.append(", ").append(name);
+                filledColumns[i + 1] = "LONG";
+            } else if (Arrays.asList(floatValues).contains(name)) {
+                sqlCreateTable.append(", ").append(name).append(" FLOAT");
+                columnList.append(", ").append(name);
+                filledColumns[i + 1] = "FLOAT";
+            } else if (Arrays.asList(timeValues).contains(name)) {
+                sqlCreateTable.append(", ").append(name).append(" BIGINT");
+                columnList.append(", ").append(name);
+                filledColumns[i + 1] = "TIME";
             } else {
-                if (isInteger(firstRowArray[i])) {
-                    sqlCreateTable = sqlCreateTable + columnsArray[i] + " VARCHAR)";
-                    columnList = columnList + columnsArray[i] + ")";
-                    types[i] = "VARCHAR";
-                } else if (isFloat(firstRowArray[i])) {
-                    sqlCreateTable = sqlCreateTable + columnsArray[i] + " VARCHAR)";
-                    columnList = columnList + columnsArray[i] + ")";
-                    types[i] = "VARCHAR";
-                } else {
-                    sqlCreateTable = sqlCreateTable + columnsArray[i] + " VARCHAR)";
-                    columnList = columnList + columnsArray[i] + ")";
-                    types[i] = "VARCHAR";
-                }
+                sqlCreateTable.append(", ").append(name).append(" VARCHAR");
+                columnList.append(", ").append(name);
+                filledColumns[i + 1] = "VARCHAR";
+                System.out.println("Wasn't found in defualt column names: " + name);
             }
         }
 
-        insertStatement = "INSERT INTO testitest_schema." + tableName + " " + columnList + " VALUES ";
+        columnList.append(")");
+        insertStatement.append(columnList).append(" VALUES ");
 
-        String[] values;
-        String combinedValues;
-
-        int test = 0;
-
-        do {
-            values = firstRow.split(";", -1);
-            combinedValues = "";
-            test++;
+        // Reads all rows, find out the datytype with the values stored in the
+        // filledColumns and add quotes (string and time) or not
+        String row;
+        while ((row = br.readLine()) != null) {
+            StringBuilder appendInsertStatement = new StringBuilder("(");
+            row = runID + ";" + row;
+            String[] values = row.split(";", -1);
             for (int i = 0; i < values.length; i++) {
-                if (i == 0) {
-                    if (types[i].equals("VARCHAR")) {
-                        combinedValues = combinedValues + "('" + values[i] + "', ";
+                if (i == values.length - 1) {
+                    if (filledColumns[i].equals("VARCHAR")) {
+                        appendInsertStatement.append("'").append(values[i]).append("'");
+                    } else if (filledColumns[i].equals("TIME")) {
+                        String[] splitTime =  values[i].split(":");
+                        long result = Integer.parseInt(splitTime[0]) * 3600L + Integer.parseInt(splitTime[1]) * 60L + Integer.parseInt(splitTime[2]);
+                        appendInsertStatement.append(result);
                     } else {
-                        combinedValues = combinedValues + "(" + values[i] + ", ";
-                    }
-                } else if (i == values.length - 1) {
-                    if (types[i].equals("VARCHAR")) {
-                        combinedValues = combinedValues + "'" + values[i] + "'), ";
-                    } else {
-                        combinedValues = combinedValues + "" + values[i] + "), ";
+                        appendInsertStatement.append(values[i]);
                     }
                 } else {
-                    if (types[i].equals("VARCHAR")) {
-                        combinedValues = combinedValues + "'" + values[i] + "', ";
+                    if (filledColumns[i].equals("VARCHAR")) {
+                        appendInsertStatement.append("'").append(values[i]).append("', ");
+                    } else if (filledColumns[i].equals("TIME")) {
+                        String[] splitTime =  values[i].split(":");
+                        long result = Integer.parseInt(splitTime[0]) * 3600L + Integer.parseInt(splitTime[1]) * 60L + Integer.parseInt(splitTime[2]);
+                        appendInsertStatement.append(result).append(", ");
                     } else {
-                        combinedValues = combinedValues + "" + values[i] + ", ";
+                        appendInsertStatement.append(values[i]).append(", ");
                     }
                 }
             }
-            insertStatement = insertStatement + combinedValues;
-            if (test == 10) {
-                break;
-            }
-        } while ((firstRow = br.readLine()) != null);
+            insertStatement.append(appendInsertStatement).append("), ");
+        }
 
-        insertStatement = insertStatement.substring(0, insertStatement.length() - 2);
-        insertStatement = insertStatement + ";";
+        // Format the  sqlstatement
+        sqlCreateTable.append(");");
+        insertStatement = new StringBuilder(insertStatement.substring(0, insertStatement.length() - 2));
+        insertStatement.append(";");
 
-        databaseConnection(sqlCreateTable);
-        databaseConnection(insertStatement);
-
-        System.out.println(insertStatement);
+        // Execute the sql statement
+        databaseConnection(sqlCreateTable.toString());
+        databaseConnection(insertStatement.toString());
 
         // => Friedrich
 
@@ -145,7 +149,6 @@ public class PostgresExporter {
 
         // Copy instead of insert query
         // https://www.postgresqltutorial.com/import-csv-file-into-posgresql-table/
-
     }
 
     public void databaseConnection(String sqlStatement){
@@ -180,37 +183,5 @@ public class PostgresExporter {
         conn.commit();
         conn.close();
 
-    }
-
-    public static boolean isFloat(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch(NumberFormatException e){
-            return false;
-        }
-    }
-
-    public static boolean isInteger (String str) {
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch(NumberFormatException e){
-            return false;
-        }
-    }
-
-    public static void decompressGzip(Path source, Path target) throws IOException {
-
-        try (GZIPInputStream gis = new GZIPInputStream(
-                new FileInputStream(source.toFile()));
-             FileOutputStream fos = new FileOutputStream(target.toFile())) {
-
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = gis.read(buffer)) > 0) {
-                fos.write(buffer, 0, len);
-            }
-        }
     }
 }
