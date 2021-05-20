@@ -608,9 +608,17 @@ public final class NetworkUtils {
 	}
 
 
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link ) {
 		return link.getLength() / link.getFreespeed() ;
 	}
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link, double time ) {
 		return link.getLength() / link.getFreespeed(time) ;
 	}

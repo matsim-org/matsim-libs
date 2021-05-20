@@ -43,11 +43,11 @@ public class IterationTravelStatsControlerListenerTest {
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	Config config = ConfigUtils.createConfig();
 	
-	private static int person;
-	private static int executed_score;
-	private static int first_act_x;
-	private static int first_act_y;
-	private static int first_act_type;
+	private int person;
+	private int executed_score;
+	private int first_act_x;
+	private int first_act_y;
+	private int first_act_type;
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -164,7 +164,7 @@ public class IterationTravelStatsControlerListenerTest {
 	
 	}
 	
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

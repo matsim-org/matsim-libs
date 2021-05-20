@@ -246,6 +246,30 @@
                     </rules>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>org.matsim.api.core.v01.AutoResetIdCaches</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>org.matsim.api.core.v01.AutoResetIdCaches</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -324,6 +348,7 @@
                             <artifactId>maven-javadoc-plugin</artifactId>
                             <configuration>
                                 <doclint>none</doclint>
+                                <quiet>true</quiet>
                             </configuration>
                         </plugin>
                     </plugins>

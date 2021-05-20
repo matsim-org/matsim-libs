@@ -93,7 +93,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_JUNCTION = "junction";
 	private final static String TAG_ONEWAY = "oneway";
 	private final static String TAG_ACCESS = "access";
-	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
+	private static final  List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
 
 	private final Map<Long, OsmNode> nodes = new HashMap<>();
@@ -1000,7 +1000,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private static class StringCache {
-		private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>(10000);
+		private static final  ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>(10000);
 		
 		/**
 		 * Returns the cached version of the given String. If the strings was

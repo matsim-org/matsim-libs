@@ -44,7 +44,7 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 class RunJointDemandCarExample {
 
-    private static String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
+    private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
     private static final Logger log = Logger.getLogger(RunJointDemandCarExample.class);
 
     public static void main(String[] args) throws IOException {

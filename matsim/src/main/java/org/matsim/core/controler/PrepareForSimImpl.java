@@ -60,6 +60,8 @@ import javax.inject.Provider;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData;
+
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
 	// but how should that work with a non-public constructor? kai, jun'18
@@ -246,11 +248,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
 					type = VehicleUtils.getDefaultVehicleType();
-					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId()))
-						scenario.getVehicles().addVehicleType(type);
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId())){
+						scenario.getVehicles().addVehicleType( type );
+					}
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					type = scenario.getVehicles().getVehicleTypes().get(Id.create(mode, VehicleType.class));
+					if ( type==null ) {
+						log.fatal( "Could not find requested vehicle type =" + mode + ". With config setting " + modeVehicleTypesFromVehiclesData.toString() + ", you need");
+						log.fatal( "to add, for each mode that performs network routing and/or is used as network/main mode in the qsim, a vehicle type for that mode." );
+						throw new RuntimeException("Could not find requested vehicle type = " + mode + ". See above.");
+					}
 					break;
 				default:
 					throw new RuntimeException(qSimConfigGroup.getVehiclesSource().toString() + " is not implemented yet.");

@@ -104,7 +104,7 @@ public class EditTripsTest {
 	// this is messy, but DisturbanceAndReplanningEngine needs to be static and there is no 
 	// constructor or similar to pass the replanning time
 	private static double testReplanTime = 0;
-	private static final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
+	private final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
 	
 
 	/**
@@ -656,7 +656,7 @@ public class EditTripsTest {
 
 	}
 	
-	public class HandlerForTests implements ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler
+	private static class HandlerForTests implements ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler
 	{		
 		private HashMap<Id<Person>, List<String>> trips;
 		private HashMap<Id<Person>, Double> arrivalTimes;

@@ -10,8 +10,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 
 public class GridTest {
 
-    private static GeometryFactory geometryFactory = new GeometryFactory();
-
     @Test
     public void initializeSquareGrid() {
 

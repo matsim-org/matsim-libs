@@ -23,18 +23,15 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  */
 public class RunTest {
-	private static String configFile;
-	private static String outputDirectory;
-	private static String runId;	
-	
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
 	public void test1() {
-		
-		configFile = utils.getPackageInputDirectory() + "/trial_scenario/trial_scenario_config.xml";
-		outputDirectory = utils.getOutputDirectory();
-		runId = "run1";
+
+		String configFile = utils.getPackageInputDirectory() + "/trial_scenario/trial_scenario_config.xml";
+		String outputDirectory = utils.getOutputDirectory();
+		String runId = "run1";
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

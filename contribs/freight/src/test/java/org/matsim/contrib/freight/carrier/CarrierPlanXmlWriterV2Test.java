@@ -28,8 +28,7 @@ public class CarrierPlanXmlWriterV2Test {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	private static Logger log = Logger.getLogger(CarrierPlanXmlWriterV2Test.class);
-	Carrier testCarrier;
+	private Carrier testCarrier;
 	
 	@Before
 	public void setUp() throws Exception{
