@@ -121,7 +121,8 @@ public class SupersonicOsmNetworkReader {
         long nodeId = way.getNodeIds().get(index);
         ProcessedOsmNode node = nodes.get(nodeId);
         if (node == null) {
-            throw new RuntimeException("Ensure you pass the 'completeWays=yes' argument when executing osmosis commands.");
+            throw new RuntimeException("A node with id: " + nodeId + " was null. " +
+                    "Ensure you pass the 'completeWays=yes' argument when executing osmosis commands.");
         }
         return node;
     }
