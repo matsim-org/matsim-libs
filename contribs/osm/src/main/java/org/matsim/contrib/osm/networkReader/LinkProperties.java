@@ -114,6 +114,10 @@ public class LinkProperties {
         return new LinkProperties(LEVEL_RESIDENTIAL, 1, 15 / 3.6, 600, false);
 	}
 
+	static LinkProperties createService() {
+		return new LinkProperties(LEVEL_RESIDENTIAL, 1, 15 / 3.6, 600, false);
+	}
+
 	static LinkProperties createLivingStreet() {
         return new LinkProperties(LEVEL_LIVING_STREET, 1, 10 / 3.6, 300, false);
 	}
@@ -135,6 +139,7 @@ public class LinkProperties {
 		result.put(OsmTags.TERTIARY_LINK, createTertiaryLink());
 		result.put(OsmTags.UNCLASSIFIED, createUnclassified());
 		result.put(OsmTags.RESIDENTIAL, createResidential());
+		result.put(OsmTags.SERVICE, createService());
 		result.put(OsmTags.LIVING_STREET, createLivingStreet());
 		return result;
 	}
