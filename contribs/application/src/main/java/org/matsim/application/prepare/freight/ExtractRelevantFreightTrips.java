@@ -273,7 +273,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             }
         }
 
-        ProjectionUtils.putCRS(originalPlans, crs.getTargetCRS());
+        if (crs.getTargetCRS() != null)
+            ProjectionUtils.putCRS(originalPlans, crs.getTargetCRS());
 
         // Write population
         log.info("Writing population file...");

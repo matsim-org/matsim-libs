@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
+import org.matsim.contrib.osm.networkReader.OsmTags;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -213,6 +214,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
         LanesFactory lf = lanes.getFactory();
 
         Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
+
+        // add additional service tag
+        linkProperties.put(OsmTags.SERVICE, new LinkProperties(LinkProperties.LEVEL_LIVING_STREET, 1,15 / 3.6, 450, false));
 
         for (SumoNetworkHandler.Edge edge : sumoHandler.edges.values()) {
 
