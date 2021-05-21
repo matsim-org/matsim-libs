@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbParams>
+	<param name="host" value="wedekind-matsim-analysis.c7lku8hegspn.eu-central-1.rds.amazonaws.com" />
+	<param name="databaseName" value="testitest" />
+	<param name="port" value="5432" />
+	<param name="user" value="postgres" />
+	<param name="password" value="dWS8GFklQZltTFwZmdvz" />
+</dbParams>
