@@ -115,7 +115,7 @@ public class LinkProperties {
 	}
 
 	static LinkProperties createService() {
-		return new LinkProperties(LEVEL_RESIDENTIAL, 1, 15 / 3.6, 600, false);
+		return new LinkProperties(LEVEL_LIVING_STREET, 1, 15 / 3.6, 600, false);
 	}
 
 	static LinkProperties createLivingStreet() {
