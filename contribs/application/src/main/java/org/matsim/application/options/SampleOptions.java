@@ -83,7 +83,7 @@ public final class SampleOptions {
 	/**
 	 * Returns the specified sample size.
 	 */
-	public int getSample() {
+	public int getSize() {
 		return sample;
 	}
 
@@ -91,7 +91,7 @@ public final class SampleOptions {
 	 * Adjust file name for selected sample size.
 	 */
 	public String adjustName(String name) {
-		String postfix = getSample() + "pct";
+		String postfix = getSize() + "pct";
 
 		return PATTERN.matcher(name).replaceAll(postfix);
 	}
