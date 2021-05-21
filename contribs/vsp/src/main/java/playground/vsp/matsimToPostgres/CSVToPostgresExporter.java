@@ -15,13 +15,15 @@ public class CSVToPostgresExporter {
     private final String tableName;
     private final String runID;
 
+    private final String schema = "matsim_output";
+
     private final String[] stringValues = {"person", "trip_id", "mode", "start_link", "end_link", "access_stop_id", "egress_stop_id", "transit_line", "transit_route", "trip_id", "main_mode", "longest_distance_mode", "modes", "start_activity_type", "end_activity_type", "start_facility_id", "start_link", "end_facility_id", "end_link", "first_pt_boarding_stop", "last_pt_egress_stop"};
     private final String[] longValues = {"trip_number"};
     private final String[] floatValues = {"traveled_distance", "euclidean_distance", "start_x", "start_y", "end_x", "end_y", "distance"};
     private final String[] timeValues = {"dep_time", "trav_time", "wait_time"};
 
-    Map<Integer, String> indexToColumnTypes;
-    Map<Integer, String> indexToColumnNames;
+    Map<Integer, String> indexToColumnTypes = new HashMap<>();
+    Map<Integer, String> indexToColumnNames = new HashMap<>();
 
 
     CSVToPostgresExporter(Connection conn, String csvFile, String databaseName, String runID){
@@ -76,11 +78,11 @@ public class CSVToPostgresExporter {
             if (Arrays.asList(stringValues).contains(name)) {
                 indexToColumnTypes.put(i+1, "VARCHAR");
             } else if (Arrays.asList(longValues).contains(columnsArray[i])) {
-                indexToColumnTypes.put(i+1, "LONG");
+                indexToColumnTypes.put(i+1, "BIGINT");
             } else if (Arrays.asList(floatValues).contains(name)) {
-                indexToColumnTypes.put(i+1, "FLOAT");
+                indexToColumnTypes.put(i+1, "DOUBLE PRECISION");
             } else if (Arrays.asList(timeValues).contains(name)) {
-                indexToColumnTypes.put(i+1, "TIME");
+                indexToColumnTypes.put(i+1, "INTEGER");
             } else {
                 indexToColumnTypes.put(i+1, "VARCHAR");
                 log.warn("Wasn't found in default column names: " + name);
@@ -92,7 +94,7 @@ public class CSVToPostgresExporter {
 
 
     private void createTableIfNotExists(){
-        StringBuilder sqlCreateTable = new StringBuilder("CREATE TABLE IF NOT EXISTS " + databaseName + "." + tableName + " (id serial PRIMARY KEY");
+        StringBuilder sqlCreateTable = new StringBuilder("CREATE TABLE IF NOT EXISTS " + schema + "." + tableName + " (id serial PRIMARY KEY");
 
         for (var indexToColumnName: indexToColumnNames.entrySet()){
             sqlCreateTable.append(", ").append(indexToColumnName.getValue()).append(" ").append(indexToColumnTypes.get(indexToColumnName.getKey()));
@@ -107,7 +109,7 @@ public class CSVToPostgresExporter {
 
 
     private String writeInsertStatement() throws IOException{
-        StringBuilder insertStatement = new StringBuilder("INSERT INTO " + databaseName + "." + tableName + " ");
+        StringBuilder insertStatement = new StringBuilder("INSERT INTO " + schema + "." + tableName + " ");
 
         StringBuilder columnList = new StringBuilder("(");
 
@@ -115,6 +117,7 @@ public class CSVToPostgresExporter {
         GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(csvFile));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
+        // ToDo fst element and concat
         for (var columnName: indexToColumnNames.values()){
             columnList.append(", ").append(columnName);
         }
@@ -122,6 +125,8 @@ public class CSVToPostgresExporter {
         columnList.append(")");
         insertStatement.append(columnList).append(" VALUES ");
 
+
+        // ToDo as of snd row
         // Reads all rows, find out the datytype with the values stored in the
         // filledColumns and add quotes (string and time) or not
         String row;
@@ -181,7 +186,6 @@ public class CSVToPostgresExporter {
         try {
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.execute();
-            conn.commit();
             conn.close();
 
         } catch (SQLException e) {
