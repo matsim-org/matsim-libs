@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * }
  * </pre>
  */
-public class SampleOptions {
+public final class SampleOptions {
 
 	private static final Pattern PATTERN = Pattern.compile("\\d+pct");
 
