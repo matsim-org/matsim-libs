@@ -28,20 +28,20 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
         Connection connection = params.createDBConnection();
 
         if (connection != null) {
-            System.out.println("Connected to the database!");
+            log.info("Connected to the database!");
         } else {
-            System.out.println("Failed to make connection!");
+            log.error("Failed to make connection!");
         }
 
         try{
             // Import tripsCSV
             String tripsCSVFile = outputDir + "/" + runID + ".output_trips.csv.gz";
-            CSVToPostgresExporter tripsExporter = new CSVToPostgresExporter(connection, tripsCSVFile, params.getDatabaseName(), runID);
+            CsvToPostgresExporter tripsExporter = new CsvToPostgresExporter(connection, tripsCSVFile, params.getDatabaseName(), runID);
             tripsExporter.export(params.getDatabaseName(), runID);
 
             // Import legsCSV
             String legsCSVFile = outputDir + "/" + runID + ".output_legs.csv.gz";
-            CSVToPostgresExporter legsExporter = new CSVToPostgresExporter(connection, legsCSVFile, params.getDatabaseName(), runID);
+            CsvToPostgresExporter legsExporter = new CsvToPostgresExporter(connection, legsCSVFile, params.getDatabaseName(), runID);
             legsExporter.export(params.getDatabaseName(), runID);
 
             assert connection != null;

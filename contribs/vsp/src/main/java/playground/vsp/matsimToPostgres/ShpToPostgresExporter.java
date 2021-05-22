@@ -2,13 +2,20 @@ package playground.vsp.matsimToPostgres;
 
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.sql.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-public class CSVToPostgresExporter {
-    private final Logger log = Logger.getLogger(CSVToPostgresExporter.class);
+public class ShpToPostgresExporter {
+    private final Logger log = Logger.getLogger(ShpToPostgresExporter.class);
     private final Connection conn;
     private final String csvFile;
     private final String databaseName;
@@ -26,7 +33,7 @@ public class CSVToPostgresExporter {
     Map<Integer, String> indexToColumnNames = new HashMap<>();
 
 
-    CSVToPostgresExporter(Connection conn, String csvFile, String databaseName, String runID){
+    ShpToPostgresExporter(Connection conn, String csvFile, String databaseName, String runID){
         this.conn = conn;
         this.csvFile = csvFile;
         this.tableName = getTableName(csvFile);
@@ -37,7 +44,7 @@ public class CSVToPostgresExporter {
     public void export(String databaseName, String runID) throws IOException {
         // set database and the table name
         String tableName = getTableName(csvFile);
-        
+
         // analyze csv File
         analyzeFile();
 
@@ -117,6 +124,7 @@ public class CSVToPostgresExporter {
 
         String columnList = ("(" + String.join(", ", indexToColumnNames.values()) + ")").replace("TIME", "BIGINT");
         insertStatement.append(columnList).append(" VALUES ");
+
 
         // Reads all rows, find out the datytype with the values stored in the
         // filledColumns and add quotes (string and time) or not
