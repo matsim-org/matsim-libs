@@ -37,7 +37,7 @@ public class ReceiversWriterTest {
 	
 	@Test
 	public void testV1() {
-		Scenario sc = BaseReceiverChessboardScenario.createChessboardScenario(1L, 1, 5, false );
+		Scenario sc = BaseReceiverChessboardScenario.createChessboardScenario(1L, 5, false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
 		
@@ -54,7 +54,7 @@ public class ReceiversWriterTest {
 
 	@Test
 	public void testV2() {
-		Scenario sc = BaseReceiverChessboardScenario.createChessboardScenario(1L, 1, 5, false );
+		Scenario sc = BaseReceiverChessboardScenario.createChessboardScenario(1L, 5, false );
 		ReceiverUtils.getReceivers(sc).getAttributes().putAttribute("date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format( Calendar.getInstance().getTime()));
 

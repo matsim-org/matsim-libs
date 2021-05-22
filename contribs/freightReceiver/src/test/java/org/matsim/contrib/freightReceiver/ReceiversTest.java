@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freightReceiver.usecases.chessboard.BaseReceiverChessboardScenario;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Collection;
@@ -114,13 +115,13 @@ public class ReceiversTest {
         ProductType p1 = list.get(0);
         Assert.assertTrue("Should contain P1", p1.getId().toString().equalsIgnoreCase("P1"));
         Assert.assertTrue("Wrong description", p1.getDescription().equalsIgnoreCase("Product 1"));
-        Assert.assertEquals("Wrong origin Id", Id.createLinkId("j(1,7)"), p1.getOriginLinkId());
+        Assert.assertEquals("Wrong origin Id", Id.createLinkId("j(1,4)"), p1.getOriginLinkId());
         Assert.assertEquals("Wrong capacity", 1.0, p1.getRequiredCapacity(), MatsimTestUtils.EPSILON);
 
         ProductType p2 = list.get(1);
         Assert.assertTrue("Should contain P2", p2.getId().toString().equalsIgnoreCase("P2"));
         Assert.assertTrue("Wrong description", p2.getDescription().equalsIgnoreCase("Product 2"));
-        Assert.assertEquals("Wrong origin Id", Id.createLinkId("j(1,7)"), p2.getOriginLinkId());
+        Assert.assertEquals("Wrong origin Id", Id.createLinkId("j(1,4)"), p2.getOriginLinkId());
         Assert.assertEquals("Wrong capacity", 2.0, p2.getRequiredCapacity(), MatsimTestUtils.EPSILON);
     }
 
@@ -149,7 +150,8 @@ public class ReceiversTest {
     }
 
     private Receivers setupReceivers() {
-        Scenario scenario = BaseReceiverChessboardScenario.createChessboardScenario(1L, 1, 5, false);
+        MatsimRandom.reset(1234L);
+        Scenario scenario = BaseReceiverChessboardScenario.createChessboardScenario(1L, 5, false);
         return ReceiverUtils.getReceivers(scenario);
     }
 }

@@ -59,10 +59,10 @@ public class BaseReceiverChessboardScenario {
     /**
      * Build the entire chessboard example.
      */
-    public static Scenario createChessboardScenario(long seed, int run, int numberOfReceivers, boolean write) {
+    public static Scenario createChessboardScenario(long seed, int numberOfReceivers, boolean write) {
         MatsimRandom.reset(seed);
 
-        Config config = setupChessboardConfig(seed, run);
+        Config config = setupChessboardConfig(seed);
 
         Scenario sc = ScenarioUtils.loadScenario(config);
 
@@ -94,7 +94,7 @@ public class BaseReceiverChessboardScenario {
     /**
      * FIXME Need to complete this.
      */
-    private static Config setupChessboardConfig(long seed, int run) {
+    private static Config setupChessboardConfig(long seed) {
         URL context = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
         Config config = ConfigUtils.createConfig();
@@ -115,7 +115,10 @@ public class BaseReceiverChessboardScenario {
         /* Write the necessary bits to file. */
         String outputFolder = sc.getConfig().controler().getOutputDirectory();
         outputFolder += outputFolder.endsWith("/") ? "" : "/";
-        new File(outputFolder).mkdirs();
+        boolean success = new File(outputFolder).mkdirs();
+        if (!success) {
+            LOG.warn("Could not successfully create '" + outputFolder + "'. Maybe it already exists?");
+        }
 
         new NetworkWriter(sc.getNetwork()).write(outputFolder + "network.xml");
         new ConfigWriter(sc.getConfig()).write(outputFolder + "config.xml");
@@ -165,22 +168,22 @@ public class BaseReceiverChessboardScenario {
             /* Create receiver-specific products */
             Receiver receiver = receivers.getReceivers().get(Id.create(Integer.toString(r), Receiver.class));
 
-            ReceiverProduct receiverProductOne = createReceiverProduct(receiver, productTypeOne, 1000, 5000);
+            ReceiverProduct receiverProductOne = createReceiverProduct(productTypeOne, 1000, 5000);
             receiver.addProduct(receiverProductOne);
 
-            ReceiverProduct receiverProductTwo = createReceiverProduct(receiver, productTypeTwo, 500, 2500);
+            ReceiverProduct receiverProductTwo = createReceiverProduct(productTypeTwo, 500, 2500);
             receiver.addProduct(receiverProductTwo);
 
             /* Generate and collate orders for the different receiver/order combination. */
-            Collection<Order> rOrders = new ArrayList<Order>();
+            Collection<Order> rOrders = new ArrayList<>();
             {
-                Order rOrder1 = createProductOrder(Id.create("Order" + Integer.toString(r) + "1", Order.class), receiver,
+                Order rOrder1 = createProductOrder(Id.create("Order" + r + "1", Order.class), receiver,
                         receiverProductOne, Time.parseTime(serdur));
                 rOrder1.setNumberOfWeeklyDeliveries(numDel);
                 rOrders.add(rOrder1);
             }
             {
-                Order rOrder2 = createProductOrder(Id.create("Order" + Integer.toString(r) + "2", Order.class), receiver,
+                Order rOrder2 = createProductOrder(Id.create("Order" + r + "2", Order.class), receiver,
                         receiverProductTwo, Time.parseTime(serdur));
                 rOrder2.setNumberOfWeeklyDeliveries(numDel);
                 rOrders.add(rOrder2);
@@ -200,8 +203,7 @@ public class BaseReceiverChessboardScenario {
                     ReceiverUtils.ATTR_RECEIVER_TW_COST,
                     ChessboardExperimentParameters.TIME_WINDOW_HOURLY_COST);
 
-            /* Convert receiver orders to initial carrier services. */
-//			convertReceiverOrdersToInitialCarrierServices( carriers, receiverOrder, receiverPlan );
+            /* Convert receiver orders to initial carrier shipment. */
             convertReceiverOrdersToInitialCarrierShipments(carriers, receiverOrder, receiverPlan);
         }
 
@@ -254,9 +256,6 @@ public class BaseReceiverChessboardScenario {
 
     /**
      * Creates the carrier agents for the simulation.
-     *
-     * @param sc
-     * @return
      */
     private static void createChessboardCarriersAndAddToScenario(Scenario sc) {
         Id<Carrier> carrierId = Id.create("Carrier1", Carrier.class);
@@ -316,7 +315,7 @@ public class BaseReceiverChessboardScenario {
         types.getVehicleTypes().put(typeLight.getId(), typeLight);
         types.getVehicleTypes().put(typeHeavy.getId(), typeHeavy);
 
-        Carriers carriers = FreightUtils.getOrCreateCarriers(sc);
+        Carriers carriers = FreightUtils.addOrGetCarriers(sc);
         carriers.addCarrier(carrier);
 
     }
@@ -324,16 +323,13 @@ public class BaseReceiverChessboardScenario {
 
     /**
      * Selects a random link in the network.
-     *
-     * @param network
-     * @return
      */
     @SuppressWarnings("unchecked")
     static Id<Link> selectRandomLink(Network network) {
         Object[] linkIds = network.getLinks().keySet().toArray();
         int sample = MatsimRandom.getRandom().nextInt(linkIds.length);
         Object o = linkIds[sample];
-        Id<Link> linkId = null;
+        Id<Link> linkId;
         if (o instanceof Id<?>) {
             linkId = (Id<Link>) o;
             return linkId;
@@ -350,36 +346,28 @@ public class BaseReceiverChessboardScenario {
      * TODO This must be made more generic so that multiple policies can be considered. Currently (2018/04
      * this is hard-coded to be a min-max (s,S) reordering policy.
      */
-    private static ReceiverProduct createReceiverProduct(Receiver receiver, ProductType productType, int minLevel, int maxLevel) {
+    private static ReceiverProduct createReceiverProduct(ProductType productType, int minLevel, int maxLevel) {
         ReceiverProduct.Builder builder = ReceiverProduct.Builder.newInstance();
-        ReceiverProduct rProd = builder
+        return builder
                 .setReorderingPolicy(new SSReorderPolicy(minLevel, maxLevel))
                 .setProductType(productType)
                 .build();
-        return rProd;
     }
 
     /**
      * Create a receiver order for different products.
-     *
-     * @param number
-     * @param receiver
-     * @param receiverProduct
-     * @param serviceTime
-     * @return
      */
     private static Order createProductOrder(Id<Order> number, Receiver receiver, ReceiverProduct receiverProduct, double serviceTime) {
         Order.Builder builder = Order.Builder.newInstance(number, receiver, receiverProduct);
-        Order order = builder
+
+        return builder
                 .calculateOrderQuantity()
                 .setServiceTime(serviceTime)
                 .build();
-
-        return order;
     }
 
     static TimeWindow selectRandomTimeStart(int tw) {
-        int min = 06;
+        int min = 6;
         int max = 18;
 //		Random randomTime = new Random();
         Random randomTime = MatsimRandom.getLocalInstance(); // overkill, but easiest to retrofit.  kai, jan'19
