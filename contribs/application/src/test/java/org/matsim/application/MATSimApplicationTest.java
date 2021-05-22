@@ -3,6 +3,7 @@ package org.matsim.application;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.application.options.SampleOptions;
 import org.matsim.application.prepare.freight.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.freight.GenerateGermanWideFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
@@ -13,6 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
+import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +68,16 @@ public class MATSimApplicationTest {
         assertThat(params.getOrCreateModeParams("bike").getConstant())
                 .isEqualTo(-2);
 
+	}
+
+	@Test
+	public void sample() {
+
+		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
+				"--10pct");
+
+		assertThat(controler.getConfig().controler().getRunId())
+				.isEqualTo("run-10pct");
 	}
 
 	@Test
@@ -143,6 +155,9 @@ public class MATSimApplicationTest {
 	})
 	private static final class TestScenario extends MATSimApplication {
 
+		@CommandLine.Mixin
+		private SampleOptions sample = new SampleOptions(1, 10, 25);
+
 		public TestScenario(Config config) {
 			super(config);
 		}
@@ -151,6 +166,13 @@ public class MATSimApplicationTest {
 		public TestScenario() {
 		}
 
+		@Override
+		protected Config prepareConfig(Config config) {
+
+			config.controler().setRunId(sample.adjustName("run-1pct"));
+
+			return config;
+		}
 	}
 
 }
