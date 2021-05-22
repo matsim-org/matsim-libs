@@ -80,5 +80,4 @@ scenarios/berlin-v5.5-1pct/output-berlin-v5.5-1pct/ITERS/it.0/Test123.0.legHisto
 scenarios/berlin-v5.5-1pct/output-berlin-v5.5-1pct/ITERS/it.0/Test123.0.legHistogram.txt
 scenarios/berlin-v5.5-1pct/output-berlin-v5.5-1pct/ITERS/it.0/Test123.0.legdurations.txt
 scenarios/berlin-v5.5-1pct/output-berlin-v5.5-1pct/ITERS/it.0/Test123.0.events.xml.gz
-contribs/vsp/src/main/java/playground/vsp/matsimToPostgres/TestRunner.java
 scenarios/berlin-v5.5-1pct/output-berlin-v5.5-1pct/ITERS/it.1/Test123.1.events.xml.gz
