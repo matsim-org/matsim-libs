@@ -90,6 +90,7 @@
 		<module>emissions</module>
 		<module>eventsBasedPTRouter</module>
 		<module>freight</module>
+		<module>freightReceiver</module>
 		<module>hybridsim</module>
 		<module>integration</module>
 		<module>locationchoice</module>
