@@ -79,7 +79,7 @@ public final class ReceiverModule extends AbstractModule {
     }
 
 
-    public boolean isCreatePNG() {
+    public boolean isCreatingPNG() {
         return this.createPNG;
     }
 
