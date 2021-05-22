@@ -39,7 +39,7 @@ public class CSVToPostgresExporter {
         String tableName = getTableName(csvFile);
         
         // analyze csv File
-        analyzeFile(csvFile);
+        analyzeFile();
 
         // create table if not exist
         createTableIfNotExists();
@@ -57,7 +57,7 @@ public class CSVToPostgresExporter {
         sqlExecute(conn, insertStatement);
     }
 
-    private void analyzeFile(String csvFile) throws IOException {
+    private void analyzeFile() throws IOException {
         // Input stream for the input .gz file
         GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(csvFile));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
@@ -82,7 +82,7 @@ public class CSVToPostgresExporter {
             } else if (Arrays.asList(floatValues).contains(name)) {
                 indexToColumnTypes.put(i+1, "DOUBLE PRECISION");
             } else if (Arrays.asList(timeValues).contains(name)) {
-                indexToColumnTypes.put(i+1, "INTEGER");
+                indexToColumnTypes.put(i+1, "TIME");
             } else {
                 indexToColumnTypes.put(i+1, "VARCHAR");
                 log.warn("Wasn't found in default column names: " + name);
@@ -101,9 +101,9 @@ public class CSVToPostgresExporter {
         }
         sqlCreateTable.append(");");
 
-        sqlExecute(conn, sqlCreateTable.toString());
+        String executeStatement = sqlCreateTable.toString().replace("TIME", "BIGINT");
 
-
+        sqlExecute(conn, executeStatement);
 
     }
 
@@ -111,44 +111,44 @@ public class CSVToPostgresExporter {
     private String writeInsertStatement() throws IOException{
         StringBuilder insertStatement = new StringBuilder("INSERT INTO " + schema + "." + tableName + " ");
 
-        StringBuilder columnList = new StringBuilder("(");
-
         // Input stream for the input .gz file
         GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(csvFile));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
-        // ToDo fst element and concat
-        for (var columnName: indexToColumnNames.values()){
-            columnList.append(", ").append(columnName);
-        }
-
-        columnList.append(")");
+        String columnList = ("(" + String.join(", ", indexToColumnNames.values()) + ")").replace("TIME", "BIGINT");
         insertStatement.append(columnList).append(" VALUES ");
 
-
-        // ToDo as of snd row
         // Reads all rows, find out the datytype with the values stored in the
         // filledColumns and add quotes (string and time) or not
         String row;
+        boolean skipFirstRow = true;
         while ((row = br.readLine()) != null) {
-            StringBuilder appendInsertStatement = new StringBuilder("(");
-            row = runID + ";" + row;
-            String[] values = row.split(";", -1);
 
-            for (int i = 0; i < values.length; i++) {
-                if (indexToColumnTypes.get(i).equals("VARCHAR")) {
-                    appendInsertStatement.append("'").append(values[i]).append("'");
-                } else if (indexToColumnTypes.get(i).equals("TIME")) {
-                    appendInsertStatement.append(convertTimeStringToSeconds(values[i]));
-                } else {
-                    appendInsertStatement.append(values[i]);
-                }
+            if (skipFirstRow){
+                skipFirstRow = false;
 
-                if (i == values.length - 1) {
-                    appendInsertStatement.append(", ");
+            } else {
+                StringBuilder appendInsertStatement = new StringBuilder("(");
+                row = runID + ";" + row;
+                String[] values = row.split(";", -1);
+
+                for (int i = 0; i < values.length; i++) {
+                    if (indexToColumnTypes.get(i).equals("VARCHAR")) {
+                        appendInsertStatement.append("'").append(values[i]).append("'");
+
+                    } else if (indexToColumnTypes.get(i).equals("TIME")) {
+                        appendInsertStatement.append(convertTimeStringToSeconds(values[i]));
+
+                    } else {
+                        appendInsertStatement.append(values[i]);
+                    }
+
+                    if (i < values.length - 1) {
+                        appendInsertStatement.append(", ");
+                    }
                 }
+                insertStatement.append(appendInsertStatement).append("), ");
             }
-            insertStatement.append(appendInsertStatement).append("), ");
         }
 
         // Format the sql statement
@@ -174,26 +174,12 @@ public class CSVToPostgresExporter {
 
 
     private void sqlExecute(Connection conn, String sql) {
-
-        if (conn != null) {
-            System.out.println("Connected to the database!");
-        } else {
-            System.out.println("Failed to make connection!");
-        }
-
-        assert conn != null;
-
         try {
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.execute();
-            conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
-
-
     }
 }

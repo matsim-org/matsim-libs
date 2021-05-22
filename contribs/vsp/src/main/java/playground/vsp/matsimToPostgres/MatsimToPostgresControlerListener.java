@@ -8,6 +8,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 
 public class MatsimToPostgresControlerListener implements ShutdownListener {
@@ -26,6 +27,12 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
         DBParameters params = new DBParameters(exporterConfigGroup.dbParamFile);
         Connection connection = params.createDBConnection();
 
+        if (connection != null) {
+            System.out.println("Connected to the database!");
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
         try{
             // Import tripsCSV
             String tripsCSVFile = outputDir + "/" + runID + ".output_trips.csv.gz";
@@ -37,10 +44,17 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
             CSVToPostgresExporter legsExporter = new CSVToPostgresExporter(connection, legsCSVFile, params.getDatabaseName(), runID);
             legsExporter.export(params.getDatabaseName(), runID);
 
+            assert connection != null;
+            connection.close();
+
         } catch (IOException e) {
             log.error("Csv output files were not found hence cannot export trips and legs to database. This probably means that the WriteTripsInterval value is not set correctly.");
             e.printStackTrace();
+        } catch (SQLException e){
+            log.error("Some sql error. See Strack Trace...");
+            e.printStackTrace();
         }
+
 
 
     }
