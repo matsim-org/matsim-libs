@@ -26,23 +26,35 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * This config Module can be used to specify the paths to the
  * xml files configuring the signals.
  *
- * @author dgrether
- *
+ * @author dgrether, tthunig
  */
 public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUPNAME = "signalsystems";
+	public static final String GROUP_NAME = "signalsystems";
 	public static final String USE_SIGNALSYSTEMS = "useSignalsystems";
 	public static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public static final String SIGNALCONTROL_FILE = "signalcontrol";
 	public static final String SIGNALGROUPS_FILE = "signalgroups";
 	public static final String USE_AMBER_TIMES = "useAmbertimes";
 	public static final String AMBERTIMES_FILE = "ambertimes";
+	public static final String CONFLICTING_DIRECTIONS_FILE = "conflictingDirections";
+	public static final String INTERSECTION_LOGIC = "intersectionLogic"; 
 	public static final String INTERGREENTIMES_FILE = "intergreentimes";
 	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
 	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
-	public enum ActionOnIntergreenViolation{
+	public static final String ACTION_ON_CONFLICTING_DIRECTION_VIOLATION = "actionOnConflictingDirectionViolation";
+	public enum ActionOnSignalSpecsViolation{
 		WARN, EXCEPTION
+	}
+	public enum IntersectionLogic{
+		/* vehicles drive through each other at intersections */
+		NONE,
+		/* vehicles still drive through each other, but data about conflicting directions is stored 
+		 * e.g. for possible signal phase combinations */
+		CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS,
+		/* data about conflicting directions is used to forbid turns when oncoming traffic 
+		 * (from directions with right of way) is approaching */
+		CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS
 	}
 
 	private String signalSystemFile;
@@ -50,13 +62,16 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private String signalGroupsFile;
 	private String amberTimesFile;
 	private String intergreenTimesFile;
+	private String conflictingDirectionsFile;
 	private boolean useIntergreens = false;
 	private boolean useAmbertimes = false;
 	private boolean useSignalSystems = false;
-	private ActionOnIntergreenViolation actionOnIntergreenViolation = ActionOnIntergreenViolation.WARN;
+	private IntersectionLogic intersectionLogic = IntersectionLogic.NONE;
+	private ActionOnSignalSpecsViolation actionOnIntergreenViolation = ActionOnSignalSpecsViolation.WARN;
+	private ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation = ActionOnSignalSpecsViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
-		super(GROUPNAME);
+		super(GROUP_NAME);
 	}
 
 	@Override
@@ -116,6 +131,16 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setSignalControlFile(String signalControlFile){
 		this.signalControlFile = signalControlFile;
 	}
+	
+	@StringGetter( CONFLICTING_DIRECTIONS_FILE )
+	public String getConflictingDirectionsFile() {
+		return this.conflictingDirectionsFile;
+	}
+	
+	@StringSetter( CONFLICTING_DIRECTIONS_FILE )
+	public void setConflictingDirectionsFile(String conflictingDirectionsFile){
+		this.conflictingDirectionsFile = conflictingDirectionsFile;
+	}
 
 	@StringGetter( USE_INTERGREEN_TIMES )
 	public boolean isUseIntergreenTimes() {
@@ -128,12 +153,12 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public ActionOnIntergreenViolation getActionOnIntergreenViolation() {
+	public ActionOnSignalSpecsViolation getActionOnIntergreenViolation() {
 		return actionOnIntergreenViolation;
 	}
 
 	@StringSetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public void setActionOnIntergreenViolation(ActionOnIntergreenViolation actionOnIntergreenViolation) {
+	public void setActionOnIntergreenViolation(ActionOnSignalSpecsViolation actionOnIntergreenViolation) {
 		switch (actionOnIntergreenViolation){
 		// set the value for the supported actions
 		case WARN:
@@ -144,6 +169,26 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 		default:
 			throw new IllegalArgumentException("The value " + actionOnIntergreenViolation 
 					+ " for key : " + ACTION_ON_INTERGREEN_VIOLATION + " is not supported by this config group");
+		}
+	}
+	
+	@StringGetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
+	public ActionOnSignalSpecsViolation getActionOnConflictingDirectionViolation() {
+		return actionOnConflictingDirectionViolation;
+	}
+
+	@StringSetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
+	public void setActionOnConflictingDirectionViolation(ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation) {
+		switch (actionOnConflictingDirectionViolation){
+		// set the value for the supported actions
+		case WARN:
+		case EXCEPTION:
+			this.actionOnConflictingDirectionViolation = actionOnConflictingDirectionViolation;
+			break;
+		// throw an exception if the value is not supported
+		default:
+			throw new IllegalArgumentException("The value " + actionOnConflictingDirectionViolation 
+					+ " for key : " + ACTION_ON_CONFLICTING_DIRECTION_VIOLATION + " is not supported by this config group");
 		}
 	}
 	
@@ -166,4 +211,15 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseSignalSystems(final boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
+	
+	@StringGetter( INTERSECTION_LOGIC )
+	public IntersectionLogic getIntersectionLogic() {
+		return intersectionLogic;
+	}
+
+	@StringSetter( INTERSECTION_LOGIC )
+	public void setIntersectionLogic(IntersectionLogic intersectionLogic) {
+		this.intersectionLogic = intersectionLogic;
+	}
 }
+

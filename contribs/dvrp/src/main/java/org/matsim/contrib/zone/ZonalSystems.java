@@ -19,45 +19,59 @@
 
 package org.matsim.contrib.zone;
 
-import java.util.*;
+import static java.util.stream.Collectors.*;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.util.distance.DistanceCalculators;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.common.collect.Maps;
 
+//TODO add zone indexing?
 public class ZonalSystems {
-	public interface ZonalDistanceCalculator {
-		double calcDistance(Zone z1, Zone z2);
+	public static Set<Zone> filterZonesWithNodes(Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
+		return nodes.stream().map(zonalSystem::getZone).collect(toSet());
 	}
 
-	public static final ZonalDistanceCalculator BEELINE_DISTANCE_CALCULATOR = new ZonalDistanceCalculator() {
-		@Override
-		public double calcDistance(Zone z1, Zone z2) {
-			return DistanceCalculators.BEELINE_DISTANCE_CALCULATOR.calcDistance(z1.getCoord(), z2.getCoord());
-		}
-	};
+	public static List<Node> selectNodesWithinArea(Collection<? extends Node> nodes, List<PreparedGeometry> areaGeoms) {
+		return nodes.stream().filter(node -> {
+			Point point = MGC.coord2Point(node.getCoord());
+			return areaGeoms.stream().anyMatch(serviceArea -> serviceArea.intersects(point));
+		}).collect(toList());
+	}
+
+	public static Map<Zone, Node> computeMostCentralNodes(Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
+		BinaryOperator<Node> chooseMoreCentralNode = (n1, n2) -> {
+			Zone zone = zonalSystem.getZone(n1);
+			return DistanceUtils.calculateSquaredDistance(n1, zone) <= DistanceUtils.calculateSquaredDistance(n2,
+					zone) ? n1 : n2;
+		};
+		return nodes.stream()
+				.map(n -> Pair.of(n, zonalSystem.getZone(n)))
+				.collect(toMap(Pair::getValue, Pair::getKey, chooseMoreCentralNode));
+	}
 
 	public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones) {
-		return initZonesByDistance(zones, BEELINE_DISTANCE_CALCULATOR);
-	}
-
-	public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones,
-			final ZonalDistanceCalculator distCalc) {
 		Map<Id<Zone>, List<Zone>> zonesByDistance = Maps.newHashMapWithExpectedSize(zones.size());
-		List<Zone> sortedList = new ArrayList<>(zones.values());
-
 		for (final Zone currentZone : zones.values()) {
-			Collections.sort(sortedList, new Comparator<Zone>() {
-				public int compare(Zone z1, Zone z2) {
-					return Double.compare(distCalc.calcDistance(currentZone, z1),
-							distCalc.calcDistance(currentZone, z2));
-				}
-			});
-
-			zonesByDistance.put(currentZone.getId(), new ArrayList<>(sortedList));
+			List<Zone> sortedZones = zones.values()
+					.stream()
+					.sorted(Comparator.comparing(z -> DistanceUtils.calculateSquaredDistance(currentZone, z)))
+					.collect(Collectors.toList());
+			zonesByDistance.put(currentZone.getId(), sortedZones);
 		}
-
 		return zonesByDistance;
 	}
 }

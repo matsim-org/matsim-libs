@@ -107,20 +107,23 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		
 		// add departures
 		int n = 0;
-		int headway = (int) (transitRoute_H.getStop(endStop).getDepartureOffset() + transitRoute_R.getStop(startStop).getDepartureOffset()) / numberOfVehicles;
+		/* After finishing one tour, vehicles wait the driver rest time and then start the next tour immediately.
+		 * So, headway is a function of the number of vehicles and the time spent on one tour of the TransitRoute.
+		 */
+		int headway = (int) (transitRoute_H.getStop(endStop).getDepartureOffset().seconds() + transitRoute_R.getStop(startStop).getDepartureOffset().seconds() + this.driverRestTime) / numberOfVehicles;
 		// (headway = round trip time / number of vehicles)
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j < endTime; ) {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_H.addDeparture(departure);
-				j += transitRoute_H.getStop(endStop).getDepartureOffset() + 1 *60;
+				j += transitRoute_H.getStop(endStop).getDepartureOffset().seconds() + 1 *60;
 				n++;
 
 				departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_R.addDeparture(departure);
-				j += transitRoute_R.getStop(startStop).getDepartureOffset() + this.driverRestTime;
+				j += transitRoute_R.getStop(startStop).getDepartureOffset().seconds() + this.driverRestTime;
 				n++;
 			}
 		}		

@@ -49,20 +49,34 @@
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="60.0" />
 
-		<param name="lateArrival" value="-18" />
-		<param name="earlyDeparture" value="-0" />
-		<param name="performing" value="+6" />
-		<param name="traveling" value="-6" />
-		<param name="waiting" value="-0" />
+		<parameterset type="scoringParameters">
+			<param name="lateArrival" value="-18" />
+			<param name="earlyDeparture" value="-0" />
+			<param name="performing" value="+6" />
+			<param name="waiting" value="-0" />
 
-		<param name="activityType_0" value="h" /> <!-- home -->
-		<param name="activityPriority_0" value="1" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="activityParams">
+				<param name="activityType"    value="h" /> <!-- home -->
+				<param name="priority"        value="1" />
+				<param name="typicalDuration" value="12:00:00" />
+			</parameterset>
+		</parameterset>
+
 	</module>
 
 	<module name="strategy">
-		<param name="ModuleProbability_1" value="0.9" />
-		<param name="Module_1" value="ChangeExpBeta" />
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ChangeExpBeta"/>
+			<param name="weight" value="0.9"/>
+		</parameterset>
+
 
 <!-- 		<param name="ModuleProbability_1" value="0.9" /> -->
 <!-- 		<param name="Module_1" value="BestScore" /> -->

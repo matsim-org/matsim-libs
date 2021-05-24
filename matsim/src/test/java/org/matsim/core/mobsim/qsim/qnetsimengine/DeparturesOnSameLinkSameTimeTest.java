@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -37,8 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -47,6 +45,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * @author amit
@@ -119,8 +119,10 @@ public class DeparturesOnSameLinkSameTimeTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(inputs.scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(inputs.scenario,events);
-		qsim.run();
+		new QSimBuilder(inputs.scenario.getConfig()) //
+			.useDefaults() //
+			.build(inputs.scenario, events) //
+			.run();
 
 		return linkLeaveTimes;
 	}
@@ -145,24 +147,32 @@ public class DeparturesOnSameLinkSameTimeTest {
 			config=ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
 			config.qsim().setMainModes(Arrays.asList(travelMode));
-			network =  (Network) this.scenario.getNetwork();
+
+			//following is necessary for mixed traffic, providing a route was obstructing
+			// the requirement of these which might be all right in some cases. Amit Jan'18
+			config.plansCalcRoute().setNetworkModes(Arrays.asList(travelMode));
+			config.travelTimeCalculator().setAnalyzedModesAsString(travelMode );
+			config.travelTimeCalculator().setSeparateModes(true);
+			config.planCalcScore().getOrCreateModeParams(travelMode);
+
+			network = this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 
 		private void createNetwork(double departureLinkCapacity){
 
-			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(0, 0));
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(100, 10));
 			double y = -10;
-			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 300, y));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(300, y));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 			final double capacity = departureLinkCapacity;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, capacity, (double) 1, null, "7");
+			link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("1"), fromNode, toNode, 1000.0, 20.0, capacity, 1, null, "7");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 1000.0, 20.0, (double) 3600, (double) 1, null, "7");
+			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("2"), fromNode1, toNode1, 1000.0, 20.0, 3600, 1, null, "7");
 		}
 
 		private void createPopulation(){
@@ -184,14 +194,14 @@ public class DeparturesOnSameLinkSameTimeTest {
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-				a1.setEndTime(0*3600);
+				a1.setEndTime(0 * 3600);
 				Leg leg = population.getFactory().createLeg(travelMode);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route= (NetworkRoute) factory.createRoute(link1.getId(), link2.getId());
+				route = (NetworkRoute) factory.createRoute(link1.getId(), link2.getId());
 				linkIds.add(link2.getId());
 				route.setLinkIds(link1.getId(), linkIds, link2.getId());
 				leg.setRoute(route);
@@ -200,7 +210,8 @@ public class DeparturesOnSameLinkSameTimeTest {
 				plan.addActivity(a2);
 				population.addPerson(p);
 
-				Id<Vehicle> vehId = Id.create(i,Vehicle.class);
+				Id<Vehicle> vehId = Id.createVehicleId(i);
+				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

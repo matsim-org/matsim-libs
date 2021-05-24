@@ -1,2 +1,0 @@
-person_id,home2work_travel_time_min,home2work_distance_meter,work2home_travel_time_min,work2home_distance_meter,mode
-1,-Infinity,200.0,-Infinity,200.0,car

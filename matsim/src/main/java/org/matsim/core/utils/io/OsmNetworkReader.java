@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.io;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -46,7 +48,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -75,8 +76,11 @@ import org.xml.sax.InputSource;
  * multiple overlapping areas can be specified, each with a different denseness, e.g. one only containing motorways,
  * a second one containing every link down to footways.
  *
+ * @deprecated The OsmNetworkReader has been moved to the osm-contrib. Use org.matsim.contribs.osm.networkReader.SupersonicOsmNetworkReader instead.
+ *
  * @author mrieser, aneumann
  */
+@Deprecated
 public class OsmNetworkReader implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
@@ -89,16 +93,16 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	protected final static String TAG_JUNCTION = "junction";
     protected final static String TAG_ONEWAY = "oneway";
     private final static String TAG_ACCESS = "access";
-	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
+	private static final List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
 
-	protected final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
-	protected final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
-	private final Set<String> unknownHighways = new HashSet<String>();
-	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
-	private final Set<String> unknownLanesTags = new HashSet<String>();
+	protected final Map<Long, OsmNode> nodes = new HashMap<>();
+	protected final Map<Long, OsmWay> ways = new HashMap<>();
+	private final Set<String> unknownHighways = new HashSet<>();
+	private final Set<String> unknownMaxspeedTags = new HashSet<>();
+	private final Set<String> unknownLanesTags = new HashSet<>();
 	protected long id = 0;
-	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
+	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<>();
 	protected final Network network;
 	protected final CoordinateTransformation transform;
 	private boolean keepPaths = false;
@@ -106,7 +110,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	private boolean slowButLowMemory = false;
 	
-	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
+	private boolean useVspAdjustments = false; // Adjustments discussed on 2018-04-30, kn,ik,dz. apr'18 (Might become default after testing)
+	
+	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<>();
 
 	// nodes that are definitely to be kept (e.g. for counts later)
 	private Set<Long> nodeIDsToKeep = null;
@@ -132,8 +138,26 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
 	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+		this(network, transformation, useHighwayDefaults, false);
+	}
+	
+	/**
+	 * Creates a new Reader to convert OSM data into a MATSim network.
+	 * 
+	 * After discussion, we (kn,ik,dz) introduced some adjustments to links regarding speeds and capacities
+	 * that aim to represent different travel times in urban vs. rural areas better, esp. taking into account
+	 * intersections/traffic lights and their implications on speeds and capacities in urban areas.
+	 *
+	 * @param network An empty network where the converted OSM data will be stored.
+	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
+	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
+	 * @param useVspAdjustments Highway defaults are set to standard VSP values, if true.
+	 * 
+	 */
+	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults, final boolean useVspAdjustments) {
 		this.network = network;
 		this.transform = transformation;
+		this.useVspAdjustments = useVspAdjustments;
 
 		if (useHighwayDefaults) {
 			log.info("Falling back to default values.");
@@ -141,8 +165,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
 			this.setHighwayDefaults(2, "trunk",         1,  80.0/3.6, 1.0, 2000);
 			this.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
+			if (useVspAdjustments) {
+				this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1000);
+				this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1000);
+			} else {
+				this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
+				this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
+			}
 			
 //			this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
 //			this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
@@ -153,17 +182,24 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections. 
 			// If someone does a systematic study, please report.  kai, jul'16
-			this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
-			this.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 1000);
+			//
+			// We revised the below street types (removed "minor" and put "living_street", "residential", and "unclassified" into
+			// different hierarchy layers), trying to make this more reasonable based on the
+			// <a href="OMS Wiki">http://wiki.openstreetmap.org/wiki/DE:Key:highway</a>, ts/aa/dz, oct'17
+			if (useVspAdjustments) {
+				this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 800);
+				this.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 800);
+			} else {
+				this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
+				this.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 1000);
+			}
 			this.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(5, "tertiary_link",      1,  25.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "minor",         1,  20.0/3.6, 1.0,  600); // According to OSM wiki this road type does not exist, dz, aug'18
-			this.setHighwayDefaults(6, "residential",   1,  15.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "living_street", 1,  10.0/3.6, 1.0,  300);
+			this.setHighwayDefaults(6, "unclassified",  1,  15.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(7, "residential",   1,  15.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(8, "living_street", 1,  10.0/3.6, 1.0,  300);
 			// changing the speed values failed the evacuation ScenarioGenerator test because of a different network -- DESPITE
 			// the fact that all the speed values are reset to some other value there.  No idea what happens there. kai, jul'16
-
-			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
 		}
 		
 		this.parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
@@ -175,28 +211,29 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param osmFilename
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final String osmFilename) {
+	public final void parse(final String osmFilename) {
 		parse(osmFilename, null);
 	}
 
 	/**
 	 * Parses the given input stream and creates a MATSim network from the data.
+	 * We need to pass a supplier as in some cases, the stream could be parsed multiple times.
 	 *
-	 * @param stream
+	 * @param streamSupplier
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final InputStream stream) throws UncheckedIOException {
-		parse(null, stream);
+	public final void parse(final Supplier<InputStream> streamSupplier) throws UncheckedIOException {
+		parse(null, streamSupplier);
 	}
 
 	/**
-	 * Either osmFilename or stream must be <code>null</code>, but not both.
+	 * Either osmFilename or streamSupplier must be <code>null</code>, but not both.
 	 *
 	 * @param osmFilename
-	 * @param stream
+	 * @param streamSupplier
 	 * @throws UncheckedIOException
 	 */
-	private void parse(final String osmFilename, final InputStream stream) throws UncheckedIOException {
+	private void parse(final String osmFilename, final Supplier<InputStream> streamSupplier) throws UncheckedIOException {
 		if(this.hierarchyLayers.isEmpty()){
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
@@ -204,22 +241,34 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if (this.slowButLowMemory) {
 			log.info("parsing osm file first time: identifying nodes used by ways");
 			this.parser.enableOptimization(1);
-			if (stream != null) {
-				this.parser.parse(new InputSource(stream));
+			if (streamSupplier != null) {
+				try (InputStream is = streamSupplier.get()) {
+					this.parser.parse(is);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			} else {
 				this.parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			this.parser.enableOptimization(2);
-			if (stream != null) {
-				this.parser.parse(new InputSource(stream));
+			if (streamSupplier != null) {
+				try (InputStream is = streamSupplier.get()) {
+					this.parser.parse(is);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			} else {
 				this.parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
-			if (stream != null) {
-				this.parser.parse(new InputSource(stream));
+			if (streamSupplier!= null) {
+				try (InputStream is = streamSupplier.get()) {
+					this.parser.parse(is);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			} else {
 				this.parser.readFile(osmFilename);
 			}
@@ -261,7 +310,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @see <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway">http://wiki.openstreetmap.org/wiki/Map_Features#Highway</a>
 	 */
-	public void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
+	public final void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
 		setHighwayDefaults(hierarchy, highwayType, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
 	}
 
@@ -276,11 +325,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
 	 * @param oneway <code>true</code> to say that this road is a oneway road
 	 */
-	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanesPerDirection, final double freespeed,
+	public final void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanesPerDirection, final double freespeed,
 			final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
         this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
     }
-
 
 	/**
 	 * Sets whether the detailed geometry of the roads should be retained in the conversion or not.
@@ -293,7 +341,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param keepPaths <code>true</code> to keep all details of the OSM roads
 	 */
-	public void setKeepPaths(final boolean keepPaths) {
+	public final void setKeepPaths(final boolean keepPaths) {
 		this.keepPaths = keepPaths;
 	}
 
@@ -306,7 +354,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param scaleMaxSpeed <code>true</code> to scale the speed limit down by the value specified by the
 	 * {@link #setHighwayDefaults(int, String, double, double, double, double) defaults}.
 	 */
-	public void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
+	public final void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
 		this.scaleMaxSpeed = scaleMaxSpeed;
 	}
 
@@ -319,10 +367,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param coordSEEasting The longitude of the south eastern corner of the rectangle.
 	 * @param hierarchy Layer specifying the hierarchy of the layers starting with 1 as the top layer.
 	 */
-	public void setHierarchyLayer(final double coordNWNorthing, final double coordNWEasting, final double coordSENorthing, final double coordSEEasting, final int hierarchy) {
+	public final void setHierarchyLayer(final double coordNWNorthing, final double coordNWEasting, final double coordSENorthing, final double coordSEEasting, final int hierarchy) {
 		this.hierarchyLayers.add(new OsmFilterImpl(this.transform.transform(new Coord(coordNWEasting, coordNWNorthing)), this.transform.transform(new Coord(coordSEEasting, coordSENorthing)), hierarchy));
 	}
-	public void setHierarchyLayer(final int hierarchy) {
+	public final void setHierarchyLayer(final int hierarchy) {
 		this.hierarchyLayers.add(new GeographicallyNonrestrictingOsmFilterImpl(hierarchy));
 	}
 
@@ -330,7 +378,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * Adds a new filter to hierarchy layer.
 	 * @param osmFilter
 	 */
-	public void addOsmFilter(final OsmFilter osmFilter) {
+	public final void addOsmFilter(final OsmFilter osmFilter) {
 		this.hierarchyLayers.add(osmFilter);
 	}
 
@@ -341,11 +389,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param memoryEnabled
 	 */
-	public void setMemoryOptimization(final boolean memoryEnabled) {
+	public final void setMemoryOptimization(final boolean memoryEnabled) {
 		this.slowButLowMemory = memoryEnabled;
 	}
 	
-	public void setNodeIDsToKeep(Set<Long> nodeIDsToKeep){
+	public final void setNodeIDsToKeep(Set<Long> nodeIDsToKeep){
 		if(nodeIDsToKeep != null && !nodeIDsToKeep.isEmpty()){
 			this.nodeIDsToKeep = nodeIDsToKeep;
 		}
@@ -356,9 +404,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 	
 	private void convert() {
-		if (this.network instanceof Network) {
-			((Network) this.network).setCapacityPeriod(3600);
-		}
+		this.network.setCapacityPeriod(3600);
 
 		preprocessOsmData();
 		
@@ -599,14 +645,42 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				} else {
 					freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
 				}
+				if (useVspAdjustments) {
+					// For links whose maxspeed is known, we assume that those with maxspeed lower than or equl to 51km/h are 'urban' links
+					// For these, we reduced speeds to 50% to account for traffic lights/intersections now, kn,ik,dz, apr'18
+					if (freespeed <= 51./3.6) {
+						freespeed = freespeed/2;
+					}
+				}
 			} catch (NumberFormatException e) {
 				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
 					this.unknownMaxspeedTags.add(maxspeedTag);
 					log.warn("Could not parse maxspeed tag:" + e.getMessage() + ". Ignoring it.");
 				}
 			}
+		} else {
+			if (useVspAdjustments) {
+				// For links whose maxspeed is unknown, we assume that links with a length (after removal of purely geometric nodes) of more
+				// than 300m are 'rural' others 'urban'. 'Rural' speed is 100km/h, 'urban' linearly increasing from 10km/h at zero length to
+				// the 'rural' speed for links with a length of 300m. kn,ik,dz, apr'18
+				if(highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary") || highway.equalsIgnoreCase("tertiary")
+						|| highway.equalsIgnoreCase("primary_link") || highway.equalsIgnoreCase("secondary_link") || highway.equalsIgnoreCase("tertiary_link")) {
+							if (length > 300.) {
+						freespeed = 80. / 3.6; // Might be different (but also not too much different) in other countries				
+					} else {
+						freespeed = (10. + 70./300 * length) / 3.6;
+					}
+				}
+			}
 		}
-
+		
+		if (useVspAdjustments) {
+			// Adjustments that KN had been using for a while: For short links, often roundabouts or short u-turns, etc.
+			if (length < 100 ) {
+				laneCapacity = 2 * laneCapacity;
+			}
+		}		
+		
 		// check tag "lanes"
 		String lanesTag = way.tags.get(TAG_LANES);
 		String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
@@ -671,6 +745,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 		if (this.scaleMaxSpeed) {
 			freespeed = freespeed * freespeedFactor;
+			if (useVspAdjustments) {
+				throw new RuntimeException("Max speed scaling and VSP adjustments used at the same time. Both reduce speeds. It is most likely "
+						+ "unintended to use them both at the same time. ik,dz, spr'18");
+			}
 		}
 
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
@@ -779,6 +857,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	public static interface OsmFilter {
 		boolean coordInFilter( final Coord coord, final int hierarchyLevel ) ;
 	}
+	
 	private static class OsmFilterImpl implements OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;
@@ -800,6 +879,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()));
 		}
 	}
+	
 	private static class GeographicallyNonrestrictingOsmFilterImpl implements OsmFilter {
 		private final int hierarchy;
 		GeographicallyNonrestrictingOsmFilterImpl(final int hierarchy) {
@@ -830,8 +910,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	protected final static class OsmWay {
 		public final long id;
-		public final List<Long> nodes = new ArrayList<Long>(4);
-		public final Map<String, String> tags = new HashMap<String, String>(4);
+		public final List<Long> nodes = new ArrayList<>(4);
+		public final Map<String, String> tags = new HashMap<>(4);
 		public int hierarchy = -1;
 
 		public OsmWay(final long id) {
@@ -981,9 +1061,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private static class StringCache {
-
-		private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<String, String>(10000);
-
+		private static final  ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>(10000);
+		
 		/**
 		 * Returns the cached version of the given String. If the strings was
 		 * not yet in the cache, it is added and returned as well.
@@ -999,5 +1078,4 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			return s;
 		}
 	}
-
 }

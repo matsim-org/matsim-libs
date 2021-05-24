@@ -19,9 +19,10 @@
 
 package org.matsim.contrib.util;
 
-import java.util.*;
-
-import com.google.common.collect.Iterables;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class CSVLineBuilder {
 	private final List<String> line = new ArrayList<>();
@@ -41,8 +42,13 @@ public class CSVLineBuilder {
 		return this;
 	}
 
-	public CSVLineBuilder addAll(Iterable<String> cells) {
-		Iterables.addAll(line, cells);
+	public CSVLineBuilder addAll(List<String> cells) {
+		line.addAll(cells);
+		return this;
+	}
+
+	public CSVLineBuilder addAll(Stream<String> cells) {
+		cells.forEach(line::add);
 		return this;
 	}
 
@@ -57,6 +63,6 @@ public class CSVLineBuilder {
 	}
 
 	public String[] build() {
-		return line.toArray(new String[line.size()]);
+		return line.toArray(new String[0]);
 	}
 }

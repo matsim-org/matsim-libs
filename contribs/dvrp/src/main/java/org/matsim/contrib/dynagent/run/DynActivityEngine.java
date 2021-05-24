@@ -19,36 +19,33 @@
 
 package org.matsim.contrib.dynagent.run;
 
-import java.util.*;
-
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+
+import com.google.common.base.Preconditions;
 
 /**
- * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a hardcoded
- * "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine interface?
- * 
- * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
- * called before that of ActivityEngine)
+ * DynActivityEngine is not an ActivityEngine (as only one is allowed)
  */
-public class DynActivityEngine extends ActivityEngine {
+public class DynActivityEngine implements MobsimEngine, ActivityHandler {
+	public final static String COMPONENT_NAME = "DynActivityEngine";
+
 	private InternalInterface internalInterface;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
-
-	@Inject
-	public DynActivityEngine(EventsManager eventsManager) {
-		super(eventsManager);
-	}
 
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
@@ -62,32 +59,28 @@ public class DynActivityEngine extends ActivityEngine {
 		Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
 		while (dynAgentIter.hasNext()) {
 			DynAgent agent = dynAgentIter.next();
-			if (agent.getState() == State.ACTIVITY) {
-				agent.doSimStep(time);
-				// ask agents about the current activity end time;
-				double currentEndTime = agent.getActivityEndTime();
+			Preconditions.checkState(agent.getState() == State.ACTIVITY);
+			agent.doSimStep(time);
+			// ask agents about the current activity end time;
+			double currentEndTime = agent.getActivityEndTime();
 
-				if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
-					unregisterAgentAtActivityLocation(agent);
-					internalInterface.getMobsim().getAgentCounter().decLiving();
-					dynAgentIter.remove();
-				} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
-					unregisterAgentAtActivityLocation(agent);
-					agent.endActivityAndComputeNextState(time);
-					internalInterface.arrangeNextAgentState(agent);
-					dynAgentIter.remove();
-				}
+			if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
+				unregisterAgentAtActivityLocation(agent);
+				internalInterface.getMobsim().getAgentCounter().decLiving();
+				dynAgentIter.remove();
+			} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
+				unregisterAgentAtActivityLocation(agent);
+				agent.endActivityAndComputeNextState(time);
+				internalInterface.arrangeNextAgentState(agent);
+				dynAgentIter.remove();
 			}
-			// TODO what if not activity?
 		}
-
-		super.doSimStep(time);
 	}
 
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		if (!(agent instanceof DynAgent)) {
-			return super.handleActivity(agent);
+			return false; // (this means "I am not responsible").
 		}
 
 		double endTime = agent.getActivityEndTime();
@@ -118,14 +111,12 @@ public class DynActivityEngine extends ActivityEngine {
 
 	@Override
 	public void afterSim() {
-		super.afterSim();
 		dynAgents.clear();
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		super.setInternalInterface(internalInterface);
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
@@ -134,5 +125,13 @@ public class DynActivityEngine extends ActivityEngine {
 		if (linkId != null) { // may be bushwacking
 			internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
+	}
+
+	@Override
+	public void onPrepareSim() {
+	}
+
+	@Override
+	public void rescheduleActivityEnd(MobsimAgent agent) {
 	}
 }

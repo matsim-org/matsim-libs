@@ -63,10 +63,7 @@ public final class NetworkSummary implements NetworkRunnable {
 			if (y < this.minY) { this.minY = y; }
 		}
 
-		double cellSize = 7.5;
-		if (network instanceof Network) {
-			cellSize = ((Network) network).getEffectiveCellSize();
-		}
+		double cellSize = network.getEffectiveCellSize();
 		for (Link link : network.getLinks().values()) {
 			link_cnt++;
 			int link_getID = Integer.parseInt(link.getId().toString());

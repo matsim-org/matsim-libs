@@ -20,16 +20,17 @@
 
 package org.matsim.core.config.consistency;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -38,12 +39,16 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheck
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.pt.PtConstants;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author nagel
  *
  */
 public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
-	private static Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class) ;
+	private static final  Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class);
 	
 	public VspConfigConsistencyCheckerImpl() {
 		// empty.  only here to find out where it is called.
@@ -73,16 +78,19 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		boolean problem = false ; // ini
 		
-		// sort the config groups alphabetically
+		// yy: sort the config groups alphabetically
+		
+		// === global:
+		
+		if ( config.global().isInsistingOnDeprecatedConfigVersion() ) {
+			problem = true ;
+			System.out.flush();
+			log.log( lvl, "you are insisting on config v1.  vsp default is using v2." ) ;
+		}
 		
 		// === controler:
-		
-		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
-		if ( !formats.contains(EventsFileFormat.xml) ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
-		}
+
+		problem = checkControlerConfigGroup( config, lvl, problem );
 
 		// === location choice:
 		
@@ -135,7 +143,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				break;
 			case uniform:
 //				problem = true ;
-				log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should try out `relative' and report. ") ;
+				log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ") ;
 				break;
 			default:
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
@@ -153,14 +161,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 		
-		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
+		if ( config.planCalcScore().getModes().get(TransportMode.car) != null && config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 		}
-		if ( config.planCalcScore().getModes().get(TransportMode.pt).getMonetaryDistanceRate() > 0 ) {
+		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt);
+		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
-			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
-					"This is a bug and may be changed eventually.  kai, jun'11") ;
+			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here." ) ;
 		}
 		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
 			problem = true ;
@@ -171,11 +179,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( config.planCalcScore().getMarginalUtlOfWaiting_utils_hr() != 0. ) {
 			problem = true ;
 			System.out.flush() ;
-			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
+			log.log(lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
 		
 		// added oct'17:
-		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null ) {
+		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null || config.planCalcScore().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +
@@ -183,6 +191,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "<module name=\"planCalcScore\">");
 			log.log( lvl, "	<param name=\"fractionOfIterationsToStartScoreMSA\" value=\"0.8\" />");
 			log.log( lvl, "</module>");
+		}
+
+		// added apr'21:
+		for( Map.Entry<String, PlanCalcScoreConfigGroup.ScoringParameterSet> entry : config.planCalcScore().getScoringParametersPerSubpopulation().entrySet() ){
+			for( ActivityParams activityParam : entry.getValue().getActivityParams() ){
+				if( activityParam.getMinimalDuration().isDefined() ){
+					log.log( lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey() );
+				}
+			}
 		}
 
 		// === plans:
@@ -223,8 +240,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// === plansCalcRoute:
 		
 		// added feb'16
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
+		if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or some other value or talk to Kai." ) ;
 		}
 		
 		// === qsim:
@@ -240,18 +257,18 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		
 		// added apr'15
-		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
-			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
-		}
+//		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
+//			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
+//		}
 		switch( config.qsim().getTrafficDynamics() ) {
-		case withHoles:
-		case kinematicWaves:
-			break;
-		case queue:
-		default:
-			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
-					+ TrafficDynamics.kinematicWaves + "'." ) ;
-			break;
+			case kinematicWaves:
+				break;
+			case withHoles:
+			case queue:
+			default:
+				log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`"
+							     + TrafficDynamics.kinematicWaves + "'." ) ;
+				break;
 		}
 		
 		if ( config.qsim()!=null && config.qsim().isRemoveStuckVehicles() ) {
@@ -288,7 +305,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// added nov'15
 		boolean usingTimeMutator = false ;
 		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
-			if ( DefaultStrategy.TimeAllocationMutator.name().equals( it.getName() ) ) {
+			if ( DefaultStrategy.TimeAllocationMutator.equals( it.getName() ) ) {
 				usingTimeMutator = true ;
 				break ;
 			}
@@ -313,6 +330,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
 				log.log( lvl, "</module>");
 			}
+		}
+
+		// === travelTimeCalculator:
+
+		// added feb'19
+		if ( !config.travelTimeCalculator().getSeparateModes() ) {
+			System.out.flush() ;
+			log.log( lvl, "travelTimeCalculator is not analyzing different modes separately; vsp default is to do that.  Otherwise, you are using the same travel times " +
+						    "for, say, bike and car.") ;
 		}
 		
 		// === interaction between config groups:
@@ -343,6 +369,28 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			throw new RuntimeException( str ) ;
 		}
 		
+	}
+	private static boolean checkControlerConfigGroup( Config config, Level lvl, boolean problem ){
+		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
+		if ( !formats.contains( EventsFileFormat.xml ) ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
+		}
+
+		// may'21
+		switch ( config.controler().getRoutingAlgorithmType() ) {
+			case Dijkstra:
+			case AStarLandmarks:
+			case FastDijkstra:
+			case FastAStarLandmarks:
+				log.log( lvl, "you are not using SpeedyALT as routing algorithm.  vsp default (since may'21) is to use SpeedeALT.") ;
+				System.out.flush();
+				break;
+			case SpeedyALT:
+				break;
+		}
+		return problem;
 	}
 
 }

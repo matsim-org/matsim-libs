@@ -24,12 +24,11 @@ package org.matsim.core.trafficmonitoring;
  *  Returns the travel time that is stored in the TravelTimeData objects without modification. 
  *
  */
-public class AveragingTravelTimeGetter implements TravelTimeGetter {
+class AveragingTravelTimeGetter implements TravelTimeGetter {
 
-	private AbstractTravelTimeAggregator travelTimeAggregator;
+	private TimeSlotComputation travelTimeAggregator;
 	
-	@Override
-	public void setTravelTimeAggregator(AbstractTravelTimeAggregator travelTimeAggregator) {
+	public AveragingTravelTimeGetter( TimeSlotComputation travelTimeAggregator ) {
 		this.travelTimeAggregator = travelTimeAggregator;		
 	}
 	

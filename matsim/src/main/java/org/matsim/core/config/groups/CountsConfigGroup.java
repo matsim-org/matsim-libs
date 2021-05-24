@@ -74,7 +74,6 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	private String analyzedModes = TransportMode.car;
 	private boolean filterModes = false;
 	private String inputCRS = null;
-	private URL countsFileURL;
 
 	public CountsConfigGroup() {
 		super(GROUP_NAME);

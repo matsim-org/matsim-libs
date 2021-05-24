@@ -29,7 +29,9 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.parkingchoice.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PublicParking;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScore;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructure;
 import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.parkingchoice.example.ParkingBetaExample;
 import org.matsim.contrib.parking.parkingchoice.example.ParkingCostCalculatorExample;
@@ -61,13 +63,13 @@ public class RunParkingChoiceExample {
 		// ---
 
 		// we need some settings to walk from parking to destination:
-		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().plansCalcRoute()), scenario);
+		ParkingScore parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().plansCalcRoute()), scenario);
 		parkingScoreManager.setParkingScoreScalingFactor(1);
 		parkingScoreManager.setParkingBetas(new ParkingBetaExample());
 
 		// ---
 
-		ParkingInfrastructureManager parkingInfrastructureManager = new ParkingInfrastructureManager(parkingScoreManager, controler.getEvents());
+		ParkingInfrastructure parkingInfrastructureManager = new ParkingInfrastructureManager(parkingScoreManager, controler.getEvents());
 		{
 			LinkedList<PublicParking> publicParkings = new LinkedList<PublicParking>();
 			//parking 1: we place this near the workplace

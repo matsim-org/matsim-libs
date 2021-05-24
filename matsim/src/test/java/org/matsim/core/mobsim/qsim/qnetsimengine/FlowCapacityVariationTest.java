@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,8 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -49,6 +47,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * Tests that two persons can leave a link at the same time if flow capacity permits
@@ -93,8 +93,10 @@ public class FlowCapacityVariationTest {
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
-		qSim.run();
+		new QSimBuilder(net.scenario.getConfig()) //
+			.useDefaults() //
+			.build(net.scenario, manager) //
+			.run();
 
 		Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 		Map<Id<Link>, double[]> times2 = vehicleLinkTravelTimes.get(Id.create("2", Vehicle.class));
@@ -134,7 +136,7 @@ public class FlowCapacityVariationTest {
 
 		private void createNetwork(double linkCapacity){
 
-			network = (Network) scenario.getNetwork();
+			network = scenario.getNetwork();
 
 			double x = -100.0;
 			Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x, 0.0));
@@ -144,14 +146,14 @@ public class FlowCapacityVariationTest {
 			final Node fromNode = node1;
 			final Node toNode = node2;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
+			link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), fromNode, toNode, 1000, 25, 7200, 1, null, "22");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
-			final double capacity = linkCapacity; 
-			link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1000, (double) 25, capacity, (double) 1, null, "22");
+			final double capacity = linkCapacity;
+			link2 = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), fromNode1, toNode1, 1000, 25, capacity, 1, null, "22");
 			final Node fromNode2 = node3;
-			final Node toNode2 = node4;	
-			link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
+			final Node toNode2 = node4;
+			link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), fromNode2, toNode2, 1000, 25, 7200, 1, null, "22");
 
 		}
 		
@@ -173,14 +175,14 @@ public class FlowCapacityVariationTest {
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-				a1.setEndTime(0*3600);
+				a1.setEndTime(0 * 3600);
 				Leg leg = population.getFactory().createLeg(travelMode);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route= (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+				route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
 				linkIds.add(link2.getId());
 				route.setLinkIds(link1.getId(), linkIds, link3.getId());
 				leg.setRoute(route);
@@ -189,7 +191,8 @@ public class FlowCapacityVariationTest {
 				plan.addActivity(a2);
 				population.addPerson(p);
 
-				Id<Vehicle> vehId = Id.create(i,Vehicle.class);
+				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
+				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

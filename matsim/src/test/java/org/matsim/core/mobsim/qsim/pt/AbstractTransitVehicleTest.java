@@ -27,12 +27,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.fakes.FakePassengerAgent;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.*;
 
 
 /**
@@ -45,46 +40,46 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	protected abstract TransitVehicle createTransitVehicle(final Vehicle vehicle);
 
 	public void testInitialization_SeatAndStandCapacity() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		capacity.setStandingRoom(Integer.valueOf(2));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+		vehType.getCapacity().setStandingRoom(Integer.valueOf(2));
+//		vehType.getCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(7, veh.getPassengerCapacity());
 	}
 
 	public void testInitialization_SeatOnlyCapacity() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(4));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(4));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(4, veh.getPassengerCapacity());
 	}
 
 	public void testInitialization_NoCapacity() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		try {
 			createTransitVehicle(vehicle);
 			fail("missing exception.");
 		}
 		catch (Exception e) {
-			log.info("catched expected exception.", e);
+			log.info("caught expected exception.", e);
 		}
 	}
 
 	public void testAddPassenger() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		ArrayList<PTPassengerAgent> passengers = new ArrayList<PTPassengerAgent>(veh.getPassengerCapacity());
 		for (int i = 0; i < veh.getPassengerCapacity(); i++) {
@@ -102,11 +97,11 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testRemovePassenger() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 
 		PTPassengerAgent passenger1 = new FakePassengerAgent(null);

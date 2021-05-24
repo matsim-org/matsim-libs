@@ -29,11 +29,11 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -43,13 +43,13 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 /**
  * @author dgrether
  */
-public class OTFSignalWriter extends OTFLaneWriter {
+final class OTFSignalWriter extends OTFLaneWriter {
 
 	private transient SignalGroupStateChangeTracker signalTracker;
 	private transient SignalGroupsData signalGroups;
 	private transient SignalSystemsData signalSystems;
 
-	public OTFSignalWriter(VisNetwork visNetwork, Lanes lanes, Config config, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
+	OTFSignalWriter(VisNetwork visNetwork, Lanes lanes, Config config, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
 		super(visNetwork, lanes, config);
 		this.signalTracker = signalTracker;
 		this.signalSystems = signalSystemsData;

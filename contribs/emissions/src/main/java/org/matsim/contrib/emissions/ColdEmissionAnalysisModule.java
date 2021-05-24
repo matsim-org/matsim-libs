@@ -21,20 +21,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.types.*;
-import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
 
 
 /**
@@ -43,7 +44,7 @@ import org.matsim.vehicles.Vehicle;
  * <li> 0 - 1 km </li>
  * <li> 1 - 2 km </li>
  * </ul>
- * 
+ *
  * 13 categories for parking time BEFORE coldstart:
  * <ul>
  * <li> 0 - 1 h [1]</li>
@@ -52,7 +53,7 @@ import org.matsim.vehicles.Vehicle;
  * <li> 11 - 12 h [12]</li>
  * <li> > 12 h [13]</li>
  * </ul>
- * 
+ *
  * Remarks:
  * <ul>
  * <li>HBEFA 3.1 does not provide further distance categories for cold start emission factors when average amient temperature is assumed <br>
@@ -60,220 +61,367 @@ import org.matsim.vehicles.Vehicle;
  * <li>In the current implementation, vehicles emit one part of their cold start emissions when the engine is started (distance class 0 - 1 km);
  * after reaching 1 km, the rest of their cold start emissions is emitted (difference between distance class 1 - 2 km and distance class 0 - 1 km)
  * </ul>
- * 
- * 
+ *
+ *
  * @author benjamin
  */
-public class ColdEmissionAnalysisModule {
+final class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
-	
+
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
-	
+
 	private final EventsManager eventsManager;
-	private final Double emissionEfficiencyFactor;
 	private final EmissionsConfigGroup ecg;
-	
+
+	private final Set<Pollutant> coldPollutants;
+
+	private int detailedReadingInfoCnt = 0;
+	private int detailedTransformToHbefa4Cnt = 0;
+	private int detailedFallbackTechAverageWarnCnt = 0;
+	private int detailedFallbackAverageTableWarnCnt = 0;
+	private int averageReadingInfoCnt = 0;
 	private int vehInfoWarnHDVCnt = 0;
-	private int vehAttributesNotSpecifiedCnt = 0;
 	private static final int maxWarnCnt = 3;
-	private int vehInfoWarnMotorCylceCnt = 0;
 
-	public static class ColdEmissionAnalysisModuleParameter {
-		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
-		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
-		private final EmissionsConfigGroup ecg;
+	/*package-private*/ ColdEmissionAnalysisModule( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
+													Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
+													Set<Pollutant> coldPollutants, EventsManager eventsManager ){
 
-		public ColdEmissionAnalysisModuleParameter(
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup emissionsConfigGroup) {
-			this.avgHbefaColdTable = avgHbefaColdTable;
-			this.detailedHbefaColdTable = detailedHbefaColdTable;
-			this.ecg = emissionsConfigGroup;
-		}
+		Gbl.assertIf( avgHbefaColdTable!=null || detailedHbefaColdTable!=null );
+		this.avgHbefaColdTable = avgHbefaColdTable;
+		this.detailedHbefaColdTable = detailedHbefaColdTable;
+		this.ecg = ecg;
+		this.coldPollutants = coldPollutants;
+
+		Gbl.assertNotNull( eventsManager );
+		this.eventsManager = eventsManager;
 	}
 
-	public ColdEmissionAnalysisModule(
-			ColdEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(
+			VehicleType vehicleType, Id<Vehicle> vehicleId, Id<Link> coldEmissionEventLinkId,
+			double eventTime, double parkingDuration, int distance_km) {
 
-		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
-		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
-		this.ecg = parameterObject.ecg;
-		this.eventsManager = emissionEventsManager;
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-	}
-
-	public void reset() {
-		logger.info("resetting counters...");
-		vehInfoWarnHDVCnt = 0;
-		vehAttributesNotSpecifiedCnt = 0;
-	}
-
-	public void calculateColdEmissionsAndThrowEvent(
-			Id<Link> coldEmissionEventLinkId,
-			Vehicle vehicle,
-			double eventTime,
-			double parkingDuration,
-			int distance_km) {
-
-		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-			if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-				vehicle.getType().setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS);
-			} else if( vehicle.getType().getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) ) {
-				// emission specification is in vehicle type id and in vehicle description too.
-			} else {
-				String vehicleDescription = vehicle.getType().getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
-				vehicle.getType().setDescription(vehicleDescription);
-			}
+		{
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
+			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
+			Gbl.assertNotNull( hbefaVehicleTypeDescription );
 		}
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType );
+		Gbl.assertNotNull( vehicleInformationTuple );
 
-		String vehicleDescription = vehicle.getType().getDescription();
-
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
-		if(vehicle.getType().getDescription() == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
-					"Please make sure that requirements for emission vehicles in "
-					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
-					"Please make sure that requirements for emission vehicles in " + 
+			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
+					"Please make sure that requirements for emission vehicles in " +
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 
-		coldEmissions = getColdPollutantDoubleMap(vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km);
+		return calculateColdEmissions(vehicleId, parkingDuration, vehicleInformationTuple, distance_km);
+	}
 
-		// a basic apporach to introduce emission reduced cars:
-		if(emissionEfficiencyFactor != null){
-			coldEmissions = rescaleColdEmissions(coldEmissions);
-		}
-		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
+	/*package-private*/ void throwColdEmissionEvent(Id<Vehicle> vehicleId, Id<Link> coldEmissionEventLinkId, double eventTime, Map<Pollutant, Double> coldEmissions) {
+		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicleId, coldEmissions);
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
-	private Map<ColdPollutant, Double> rescaleColdEmissions(Map<ColdPollutant, Double> coldEmissions) {
-		Map<ColdPollutant, Double> rescaledColdEmissions = new HashMap<>();
-		
-		for(ColdPollutant wp : coldEmissions.keySet()){
-			Double orgValue = coldEmissions.get(wp);
-			Double rescaledValue = emissionEfficiencyFactor * orgValue;
-			rescaledColdEmissions.put(wp, rescaledValue);
+	private static int cnt =10;
+	private Map<Pollutant, Double> calculateColdEmissions(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
+
+		final Map<Pollutant, Double> coldEmissionsOfEvent = new EnumMap<>( Pollutant.class );
+
+		logger.debug("VehId: " + vehicleId + " ; Tuple.first = " +vehicleInformationTuple.getFirst());
+		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
+		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
+			for ( Pollutant coldPollutant : coldPollutants) {
+				coldEmissionsOfEvent.put( coldPollutant, 0.0 );
+				// yyyyyy todo replace by something more meaningful. kai, jan'20
+			}
+			if ( cnt >0 ) {
+				logger.warn( "Just encountered non hbefa vehicle; currently, this code is setting the emissions of such vehicles to zero.  " +
+						"Might be necessary to find a better solution for this.  kai, jan'20" );
+				cnt--;
+				if ( cnt ==0 ) {
+					logger.warn( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			return coldEmissionsOfEvent;
 		}
-		return rescaledColdEmissions;
+
+		// translate vehicle information type into factor key.  yyyy maybe combine these two? kai, jan'20
+		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
+		key.setVehicleCategory(vehicleInformationTuple.getFirst());
+
+		//HBEFA 3 provide cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
+		//HBEFA 4.1 provide cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
+		//see https://www.hbefa.net/e/documents/HBEFA41_Development_Report.pdf (WP 4 , page 23)  kturner, may'20
+		//Mapping everything except "motorcycle" to "pass.car", since this was done in the last years for HGV.
+		//This may can be improved: What should be better set to LGV or zero???? kturner, may'20
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
+			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if (vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)) {
+			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if (vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.URBAN_BUS +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.COACH)) {
+			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if (vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.COACH +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)){
+			for ( Pollutant coldPollutant : coldPollutants) {
+				coldEmissionsOfEvent.put( coldPollutant, 0.0 );
+				// yyyyyy todo replace by something more meaningful. kai, jan'20
+			}
+			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.MOTORCYCLE +
+					//	". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+						"Currently, this code is setting the emissions of such vehicles to zero - as it was in the last years" +
+					"Might be necessary to find a better solution for this.  kturner, may'20" );
+				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+			return coldEmissionsOfEvent;
+		}
+
+		if(this.detailedHbefaColdTable != null) {
+			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
+			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
+			key.setVehicleAttributes(hbefaVehicleAttributes);
+		}
+
+		int parkingDuration_h = Math.max(1, (int) (parkingDuration / 3600));
+		if (parkingDuration_h >= 12) parkingDuration_h = 13;
+
+		key.setParkingTime(parkingDuration_h);
+
+		for (Pollutant coldPollutant : coldPollutants) {
+			double generatedEmissions;
+			// this is a really weird logic. Probably a million ways how this could fail janek jan'21
+			if (distance_km == 1) {
+				generatedEmissions = getEmissionsFactor(vehicleInformationTuple, 1, key, coldPollutant).getFactor();
+			} else {
+				generatedEmissions = getEmissionsFactor(vehicleInformationTuple, 2, key, coldPollutant).getFactor() - getEmissionsFactor(vehicleInformationTuple, 1, key, coldPollutant).getFactor();
+			}
+			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
+		}
+		return coldEmissionsOfEvent;
 	}
 
-    private Map<ColdPollutant, Double> getColdPollutantDoubleMap(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km) {
-        final Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<>();
+	private HbefaColdEmissionFactor getEmissionsFactor(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey efkey, Pollutant coldPollutant) {
 
-        HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
+		efkey.setDistance(distance_km);
 
-        if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
-            key.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-            key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-            if(vehInfoWarnHDVCnt < maxWarnCnt) {
-                vehInfoWarnHDVCnt++;
-                logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-                        HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
-                        ". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-                if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-            }
-        } else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-			for (ColdPollutant cp : ColdPollutant.values()){
-				coldEmissionsOfEvent.put( cp, 0.0 );
-			}
-			return coldEmissionsOfEvent;
-		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
-			if(vehInfoWarnMotorCylceCnt == 0) {
-				vehInfoWarnMotorCylceCnt++;
-				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-						HbefaVehicleCategory.MOTORCYCLE +
-						". Setting cold emissions to zero.");
-				logger.warn(Gbl.ONLYONCE + "\t" + Gbl.FUTURE_SUPPRESSED);
-			}
-			for (ColdPollutant cp : ColdPollutant.values()){
-				coldEmissionsOfEvent.put( cp, 0.0 );
-			}
-			return coldEmissionsOfEvent;
-		} else {
-            key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-        }
+		efkey.setComponent(coldPollutant);
+		efkey.setVehicleAttributes(vehicleInformationTuple.getSecond());
 
-        int parkingDuration_h = Math.max(1, (int) (parkingDuration / 3600));
-        if (parkingDuration_h >= 12) parkingDuration_h = 13;
+		switch (ecg.getDetailedVsAverageLookupBehavior()) {
+			case onlyTryDetailedElseAbort:
+				if (detailedReadingInfoCnt <= 1) {
+					logger.info("try reading detailed values");
+					logger.info(Gbl.ONLYONCE);
+					logger.info(Gbl.FUTURE_SUPPRESSED);
+					detailedReadingInfoCnt++;
+				}
+				if (this.detailedHbefaColdTable.get(efkey) != null) {
+					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
+					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					return ef;
+				} else {
+					if (detailedTransformToHbefa4Cnt <= 1) {
+						logger.info("try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again");
+						logger.info(Gbl.ONLYONCE);
+						logger.info(Gbl.FUTURE_SUPPRESSED);
+						detailedTransformToHbefa4Cnt++;
+					}
+					HbefaColdEmissionFactorKey efkey2 = new HbefaColdEmissionFactorKey(efkey);
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					// put this into a new key ...
+					efkey2.setVehicleAttributes(attribs2);
+					// ... and try to look up:
+					if (this.detailedHbefaColdTable.get(efkey2) != null) {
+						HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
+						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						return ef2;
+					}
+				}
+				break;
+			case tryDetailedThenTechnologyAverageElseAbort:
+				//Look up detailed values
+				if (detailedReadingInfoCnt <= 1) {
+					logger.info("try reading detailed values");
+					logger.info(Gbl.ONLYONCE);
+					logger.info(Gbl.FUTURE_SUPPRESSED);
+					detailedReadingInfoCnt++;
+				}
+				if (this.detailedHbefaColdTable.get(efkey) != null) {
+					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
+					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					return ef;
+				} else {
+					if (detailedTransformToHbefa4Cnt <= 1) {
+						logger.info("try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again");
+						logger.info(Gbl.ONLYONCE);
+						logger.info(Gbl.FUTURE_SUPPRESSED);
+						detailedTransformToHbefa4Cnt++;
+					}
+					HbefaColdEmissionFactorKey efkey2 = new HbefaColdEmissionFactorKey(efkey);
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					// put this into a new key ...
+					efkey2.setVehicleAttributes(attribs2);
+					// ... and try to look up:
+					if (this.detailedHbefaColdTable.get(efkey2) != null) {
+						HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
+						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						return ef2;
+					}
 
-        key.setHbefaParkingTime(parkingDuration_h);
+					//if not possible, try "<technology>; average; average":
+					if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable) {
+						attribs2.setHbefaSizeClass("average");
+						attribs2.setHbefaEmConcept("average");
+						if (detailedFallbackTechAverageWarnCnt <= 1) {
+							logger.warn("did not find emission factor for efkey=" + efkey);
+							logger.warn(" re-written to " + efkey2);
+							logger.warn("will try it with '<technology>; average; average'");
+							logger.warn(Gbl.ONLYONCE);
+							logger.warn(Gbl.FUTURE_SUPPRESSED);
+							detailedFallbackTechAverageWarnCnt++;
+						}
+						if (this.detailedHbefaColdTable.get(efkey2) != null) {
+							HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
+							logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+							return ef2;
+						}
+						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
+						logger.error("That also did not worked ");
+					}
+				}
+				break;
+			case tryDetailedThenTechnologyAverageThenAverageTable:
+				//Look up detailed values
+				if (detailedReadingInfoCnt <= 1) {
+					logger.info("try reading detailed values");
+					logger.info(Gbl.ONLYONCE);
+					logger.info(Gbl.FUTURE_SUPPRESSED);
+					detailedReadingInfoCnt++;
+				}
+				if (this.detailedHbefaColdTable.get(efkey) != null) {
+					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
+					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					return ef;
+				} else {
+					if (detailedTransformToHbefa4Cnt <= 1) {
+						logger.info("try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again");
+						logger.info(Gbl.ONLYONCE);
+						logger.info(Gbl.FUTURE_SUPPRESSED);
+						detailedTransformToHbefa4Cnt++;
+					}
+					HbefaColdEmissionFactorKey efkey2 = new HbefaColdEmissionFactorKey(efkey);
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					// put this into a new key ...
+					efkey2.setVehicleAttributes(attribs2);
+					// ... and try to look up:
+					if (this.detailedHbefaColdTable.get(efkey2) != null) {
+						HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
+						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						return ef2;
+					}
 
-        for (ColdPollutant coldPollutant : ColdPollutant.values()) {
-            double generatedEmissions;
-            if (distance_km == 1) {
-               generatedEmissions = getTableEmissions(vehicleId, vehicleInformationTuple, 1, key, coldPollutant);
-            } else {
-               generatedEmissions = getTableEmissions(vehicleId, vehicleInformationTuple, 2, key, coldPollutant) - getTableEmissions(vehicleId, vehicleInformationTuple, 1, key, coldPollutant);
-            }
-            coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
-        }
-        return coldEmissionsOfEvent;
-    }
-
-    private double getTableEmissions(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey key, ColdPollutant coldPollutant) {
-        key.setHbefaDistance(distance_km);
-        double generatedEmissions;
-
-        key.setHbefaComponent(coldPollutant);
-
-        if(this.detailedHbefaColdTable != null){ // check if detailed emission factors file is set in config
-            HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-            hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
-            hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
-            hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
-            key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-
-            if(this.detailedHbefaColdTable.containsKey(key)){
-                generatedEmissions = this.detailedHbefaColdTable.get(key).getColdEmissionFactor();
-            } else {
-                generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
-
-                if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
-                    vehAttributesNotSpecifiedCnt++;
-                    logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
-                            "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
-                    if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-                }
-            }
-        } else {
-            generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
-        }
-        return generatedEmissions;
-    }
-
-    private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-		HbefaVehicleCategory hbefaVehicleCategory = null;
-		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-
-		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
-
-		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
-
-		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-			if(vehCat.toString().equals(vehicleInformationArray[0])){
-				hbefaVehicleCategory = vehCat;
-			}
+					//if not possible, try "<technology>; average; average":
+					if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable) {
+						attribs2.setHbefaSizeClass("average");
+						attribs2.setHbefaEmConcept("average");
+						if (detailedFallbackTechAverageWarnCnt <= 1) {
+							logger.warn("did not find emission factor for efkey=" + efkey);
+							logger.warn(" re-written to " + efkey2);
+							logger.warn("will try it with '<technology>; average; average'");
+							logger.warn(Gbl.ONLYONCE);
+							logger.warn(Gbl.FUTURE_SUPPRESSED);
+							detailedFallbackTechAverageWarnCnt++;
+						}
+						if (this.detailedHbefaColdTable.get(efkey2) != null) {
+							HbefaColdEmissionFactor ef2 = this.detailedHbefaColdTable.get(efkey2);
+							logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+							return ef2;
+						}
+						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
+					}
+				}
+				if (detailedFallbackAverageTableWarnCnt <= 1) {
+					logger.warn("That also did not work.");
+					logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table");
+					logger.warn(Gbl.ONLYONCE);
+					logger.warn(Gbl.FUTURE_SUPPRESSED);
+					detailedFallbackAverageTableWarnCnt++;
+				}
+				HbefaColdEmissionFactorKey efkey3 = new HbefaColdEmissionFactorKey(efkey);
+				efkey3.setVehicleAttributes(new HbefaVehicleAttributes());
+				if (this.avgHbefaColdTable.get(efkey3) != null) {
+					HbefaColdEmissionFactor ef = this.avgHbefaColdTable.get(efkey3);
+					logger.debug("Lookup result for " + efkey3 + " is " + ef.toString());
+					Gbl.assertNotNull(ef);
+					return ef;
+				}
+				break;
+			case directlyTryAverageTable:
+				if (averageReadingInfoCnt <= 1) {
+					logger.info("try reading average values");
+					logger.info(Gbl.ONLYONCE);
+					logger.info(Gbl.FUTURE_SUPPRESSED);
+					averageReadingInfoCnt++;
+				}
+				efkey.setVehicleAttributes(new HbefaVehicleAttributes());
+				if (this.avgHbefaColdTable.get(efkey) != null) {
+					HbefaColdEmissionFactor ef = this.avgHbefaColdTable.get(efkey);
+					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+					Gbl.assertNotNull(ef);
+					return ef;
+				} else {
+					logger.warn("did not find average emission factor for efkey=" + efkey);
+					List<HbefaColdEmissionFactorKey> list = new ArrayList<>(this.avgHbefaColdTable.keySet());
+					list.sort(Comparator.comparing(HbefaColdEmissionFactorKey::toString));
+					for (HbefaColdEmissionFactorKey key : list) {
+						logger.warn(key.toString());
+					}
+				}
+				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior());
 		}
 
-		if(vehicleInformationArray.length == 4){
-			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
-			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
-			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
-		} // else interpretation as "average vehicle"
+		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
+				"the config OR you should use another fallback setting when using detailed calculation OR " +
+				"values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+	}
 
-		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
-		return vehicleInformationTuple;
+	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {
+		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology( hbefaTechnology );
+		vehAtt.setHbefaSizeClass( hbefaSizeClass );
+		vehAtt.setHbefaEmConcept( hbefaEmConcept );
+		return vehAtt;
 	}
 
 }

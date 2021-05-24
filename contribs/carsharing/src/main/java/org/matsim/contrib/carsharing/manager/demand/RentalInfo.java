@@ -1,5 +1,6 @@
 package org.matsim.contrib.carsharing.manager.demand;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
@@ -92,12 +93,42 @@ public class RentalInfo {
 	public void setVehId(Id<Vehicle> vehId) {
 		this.vehId = vehId;
 	}
+	public Coord getOriginCoord() {
+		return originCoord;
+	}
+	public void setOriginCoord(Coord originCoord) {
+		this.originCoord = originCoord;
+	}
+	public Coord getPickupCoord() {
+		return pickupCoord;
+	}
+	public void setPickupCoord(Coord pickupCoord) {
+		this.pickupCoord = pickupCoord;
+	}
+	public Coord getDropoffCoord() {
+		return dropoffCoord;
+	}
+	public void setDropoffCoord(Coord dropoffCoord) {
+		this.dropoffCoord = dropoffCoord;
+	}
+	public Coord getEndCoord() {
+		return endCoord;
+	}
+	public void setEndCoord(Coord endCoord) {
+		this.endCoord = endCoord;
+	}
 	private double startTime = 0.0;
 	private double endTime = 0.0;
 	private Id<Link> originLinkId = null;
 	private Id<Link> pickupLinkId = null;
 	private Id<Link> dropoffLinkId = null;
 	private Id<Link> endLinkId = null;
+	private Coord originCoord = null;
+	private Coord pickupCoord = null;
+	private Coord dropoffCoord = null;
+	private Coord endCoord = null;
+
+	
 	private double distance = 0.0;
 	private double inVehicleTime = 0.0;
 	private double accessStartTime = 0.0;
@@ -109,6 +140,9 @@ public class RentalInfo {
 		
 		return carsharingType + "," + Double.toString(startTime) + "," + Double.toString(endTime) + "," +
 				originLinkId + "," + pickupLinkId + "," +	dropoffLinkId + "," + endLinkId + "," + 
+				originCoord.getX() + "," + originCoord.getY() + "," + pickupCoord.getX() + "," + pickupCoord.getY() + "," + 
+				dropoffCoord.getX() + "," + dropoffCoord.getY() + "," + endCoord.getX() + "," + endCoord.getY() + "," + 
+
 				Double.toString(distance) + "," + Double.toString(inVehicleTime) + "," +
 				Double.toString(accessEndTime - accessStartTime) + "," + Double.toString(egressEndTime - egressStartTime) +
 		"," + vehId;

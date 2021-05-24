@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
@@ -11,7 +11,12 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <forkCount>1</forkCount>
+                <reuseForks>false</reuseForks>
+              </configuration>
             </plugin>
         </plugins>
     </build>
@@ -19,13 +24,13 @@
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>otfvis</artifactId>
-            <version>0.10.0-SNAPSHOT</version>
+            <version>14.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.matsim</groupId>
-            <artifactId>matsim-examples</artifactId>
-            <version>0.10.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
+	    <dependency>
+		    <groupId>org.matsim.contrib</groupId>
+		    <artifactId>analysis</artifactId>
+		    <version>14.0-SNAPSHOT</version>
+		    <scope>test</scope>
+	    </dependency>
     </dependencies>
 </project>

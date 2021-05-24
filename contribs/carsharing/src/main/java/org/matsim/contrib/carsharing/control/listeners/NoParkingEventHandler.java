@@ -9,27 +9,23 @@ import org.matsim.contrib.carsharing.events.handlers.NoParkingSpotEventHandler;
 
 public class NoParkingEventHandler implements NoParkingSpotEventHandler {
 
-	ArrayList<NoParkingInfo> noParking = new ArrayList<NoParkingInfo>();
+	ArrayList<NoParkingInfo> noParking = new ArrayList<>();
 	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		noParking = new ArrayList<NoParkingInfo>();
-		
+		noParking = new ArrayList<>();
 	}
 	
 	public ArrayList<NoParkingInfo> info() {
-		
 		return this.noParking;
 	}
 	
-	public class NoParkingInfo {
+	public static class NoParkingInfo {
 		
 		Id<Link> linkId = null;
 		String type = null;
 		
 		public String toString() {
-			
 			return linkId.toString() + " " + type;
 		}		
 		
@@ -37,12 +33,10 @@ public class NoParkingEventHandler implements NoParkingSpotEventHandler {
 
 	@Override
 	public void handleEvent(NoParkingSpaceEvent event) {
-		// TODO Auto-generated method stub
 		NoParkingInfo info = new NoParkingInfo();
 		info.linkId = event.getLinkId();
 		info.type = event.getCarsharingType();
 		noParking.add(info);
-		
 	}
 
 }

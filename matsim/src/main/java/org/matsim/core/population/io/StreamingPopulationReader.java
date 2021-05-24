@@ -20,11 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,10 +31,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 
 public final class StreamingPopulationReader implements MatsimReader {
 	private static final Logger log = Logger.getLogger(StreamingPopulationReader.class);
@@ -52,13 +49,15 @@ public final class StreamingPopulationReader implements MatsimReader {
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<>();
 
 	public StreamingPopulationReader(Scenario scenario ) {
-		this( new IdentityTransformation(), scenario ) ;
+	    // should we convert to global by default or not? Optimal seems to depend on usecase...
+		this( null, null, scenario ) ;
 	}
-	public StreamingPopulationReader(CoordinateTransformation coordinateTransformation, Scenario scenario ) {
+
+	public StreamingPopulationReader(String inputCRS, String targetCRS, Scenario scenario ) {
 		if ( scenario instanceof MutableScenario ) {
 			pop = new StreamingPopulation( scenario.getConfig() ) ;
 			((MutableScenario) scenario).setPopulation(pop);
-			reader = new PopulationReader( coordinateTransformation, scenario, true) ;
+			reader = new PopulationReader( inputCRS, targetCRS, scenario, true) ;
 		} else {
 			throw new RuntimeException("scenario given into this class needs to be an instance of MutableScenario.") ;
 		}
@@ -69,6 +68,12 @@ public final class StreamingPopulationReader implements MatsimReader {
 	@Override public void readFile(String filename) {
 		reader.readFile(filename);
 	}
+
+	@Override
+	public void readURL( URL url ) {
+		reader.parse( url ) ;
+	}
+
 	public void parse(InputStream is) {
 		reader.parse(is);
 	}
@@ -166,9 +171,6 @@ public final class StreamingPopulationReader implements MatsimReader {
 		}
 		@Override public Person removePerson(Id<Person> personId) {
 			return delegate.removePerson(personId);
-		}
-		@Override public ObjectAttributes getPersonAttributes() {
-			return delegate.getPersonAttributes();
 		}
 
 		@Override

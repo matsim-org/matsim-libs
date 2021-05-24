@@ -1,0 +1,54 @@
+name: deploy-on-release-created
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  deploy-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+          server-id: matsim-releases
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Set MATSim version
+        run: mvn versions:set --batch-mode -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+
+      # Build and publish are separated so we start deploying only after all jars are built successfully
+      - name: Build jars
+        run: mvn package --batch-mode -DskipTests
+
+      - name: Publish jars to matsim maven repo
+        # fail at end to deploy as many jars as possible
+        run: mvn deploy -P release --batch-mode --fail-at-end -DskipTests -Dmaven.resources.skip=true -Dmaven.install.skip=true
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
+
+      - name: Upload matsim (core) assembly as release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ github.token }}
+          file: matsim/target/matsim-${{ github.event.release.tag_name }}-release.zip
+          tag: ${{ github.event.release.tag_name }}
+    env:
+      MAVEN_OPTS: -Xmx2g

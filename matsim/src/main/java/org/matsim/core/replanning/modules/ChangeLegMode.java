@@ -52,22 +52,28 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	private String[] availableModes;
 	private boolean ignoreCarAvailability;
+	private boolean allowSwitchFromListedModesOnly;
+
 
 	public ChangeLegMode(final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
 		super(globalConfigGroup.getNumberOfThreads());
 		this.availableModes = changeLegModeConfigGroup.getModes();
 		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
+		if (changeLegModeConfigGroup.getBehavior().equals(ChangeModeConfigGroup.Behavior.fromSpecifiedModesToSpecifiedModes)) {
+			this.allowSwitchFromListedModesOnly = true;
+		} else this.allowSwitchFromListedModesOnly=false;
 	}
 	
-	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
+	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty, boolean allowSwitchFromListedModesOnly) {
 		super(nOfThreads);
 		this.availableModes = modes.clone();
 		this.ignoreCarAvailability = ignoreCarAvailabilty;
+		this.allowSwitchFromListedModesOnly = allowSwitchFromListedModesOnly;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), this.allowSwitchFromListedModesOnly);
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;
 	}

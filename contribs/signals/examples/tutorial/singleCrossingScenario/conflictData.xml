@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<conflictData>
+
+	<intersection nodeId="3" signalSystemId="SignalSystem1" >
+		<direction id="7-8" fromLinkId="7_3" toLinkId="3_8" >
+			<conflictingDirections> 2-4 2-7 2-8 4-2 4-8 4-7 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 7-4 7-2 8-7 8-2 8-4 </nonConflictingDirections>
+		</direction>
+
+		<direction id="8-7" fromLinkId="8_3" toLinkId="3_7" >
+			<conflictingDirections> 2-4 2-7 2-8 4-2 4-8 4-7 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 7-8 7-4 7-2 8-2 8-4 </nonConflictingDirections>
+		</direction>
+
+		<direction id="2-4" fromLinkId="2_3" toLinkId="3_4" >
+			<conflictingDirections> 7-8 7-4 7-2 8-7 8-2 8-4 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> 4-8 </directionsWhichMustYield>
+			<nonConflictingDirections> 4-2 4-7 2-7 2-8 </nonConflictingDirections>
+		</direction>
+
+		<direction id="4-2" fromLinkId="4_3" toLinkId="3_2" >
+			<conflictingDirections> 7-8 7-4 7-2 8-7 8-2 8-4 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> 2-7 </directionsWhichMustYield>
+			<nonConflictingDirections> 2-4 2-8 4-8 4-7 </nonConflictingDirections>
+		</direction>
+
+		<direction id="2-7" fromLinkId="2_3" toLinkId="3_7" >
+			<conflictingDirections> 7-8 7-4 7-2 8-7 8-2 8-4 </conflictingDirections>
+			<directionsWithRightOfWay> 4-2 4-7 </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 2-4 2-8 4-8 </nonConflictingDirections>
+		</direction>
+
+		<direction id="7-2" fromLinkId="7_3" toLinkId="3_2" >
+			<conflictingDirections> 2-4 2-7 2-8 4-2 4-8 4-7 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 7-8 7-4 8-7 8-2 8-4 </nonConflictingDirections>
+		</direction>
+
+		<direction id="2-8" fromLinkId="2_3" toLinkId="3_8" >
+			<conflictingDirections> 7-8 7-4 7-2 8-7 8-2 8-4 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> 4-8 </directionsWhichMustYield>
+			<nonConflictingDirections> 2-4 2-7 4-7 4-2 </nonConflictingDirections>
+		</direction>
+
+		<direction id="8-2" fromLinkId="8_3" toLinkId="3_2" >
+			<conflictingDirections> 2-4 2-7 2-8 4-2 4-8 4-7 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 7-8 7-4 7-2 8-7 8-4 </nonConflictingDirections>
+		</direction>
+
+		<direction id="4-7" fromLinkId="4_3" toLinkId="3_7" >
+			<conflictingDirections> 7-8 7-4 7-2 8-7 8-2 8-4 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> 2-7 </directionsWhichMustYield>
+			<nonConflictingDirections> 4-2 4-8 2-8 2-4 </nonConflictingDirections>
+		</direction>
+
+		<direction id="7-4" fromLinkId="7_3" toLinkId="3_4" >
+			<conflictingDirections> 2-4 2-7 2-8 4-2 4-8 4-7 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 7-8 7-2 8-7 8-2 8-4 </nonConflictingDirections>
+		</direction>
+
+		<direction id="4-8" fromLinkId="4_3" toLinkId="3_8" >
+			<conflictingDirections> 7-8 7-4 7-2 8-7 8-2 8-4 </conflictingDirections>
+			<directionsWithRightOfWay> 2-4 2-8 </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 4-2 4-7 2-7 </nonConflictingDirections>
+		</direction>
+
+		<direction id="8-4" fromLinkId="8_3" toLinkId="3_4" >
+			<conflictingDirections> 2-4 2-7 2-8 4-2 4-8 4-7 </conflictingDirections>
+			<directionsWithRightOfWay> </directionsWithRightOfWay>
+			<directionsWhichMustYield> </directionsWhichMustYield>
+			<nonConflictingDirections> 7-8 7-4 7-2 8-7 8-2 </nonConflictingDirections>
+		</direction>
+
+	</intersection>
+<!-- ====================================================================== -->
+
+</conflictData>

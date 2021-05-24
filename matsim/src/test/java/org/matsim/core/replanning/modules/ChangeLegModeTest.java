@@ -20,9 +20,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -36,6 +33,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mrieser
@@ -62,10 +62,34 @@ public class ChangeLegModeTest {
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
-	
+
+	@Test
+	public void test_behavior_allowSwitchFromListedModesOnly() {
+		Config config = ConfigUtils.createConfig();
+		config.global().setNumberOfThreads(0);
+		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
+		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromSpecifiedModesToSpecifiedModes");
+
+		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
+		final String[] modes = new String[] {TransportMode.car};
+		runTest(module, modes);
+	}
+
+	@Test
+	public void test_behavior_fromAllModesToSpecifiedModes() {
+		Config config = ConfigUtils.createConfig();
+		config.global().setNumberOfThreads(0);
+		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
+		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromAllModesToSpecifiedModes");
+
+		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
+		final String[] modes = new String[] {TransportMode.pt, TransportMode.bike, TransportMode.walk};
+		runTest(module, modes);
+	}
+
 	@Test
 	public void testWithConstructor() {
-		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true);
+		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true, false);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
@@ -88,7 +112,7 @@ public class ChangeLegModeTest {
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 
-		HashMap<String, Integer> counter = new HashMap<String, Integer>();
+		HashMap<String, Integer> counter = new HashMap<>();
 		for (String mode : modes) {
 			counter.put(mode, Integer.valueOf(0));
 		}
@@ -109,7 +133,7 @@ public class ChangeLegModeTest {
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 
-		HashMap<String, Integer> counter = new HashMap<String, Integer>();
+		HashMap<String, Integer> counter = new HashMap<>();
 		for (String mode : possibleModes) {
 			counter.put(mode, Integer.valueOf(0));
 		}

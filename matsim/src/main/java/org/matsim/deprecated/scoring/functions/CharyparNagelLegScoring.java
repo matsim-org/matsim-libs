@@ -30,9 +30,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.pt.PtConstants;
@@ -44,7 +43,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScoring, org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
+@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
+public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScoring {
 
 	protected double score;
 	private double lastTime;
@@ -60,14 +60,16 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
-	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
+	private double lastActivityEndTime = Double.NaN;
 	
+	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
 		this.reset();
 	}
 	
+	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network, TransitSchedule transitSchedule) {
 		this(params, network);
 		this.transitSchedule = transitSchedule;
@@ -180,11 +182,11 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		}
 	}
 
-	@Override
-	public void handleLeg(Leg leg) {
-		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
-		this.score += legScore;
-	}
+//	@Override
+//	public void handleLeg(Leg leg) {
+//		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+//		this.score += legScore;
+//	}
 
 
 }

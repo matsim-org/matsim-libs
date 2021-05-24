@@ -50,11 +50,12 @@ public class ChangeSingleTripMode implements Provider<PlanStrategy> {
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
-		strategy.addStrategyModule(new ChangeSingleLegMode(globalConfigGroup, changeLegModeConfigGroup));
-		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
-		return strategy;
+		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+
+		builder.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
+		builder.addStrategyModule(new ChangeSingleLegMode(globalConfigGroup, changeLegModeConfigGroup));
+		builder.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
+		return builder.build();
 	}
 
 }

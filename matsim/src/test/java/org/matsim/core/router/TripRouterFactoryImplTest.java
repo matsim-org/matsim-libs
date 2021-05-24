@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.PopulationUtils;
@@ -126,7 +127,7 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			l = (Leg) trip.get(2) ;
 		}
 
@@ -201,7 +202,7 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			l = (Leg) trip.get(2) ;
 		}
 
@@ -229,11 +230,6 @@ public class TripRouterFactoryImplTest {
 		@Override
 		public Coord getCoord() {
 			return l.getCoord();
-		}
-
-		@Override
-		public Id<Link> getId() {
-			return l.getId();
 		}
 
 		@Override

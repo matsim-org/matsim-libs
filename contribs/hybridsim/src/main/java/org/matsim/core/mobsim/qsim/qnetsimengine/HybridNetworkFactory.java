@@ -30,10 +30,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-public class HybridNetworkFactory extends QNetworkFactory {
+public final class HybridNetworkFactory implements QNetworkFactory {
 	@Inject QSimConfigGroup qsimConfig ;
 	@Inject EventsManager events ;
 	@Inject Scenario scenario ;
@@ -46,7 +50,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	private ExternalEngine externalEngine;
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2 ) {
 		network = arg2.getNetsimNetwork().getNetwork();
 		double effectiveCellSize = ( network).getEffectiveCellSize() ;
 
@@ -55,7 +59,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		this.context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 		
@@ -65,7 +69,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 
 	@Override
 	public QNodeI createNetsimNode(Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
 		return builder.build( node ) ;
 	}
 
@@ -73,7 +77,10 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	@Override
 	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 		if (link.getAllowedModes().contains("2ext")) {
-			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode );
+			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+			VehicleHandler vehicleHandler = new DefaultVehicleHandler();
+			// yyyyyy I don't think that this would have been set correctly before I refactored this.  kai, feb'18
+			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator, vehicleHandler);
 		}
 //		QLinkImpl ret = new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine );

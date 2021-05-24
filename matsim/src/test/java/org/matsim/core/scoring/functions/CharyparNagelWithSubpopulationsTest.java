@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -117,7 +117,8 @@ public class CharyparNagelWithSubpopulationsTest {
 			final String subpop = ""+i;
 			final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(i));
 			sc.getPopulation().addPerson(person);
-			sc.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", subpop);
+//			sc.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", subpop);
+			PopulationUtils.putPersonAttribute( person, "subpopulation", subpop );
 
 			final double util = (double) i;
 			final ScoringParameterSet params = config.planCalcScore().getOrCreateScoringParameters(subpop);

@@ -19,22 +19,22 @@
 
 package org.matsim.contrib.taxi.schedule;
 
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.PICKUP;
 
-public class TaxiPickupTask extends StayTaskImpl implements TaxiTaskWithRequest {
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+
+import com.google.common.base.MoreObjects;
+
+public class TaxiPickupTask extends StayTask {
+	public static final TaxiTaskType TYPE = new TaxiTaskType(PICKUP);
+
 	private final TaxiRequest request;
 
 	public TaxiPickupTask(double beginTime, double endTime, TaxiRequest request) {
-		super(beginTime, endTime, request.getFromLink());
-
+		super(TYPE, beginTime, endTime, request.getFromLink());
 		this.request = request;
 		request.setPickupTask(this);
-	}
-
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.PICKUP;
 	}
 
 	public TaxiRequest getRequest() {
@@ -42,7 +42,7 @@ public class TaxiPickupTask extends StayTaskImpl implements TaxiTaskWithRequest 
 	}
 
 	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
 	}
 }

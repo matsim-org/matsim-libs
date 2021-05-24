@@ -22,7 +22,7 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;

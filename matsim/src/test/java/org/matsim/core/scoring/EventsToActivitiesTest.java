@@ -21,13 +21,13 @@ package org.matsim.core.scoring;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
 public class EventsToActivitiesTest {
@@ -38,11 +38,15 @@ public class EventsToActivitiesTest {
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.addActivityHandler(ah);
 		testee.reset(0);
-		testee.handleEvent(new ActivityStartEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class), "work"));
-		testee.handleEvent(new ActivityEndEvent(30.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class), "work"));
+		testee.handleEvent(new ActivityStartEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
+				"work", new Coord( 123., 4.56 ) ) );
+		testee.handleEvent(new ActivityEndEvent(30.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
+				"work", new Coord( 123., 4.56 )));
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getStartTime(), 1e-8);
-		Assert.assertEquals(30.0, ah.handledActivity.getActivity().getEndTime(), 1e-8);
+		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getStartTime().seconds(), 1e-8);
+		Assert.assertEquals(30.0, ah.handledActivity.getActivity().getEndTime().seconds(), 1e-8);
+		Assert.assertEquals( 123., ah.handledActivity.getActivity().getCoord().getX(), 0. );
+		Assert.assertEquals( 4.56, ah.handledActivity.getActivity().getCoord().getY(), 0. );
 	}
 
 	@Test
@@ -51,16 +55,20 @@ public class EventsToActivitiesTest {
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.addActivityHandler(ah);
 		testee.reset(0);
-		testee.handleEvent(new ActivityEndEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class), "home"));
+		testee.handleEvent(new ActivityEndEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
+				"home", new Coord( 123., 4.56 )));
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getActivity().getStartTime(), 1e-8);
-		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getEndTime(), 1e-8);
+		Assert.assertTrue(ah.handledActivity.getActivity().getStartTime().isUndefined());
+		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getEndTime().seconds(), 1e-8);
 		ah.reset();
-		testee.handleEvent(new ActivityStartEvent(90.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class), "home"));
+		testee.handleEvent(new ActivityStartEvent(90.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
+				"home", new Coord( 123., 4.56 ) ) );
 		testee.finish();
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getActivity().getEndTime(), 1e-8);
-		Assert.assertEquals(90.0, ah.handledActivity.getActivity().getStartTime(), 1e-8);
+		Assert.assertTrue(ah.handledActivity.getActivity().getEndTime().isUndefined());
+		Assert.assertEquals(90.0, ah.handledActivity.getActivity().getStartTime().seconds(), 1e-8);
+		Assert.assertEquals( 123., ah.handledActivity.getActivity().getCoord().getX(), 0. );
+		Assert.assertEquals( 4.56, ah.handledActivity.getActivity().getCoord().getY(), 0. );
 	}
 	
 	@Test
@@ -69,10 +77,11 @@ public class EventsToActivitiesTest {
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.addActivityHandler(ah);
 		testee.reset(0);
-		testee.handleEvent(new ActivityEndEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("f1", ActivityFacility.class), "home"));
+		testee.handleEvent(new ActivityEndEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("f1", ActivityFacility.class),
+				"home", new Coord( 123., 4.56 )));
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getActivity().getStartTime(), 1e-8);
-		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getEndTime(), 1e-8);
+		Assert.assertTrue(ah.handledActivity.getActivity().getStartTime().isUndefined()) ;
+		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getEndTime().seconds(), 1e-8);
 		ah.reset();
 		testee.finish();
 		Assert.assertNull(ah.handledActivity);

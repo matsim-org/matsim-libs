@@ -22,6 +22,9 @@ package org.matsim.core.gbl;
 
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
+
 /**
  * An abstract class, providing random numbers for MATSim. Also provides
  * Random Number Generators (RNG) for use in threads, which should all
@@ -30,6 +33,21 @@ import java.util.Random;
  * @author mrieser
  */
 public abstract class MatsimRandom {
+	private static final Logger log = Logger.getLogger( MatsimRandom.class ) ;
+
+	private static final class InstrumentedRandom extends Random {
+		InstrumentedRandom(long defaultRandomSeed) {
+			super(defaultRandomSeed) ;
+		}
+		private long cntDbl = 0 ;
+		@Override public double nextDouble() {
+			cntDbl++ ; 
+			return super.nextDouble() ;
+		}
+		long numberOfDrawnDoubles() {
+			return cntDbl ;
+		}
+	}
 
 	private static final long DEFAULT_RANDOM_SEED = 4711;
 
@@ -38,6 +56,7 @@ public abstract class MatsimRandom {
 
 	/** the global random number generator */
 	private static final Random random = new Random(DEFAULT_RANDOM_SEED);
+//	private static final Random random = new InstrumentedRandom(DEFAULT_RANDOM_SEED);
 
 	/** Resets the random number generator with a default random seed. */
 	public static void reset() {
@@ -54,7 +73,6 @@ public abstract class MatsimRandom {
 		getRandom().setSeed(seed);
 //		prepareRNG(random);
 	}
-
 	public static Random getRandom() {
 		return random;
 	}
@@ -80,6 +98,13 @@ public abstract class MatsimRandom {
 		for (int i = 0; i < 100; i++) {
 			rng.nextDouble();
 		}
+	}
+
+	public static final void printRNGState(String label) {
+		if ( random instanceof InstrumentedRandom ) {
+			log.warn( "label=" + label + ";\tnumber of doubles draws = " + ((InstrumentedRandom) random).numberOfDrawnDoubles() ) ;
+		}
+		log.warn("label=" + label + ";\tnumber of local instances =" + internalCounter );
 	}
 
 }

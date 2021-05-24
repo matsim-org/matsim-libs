@@ -20,20 +20,30 @@
 
 package org.matsim.core.utils.collections;
 
-import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test for {@link QuadTree}.
@@ -48,7 +58,7 @@ public class QuadTreeTest {
 	 * @return A simple QuadTree with 6 entries for tests.
 	 */
 	private QuadTree<String> getTestTree() {
-		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, +150.0, +150.0);
+		QuadTree<String> qt = new QuadTree<>(-50.0, -50.0, +150.0, +150.0);
 
 		qt.put(10.0, 10.0, "10.0, 10.0");
 		qt.put(15.0, 15.0, "15.0, 15.0");
@@ -65,7 +75,7 @@ public class QuadTreeTest {
 	 */
 	@Test
 	public void testConstructor() {
-		QuadTree<String> qt = new QuadTree<String>(-50.0, -40.0, +30.0, +20.0);
+		QuadTree<String> qt = new QuadTree<>(-50.0, -40.0, +30.0, +20.0);
 		assertEquals(-50.0, qt.getMinEasting(), 0.0);
 		assertEquals(-40.0, qt.getMinNorthing(), 0.0);
 		assertEquals(+30.0, qt.getMaxEasting(), 0.0);
@@ -77,7 +87,7 @@ public class QuadTreeTest {
 	 */
 	@Test
 	public void testPut() {
-		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, +150.0, +150.0);
+		QuadTree<String> qt = new QuadTree<>(-50.0, -50.0, +150.0, +150.0);
 		assertEquals(0, qt.size());
 		qt.put(10.0, 10.0, "10.0, 10.0");
 		assertEquals(1, qt.size());
@@ -97,7 +107,7 @@ public class QuadTreeTest {
 
 	@Test
 	public void testPutOutsideBounds() {
-		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, 50.0, 50.0);
+		QuadTree<String> qt = new QuadTree<>(-50.0, -50.0, 50.0, 50.0);
 		try {
 			qt.put( -100 , 0 , "-100 0" );
 			Assert.fail( "no exception when adding an element on the left" );
@@ -208,7 +218,7 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetXY_EntryOnDividingBorder() {
-		QuadTree<String> qt = new QuadTree<String>(0, 0, 40, 60);
+		QuadTree<String> qt = new QuadTree<>(0, 0, 40, 60);
 		qt.put(10.0, 10.0, "10.0, 10.0");
 		qt.put(20.0, 20.0, "20.0, 20.0"); // on vertical border
 		qt.put(20.0, 30.0, "20.0, 30.0"); // exactly on center
@@ -221,7 +231,7 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetXY_EntryOnOutsideBorder() {
-		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
+		QuadTree<String> qt = new QuadTree<>(0.0, 0.0, 40.0, 60.0);
 		// the 4 corners
 		qt.put(0.0, 0.0, "SW");
 		qt.put(40.0, 0.0, "SE");
@@ -254,7 +264,7 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetDistance_EntryOnDividingBorder() {
-		QuadTree<String> qt = new QuadTree<String>(0, 0, 40, 60);
+		QuadTree<String> qt = new QuadTree<>(0, 0, 40, 60);
 		qt.put(10.0, 10.0, "10.0, 10.0");
 		qt.put(20.0, 20.0, "20.0, 20.0"); // on vertical border
 		qt.put(20.0, 30.0, "20.0, 30.0"); // exactly on center
@@ -276,7 +286,7 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetDistance_EntryOnOutsideBorder() {
-		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
+		QuadTree<String> qt = new QuadTree<>(0.0, 0.0, 40.0, 60.0);
 		// the 4 corners
 		qt.put(0.0, 0.0, "SW");
 		qt.put(40.0, 0.0, "SE");
@@ -301,8 +311,8 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetElliptical() {
-		final Collection<Coord> all = new ArrayList<Coord>();
-		QuadTree<Coord> qt = new QuadTree<Coord>(0, 0, 40, 60);
+		final Collection<Coord> all = new ArrayList<>();
+		QuadTree<Coord> qt = new QuadTree<>(0, 0, 40, 60);
 
 		all.add(new Coord(10.0, 10.0));
 		all.add(new Coord(20.0, 20.0));
@@ -338,7 +348,7 @@ public class QuadTreeTest {
 
 						for ( double distance : distances ) {
 							if ( distance < interfoci ) continue;
-							final Collection<Coord> expected = new ArrayList<Coord>();
+							final Collection<Coord> expected = new ArrayList<>();
 							for ( Coord coord : all ) {
 								if ( CoordUtils.calcEuclideanDistance( coord , f1 ) + CoordUtils.calcEuclideanDistance( coord , f2 ) <= distance ) {
 									expected.add( coord );
@@ -369,13 +379,13 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetRect() {
-		QuadTree<String> qt = new QuadTree<String>(0, 0, 1000, 1000);
+		QuadTree<String> qt = new QuadTree<>(0, 0, 1000, 1000);
 		qt.put(100, 200, "node1");
 		qt.put(400, 900, "node2");
 		qt.put(700, 300, "node3");
 		qt.put(900, 400, "node4");
 		
-		Collection<String> values = new ArrayList<String>();
+		Collection<String> values = new ArrayList<>();
 		qt.getRectangle(new Rect(400, 300, 700, 900), values);
 		Assert.assertEquals(2, values.size());
 		Assert.assertTrue(values.contains("node2"));
@@ -384,19 +394,19 @@ public class QuadTreeTest {
 
 	@Test
 	public void testGetRect_flatNetwork() {
-		QuadTree<String> qt = new QuadTree<String>(0, 0, 1000, 0);
+		QuadTree<String> qt = new QuadTree<>(0, 0, 1000, 0);
 		qt.put(0, 0, "node1");
 		qt.put(100, 0, "node2");
 		qt.put(500, 0, "node3");
 		qt.put(900, 0, "node4");
 
-		Collection<String> values = new ArrayList<String>();
+		Collection<String> values = new ArrayList<>();
 		qt.getRectangle(new Rect(90, -10, 600, +10), values);
 		Assert.assertEquals(2, values.size());
 		Assert.assertTrue(values.contains("node2"));
 		Assert.assertTrue(values.contains("node3"));
 
-		Collection<String> values2 = new ArrayList<String>();
+		Collection<String> values2 = new ArrayList<>();
 		qt.getRectangle(new Rect(90, 0, 600, 0), values2);
 		Assert.assertEquals(2, values2.size());
 		Assert.assertTrue(values2.contains("node2"));
@@ -484,62 +494,6 @@ public class QuadTreeTest {
 			iter.remove();
 			fail("expected UnsupportedOperationException, got none.");
 		} catch (UnsupportedOperationException expected) {}
-	}
-
-	@Test
-	public void testValues_EntryOnDividingBorder() {
-		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
-		qt.put(10.0, 10.0, "10.0, 10.0");
-		qt.put(20.0, 20.0, "20.0, 20.0"); // on vertical border
-		qt.put(20.0, 30.0, "20.0, 30.0"); // exactly on center
-		qt.put(20.0, 30.0, "30.0, 30.0"); // on horizontal border
-		qt.put(20.0, 30.0, "30.0, 30.0"); // on horizontal border
-		qt.put(10.0, 40.0, "10.0, 40.0"); // on 2nd-level border
-		assertEquals(5, qt.size());
-		valuesTester(5, qt.values());
-		Iterator<String> iter = qt.values().iterator();
-		assertEquals("10.0, 10.0", iter.next());
-		assertEquals("10.0, 40.0", iter.next());
-		assertEquals("20.0, 20.0", iter.next());
-		assertEquals("20.0, 30.0", iter.next());
-		assertEquals("30.0, 30.0", iter.next());
-		assertFalse(iter.hasNext());
-	}
-
-	@Test
-	public void testValues_EntryOnOutsideBorder() {
-		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
-		// the 4 corners
-		qt.put(0.0, 0.0, "SW");
-		qt.put(40.0, 0.0, "SE");
-		qt.put(0.0, 60.0, "NW");
-		qt.put(40.0, 60.0, "NE");
-		// the 4 sides
-		qt.put(10.0, 60.0, "N");
-		qt.put(40.0, 10.0, "E");
-		qt.put(10.0, 0.0, "S");
-		qt.put(0.0, 10.0, "W");
-
-		assertEquals(8, qt.size());
-		valuesTester(8, qt.values());
-		assertTrue(qt.values().contains("SW"));
-		assertTrue(qt.values().contains("SE"));
-		assertTrue(qt.values().contains("NW"));
-		assertTrue(qt.values().contains("NE"));
-		assertTrue(qt.values().contains("N"));
-		assertTrue(qt.values().contains("E"));
-		assertTrue(qt.values().contains("S"));
-		assertTrue(qt.values().contains("W"));
-		Iterator<String> iter = qt.values().iterator();
-		assertEquals("SW", iter.next());
-		assertEquals("W", iter.next());
-		assertEquals("S", iter.next());
-		assertEquals("NW", iter.next());
-		assertEquals("N", iter.next());
-		assertEquals("SE", iter.next());
-		assertEquals("E", iter.next());
-		assertEquals("NE", iter.next());
-		assertFalse(iter.hasNext());
 	}
 
 	/**
@@ -669,11 +623,11 @@ public class QuadTreeTest {
 	 */
 	static class TestExecutor implements QuadTree.Executor<String> {
 
-		public final Collection<Tuple<Coord, String>> objects = new ArrayList<Tuple<Coord, String>>();
+		public final Collection<Tuple<Coord, String>> objects = new ArrayList<>();
 
 		@Override
 		public void execute(final double x, final double y, final String object) {
-			this.objects.add(new Tuple<Coord, String>(new Coord(x, y), object));
+			this.objects.add(new Tuple<>(new Coord(x, y), object));
 		}
 
 	}
@@ -725,6 +679,94 @@ public class QuadTreeTest {
 		result = qt.getRing(0, 0, Math.sqrt(18), Math.sqrt(18));
 		assertEquals(result.size(), 1);
 		assertEquals(result.contains("3,3"), true);
+	}
+
+	/**
+	 * tests that also for a large number of entries, values() returns the correct result.
+	 */
+	@Test
+	public void testGetValues() {
+		double minX = -1000;
+		double minY = -5000;
+		double maxX = 20000;
+		double maxY = 12000;
+
+		Random r = new Random(20181017L);
+		List<String> expected = new ArrayList<>(1000);
+		QuadTree<String> qt = new QuadTree<>(minX, minY, maxX, maxY);
+		for (int i = 0; i < 1000; i++) {
+			double x = minX + r.nextDouble() * (maxX - minX);
+			double y = minY + r.nextDouble() * (maxY - minY);
+			String value = "ITEM_" + i;
+			qt.put(x, y, value);
+			expected.add(value);
+		}
+
+		List<String> items = new ArrayList<>(qt.values());
+		Assert.assertEquals(1000, items.size());
+		items.sort(String::compareTo);
+		expected.sort(String::compareTo);
+		for (int i = 0; i < 1000; i++) {
+			Assert.assertEquals(expected.get(i), items.get(i));
+		}
+	}
+
+	/**
+	 * A kind of performance test, but not marked as test, as there is no need
+	 * to run it in every check as there is not assert statement.
+	 *
+	 * @author mrieser
+	 */
+	private static void measurePerformance() {
+		Random r = new Random(20181016L);
+		int elementCount = 1_000_000;
+		int queryCount = 10_000_000;
+		Runtime runtime = Runtime.getRuntime();
+
+		double minX = -1000;
+		double minY = -5000;
+		double maxX = 20000;
+		double maxY = 12000;
+
+		QuadTree<Coord> qt = new QuadTree<>(minX, minY, maxX, maxY);
+		System.gc();
+		System.gc();
+		System.gc();
+		long usedMemBefore = runtime.totalMemory() - runtime.freeMemory();
+		long startTimeInit = System.currentTimeMillis();
+		for (int i = 0; i < elementCount; i++) {
+			Coord coord = new Coord(minX + r.nextDouble() * (maxX - minX), minY + r.nextDouble() * (maxY - minY));
+			qt.put(coord.getX(), coord.getY(), coord);
+		}
+		long endTimeInit = System.currentTimeMillis();
+		System.gc();
+		System.gc();
+		System.gc();
+		long usedMemAfter = runtime.totalMemory() - runtime.freeMemory();
+
+		int countFirstQuadrant = 0;
+		long startTimeQuery = System.currentTimeMillis();
+		for (int i = 0; i < queryCount; i++) {
+			double x = minX + r.nextDouble() * (maxX - minX);
+			double y = minY + r.nextDouble() * (maxY - minY);
+			Coord coord = qt.getClosest(x, y);
+			if (coord.getX() >= 0 && coord.getY() >= 0) {
+				countFirstQuadrant++;
+			}
+		}
+		long endTimeQuery = System.currentTimeMillis();
+
+		log.info("init time: " + (endTimeInit - startTimeInit) / 1000.0 + " sec.");
+		log.info("query time: " + (endTimeQuery - startTimeQuery) / 1000.0 + " sec.");
+		log.info("memory usage: " + (usedMemAfter - usedMemBefore) / 1024 / 1024.0 + " MB");
+		log.info("check, ignore: " + countFirstQuadrant);
+	}
+
+	public static void main(String[] args) {
+		for (int i = 0; i < 5; i++) {
+			log.info("Round " + i);
+			measurePerformance();
+		}
 	}
 
 }

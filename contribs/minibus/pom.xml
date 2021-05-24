@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
@@ -23,22 +23,35 @@
           </archive>
         </configuration>
       </plugin>
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-        </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
-  	<dependency>
-  		<groupId>org.matsim</groupId>
-  		<artifactId>matsim</artifactId>
-  		<version>0.10.0-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<!-- only needed for external jar, no code dependency -->
-		<groupId>commons-codec</groupId>
-		<artifactId>commons-codec</artifactId>
-		<version>1.4</version>
-	</dependency>
+    <dependency>
+      <groupId>org.matsim</groupId>
+      <artifactId>matsim</artifactId>
+      <version>14.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <!-- only needed for external jar, no code dependency -->
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+    <version>1.4</version>
+  </dependency>
   </dependencies>
 </project>

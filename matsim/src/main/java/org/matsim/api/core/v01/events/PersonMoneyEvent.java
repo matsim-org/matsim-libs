@@ -36,27 +36,47 @@ import org.matsim.core.api.internal.HasPersonId;
  */
 public final class PersonMoneyEvent extends Event implements HasPersonId {
 
-	public static final String ATTRIBUTE_AMOUNT = "amount";
-
 	public static final String EVENT_TYPE = "personMoney";
-	public static final String ATTRIBUTE_PERSON = "person";
+	
+	public static final String ATTRIBUTE_AMOUNT = "amount";
+	public static final String ATTRIBUTE_PURPOSE = "purpose";
+	public static final String ATTRIBUTE_TRANSACTION_PARTNER = "transactionPartner";
 
 	private final Id<Person> personId;
 	private final double amount;
+	private final String purpose;
+	private final String transactionPartner;
 
 	/**
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
 	 * some money at the specified <tt>time</tt>. Positive values for <tt>amount</tt>
 	 * mean the agent has gained money, negative values that the agent has paid money.
+	 * <br>
+	 * There are two optional fields: <tt>purpose</tt> and <tt>transactionPartner</tt>.
+	 * Those are currently not read by any core MATSim code, but can be useful for 
+	 * analysis, e.g. calculate the drt fare revenue (purpose = "drtFare") by 
+	 * drt operator (transactionPartner = "Greedy Shared Taxis Inc.").
 	 *
 	 * @param time
 	 * @param agentId
 	 * @param amount
+	 * @param purpose (not required by dtd)
+	 * @param transactionPartner (not required by dtd)
 	 */
-	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
+				final String transactionPartner) {
 		super(time);
 		this.personId = agentId;
 		this.amount = amount;
+		this.purpose = purpose;
+		this.transactionPartner = transactionPartner;
+	}
+	/**
+	 * @deprecated -- add "purpose" and "transactionPartner"
+	 */
+	@Deprecated // add "purpose" and "transactionPartner"
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
+		this( time, agentId, amount, null, null);
 	}
 
 	public Id<Person> getPersonId() {
@@ -65,6 +85,14 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	
 	public double getAmount() {
 		return this.amount;
+	}
+	
+	public String getPurpose() {
+		return this.purpose;
+	}
+	
+	public String getTransactionPartner() {
+		return this.transactionPartner;
 	}
 
 	@Override
@@ -75,8 +103,14 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		// personId is treated in upstream
 		attr.put(ATTRIBUTE_AMOUNT, Double.toString(this.amount));
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		if (this.purpose != null) {
+			attr.put(ATTRIBUTE_PURPOSE, this.purpose);
+		}
+		if (this.transactionPartner != null) {
+			attr.put(ATTRIBUTE_TRANSACTION_PARTNER, this.transactionPartner);
+		}
 		return attr;
 	}
 }

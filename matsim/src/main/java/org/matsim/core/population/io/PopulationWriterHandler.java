@@ -22,22 +22,35 @@ package org.matsim.core.population.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**
  * @author mrieser
  */
 public interface PopulationWriterHandler {
 
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
+	void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
 
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException;
+	void startPlans(final Population plans, final BufferedWriter out) throws IOException;
 
-	public void writePerson(final Person person, final BufferedWriter out) throws IOException;
+	void writePerson(final Person person, final BufferedWriter out) throws IOException;
 
-	public void endPlans(final BufferedWriter out) throws IOException;
+	void endPlans(final BufferedWriter out) throws IOException;
 	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
+	void writeSeparator(final BufferedWriter out) throws IOException;
+
+	default void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+		if (!converters.isEmpty()) {
+			Logger.getLogger(getClass()).warn(
+					getClass().getName() +
+							" does not support custom attributes." +
+							" Please use a more recent file format" +
+							" if you need this feature.");
+		}
+	}
 }

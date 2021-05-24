@@ -19,36 +19,27 @@
 
 package org.matsim.contrib.signals.data.intergreens.v10;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
+import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  */
-public class IntergreenTimesReader10 implements MatsimReader {
-
-	private static final Logger log = Logger.getLogger(IntergreenTimesReader10.class);
+public final class IntergreenTimesReader10 extends AbstractSignalsReader{
 	
 	private IntergreenTimesData intergreensData;
 
@@ -56,18 +47,7 @@ public class IntergreenTimesReader10 implements MatsimReader {
 		this.intergreensData = intergreenTimesData;
 	}
 	
-	
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		log.info("starting unmarshalling " + filename);
-		try (InputStream stream = IOUtils.getInputStream(filename)){
-			readStream(stream);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	public void readStream(InputStream stream) throws UncheckedIOException {
+		public void read(InputSource stream) throws UncheckedIOException {
 		try {
 			Unmarshaller u = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class).createUnmarshaller();
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/intergreenTimes_v1.0.xsd")));

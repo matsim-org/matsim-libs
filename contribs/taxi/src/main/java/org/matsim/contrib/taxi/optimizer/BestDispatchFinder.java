@@ -1,18 +1,19 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.LinkProvider;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.InitialNode;
@@ -29,11 +30,11 @@ import com.google.common.collect.Maps;
  */
 public class BestDispatchFinder {
 	public static class Dispatch<D> {
-		public final Vehicle vehicle;
+		public final DvrpVehicle vehicle;
 		public final D destination;
 		public final VrpPathWithTravelData path;
 
-		public Dispatch(Vehicle vehicle, D destination, VrpPathWithTravelData path) {
+		public Dispatch(DvrpVehicle vehicle, D destination, VrpPathWithTravelData path) {
 			this.vehicle = vehicle;
 			this.destination = destination;
 			this.path = path;
@@ -60,26 +61,25 @@ public class BestDispatchFinder {
 
 	// for immediate requests only
 	// minimize TW
-	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Iterable<? extends Vehicle> vehicles) {
-		return findBestVehicle(req, vehicles, LinkProviders.REQUEST_TO_FROM_LINK);
+	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Stream<? extends DvrpVehicle> vehicles) {
+		return findBestVehicle(req, vehicles, TaxiRequest::getFromLink);
 	}
 
 	// We use many-to-one forward search. Therefore, we cannot assess all vehicles.
 	// However, that would be possible if one-to-many backward search were used instead.
 	// TODO intuitively, many-to-one is slower, some performance tests needed before switching to
 	// one-to-many
-	public <D> Dispatch<D> findBestVehicle(D destination, Iterable<? extends Vehicle> vehicles,
-			LinkProvider<D> destinationToLink) {
+	public <D> Dispatch<D> findBestVehicle(D destination, Stream<? extends DvrpVehicle> vehicles,
+			Function<D, Link> destinationToLink) {
 		double currTime = timer.getTimeOfDay();
 		Link toLink = destinationToLink.apply(destination);
 		Node toNode = toLink.getFromNode();
 
-		Map<Id<Node>, Vehicle> nodeToVehicle = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
+		Map<Id<Node>, DvrpVehicle> nodeToVehicle = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
 		Map<Id<Node>, InitialNode> initialNodes = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
-		for (Vehicle veh : vehicles) {
+		vehicles.forEach(veh -> {
 			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
 			if (departure != null) {
-
 				Node vehNode;
 				double delay = departure.time - currTime;
 				if (departure.link == toLink) {
@@ -89,7 +89,7 @@ public class BestDispatchFinder {
 					vehNode = departure.link.getToNode();
 
 					// simplified, but works for taxis, since pickup trips are short (about 5 mins)
-					delay += 1 + toLink.getFreespeed(departure.time);
+					delay += 1 + toLink.getLength() / toLink.getFreespeed(departure.time);
 				}
 
 				InitialNode existingInitialNode = initialNodes.get(vehNode.getId());
@@ -99,7 +99,7 @@ public class BestDispatchFinder {
 					nodeToVehicle.put(vehNode.getId(), veh);
 				}
 			}
-		}
+		});
 
 		if (initialNodes.isEmpty()) {
 			return null;
@@ -111,8 +111,8 @@ public class BestDispatchFinder {
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
-		Node fromNode = path.nodes.get(0);
-		Vehicle bestVehicle = nodeToVehicle.get(fromNode.getId());
+		Node fromNode = path.getFromNode();
+		DvrpVehicle bestVehicle = nodeToVehicle.get(fromNode.getId());
 		LinkTimePair bestDeparture = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(bestVehicle);
 
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(bestDeparture.link, toLink, bestDeparture.time, path,
@@ -122,18 +122,18 @@ public class BestDispatchFinder {
 
 	// for immediate requests only
 	// minimize TP
-	public Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh, Iterable<TaxiRequest> unplannedRequests) {
-		return findBestDestination(veh, unplannedRequests, LinkProviders.REQUEST_TO_FROM_LINK);
+	public Dispatch<TaxiRequest> findBestRequestForVehicle(DvrpVehicle veh, Stream<TaxiRequest> unplannedRequests) {
+		return findBestDestination(veh, unplannedRequests, TaxiRequest::getFromLink);
 	}
 
-	public <D> Dispatch<D> findBestDestination(Vehicle veh, Iterable<D> destinations,
-			LinkProvider<D> destinationToLink) {
+	public <D> Dispatch<D> findBestDestination(DvrpVehicle veh, Stream<D> destinations,
+			Function<D, Link> destinationToLink) {
 		LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
 		Node fromNode = departure.link.getToNode();
 
 		Map<Id<Node>, D> nodeToDestination = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
 		Map<Id<Node>, InitialNode> initialNodes = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
-		for (D loc : destinations) {
+		for (D loc : (Iterable<D>)destinations::iterator) {
 			Link link = destinationToLink.apply(loc);
 
 			if (departure.link == link) {
@@ -144,7 +144,7 @@ public class BestDispatchFinder {
 
 			if (!initialNodes.containsKey(locNodeId)) {
 				// simplified, but works for taxis, since pickup trips are short (about 5 mins)
-				double delayAtLastLink = link.getFreespeed(departure.time);
+				double delayAtLastLink = link.getLength() / link.getFreespeed(departure.time);
 
 				// works most fair (FIFO) if unplannedRequests (=destinations) are sorted by T0 (ascending)
 				InitialNode newInitialNode = new InitialNode(link.getFromNode(), delayAtLastLink, delayAtLastLink);
@@ -161,7 +161,7 @@ public class BestDispatchFinder {
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
-		Node toNode = path.nodes.get(path.nodes.size() - 1);
+		Node toNode = path.getToNode();
 		D bestDestination = nodeToDestination.get(toNode.getId());
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, destinationToLink.apply(bestDestination),
 				departure.time, path, travelTime);

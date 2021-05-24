@@ -37,7 +37,12 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 /**
+ * <p>
  * Starts a simulation with a social network, joint trips and joint activities.
+ * </p>
+ *
+ * <p>For details of the approach, please refer to <a href="https://doi.org/10.3929/ethz-b-000165685">this dissertation</a>.</p>
+ *
  * @author thibautd
  */
 public class RunExampleSocialSimulation {

@@ -19,10 +19,15 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.net.URL;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -36,27 +41,18 @@ public class RunTaxiScenarioTestIT {
 	}
 
 	@Test
-	public void testRunMielecLowDemandHighSupply() {
-		runMielec("plans_taxi_1.0.xml.gz", "taxis-50.xml");
-	}
-
-	@Test
 	public void testRunMielecHighDemandLowSupply() {
 		runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
 	}
 
-	@Test
-	public void testRunMielecHighDemandHighSupply() {
-		runMielec("plans_taxi_4.0.xml.gz", "taxis-50.xml");
-	}
-
 	private void runMielec(String plansFile, String taxisFile) {
-		String configFile = "mielec_2014_02/mielec_taxi_config.xml";
-		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
-		taxiCfg.setTaxisFile(taxisFile);
+		TaxiConfigGroup.getSingleModeTaxiConfig(config).setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		RunTaxiScenario.createControler(config, false).run();
+		config.controler().setDumpDataAtEnd(false);
+		TaxiControlerCreator.createControler(config, false).run();
 	}
 }

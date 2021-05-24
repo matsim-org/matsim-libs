@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -29,13 +33,9 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wraps a {@link TransitRouter}.
@@ -43,8 +43,6 @@ import java.util.List;
  * @author thibautd
  */
 public class TransitRouterWrapper implements RoutingModule {
-	private static final StageActivityTypes CHECKER =
-			new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
 	private final TransitRouter router;
 	private final RoutingModule walkRouter;
 	private final TransitSchedule transitSchedule;
@@ -74,8 +72,8 @@ public class TransitRouterWrapper implements RoutingModule {
 	 */
 	@Override
 	public List<? extends PlanElement> calcRoute(
-			final Facility<?> fromFacility,
-			final Facility<?> toFacility,
+			final Facility fromFacility,
+			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
 		List<Leg> baseTrip = router.calcRoute(
@@ -91,7 +89,7 @@ public class TransitRouterWrapper implements RoutingModule {
 		// mode" flag should be put to the mode of the routing module.
 		return baseTrip != null ?
 				fillWithActivities(baseTrip, fromFacility, toFacility, departureTime, person) :
-					walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+					null;
 	}
 
 	/**
@@ -110,21 +108,21 @@ public class TransitRouterWrapper implements RoutingModule {
 				// (access leg)
 				Facility firstToFacility;
 				if (baseTrip.size() > 1) { // at least one pt leg available
-					ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(1).getRoute();
+					TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(1).getRoute();
 					firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
 				} else {
 					firstToFacility = toFacility;
 				}
 				// (*)
-				Route route = createWalkRoute(fromFacility, departureTime, person, leg.getTravelTime(), firstToFacility);
+				Route route = createWalkRoute(fromFacility, departureTime, person,
+						leg.getTravelTime().seconds(), firstToFacility);
 				leg.setRoute(route);
 			} else {
-				if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-					ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
-					tRoute.setTravelTime(leg.getTravelTime());
+				if (leg.getRoute() instanceof TransitPassengerRoute) {
+					TransitPassengerRoute tRoute = (TransitPassengerRoute) leg.getRoute();
+					tRoute.setTravelTime(leg.getTravelTime().seconds());
 					tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
-					Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
-					act.setMaximumDuration(0.0);
+					Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId(), TransportMode.pt);
 					trip.add(act);
 					nextCoord = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 				} else { 
@@ -136,14 +134,14 @@ public class TransitRouterWrapper implements RoutingModule {
 					if (i == baseTrip.size() - 1) {
 						// if this is the last leg, we don't believe the leg from the TransitRouter.  Why?
 
-						ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
+						TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
 						Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
-						
-						Route route = createWalkRoute(lastFromFacility, departureTime, person, leg.getTravelTime(), toFacility);
+
+						Route route = createWalkRoute(lastFromFacility, departureTime, person,
+								leg.getTravelTime().seconds(), toFacility);
 						leg.setRoute(route);
 					}
-					Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg.getRoute().getStartLinkId());
-					act.setMaximumDuration(0.0);
+					Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(nextCoord, leg.getRoute().getStartLinkId(), TransportMode.pt);
 					trip.add(act);
 				}
 			}
@@ -165,8 +163,4 @@ public class TransitRouterWrapper implements RoutingModule {
 		return route;
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return CHECKER;
-	}
 } 

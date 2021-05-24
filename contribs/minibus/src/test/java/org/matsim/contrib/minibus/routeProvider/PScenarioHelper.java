@@ -43,7 +43,6 @@ import org.matsim.contrib.minibus.schedule.CreatePStops;
 import org.matsim.contrib.minibus.schedule.CreateStopsForAllCarLinks;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -391,6 +390,21 @@ public class PScenarioHelper {
 		
 		return coop;
 	}
+	
+	public static Operator createCoopRouteVShaped(){
+		
+		Scenario sc= PScenarioHelper.createTestNetwork();
+		
+		PConfigGroup conf = new PConfigGroup();
+		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getDriverRestTime(), conf.getMode());
+	
+		Operator coop = new BasicOperator(Id.create(conf.getPIdentifier() + 1, Operator.class), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
+		coop.init(prov, new RouteVShaped(sched, conf.getPIdentifier()), 0, 0.0);
+		
+		return coop;
+	}
 
 }
 
@@ -528,5 +542,39 @@ class Route2111to1314to4443 implements PStrategy{
 	@Override
 	public String getStrategyName() {
 		return "Route2111to1314to4443";
+	}
+}
+
+class RouteVShaped implements PStrategy{
+	
+	private final String pId;
+	private final TransitSchedule sched;
+	public RouteVShaped(TransitSchedule sched, String pId){
+		this.sched = sched;
+		this.pId = pId;
+	}
+	@Override
+	public PPlan run(Operator cooperative) {
+		Id<PPlan> routeId = Id.create(cooperative.getCurrentIteration(), PPlan.class);
+		
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName(), PConstants.founderPlanId);
+		newPlan.setNVehicles(1);
+		newPlan.setStartTime(8.0 * 3600.0);
+		newPlan.setEndTime(16.0 * 3600.0);
+		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", TransitStopFacility.class));
+		TransitStopFacility mostDistantStop = sched.getFacilities().get(Id.create(pId + "3141", TransitStopFacility.class));
+		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "3222", TransitStopFacility.class));
+		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
+		stopsToBeServed.add(startStop);
+		stopsToBeServed.add(mostDistantStop);
+		stopsToBeServed.add(endStop);
+		stopsToBeServed.add(mostDistantStop);
+		newPlan.setStopsToBeServed(stopsToBeServed);
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLineFromOperatorPlan(cooperative.getId(), newPlan));
+		return newPlan;
+	}
+	@Override
+	public String getStrategyName() {
+		return "RouteVShaped2111to3141to3222";
 	}
 }

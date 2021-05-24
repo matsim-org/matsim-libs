@@ -22,11 +22,13 @@ package org.matsim.withinday.trafficmonitoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector.TravelTimeInfo;
+import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime.TravelTimeInfo;
 
 public interface TravelTimeInfoProvider {
 	
-	/*package*/ TravelTimeInfo getTravelTimeData(final Id<Link> linkId);
+	/*package*/ TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId);
 	
-	/*package*/ TravelTimeInfo getTravelTimeData(final Link link);
+	/*package*/ TravelTimeInfo getTravelTimeInfo(final Link link);
+	// needs to be available separately since sometimes calling
+	// with the link argument is faster. kai, dec'17
 }

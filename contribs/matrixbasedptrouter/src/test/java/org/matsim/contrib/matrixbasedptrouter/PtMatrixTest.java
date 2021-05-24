@@ -25,7 +25,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;

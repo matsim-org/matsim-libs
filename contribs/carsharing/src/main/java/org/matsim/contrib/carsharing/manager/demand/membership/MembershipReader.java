@@ -1,13 +1,13 @@
 package org.matsim.contrib.carsharing.manager.demand.membership;
 
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
 /** 
  * @author balac
  */
@@ -19,23 +19,27 @@ public class MembershipReader extends MatsimXmlParser{
 	private Map<String, Set<String>> membershipPerCSType;
 	private String personId;
 	private String companyId;
+	private HashMap<String, String> stringCache = new HashMap<>();
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		
+
 		if (name.equals("person")) {
 			
 			personId = atts.getValue("id");
-			memberships = new HashMap<String, Set<String>>();
-			membershipPerCSType = new HashMap<String, Set<String>>();
+			memberships = new HashMap<>();
+			membershipPerCSType = new HashMap<>();
 		}
 		else if (name.equals("company")) {
 			
 			companyId = atts.getValue("id");
-			carsharingTypes = new TreeSet<String>();
+			companyId = stringCache.computeIfAbsent(companyId, id -> id);
+			carsharingTypes = new TreeSet<>();
 		}
 		else if (name.equals("carsharing")) {
 			
 			String csType = atts.getValue("name");
+			csType = stringCache.computeIfAbsent(csType, type -> type);
 			if (this.membershipPerCSType.containsKey(csType)) {
 				
 				Set<String> companies = this.membershipPerCSType.get(csType);
@@ -44,7 +48,7 @@ public class MembershipReader extends MatsimXmlParser{
 				
 			}
 			else {
-				Set<String> companies = new TreeSet<String>();
+				Set<String> companies = new TreeSet<>();
 				companies.add(companyId);
 				this.membershipPerCSType.put(csType, companies);				
 			}

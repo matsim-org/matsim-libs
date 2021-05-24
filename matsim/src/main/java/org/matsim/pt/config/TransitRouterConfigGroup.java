@@ -38,6 +38,8 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 	private double additionalTransferTime = 0.0;
 
 	private double directWalkFactor = 1. ;
+	
+	private boolean cacheTree = false;
 
 	public TransitRouterConfigGroup() {
 		super(GROUP_NAME);
@@ -114,5 +116,13 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(DIRECT_WALK_FACTOR)
 	public final void setDirectWalkFactor(double directWalkFactor) {
 		this.directWalkFactor = directWalkFactor;
+	}
+	
+	public boolean isCacheTree() {
+		return cacheTree;
+	}
+
+	public void setCacheTree(boolean cacheTree) {
+		this.cacheTree = cacheTree;
 	}
 }

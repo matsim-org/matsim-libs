@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
@@ -35,6 +34,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 /*package*/ class NetworkWriterHandlerImplV2 implements NetworkWriterHandler {
 	private final CoordinateTransformation transformation;
@@ -61,8 +62,8 @@ import java.util.Set;
 	@Override
 	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
 		out.write("<network");
-		if (network instanceof Network && (network.getName() != null)) {
-			out.write(" name=\"" + network.getName() + "\"");
+		if (network.getName() != null) {
+			out.write(" name=\"" + encodeAttributeValue(network.getName()) + "\"");
 		}
 		out.write(">\n\n");
 
@@ -99,10 +100,8 @@ import java.util.Set;
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
 		}
 
-		if (network instanceof Network) {
-			out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
-			out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
-		}
+		out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
+		out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
 
 		out.write(">\n");
 	}
@@ -119,16 +118,16 @@ import java.util.Set;
 	@Override
 	public void startNode(final Node node, final BufferedWriter out) throws IOException {
 		out.write("\t\t<node");
-		out.write(" id=\"" + node.getId() + "\"");
+		out.write(" id=\"" + encodeAttributeValue(node.getId().toString()) + "\"");
 		final Coord coord = transformation.transform( node.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");
 		if ( coord.hasZ() ) out.write(" z=\"" + coord.getZ() + "\"");
 		if (NetworkUtils.getType( node ) != null) {
-			out.write(" type=\"" + NetworkUtils.getType( node ) + "\"");
+			out.write(" type=\"" + encodeAttributeValue(NetworkUtils.getType(node)) + "\"");
 		}
 		if (NetworkUtils.getOrigId( node ) != null) {
-			out.write(" origid=\"" + NetworkUtils.getOrigId( node ) + "\"");
+			out.write(" origid=\"" + encodeAttributeValue(NetworkUtils.getOrigId(node)) + "\"");
 		}
 		out.write(" >\n");
 
@@ -150,9 +149,9 @@ import java.util.Set;
 	@Override
 	public void startLink(final Link link, final BufferedWriter out) throws IOException {
 		out.write("\t\t<link");
-		out.write(" id=\"" + link.getId() + "\"");
-		out.write(" from=\"" + link.getFromNode().getId() + "\"");
-		out.write(" to=\"" + link.getToNode().getId() + "\"");
+		out.write(" id=\"" + encodeAttributeValue(link.getId().toString()) + "\"");
+		out.write(" from=\"" + encodeAttributeValue(link.getFromNode().getId().toString()) + "\"");
+		out.write(" to=\"" + encodeAttributeValue(link.getToNode().getId().toString()) + "\"");
 		out.write(" length=\"" + link.getLength() + "\"");
 		out.write(" freespeed=\"" + link.getFreespeed() + "\"");
 		out.write(" capacity=\"" + link.getCapacity() + "\"");
@@ -171,7 +170,7 @@ import java.util.Set;
 					buffer.append(mode);
 					counter++;
 				}
-				this.lastModes = buffer.toString();
+				this.lastModes = encodeAttributeValue(buffer.toString());
 				this.lastSet = modes;
 			}
 			out.write(" modes=\"" + this.lastModes + "\"");

@@ -19,19 +19,35 @@
 
 package org.matsim.contrib.dynagent;
 
+/**
+ * Design suggestions:
+ * <p>
+ * The constructor is called before ActivityStartEvent and finalizeAction() is called after ActivityEndEvent.
+ * These two methods are meant for initialising and cleaning up the activity and should not be used for simulating it.
+ * For that purpose, use DynActivity.doSimStep(timeStep) with a special handling for the first/last time step.
+ */
 public interface DynActivity extends DynAction {
-	// Double.POSITIVE_INFINITY == stop simulating the agent (permanent sleep)
-	public static final double END_ACTIVITY_LATER = Double.MAX_VALUE;
+	double END_ACTIVITY_NOW = -Double.MAX_VALUE;
+	double END_ACTIVITY_LATER = Double.MAX_VALUE;
 
 	String getActivityType();
 
+	/**
+	 * Called in each time step after doSimStep().
+	 *
+	 * @return There are three possible outcomes:
+	 * <ul>
+	 * <li>{@code endTime == Double.POSITIVE_INFINITY} ==> stop simulating the agent (permanent sleep)</li>
+	 * <li>{@code endTime <= timeStep} ==> end simulating the activity in this time step (e.g. END_ACTIVITY_NOW)</li>
+	 * <li>{@code endTime > timeStep} ==> continue simulating the activity (e.g. END_ACTIVITY_LATER)</li>
+	 * </ul>
+	 */
 	double getEndTime();
 
 	/**
 	 * DynActivity is performed at steps: now == beginTime + 1, ..., endTime
-	 * 
-	 * @param now
-	 *            current time
+	 *
+	 * @param now current time
 	 */
 	// TODO this method may possibly be pulled up to DynAction since even when travelling (either by
 	// PuT or PrT) an agent may think, talk (also on the phone), collaborate etc.

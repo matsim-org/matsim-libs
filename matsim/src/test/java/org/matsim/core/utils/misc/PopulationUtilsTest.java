@@ -38,6 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -56,16 +57,22 @@ public class PopulationUtilsTest {
 		List<Leg> legs2 = PopulationUtils.getLegs(f.plan2);
 		List<Leg> legs3 = PopulationUtils.getLegs(f.plan3);
 		
-		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
-		Assert.assertEquals( 1., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+//		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
+		Assert.assertEquals( 4., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
+		// (no route is now counted as "same route" and thus reaps the reward. kai, jul'18)
+		
+//		Assert.assertEquals( 1., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+		// (no route is now counted as "same route" and thus reaps the reward. kai, jul'18)
+
 	}
 	
 	@Test
 	public void testActivityOverlap() {
 		Fixture f = new Fixture() ;
-		List<Activity> acts1 = PopulationUtils.getActivities(f.plan1, null ) ;
-		List<Activity> acts2 = PopulationUtils.getActivities(f.plan2, null ) ;
-		List<Activity> acts3 = PopulationUtils.getActivities(f.plan3, null ) ;
+		List<Activity> acts1 = PopulationUtils.getActivities(f.plan1, StageActivityHandling.StagesAsNormalActivities ) ;
+		List<Activity> acts2 = PopulationUtils.getActivities(f.plan2, StageActivityHandling.StagesAsNormalActivities ) ;
+		List<Activity> acts3 = PopulationUtils.getActivities(f.plan3, StageActivityHandling.StagesAsNormalActivities ) ;
 		
 		Assert.assertEquals( 6., PopulationUtils.calculateSimilarity( acts1, acts2 , 1., 1., 0. ) , 0.001 ) ;
 		Assert.assertEquals( 5., PopulationUtils.calculateSimilarity( acts1, acts3 , 1., 1., 0. ) , 0.001 ) ;

@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
@@ -59,7 +57,7 @@ import javax.inject.Inject;
  * @author rashid_waraich
  *
  */
-public class ParallelEventsManagerImpl implements EventsManager {
+public final class ParallelEventsManagerImpl implements EventsManager {
 
 	private boolean parallelMode = true;
 	private int numberOfThreads;
@@ -165,7 +163,7 @@ public class ParallelEventsManagerImpl implements EventsManager {
 		this.threads = new Thread[numberOfThreads];
 		// the additional 1 is for the simulation barrier
 		for (int i = 0; i < numberOfThreads; i++) {
-			events[i] = (EventsManagerImpl) EventsUtils.createEventsManager();
+			events[i] = new EventsManagerImpl();
 		}
 	}
 

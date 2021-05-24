@@ -19,120 +19,100 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.List;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
-import org.matsim.contrib.util.LongEnumAdder;
+import java.util.Collection;
+import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.Task.TaskType;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.util.stats.DurationStats;
+
+import com.google.common.collect.ImmutableList;
+
+import one.util.streamex.EntryStream;
 
 public class TaxiStatsCalculator {
-	private final int hours;
-	private final TaxiStats[] hourlyStats;
-	private final TaxiStats dailyStats = new TaxiStats(TaxiStatsCalculators.DAILY_STATS_ID);
-	private final List<TaxiStats> taxiStats;
+	public static final String DAILY_STATS_ID = "daily";
 
-	public TaxiStatsCalculator(Iterable<? extends Vehicle> vehicles) {
-		hours = TaxiStatsCalculators.calcHourCount(vehicles);
-		hourlyStats = new TaxiStats[hours];
-		for (int h = 0; h < hours; h++) {
-			hourlyStats[h] = new TaxiStats(h + "");
-		}
+	private final SortedMap<Integer, TaxiStats> hourlyStats = new TreeMap<>();
+	private final TaxiStats dailyStats = new TaxiStats(DAILY_STATS_ID);
 
-		taxiStats = TaxiStatsCalculators.createStatsList(hourlyStats, dailyStats);
+	public TaxiStatsCalculator(Collection<? extends DvrpVehicle> vehicles) {
+		for (DvrpVehicle vehicle : vehicles) {
+			DurationStats.taskDurationByTimeBinAndType(vehicle, 3600)
+					.forEach((hour, taskTypeDurations) -> updateTaxiStats(getHourlyStats(hour), taskTypeDurations));
 
-		for (Vehicle v : vehicles) {
-			updateStatsForVehicle(v);
+			Map<TaskType, Double> dailyTaskTypeDuration = DurationStats.taskDurationByTimeBinAndType(vehicle,
+					Integer.MAX_VALUE).entrySet().iterator().next().getValue();
+			updateTaxiStats(dailyStats, dailyTaskTypeDuration);
+
+			updatePassengerWaitTimeStats(vehicle);
 		}
 	}
 
-	public List<TaxiStats> getTaxiStats() {
-		return taxiStats;
+	public ImmutableList<TaxiStats> getTaxiStats() {
+		return ImmutableList.<TaxiStats>builder().addAll(hourlyStats.values()).add(dailyStats).build();
 	}
 
 	public TaxiStats getDailyStats() {
 		return dailyStats;
 	}
 
-	private void updateStatsForVehicle(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-			return;// do not evaluate - the vehicle is unused
-		}
-
-		@SuppressWarnings("unchecked")
-		LongEnumAdder<TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
-
-		for (Task t : schedule.getTasks()) {
-			TaxiTask tt = (TaxiTask)t;
-			int[] hourlyDurations = TaxiStatsCalculators.calcHourlyDurations((int)t.getBeginTime(),
-					(int)t.getEndTime());
-			int fromHour = TaxiStatsCalculators.getHour(t.getBeginTime());
-			for (int i = 0; i < hourlyDurations.length; i++) {
-				includeTaskIntoHourlySums(vehicleHourlySums, fromHour + i, tt, hourlyDurations[i]);
-			}
-
-			if (tt.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-				Request req = ((TaxiPickupTask)t).getRequest();
-				double waitTime = Math.max(t.getBeginTime() - req.getEarliestStartTime(), 0);
-				int hour = TaxiStatsCalculators.getHour(req.getEarliestStartTime());
-				hourlyStats[hour].passengerWaitTime.addValue(waitTime);
-				dailyStats.passengerWaitTime.addValue(waitTime);
-			}
-		}
-
-		includeVehicleHourlySumsIntoStats(vehicleHourlySums);
+	private TaxiStats getHourlyStats(int hour) {
+		return hourlyStats.computeIfAbsent(hour, h -> new TaxiStats(h + ""));
 	}
 
-	private void includeTaskIntoHourlySums(LongEnumAdder<TaxiTaskType>[] hourlySums, int hour, TaxiTask task,
-			int duration) {
-		if (duration > 0) {
-			if (hourlySums[hour] == null) {
-				hourlySums[hour] = new LongEnumAdder<>(TaxiTaskType.class);
-			}
-			hourlySums[hour].add(task.getTaxiTaskType(), duration);
-		}
+	private static void updateTaxiStats(TaxiStats stats, Map<TaskType, Double> taskTypeDurations) {
+		updateTaskDurations(stats, taskTypeDurations);
+		calculateEmptyDriveRatio(taskTypeDurations).ifPresent(stats.vehicleEmptyDriveRatio::addValue);
+		calculateStayRatio(taskTypeDurations).ifPresent(stats.vehicleStayRatio::addValue);
 	}
 
-	private void includeVehicleHourlySumsIntoStats(LongEnumAdder<TaxiTaskType>[] vehicleHourlySums) {
-		LongEnumAdder<TaxiTaskType> vehicleDailySums = new LongEnumAdder<>(TaxiTaskType.class);
-
-		for (int h = 0; h < hours; h++) {
-			LongEnumAdder<TaxiTaskType> vhs = vehicleHourlySums[h];
-			if (vhs != null && vhs.getLongTotal() > 0) {
-				updateTaxiStats(hourlyStats[h], vhs);
-				vehicleDailySums.addAll(vhs);
-			}
-		}
-
-		updateTaxiStats(dailyStats, vehicleDailySums);
+	static OptionalDouble calculateEmptyDriveRatio(Map<TaskType, Double> taskTypeDurations) {
+		double empty = sumBaseTaskTypeDurations(taskTypeDurations, EMPTY_DRIVE);
+		double occupied = sumBaseTaskTypeDurations(taskTypeDurations, OCCUPIED_DRIVE);
+		return (empty != 0 || occupied != 0) ? OptionalDouble.of(empty / (empty + occupied)) : OptionalDouble.empty();
 	}
 
-	private void updateTaxiStats(TaxiStats taxiStats, LongEnumAdder<TaxiTaskType> vehicleSums) {
-		updateEmptyDriveRatio(taxiStats.vehicleEmptyDriveRatio, vehicleSums);
-		updateStayRatio(taxiStats.vehicleStayRatio, vehicleSums);
-		taxiStats.taskTimeSumsByType.addAll(vehicleSums);
+	static OptionalDouble calculateStayRatio(Map<TaskType, Double> taskTypeDurations) {
+		double stay = sumBaseTaskTypeDurations(taskTypeDurations, STAY);
+		double total = taskTypeDurations.values().stream().mapToDouble(Double::doubleValue).sum();
+		return total != 0 ? OptionalDouble.of(stay / total) : OptionalDouble.empty();
 	}
 
-	private void updateEmptyDriveRatio(DescriptiveStatistics emptyDriveRatioStats,
-			LongEnumAdder<TaxiTaskType> durations) {
-		double empty = durations.getLong(TaxiTaskType.EMPTY_DRIVE);
-		double occupied = durations.getLong(TaxiTaskType.OCCUPIED_DRIVE);
-
-		if (empty != 0 || occupied != 0) {
-			double emptyRatio = empty / (empty + occupied);
-			emptyDriveRatioStats.addValue(emptyRatio);
-		}
+	static OptionalDouble calculateOccupiedDriveRatio(Map<TaskType, Double> taskTypeDurations) {
+		double occupied = sumBaseTaskTypeDurations(taskTypeDurations, OCCUPIED_DRIVE);
+		double total = taskTypeDurations.values().stream().mapToDouble(Double::doubleValue).sum();
+		return total != 0 ? OptionalDouble.of(occupied / total) : OptionalDouble.empty();
 	}
 
-	private void updateStayRatio(DescriptiveStatistics stayRatioStats, LongEnumAdder<TaxiTaskType> durations) {
-		double total = durations.getLongTotal();
-		if (total != 0) {
-			double stayRatio = durations.getLong(TaxiTaskType.STAY) / total;
-			stayRatioStats.addValue(stayRatio);
-		}
+	private static double sumBaseTaskTypeDurations(Map<TaskType, Double> taskTypeDurations, TaxiTaskBaseType baseType) {
+		return EntryStream.of(taskTypeDurations)
+				.filterKeys(taskType -> ((TaxiTaskType)taskType).getBaseType().orElse(null) == baseType)
+				.mapToDouble(Map.Entry::getValue)
+				.sum();
+	}
+
+	private static void updateTaskDurations(TaxiStats stats, Map<TaskType, Double> taskTypeDurations) {
+		taskTypeDurations.forEach(
+				(taskType, duration) -> stats.taskTypeDurations.merge(taskType, duration, Double::sum));
+	}
+
+	private void updatePassengerWaitTimeStats(DvrpVehicle vehicle) {
+		vehicle.getSchedule().tasks().filter(task -> PICKUP.isBaseTypeOf(task)).forEach(task -> {
+			TaxiRequest req = ((TaxiPickupTask)task).getRequest();
+			double waitTime = Math.max(task.getBeginTime() - req.getEarliestStartTime(), 0);
+			int hour = (int)(req.getEarliestStartTime() / 3600);
+			getHourlyStats(hour).passengerWaitTime.addValue(waitTime);
+			dailyStats.passengerWaitTime.addValue(waitTime);
+		});
 	}
 }

@@ -21,9 +21,9 @@ package org.matsim.vis.kml;
 
 import java.io.IOException;
 
-import net.opengis.kml._2.StyleType;
-
 import org.matsim.core.api.internal.MatsimFactory;
+
+import net.opengis.kml.v_2_2_0.StyleType;
 
 public interface NetworkKmlStyleFactory extends MatsimFactory {
 

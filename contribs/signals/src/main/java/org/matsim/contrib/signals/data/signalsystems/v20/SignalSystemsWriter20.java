@@ -38,16 +38,15 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
-import org.matsim.lanes.data.Lane;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
+import org.matsim.lanes.Lane;
+import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
+public final class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 	
 	private static final Logger log = Logger.getLogger(SignalSystemsWriter20.class);
 	

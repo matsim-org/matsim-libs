@@ -2,28 +2,24 @@ package org.matsim.contrib.freight.usecases.chessboard;
 
 import java.util.Collection;
 
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.VehicleRoutingAlgorithmBuilder;
-import jsprit.core.algorithm.state.StateManager;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.constraint.ConstraintManager;
-import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.activity.TourActivity;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -31,7 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class InitialCarrierPlanCreator {
+final class InitialCarrierPlanCreator {
 
     private Network network;
 
@@ -87,11 +83,18 @@ public class InitialCarrierPlanCreator {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 //						double waiting = 0.;
-                double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perTimeUnit;
-                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit*waiting + service;
+                double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
+                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
                 //						//				return penalty4missedTws*tooLate;
                 //						return 0.0;
             }
+
+			@Override
+			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
+					Vehicle vehicle) {
+				double activityDuration = Math.max(0, tourAct.getEndTime() - tourAct.getArrTime()); //including waiting times
+				return activityDuration;
+			}
 
         };
         vrpBuilder.setActivityCosts(activitycosts);
@@ -99,17 +102,20 @@ public class InitialCarrierPlanCreator {
         //build the problem
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
-        VehicleRoutingAlgorithmBuilder vraBuilder = new VehicleRoutingAlgorithmBuilder(vrp, "input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
-        vraBuilder.addDefaultCostCalculators();
+        //configure the algorithm
+        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+        xmlReader.read("input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
 
         StateManager stateManager = new StateManager(vrp);
         stateManager.updateLoadStates();
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        vraBuilder.setStateAndConstraintManager(stateManager, constraintManager);
-
-        VehicleRoutingAlgorithm vra = vraBuilder.build();
+        
+        boolean addDefaultCostCalculators = true;
+        
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
         //				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);
@@ -139,7 +145,7 @@ public class InitialCarrierPlanCreator {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap20.xml");
 
         Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml");
+        new CarrierPlanXmlReader(carriers).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml" );
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
@@ -150,7 +156,7 @@ public class InitialCarrierPlanCreator {
             carrier.setSelectedPlan(plan);
         }
 
-        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

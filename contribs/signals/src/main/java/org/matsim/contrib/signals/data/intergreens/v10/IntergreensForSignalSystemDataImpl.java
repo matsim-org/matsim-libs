@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 
@@ -36,7 +35,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalSystemData {
+public final class IntergreensForSignalSystemDataImpl implements IntergreensForSignalSystemData {
 
 	private Id<SignalSystem> signalSystemId;
 	private Map<Id<SignalGroup>, Map<Id<SignalGroup>, Integer>> endingGroupToBeginningGroupTimeMap = new HashMap<>();

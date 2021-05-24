@@ -22,8 +22,8 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 
@@ -44,7 +44,7 @@ public class FifoSchedulingProblem {
 			TaxiRequest req = reqIter.next();
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req,
-					fleet.getVehicles().values());
+					fleet.getVehicles().values().stream());
 
 			// TODO search only through available vehicles
 			// TODO what about k-nearstvehicle filtering?

@@ -20,12 +20,13 @@
 package org.matsim.contrib.dvrp.util.chart;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
-
-import com.google.common.collect.Lists;
 
 public class ScheduleCoordSources {
 	// n DriveTasks -> n+1 Links
@@ -51,7 +52,7 @@ public class ScheduleCoordSources {
 
 	// Schedule -> n DriveTasks -> n+1 Links
 	public static CoordSource createCoordSource(Schedule schedule) {
-		List<DriveTask> driveTasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
+		List<DriveTask> driveTasks = Schedules.driveTasks(schedule).collect(Collectors.toList());
 		return ScheduleCoordSources.createCoordSource(driveTasks);
 	}
 }

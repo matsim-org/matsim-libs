@@ -32,18 +32,22 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Collection;
 
+import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+
 public class SnapshotWritersModule extends AbstractModule {
 	@Override
 	public void install() {
-		if (getConfig().controler().getSnapshotFormat().contains("googleearth")) {
+		if (getConfig().controler().getSnapshotFormat().contains( SnapshotFormat.googleearth )) {
 			addSnapshotWriterBinding().toProvider(KMLSnapshotWriterFactory.class);
 		}
-		if (getConfig().controler().getSnapshotFormat().contains("transims")) {
+		if (getConfig().controler().getSnapshotFormat().contains( SnapshotFormat.transims )) {
 			addSnapshotWriterBinding().toProvider(TransimsSnapshotWriterFactory.class);
+		}
+		if ( getConfig().controler().getSnapshotFormat().contains( SnapshotFormat.positionevents )) {
+			addSnapshotWriterBinding().toProvider( PositionEventsWriterFactory.class );
 		}
 		if (getConfig().controler().getWriteSnapshotsInterval() != 0) {
 			addMobsimListenerBinding().toProvider(SnapshotWriterManagerProvider.class);
-
 		}
 	}
 
@@ -55,7 +59,9 @@ public class SnapshotWritersModule extends AbstractModule {
 		private final Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters;
 
 		@Inject
-		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup, ReplanningContext iterationContext, Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
+		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup,
+											  ReplanningContext iterationContext,
+											  Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
 			this.config = config;
 			this.controlerConfigGroup = controlerConfigGroup;
 			this.iterationContext = iterationContext;
@@ -75,6 +81,6 @@ public class SnapshotWritersModule extends AbstractModule {
 			}
 		}
 
-		private class NoopMobsimListener implements MobsimListener {
+		private static class NoopMobsimListener implements MobsimListener {
 		}
 	}}

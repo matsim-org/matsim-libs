@@ -1,16 +1,17 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import java.net.URL;
 import java.util.Collection;
 
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.activity.TourActivity;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -25,8 +26,12 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
-public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
+final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
+	
+	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 	
 	private Network network;
 	
@@ -80,6 +85,7 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
 					private double penalty4missedTws = 0.008; 
 					
+					//TODO: Why is here always returned 0.0? KMT jan/2018
 					@Override
 					public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {	
 						double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
@@ -89,6 +95,13 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 //						return penalty4missedTws*tooLate;
 						return 0.0;
 					}
+
+					@Override
+					public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
+							Vehicle vehicle) {
+						// TODO Auto-generated method stub
+						return 0;
+					}
 					
 				};
 				vrpBuilder.setActivityCosts(activitycosts);
@@ -97,7 +110,7 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				VehicleRoutingProblem vrp = vrpBuilder.build();
 				
 				//get configures algorithm
-				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/algorithm.xml");
+				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, IOUtils.extendUrl(url, "algorithm.xml"));
 //				vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
 				//add initial-solution - which is the initialSolution for the vehicle-routing-algo
 //				vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, network));

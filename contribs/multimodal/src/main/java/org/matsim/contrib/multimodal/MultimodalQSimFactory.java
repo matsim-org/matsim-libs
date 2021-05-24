@@ -20,23 +20,24 @@
 
 package org.matsim.contrib.multimodal;
 
-import com.google.inject.Provider;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Inject;
-import java.util.Map;
+import com.google.inject.Provider;
 
 public class MultimodalQSimFactory implements Provider<Mobsim> {
 
 	private Scenario scenario;
 	private EventsManager eventsManager;
-	private final Map<String, TravelTime> multiModalTravelTimes;
+	private Map<String, TravelTime> multiModalTravelTimes;
 
 	@Inject
 	MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes) {
@@ -47,8 +48,10 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 
 	@Override
 	public Mobsim get() {
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
-		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes).configure(qSim);
-		return qSim;
+		return new QSimBuilder(scenario.getConfig()) //
+									   .useDefaults()
+									   .addQSimModule(new MultiModalQSimModule(multiModalTravelTimes))
+									   .configureQSimComponents(MultiModalQSimModule::configureComponents ) //
+									   .build(scenario, eventsManager);
 	}
 }

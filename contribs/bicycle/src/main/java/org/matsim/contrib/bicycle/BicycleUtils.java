@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,19 +16,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.contrib.bicycle;
 
 /**
- * @author amit, dziemke
+ * Enumeration of frequently used labels related to bicycles.
+ *
+ * @author dziemke
  */
-public class BicycleUtils {
+public final class BicycleUtils {
+	// I think that this should rather be used through a BicycleUtils class.  kai, may'19
 
-	public static double getSpeed(final String travelMode){
-		double speed;
-		switch (travelMode) {
-		case "bicycle": speed = 4.17; break;
-		default: throw new RuntimeException("No speed is set for travel mode "+travelMode+ ".");
-		}
-		return speed;
+	public static final String GRADIENT = "gradient";
+	public static final String AVERAGE_ELEVATION = "averageElevation";
+	public static final String SURFACE = "surface";
+	public static final String SMOOTHNESS = "smoothness";
+	public static final String CYCLEWAY = "cycleway";
+	public static final String WAY_TYPE = "type";
+	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
+
+	private BicycleUtils() {
+		// Don't allow to create instances of this class
 	}
 }

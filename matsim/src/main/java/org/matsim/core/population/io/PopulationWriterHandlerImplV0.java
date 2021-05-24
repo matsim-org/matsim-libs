@@ -141,15 +141,12 @@ import org.matsim.core.utils.misc.Time;
 		}
 		if (act.getLinkId() != null)
 			out.write(" link=\"" + act.getLinkId() + "\"");
-		if (act.getStartTime() != Integer.MIN_VALUE)
-			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act != null){
-			Activity a = act;
-			if (a.getMaximumDuration() != Time.UNDEFINED_TIME)
-				out.write(" dur=\"" + Time.writeTime(a.getMaximumDuration()) + "\"");
-		}
-		if (act.getEndTime() != Integer.MIN_VALUE)
-			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
+		if (act.getStartTime().seconds() != Integer.MIN_VALUE)
+			out.write(" start_time=\"" + Time.writeTime(act.getStartTime().seconds()) + "\"");
+		if (act.getMaximumDuration().isDefined())
+			out.write(" dur=\"" + Time.writeTime(act.getMaximumDuration().seconds()) + "\"");
+		if (act.getEndTime().seconds() != Integer.MIN_VALUE)
+			out.write(" end_time=\"" + Time.writeTime(act.getEndTime().seconds()) + "\"");
 		out.write(" />\n");
 	}
 
@@ -165,13 +162,13 @@ import org.matsim.core.utils.misc.Time;
 	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepartureTime() != Integer.MIN_VALUE)
-			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
-		if (leg.getTravelTime() != Integer.MIN_VALUE)
-			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
+		if (leg.getDepartureTime().seconds() != Integer.MIN_VALUE)
+			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime().seconds()) + "\"");
+		if (leg.getTravelTime().seconds() != Integer.MIN_VALUE)
+			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime().seconds()) + "\"");
 //		if (leg instanceof LegImpl){
 //			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME)
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime())
 //				out.write(" arr_time=\"" + Time.writeTime(l.getDepartureTime() + l.getTravelTime()) + "\"");
 //		}
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16

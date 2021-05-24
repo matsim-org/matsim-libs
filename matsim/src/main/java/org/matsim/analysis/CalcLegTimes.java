@@ -22,12 +22,13 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -41,8 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-
-import javax.inject.Inject;
 
 /**
  * @author mrieser
@@ -60,10 +59,10 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
-	private final Map<Id<Person>, Double> agentDepartures = new HashMap<>();
-	private final Map<Id<Person>, Double> agentArrivals = new HashMap<>();
+	private final IdMap<Person, Double> agentDepartures = new IdMap<>(Person.class);
+	private final IdMap<Person, Double> agentArrivals = new IdMap<>(Person.class);
 	private final Map<String, int[]> legStats = new TreeMap<>();
-	private final Map<Id<Person>, String> previousActivityTypes = new HashMap<>();
+	private final IdMap<Person, String> previousActivityTypes = new IdMap<>(Person.class);
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 
@@ -141,12 +140,8 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	}
 
 	public void writeStats(final String filename) {
-		BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
-		writeStats(legStatsFile);
-		try {
-			if (legStatsFile != null) {
-				legStatsFile.close();
-			}
+		try (BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename)) {
+			writeStats(legStatsFile);
 		} catch (IOException e) {
 			log.error(e);
 		}
@@ -154,33 +149,34 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 
 	public void writeStats(final java.io.Writer out) throws UncheckedIOException {
 		try {
-		boolean first = true;
-		for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
-			String key = entry.getKey();
-			int[] counts = entry.getValue();
-			if (first) {
-				first = false;
-				out.write("pattern");
-				for (int i = 0; i < counts.length; i++) {
-					out.write("\t" + (i*SLOT_SIZE/60) + "+");
+			boolean first = true;
+			for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
+				String key = entry.getKey();
+				int[] counts = entry.getValue();
+				if (first) {
+					first = false;
+					out.write("pattern");
+					for (int i = 0; i < counts.length; i++) {
+						out.write("\t" + (i * SLOT_SIZE / 60) + "+");
+					}
+					out.write("\n");
+				}
+				out.write(key);
+				for (int count : counts) {
+					out.write("\t" + count);
 				}
 				out.write("\n");
 			}
-			out.write(key);
-            for (int count : counts) {
-                out.write("\t" + count);
-            }
 			out.write("\n");
-		}
-		out.write("\n");
-		if (this.sumTrips == 0) {
-			out.write("average trip duration: no trips!");
-		} else {
-			out.write("average trip duration: "
-					+ (this.sumTripDurations / this.sumTrips) + " seconds = "
-					+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
-		}
-		out.write("\n");
+			if (this.sumTrips == 0) {
+				out.write("average trip duration: no trips!");
+			} else {
+				out.write("average trip duration: "
+						+ (this.sumTripDurations / this.sumTrips)
+						+ " seconds = "
+						+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
+			}
+			out.write("\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} finally {

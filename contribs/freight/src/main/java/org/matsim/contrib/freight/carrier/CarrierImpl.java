@@ -1,10 +1,12 @@
 package org.matsim.contrib.freight.carrier;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -13,31 +15,32 @@ import org.matsim.api.core.v01.Id;
  * @author sschroeder, mzilske
  *
  */
-public class CarrierImpl implements Carrier {
-
-	public static Carrier newInstance(Id<Carrier> id){
-		return new CarrierImpl(id);
+public final class CarrierImpl implements Carrier {
+	@Deprecated // refactoring device, please inline
+	public static Carrier newInstance( Id<Carrier> carrierId ){
+		return CarrierUtils.createCarrier( carrierId ) ;
 	}
-	
 	private final Id<Carrier> id;
 
 	private final List<CarrierPlan> plans;
 
-	private final Collection<CarrierShipment> shipments; 
+	private final Map<Id<CarrierShipment>, CarrierShipment> shipments;
 
-	private final Collection<CarrierService> services;
+	private final Map<Id<CarrierService>, CarrierService> services;
 
 	private CarrierCapabilities carrierCapabilities;
 	
 	private CarrierPlan selectedPlan;
-	
-	private CarrierImpl(final Id<Carrier> id) {
+
+	private final Attributes attributes = new Attributes();
+
+	CarrierImpl( final Id<Carrier> id ) {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
-		services = new ArrayList<CarrierService>();
-		shipments = new ArrayList<CarrierShipment>();
-		plans = new ArrayList<CarrierPlan>();
+		services = new LinkedHashMap<>();
+		shipments = new LinkedHashMap<>();
+		plans = new ArrayList<>();
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public class CarrierImpl implements Carrier {
 	}
 
 	@Override
-	public Collection<CarrierShipment> getShipments() {
+	public Map<Id<CarrierShipment>, CarrierShipment> getShipments() {
 		return shipments;
 	}
 
@@ -78,65 +81,46 @@ public class CarrierImpl implements Carrier {
 		this.selectedPlan = selectedPlan;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.mzilske.freight.Carrier#setCarrierCapabilities(playground.
-	 * mzilske.freight.CarrierCapabilities)
-	 */
 	@Override
 	public void setCarrierCapabilities(CarrierCapabilities carrierCapabilities) {
 		this.carrierCapabilities = carrierCapabilities;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getCarrierCapabilities()
-	 */
 	@Override
 	public CarrierCapabilities getCarrierCapabilities() {
 		return carrierCapabilities;
 	}
 
 	@Override
-	public Collection<CarrierService> getServices(){
+	public Map<Id<CarrierService>, CarrierService> getServices(){
 		return services;
 	}
 
 	@Override
 	public boolean addPlan(CarrierPlan p) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
-		CarrierPlan newPlan = CarrierImpl.copyPlan(this.selectedPlan) ;
+		CarrierPlan newPlan = CarrierUtils.copyPlan(this.selectedPlan ) ;
 		this.setSelectedPlan( newPlan ) ;
 		return newPlan ;
-	}
-
-	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
-		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
-		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
-			double depTime = sTour.getDeparture();
-			CarrierVehicle vehicle = sTour.getVehicle();
-			Tour tour = sTour.getTour().duplicate();
-			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
-		}
-		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
-		double initialScoreOfCopiedPlan = plan2copy.getScore();
-		copiedPlan.setScore(initialScoreOfCopiedPlan);
-		return copiedPlan;
-	
 	}
 
 	@Override
 	public boolean removePlan(CarrierPlan p) {
 		return this.plans.remove(p);
 	}
-	
+
+	@Override
+	public void clearPlans() { this.plans.clear(); }
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+
 
 }

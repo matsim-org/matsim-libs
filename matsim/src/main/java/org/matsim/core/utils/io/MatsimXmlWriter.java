@@ -20,11 +20,14 @@
 
 package org.matsim.core.utils.io;
 
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
+
 import java.io.IOException;
 import java.util.List;
 
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 
 /**
  * A simple abstract class to write XML files.
@@ -243,25 +246,41 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	}
 
 	/**
-	 * Encodes the given string in such a way that it no longer contains
-	 * characters that have a special meaning in xml.
-	 * 
-	 * @see <a href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
-	 * @param attributeValue
-	 * @return String with some characters replaced by their xml-encoding.
+	 * Writes an element including start and end tag on the writer
+	 * @param tagname
+	 * @param content
+	 * @throws UncheckedIOException
 	 */
-	protected static String encodeAttributeValue(final String attributeValue) {
-		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
-			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+	protected final void writeElement(String tagname, String content) throws UncheckedIOException{
+		//start tag
+		try {
+			if (doPrettyPrint) {
+				this.writer.write(NL);
+				indent();
+				this.indentationLevel++;
+			}
+			this.writer.write("<" + tagname + ">");
+				if (doPrettyPrint) {
+					this.indentationLevel--;
+				}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		return attributeValue;
+
+		//content
+		try {
+			writer.write(encodeContent(content));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		//end tag
+		try {
+			this.writer.write("</" + tagname + ">");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
-	protected static String encodeContent(final String content) {
-		if (content.contains("&") || content.contains("<") || content.contains(">")) {
-			return content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-		}
-		return content;
-	}
 
 }

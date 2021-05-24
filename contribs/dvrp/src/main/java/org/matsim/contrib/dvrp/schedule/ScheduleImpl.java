@@ -19,18 +19,22 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author michalm
  */
-public class ScheduleImpl implements Schedule {
-	private final Vehicle vehicle;
+final class ScheduleImpl implements Schedule {
+	private final DvrpVehicleSpecification vehicleSpecification;
 
 	private final List<AbstractTask> tasks = new ArrayList<>();
 	private final List<? extends Task> unmodifiableTasks = Collections.unmodifiableList(tasks);
@@ -38,8 +42,8 @@ public class ScheduleImpl implements Schedule {
 	private ScheduleStatus status = ScheduleStatus.UNPLANNED;
 	private AbstractTask currentTask = null;
 
-	public ScheduleImpl(Vehicle vehicle) {
-		this.vehicle = vehicle;
+	ScheduleImpl(DvrpVehicleSpecification vehicleSpecification) {
+		this.vehicleSpecification = vehicleSpecification;
 	}
 
 	@Override
@@ -48,14 +52,21 @@ public class ScheduleImpl implements Schedule {
 	}
 
 	@Override
+	public Stream<? extends Task> tasks() {
+		return tasks.stream();
+	}
+
+	@Override
 	public int getTaskCount() {
 		return tasks.size();
 	}
 
+	@Override
 	public void addTask(Task task) {
 		addTask(tasks.size(), task);
 	}
 
+	@Override
 	public void addTask(int taskIdx, Task task) {
 		validateArgsBeforeAddingTask(taskIdx, task);
 
@@ -76,53 +87,25 @@ public class ScheduleImpl implements Schedule {
 
 	private void validateArgsBeforeAddingTask(int taskIdx, Task task) {
 		failIfCompleted();
-		if (status == ScheduleStatus.STARTED && taskIdx <= currentTask.getTaskIdx()) {
-			throw new IllegalStateException();
-		}
+		Preconditions.checkState(status != ScheduleStatus.STARTED || taskIdx > currentTask.getTaskIdx());
 
 		double beginTime = task.getBeginTime();
 		double endTime = task.getEndTime();
 		Link beginLink = Tasks.getBeginLink(task);
-		Link endLink = Tasks.getEndLink(task);
 		int taskCount = tasks.size();
 
-		if (taskIdx < 0 || taskIdx > taskCount) {
-			throw new IllegalArgumentException();
-		}
-
-		if (beginTime > endTime) {
-			throw new IllegalArgumentException();
-		}
+		Preconditions.checkArgument(taskIdx >= 0 && taskIdx <= taskCount);
+		Preconditions.checkArgument(beginTime <= endTime);
 
 		if (taskIdx > 0) {
 			Task previousTask = tasks.get(taskIdx - 1);
-
-			if (previousTask.getEndTime() != beginTime) {
-				throw new IllegalArgumentException();
-			}
-
-			if (Tasks.getEndLink(previousTask) != beginLink) {
-				Logger.getLogger(getClass()).error("Last task End link: " + Tasks.getEndLink(previousTask).getId()
-						+ " ; next Task start link: " + beginLink.getId());
-				throw new IllegalArgumentException();
-			}
+			Preconditions.checkArgument(previousTask.getEndTime() == beginTime);
+			Preconditions.checkArgument(Tasks.getEndLink(previousTask) == beginLink,
+					"Last task end link: %s; Next task start link: %s", Tasks.getEndLink(previousTask).getId(),
+					beginLink.getId());
 		} else { // taskIdx == 0
-			if (vehicle.getStartLink() != beginLink) {
-				throw new IllegalArgumentException();
-			}
+			Preconditions.checkArgument(vehicleSpecification.getStartLinkId().equals(beginLink.getId()));
 		}
-
-//		if (taskIdx < taskCount) {
-//			Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
-//
-//			if (nextTask.getBeginTime() != endTime) {
-//				throw new IllegalArgumentException();
-//			}
-//
-//			if (Tasks.getBeginLink(nextTask) != endLink) {
-//				throw new IllegalArgumentException();
-//			}
-//		}
 	}
 
 	@Override
@@ -139,12 +122,7 @@ public class ScheduleImpl implements Schedule {
 		failIfUnplanned();
 		failIfCompleted();
 
-		AbstractTask task = tasks.get(taskIdx);
-
-		if (task.getStatus() != TaskStatus.PLANNED) {
-			throw new IllegalStateException();
-		}
-
+		Preconditions.checkState(tasks.get(taskIdx).getStatus() == TaskStatus.PLANNED);
 		tasks.remove(taskIdx);
 
 		for (int i = taskIdx; i < tasks.size(); i++) {
@@ -212,24 +190,18 @@ public class ScheduleImpl implements Schedule {
 
 	@Override
 	public String toString() {
-		return "Schedule_" + vehicle.getId();
+		return "Schedule_" + vehicleSpecification.getId();
 	}
 
 	private void failIfUnplanned() {
-		if (status == ScheduleStatus.UNPLANNED) {
-			throw new IllegalStateException();
-		}
+		Preconditions.checkState(status != ScheduleStatus.UNPLANNED);
 	}
 
 	private void failIfCompleted() {
-		if (status == ScheduleStatus.COMPLETED) {
-			throw new IllegalStateException();
-		}
+		Preconditions.checkState(status != ScheduleStatus.COMPLETED);
 	}
 
 	private void failIfNotStarted() {
-		if (status != ScheduleStatus.STARTED) {
-			throw new IllegalStateException();
-		}
+		Preconditions.checkState(status == ScheduleStatus.STARTED);
 	}
 }

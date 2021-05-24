@@ -19,97 +19,83 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Set;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
  * Multiple passenger dropoff and pickup activity
- * 
+ *
  * @author michalm
  */
-public class BusStopActivity extends AbstractDynActivity implements PassengerPickupActivity {
-	private final PassengerEngine passengerEngine;
+public class BusStopActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
-	private final Set<? extends PassengerRequest> dropoffRequests;
-	private final Set<? extends PassengerRequest> pickupRequests;
+	private final Map<Id<Request>, ? extends PassengerRequest> dropoffRequests;
+	private final Map<Id<Request>, ? extends PassengerRequest> pickupRequests;
+	private final double expectedEndTime;
 
-	private int passengersAboard;
-	private double endTime = END_ACTIVITY_LATER;
-	private double departureTime;
+	private int passengersPickedUp = 0;
 
-	public BusStopActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask task,
-			Set<? extends PassengerRequest> dropoffRequests, Set<? extends PassengerRequest> pickupRequests,
-			String activityType) {
+	public BusStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
+			Map<Id<Request>, ? extends PassengerRequest> dropoffRequests,
+			Map<Id<Request>, ? extends PassengerRequest> pickupRequests, String activityType) {
 		super(activityType);
-
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.dropoffRequests = dropoffRequests;
 		this.pickupRequests = pickupRequests;
-		this.departureTime = task.getEndTime();
-
-		double now = task.getBeginTime();
-		dropoffPassengers(now);
+		this.expectedEndTime = task.getEndTime();
 	}
 
-	// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
-	private void dropoffPassengers(double now) {
-		for (PassengerRequest request : dropoffRequests) {
-			passengerEngine.dropOffPassenger(driver, request, now);
+	@Override
+	protected boolean isLastStep(double now) {
+		return passengersPickedUp == pickupRequests.size() && now >= expectedEndTime;
+	}
+
+	@Override
+	protected void beforeFirstStep(double now) {
+		// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
+		for (PassengerRequest request : dropoffRequests.values()) {
+			passengerHandler.dropOffPassenger(driver, request, now);
 		}
 	}
 
 	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-
-	@Override
-	public void doSimStep(double now) {
-		if (now < departureTime) {
-			return;
-		}
-
-		if (now == departureTime) {
-			// picking up is at the end of stay
-			// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
-			for (PassengerRequest request : pickupRequests) {
-				if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
-					passengersAboard++;
+	protected void simStep(double now) {
+		if (now == expectedEndTime) {
+			for (PassengerRequest request : pickupRequests.values()) {
+				if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+					passengersPickedUp++;
 				}
-			}
-
-			if (passengersAboard == pickupRequests.size()) {
-				endTime = now;
 			}
 		}
 	}
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		PassengerRequest request = getRequestForPassenger(passenger);
+		if (now < expectedEndTime) {
+			return;// pick up only at the end of stop activity
+		}
 
-		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
-			passengersAboard++;
+		PassengerRequest request = getRequestForPassenger(passenger.getId());
+		if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}
-
-		if (passengersAboard == pickupRequests.size()) {
-			endTime = now;
-		}
 	}
 
-	private PassengerRequest getRequestForPassenger(MobsimPassengerAgent passenger) {
-		for (PassengerRequest request : pickupRequests) {
-			if (passenger == request.getPassenger()) {
-				return request;
-			}
-		}
-
-		throw new IllegalArgumentException("I am waiting for different passengers!");
+	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
+		return pickupRequests.values().stream()
+				.filter(r -> passengerId.equals(r.getPassengerId()))
+				.findAny()
+				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
 }

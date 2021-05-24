@@ -81,6 +81,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 
 			this.gexfFactory = new ObjectFactory();
 			this.gexfContainer = this.gexfFactory.createXMLGexfContent();
+			this.gexfContainer.setVersion("1.2");
 		
 			XMLGraphContent graph = this.gexfFactory.createXMLGraphContent();
 			graph.setDefaultedgetype(XMLDefaultedgetypeType.DIRECTED);
@@ -159,6 +160,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 //			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			entry.getValue().getAttvalue().add(attValue);
 			this.linkId2CountsFromLastIteration.put(entry.getKey(), countForLink);

@@ -18,11 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -30,11 +25,13 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+
 /**
  * @author dziemke
  */
-public class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
-	private static final Logger LOG = Logger.getLogger(MotorizedInteractionEngine.class);
+final class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
+	// ok to have this public final when ctor is package-private/injected: can only be used through injection
 
 	private EventsManager eventsManager;
 //	private List<Id<Link>> links;

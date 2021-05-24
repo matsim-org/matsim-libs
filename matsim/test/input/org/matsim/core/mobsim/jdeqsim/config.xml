@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+<!-- ====================================================================== -->
+
+	<module name="JDEQSim" >
+		<param name="carSize" value="10.0" />
+		<param name="endTime" value="00:06:00" />
+		<param name="flowCapacityFactor" value="2.0" />
+		<param name="gapTravelSpeed" value="20.0" />
+		<param name="minimumInFlowCapacity" value="3600" />
+		<param name="squeezeTime" value="9000" />
+		<param name="storageCapacityFactor" value="3.0" />
+	</module>
+
+</config>

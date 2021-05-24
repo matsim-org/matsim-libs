@@ -22,6 +22,7 @@ package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -29,18 +30,18 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public interface Departure extends Identifiable<Departure> {
+public interface Departure extends Identifiable<Departure>, Attributable {
 
-	public abstract double getDepartureTime();
+	double getDepartureTime();
 
 	/**
 	 * @param vehicleId the id of the vehicle to be used for this departure, may be <code>null</code>
 	 */
-	public abstract void setVehicleId(final Id<Vehicle> vehicleId);
+	void setVehicleId(final Id<Vehicle> vehicleId);
 
 	/**
 	 * @return The id of the vehicle to be used for this departure, may be <code>null</code>
 	 */
-	public abstract Id<Vehicle> getVehicleId();
+	Id<Vehicle> getVehicleId();
 
 }

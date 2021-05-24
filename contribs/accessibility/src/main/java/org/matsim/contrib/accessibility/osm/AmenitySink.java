@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -47,7 +44,10 @@ import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-public class AmenitySink implements Sink {
+import java.util.HashMap;
+import java.util.Map;
+
+class AmenitySink implements Sink {
 	private final Logger log = Logger.getLogger(AmenitySink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;
@@ -67,8 +67,13 @@ public class AmenitySink implements Sink {
 	private int otherCounter = 0;
 	private int policeCounter = 0;
 	private int healthcareCounter = 0;
+	private final boolean skipDesc;
 	
 	public AmenitySink(CoordinateTransformation ct, Map<String, String> osmToMatsimType) {
+		this(ct, osmToMatsimType, false);
+	}
+	
+	public AmenitySink(CoordinateTransformation ct, Map<String, String> osmToMatsimType, boolean skipDesc) {
 		this.ct = ct;
 		this.typeMap = osmToMatsimType;
 		this.nodeMap = new HashMap<Long, NodeContainer>();
@@ -84,6 +89,8 @@ public class AmenitySink implements Sink {
 		educationLevelMap.put("secondary", 0);
 		educationLevelMap.put("tertiary", 0);
 		educationLevelMap.put("unknown", 0);
+		
+		this.skipDesc = skipDesc;
 	}
 
 	
@@ -147,12 +154,12 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				//Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = OSMCoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);
-					((ActivityFacilityImpl)af).setDesc(name);
+					if (!skipDesc) ((ActivityFacilityImpl)af).setDesc(name);
 					facilities.addActivityFacility(af);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -173,12 +180,12 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 //				Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = OSMCoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);					
-					((ActivityFacilityImpl)af).setDesc(name);
+					if (!skipDesc) ((ActivityFacilityImpl)af).setDesc(name);
 					facilities.addActivityFacility(af);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -363,7 +370,7 @@ public class AmenitySink implements Sink {
 	
 
 	@Override
-	public void release() {
+	public void close() {
 
 	}
 
@@ -433,7 +440,6 @@ public class AmenitySink implements Sink {
 
 	@Override
 	public void initialize(Map<String, Object> metaData) {
-		// TODO Auto-generated method stub
 	}
 
 }

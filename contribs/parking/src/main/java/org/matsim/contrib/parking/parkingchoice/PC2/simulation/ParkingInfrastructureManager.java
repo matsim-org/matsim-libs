@@ -31,7 +31,7 @@ import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PPRestrictedT
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PrivateParking;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.RentableParking;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScore;
 import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.SortableMapObject;
@@ -42,9 +42,9 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
 // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
-public final class ParkingInfrastructureManager {
+public final class ParkingInfrastructureManager implements ParkingInfrastructure {
 
-	private ParkingScoreManager parkingScoreManager;
+	private ParkingScore parkingScoreManager;
 	private HashMap<Id<PC2Parking>, PC2Parking> allParkings;
 	private HashMap<Id<Person>, Id<PC2Parking>> parkedVehicles;
 	private EventsManager eventsManager;
@@ -71,7 +71,7 @@ public final class ParkingInfrastructureManager {
 	// + also private parking, which is attached to activity
 	// both should be checked.
 
-	public ParkingInfrastructureManager(ParkingScoreManager parkingScoreManager, EventsManager eventsManager) {
+	public ParkingInfrastructureManager(ParkingScore parkingScoreManager, EventsManager eventsManager) {
 		this.parkingScoreManager = parkingScoreManager;
 		this.eventsManager = eventsManager;
 		parkedVehicles = new HashMap<>();
@@ -80,6 +80,7 @@ public final class ParkingInfrastructureManager {
 		rentablePrivateParking = new HashMap<>();
 	}
 
+	@Override
 	public synchronized void setPublicParkings(LinkedList<PublicParking> publicParkings) {
 		publicParkingGroupQuadTrees = new HashMap<String, QuadTree<PC2Parking>>();
 		EnclosingRectangle allPublicParkingRect = new EnclosingRectangle();
@@ -116,6 +117,7 @@ public final class ParkingInfrastructureManager {
 		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
 	}
 
+	@Override
 	public synchronized void setRentableParking(LinkedList<RentableParking> rentableParkings) {
 		for (RentableParking pp : rentableParkings) {
 			rentablePrivateParking.put(pp.getOwnerId(), pp);
@@ -123,6 +125,7 @@ public final class ParkingInfrastructureManager {
 		}
 	}
 
+	@Override
 	public synchronized void setPrivateParkingRestrictedToFacilities(
 			LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
@@ -133,6 +136,7 @@ public final class ParkingInfrastructureManager {
 		}
 	}
 
+	@Override
 	public synchronized void reset() {
 		parkedVehicles.clear();
 
@@ -168,6 +172,7 @@ public final class ParkingInfrastructureManager {
 		return publicParkingsQuadTree;
 	}
 
+	@Override
 	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate,
 			String groupName) {
 		PC2Parking parking = null;
@@ -187,10 +192,12 @@ public final class ParkingInfrastructureManager {
 		return parking;
 	}
 
+	@Override
 	public synchronized void logArrivalEventAtTimeZero(PC2Parking parking) {
 		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(), null, null, 0));
 	}
 
+	@Override
 	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName,
 			Id<Person> personId, double parkingDurationInSeconds, double arrivalTime) {
 		PC2Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
@@ -208,6 +215,7 @@ public final class ParkingInfrastructureManager {
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to
 	// vehicleId - check, if this is the case now.
+	@Override
 	public synchronized PC2Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		// availablePublicParkingAtCityCentre();
 
@@ -476,6 +484,7 @@ public final class ParkingInfrastructureManager {
 	// never used. kai, jul'15
 
 	// TODO: make this method abstract
+	@Override
 	public synchronized PC2Parking personCarDepartureEvent(
 			ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		final Id<Person> personId = parkingOperationRequestAttributes.personId;
@@ -489,6 +498,7 @@ public final class ParkingInfrastructureManager {
 		return parking;
 	}
 
+	@Override
 	public synchronized void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes,
 			PC2Parking parking) {
 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
@@ -498,6 +508,7 @@ public final class ParkingInfrastructureManager {
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
+	@Override
 	public synchronized void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId) {
 		// yyyy I would prefer if this could not be called publicly ... since it
 		// allows to bypass parkedVehicles.remove(personId);
@@ -534,22 +545,27 @@ public final class ParkingInfrastructureManager {
 		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId(), personId));
 	}
 
-	public synchronized ParkingScoreManager getParkingScoreManager() {
+	@Override
+	public synchronized ParkingScore getParkingScoreManager() {
 		return parkingScoreManager;
 	}
 
+	@Override
 	public synchronized EventsManager getEventsManager() {
 		return eventsManager;
 	}
 
+	@Override
 	public synchronized void setEventsManager(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 	}
 
+	@Override
 	public HashMap<Id<PC2Parking>, PC2Parking> getAllParkings() {
 		return allParkings;
 	}
 
+	@Override
 	public void setAllParkings(HashMap<Id<PC2Parking>, PC2Parking> allParkings) {
 		this.allParkings = allParkings;
 	}

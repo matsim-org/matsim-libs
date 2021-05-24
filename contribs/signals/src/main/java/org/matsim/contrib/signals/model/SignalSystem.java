@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.signals.controller.SignalController;
 
 
 /**
@@ -30,6 +31,8 @@ import org.matsim.api.core.v01.Identifiable;
  *
  */
 public interface SignalSystem extends Identifiable<SignalSystem> {
+	
+	public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 	
 	public void setSignalSystemsManager(SignalSystemsManager signalManager);
 

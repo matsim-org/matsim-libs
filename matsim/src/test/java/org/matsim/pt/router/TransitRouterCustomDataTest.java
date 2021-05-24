@@ -1,4 +1,25 @@
-package org.matsim.pt.router;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TransitRouterCustomDataTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.pt.router;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +36,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -52,7 +72,7 @@ public class TransitRouterCustomDataTest {
 
 		double x = -100;
 		List<Leg> legs = router.calcRoute(new FakeFacility( new Coord(x, (double) 0)), new FakeFacility( new Coord((double) 3100, (double) 0)), 5.9*3600, null);
-		Assert.assertEquals(1, legs.size());
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
 		
 		/* the following is not really nice as a test, but I had to somehow
 		 * keep track of the internal state and have to replay this now
@@ -78,7 +98,7 @@ public class TransitRouterCustomDataTest {
 	private static class MockingTransitTravelDisutility implements TransitTravelDisutility {
 
 		private final TransitRouterNetworkTravelTimeAndDisutility routerDisutility;
-		private ArrayList<String> states = new ArrayList<String>();
+		private ArrayList<String> states = new ArrayList<>();
 		
 		public MockingTransitTravelDisutility(final TransitRouterNetworkTravelTimeAndDisutility routerDisutility) {
 			this.routerDisutility = routerDisutility;
@@ -91,7 +111,7 @@ public class TransitRouterCustomDataTest {
 
 			System.out.print("handling link " + ((TransitRouterNetworkNode) link.getFromNode()).getStop().getStopFacility().getId() 
 					+ ">" + ((TransitRouterNetworkNode) link.getToNode()).getStop().getStopFacility().getId());
-			ArrayList<LoggerData> links = new ArrayList<LoggerData>();
+			ArrayList<LoggerData> links = new ArrayList<>();
 			Object o = dataManager.getFromNodeCustomData();
 			if (o instanceof ArrayList) {
 				links.addAll((Collection<? extends LoggerData>) o);
@@ -163,22 +183,22 @@ public class TransitRouterCustomDataTest {
 		schedule.addStopFacility(f5);
 		
 		TransitLine line1 = f.createTransitLine(Id.create("1", TransitLine.class));
-		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		stops.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
-		stops.add(f.createTransitRouteStop(f2, Time.UNDEFINED_TIME, 300.0));
-		stops.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 600.0));
-		stops.add(f.createTransitRouteStop(f4, Time.UNDEFINED_TIME, 900.0));
-		stops.add(f.createTransitRouteStop(f5, 1200.0, Time.UNDEFINED_TIME));
+		List<TransitRouteStop> stops = new ArrayList<>();
+		stops.add(f.createTransitRouteStopBuilder(f1).departureOffset(0.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f2).departureOffset(300.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f3).departureOffset(600.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f4).departureOffset(900.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f5).arrivalOffset(1200.0).build());
 		TransitRoute route1 = f.createTransitRoute(Id.create("1", TransitRoute.class), null, stops, "pt");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
 		route1.addDeparture(f.createDeparture(Id.create("1", Departure.class), 6.0*3600));
 		
 		TransitLine line2 = f.createTransitLine(Id.create("2", TransitLine.class));
-		List<TransitRouteStop> stops2 = new ArrayList<TransitRouteStop>();
-		stops2.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
-		stops2.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 750.0));
-		stops2.add(f.createTransitRouteStop(f5, 1100.0, Time.UNDEFINED_TIME));
+		List<TransitRouteStop> stops2 = new ArrayList<>();
+		stops2.add(f.createTransitRouteStopBuilder(f1).departureOffset(0.0).build());
+		stops2.add(f.createTransitRouteStopBuilder(f3).departureOffset(750.0).build());
+		stops2.add(f.createTransitRouteStopBuilder(f5).arrivalOffset(1100.0).build());
 		TransitRoute route2 = f.createTransitRoute(Id.create("2", TransitRoute.class), null, stops2, "pt");
 		line2.addRoute(route2);
 		schedule.addTransitLine(line2);

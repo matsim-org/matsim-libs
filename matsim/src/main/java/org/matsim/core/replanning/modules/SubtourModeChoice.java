@@ -20,17 +20,13 @@
 
 package org.matsim.core.replanning.modules;
 
-
-import javax.inject.Provider;
-
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
-import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * Changes the transportation mode of all legs of one randomly chosen subtour in a plan to a randomly chosen
@@ -48,37 +44,48 @@ import org.matsim.core.router.TripRouter;
  * If the plan initially violates this constraint, this module may (!) repair it. 
  * 
  * @author michaz
- * 
+ *
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
 
-	private final Provider<TripRouter> tripRouterProvider;
+	private final double probaForChangeSingleTripMode;
 
-	private PermissibleModesCalculator permissibleModesCalculator;
-	
+	public enum Behavior {fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes}
+
+	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes;
+
+	private final PermissibleModesCalculator permissibleModesCalculator;
+
 	private final String[] chainBasedModes;
 	private final String[] modes;
-	
-	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+
+	public SubtourModeChoice(GlobalConfigGroup globalConfigGroup,
+			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup, PermissibleModesCalculator permissibleModesCalculator) {
 		this(globalConfigGroup.getNumberOfThreads(),
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
-				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
+				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode(),
+				permissibleModesCalculator
+		);
+		this.setBehavior(subtourModeChoiceConfigGroup.getBehavior());
 	}
 
-	public SubtourModeChoice(
+	SubtourModeChoice(
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability, Provider<TripRouter> tripRouterProvider) {
+			double probaForChangeSingleTripMode,
+			PermissibleModesCalculator permissibleModesCalculator) {
 		super(numberOfThreads);
-		this.tripRouterProvider = tripRouterProvider;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
-		this.permissibleModesCalculator =
-			new PermissibleModesCalculatorImpl(
-					this.modes,
-					considerCarAvailability);
+		this.permissibleModesCalculator = permissibleModesCalculator;
+		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;
+	}
+	
+	@Deprecated // only use when backwards compatibility is needed. kai, may'18
+	public final void setBehavior ( Behavior behavior ) {
+		this.behavior = behavior ;
 	}
 	
 	protected String[] getModes() {
@@ -87,25 +94,16 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = tripRouterProvider.get();
+		
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
-						tripRouter.getStageActivityTypes(),
-						tripRouter.getMainModeIdentifier(),
+						TripStructureUtils.getRoutingModeIdentifier(),
 						this.permissibleModesCalculator,
 						this.modes,
 						this.chainBasedModes,
-						MatsimRandom.getLocalInstance());
-		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
+						MatsimRandom.getLocalInstance(), behavior, probaForChangeSingleTripMode);
 		return chooseRandomLegMode;
 	}
 
-	/**
-	 * Decides if a person may use a certain mode of transport. Can be used for car ownership.
-	 * 
-	 */
-	public void setPermissibleModesCalculator(PermissibleModesCalculator permissibleModesCalculator) {
-		this.permissibleModesCalculator = permissibleModesCalculator;
-	}
 
 }

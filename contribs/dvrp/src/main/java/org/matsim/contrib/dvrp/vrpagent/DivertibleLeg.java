@@ -19,12 +19,10 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dynagent.DriverDynLeg;
 
 public interface DivertibleLeg extends DriverDynLeg {
-	VrpPath getPath();
-
 	/**
 	 * @return true - yes, false - it is too late, the diversion is possible only at the next link
 	 */

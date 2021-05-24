@@ -58,30 +58,43 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final PopulationFactory populationFactory,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo) {
-		this.network = network;
-		this.routeAlgo = routeAlgo;
-		this.mode = mode;
-		this.populationFactory = populationFactory;
+		 Gbl.assertNotNull(network);
+//		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
+		 // makes many tests fail.  
+		 this.network = network;
+		 this.routeAlgo = routeAlgo;
+		 this.mode = mode;
+		 this.populationFactory = populationFactory;
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime,
+	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime,
 			final Person person) {		
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
-		
+
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
+		if ( fromLink==null ) {
+			Gbl.assertNotNull( fromFacility.getCoord() ) ;
+			fromLink = NetworkUtils.getNearestLink( network, fromFacility.getCoord()) ;
+		}
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
-
+		if ( toLink==null ) {
+			Gbl.assertNotNull( toFacility.getCoord() ) ;
+			toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
+		}
+		Gbl.assertNotNull(fromLink);
+		Gbl.assertNotNull(toLink);
+		
 		if (toLink != fromLink) {
 			// (a "true" route)
 			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
 			if (path == null)
-				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " by mode " + this.mode + ".");
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime(path.travelTime);
@@ -101,11 +114,6 @@ public final class NetworkRoutingModule implements RoutingModule {
 		newLeg.setDepartureTime(departureTime);
 
 		return Arrays.asList( newLeg );
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
 	}
 
 	@Override

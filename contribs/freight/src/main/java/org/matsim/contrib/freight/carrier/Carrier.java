@@ -1,10 +1,11 @@
 package org.matsim.contrib.freight.carrier;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A carrier.
@@ -12,7 +13,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * @author sschroeder
  *
  */
-public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
+public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributable{
 	
 	public static int PLAN_MEMORY = 5;
 
@@ -37,14 +38,14 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	 * 
 	 * @return collection of {@link CarrierShipment}
 	 */
-	public abstract Collection<CarrierShipment> getShipments();
+	public abstract Map<Id<CarrierShipment>, CarrierShipment> getShipments();
 	
 	/**
 	 * Gets a collection of carrierServices
 	 * 
 	 * @return collection of {@link CarrierService}
 	 */
-	public abstract Collection<CarrierService> getServices();
+	public abstract Map<Id<CarrierService>, CarrierService> getServices();
 
 	/**
 	 * Gets the selected plan.
@@ -78,4 +79,6 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	 */
 	public abstract CarrierCapabilities getCarrierCapabilities();
 
+
+	void clearPlans();
 }

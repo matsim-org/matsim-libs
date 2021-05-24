@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans xml:lang="de-CH">
+<person id="1">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:00" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="02:35" />
+	</plan>
+</person>
+ 
+<person id="2">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:01" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="02:50" />
+	</plan>
+</person>
+
+<person id="3">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:02" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="02:30" />
+	</plan>
+</person>
+
+<person id="4">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:03" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="05:30" />
+	</plan>
+</person>
+
+<person id="5">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:04" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="04:30" />
+	</plan>
+</person>
+
+<person id="6">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:05" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="05:00" />
+	</plan>
+</person>
+
+<person id="7">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:06" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="03:30" />
+	</plan>
+</person>
+
+<person id="8">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:07" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="03:00" />
+	</plan>
+</person>
+
+<person id="9">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:08" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="03:35" />
+	</plan>
+</person>
+
+<person id="10">
+	<plan>
+		<act type="home" x="-750" y="0" link="1" end_time="06:00:09" />
+		<leg mode="car">
+			<route>2 4 5</route>
+		</leg>
+		<act type="work" x="500" y="0" link="6" dur="02:55" />
+	</plan>
+</person>
+
+</plans>

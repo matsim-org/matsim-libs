@@ -19,120 +19,125 @@
 
 package org.matsim.contrib.dvrp.path;
 
-import java.util.*;
+import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
-import org.matsim.core.router.*;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-public class OneToManyPathSearch {
-	public static OneToManyPathSearch createForwardSearch(MultiNodePathCalculator forwardMultiNodeDijkstra) {
-		return new OneToManyPathSearch(forwardMultiNodeDijkstra, true);
-	}
+import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.LeastCostPathTree;
 
-	public static OneToManyPathSearch createBackwardSearch(BackwardMultiNodePathCalculator backwardMultiNodeDijkstra) {
-		return new OneToManyPathSearch(backwardMultiNodeDijkstra, false);
+public class OneToManyPathSearch {
+	public static OneToManyPathSearch createSearch(SpeedyGraph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
+			TravelDisutility travelDisutility, boolean lazyPathCreation) {
+		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility),
+				lazyPathCreation);
 	}
 
 	public static class PathData {
-		public final Path path;// shortest path
-		public final double firstAndLastLinkTT;// at both the first and last links
+		public static final PathData EMPTY = new PathData(0, 0);
+		public static final PathData INFEASIBLE = new PathData(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+		private final Supplier<Path> pathSupplier;
+		private Path path; // inline?
+
+		private final double travelTime;
+
+		private PathData(double travelTime, double travelCost) {
+			this.pathSupplier = null;
+			this.path = new Path(null, null, travelTime, travelCost);
+			this.travelTime = travelTime;
+		}
 
 		public PathData(Path path, double firstAndLastLinkTT) {
-			this.path = path;
-			this.firstAndLastLinkTT = firstAndLastLinkTT;
+			this.pathSupplier = null;
+			this.path = new Path(null, ImmutableList.copyOf(path.links), path.travelTime, path.travelCost);
+			this.travelTime = path.travelTime + firstAndLastLinkTT;
 		}
-	}
 
-	private static class ToNode extends InitialNode {
-		private Path path;
-
-		private ToNode(Node node, double initialCost, double initialTime) {
-			super(node, initialCost, initialTime);
+		public PathData(Supplier<Path> pathSupplier, double pathTravelTime, double firstAndLastLinkTT) {
+			this.pathSupplier = pathSupplier;
+			this.travelTime = pathTravelTime + firstAndLastLinkTT;
 		}
-	}
 
-	private final MultiNodePathCalculator multiNodeDijkstra;// forward or backward
-	private final boolean forward;
+		public double getTravelTime() {
+			return travelTime;
+		}
 
-	private OneToManyPathSearch(MultiNodePathCalculator multiNodeDijkstra, boolean forward) {
-		this.multiNodeDijkstra = multiNodeDijkstra;
-		this.forward = forward;
-	}
-
-	public PathData[] calcPaths(Link fromLink, List<Link> toLinks, double startTime) {
-		Node fromNode = getFromNode(fromLink);
-		Map<Id<Node>, ToNode> toNodes = createToNodes(fromLink, toLinks);
-		calculatePaths(fromNode, toNodes, startTime);
-		return createPathDataArray(fromLink, toLinks, startTime, toNodes);
-	}
-
-	private Map<Id<Node>, ToNode> createToNodes(Link fromLink, List<Link> toLinks) {
-		Map<Id<Node>, ToNode> toNodes = Maps.newHashMapWithExpectedSize(toLinks.size());
-
-		for (int i = 0; i < toLinks.size(); i++) {
-			Link toLink = toLinks.get(i);
-			if (toLink != fromLink) {
-				Node toNode = getToNode(toLink);
-				if (!toNodes.containsKey(toNode.getId())) {
-					toNodes.put(toNode.getId(), new ToNode(toNode, 0, 0));
-				}
+		//package visibility only (path.nodes is null)
+		Path getPath() {
+			if (path == null) {
+				path = pathSupplier.get();
 			}
-		}
-
-		return toNodes;
-	}
-
-	private void calculatePaths(Node fromNode, Map<Id<Node>, ToNode> toNodes, double startTime) {
-		RoutingNetworkImaginaryNode imaginaryNode = new RoutingNetworkImaginaryNode(toNodes.values());
-		multiNodeDijkstra.setSearchAllEndNodes(true);
-		multiNodeDijkstra.calcLeastCostPath(fromNode, imaginaryNode, startTime, null, null);
-
-		// get path for each ToNode
-		for (ToNode toNode : toNodes.values()) {
-			toNode.path = multiNodeDijkstra.constructPath(fromNode, toNode.node, startTime);
+			return path;
 		}
 	}
 
-	private PathData[] createPathDataArray(Link fromLink, List<Link> toLinks, double startTime,
-			Map<Id<Node>, ToNode> toNodes) {
+	private final IdMap<Node, Node> nodeMap;
+	private final LeastCostPathTree dijkstraTree;
+	private final boolean lazyPathCreation;
+
+	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, boolean lazyPathCreation) {
+		this.nodeMap = nodeMap;
+		this.dijkstraTree = dijkstraTree;
+		this.lazyPathCreation = lazyPathCreation;
+	}
+
+	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward) {
+		return calcPathDataArray(fromLink, toLinks, startTime, forward, Double.POSITIVE_INFINITY);
+	}
+
+	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward,
+			double maxTravelTime) {
+		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
+				startTime);
+		pathConstructor.calculateDijkstraTree(toLinks, maxTravelTime);
+		return createPathDataArray(toLinks, pathConstructor);
+	}
+
+	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+			boolean forward) {
+		return calcPathDataMap(fromLink, toLinks, startTime, forward, Double.POSITIVE_INFINITY);
+	}
+
+	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+			boolean forward, double maxTravelTime) {
+		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
+				startTime);
+		pathCalculator.calculateDijkstraTree(toLinks, maxTravelTime);
+		return createPathDataMap(toLinks, pathCalculator);
+	}
+
+	private PathData[] createPathDataArray(List<Link> toLinks, OneToManyPathCalculator pathCalculator) {
 		PathData[] pathDataArray = new PathData[toLinks.size()];
-
 		for (int i = 0; i < pathDataArray.length; i++) {
-			Link toLink = toLinks.get(i);
-			if (toLink == fromLink) {
-				pathDataArray[i] = createZeroPath(fromLink);
-			} else {
-				ToNode toNode = toNodes.get(getToNode(toLink).getId());
-				pathDataArray[i] = new PathData(toNode.path,
-						getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime));
-			}
+			pathDataArray[i] = createPathData(pathCalculator, toLinks.get(i));
 		}
-
 		return pathDataArray;
 	}
 
-	private PathData createZeroPath(Link fromLink) {
-		List<Node> singleNodeList = Collections.singletonList(getFromNode(fromLink));
-		List<Link> emptyLinkList = Collections.emptyList();
-		return new PathData(new Path(singleNodeList, emptyLinkList, 0, 0), 0);
+	private Map<Link, PathData> createPathDataMap(Collection<Link> toLinks, OneToManyPathCalculator pathCalculator) {
+		Map<Link, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
+		for (Link toLink : toLinks) {
+			pathDataMap.put(toLink, createPathData(pathCalculator, toLink));
+		}
+		return pathDataMap;
 	}
 
-	private Node getToNode(Link toLink) {
-		return forward ? toLink.getFromNode() : toLink.getToNode();
-	}
-
-	private Node getFromNode(Link fromLink) {
-		return forward ? fromLink.getToNode() : fromLink.getFromNode();
-	}
-
-	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, Path path, double time) {
-		double lastLinkTT = forward ? //
-				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) : VrpPaths.getLastLinkTT(fromLink, time);
-		return VrpPaths.FIRST_LINK_TT + lastLinkTT;
+	private PathData createPathData(OneToManyPathCalculator pathCalculator, Link toLink) {
+		return lazyPathCreation ?
+				pathCalculator.createPathDataLazily(toLink) :
+				pathCalculator.createPathDataEagerly(toLink);
 	}
 }

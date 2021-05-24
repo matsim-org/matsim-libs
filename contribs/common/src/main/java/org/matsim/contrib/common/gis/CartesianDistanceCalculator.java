@@ -19,8 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.common.gis;
 
-
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 /**
  * @author illenberger

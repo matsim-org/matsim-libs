@@ -20,25 +20,21 @@
 
  package org.matsim.core.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PopulationUtils;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -59,37 +55,35 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private Map<Id<Person>, Activity> activities = new HashMap<>();
-    private List<ActivityHandler> activityHandlers = new ArrayList<>();
+    private final IdMap<Person, Activity> activities = new IdMap<>(Person.class);
+    private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
 
     }
 
     @Inject
-    EventsToActivities(ControlerListenerManager controlerListenerManager, EventsManager eventsManager) {
+    EventsToActivities(ControlerListenerManager controlerListenerManager) {
         controlerListenerManager.addControlerListener(new AfterMobsimListener() {
             @Override
             public void notifyAfterMobsim(AfterMobsimEvent event) {
                 finish();
             }
         });
-        eventsManager.addHandler(this);
     }
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        Activity activity = activities.get(event.getPersonId());
+        Activity activity = this.activities.remove(event.getPersonId());
         if (activity == null) {
             Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
-        for (ActivityHandler activityHandler : activityHandlers) {
+        for (ActivityHandler activityHandler : this.activityHandlers) {
             activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
         }
-        activities.remove(event.getPersonId());
     }
 
     @Override
@@ -97,12 +91,18 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
-        activities.put(event.getPersonId(), activity);
+
+        activity.setCoord( event.getCoord() );
+        // (this is debatable. However, it seems to me that once an activity event "knows" where it is, there is no reason to pass that knowledge on into the
+        // activity.  ???  kai, feb'20)
+        //I find this very useful (jb)
+
+        this.activities.put(event.getPersonId(), activity);
     }
 
     @Override
     public void reset(int iteration) {
-        activities.clear();
+        this.activities.clear();
     }
 
     public void addActivityHandler(ActivityHandler activityHandler) {
@@ -110,11 +110,11 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     public void finish() {
-        for (Map.Entry<Id<Person>, Activity> entry : activities.entrySet()) {
-            for (ActivityHandler activityHandler : activityHandlers) {
-                activityHandler.handleActivity(new PersonExperiencedActivity(entry.getKey(), entry.getValue()));
+        this.activities.forEach((id, activity) -> {
+            for (ActivityHandler activityHandler : this.activityHandlers) {
+                activityHandler.handleActivity(new PersonExperiencedActivity(id, activity));
             }
-        }
+        });
     }
 
 }

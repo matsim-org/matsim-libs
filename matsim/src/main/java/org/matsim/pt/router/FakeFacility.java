@@ -1,4 +1,25 @@
-package org.matsim.pt.router;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FakeFacility.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.pt.router;
 
 import java.util.Map;
 
@@ -14,20 +35,12 @@ public final class FakeFacility implements Facility {
 	}
 
 	@Override
-	public Id getId() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
 	public Map<String, Object> getCustomAttributes() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public Id getLinkId() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 	

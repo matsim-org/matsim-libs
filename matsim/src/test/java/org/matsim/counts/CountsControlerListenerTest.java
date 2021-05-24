@@ -44,6 +44,7 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -370,6 +371,8 @@ public class CountsControlerListenerTest {
 			@Override
 			public void install() {
 				bind(Mobsim.class).to(DummyMobsim2.class);
+				// use single threaded manager because the dummy mobsim doesn't correctly calls EventsManager interface which may fail for parallel implementations
+				bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);

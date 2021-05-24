@@ -19,7 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -31,17 +36,21 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -125,6 +134,7 @@ public class VehicleWaitingTest {
 			plan.addActivity( orig );
 			for ( int lap=0; lap < nLaps; lap++ ) {
 				final Leg leg = popFact.createLeg( TransportMode.car );
+				TripStructureUtils.setRoutingMode(leg, TransportMode.car );
 				final NetworkRoute route =
 					RouteUtils.createLinkNetworkRouteImpl(link1.getId(), Collections.singletonList( link2.getId() ), link3.getId());
 				route.setVehicleId( Id.create(personId1, Vehicle.class) ); // QSim creates a vehicle per person, with the ids of the persons
@@ -138,6 +148,7 @@ public class VehicleWaitingTest {
 				}
 
 				final Leg secondLeg = popFact.createLeg( TransportMode.car );
+				TripStructureUtils.setRoutingMode(secondLeg, TransportMode.car );
 				final NetworkRoute secondRoute =
 					RouteUtils.createLinkNetworkRouteImpl(link3.getId(), Collections.<Id<Link>>emptyList(), link1.getId());
 
@@ -170,15 +181,10 @@ public class VehicleWaitingTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		final Netsim qsim = QSimUtils.createDefaultQSim(sc, events);
-
-//		try {
-			qsim.run();
-//		}
-//		catch (Exception e) {
-//			log.error( "exception in Mobsim" , e  );
-//			Assert.fail( "got an exception in the mobsim with arrivals "+arrivalCounts+"! "+e.getMessage() );
-//		}
+		new QSimBuilder(sc.getConfig()) //
+			.useDefaults() //
+			.build(sc, events) //
+			.run();
 
 		for ( Id<Person> id : personIds ) {
 			Assert.assertNotNull(

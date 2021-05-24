@@ -24,6 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
 /**
+ * This class extends the DefaultTurnAcceptanceLogic by also checking for signal states: 
+ * It only accepts a turn, if the corresponding signal shows green. If not, it returns AcceptTurn.WAIT.
+ * 
  * @author tthunig
  */
 final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
@@ -31,8 +34,8 @@ final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
 	private final TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
 	
 	@Override
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork) {
-		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork);
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now) {
+		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork, now);
 		if ( defaultTurn.equals(AcceptTurn.ABORT) ) {
 			return defaultTurn;
 		}

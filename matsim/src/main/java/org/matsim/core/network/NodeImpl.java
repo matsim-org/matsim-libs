@@ -80,13 +80,14 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	public final boolean addInLink(Link inlink) {
 		Id<Link> linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
-			throw new IllegalArgumentException(this + "[inlink_id=" + inlink.getId() + " already exists]");
+			throw new IllegalArgumentException(this + ": inlink_id=" + inlink.getId() + " already exists");
 		}
-		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
-			cnt2++ ;
-			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
-			log.warn(Gbl.ONLYONCE) ;
-		}
+//		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
+//			cnt2++ ;
+//			log.warn(this + ": inlink_id=" + inlink.getId() + " is now in- and out-link");
+//			log.warn(Gbl.ONLYONCE) ;
+//		}
+		// (this means it is a loop link; they have become an acceptable data structure within matsim.  kai, sep'19)
 		this.inlinks.put(linkid, inlink);
 		return true; // yy should return true only if collection changed as result of call
 	}
@@ -96,11 +97,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	public final boolean addOutLink(Link outlink) {
 		Id<Link> linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
-			throw new IllegalArgumentException(this + "[outlink_id=" + outlink.getId() + " already exists]");
+			throw new IllegalArgumentException(this + ": outlink_id=" + outlink.getId() + " already exists");
 		}
 		if (this.inlinks.containsKey(linkid) && (cnt < 1)) {
 			cnt++ ;
-			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
+			log.warn(this.toString() + ": outlink_id=" + outlink.getId() + " is now in- and out-link");
 			log.warn(Gbl.ONLYONCE) ;
 		}
 		this.outlinks.put(linkid, outlink);

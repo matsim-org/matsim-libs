@@ -62,4 +62,26 @@ public class TimeWindow {
 		return "[start=" + Time.writeTime(start) + ", end=" + Time.writeTime(end) + "]";
 	}
 
+	@Override
+	public boolean equals(Object o){
+		if(o == this) return true;
+		if((o == null) || (o.getClass() != this.getClass())) {
+			return false;
+		}
+		TimeWindow t1 = (TimeWindow) o;
+		return (t1.getStart() == this.getStart() && t1.getEnd() == this.getEnd());
+	}
+
+	@Override
+	public int hashCode(){
+		int result = 59;
+		long startLong  = Double.doubleToLongBits(start);
+		int startHash = (int) (startLong^(startLong>>>32));
+		result = 31 * result + startHash;
+		long endLong  = Double.doubleToLongBits(end);
+		int endHash = (int) (endLong^(endLong>>>32));
+		result = 31 * result + endHash;
+		return result;
+	}
+
 }

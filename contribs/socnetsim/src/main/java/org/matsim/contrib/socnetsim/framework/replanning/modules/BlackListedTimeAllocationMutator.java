@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.List;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.misc.Time;
-
-import java.util.List;
-import java.util.Random;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * A time allocation mutator to use with multi-leg routing.
@@ -41,7 +40,6 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		Logger.getLogger(BlackListedTimeAllocationMutator.class);
 
 	private final double mutationRange;
-	private final StageActivityTypes blackList;
 	private final Random random;
 	private Setting setting = Setting.MUTATE_END;
 
@@ -52,10 +50,8 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	}
 
 	public BlackListedTimeAllocationMutator(
-			final StageActivityTypes blackList,
 			final double mutationRange,
 			final Random random) {
-		this.blackList = blackList;
 		this.mutationRange = mutationRange;
 		this.random = random;
 		log.debug( "setting initialized to "+setting );
@@ -63,7 +59,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Activity> activities = TripStructureUtils.getActivities( plan , blackList );
+		final List<Activity> activities = TripStructureUtils.getActivities( plan, StageActivityHandling.ExcludeStageActivities );
 		final int nActs = activities.size();
 		// when mutating durations "blindly", avoid creating activities ending before
 		// the previous activity.
@@ -71,26 +67,26 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
-					((Activity) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
+					a.setMaximumDuration( mutateTime(a.getMaximumDuration()) );
 					break;
 				case MUTATE_END:
-					a.setEndTime( mutateTime( a.getEndTime() ) );
-					if ( a.getEndTime() != Time.UNDEFINED_TIME &&
-							a.getEndTime() < lastEndTime ) {
+					a.setEndTime( mutateTime(a.getEndTime()) );
+					if ( a.getEndTime().isUndefined() &&
+							a.getEndTime().seconds() < lastEndTime ) {
 						a.setEndTime( lastEndTime );
 					}
-					lastEndTime = a.getEndTime();
+					lastEndTime = a.getEndTime().seconds();
 					break;
 				case MUTATE_END_AS_DUR:
-					final double oldTime = a.getEndTime();
-					if ( oldTime == Time.UNDEFINED_TIME ) break;
+					final OptionalTime oldTime = a.getEndTime();
+					if ( oldTime.isUndefined() ) break;
 					final double newTime = mutateTime( oldTime );
 					// doing this so rather than sampling mut directly allows
 					// to avoid negative times
-					final double mut = newTime - oldTime;
+					final double mut = newTime - oldTime.seconds();
 					// shift all times after the mutated time (as if we were working on durations)
 					for ( Activity currAct : activities.subList( activities.indexOf( a ) , nActs ) ) {
-						currAct.setEndTime( currAct.getEndTime() + mut );
+						currAct.setEndTime( currAct.getEndTime().seconds() + mut );
 					}
 					break;
 				default:
@@ -99,14 +95,11 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		}
 	}
 
-	private double mutateTime(final double time) {
+	private double mutateTime(final OptionalTime time) {
 		// do not do anything if time is undefined
-		if ( time == Time.UNDEFINED_TIME ) return time;
-		if ( Double.isNaN( time ) ) throw new IllegalArgumentException( ""+time );
+		if ( time.isUndefined() ) return time.seconds();
 
-		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
-		assert !Double.isNaN( t ) : t;
-		assert !Double.isInfinite( t ) : t;
+		final double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 		return t < 0 ? 0 : t;
 	}
 

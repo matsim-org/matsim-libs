@@ -21,7 +21,7 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 

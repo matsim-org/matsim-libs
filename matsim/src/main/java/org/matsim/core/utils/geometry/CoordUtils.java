@@ -21,15 +21,22 @@
 package org.matsim.core.utils.geometry;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.gbl.Gbl;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
+	final private static EucledianDistanceCalculator eucledianDistanceCalculator = new EucledianDistanceCalculator();
 	
 	public static Coordinate createGeotoolsCoordinate( final Coord coord ) {
 		return new Coordinate( coord.getX(), coord.getY() ) ;
+	}
+	
+	public static Coord createCoord( final Coordinate coordinate ) {
+		return new Coord( coordinate.x, coordinate.y ) ;
 	}
 	
 	public static Coord createCoord( final double xx, final double yy ) {
@@ -156,34 +163,8 @@ public abstract class CoordUtils {
 	}
 
 	public static double calcEuclideanDistance(Coord coord, Coord other) {
-		/* Depending on the coordinate system that is used, determining the 
-		 * distance based on the euclidean distance will lead to wrong results. 
-		 * However, if the distance is not to large (<1km) this will be a usable 
-		 * distance estimation. Another comfortable way to calculate correct 
-		 * distances would be, to use the distance functions provided by 
-		 * geotools lib. May be we need to discuss what part of GIS functionality 
-		 * we should implement by our own and for what part we could use an 
-		 * existing GIS like geotools. We need to discuss this in terms of code 
-		 * robustness, performance and so on ... [gl] */
-		if( !coord.hasZ() && !other.hasZ() ){
-			/* Both are 2D coordinates. */
-			double xDiff = other.getX()-coord.getX();
-			double yDiff = other.getY()-coord.getY();
-			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
-		} else if( coord.hasZ() && other.hasZ() ){
-			/* Both are 3D coordinates. */
-			double xDiff = other.getX()-coord.getX();
-			double yDiff = other.getY()-coord.getY();
-			double zDiff = other.getZ()-coord.getZ();
-			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff) + (zDiff*zDiff));
-		} else{
-			LOG.warn("Mixed use of elevation in coordinates: " + coord.toString() + 
-					"; " + other.toString());
-			LOG.warn("Returning projected coordinate distance (using x and y components only)");
-			return calcProjectedEuclideanDistance(coord, other);
-		}
+		return eucledianDistanceCalculator.calculateDistance(coord, other);
 	}
-
 
 	/**
 	 * Method to deal with distance calculation when only the x and y-components
@@ -242,6 +223,8 @@ public abstract class CoordUtils {
 	 *
 	 * @author mrieser, jwjoubert
 	 */
+	private static boolean onlyOnceWarnGiven = false;
+
 	public static double distancePointLinesegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
 		if( !lineFrom.hasZ() && !lineTo.hasZ() && !point.hasZ() ){
 			/* All coordinates are 2D and in the XY plane. */
@@ -313,11 +296,15 @@ public abstract class CoordUtils {
 			Coord m = minus(point, p);
 			return Math.sqrt(dotProduct(m, m));
 		} else{
-			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
+			if (!onlyOnceWarnGiven) {
+				Logger.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
+				onlyOnceWarnGiven = true;
+			}
+			return distancePointLinesegment(new Coord(lineFrom.getX(), lineFrom.getY()), new Coord(lineTo.getX(), lineTo.getY()), new Coord(point.getX(), point.getY()));
 		}
 	}
-	
-	
+
+
 	/**
 	 * Calculates the coordinate of the intersection point of the orthogonal projection
 	 * of a given point on a line segment with that line segment. The line segment
@@ -374,7 +361,58 @@ public abstract class CoordUtils {
 			Coord q = plus(lineFrom, scalarMult(t0, direction));
 			return q;
 		} else{
-			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
+			if (!onlyOnceWarnGiven) {
+				Logger.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
+				onlyOnceWarnGiven = true;
+			}
+			return orthogonalProjectionOnLineSegment(new Coord(lineFrom.getX(), lineFrom.getY()), new Coord(lineTo.getX(), lineTo.getY()), new Coord(point.getX(), point.getY()));
+			//throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
 		}
+	}
+
+	private static class EucledianDistanceCalculator {
+
+
+		private static final int maxWarnCount = 10;
+		private final AtomicInteger warnCounter = new AtomicInteger(0);
+
+		private double calculateDistance(Coord coord, Coord other) {
+			/* Depending on the coordinate system that is used, determining the
+			 * distance based on the euclidean distance will lead to wrong results.
+			 * However, if the distance is not to large (<1km) this will be a usable
+			 * distance estimation. Another comfortable way to calculate correct
+			 * distances would be, to use the distance functions provided by
+			 * geotools lib. May be we need to discuss what part of GIS functionality
+			 * we should implement by our own and for what part we could use an
+			 * existing GIS like geotools. We need to discuss this in terms of code
+			 * robustness, performance and so on ... [gl] */
+			if( !coord.hasZ() && !other.hasZ() ){
+				/* Both are 2D coordinates. */
+				double xDiff = other.getX()-coord.getX();
+				double yDiff = other.getY()-coord.getY();
+				return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
+			} else if( coord.hasZ() && other.hasZ() ){
+				/* Both are 3D coordinates. */
+				double xDiff = other.getX()-coord.getX();
+				double yDiff = other.getY()-coord.getY();
+				double zDiff = other.getZ()-coord.getZ();
+				return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff) + (zDiff*zDiff));
+			} else{
+				// there used to be a warning here, but it would clutter our log file
+				// hence we silently calculate the distance on a 2D pane now. janek mai'21
+				if (warnCounter.incrementAndGet() <= maxWarnCount) {
+					LOG.warn("Mixed use of elevation in coordinates: " + coord +
+							"; " + other);
+					LOG.warn("Returning projected coordinate distance (using x and y components only)");
+
+					if (warnCounter.get() == maxWarnCount) {
+						LOG.warn("Future occurences of this logging statement are suppressed.");
+					}
+				}
+
+				return calcProjectedEuclideanDistance(coord, other);
+			}
+		}
+
 	}
 }

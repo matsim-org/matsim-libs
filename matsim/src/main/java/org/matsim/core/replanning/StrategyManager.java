@@ -50,7 +50,10 @@ public class StrategyManager implements MatsimManager {
 	private final GenericStrategyManager<Plan, Person> delegate;
 
 	@Inject
-	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup, ControlerConfigGroup controlerConfigGroup, Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
+	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup,
+					ControlerConfigGroup controlerConfigGroup,
+					Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
+
 		this();
 		setMaxPlansPerAgent(strategyConfigGroup.getMaxAgentPlanMemorySize());
 
@@ -58,7 +61,7 @@ public class StrategyManager implements MatsimManager {
 				* strategyConfigGroup.getFractionOfIterationsToDisableInnovation() + controlerConfigGroup.getFirstIteration());
 		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
-		setSubpopulationAttributeName(plansConfigGroup.getSubpopulationAttributeName());
+//		setSubpopulationAttributeName(plansConfigGroup.getSubpopulationAttributeName());
 		for (Map.Entry<StrategyConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
 			PlanStrategy strategy = entry.getValue();
 			StrategyConfigGroup.StrategySettings settings = entry.getKey();
@@ -67,7 +70,7 @@ public class StrategyManager implements MatsimManager {
 			// now check if this modules should be disabled after some iterations
 			int maxIter = settings.getDisableAfter();
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
-				if (!PlanStrategies.isOnlySelector(strategy)) {
+				if (!ReplanningUtils.isOnlySelector(strategy)) {
 					maxIter = globalInnovationDisableAfter ;
 				}
 			}
@@ -88,13 +91,13 @@ public class StrategyManager implements MatsimManager {
 		this.delegate = new GenericStrategyManager<>();
 	}
 
-	/**
-	 * @param name the name of the subpopulation attribute
-	 * in the person's object attributes.
-	 */
-	public final void setSubpopulationAttributeName(final String name) {
-		delegate.setSubpopulationAttributeName(name);
-	}
+//	/**
+//	 * @param name the name of the subpopulation attribute
+//	 * in the person's object attributes.
+//	 */
+//	public final void setSubpopulationAttributeName(final String name) {
+//		delegate.setSubpopulationAttributeName(name);
+//	}
 
 	@Deprecated
 	public final void addStrategyForDefaultSubpopulation(
@@ -185,7 +188,7 @@ public class StrategyManager implements MatsimManager {
 	 */
 	public final void run(final Population population, final ReplanningContext replanningContext) {
 		beforePopulationRunHook(population, replanningContext);
-		delegate.run(population.getPersons().values(), population.getPersonAttributes(), replanningContext);
+		delegate.run(population.getPersons().values(), population, replanningContext);
 		afterRunHook(population);
 	}
 
@@ -204,7 +207,7 @@ public class StrategyManager implements MatsimManager {
 	 * @return the chosen strategy
 	 */
 	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation) {
-		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(subpopulation);
+		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(person, subpopulation);
 		return strategy;
 	}
 

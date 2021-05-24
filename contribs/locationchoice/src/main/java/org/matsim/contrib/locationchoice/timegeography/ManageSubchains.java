@@ -26,7 +26,7 @@ import java.util.Vector;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 
-public class ManageSubchains {
+ class ManageSubchains {
 
 	private List<SubChain> subChains = new Vector<SubChain>();
 	private int subChainIndex = -1;
@@ -43,7 +43,7 @@ public class ManageSubchains {
 		this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		this.subChains.get(subChainIndex).addAct(act);
 		this.secondaryActFound = true;
-		this.ttBudget += leg.getTravelTime();
+		this.ttBudget += leg.getTravelTime().seconds();
 		this.totalTravelDistance += leg.getRoute().getDistance();
 	}
 
@@ -73,7 +73,7 @@ public class ManageSubchains {
 			this.subChains.get(subChainIndex).setStartCoord(act.getCoord());
 			this.chainStarted = true;
 			this.secondaryActFound = false;
-			this.ttBudget = leg.getTravelTime();
+			this.ttBudget = leg.getTravelTime().seconds();
 			this.totalTravelDistance = leg.getRoute().getDistance();
 			this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		}

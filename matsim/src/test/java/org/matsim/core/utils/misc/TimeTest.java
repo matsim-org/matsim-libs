@@ -89,24 +89,24 @@ public class TimeTest extends TestCase {
 
 		// test reading
 		double iTime = 12*3600 + 34*60 + 56;
-		assertEquals(iTime, Time.parseTime( "12:34:56", ':'), 0.0);
-		assertEquals(iTime, Time.parseTime( "12/34/56", '/'), 0.0);
-		assertEquals(iTime, Time.parseTime( "12-34-56", '-'), 0.0);
+		assertEquals(iTime, Time.parseTime( "12:34:56", ':').seconds(), 0.0);
+		assertEquals(iTime, Time.parseTime( "12/34/56", '/').seconds(), 0.0);
+		assertEquals(iTime, Time.parseTime( "12-34-56", '-').seconds(), 0.0);
 
 		// test reading negative times
-		assertEquals(-iTime, Time.parseTime( "-12:34:56", ':'), 0.0);
-		assertEquals(-iTime, Time.parseTime( "-12/34/56", '/'), 0.0);
-		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-'), 0.0);
+		assertEquals(-iTime, Time.parseTime( "-12:34:56", ':').seconds(), 0.0);
+		assertEquals(-iTime, Time.parseTime( "-12/34/56", '/').seconds(), 0.0);
+		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-').seconds(), 0.0);
 	}
 
 	public void testUndefined() {
 		// test writing
-		assertEquals("undefined", Time.writeTime(Time.UNDEFINED_TIME));
+		assertEquals("undefined", Time.writeTime(OptionalTime.undefined()));
 
 		// test reading
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime("undefined"), 0.0);
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(""), 0.0);
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(null), 0.0);
+		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime("undefined"));
+		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime(""));
+		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime(null));
 	}
 
 	public void testSetDefault() {
@@ -147,6 +147,9 @@ public class TimeTest extends TestCase {
 		assertEquals(-12*3600.0 - 34*60.0 - 56.7, Time.parseTime("-12:34:56.7"), 0.0);
 		assertEquals(0.0, Time.parseTime("00:00:00"), 0.0);
 		assertEquals(Integer.MIN_VALUE, Time.parseTime("-596523:14:08"), 0.0);
+		/* test for parsing hours greater than 2^31-1 (i.e. hour of type long)
+		 */
+		assertEquals(Long.MAX_VALUE, Time.parseTime("2562047788015215:28:07"), 0.0);
 	}
 	
 	public void testConvertHHMMInteger() {

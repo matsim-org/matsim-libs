@@ -7,9 +7,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
 public class FreeFloatingRoutingModule implements RoutingModule {
@@ -21,7 +19,7 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 	public List<? extends PlanElement> calcRoute(Facility fromFacility,
 			Facility toFacility, double departureTime, Person person) {
 		
-		final List<PlanElement> trip = new ArrayList<PlanElement>();
+		final List<PlanElement> trip = new ArrayList<>();
 						
 		final Leg leg1 = PopulationUtils.createLeg("freefloating");
 		CarsharingRoute route1 = new CarsharingRoute(fromFacility.getLinkId(), toFacility.getLinkId());
@@ -29,14 +27,6 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 		trip.add( leg1 );	
 						
 		return trip;
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		// TODO Auto-generated method stub
-		
-		return EmptyStageActivityTypes.INSTANCE;
-	}
-	
+	}	
 	
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;

@@ -22,33 +22,31 @@
 
 package org.matsim.contrib.pseudosimulation.mobsim;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.pseudosimulation.RunPSim;
+import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.QSimProvider;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
 
 public class SwitchingMobsimProvider implements Provider<Mobsim> {
 
-    private Config config;
-    private Scenario scenario;
-    private EventsManager eventsManager;
-    private RunPSim.MobSimSwitcher mobSimSwitcher;
+    @Inject private Config config;
+    @Inject private Scenario scenario;
+    @Inject private EventsManager eventsManager;
+    @Inject private MobSimSwitcher mobSimSwitcher;
+    @Inject private PSimProvider pSimProvider;
+    @Inject private QSimProvider qsimProvider;
 
-    @Inject
-    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager, RunPSim.MobSimSwitcher mobSimSwitcher) {
-        this.config = config;
-        this.scenario = scenario;
-        this.eventsManager = eventsManager;
-        this.mobSimSwitcher = mobSimSwitcher;
-    }
 
     @Override
     public Mobsim get() {
@@ -57,10 +55,10 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
             if (mobsim.equals("jdeqsim")) {
                 return new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, eventsManager);
             } else {
-                return QSimUtils.createDefaultQSim(scenario, eventsManager);
+            	return qsimProvider.get();
             }
         } else {
-            return mobSimSwitcher.getpSimFactory().get();
+            return pSimProvider.get();
         }
     }
 

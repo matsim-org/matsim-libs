@@ -58,6 +58,19 @@ public final class Coord implements Serializable {
 		this.z = Double.NEGATIVE_INFINITY;
 	}
 	
+	public Coord( double[] coord ) {
+		this() ;
+		switch ( coord.length ) {
+			case 3:
+				z = coord[2] ;
+			case 2:
+				x = coord[0] ; y = coord[1] ;
+				break ;
+			default:
+				throw new RuntimeException( "double[] of wrong length; cannot be interpreted as coordinate ") ;
+		}
+	}
+	
 	
 	public Coord(final double x, final double y, final double z){
 		if(z == Double.NEGATIVE_INFINITY){
@@ -78,7 +91,7 @@ public final class Coord implements Serializable {
 		return this.y;
 	}
 	
-	public double getZ() {
+	public double getZ() throws IllegalStateException {
 		if ( !hasZ() ){
 			throw new IllegalStateException("Requesting elevation (z) without having first set it.");
 		}
@@ -135,9 +148,9 @@ public final class Coord implements Serializable {
 	@Override
 	public final String toString() {
 		if( !hasZ() ){
-			return "[x=" + this.x + "][y=" + this.y + "]";
+			return "[x=" + this.x + " | y=" + this.y + "]";
 		} else{
-			return "[x=" + this.x + "][y=" + this.y + "][z=" + this.z + "]";
+			return "[x=" + this.x + " | y=" + this.y + " | z=" + this.z + "]";
 		}
 	}
 }

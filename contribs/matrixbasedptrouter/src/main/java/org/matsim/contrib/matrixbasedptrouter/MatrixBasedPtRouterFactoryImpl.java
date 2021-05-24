@@ -55,8 +55,9 @@ public final class MatrixBasedPtRouterFactoryImpl implements Provider<TripRouter
 			log.warn("you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
 		}
 		TripRouter tripRouter = this.delegate.get();
-		tripRouter.setRoutingModule(TransportMode.pt, new MatrixBasedPtRoutingModule(scenario, ptMatrix));
-		return tripRouter;
+//		tripRouter.setRoutingModule(TransportMode.pt, new MatrixBasedPtRoutingModule(scenario, ptMatrix));
+//		return tripRouter;
+		throw new RuntimeException("routing module should just be added to trip router; don't need this delegating indirection. kai, jun'18") ;
 	}
 	
 }

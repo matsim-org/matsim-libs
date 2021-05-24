@@ -25,13 +25,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.index.SpatialIndex;
+import org.locationtech.jts.index.quadtree.Quadtree;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 /**
  * Representation of a spatial index containing zones backed by a quadtree.

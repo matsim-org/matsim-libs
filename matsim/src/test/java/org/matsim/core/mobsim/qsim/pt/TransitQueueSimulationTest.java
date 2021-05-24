@@ -22,21 +22,44 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.experimental.events.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
@@ -45,25 +68,32 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 
 /**
@@ -102,10 +132,10 @@ public class TransitQueueSimulationTest {
         Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-        VehicleCapacity capacity = vb.createVehicleCapacity();
-        capacity.setSeats(Integer.valueOf(101));
-        capacity.setStandingRoom(Integer.valueOf(0));
-        vehicleType.setCapacity(capacity);
+//        VehicleCapacity capacity = vb.createVehicleCapacity();
+        vehicleType.getCapacity().setSeats(Integer.valueOf(101));
+        vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
+//        vehicleType.setCapacity(capacity);
         
         vehicles.addVehicleType(vehicleType);
         
@@ -185,7 +215,9 @@ public class TransitQueueSimulationTest {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, eventsManager);
         sim.run();
         List<MobsimAgent> agents = new ArrayList<>(sim.getAgents().values());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
@@ -248,7 +280,7 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().qsim().setEndTime(7.0*3600);
 
         Leg leg = pb.createLeg(TransportMode.pt);
-        leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
+        leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
         Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
         plan.addActivity(homeAct);
         plan.addLeg(leg);
@@ -257,26 +289,15 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-        QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
-		qSim1.addMobsimEngine(teleportationEngine);
-        QSim qSim = qSim1;
-        AgentFactory agentFactory = new TransitAgentFactory(qSim);
-        TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-        transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-        qSim.addDepartureHandler(transitEngine);
-        qSim.addAgentSource(transitEngine);
-        qSim.addMobsimEngine(transitEngine);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, events);
         qSim.run();
+        
+        TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
 
         // check everything
-        assertEquals(1, transitEngine.getAgentTracker().getAgentsAtStop(stop1.getId()).size());
+        assertEquals(1, transitEngine.getAgentTracker().getAgentsAtFacility(stop1.getId()).size());
     }
 
     /**
@@ -332,7 +353,7 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().qsim().setEndTime(7.0*3600);
 
         Leg leg = pb.createLeg(TransportMode.pt);
-        leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
+        leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
         Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
         plan.addActivity(homeAct);
         plan.addLeg(leg);
@@ -342,8 +363,10 @@ public class TransitQueueSimulationTest {
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim simulation = QSimUtils.createDefaultQSim(scenario, events);
-        simulation.run();
+		new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, events) //
+				.run();
     }
 
     /**
@@ -435,7 +458,7 @@ public class TransitQueueSimulationTest {
         Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
         homeAct.setEndTime(departure.getDepartureTime() - 60.0);
         Leg leg1 = pb.createLeg(TransportMode.pt);
-        leg1.setRoute(new ExperimentalTransitRoute(stop1, line, tRoute, stop3));
+        leg1.setRoute(new DefaultTransitPassengerRoute(stop1, line, tRoute, stop3));
         Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
         plan1.addActivity(homeAct);
         plan1.addLeg(leg1);
@@ -446,7 +469,7 @@ public class TransitQueueSimulationTest {
         Plan plan2 = pb.createPlan();
         person2.addPlan(plan2);
         Leg leg2 = pb.createLeg(TransportMode.pt);
-        leg2.setRoute(new ExperimentalTransitRoute(stop3, line, tRoute, stop4));
+        leg2.setRoute(new DefaultTransitPassengerRoute(stop3, line, tRoute, stop4));
         Activity homeActOnLink4 = pb.createActivityFromLinkId("home", Id.create("4", Link.class));
         homeActOnLink4.setEndTime(departure.getDepartureTime() - 60.0);
         plan2.addActivity(homeActOnLink4);
@@ -522,25 +545,12 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-			QSim qSim2 = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine(events, qSim2.getAgentCounter());
-			qSim2.addMobsimEngine(activityEngine);
-			qSim2.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(qSim2);
-			qSim2.addMobsimEngine(netsimEngine);
-			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
-			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
-			qSim2.addMobsimEngine(teleportationEngine);
-            QSim qSim1 = qSim2;
-            AgentFactory agentFactory = new TransitAgentFactory(qSim1);
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim1.addDepartureHandler(transitEngine);
-            qSim1.addAgentSource(transitEngine);
-            qSim1.addMobsimEngine(transitEngine);
-            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim1);
-            qSim1.addAgentSource(agentSource);
-            qSim = qSim1;
+			this.qSim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, events);
+
+			TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
+			
             qSim.addAgentSource(new AgentSource() {
                 @Override
                 public void insertAgentsIntoMobsim() {
@@ -548,13 +558,14 @@ public class TransitQueueSimulationTest {
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
                     		transitEngine.getAgentTracker(), transitEngine);
 
-                    VehicleType vehicleType = new VehicleTypeImpl(Id.create("transitVehicleType", VehicleType.class));
-                    VehicleCapacity capacity = new VehicleCapacityImpl();
-                    capacity.setSeats(101);
-                    capacity.setStandingRoom(0);
-                    vehicleType.setCapacity(capacity);
+                    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("transitVehicleType", VehicleType.class ) );
+//                    VehicleCapacity capacity = new VehicleCapacity();
+                    vehicleType.getCapacity().setSeats(101);
+                    vehicleType.getCapacity().setStandingRoom(0);
+//                    vehicleType.setCapacity(capacity);
 
-                    TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class), vehicleType));
+                    TransitQVehicle veh = new TransitQVehicle(
+				    VehicleUtils.createVehicle(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class ), vehicleType ) );
                     veh.setDriver(TestHandleStopSimulation.this.driver);
                     veh.setStopHandler(new SimpleTransitStopHandler());
                     TestHandleStopSimulation.this.driver.setVehicle(veh);
@@ -653,7 +664,7 @@ public class TransitQueueSimulationTest {
         stopFacility2.setLinkId(link2.getId());
         TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
         NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
-        TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
+        TransitRouteStop stop1 = sb.createTransitRouteStopBuilder(stopFacility1).departureOffset(0.0).build();
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<>(2);
         stops.add(stop1);
@@ -672,8 +683,10 @@ public class TransitQueueSimulationTest {
 
         // first test without special settings
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim sim = QSimUtils.createDefaultQSim(scenario, events);
-        sim.run();
+		new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, events) //
+				.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
         collector.reset(0);
@@ -683,8 +696,10 @@ public class TransitQueueSimulationTest {
         config.qsim().setEndTime(depTime + 90.0);
 
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        sim = QSimUtils.createDefaultQSim(scenario, events);
-        sim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
     }
@@ -746,7 +761,7 @@ public class TransitQueueSimulationTest {
         stopFacility2.setLinkId(link2.getId());
         TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
         NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
-        TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
+        TransitRouteStop stop1 = sb.createTransitRouteStopBuilder(stopFacility1).departureOffset(0.0).build();
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<>(2);
         stops.add(stop1);
@@ -770,12 +785,14 @@ public class TransitQueueSimulationTest {
         route1.setTravelTime(10.0);
         route1.setDistance(10.0);
         leg1.setRoute(route1);
+        TripStructureUtils.setRoutingMode(leg1, TransportMode.pt);
         Activity act2 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act2.setEndTime(0.0);
         Leg leg2 = pb.createLeg(TransportMode.pt);
-        Route route2 = new ExperimentalTransitRoute(stopFacility1, tLine, tRoute, stopFacility2);
+        Route route2 = new DefaultTransitPassengerRoute(stopFacility1, tLine, tRoute, stopFacility2);
         route2.setTravelTime(100.0);
         leg2.setRoute(route2);
+        TripStructureUtils.setRoutingMode(leg2, TransportMode.pt);
         Activity act3 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act3.setEndTime(0.0);
         Leg leg3 = pb.createLeg(TransportMode.walk);
@@ -783,6 +800,7 @@ public class TransitQueueSimulationTest {
         route3.setTravelTime(10.0);
         route3.setDistance(10.0);
         leg3.setRoute(route3);
+        TripStructureUtils.setRoutingMode(leg3, TransportMode.pt);
         Activity act4 = pb.createActivityFromLinkId("w", link2.getId());
 
         plan.addActivity(act1);
@@ -800,7 +818,10 @@ public class TransitQueueSimulationTest {
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSimUtils.createDefaultQSim(scenario, events).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {

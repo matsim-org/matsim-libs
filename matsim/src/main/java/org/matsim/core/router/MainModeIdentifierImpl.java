@@ -35,16 +35,22 @@ public final class MainModeIdentifierImpl implements MainModeIdentifier {
 //		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
 		if ( mode.equals( TransportMode.transit_walk ) ) {
 			return TransportMode.pt ;
-			// (yy not conforming to std transport planning since that would look for mode with the highest "weight" 
+
+			// (yy not conforming to std transport planning since that would look for mode with the highest "weight"
 			// in the whole trip, but it is what I found and at least one test depends on it. kai, feb'16)
+
+			// Marcel's SBB raptor returns access/egress_walk to and from pt, and transit_walk only
+			// for direct walk (and presumably in between pt legs, if necessary).  kai/gregor, sep'18
+		}
+		if ( mode.endsWith( "_fallback" ) )  {
+			return mode.substring(0, mode.length() - 9) ;
 		}
 		
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg ) {
 				Leg leg = (Leg) pe ;
 				String mode2 = leg.getMode() ;
-				if ( !mode2.contains( TransportMode.access_walk ) && 
-						!mode2.contains( TransportMode.egress_walk) &&
+				if ( !mode2.contains( TransportMode.non_network_walk ) &&
 						!mode2.contains( TransportMode.transit_walk ) ) {
 					return mode2 ;
 				}

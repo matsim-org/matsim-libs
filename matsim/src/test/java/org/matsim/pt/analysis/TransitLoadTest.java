@@ -63,7 +63,9 @@ public class TransitLoadTest {
 		Collections.addAll(stops, factory.createTransitRouteStop(stop1, 0, 0)
 				, factory.createTransitRouteStop(stop2, 360, 360)
 				, factory.createTransitRouteStop(stop3, 360, 360)
-				, factory.createTransitRouteStop(stop4, 360, 360));
+				, factory.createTransitRouteStop(stop4, 360, 360)
+				// add first stop again to check whether serving the same stop multiple times is counted right
+				, factory.createTransitRouteStop(stop1, 420, 420));
 		TransitLine line1 = factory.createTransitLine(Id.create(1, TransitLine.class));
 		TransitRoute route1 = factory.createTransitRoute(Id.create(1, TransitRoute.class), null, stops, "bus");
 		Departure dep1 = factory.createDeparture(Id.create(1, Departure.class), 7.0*3600);
@@ -80,6 +82,7 @@ public class TransitLoadTest {
 		TransitLoad tl = new TransitLoad();
 
 		tl.handleEvent(new TransitDriverStartsEvent(7.0*3600-20, Id.create("ptDriver1", Person.class), vehicleIdDep1, line1.getId(), route1.getId(), dep1.getId()));
+		tl.handleEvent(new PersonEntersVehicleEvent(7.0*3600-20, Id.create("ptDriver1", Person.class), vehicleIdDep1));
 
 		tl.handleEvent(new VehicleArrivesAtFacilityEvent(7.0*3600-10, vehicleIdDep1, stop1.getId(), 0));
 		tl.handleEvent(new PersonEntersVehicleEvent(7.0*3600-5, Id.create(0, Person.class), vehicleIdDep1));
@@ -99,42 +102,60 @@ public class TransitLoadTest {
 		tl.handleEvent(new PersonEntersVehicleEvent(7.25*3600, Id.create("carDriver1", Person.class), Id.create("car1", Vehicle.class)));
 
 		tl.handleEvent(new VehicleArrivesAtFacilityEvent(7.3*3600-20, vehicleIdDep1, stop4.getId(), 0));
-		tl.handleEvent(new PersonLeavesVehicleEvent(7.3*3600-5, Id.create(1, Person.class), vehicleIdDep1));
-		tl.handleEvent(new PersonLeavesVehicleEvent(7.3*3600, Id.create(3, Person.class), vehicleIdDep1));
 		tl.handleEvent(new VehicleDepartsAtFacilityEvent(7.3*3600+5, vehicleIdDep1, stop4.getId(), 0));
-
+		
 		tl.handleEvent(new PersonLeavesVehicleEvent(7.35*3600-5, Id.create("carDriver1", Person.class), Id.create("car1", Vehicle.class)));
+		
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent(7.4*3600-20, vehicleIdDep1, stop1.getId(), 0));
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.4*3600-5, Id.create(1, Person.class), vehicleIdDep1));
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.4*3600, Id.create(3, Person.class), vehicleIdDep1));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent(7.4*3600+5, vehicleIdDep1, stop1.getId(), 0));
+		
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.45*3600-20, Id.create("ptDriver1", Person.class), vehicleIdDep1));
+
 
 		Assert.assertEquals(1, tl.getLoadAtDeparture(line1, route1, stop1, dep1));
 		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop2, dep1));
 		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop3, dep1));
-		Assert.assertEquals(0, tl.getLoadAtDeparture(line1, route1, stop4, dep1));
+		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop4, dep1));
+		
+		Assert.assertEquals(1, tl.getLoadAtDeparture(line1, route1, 0, dep1));
+		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 1, dep1));
+		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 2, dep1));
+		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, 3, dep1));
+		Assert.assertEquals(0, tl.getLoadAtDeparture(line1, route1, 4, dep1));
 
-		TransitLoad.StopInformation si = tl.getDepartureStopInformation(line1, route1, stop1, dep1);
+		TransitLoad.StopInformation si = tl.getDepartureStopInformation(line1, route1, stop1, dep1).get(0);
 		Assert.assertEquals(7.0*3600-10, si.arrivalTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(7.0*3600+10, si.departureTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, si.nOfEntering);
 		Assert.assertEquals(0, si.nOfLeaving);
 
-		si = tl.getDepartureStopInformation(line1, route1, stop2, dep1);
+		si = tl.getDepartureStopInformation(line1, route1, stop2, dep1).get(0);
 		Assert.assertEquals(7.1*3600-25, si.arrivalTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(7.1*3600+25, si.departureTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(2, si.nOfEntering);
 		Assert.assertEquals(1, si.nOfLeaving);
 
-		si = tl.getDepartureStopInformation(line1, route1, stop3, dep1);
+		si = tl.getDepartureStopInformation(line1, route1, stop3, dep1).get(0);
 		Assert.assertEquals(7.2*3600-15, si.arrivalTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(7.2*3600+20, si.departureTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, si.nOfEntering);
 		Assert.assertEquals(1, si.nOfLeaving);
 
-		si = tl.getDepartureStopInformation(line1, route1, stop4, dep1);
+		si = tl.getDepartureStopInformation(line1, route1, stop4, dep1).get(0);
 		Assert.assertEquals(7.3*3600-20, si.arrivalTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(7.3*3600+5, si.departureTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0, si.nOfEntering);
+		Assert.assertEquals(0, si.nOfLeaving);
+		
+		si = tl.getDepartureStopInformation(line1, route1, stop1, dep1).get(1);
+		Assert.assertEquals(7.4*3600-20, si.arrivalTime, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(7.4*3600+5, si.departureTime, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(0, si.nOfEntering);
 		Assert.assertEquals(2, si.nOfLeaving);
 
-		si = tl.getDepartureStopInformation(line1, route1, stop1, dep2);
-		Assert.assertNull(si);
+		List<TransitLoad.StopInformation> siList = tl.getDepartureStopInformation(line1, route1, stop1, dep2);
+		Assert.assertNull(siList);
 	}
 }

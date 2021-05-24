@@ -31,9 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.GenericRouteFactory;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
 import javax.inject.Inject;
@@ -86,9 +84,5 @@ public final class MatrixBasedPtRoutingModule implements RoutingModule {
 		
 		return Arrays.asList( newLeg );
 	}
-	
-	@Override
-	public StageActivityTypes getStageActivityTypes(){
-		return EmptyStageActivityTypes.INSTANCE;
-	}
+
 }

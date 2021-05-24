@@ -20,22 +20,28 @@
 
 package org.matsim.core.network;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An abstract class that tests if certain features of networks (e.g. specific
@@ -44,7 +50,6 @@ import org.matsim.testcases.MatsimTestCase;
  * different file formats.
  *
  * @author mrieser
- * @param <T>
  */
 public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 
@@ -59,10 +64,26 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	/**
 	 * Reads a network from the specified file into the given network data structure.
 	 *
-	 * @param qnetwork
+	 * @param scenario
 	 * @param filename
 	 */
 	protected abstract void readNetwork(final Scenario scenario, final String filename);
+
+	/**
+	 * Writes the given network to the specified file.
+	 *
+	 * @param network
+	 * @param stream
+	 */
+	protected abstract void writeNetwork(final Network network, final OutputStream stream);
+
+	/**
+	 * Reads a network from the specified file into the given network data structure.
+	 *
+	 * @param scenario
+	 * @param stream
+	 */
+	protected abstract void readNetwork(final Scenario scenario, final InputStream stream);
 
 	public void testAllowedModes_multipleModes() {
 		doTestAllowedModes(createHashSet("bus", "train"), getOutputDirectory() + "network.xml");
@@ -114,7 +135,73 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		nodes.add(n2);
 		doTestNodes(nodes, getOutputDirectory() + "network.xml");
 	}
-	
+
+	public void testNodes_IdSpecialCharacters() {
+		Network network1 = NetworkUtils.createNetwork();
+		NetworkFactory nf = network1.getFactory();
+		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
+		Node nodeB1 = nf.createNode(Id.create("B & 1 <b>\"'bb", Node.class), new Coord(100, 200));
+		network1.addNode(nodeA1);
+		network1.addNode(nodeB1);
+
+		Network network2 = doIOTest(network1);
+		Node nodeA2 = network2.getNodes().get(nodeA1.getId());
+		Node nodeB2 = network2.getNodes().get(nodeB1.getId());
+
+		Assert.assertNotNull(nodeA2);
+		Assert.assertNotNull(nodeB2);
+		Assert.assertNotSame(nodeA1, nodeA2);
+		Assert.assertNotSame(nodeB1, nodeB2);
+	}
+
+	public void testLinks_IdSpecialCharacters() {
+		Network network1 = NetworkUtils.createNetwork();
+		NetworkFactory nf = network1.getFactory();
+		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
+		Node nodeB1 = nf.createNode(Id.create("B & 1 <b>\"'bb", Node.class), new Coord(100, 200));
+		network1.addNode(nodeA1);
+		network1.addNode(nodeB1);
+
+		Link linkA1 = nf.createLink(Id.create("aa & 1 <A>\"'AA", Link.class), nodeA1, nodeB1);
+		Link linkB1 = nf.createLink(Id.create("bb & 1 <B>\"'BB", Link.class), nodeB1, nodeA1);
+		NetworkUtils.setType(linkA1, "my&special<type>\"'");
+		NetworkUtils.setOrigId(linkB1, "my&special<origId>\"'");
+
+		network1.addLink(linkA1);
+		network1.addLink(linkB1);
+
+		Network network2 = doIOTest(network1);
+		Link linkA2 = network2.getLinks().get(linkA1.getId());
+		Link linkB2 = network2.getLinks().get(linkB1.getId());
+
+		Assert.assertNotNull(linkA2);
+		Assert.assertNotNull(linkB2);
+		Assert.assertNotSame(linkA1, linkA2);
+		Assert.assertNotSame(linkB1, linkB2);
+//		Assert.assertEquals(NetworkUtils.getType(linkA1), NetworkUtils.getType(linkA2)); // type is not supported anymore in v2
+//		Assert.assertEquals(NetworkUtils.getOrigId(linkB1), NetworkUtils.getOrigId(linkB2)); // origId is not supported anymore in v2
+	}
+
+	public void testNetwork_NameSpecialCharacters() {
+		Network network1 = NetworkUtils.createNetwork();
+		network1.setName("Special & characters < are > in \" this ' name.");
+		NetworkFactory nf = network1.getFactory();
+		Node nodeA1 = nf.createNode(Id.create("1", Node.class), new Coord(100, 200));
+		Node nodeB1 = nf.createNode(Id.create("2", Node.class), new Coord(100, 200));
+		network1.addNode(nodeA1);
+		network1.addNode(nodeB1);
+
+		Link linkA1 = nf.createLink(Id.create("A", Link.class), nodeA1, nodeB1);
+		Link linkB1 = nf.createLink(Id.create("B", Link.class), nodeB1, nodeA1);
+
+		network1.addLink(linkA1);
+		network1.addLink(linkB1);
+
+		Network network2 = doIOTest(network1);
+
+		Assert.assertNotSame(network1, network2);
+		Assert.assertEquals(network1.getName(), network2.getName());
+	}
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
 		Network network1 = NetworkUtils.createNetwork();
@@ -170,4 +257,17 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		}
 	}
 	
+	private Network doIOTest(Network network1) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		writeNetwork(network1, out);
+
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+
+		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network2 = scenario2.getNetwork();
+		readNetwork(scenario2, in);
+
+		return network2;
+	}
+
 }

@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
@@ -47,8 +47,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 
 /**
  * Write a csv file for visualizing signals in via based on the events.
@@ -82,10 +82,8 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 	Scenario scenario;
 
 	@Inject
-	public SignalEvents2ViaCSVWriter(Scenario scenario, ControlerListenerManager clm, EventsManager em) {
+	public SignalEvents2ViaCSVWriter(Scenario scenario) {
 		this.scenario = scenario;
-		clm.addControlerListener(this);
-		em.addHandler(this);
 	}
 
 	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
@@ -179,9 +177,9 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 			// vertical link
 			deltaX = 0;
 			if (toNodeCoord.getY() < fromNodeCoord.getY()) {
-				deltaY = -1;
-			} else {
 				deltaY = 1;
+			} else {
+				deltaY = -1;
 			}
 
 		} else {

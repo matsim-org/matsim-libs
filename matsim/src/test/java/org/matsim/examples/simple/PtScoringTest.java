@@ -24,8 +24,7 @@ package org.matsim.examples.simple;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +44,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -68,7 +68,8 @@ public class PtScoringTest {
 
 	@Test
 	public void test_PtScoringLineswitch() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -96,7 +97,7 @@ public class PtScoringTest {
 
 
 
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 		
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
@@ -220,7 +221,8 @@ public class PtScoringTest {
 	}
 	@Test
 	public void test_PtScoringLineswitchAndPtConstant() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
@@ -246,7 +248,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 		
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
@@ -375,7 +377,8 @@ public class PtScoringTest {
 	}
 	@Test
 	public void test_PtScoring_Wait() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -402,7 +405,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 		
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
@@ -461,7 +464,8 @@ public class PtScoringTest {
 
 	@Test
 	public void test_PtScoring() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
@@ -486,7 +490,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);

@@ -19,16 +19,29 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.vehicles.Vehicle;
 
+/**
+ * @author michalm
+ */
 public class TravelTimeUtils {
-	public static TravelTime createTravelTimesFromEvents(Scenario scenario, String eventsFile) {
-		TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(scenario.getNetwork(),
-				scenario.getConfig().travelTimeCalculator());
+	public static TravelTime maxOfTravelTimes(TravelTime travelTime1, TravelTime travelTime2) {
+		return (Link link, double time, Person person, Vehicle vehicle) -> Math.max(
+				travelTime1.getLinkTravelTime(link, time, person, vehicle),
+				travelTime2.getLinkTravelTime(link, time, person, vehicle));
+	}
+
+	public static TravelTime createTravelTimesFromEvents(Network network, Config config, String eventsFile) {
+		TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(network, config.travelTimeCalculator());
 		initTravelTimeCalculatorFromEvents(ttCalculator, eventsFile);
 		return ttCalculator.getLinkTravelTimes();
 	}

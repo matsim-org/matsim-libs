@@ -32,18 +32,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -52,7 +50,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
@@ -162,10 +159,10 @@ import org.matsim.vehicles.VehiclesFactory;
 		Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-        VehicleCapacity capacity = vb.createVehicleCapacity();
-        capacity.setSeats(101);
-        capacity.setStandingRoom(0);
-        vehicleType.setCapacity(capacity);
+//        VehicleCapacity capacity = vb.createVehicleCapacity();
+		vehicleType.getCapacity().setSeats(101);
+		vehicleType.getCapacity().setStandingRoom(0);
+//        vehicleType.setCapacity(capacity);
         vehicles.addVehicleType(vehicleType);
         vehicles.addVehicle( vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
         vehicles.addVehicle( vb.createVehicle(Id.create("veh2", Vehicle.class), vehicleType));
@@ -185,10 +182,10 @@ import org.matsim.vehicles.VehiclesFactory;
 			netRoute.setLinkIds(this.links[0].getId(), routeLinks, this.links[2].getId());
 			List<TransitRouteStop> stops = new ArrayList<>();
 			TransitRouteStop stop;
-			stop = this.builder.createTransitRouteStop(this.stopFacilities[0], Time.UNDEFINED_TIME, 0.0);
+			stop = this.builder.createTransitRouteStopBuilder(this.stopFacilities[0]).departureOffset( 0.0).build();
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			stop = this.builder.createTransitRouteStop(this.stopFacilities[1], Time.UNDEFINED_TIME, 7.0*60);
+			stop = this.builder.createTransitRouteStopBuilder(this.stopFacilities[1]).departureOffset( 7.0*60).build();
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[2], 12.0 * 60, 16.0*60);
@@ -219,12 +216,13 @@ import org.matsim.vehicles.VehiclesFactory;
 		}
 	}
 	
-	/*package*/ Person createPersonAndAdd(Scenario scenario, String id, String mode) {
+	/*package*/ Person createPersonAndAdd(Scenario scenario, String id, String legMode, String routingMode) {
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("0", Link.class));
 		((Activity) from).setCoord(this.nodes[0].getCoord());
-		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);
+		Leg leg = scenario.getPopulation().getFactory().createLeg(legMode);
+		TripStructureUtils.setRoutingMode(leg, routingMode);
 		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("3", Link.class));
 		((Activity) to).setCoord(this.nodes[4].getCoord());
 		

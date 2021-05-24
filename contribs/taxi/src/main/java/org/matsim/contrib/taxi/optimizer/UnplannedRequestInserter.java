@@ -20,7 +20,7 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Collection;
 
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 /**
  * @author michalm

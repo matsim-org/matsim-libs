@@ -24,7 +24,8 @@ public abstract class QGisSymbolLayer {
 	private QGisConstants.sizeUnits sizeUnits;
 	
 	private QGisConstants.penstyle penStyle;
-	
+	private QGisConstants.penstyle penStyleBorder;
+
 	public QGisConstants.symbolType getSymbolType() {
 		return symbolType;
 	}
@@ -88,5 +89,12 @@ public abstract class QGisSymbolLayer {
 	public QGisConstants.penstyle getPenStyle(){
 		return this.penStyle;
 	}
-	
+
+	public QGisConstants.penstyle getPenStyleBorder() {
+		return penStyleBorder;
+	}
+
+	public void setPenStyleBorder(QGisConstants.penstyle penStyleBorder) {
+		this.penStyleBorder = penStyleBorder;
+	}
 }

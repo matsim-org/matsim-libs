@@ -1,4 +1,25 @@
-/**
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * DefaultTurnAcceptanceLogic.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ /**
  * 
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
@@ -13,12 +34,12 @@ import org.matsim.api.core.v01.network.Link;
  * @author kainagel
  *
  */
-final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
+public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 	private static final Logger log = Logger.getLogger( DefaultTurnAcceptanceLogic.class) ;
 	
 	@Override
 	/** We need qNetwork to get the next QLink, because the link lookup may lead to a NullPointer otherwise */
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork){
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now){
 		if (nextLinkId == null) {
 			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 					+ " currentLink=" + currentLink.getId().toString()
@@ -45,6 +66,10 @@ final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 //			// how it currently works: network links are defined for modes, not for vehicle types.  kai, may'16
 //		}
 		// currently does not work, see MATSIM-533 
+		
+		/* note: it cannot happen, that currentLane does not lead to nextLink (e.g. due to turn restrictions) because this is checked before: 
+		 * a vehicle only enters a lane when that lane leads to the next link. see QLinkLanesImpl.moveBufferToNextLane() and .chooseNextLane()
+		 * tthunig, oct'17 */
 		
 		return AcceptTurn.GO ;
 	}

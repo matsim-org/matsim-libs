@@ -20,9 +20,12 @@
 
 package org.matsim.contrib.analysis.kai;
 
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
@@ -31,11 +34,19 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author nagel
  *
  */
-public class KaiAnalysisListener implements StartupListener, IterationEndsListener {
+public class KaiAnalysisListener implements StartupListener, IterationEndsListener, ShutdownListener{
 	// NOTE: My excel opens tab-separated txt files directly (from the command line).  It does not do this with comma-separated or semicolon-separated.
 	// So tab-separated is the way to go. kai, sep'13
 	
-	KNAnalysisEventsHandler calcLegTimes = null ;
+	public static final class Module extends AbstractModule {
+		@Override public void install() {
+			this.addControlerListenerBinding().to( KaiAnalysisListener.class );
+		}
+	}
+	
+	private KNAnalysisEventsHandler calcLegTimes = null ;
+	
+	// the default constructor can be injected even without annotation!  kai, may'18
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
@@ -48,14 +59,18 @@ public class KaiAnalysisListener implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// moved this to iteration end since I also want to analyze population scores. kai, mar'14
+		// (... which don't exist at shutdown time????)
 
 		int iteration = event.getIteration() ;
 
 		this.calcLegTimes.writeStats(event.getServices().getControlerIO().getIterationFilename(iteration, "stats_"));
 
-		// trips are from "true" activity to "true" activity.  legs may also go
-		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
-		// kai, jul'11
+	}
+
+	@Override
+	public void notifyShutdown( ShutdownEvent event ){
+
+		this.calcLegTimes.writeStats(event.getServices().getControlerIO().getOutputFilename( "stats_") );
 
 	}
 

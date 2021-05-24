@@ -14,16 +14,19 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.FreightActivity;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.scoring.FreightActivity;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 /**
  * Defines example carrier scoring function (factory).
@@ -33,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author stefan
  *
  */
-public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
+public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
 
     /**
      *
@@ -44,34 +47,19 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
      */
     static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
-        private static Logger log = Logger.getLogger(DriversActivityScoring.class);
+        private static final  Logger log = Logger.getLogger(DriversActivityScoring.class);
 
         private double score;
-
         private double timeParameter = 0.008;
-
         private double missedTimeWindowPenalty = 0.01;
-
         private FileWriter fileWriter;
 
         public DriversActivityScoring() {
             super();
-//			try {
-//				fileWriter = new FileWriter(new File("output/act_scoring_"+System.currentTimeMillis()+".txt"));
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
         public void finish() {
-//			try {
-//				fileWriter.close();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
@@ -87,30 +75,21 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
         @Override
         public void handleActivity(Activity act) {
             if(act instanceof FreightActivity) {
-                double actStartTime = act.getStartTime();
+				double actStartTime = act.getStartTime().seconds();
 
 //                log.info(act + " start: " + Time.writeTime(actStartTime));
                 TimeWindow tw = ((FreightActivity) act).getTimeWindow();
                 if(actStartTime > tw.getEnd()){
                     double penalty_score = (-1)*(actStartTime - tw.getEnd())*missedTimeWindowPenalty;
-                    assert penalty_score <= 0.0 : "penalty score must be negative";
+                    if (!(penalty_score <= 0.0)) throw new AssertionError("penalty score must be negative");
 //                    log.info("penalty " + penalty_score);
                     score += penalty_score;
 
                 }
-                double actTimeCosts = (act.getEndTime()-actStartTime)*timeParameter;
+				double actTimeCosts = (act.getEndTime().seconds() -actStartTime)*timeParameter;
 //                log.info("actCosts " + actTimeCosts);
-                assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
+                if (!(actTimeCosts >= 0.0)) throw new AssertionError("actTimeCosts must be positive");
                 score += actTimeCosts*(-1);
-//                try {
-//					fileWriter.write("actLinkId="+ act.getLinkId() + "; actArrTime=" + Time.writeTime(actStartTime) +
-//							"; twEnd=" + tw.getEnd() + "; minTooLate=" + Time.writeTime(Math.max(0, actStartTime-tw.getEnd()))
-//							+ "; penaltyMissedTW=" + (Math.max(0, actStartTime-tw.getEnd())*missedTimeWindowPenalty) +
-//							"; actCosts=" +actTimeCosts + "\n");
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
             }
         }
 
@@ -124,18 +103,11 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
     static class VehicleEmploymentScoring implements SumScoringFunction.BasicScoring {
 
         private Carrier carrier;
-
         private FileWriter fileWriter;
 
         public VehicleEmploymentScoring(Carrier carrier) {
             super();
             this.carrier = carrier;
-//			try {
-//				fileWriter = new FileWriter(new File("output/veh_employment_"+System.currentTimeMillis()+".txt"));
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
@@ -150,21 +122,9 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
             if(selectedPlan == null) return 0.;
             for(ScheduledTour tour : selectedPlan.getScheduledTours()){
                 if(!tour.getTour().getTourElements().isEmpty()){
-                    score += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
-//					try {
-//						fileWriter.write("vehicleId="+tour.getVehicle().getVehicleId()+"; fix="+tour.getVehicle().getVehicleType().getVehicleCostInformation().fix+"\n");
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+                    score += (-1)*tour.getVehicle().getType().getCostInformation().getFixedCosts();
                 }
             }
-//			try {
-//				fileWriter.close();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
             return score;
         }
 
@@ -178,12 +138,11 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
      */
     static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
+        private static final  Logger log = Logger.getLogger(DriversLegScoring.class);
+
         private double score = 0.0;
-
         private final Network network;
-
         private final Carrier carrier;
-
         private Set<CarrierVehicle> employedVehicles;
 
         public DriversLegScoring(Carrier carrier, Network network) {
@@ -206,31 +165,31 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
         }
 
         private double getTimeParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
+            return vehicle.getType().getCostInformation().getCostsPerSecond();
         }
 
 
         private double getDistanceParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
+            return vehicle.getType().getCostInformation().getCostsPerMeter();
         }
 
 
-        private CarrierVehicle getVehicle(Id vehicleId) {
-            for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
-                if(cv.getVehicleId().equals(vehicleId)){
-                    return cv;
-                }
-            }
-            return null;
-        }
+//        private CarrierVehicle getVehicle(Id vehicleId) {
+//            CarrierUtils.getCarrierVehicle(carrier, vehicleId);
+//            if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//                return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//            }
+//            log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//            return null;
+//        }
 
         @Override
         public void handleLeg(Leg leg) {
             if(leg.getRoute() instanceof NetworkRoute){
                 NetworkRoute nRoute = (NetworkRoute) leg.getRoute();
                 Id vehicleId = nRoute.getVehicleId();
-                CarrierVehicle vehicle = getVehicle(vehicleId);
-                if(vehicle == null) throw new IllegalStateException("vehicle with id " + vehicleId + " is missing");
+                CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
+                Gbl.assertNotNull(vehicle);
                 if(!employedVehicles.contains(vehicle)){
                     employedVehicles.add(vehicle);
                 }
@@ -248,10 +207,10 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
                 }
 
                 double distanceCosts = distance*getDistanceParameter(vehicle);
-                assert distanceCosts >= 0.0 : "distanceCosts must be positive";
+                if (!(distanceCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * distanceCosts;
-                double timeCosts = leg.getTravelTime()*getTimeParameter(vehicle);
-                assert timeCosts >= 0.0 : "timeCosts must be positive";
+        	double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
+                if (!(timeCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * timeCosts;
 
             }
@@ -262,12 +221,11 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
+        private static final  Logger log = Logger.getLogger(TollScoring.class);
+
         private double score = 0.;
-
         private Carrier carrier;
-
         private Network network;
-
         private VehicleTypeDependentRoadPricingCalculator roadPricing;
 
         public TollScoring(Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing) {
@@ -279,22 +237,21 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
         @Override
         public void handleEvent(Event event) {
             if(event instanceof LinkEnterEvent){
-                CarrierVehicle carrierVehicle = getVehicle(((LinkEnterEvent) event).getVehicleId());
+                CarrierVehicle carrierVehicle = CarrierUtils.getCarrierVehicle(carrier, ((LinkEnterEvent) event).getVehicleId());
                 if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
-                double toll = roadPricing.getTollAmount(carrierVehicle.getVehicleType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId()),event.getTime());
-                if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getVehicleId() + " paid toll " + toll + "");
+                double toll = roadPricing.getTollAmount(carrierVehicle.getType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId() ),event.getTime() );
+                if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getId() + " paid toll " + toll + "" );
                 score += (-1) * toll;
             }
         }
 
-        private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-            for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
-                if(v.getVehicleId().equals(vehicleId)){
-                    return v;
-                }
-            }
-            return null;
-        }
+//        private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
+//            if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//                return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//            }
+//            log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//            return null;
+//        }
 
         @Override
         public void finish() {
@@ -309,6 +266,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
     private Network network;
 
+    @Inject
     public CarrierScoringFunctionFactoryImpl(Network network) {
         super();
         this.network = network;

@@ -54,7 +54,8 @@ import org.matsim.vehicles.Vehicle;
  * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
  * counting method and leave it here. kai, sep'13 
  */
-public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
+final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
+	// can be/remain public as long as constructor is package-private.  kai, feb'20
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
@@ -67,10 +68,10 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	private final Set<Id<TransitLine>> calibratedLines;
 
 	@Inject
-	public CadytsPtOccupancyAnalyzer( Config config ) {
-		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
+	CadytsPtOccupancyAnalyzer( Config config ) {
+		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class ) ;
 
-		this.calibratedLines = toTransitLineIdSet( ccc.getCalibratedItems() ) ;
+		this.calibratedLines = toTransitLineIdSet( ccc.getCalibratedLines() ) ;
 		this.timeBinSize = ccc.getTimeBinSize() ;
 
 		this.maxTime = Time.MIDNIGHT-1; //24 * 3600 - 1;
@@ -209,7 +210,7 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	}
 
 	@Override
-	public void writeResultsForSelectedStopIds(final String filename, final Counts<Link> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
+	public void writeResultsForSelectedStopIds(final String filename, final Counts<TransitStopFacility> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
 		final String TAB = "\t";
@@ -228,8 +229,8 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 		// write content
 		for (Id<TransitStopFacility> stopId : stopIds) {
 			// get count data
-			Count count = occupCounts.getCounts().get(Id.create(stopId, Link.class));
-			if (!occupCounts.getCounts().containsKey(Id.create(stopId, Link.class))) {
+			Count count = occupCounts.getCounts().get(Id.create(stopId, TransitStopFacility.class));
+			if (!occupCounts.getCounts().containsKey(Id.create(stopId, TransitStopFacility.class))) {
 				continue;
 			}
 

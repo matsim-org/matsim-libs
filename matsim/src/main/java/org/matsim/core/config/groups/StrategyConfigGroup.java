@@ -20,9 +20,6 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -32,6 +29,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultPlansRemover;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -92,16 +92,29 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			
 			StringBuilder sels = new StringBuilder() ;
 			sels.append( DefaultSelector.SelectRandom ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.BestScore ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.KeepLastSelected ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.ChangeExpBeta ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.SelectExpBeta ) ;
+			sels.append( ' ' );
 			sels.append( DefaultSelector.SelectPathSizeLogit ) ;
 			
 			StringBuilder strats = new StringBuilder() ;
-			for ( DefaultStrategy strat : DefaultStrategy.values() ) {
-				strats.append( strat.toString() + " ") ;
-			}
+			strats.append( DefaultStrategy.ReRoute ) ;
+			sels.append( ' ' );
+			strats.append( DefaultStrategy.TimeAllocationMutator ) ;
+			sels.append( ' ' );
+			strats.append( DefaultStrategy.TimeAllocationMutator_ReRoute ) ;
+			sels.append( ' ' );
+			strats.append( DefaultStrategy.ChangeSingleTripMode ) ;
+			sels.append( ' ' );
+			strats.append( DefaultStrategy.ChangeTripMode ) ;
+			sels.append( ' ' );
+			strats.append( DefaultStrategy.SubtourModeChoice ) ;
 			
 			map.put( "strategyName",
 					"strategyName of strategy.  Possible default names: " + sels + " (selectors), " + strats + " (innovative strategies)." );
@@ -131,8 +144,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "weight" )
-		public void setWeight(final double probability) {
+		public StrategySettings setWeight(final double probability) {
 			this.probability = probability;
+			return this ;
 		}
 
 		@StringGetter( "weight" )
@@ -141,8 +155,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "strategyName" )
-		public void setStrategyName(final String name) {
+		public StrategySettings setStrategyName(final String name) {
 			this.strategyName = name;
+			return this ;
 		}
 
 		@StringGetter( "strategyName" )
@@ -151,8 +166,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "disableAfterIteration" )
-		public void setDisableAfter(final int disableAfter) {
+		public StrategySettings setDisableAfter(final int disableAfter) {
 			this.disableAfter = disableAfter;
+			return this ;
 		}
 
 		@StringGetter( "disableAfterIteration" )
@@ -161,8 +177,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "executionPath" )
-		public void setExePath(final String exePath) {
+		public StrategySettings setExePath(final String exePath) {
 			this.exePath = exePath;
+			return this ;
 		}
 
 		@StringGetter( "executionPath" )
@@ -176,8 +193,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "subpopulation" )
-		public void setSubpopulation(final String subpopulation) {
+		public StrategySettings setSubpopulation(final String subpopulation) {
 			this.subpopulation = subpopulation;
+			return this ;
 		}
 
 		@StringGetter( "subpopulation" )
@@ -257,7 +275,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
+		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something like 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
 		map.put(ReflectiveDelegate.MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 
 		StringBuilder strb = new StringBuilder() ;

@@ -20,12 +20,16 @@
 
 package org.matsim.core.config.groups;
 
-import java.net.URL;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.population.PopulationUtils;
+
+import java.net.URL;
+import java.util.Map;
 
 public final class PlansConfigGroup extends ReflectiveConfigGroup {
 
@@ -36,17 +40,17 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		public static final String CompressedNetworkRoute = "CompressedNetworkRoute";
 	}
 
-	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
+	public enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
-	private static final String SUBPOPULATION_ATTRIBUTE = "subpopulationAttributeName";
+//	private static final String SUBPOPULATION_ATTRIBUTE = "subpopulationAttributeName";
 	private static final String INPUT_CRS = "inputCRS";
 
 	private String inputFile = null;
 	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
 	private String inputPersonAttributeFile = null;
-	private String subpopulationAttributeName = "subpopulation";
+//	private String subpopulationAttributeName = "subpopulation";
 	private String inputCRS = null;
 	
 	//--
@@ -68,13 +72,13 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 				"Defines how routes are stored in memory. Currently supported: " +
 				NetworkRouteType.LinkNetworkRoute + ", " +
 				NetworkRouteType.CompressedNetworkRoute + ".");
-		comments.put(
-				INPUT_PERSON_ATTRIBUTES_FILE,
-				"Path to a file containing person attributes (required file format: ObjectAttributes).");
-		comments.put(
-				SUBPOPULATION_ATTRIBUTE,
-				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
-				" (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations." );
+//		comments.put(
+//				INPUT_PERSON_ATTRIBUTES_FILE,
+//				"Path to a file containing person attributes (required file format: ObjectAttributes).");
+//		comments.put(
+//				SUBPOPULATION_ATTRIBUTE,
+//				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
+//				" (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations." );
 
 		StringBuilder str = new StringBuilder() ;
 		for ( PlansConfigGroup.ActivityDurationInterpretation itp : PlansConfigGroup.ActivityDurationInterpretation.values() ) {
@@ -85,7 +89,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		"(simpler) version of the TimeAllocationMutator.") ;
 		
 		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
-		"activityStartTime. default=false") ;
+                "activityStartTime. default=false. Use with Caution!");
 
 		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
 				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
@@ -107,21 +111,50 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public URL getInputFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
-
+	// ---
+	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
+	private static final String INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedPersonAttributeFile" ;
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE)
+	public final void setInsistingOnUsingDeprecatedPersonAttributeFile( boolean val ) {
+		this.insistingOnUsingDeprecatedPersonAttributeFile = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE)
+	public final boolean isInsistingOnUsingDeprecatedPersonAttributeFile() {
+		return insistingOnUsingDeprecatedPersonAttributeFile;
+	}
+	
+	public static enum HandlingOfPlansWithoutRoutingMode { reject, useMainModeIdentifier };
+	private HandlingOfPlansWithoutRoutingMode handlingOfPlansWithoutRoutingMode = HandlingOfPlansWithoutRoutingMode.reject ;
+	private static final String HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE = "handlingOfPlansWithoutRoutingMode" ;
+	@StringSetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
+	public final void setHandlingOfPlansWithoutRoutingMode( HandlingOfPlansWithoutRoutingMode val ) {
+		this.handlingOfPlansWithoutRoutingMode = val ;
+	}
+	@StringGetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
+	public final HandlingOfPlansWithoutRoutingMode getHandlingOfPlansWithoutRoutingMode() {
+		return handlingOfPlansWithoutRoutingMode;
+	}
+	
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
+	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
-
+	public static final String PERSON_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate person attribute file is deprecated.  Add the information directly into each person, using " +
+						 "the Attributable feature.  If you insist on continuing to use the separate person attribute file, set " +
+						 "insistingOnUsingDeprecatedPersonAttributeFile to true.  The file will then be read, but the values " +
+						 "will be entered into each person using Attributable, and written as such to output_plans.  kai, may'19";
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
+	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
+	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public URL getInputPersonAttributeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputPersonAttributeFile);
 	}
-
+	// ---
 	@StringGetter( NETWORK_ROUTE_TYPE )
 	public String getNetworkRouteType() {
 		return this.networkRouteType;
@@ -131,17 +164,24 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public void setNetworkRouteType(final String routeType) {
 		this.networkRouteType = routeType;
 	}
-
-	@StringGetter( SUBPOPULATION_ATTRIBUTE )
-	public String getSubpopulationAttributeName() {
-		return subpopulationAttributeName;
-	}
-
-	@StringSetter( SUBPOPULATION_ATTRIBUTE )
-	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
-		this.subpopulationAttributeName = subpopulationAttributeName;
-	}
-	
+	// ---
+//	/**
+//	 * @deprecated -- use {@link org.matsim.core.population.PopulationUtils#getSubpopulation(Person, Config)}
+//	 */
+//	@Deprecated
+//	@StringGetter( SUBPOPULATION_ATTRIBUTE )
+//	public String getSubpopulationAttributeName() {
+//		return subpopulationAttributeName;
+//	}
+//	/**
+//	 * @deprecated -- do not set away from default
+//	 */
+//	@Deprecated
+//	@StringSetter( SUBPOPULATION_ATTRIBUTE )
+//	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
+//		this.subpopulationAttributeName = subpopulationAttributeName;
+//	}
+	// ---
 	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
 	public PlansConfigGroup.ActivityDurationInterpretation getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation ;
@@ -186,6 +226,14 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_CRS )
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
+	}
+
+	/**
+	 * @deprecated -- replace extraction of subpopulation by {@link PopulationUtils#getSubpopulation(HasPlansAndId)}
+	 */
+	@Deprecated
+	public String getSubpopulationAttributeName(){
+		return PopulationUtils.SUBPOPULATION_ATTRIBUTE_NAME;
 	}
 
 

@@ -19,89 +19,21 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import java.net.URL;
+
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiControlerCreator;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.Provider;
-
 public class RunTaxiExample {
-	private static final String CONFIG_FILE = "mielec_2014_02/mielec_taxi_config.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
+	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		// load config
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new TaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
-
-		// load scenario
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		// setup controler
-		Controler controler = new Controler(scenario);
-
-		final boolean ownTaxiOptimizer = false;
-		if (!ownTaxiOptimizer) {
-			controler.addOverridingModule(new TaxiModule());
-			// (default taxi optimizer)
-		} else {
-			controler.addOverridingModule(new TaxiModule(MyTaxiOptimizerProvider.class));
-			// (implement your own taxi optimizer)
-		}
-
-		controler.addOverridingModule(new TaxiOutputModule()); // taxi output (can be commented out)
-
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
-		}
-
-		// run simulation
-		controler.run();
-	}
-
-	public static void main(String[] args) {
-		RunTaxiExample.run(false, 0); // switch to 'false' to turn off visualisation
-	}
-
-	/**
-	 * See {@link DefaultTaxiOptimizerProvider} for examples.
-	 */
-	private static class MyTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-		@Override
-		public TaxiOptimizer get() {
-			return new TaxiOptimizer() {
-				@Override
-				public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void requestSubmitted(Request request) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void nextTask(Vehicle vehicle) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-					// TODO Auto-generated method stub
-				}
-			};
-		}
+		TaxiControlerCreator.createControler(config, otfvis).run();
 	}
 }

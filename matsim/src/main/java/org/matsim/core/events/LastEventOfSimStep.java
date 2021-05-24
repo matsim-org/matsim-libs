@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.Event;
  *
  * @author christoph dobler
  */
-public class LastEventOfSimStep extends Event {
+public final class LastEventOfSimStep extends Event {
 
 	public static final String EVENT_TYPE = "simstepend";
 	

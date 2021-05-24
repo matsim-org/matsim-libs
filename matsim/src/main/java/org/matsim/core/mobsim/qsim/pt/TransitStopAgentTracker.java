@@ -20,22 +20,23 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.qsim.AgentTracker;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 /**
  * @author mrieser
  */
-public class TransitStopAgentTracker {
+public class TransitStopAgentTracker implements AgentTracker {
 
 	private final static Logger log = Logger.getLogger(TransitStopAgentTracker.class);
 	
@@ -76,7 +77,8 @@ public class TransitStopAgentTracker {
 		}
 	}
 
-	public List<PTPassengerAgent> getAgentsAtStop(final Id<TransitStopFacility> stopId) {
+	@Override
+	public List<PTPassengerAgent> getAgentsAtFacility(final Id<TransitStopFacility> stopId) {
 		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
 			return Collections.emptyList();

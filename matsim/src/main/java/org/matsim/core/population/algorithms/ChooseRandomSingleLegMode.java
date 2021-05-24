@@ -21,6 +21,8 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,6 +32,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen
@@ -42,17 +45,23 @@ public final class ChooseRandomSingleLegMode implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = true;
-
+	private boolean allowSwitchFromListedModesOnly;
 	private final Random rng;
+	private final List<String> possibleFromModes = new ArrayList<>();
+
 
 	/**
-	 * @param possibleModes
+	 * @param possibleModes possible transportmodes to chose from
 	 * @param rng The random number generator used to draw random numbers to select another mode.
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public ChooseRandomSingleLegMode(final String[] possibleModes, final Random rng) {
+	public ChooseRandomSingleLegMode(final String[] possibleModes, final Random rng, boolean allowSwitchFromListedModesOnly) {
 		this.possibleModes = possibleModes.clone();
+		this.allowSwitchFromListedModesOnly=allowSwitchFromListedModesOnly;
+		if (allowSwitchFromListedModesOnly){
+			this.possibleFromModes.addAll(Arrays.asList(possibleModes));
+			}
 		this.rng = rng;
 	}
 
@@ -70,12 +79,20 @@ public final class ChooseRandomSingleLegMode implements PlanAlgorithm {
 			}
 		}
 
-		ArrayList<Leg> legs = new ArrayList<Leg>();
+		ArrayList<Leg> legs = new ArrayList<>();
 		int cnt = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
+				if (allowSwitchFromListedModesOnly){
+					if (this.possibleFromModes.contains(((Leg) pe).getMode())) {
+						legs.add((Leg) pe);
+						cnt++;
+					}
+				}
+				else {
 				legs.add((Leg) pe);
 				cnt++;
+				}
 			}
 		}
 		if (cnt == 0) {
@@ -86,7 +103,9 @@ public final class ChooseRandomSingleLegMode implements PlanAlgorithm {
 	}
 
 	private void setRandomLegMode(final Leg leg, final boolean forbidCar) {
-		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar));
+		String newMode = chooseModeOtherThan(leg.getMode(), forbidCar);
+		leg.setMode(newMode);
+		TripStructureUtils.setRoutingMode(leg, newMode);
 		Route route = leg.getRoute() ;
 		if ( route != null && route instanceof NetworkRoute) {
 			((NetworkRoute)route).setVehicleId(null);

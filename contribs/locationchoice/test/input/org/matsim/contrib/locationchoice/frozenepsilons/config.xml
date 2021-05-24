@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<!-- ====================================================================== -->
+	
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="controler">
+		<param name="firstIteration" value="0" />
+         <param name="lastIteration" value="1" />		
+         <param name="runId" value="fr01" />
+         <param name="routingAlgorithmType" value="Dijkstra" />
+         <param name="mobsim" value="qsim" />
+         <param name="writePlansInterval" value="1" />
+	</module>
+	
+	<!-- ====================================================================== -->
+	
+	<module name="frozenTastes">
+		<param name="flexible_types" value="shop,leisure"/>
+		<param name="algorithm" value="bestResponse" />	
+		<param name="destinationSamplePercent" value="50"/>
+		<param name="epsilonScaleFactors" value="1.0, 1.0"/>
+<!--		<param name="pkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsKValues.xml"/>-->
+<!--		<param name="fkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/facilitiesKValues.xml"/>-->
+<!--		<param name="maxDCScoreFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsMaxEpsUnscaled.xml"/>-->
+		
+<!--		<param name="tt_approximationLevel" value="1" />-->
+	</module>
+	 
+  <!-- ====================================================================== -->
+
+ <module name="strategy">
+          <param name="maxAgentPlanMemorySize" value="5" />
+	 <parameterset type="strategysettings" >
+		 <param name="disableAfterIteration" value="-1" />
+		 <param name="executionPath" value="null" />
+		 <param name="strategyName" value="BestScore" />
+		 <param name="subpopulation" value="null" />
+		 <param name="weight" value="0.9" />
+	 </parameterset>
+	 <parameterset type="strategysettings" >
+		 <param name="disableAfterIteration" value="-1" />
+		 <param name="executionPath" value="null" />
+		 <param name="strategyName" value="org.matsim.contrib.locationchoice.frozenepsilons.BestReplyLocationChoicePlanStrategy" />
+		 <param name="subpopulation" value="null" />
+		 <param name="weight" value="0.1" />
+	 </parameterset>
+ </module>
+ 
+ <!-- ====================================================================== -->
+
+	<module name="planCalcScore" >
+		<parameterset type="activityParams" >
+			<param name="activityType" value="work" />
+			<param name="closingTime" value="undefined" />
+			<param name="earliestEndTime" value="undefined" />
+			<param name="latestStartTime" value="undefined" />
+			<param name="minimalDuration" value="undefined" />
+			<param name="openingTime" value="undefined" />
+			<param name="priority" value="1.0" />
+			<param name="scoringThisActivityAtAll" value="true" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="typicalDurationScoreComputation" value="relative" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="shopping" />
+			<param name="closingTime" value="undefined" />
+			<param name="earliestEndTime" value="undefined" />
+			<param name="latestStartTime" value="undefined" />
+			<param name="minimalDuration" value="undefined" />
+			<param name="openingTime" value="undefined" />
+			<param name="priority" value="1.0" />
+			<param name="scoringThisActivityAtAll" value="true" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="typicalDurationScoreComputation" value="relative" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="leisure" />
+			<param name="closingTime" value="undefined" />
+			<param name="earliestEndTime" value="undefined" />
+			<param name="latestStartTime" value="undefined" />
+			<param name="minimalDuration" value="undefined" />
+			<param name="openingTime" value="undefined" />
+			<param name="priority" value="1.0" />
+			<param name="scoringThisActivityAtAll" value="true" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="typicalDurationScoreComputation" value="relative" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="home" />
+			<param name="closingTime" value="undefined" />
+			<param name="earliestEndTime" value="undefined" />
+			<param name="latestStartTime" value="undefined" />
+			<param name="minimalDuration" value="undefined" />
+			<param name="openingTime" value="undefined" />
+			<param name="priority" value="1.0" />
+			<param name="scoringThisActivityAtAll" value="true" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="typicalDurationScoreComputation" value="relative" />
+		</parameterset>
+	</module>
+ 
+  <!-- ====================================================================== -->
+</config>

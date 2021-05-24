@@ -21,6 +21,10 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -29,23 +33,22 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.lanes.data.ModelLane;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.LanesUtils;
+import org.matsim.lanes.ModelLane;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-import org.matsim.lanes.data.LanesUtils;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 
-public class QLanesNetworkFactory extends QNetworkFactory {
+public final class QLanesNetworkFactory implements QNetworkFactory {
 
 	private Lanes laneDefinitions;
-	
-	private final QNetworkFactory delegate ;
+
+	private QNetworkFactory delegate ;
+
+	private FlowEfficiencyCalculator flowEfficiencyCalculator;
 
 	private NetsimEngineContext context;
 
@@ -58,19 +61,19 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	private Scenario scenario;
 
 	private NetsimInternalInterface netsimEngine;
-	
-	@Inject 
+
+	@Inject
 	public QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.qsimConfig = scenario.getConfig().qsim();
 		this.events = events ;
 		this.network = scenario.getNetwork() ;
 		this.scenario = scenario ;
 		this.laneDefinitions = scenario.getLanes();
-		delegate = new DefaultQNetworkFactory( events, scenario ) ;
+		this.delegate = new DefaultQNetworkFactory( events, scenario ) ;
 	}
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1 ;
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -78,7 +81,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 		delegate.initializeFactory(agentCounter, mobsimTimer, netsimEngine1);
 	}
@@ -89,7 +92,15 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		LanesToLinkAssignment l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
 			List<ModelLane> lanes = LanesUtils.createLanes(link, l2l);
-			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine);
+//			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+//			// yyyyyy I don't think that this was set correctly for this execution path before I refactored this.  kai, feb'18
+//			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine, linkSpeedCalculator);
+			QLinkLanesImpl.Builder builder = new QLinkLanesImpl.Builder(context, netsimEngine) ;
+
+			if (flowEfficiencyCalculator != null)
+				builder.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
+
+			ql = builder.build( link, queueNode, lanes ) ;
 		}
 		else {
 			ql = this.delegate.createNetsimLink(link, queueNode);
@@ -102,4 +113,17 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		return this.delegate.createNetsimNode(node);
 	}
 
+	/**
+	 * Set factory to create QLinks that are not lanes.
+	 */
+	public void setDelegate(QNetworkFactory delegate) {
+		this.delegate = delegate;
+	}
+
+	/**
+	 * Flow efficiency calculator to use for lanes.
+	 */
+	public void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
+		this.flowEfficiencyCalculator = flowEfficiencyCalculator;
+	}
 }

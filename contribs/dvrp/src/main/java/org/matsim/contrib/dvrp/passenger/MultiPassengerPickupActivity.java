@@ -19,97 +19,62 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Set;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-public class MultiPassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
-	private final PassengerEngine passengerEngine;
+public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
-	private final Set<? extends PassengerRequest> requests;
-	private final double pickupDuration;
+	private final Map<Id<Request>, ? extends PassengerRequest> requests;
+	private final double expectedEndTime;
 
-	private double maxRequestT0;
+	private int passengersPickedUp = 0;
 
-	private int passengersPickedUp;
-	private double endTime;
-
-	public MultiPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
-			Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+	public MultiPassengerPickupActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask pickupTask,
+			Map<Id<Request>, ? extends PassengerRequest> requests, String activityType) {
 		super(activityType);
 
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.requests = requests;
-		this.pickupDuration = pickupDuration;
+		this.expectedEndTime = pickupTask.getEndTime();
+	}
 
-		double now = pickupTask.getBeginTime();
+	@Override
+	protected boolean isLastStep(double now) {
+		return passengersPickedUp == requests.size() && now >= expectedEndTime;
+	}
 
-		for (PassengerRequest request : requests) {
-			if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+	@Override
+	protected void beforeFirstStep(double now) {
+		for (PassengerRequest request : requests.values()) {
+			if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
 				passengersPickedUp++;
 			}
-
-			if (request.getEarliestStartTime() > maxRequestT0) {
-				maxRequestT0 = request.getEarliestStartTime();
-			}
-		}
-
-		if (passengersPickedUp == requests.size()) {
-			endTime = now + pickupDuration;
-		} else {
-			setEndTimeIfWaitingForPassengers(now);
-		}
-	}
-
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-
-	@Override
-	public void doSimStep(double now) {
-		if (passengersPickedUp < requests.size()) {
-			setEndTimeIfWaitingForPassengers(now);// TODO use DynActivityEngine.END_ACTIVITY_LATER instead?
-		}
-	}
-
-	private void setEndTimeIfWaitingForPassengers(double now) {
-		endTime = Math.max(now, maxRequestT0) + pickupDuration;
-
-		if (endTime == now) {// happens only if pickupDuration == 0
-			endTime += 1; // to prevent the driver departing now (before picking up the passenger)
 		}
 	}
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		PassengerRequest request = getRequestForPassenger(passenger);
-
-		if (request == null) {
-			throw new IllegalArgumentException("I am waiting for different passengers!");
-		}
-
-		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+		PassengerRequest request = getRequestForPassenger(passenger.getId());
+		if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}
-
-		if (passengersPickedUp == requests.size()) {
-			endTime = now + pickupDuration;
-		}
 	}
 
-	private PassengerRequest getRequestForPassenger(MobsimPassengerAgent passenger) {
-		for (PassengerRequest request : requests) {
-			if (passenger == request.getPassenger()) {
-				return request;
-			}
-		}
-
-		return null;
+	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
+		return requests.values().stream()
+				.filter(r -> passengerId.equals(r.getPassengerId()))
+				.findAny()
+				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
 }

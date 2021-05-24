@@ -149,10 +149,16 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
+	@Override
+	public final void readURL( final URL url ) throws UncheckedIOException {
+		parse( url ) ;
+	}
+
 	public final void parse(final URL url) throws UncheckedIOException {
 		Gbl.assertNotNull(url);
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
+		System.out.flush();
 		if (url.getFile().endsWith(".gz")) {
 			try {
 				parse(new InputSource(new GZIPInputStream(url.openStream())));
@@ -174,6 +180,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setValidating(this.isValidating);
 			factory.setNamespaceAware(this.isNamespaceAware);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 			if (this.isValidating) {
 				// enable optional support for XML Schemas
 				factory.setFeature("http://apache.org/xml/features/validation/schema", true);

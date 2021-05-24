@@ -19,6 +19,13 @@
 
 package org.matsim.contrib.minibus.operator;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -28,12 +35,14 @@ import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * 
@@ -110,7 +119,24 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 				} else if (longestRouteR.getStops().size() < route.getStops().size()) {
 					longestRouteR = route;
 				}
-			}			
+			} else {
+				/*
+				 * The two travel directions are not marked by .H or .R so the existing code just picked up no stops but
+				 * carried on anyway to fail later (due to the lack of stops). This is an attempt to avoid such
+				 * exceptions, but it is obviously simplified and therefore creates less precise results.
+				 * It seems time-consuming to programmatically determine what is a forward direction TransitRoute and
+				 * what is a backward direction TransitRoute.
+				 * The idea is to only provide one direction (as we cannot identify the opposite direction or that
+				 * opposite direction might even not exist at all) and hope that the errors caused by that in terms of
+				 * wrong overall travel time, headway and missing backward direction stopsToBeServed will be fixed
+				 * over iterations by the minibus algorithm.
+				 */
+				if (longestRouteH == null) {
+					longestRouteH = route;
+				} else if (longestRouteH.getStops().size() < route.getStops().size()) {
+					longestRouteH = route;
+				}
+			}
 			
 			for (Departure departure : route.getDepartures().values()) {
 				if (startTime > departure.getDepartureTime()) {
@@ -132,11 +158,15 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 		// current planned headway in case number of vehicles is not changed
 		double departureOffset = 0.0;
 		if (longestRouteH != null) {
-			departureOffset += longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset();
+			TransitRouteStop lastStop = longestRouteH.getStops().get(longestRouteH.getStops().size() - 1);
+			double lastStopOffset = lastStop.getDepartureOffset().isDefined() ? lastStop.getDepartureOffset().seconds() : lastStop.getArrivalOffset().seconds();
+			departureOffset += lastStopOffset;
 		}
 		
 		if (longestRouteR != null) {
-			departureOffset += longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset();
+			TransitRouteStop lastStop = longestRouteR.getStops().get(longestRouteR.getStops().size() - 1);
+			double lastStopOffset = lastStop.getDepartureOffset().isDefined() ? lastStop.getDepartureOffset().seconds() : lastStop.getArrivalOffset().seconds();
+			departureOffset += lastStopOffset;
 		}
 		
 		double headway = departureOffset / vehicleIds.size(); 
@@ -176,7 +206,7 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 		log.info("Reading " + transitScheduleToStartWith);
-		new TransitScheduleReaderV1(sc).readFile(transitScheduleToStartWith);
+		new TransitScheduleReader(sc).readFile(transitScheduleToStartWith);
 		return sc.getTransitSchedule();
 	}
 

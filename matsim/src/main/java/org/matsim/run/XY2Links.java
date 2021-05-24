@@ -22,7 +22,6 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -103,15 +102,10 @@ public class XY2Links {
 		this.config = ConfigUtils.loadConfig(this.configfile);
 		MatsimRandom.reset(this.config.global().getRandomSeed());
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(this.config);
-//		scenario.setPopulation( PopulationUtils.createStreamingPopulation( config.plans(), null)) ;
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
-		Network network = (Network) scenario.getNetwork();
 		this.config = scenario.getConfig();
 
-//		final Population plans = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-//		StreamingUtils.setIsStreaming(reader, true);
-//		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		plansWriter.startStreaming(this.plansfile);
 		reader.addAlgorithm(new org.matsim.core.population.algorithms.XY2Links(scenario));

@@ -19,71 +19,58 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.FastAStarEuclideanFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
-	private final DrtConfigGroup drtCfg;
-	private final TravelTime travelTime;
-	private final LeastCostPathCalculator router;
+	private static final Logger log = Logger.getLogger(DrtRequestCreator.class);
+	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
-	@Inject
-	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility) {
-		this.drtCfg = drtCfg;
-		this.travelTime = travelTime;
-		this.eventsManager = qSim.getEventsManager();
-		this.timer = qSim.getSimTimer();
-
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+	public DrtRequestCreator(String mode, EventsManager eventsManager, MobsimTimer timer) {
+		this.mode = mode;
+		this.eventsManager = eventsManager;
+		this.timer = timer;
 	}
 
 	@Override
-	public DrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public DrtRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
-		double latestDepartureTime = departureTime + drtCfg.getMaxWaitTime();
+		DrtRoute drtRoute = (DrtRoute)route;
+		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
+		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
 
-		VrpPathWithTravelData unsharedRidePath = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router,
-				travelTime);
+		eventsManager.processEvent(
+				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passengerId, fromLink.getId(),
+						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
-		double optimisticTravelTime = unsharedRidePath.getTravelTime();
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * optimisticTravelTime + drtCfg.getMaxTravelTimeBeta();
-		double latestArrivalTime = departureTime + maxTravelTime;
+		DrtRequest request = DrtRequest.newBuilder()
+				.id(id)
+				.passengerId(passengerId)
+				.mode(mode)
+				.fromLink(fromLink)
+				.toLink(toLink)
+				.earliestStartTime(departureTime)
+				.latestStartTime(latestDepartureTime)
+				.latestArrivalTime(latestArrivalTime)
+				.submissionTime(submissionTime)
+				.build();
 
-		double unsharedDistance = VrpPaths.calcPathDistance(unsharedRidePath);
-
-		eventsManager.processEvent(new DrtRequestSubmittedEvent(timer.getTimeOfDay(), id, passenger.getId(),
-				fromLink.getId(), toLink.getId(), unsharedRidePath.getTravelTime(), unsharedDistance));
-
-		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
-				submissionTime, unsharedRidePath);
+		log.debug(route);
+		log.debug(request);
+		return request;
 	}
 }

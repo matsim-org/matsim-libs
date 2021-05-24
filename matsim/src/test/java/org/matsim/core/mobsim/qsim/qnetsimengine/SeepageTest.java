@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,8 +43,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -54,6 +52,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * Tests that in congested part, walk (seep mode) can overtake (seep) car mode.
@@ -129,9 +129,10 @@ public class SeepageTest {
 			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
 			plan.addActivity(a2);
 			net.population.addPerson(p);
-			
-			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(leg.getMode()));
+
+			Id<Vehicle> vehicleId = Id.create(p.getId(), Vehicle.class);
+			VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(leg.getMode(), vehicleId));
+			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modesType.get(leg.getMode()));
 			sc.getVehicles().addVehicle(vehicle);
 		}
 		
@@ -142,8 +143,10 @@ public class SeepageTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 
-		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
-		qSim.run();
+		new QSimBuilder(sc.getConfig()) //
+				.useDefaults() //
+				.build(sc, manager) //
+				.run();
 
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.createVehicleId("2"));
 		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.createVehicleId("1"));
@@ -184,8 +187,8 @@ public class SeepageTest {
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
-			
-			network = (Network) scenario.getNetwork();
+
+			network = scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			double x = -100.0;
 			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(x, 0.0));
@@ -197,13 +200,13 @@ public class SeepageTest {
 			final Node fromNode = node1;
 			final Node toNode = node2;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode, toNode, (double) 100, (double) 25, (double) 36000, (double) 1, null, "22");
+			link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("1"), fromNode, toNode, 100, 25, 36000, 1, null, "22");
 			final Node fromNode1 = node2;
-			final Node toNode1 = node3; 
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode1, toNode1, (double) 1000, (double) 25, (double) 60, (double) 1, null, "22");
+			final Node toNode1 = node3;
+			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("2"), fromNode1, toNode1, 1000, 25, 60, 1, null, "22");
 			final Node fromNode2 = node3;
 			final Node toNode2 = node4;	//flow capacity is 1 PCU per min.
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), fromNode2, toNode2, (double) 100, (double) 25, (double) 36000, (double) 1, null, "22");
+			link3 = NetworkUtils.createAndAddLink(network, Id.createLinkId("3"), fromNode2, toNode2, 100, 25, 36000, 1, null, "22");
 
 			for(Link l :network.getLinks().values()){
 				l.setAllowedModes(allowedModes);

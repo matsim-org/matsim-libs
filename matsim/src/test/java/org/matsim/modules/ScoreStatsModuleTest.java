@@ -35,9 +35,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -75,7 +75,7 @@ public class ScoreStatsModuleTest {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		config.plansCalcRoute().setInsertingAccessEgressWalk(this.isInsertingAccessEgressWalk);
+		config.plansCalcRoute().setAccessEgressType(this.isInsertingAccessEgressWalk? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
 
 		config.controler().setLastIteration(1);
 		Controler controler = new Controler(config);
@@ -107,23 +107,23 @@ public class ScoreStatsModuleTest {
 			//            }
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
-			if ( ! config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			if ( config.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 				{
 					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.78368121099818, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.78366379257605, array[1], DELTA);
 				} {
 					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.84181874405796, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.84180132563583, array[1], DELTA);
 				}{
 					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.81274997752806, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.81273255910591, array[1], DELTA);
 				}{
 					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.84181874405796, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.84180132563583, array[1], DELTA);
 				}
 				} else {
 					// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16

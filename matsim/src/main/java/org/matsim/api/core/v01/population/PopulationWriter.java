@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007, 2011 by the members listed in the COPYING,  *
@@ -26,6 +24,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,6 +77,10 @@ public final class PopulationWriter implements MatsimWriter {
 		writeV6( filename );
 	}
 
+	public void write(final OutputStream stream) {
+		writeV6(stream);
+	}
+
 	/**
 	 * Writes the population in the format of plans_v4.dtd
 	 *
@@ -97,7 +100,7 @@ public final class PopulationWriter implements MatsimWriter {
 	}
 
 	/**
-	 * Writes the population in the format of population_v5.dtd
+	 * Writes the population in the format of population_v6.dtd
 	 *
 	 * @param filename
 	 */
@@ -106,5 +109,12 @@ public final class PopulationWriter implements MatsimWriter {
 				new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network);
 		writer.putAttributeConverters( attributeConverters );
 		writer.writeV6(filename);
+	}
+
+	public void writeV6(final OutputStream stream) {
+		final org.matsim.core.population.io.PopulationWriter writer =
+				new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network);
+		writer.putAttributeConverters( attributeConverters );
+		writer.writeV6(stream);
 	}
 }

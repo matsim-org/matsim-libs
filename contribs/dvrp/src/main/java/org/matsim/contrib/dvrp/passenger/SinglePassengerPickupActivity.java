@@ -20,71 +20,47 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-public class SinglePassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
-	private final PassengerEngine passengerEngine;
+public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
 	private final PassengerRequest request;
-	private final double pickupDuration;
+	private final double expectedEndTime;
 
 	private boolean passengerAboard = false;
-	private double endTime;
 
-	public SinglePassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
-			PassengerRequest request, double pickupDuration, String activityType) {
+	public SinglePassengerPickupActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask pickupTask,
+			PassengerRequest request, String activityType) {
 		super(activityType);
 
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.request = request;
-		this.pickupDuration = pickupDuration;
-
-		double now = pickupTask.getBeginTime();
-
-		passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
-
-		if (passengerAboard) {
-			endTime = now + pickupDuration;
-		} else {
-			setEndTimeIfWaitingForPassenger(now);
-		}
+		this.expectedEndTime = pickupTask.getEndTime();
 	}
 
 	@Override
-	public double getEndTime() {
-		return endTime;
+	protected boolean isLastStep(double now) {
+		return passengerAboard && now >= expectedEndTime;
 	}
 
 	@Override
-	public void doSimStep(double now) {
-		if (!passengerAboard) {
-			setEndTimeIfWaitingForPassenger(now);// TODO use DynActivityEngine.END_ACTIVITY_LATER instead?
-		}
-	}
-
-	private void setEndTimeIfWaitingForPassenger(double now) {
-		// try to predict the passenger's arrival time
-		endTime = Math.max(now, request.getEarliestStartTime()) + pickupDuration;
-
-		if (endTime == now) {// happens only if pickupDuration == 0
-			endTime += 1; // to prevent the driver departing now (before picking up the passenger)
-		}
+	protected void beforeFirstStep(double now) {
+		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request, now);
 	}
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		if (passenger != request.getPassenger()) {
+		if (passenger.getId().equals(request.getPassengerId())) {
 			throw new IllegalArgumentException("I am waiting for a different passenger!");
 		}
 
-		passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
-
+		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request, now);
 		if (!passengerAboard) {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}
-
-		endTime = now + pickupDuration;
 	}
 }

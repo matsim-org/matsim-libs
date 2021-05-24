@@ -30,7 +30,8 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
+@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
+public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring {
 
 	protected double score;
 
@@ -38,7 +39,8 @@ public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicS
 
 	/** The parameters used for scoring */
 	protected final ScoringParameters params;
-
+	
+	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
 		this.params = params;
 		this.reset();

@@ -20,6 +20,8 @@
 
 package org.matsim.core.population.io;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -38,6 +40,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.core.utils.misc.Time;
 
 /*package*/ class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
@@ -71,7 +74,7 @@ import org.matsim.core.utils.misc.Time;
 	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<plans");
 		if (plans.getName() != null) {
-			out.write(" name=\"" + plans.getName() + "\"");
+			out.write(" name=\"" + encodeAttributeValue(plans.getName()) + "\"");
 		}
 		out.write(">\n\n");
 	}
@@ -86,37 +89,34 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startPerson(final Person p, final BufferedWriter out) throws IOException {
+	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
-		out.write(p.getId().toString());
+		out.write(encodeAttributeValue(person.getId().toString()));
 		out.write("\"");
-		if (p != null){
-			Person person = p;
-			if (PersonUtils.getSex(person) != null) {
-				out.write(" sex=\"");
-				out.write(PersonUtils.getSex(person));
-				out.write("\"");
-			}
-			if (PersonUtils.getAge(person) != null) {
-				out.write(" age=\"");
-				out.write(Integer.toString(PersonUtils.getAge(person)));
-				out.write("\"");
-			}
-			if (PersonUtils.getLicense(person) != null) {
-				out.write(" license=\"");
-				out.write(PersonUtils.getLicense(person));
-				out.write("\"");
-			}
-			if (PersonUtils.getCarAvail(person) != null) {
-				out.write(" car_avail=\"");
-				out.write(PersonUtils.getCarAvail(person));
-				out.write("\"");
-			}
-			if (PersonUtils.isEmployed(person) != null) {
-				out.write(" employed=\"");
-				out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
-				out.write("\"");
-			}
+		if (PersonUtils.getSex(person) != null) {
+			out.write(" sex=\"");
+			out.write(PersonUtils.getSex(person));
+			out.write("\"");
+		}
+		if (PersonUtils.getAge(person) != null) {
+			out.write(" age=\"");
+			out.write(Integer.toString(PersonUtils.getAge(person)));
+			out.write("\"");
+		}
+		if (PersonUtils.getLicense(person) != null) {
+			out.write(" license=\"");
+			out.write(PersonUtils.getLicense(person));
+			out.write("\"");
+		}
+		if (PersonUtils.getCarAvail(person) != null) {
+			out.write(" car_avail=\"");
+			out.write(PersonUtils.getCarAvail(person));
+			out.write("\"");
+		}
+		if (PersonUtils.isEmployed(person) != null) {
+			out.write(" employed=\"");
+			out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
+			out.write("\"");
 		}
 		out.write(">\n");
 	}
@@ -157,13 +157,10 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan != null){
-			Plan p = plan;
-			if ((p.getType() != null)) {
-				out.write(" type=\"");
-				out.write(p.getType());
-				out.write("\"");
-			}
+		if ((plan.getType() != null)) {
+			out.write(" type=\"");
+			out.write(encodeAttributeValue(plan.getType()));
+			out.write("\"");
 		}
 		out.write(">\n");
 	}
@@ -180,16 +177,16 @@ import org.matsim.core.utils.misc.Time;
 	@Override
 	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act type=\"");
-		out.write(act.getType());
+		out.write(encodeAttributeValue(act.getType()));
 		out.write("\"");
 		if (act.getLinkId() != null) {
 			out.write(" link=\"");
-			out.write(act.getLinkId().toString());
+			out.write(encodeAttributeValue(act.getLinkId().toString()));
 			out.write("\"");
 		}
 		if (act.getFacilityId() != null) {
 			out.write(" facility=\"");
-			out.write(act.getFacilityId().toString());
+			out.write(encodeAttributeValue(act.getFacilityId().toString()));
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
@@ -200,19 +197,19 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
-		if (act.getStartTime() != Time.UNDEFINED_TIME) {
+		if (act.getStartTime().isDefined()) {
 			out.write(" start_time=\"");
-			out.write(Time.writeTime(act.getStartTime()));
+			out.write(Time.writeTime(act.getStartTime().seconds()));
 			out.write("\"");
 		}
-			if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
-				out.write(" dur=\"");
-				out.write(Time.writeTime(act.getMaximumDuration()));
-				out.write("\"");
-			}
-		if (act.getEndTime() != Time.UNDEFINED_TIME) {
+		if (act.getMaximumDuration().isDefined()) {
+			out.write(" dur=\"");
+			out.write(Time.writeTime(act.getMaximumDuration().seconds()));
+			out.write("\"");
+		}
+		if (act.getEndTime().isDefined()) {
 			out.write(" end_time=\"");
-			out.write(Time.writeTime(act.getEndTime()));
+			out.write(Time.writeTime(act.getEndTime().seconds()));
 			out.write("\"");
 		}
 		out.write(" />\n");
@@ -231,19 +228,19 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode());
 		out.write("\"");
-		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+		if (leg.getDepartureTime().isDefined()) {
 			out.write(" dep_time=\"");
-			out.write(Time.writeTime(leg.getDepartureTime()));
+			out.write(Time.writeTime(leg.getDepartureTime().seconds()));
 			out.write("\"");
 		}
-		if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+		if (leg.getTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
-			out.write(Time.writeTime(leg.getTravelTime()));
+			out.write(Time.writeTime(leg.getTravelTime().seconds()));
 			out.write("\"");
 		}
 //		if (leg instanceof LegImpl) {
 //			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime()) {
 //				out.write(" arr_time=\"");
 //				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
 //				out.write("\"");
@@ -270,9 +267,9 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Double.toString(route.getDistance()));
 			out.write("\"");
 		}
-		if (route.getTravelTime() != Time.UNDEFINED_TIME) {
+		if (route.getTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
-			out.write(Time.writeTime(route.getTravelTime()));
+			out.write(Time.writeTime(route.getTravelTime().seconds()));
 			out.write("\"");
 		}
 		out.write(">\n");
@@ -286,7 +283,7 @@ import org.matsim.core.utils.misc.Time;
 		} else {
 			String rd = route.getRouteDescription();
 			if (rd != null) {
-				out.write(rd);
+				out.write(XmlUtils.encodeContent(rd));
 				out.write(" "); // this is at the moment only to maintain binary compatibility
 			}
 		}

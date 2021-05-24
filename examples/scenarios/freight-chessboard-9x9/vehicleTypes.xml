@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<!-- Small example according to the vehicleDefinitions_v2.0 scheme. The freight contrib now uses the regular MATSim vehicleType format
+	For more information please have a look to http://matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd -->
+
+	<vehicleType id="heavy">
+		<description>A heavy truck</description>
+		<capacity seats="1" standingRoomInPersons="0" other="50.0"/>
+		<costInformation  fixedCostsPerDay="130.0" costsPerMeter="7.7E-4" costsPerSecond="0.0080"/>
+	</vehicleType>
+	<vehicleType id="light">
+		<description>A light truck</description>
+		<capacity seats="1" standingRoomInPersons="0" other="5.0"/>
+		<costInformation  fixedCostsPerDay="84.0" costsPerMeter="4.7E-4" costsPerSecond="0.0080"/>
+	</vehicleType>
+
+</vehicleDefinitions>

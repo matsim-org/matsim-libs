@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.facilities.FacilitiesUtils;
 
 /**
  * Checks driver routes, in case only passengers were provided in the plan file
@@ -68,8 +68,8 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 				List<? extends PlanElement> trip =
 					router.calcRoute(
 							l.getMode(),
-							new ActivityWrapperFacility( origin ),
-							new ActivityWrapperFacility( dest ),
+						  FacilitiesUtils.toFacility( origin, null ),
+						  FacilitiesUtils.toFacility( dest, null ),
 							now,
 							plan.getPerson());
 
@@ -90,17 +90,15 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 	private static double updateTime(
 			final double currTime,
 			final Activity act) {
-		double e = act.getEndTime();
-		double d = act.getMaximumDuration();
-		return e != Time.UNDEFINED_TIME ? e :
-			currTime + ( d != Time.UNDEFINED_TIME ? d : 0 );
+		OptionalTime e = act.getEndTime();
+		OptionalTime d = act.getMaximumDuration();
+		return e.orElseGet(() -> currTime + d.orElse(0));
 	}
 
 	private static double updateTime(
 			final double currTime,
 			final Leg leg) {
-		double tt = leg.getTravelTime();
-		return tt != Time.UNDEFINED_TIME ? currTime + tt : currTime;
+		return currTime + leg.getTravelTime().orElse(0);
 	}
 }
 

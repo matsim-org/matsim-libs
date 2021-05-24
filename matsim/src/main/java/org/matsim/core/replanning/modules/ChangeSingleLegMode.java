@@ -49,13 +49,17 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
  */
 public class ChangeSingleLegMode extends AbstractMultithreadedModule {
 
-	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
-	private boolean ignoreCarAvailability = true;
+	private String[] availableModes;
+	private boolean ignoreCarAvailability;
+	private boolean allowSwitchFromListedModesOnly;
 
 	public ChangeSingleLegMode(final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
 		super(globalConfigGroup.getNumberOfThreads());
 		this.availableModes = changeLegModeConfigGroup.getModes();
 		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
+		if (changeLegModeConfigGroup.getBehavior().equals(ChangeModeConfigGroup.Behavior.fromSpecifiedModesToSpecifiedModes)) {
+			this.allowSwitchFromListedModesOnly = true;
+		} else this.allowSwitchFromListedModesOnly=false;
 	}
 	
 	public ChangeSingleLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
@@ -66,7 +70,7 @@ public class ChangeSingleLegMode extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(this.availableModes, MatsimRandom.getLocalInstance());
+		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(this.availableModes, MatsimRandom.getLocalInstance(), this.allowSwitchFromListedModesOnly );
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;
 	}

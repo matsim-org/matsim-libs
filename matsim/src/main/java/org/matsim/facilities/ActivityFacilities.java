@@ -24,14 +24,16 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Root class for activity facilities.
  *
  * Maintainer: mrieser / Senozon AG
  */
-public interface ActivityFacilities extends MatsimToplevelContainer {
+public interface ActivityFacilities extends MatsimToplevelContainer, Attributable {
 
 	public String getName();
 
@@ -44,7 +46,8 @@ public interface ActivityFacilities extends MatsimToplevelContainer {
 
 	public void addActivityFacility(ActivityFacility facility);
 
-	public ObjectAttributes getFacilityAttributes();
+	@Deprecated // I think that this should be phased out; use Attributable inside ActivityFacility.  kai, mar'19
+	public FailingObjectAttributes getFacilityAttributes();
 
 	/* not sure if this method should be in the interface, but too many users seem to use and like it,
 	 * so there seems to be a need for it...   mrieser/jul13

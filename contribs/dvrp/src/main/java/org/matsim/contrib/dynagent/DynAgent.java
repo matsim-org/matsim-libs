@@ -22,26 +22,32 @@ package org.matsim.contrib.dynagent;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.*;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 public final class DynAgent implements MobsimDriverPassengerAgent {
-	private DynAgentLogic agentLogic;
+	private final DynAgentLogic agentLogic;
 
-	private Id<Person> id;
+	private final Id<Person> id;
 
 	private MobsimVehicle veh;
 
-	private EventsManager events;
+	private final EventsManager events;
 
 	private MobsimAgent.State state;
 
@@ -64,8 +70,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 		// initial activity
 		dynActivity = this.agentLogic.computeInitialActivity(this);
-		state = dynActivity.getEndTime() != Time.UNDEFINED_TIME ? //
-				MobsimAgent.State.ACTIVITY : MobsimAgent.State.ABORT;
+		state = MobsimAgent.State.ACTIVITY;
 	}
 
 	private void computeNextAction(DynAction oldDynAction, double now) {
@@ -93,6 +98,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 		computeNextAction(dynActivity, now);
 	}
 
+	//this method can be called for several agents at the same time
 	@Override
 	public void endLegAndComputeNextState(double now) {
 		events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));
@@ -201,7 +207,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// MobsimAgent
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		return dynLeg.getExpectedTravelTime();
 	}
 
@@ -249,14 +255,12 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getCurrentFacility() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented");
+	public Facility getCurrentFacility() {
+		throw new UnsupportedOperationException("Teleportation is not supported by DynAgent");
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getDestinationFacility() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented");
+	public Facility getDestinationFacility() {
+		throw new UnsupportedOperationException("Teleportation is not supported by DynAgent");
 	}
 }

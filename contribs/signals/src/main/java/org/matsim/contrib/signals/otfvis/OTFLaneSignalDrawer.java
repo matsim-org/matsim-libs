@@ -28,19 +28,17 @@ import java.util.Map;
 import com.jogamp.opengl.GL2;
 
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
-import org.matsim.lanes.vis.VisLane;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.lanes.vis.VisSignal;
+import org.matsim.lanes.VisLane;
+import org.matsim.lanes.VisLaneModelBuilder;
+import org.matsim.lanes.VisLinkWLanes;
+import org.matsim.lanes.VisSignal;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
-public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
-
-//	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
+final class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	
 	private static final int glListName = 2342;
 	

@@ -1,19 +1,41 @@
-package org.matsim.core.config.groups;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PlanCalcScoreConfigGroupTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.config.groups;
+
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 
 import java.util.Map;
 import java.util.Random;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.testcases.MatsimTestUtils;
@@ -25,24 +47,104 @@ public class PlanCalcScoreConfigGroupTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
+	private void testResultsBeforeCheckConsistency( Config config, boolean fullyHierarchical ) {
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+
+		if ( ! fullyHierarchical ){
+			// mode params are there for default modes:
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.car ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.walk ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.bike ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.ride ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.pt ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.other ) );
+
+			// default stage/interaction params are there for pt and drt (as a service):
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.drt ) ) );
+		}
+		// default stage/interaction params for modes routed on the network are not yet there:
+//		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+//			Assert.assertNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+//		}
+	}
+	private void testResultsAfterCheckConsistency( Config config ) {
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+
+		// default stage/interaction params for modes routed on the network are now there:
+		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+		}
+	}
+
+	@Test
+	public void testFullyHierarchicalVersion() {
+		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		testResultsBeforeCheckConsistency( config, true ) ;
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+		log.warn( "checking consistency ..." );
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		scoringConfig.checkConsistency( config );
+		testResultsAfterCheckConsistency( config );
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+	}
+	@Test
+	public void testVersionWoScoringparams() {
+		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		testResultsBeforeCheckConsistency( config, false ) ;
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+		log.warn( "checking consistency ..." );
+		config.plansCalcRoute().setAccessEgressType( PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		scoringConfig.checkConsistency( config );
+		testResultsAfterCheckConsistency( config );
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+	}
+
 	@Test
 	public void testAddActivityParams() {
 		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
+        int originalSize = c.getActivityParams().size();
 		Assert.assertNull(c.getActivityParams("type1"));
+        Assert.assertEquals(originalSize, c.getActivityParams().size());
 
-//		Assert.assertEquals(0, c.getActivityParams().size());
-		Assert.assertEquals(6, c.getActivityParams().size());
-		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding interaction activities hard-wired.  kai, feb'16
-		// yyyyyy and now also the "dummy" activity.  kai, jul'17
-		
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
 		Assert.assertEquals(ap, c.getActivityParams("type1"));
-
-		//		Assert.assertEquals(1, c.getActivityParams().size());
-		Assert.assertEquals(7, c.getActivityParams().size());
-		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding  interaction activities hard-wired.  kai, feb'16
-		// yyyyyy and now also the "dummy" activity.  kai, jul'17
+        Assert.assertEquals(originalSize + 1, c.getActivityParams().size());
 	}
 
 	@Test
@@ -77,99 +179,123 @@ public class PlanCalcScoreConfigGroupTest {
 		Assert.assertEquals(
 				"wrong brainExpBeta "+msg,
 				initialGroup.getBrainExpBeta(),
-				inputConfigGroup.getBrainExpBeta() );
+				inputConfigGroup.getBrainExpBeta(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong constantBike "+msg,
 				initialGroup.getModes().get(TransportMode.bike).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.bike).getConstant());
+				inputConfigGroup.getModes().get(TransportMode.bike).getConstant(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong constantCar "+msg,
 				initialGroup.getModes().get(TransportMode.car).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.car).getConstant());
+				inputConfigGroup.getModes().get(TransportMode.car).getConstant(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong constantOther "+msg,
 				initialGroup.getModes().get(TransportMode.other).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.other).getConstant());
+				inputConfigGroup.getModes().get(TransportMode.other).getConstant(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong constantPt "+msg,
 				initialGroup.getModes().get(TransportMode.pt).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.pt).getConstant());
+				inputConfigGroup.getModes().get(TransportMode.pt).getConstant(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong constantWalk "+msg,
 				initialGroup.getModes().get(TransportMode.walk).getConstant(),
-				inputConfigGroup.getModes().get(TransportMode.walk).getConstant());
+				inputConfigGroup.getModes().get(TransportMode.walk).getConstant(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong lateArrival_utils_hr "+msg,
 				initialGroup.getLateArrival_utils_hr(),
-				inputConfigGroup.getLateArrival_utils_hr() );
+				inputConfigGroup.getLateArrival_utils_hr(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong earlyDeparture_utils_hr "+msg,
 				initialGroup.getEarlyDeparture_utils_hr(),
-				inputConfigGroup.getEarlyDeparture_utils_hr() );
+				inputConfigGroup.getEarlyDeparture_utils_hr(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong learningRate "+msg,
 				initialGroup.getLearningRate(),
-				inputConfigGroup.getLearningRate() );
+				inputConfigGroup.getLearningRate(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong marginalUtilityOfMoney "+msg,
 				initialGroup.getMarginalUtilityOfMoney(),
-				inputConfigGroup.getMarginalUtilityOfMoney() );
+				inputConfigGroup.getMarginalUtilityOfMoney() ,
+				1e-7);
 		Assert.assertEquals(
 				"wrong marginalUtlOfDistanceOther "+msg,
 				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
-				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance());
+				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong marginalUtlOfDistanceWalk "+msg,
 				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
-				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance());
+				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong marginalUtlOfWaiting_utils_hr "+msg,
 				initialGroup.getMarginalUtlOfWaiting_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaiting_utils_hr() );
+				inputConfigGroup.getMarginalUtlOfWaiting_utils_hr(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong marginalUtlOfWaitingPt_utils_hr "+msg,
 				initialGroup.getMarginalUtlOfWaitingPt_utils_hr(),
-				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr() );
+				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong monetaryDistanceCostRateCar "+msg,
 				initialGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
-				inputConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate());
+				inputConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong monetaryDistanceCostRatePt "+msg,
 				initialGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
-				inputConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate());
+				inputConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong pathSizeLogitBeta "+msg,
 				initialGroup.getPathSizeLogitBeta(),
-				inputConfigGroup.getPathSizeLogitBeta() );
+				inputConfigGroup.getPathSizeLogitBeta(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong performing_utils_hr "+msg,
 				initialGroup.getPerforming_utils_hr(),
-				inputConfigGroup.getPerforming_utils_hr() );
+				inputConfigGroup.getPerforming_utils_hr(),
+				1e-7 );
 		Assert.assertEquals(
 				"wrong traveling_utils_hr "+msg,
 				initialGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
+				inputConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong travelingBike_utils_hr "+msg,
 				initialGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling());
+				inputConfigGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong travelingOther_utils_hr "+msg,
 				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling());
+				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong travelingPt_utils_hr "+msg,
 				initialGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling());
+				inputConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong travelingWalk_utils_hr "+msg,
 				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
-				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling());
+				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
+				1e-7);
 		Assert.assertEquals(
 				"wrong utilityOfLineSwitch "+msg,
 				initialGroup.getUtilityOfLineSwitch(),
-				inputConfigGroup.getUtilityOfLineSwitch() );
+				inputConfigGroup.getUtilityOfLineSwitch(),
+				1e-7 );
 
 		for ( ActivityParams initialSettings : initialGroup.getActivityParams() ) {
 			final ActivityParams inputSettings =
@@ -180,33 +306,28 @@ public class PlanCalcScoreConfigGroupTest {
 					initialSettings.getActivityType(),
 					inputSettings.getActivityType() );
 			Assert.assertEquals(
-					"wrong closingTime "+msg,
-					initialSettings.getClosingTime(),
-					inputSettings.getClosingTime() );
+					"wrong closingTime "+msg, initialSettings.getClosingTime(),
+					inputSettings.getClosingTime());
 			Assert.assertEquals(
-					"wrong earliestEndTime "+msg,
-					initialSettings.getEarliestEndTime(),
-					inputSettings.getEarliestEndTime() );
+					"wrong earliestEndTime "+msg, initialSettings.getEarliestEndTime(),
+					inputSettings.getEarliestEndTime());
 			Assert.assertEquals(
-					"wrong latestStartTime "+msg,
-					initialSettings.getLatestStartTime(),
-					inputSettings.getLatestStartTime() );
+					"wrong latestStartTime "+msg, initialSettings.getLatestStartTime(),
+					inputSettings.getLatestStartTime());
 			Assert.assertEquals(
-					"wrong minimalDuration "+msg,
-					initialSettings.getMinimalDuration(),
-					inputSettings.getMinimalDuration() );
+					"wrong minimalDuration "+msg, initialSettings.getMinimalDuration(),
+					inputSettings.getMinimalDuration());
 			Assert.assertEquals(
-					"wrong openingTime "+msg,
-					initialSettings.getOpeningTime(),
-					inputSettings.getOpeningTime() );
+					"wrong openingTime "+msg, initialSettings.getOpeningTime(),
+					inputSettings.getOpeningTime());
 			Assert.assertEquals(
 					"wrong priority "+msg,
 					initialSettings.getPriority(),
-					inputSettings.getPriority() );
+					inputSettings.getPriority(),
+					1e-7 );
 			Assert.assertEquals(
-					"wrong typicalDuration "+msg,
-					initialSettings.getTypicalDuration(),
-					inputSettings.getTypicalDuration() );
+					"wrong typicalDuration "+msg, initialSettings.getTypicalDuration(),
+					inputSettings.getTypicalDuration());
 		}
 
 		for ( ModeParams initialSettings : initialGroup.getModes().values() ) {
@@ -215,19 +336,23 @@ public class PlanCalcScoreConfigGroupTest {
 			Assert.assertEquals(
 					"wrong constant "+msg,
 					initialSettings.getConstant(),
-					inputSettings.getConstant() );
+					inputSettings.getConstant(),
+					1e-7 );
 			Assert.assertEquals(
 					"wrong marginalUtilityOfDistance "+msg,
 					initialSettings.getMarginalUtilityOfDistance(),
-					inputSettings.getMarginalUtilityOfDistance() );
+					inputSettings.getMarginalUtilityOfDistance(),
+					1e-7 );
 			Assert.assertEquals(
 					"wrong marginalUtilityOfTraveling "+msg,
 					initialSettings.getMarginalUtilityOfTraveling(),
-					inputSettings.getMarginalUtilityOfTraveling() );
+					inputSettings.getMarginalUtilityOfTraveling(),
+					1e-7 );
 			Assert.assertEquals(
 					"wrong monetaryDistanceRate "+msg,
 					initialSettings.getMonetaryDistanceRate(),
-					inputSettings.getMonetaryDistanceRate() );
+					inputSettings.getMonetaryDistanceRate(),
+					1e-7 );
 		}
 
 
@@ -249,13 +374,14 @@ public class PlanCalcScoreConfigGroupTest {
 			if ( !suffix.equals( settings.getActivityType() ) ) {
 				module.addParam( "activityType_"+suffix , ""+settings.getActivityType() );
 			}
-			module.addParam( "activityClosingTime_"+suffix , ""+settings.getClosingTime() );
-			module.addParam( "activityEarliestEndTime_"+suffix , ""+settings.getEarliestEndTime() );
-			module.addParam( "activityLatestStartTime_"+suffix , ""+settings.getLatestStartTime() );
-			module.addParam( "activityMinimalDuration_"+suffix , ""+settings.getMinimalDuration() );
-			module.addParam( "activityOpeningTime_"+suffix , ""+settings.getOpeningTime() );
-			module.addParam( "activityPriority_"+suffix , ""+settings.getPriority() );
-			module.addParam( "activityTypicalDuration_"+suffix , ""+settings.getTypicalDuration() );
+
+			settings.getClosingTime().ifDefined(t -> module.addParam("activityClosingTime_" + suffix, "" + t));
+			settings.getEarliestEndTime().ifDefined(t -> module.addParam("activityEarliestEndTime_" + suffix, "" + t));
+			settings.getLatestStartTime().ifDefined(t -> module.addParam("activityLatestStartTime_" + suffix, "" + t));
+			settings.getMinimalDuration().ifDefined(t -> module.addParam("activityMinimalDuration_" + suffix, "" + t));
+			settings.getOpeningTime().ifDefined(t -> module.addParam("activityOpeningTime_" + suffix, "" + t));
+			module.addParam("activityPriority_" + suffix, "" + settings.getPriority());
+			settings.getTypicalDuration().ifDefined(t -> module.addParam("activityTypicalDuration_" + suffix, "" + t));
 		}
 
 		for ( ModeParams settings : initialGroup.getModes().values() ) {

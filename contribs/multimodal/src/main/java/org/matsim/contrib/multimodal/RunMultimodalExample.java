@@ -22,23 +22,13 @@ package org.matsim.contrib.multimodal;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
-import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
-import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.FastDijkstraFactory;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import javax.inject.Provider;
-import java.util.Map;
 
 /**
  * 
@@ -50,12 +40,11 @@ import java.util.Map;
 public class RunMultimodalExample {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../matsim/src/test/resources/test/scenarios/berlin/config_multimodal.xml", new MultiModalConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		Config config = ConfigUtils.loadConfig( args, new MultiModalConfigGroup() ) ;
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PrepareMultiModalScenario.run(scenario);
 		Controler controler = new Controler(scenario);
-		controler.setModules(new ControlerDefaultsWithMultiModalModule());
+		controler.addOverridingModule(new MultiModalModule());
 		controler.run();
 	}
 

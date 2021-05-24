@@ -38,15 +38,13 @@ import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType.XMLBeginningSignalGroup;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.model.SignalGroup;
 
 
 /**
  * @author dgrether
  */
-public class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
+public final class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
 	
 		private static final Logger log = Logger.getLogger(IntergreenTimesWriter10.class);
 		

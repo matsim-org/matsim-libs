@@ -25,12 +25,12 @@ import java.util.List;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.data.ModelLane;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesToLinkAssignment;
-import org.matsim.lanes.data.LanesUtils;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.LanesUtils;
+import org.matsim.lanes.VisLaneModelBuilder;
+import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.snapshotwriters.VisLink;
@@ -41,7 +41,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dgrether
  *
  */
-public class OTFLaneWriter extends OTFDataWriter<Void> {
+class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private final transient VisNetwork network;
 
@@ -51,7 +51,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private Config config;
 	
-	public OTFLaneWriter(VisNetwork visNetwork, Lanes laneDefinitions, Config config){
+	OTFLaneWriter(VisNetwork visNetwork, Lanes laneDefinitions, Config config){
 		this.network = visNetwork;
 		this.lanes = laneDefinitions;
 		this.config = config;

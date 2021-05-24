@@ -19,18 +19,22 @@
 
 package org.matsim.households;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.households.Income.IncomePeriod;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.Vehicle;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.households.Income.IncomePeriod;
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether
@@ -47,11 +51,11 @@ public class HouseholdsIoTest extends MatsimTestCase {
 	private final Id<Person> pid45 = Id.create("45", Person.class);
 	private final Id<Vehicle> vid23 = Id.create("23", Vehicle.class);
 	private final Id<Vehicle> vid42 = Id.create("42", Vehicle.class);
-  private final Id<Household> id23 = Id.create("23", Household.class);
-  private final Id<Household> id24 = Id.create("24", Household.class);
-  private final Id<Household> id25 = Id.create("25", Household.class);
+	private final Id<Household> id23 = Id.create("23", Household.class);
+	private final Id<Household> id24 = Id.create("24", Household.class);
+	private final Id<Household> id25 = Id.create("25", Household.class);
 
-	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
+	public void testBasicReaderWriter() throws IOException {
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
 		reader.readFile(this.getPackageInputDirectory() + TESTHOUSEHOLDSINPUT);
@@ -77,7 +81,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
 		assertEquals(3, hh.getMemberIds().size());
-		List<Id<Person>> hhmemberIds = new ArrayList<Id<Person>>();
+		List<Id<Person>> hhmemberIds = new ArrayList<>();
 		hhmemberIds.addAll(hh.getMemberIds());
 		Collections.sort(hhmemberIds);
 		assertEquals(pid23, hhmemberIds.get(0));
@@ -98,7 +102,12 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertEquals("eur", hh.getIncome().getCurrency());
 		assertEquals(50000.0d, hh.getIncome().getIncome(), EPSILON);
 
-		
+		Attributes currentAttributes = hh.getAttributes();
+		assertNotNull("Custom attributes from household with id 23 should not be empty.", currentAttributes);
+		String customAttributeName = "customAttribute1";
+		String customContent = (String)currentAttributes.getAttribute(customAttributeName);
+		assertEquals("customValue1", customContent);
+
 		hh = households.getHouseholds().get(id24);
 		assertNotNull(hh);
 		assertEquals(id24, hh.getId());
@@ -126,5 +135,6 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertEquals(0, hh.getVehicleIds().size());
 
 		assertNull(hh.getIncome());
+
 	}
 }

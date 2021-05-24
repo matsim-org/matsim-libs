@@ -22,13 +22,10 @@
  */
 package org.matsim.contrib.noise.examples;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseModule;
-import org.matsim.contrib.noise.data.NoiseAllocationApproach;
-import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.contrib.noise.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -39,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * An example how to use the noise module during a MATSim run (= online noise computation).
  * 
  * The {@link NoiseConfigGroup} specifies parameters that are relevant for the noise computation and if noise damages are internalized.
- * For the internalization of noise damages, there is an average and a marginal cost pricing approach, see {@link NoiseAllocationApproach}.
+ * For the internalization of noise damages, there is an average and a marginal cost pricing approach, see {@link NoiseConfigGroup.NoiseAllocationApproach}.
  * 
  * For an example of how to compute noise levels, damages etc. for a final iteration (= offline noise computation), see {@link NoiseOfflineCalculationExample}. 
  * 
@@ -48,15 +45,15 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class NoiseOnlineControlerExample {
 	
-	private static final String configFile = "./test/input/org/matsim/contrib/noise/config.xml";
+	private static final String configFile = "./contribs/noise/test/input/org/matsim/contrib/noise/config.xml";
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 				
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new NoiseModule(scenario));
+		controler.addOverridingModule(new NoiseModule());
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
@@ -64,9 +61,8 @@ public class NoiseOnlineControlerExample {
 		// optionally process the output data
 		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class ) ;
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();	
 	}
-	
 }

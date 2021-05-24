@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.network.io;
 
 import java.util.List;
@@ -72,10 +69,6 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	static final String VALUE_TAG = "value";
 	
-	static final String ABSOLUTE_VALUE = "absolute";
-	
-	static final String FACTOR_VALUE = "scaleFactor";
-
 	// ========================================================================
 	// private members
 	// ========================================================================
@@ -149,8 +142,8 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equalsIgnoreCase(NETWORK_CHANGE_EVENT_TAG)) {
-			events.add(currentEvent);
-			currentEvent = null;
+			this.events.add(this.currentEvent);
+			this.currentEvent = null;
 		}
 	}
 
@@ -162,45 +155,50 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 		if(name.equalsIgnoreCase(NETWORK_CHANGE_EVENT_TAG)) {
 			String value = atts.getValue(START_TIME_TAG);
 			if(value != null) {
-				currentEvent = new NetworkChangeEvent(Time.parseTime(value));
+				this.currentEvent = new NetworkChangeEvent(Time.parseTime(value));
 			} else {
-				currentEvent = null;
+				this.currentEvent = null;
 				log.warn("A start time must be defined!");
 			}
 		/*
 		 * Links
 		 */
-		} else if(name.equalsIgnoreCase(LINK_TAG) && currentEvent != null) {
+		} else if(name.equalsIgnoreCase(LINK_TAG) && this.currentEvent != null) {
 			String value = atts.getValue(REF_ID_TAG);
 			if(value != null) {
-				Link link = network.getLinks().get(Id.create(value, Link.class));
+				Link link = this.network.getLinks().get(Id.create(value, Link.class));
 				if(link != null)
-					currentEvent.addLink(link);
+					this.currentEvent.addLink(link);
 				else
 					log.warn(String.format("Link %1$s not found!", value));
 			}
 		/*
 		 * flow capacity changes 
 		 */
-		} else if(name.equalsIgnoreCase(FLOW_CAPACITY_TAG) && currentEvent != null) {
-			currentEvent.setFlowCapacityChange(newNetworkChangeType(atts
+		} else if(name.equalsIgnoreCase(FLOW_CAPACITY_TAG) && this.currentEvent != null) {
+			this.currentEvent.setFlowCapacityChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		/*
 		 * freespeed change
 		 */
-		} else if(name.equalsIgnoreCase(FREESPEED_TAG) && currentEvent != null) {
-			currentEvent.setFreespeedChange(newNetworkChangeType(atts
+		} else if(name.equalsIgnoreCase(FREESPEED_TAG) && this.currentEvent != null) {
+			this.currentEvent.setFreespeedChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		/*
 		 * lanes changes
 		 */
-		} else if(name.equalsIgnoreCase(LANES_TAG) && currentEvent != null) {
-			currentEvent.setLanesChange(newNetworkChangeType(atts
+		} else if(name.equalsIgnoreCase(LANES_TAG) && this.currentEvent != null) {
+			this.currentEvent.setLanesChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		}
 		
 	}
 
+	static final String ABSOLUTE_VALUE = "absolute";
+	static final String FACTOR_VALUE = "scaleFactor";
+	static final String OFFSET_VALUE = "offset" ;
+	// the enum is different from the xml value, since the "in_SI_units" was considered important, but changing it also
+	// in the xml was considered too messy.  kai, nov'17
 	private static ChangeValue newNetworkChangeType(String typeStr, String valueStr) {
 		if(typeStr != null && valueStr != null) {
 			double value = Double.parseDouble(valueStr);
@@ -208,10 +206,12 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 				return new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, value);
 			else if(typeStr.equalsIgnoreCase(FACTOR_VALUE))
 				return new ChangeValue(ChangeType.FACTOR, value);
+			else if(typeStr.equalsIgnoreCase(OFFSET_VALUE))
+				return new ChangeValue(ChangeType.OFFSET_IN_SI_UNITS, value);
 			else {
 				log.warn(String.format(
-					"The change type %1$s is not allowed. Only \"%2$s\" and \"%3$s\" permitted!",
-					typeStr, ABSOLUTE_VALUE, FACTOR_VALUE));
+					"The change type %1$s is not allowed. Alowed: %2$s %3$s %4$s",
+					typeStr, ABSOLUTE_VALUE, FACTOR_VALUE, OFFSET_VALUE ));
 				return null;
 			}
 		} else {

@@ -22,8 +22,10 @@ package org.matsim.contrib.zone;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.zone.util.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
+import org.matsim.contrib.zone.util.ZoneFinder;
 
 public class ZonalSystemImpl implements ZonalSystem {
 	private final Map<Id<Zone>, Zone> zones;
@@ -31,7 +33,6 @@ public class ZonalSystemImpl implements ZonalSystem {
 
 	public ZonalSystemImpl(Map<Id<Zone>, Zone> zones, ZoneFinder zoneFinder, Network network) {
 		this.zones = zones;
-
 		nodeToZoneMap = NetworkWithZonesUtils.createNodeToZoneMap(network, zoneFinder);
 	}
 
@@ -42,6 +43,6 @@ public class ZonalSystemImpl implements ZonalSystem {
 
 	@Override
 	public Zone getZone(Node node) {
-		return nodeToZoneMap.get(node);
+		return nodeToZoneMap.get(node.getId());
 	}
 }

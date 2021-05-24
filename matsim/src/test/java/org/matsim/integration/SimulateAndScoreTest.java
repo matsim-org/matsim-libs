@@ -45,7 +45,8 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -150,10 +151,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 		Vehicles vehicles = scenario.getTransitVehicles();
 		VehicleType vehicleType = vehicles.getFactory().createVehicleType(Id.create("VT1", VehicleType.class));
-		VehicleCapacity vehicleCapacity = vehicles.getFactory().createVehicleCapacity();
-		vehicleCapacity.setSeats(30);
-		vehicleCapacity.setStandingRoom(70);
-		vehicleType.setCapacity(vehicleCapacity);
+//		VehicleCapacity vehicleCapacity = vehicles.getFactory().createVehicleCapacity();
+		vehicleType.getCapacity().setSeats(30);
+		vehicleType.getCapacity().setStandingRoom(70);
+//		vehicleType.setCapacity(vehicleCapacity);
 		vehicles.addVehicleType(vehicleType);
 		
 		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create("V1", Vehicle.class), vehicleType);
@@ -184,7 +185,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 				install(new TripRouterModule());
 				install(new TravelTimeCalculatorModule());
 				install(new EventsManagerModule());
-				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ));
+				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config ));
 			}
 		});
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
@@ -204,7 +205,9 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events);
 		EventsToScore scorer =
 				EventsToScore.createWithScoreUpdating(
 						scenario,
@@ -213,7 +216,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
-		scorer.beginIteration(0);
+		scorer.beginIteration(0, false);
 		sim.run();
 		scorer.finish();
 
@@ -262,7 +265,9 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		Netsim sim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events);
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
@@ -278,7 +283,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
-		scorer.beginIteration(0);
+		scorer.beginIteration(0, false);
 		sim.run();
 		scorer.finish();
 

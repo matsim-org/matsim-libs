@@ -105,7 +105,7 @@ public class ParkingSearchEvaluator implements TeleportationArrivalEventHandler,
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.egress_walk)){
+		if (event.getLegMode().equals(TransportMode.non_network_walk )){
 			this.departureTimes.put(event.getPersonId(), event.getTime());
 		}	
 	}

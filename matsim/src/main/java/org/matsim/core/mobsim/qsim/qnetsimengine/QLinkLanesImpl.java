@@ -35,15 +35,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.DefaultFlowEfficiencyCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.lanes.data.ModelLane;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.vis.VisLane;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.VisLane;
+import org.matsim.lanes.VisLaneModelBuilder;
+import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -111,8 +117,34 @@ import org.matsim.vis.snapshotwriters.VisData;
  *         </ul>
  */
 public final class QLinkLanesImpl extends AbstractQLink {
-
 	private static final Logger log = Logger.getLogger(QLinkLanesImpl.class);
+
+	/* public? */ static final class Builder {
+		private final NetsimEngineContext context;
+		private final NetsimInternalInterface netsimEngine;
+		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
+		private FlowEfficiencyCalculator flowEfficiencyCalculator = new DefaultFlowEfficiencyCalculator();
+
+		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine ) {
+			this.context = context;
+			this.netsimEngine = netsimEngine;
+		}
+
+		public final void setLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ) {
+			this.linkSpeedCalculator = linkSpeedCalculator ;
+		}
+
+		public void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
+			this.flowEfficiencyCalculator = flowEfficiencyCalculator;
+		}
+
+		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler ) ;
+		}
+
+	}
+	
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -137,6 +169,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private final List<ModelLane> lanes;
 
+	private final FlowEfficiencyCalculator flowEfficiencyCalculator;
+
 	private final Map<Id<Lane>, Map<Id<Link>, List<QLaneI>>> nextQueueToLinkCache;
 
 	private NetsimEngineContext context;
@@ -145,14 +179,18 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param context TODO
 	 * @param netsimEngine TODO
+	 * @param linkSpeedCalculator
+	 * @param flowEfficiencyCalculator
 	 */
-	QLinkLanesImpl(final Link link2, final QNodeI queueNode, List<ModelLane> lanes, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
-		super(link2, queueNode, context, netsimEngine);
+	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
+						   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, FlowEfficiencyCalculator flowEfficiencyCalculator, VehicleHandler vehicleHandler) {
+		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
 		this.context = context ;
-		this.toQueueNode = queueNode;
+		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();
 		this.lanes = lanes;
+		this.flowEfficiencyCalculator = flowEfficiencyCalculator;
 		this.nextQueueToLinkCache = new LinkedHashMap<>(); // maps a lane id to a map containing the
 															// downstream queues indexed by a
 															// downstream link
@@ -167,7 +205,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		Map<Id<Lane>, Set<Id<Link>>> laneIdToLinksMap = new HashMap<>();
 		for (ModelLane lane : lanes) { // lanes is sorted downstream to upstream
 			Id<Lane> laneId = lane.getLaneData().getId();
-			double noEffectiveLanes = lane.getLaneData().getNumberOfRepresentedLanes();
 			// --
 			// QLaneI queue = new QueueWithBuffer(this, new FIFOVehicleQ(), laneId,
 			// lane.getLength(), noEffectiveLanes,
@@ -177,8 +214,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			builder.setVehicleQueue(new FIFOVehicleQ());
 			builder.setLaneId(laneId);
 			builder.setLength(lane.getLength());
-			builder.setEffectiveNumberOfLanes(noEffectiveLanes);
+			builder.setEffectiveNumberOfLanes(lane.getLaneData().getNumberOfRepresentedLanes());
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
+			builder.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
 			QLaneI queue = builder.createLane(this);
 			// --
 			queueByIdMap.put(laneId, queue);
@@ -193,7 +231,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				laneIdToLinksMap.put(laneId, toLinkIds);
 			} else { // lane is within the link and has no connection to a node
 				Map<Id<Link>, List<QLaneI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
-				nextQueueToLinkCache.put(Id.create(((QueueWithBuffer) queue).getId(), Lane.class),
+				nextQueueToLinkCache.put(Id.create(queue.getId(), Lane.class),
 						toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
 					Set<Id<Link>> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
@@ -215,13 +253,13 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					}
 				}
 			}
-			queue.changeSpeedMetersPerSecond( this.getLink().getFreespeed() );
+//			queue.changeSpeedMetersPerSecond( this.getLink().getFreespeed() );
 			
 		}
 		// reverse the order in the linked map, i.e. upstream to downstream
 		while (!stack.isEmpty()) {
 			QLaneI queue = stack.pop();
-			this.laneQueues.put(((QueueWithBuffer) queue).getId(), queue);
+			this.laneQueues.put(queue.getId(), queue);
 		}
 	}
 
@@ -327,21 +365,15 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			QLaneI nextQueue = this.chooseNextLane(qlane, toLinkId);
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
-					((QueueWithBuffer) qlane).popFirstVehicle();
-//					context .getEventsManager() .processEvent(
-//									new LaneLeaveEvent(now, veh.getId(), this.getLink()
-//											.getId(), ((QueueWithBuffer) qlane).getId()));
+					qlane.popFirstVehicle();
 					nextQueue.addFromUpstream(veh);
-//					context .getEventsManager() .processEvent(
-//									new LaneEnterEvent(now, veh.getId(), this.getLink()
-//											.getId(), ((QueueWithBuffer) nextQueue).getId()));
 				} else {
 					break;
 				}
 			} else {
 				StringBuilder b = new StringBuilder();
 				b.append("Person Id: ").append(veh.getDriver().getId());
-				b.append(" is on Lane Id ").append(((QueueWithBuffer) qlane).getId());
+				b.append(" is on Lane Id ").append(qlane.getId());
 				b.append(" on Link Id ").append(this.getLink().getId());
 				b.append(" and wants to drive to Link Id ").append(toLinkId);
 				b.append(" but there is no Lane leading to that Link!");
@@ -360,7 +392,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		// else chose lane by storage cap
 		for (int i = 1; i < toQueues.size(); i++) {
 			QLaneI toQueue = toQueues.get(i);
-			if (((QueueWithBuffer) toQueue).getLoadIndicator() < ((QueueWithBuffer) retLane).getLoadIndicator()) {
+			if (toQueue.getLoadIndicator() < retLane.getLoadIndicator()) {
 				retLane = toQueue;
 			}
 		}
@@ -417,12 +449,13 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	public void recalcTimeVariantAttributes() {
-		double now = context.getSimTimer().getTimeOfDay() ;
+//		double now = context.getSimTimer().getTimeOfDay() ;
 
 		for (QLaneI lane : this.laneQueues.values()) {
-			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;
-			lane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
-			lane.changeUnscaledFlowCapacityPerSecond( ((Link)getLink()).getFlowCapacityPerSec(now) );
+//			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;
+//			lane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
+//			lane.changeUnscaledFlowCapacityPerSecond( ((Link)getLink()).getFlowCapacityPerSec(now) );
+			lane.recalcTimeVariantAttributes();
 		}
 	}
 
@@ -462,7 +495,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		// (only for tests)
 		double total = 0.0;
 		for (QLaneI lane : this.laneQueues.values()) {
-			total += lane.getStorageCapacity();
+			final double storageCapacity = lane.getStorageCapacity();
+			log.warn("storageCapacity=" + storageCapacity) ;
+			total += storageCapacity;
 		}
 		return total;
 	}
@@ -532,7 +567,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (visLink != null) {
 				for (QLaneI ql : QLinkLanesImpl.this.laneQueues.values()) {
 					VisLane otfLane = visLink.getLaneData().get(
-							((QueueWithBuffer) ql).getId().toString());
+							ql.getId().toString());
 					((QueueWithBuffer.VisDataImpl) ql.getVisData()).setVisInfo(
 							otfLane.getStartCoord(), otfLane.getEndCoord());
 				}

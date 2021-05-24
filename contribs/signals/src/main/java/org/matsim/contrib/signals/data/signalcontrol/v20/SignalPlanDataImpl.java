@@ -23,8 +23,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 
@@ -33,12 +31,12 @@ import org.matsim.contrib.signals.model.SignalPlan;
  * @author dgrether
  *
  */
-public class SignalPlanDataImpl implements SignalPlanData {
+public final class SignalPlanDataImpl implements SignalPlanData {
 
 	private Id<SignalPlan> id;
 	private Integer cycletime;
 	private double endtime = 0.0;
-	private Integer offset;
+	private int offset;
 	private SortedMap<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsBySignalGroupId;
 	private double starttime = 0.0;
 
@@ -70,7 +68,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public Integer getOffset() {
+	public int getOffset() {
 		return this.offset;
 	}
 
@@ -95,7 +93,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public void setOffset(Integer seconds) {
+	public void setOffset(int seconds) {
 		this.offset = seconds;
 	}
 

@@ -29,7 +29,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -131,7 +133,6 @@ public class RouteUtils {
 		return route.getSubRoute(fromLinkId, toLinkId);
 	}
 
-
 	/**
 	 * Calculates the distance of the complete route, <b>excluding</b> the distance traveled
 	 * on the start- and end-link of the route.
@@ -173,8 +174,19 @@ public class RouteUtils {
 		}
 		return routeDistance;
 	}
-
-	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
+	
+	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
+		double length = 0. ;
+		for ( Link link : path.links ) {
+			length += link.getLength() ;
+		}
+		return length ;
+	}
+	@Deprecated // network argument is not needed; please inline.  kai, sep'20
+	public static NetworkRoute createNetworkRoute( List<Id<Link>> routeLinkIds, Network network ) {
+		return createNetworkRoute( routeLinkIds );
+	}
+	public static NetworkRoute createNetworkRoute( List<Id<Link>> routeLinkIds ) {
 		Id<Link> startLinkId = routeLinkIds.get(0);
 		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<>(0);
 		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
@@ -182,9 +194,8 @@ public class RouteUtils {
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
 	}
-
-	public static double calcDistance(ExperimentalTransitRoute route, TransitSchedule ts, Network network) {
-		
+	
+	public static double calcDistance(TransitPassengerRoute route, TransitSchedule ts, Network network) {
 		Id<TransitLine> lineId = route.getLineId();
 		Id<TransitRoute> routeId = route.getRouteId();
 		Id<TransitStopFacility> enterStopId = route.getAccessStopId();
@@ -192,9 +203,16 @@ public class RouteUtils {
 	
 		TransitLine line = ts.getTransitLines().get(lineId);
 		TransitRoute tr = line.getRoutes().get(routeId);
+		
+		TransitStopFacility accessFacility = ts.getFacilities().get(enterStopId);
+		TransitStopFacility egressFacility = ts.getFacilities().get(exitStopId);
+		
+		return calcDistance(tr, accessFacility, egressFacility, network);
+	}
 	
-		Id<Link> enterLinkId = ts.getFacilities().get(enterStopId).getLinkId();
-		Id<Link> exitLinkId = ts.getFacilities().get(exitStopId).getLinkId();
+	public static double calcDistance(TransitRoute tr, TransitStopFacility accessFacility, TransitStopFacility egressFacility, Network network) {
+		Id<Link> enterLinkId = accessFacility.getLinkId();
+		Id<Link> exitLinkId = egressFacility.getLinkId();
 	
 		NetworkRoute nr = tr.getRoute();
 		double dist = 0;
@@ -234,12 +252,18 @@ public class RouteUtils {
 	 * @return a number between 0 (no coverage) and 1 (route2 fully covers route1)
 	 */
 	public static double calculateCoverage(NetworkRoute route1, NetworkRoute route2, Network network ) {
+		Gbl.assertNotNull( route1 );
+		Gbl.assertNotNull( route2 );
+		Gbl.assertNotNull( network );
+		
 		double routeLength = 0. ;
 		double coveredLength = 0. ;
 		for ( Id<Link> id : route1.getLinkIds() ) {
-			routeLength += network.getLinks().get( id ).getLength() ;
+			final Link link = network.getLinks().get( id );
+			Gbl.assertNotNull( link );
+			routeLength += link.getLength() ;
 			if ( route2.getLinkIds().contains(id) ) {
-				coveredLength += network.getLinks().get( id ).getLength() ;
+				coveredLength += link.getLength() ;
 			}
 		}
 		if ( routeLength > 0. ) {

@@ -33,6 +33,7 @@ import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
+import org.matsim.guice.DependencyGraphModule;
 import org.matsim.pt.counts.PtCountsModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
@@ -44,20 +45,23 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new TravelTimeCalculatorModule());
         install(new TravelDisutilityModule());
         install(new CharyparNagelScoringFunctionModule());
-        install(new ExperiencedPlansModule());
         install(new TripRouterModule());
         install(new StrategyManagerModule());
+    
+        // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
+        install(new ExperiencedPlansModule());
         install(new LinkStatsModule());
         install(new VolumesAnalyzerModule());
         install(new LegHistogramModule());
         install(new LegTimesModule());
-        install(new TravelDistanceStatsModule());
+        install(new IterationTravelStatsModule());
         install(new ScoreStatsModule());
         install(new ModeStatsModule());
         install(new CountsModule());
         install(new PtCountsModule());
         install(new VspPlansCleanerModule());
         install(new SnapshotWritersModule());
+        install(new DependencyGraphModule());
 
     	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include 
         * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the

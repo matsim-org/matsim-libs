@@ -3,48 +3,47 @@ package org.matsim.contrib.freight.mobsim;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
-import org.matsim.core.utils.misc.Time;
-
-import javax.inject.Inject;
+import org.matsim.vehicles.Vehicle;
 
 @Ignore
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{
-			
-			private double score = 0.0;
 
+			private double score = 0.0;
 			private final Network network;
-			
 			private final Carrier carrier;
-			
-			private Set<CarrierVehicle> employedVehicles;
-			
+			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
-			
 			private double currentLegStartTime;
 			
 			public DriverLegScoring(Carrier carrier, Network network) {
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<CarrierVehicle>();
+				employedVehicles = new HashSet<>();
 			}
 
 			
@@ -78,8 +77,8 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			public void endLeg(double time) {
 				if(currentLeg.getRoute() instanceof NetworkRoute){
 					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
-					Id vehicleId = nRoute.getVehicleId();
-					CarrierVehicle vehicle = getVehicle(vehicleId);
+					Id<Vehicle> vehicleId = nRoute.getVehicleId();
+					CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
 					if(!employedVehicles.contains(vehicle)){
 						employedVehicles.add(vehicle);
@@ -89,7 +88,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 					double toll = 0.0;
 					if(currentLeg.getRoute() instanceof NetworkRoute){
 						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
-						for(Id linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
+						for(Id<Link> linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
 							distance += network.getLinks().get(linkId).getLength();
 							toll += getToll(linkId, vehicle, null);
 						}
@@ -107,7 +106,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				return 0.0;
 			}
 
-			private double getToll(Id linkId, CarrierVehicle vehicle, Person driver) {
+			private double getToll(Id<Link> linkId, CarrierVehicle vehicle, Person driver) {
 				return 0;
 			}
 
@@ -119,15 +118,13 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				return 1.0;
 			}
 
-			private CarrierVehicle getVehicle(Id vehicleId) {
-				for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
-					if(cv.getVehicleId().equals(vehicleId)){
-						return cv;
-					}
-				}
-				return null;
-			}
-			
+//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
+//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//				}
+//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//				return null;
+//			}
 		}
 	
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{
@@ -165,8 +162,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -195,8 +190,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -209,8 +202,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void reset() {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}

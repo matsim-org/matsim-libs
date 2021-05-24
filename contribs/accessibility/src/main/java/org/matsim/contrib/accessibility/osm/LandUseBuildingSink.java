@@ -20,12 +20,10 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
@@ -54,14 +52,15 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author dziemke
  */
-public class LandUseBuildingSink implements Sink {
+class LandUseBuildingSink implements Sink {
 	private final Logger log = Logger.getLogger(LandUseBuildingSink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;
@@ -140,7 +139,7 @@ public class LandUseBuildingSink implements Sink {
 				matsimActivityType = getActivityType(landuseType, this.landUseTypeMap);
 			}
 			if(matsimActivityType != null){
-				Coord[] coords = CoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
+				Coord[] coords = OSMCoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
 				SimpleFeature feature = createLandUseFeature(coords, matsimActivityType);
 				if (feature == null) {
 					continue;
@@ -224,8 +223,8 @@ public class LandUseBuildingSink implements Sink {
 					}
 				}
 								
-				Coord coord = CoordUtils.getCentroidCoord(entity, ct, nodeMap, wayMap, relationMap);
-				Coord[] buildingCoords = CoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
+				Coord coord = OSMCoordUtils.getCentroidCoord(entity, ct, nodeMap, wayMap, relationMap);
+				Coord[] buildingCoords = OSMCoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
 				SimpleFeature buildingAsFeature = createLandUseFeature(buildingCoords, null);
 				if (buildingAsFeature == null) {
 					log.error("The feature of building " + entityKey + " is null!");
@@ -386,7 +385,7 @@ public class LandUseBuildingSink implements Sink {
 	
 
 	@Override
-	public void release() {
+	public void close() {
 	}
 
 	
@@ -437,6 +436,5 @@ public class LandUseBuildingSink implements Sink {
 
 	@Override
 	public void initialize(Map<String, Object> metaData) {
-		// TODO Auto-generated method stub
 	}
 }

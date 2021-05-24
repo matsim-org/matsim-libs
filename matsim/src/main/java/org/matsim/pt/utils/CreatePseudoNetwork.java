@@ -41,6 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -56,6 +57,9 @@ public class CreatePseudoNetwork {
 	private final TransitSchedule schedule;
 	private final Network network;
 	private final String prefix;
+	private final double linkFreeSpeed;
+	private final double linkCapacity;
+	
 
 	private final Map<Tuple<Node, Node>, Link> links = new HashMap<Tuple<Node, Node>, Link>();
 	private final Map<Tuple<Node, Node>, TransitStopFacility> stopFacilities = new HashMap<Tuple<Node, Node>, TransitStopFacility>();
@@ -70,6 +74,17 @@ public class CreatePseudoNetwork {
 		this.schedule = schedule;
 		this.network = network;
 		this.prefix = networkIdPrefix;
+		this.linkFreeSpeed = 100.0 / 3.6;
+		this.linkCapacity = 100000.0;
+	}
+	
+	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix, 
+			final double linkFreeSpeed, final double linkCapacity) {
+		this.schedule = schedule;
+		this.network = network;
+		this.prefix = networkIdPrefix;
+		this.linkFreeSpeed = linkFreeSpeed;
+		this.linkCapacity = linkCapacity;
 	}
 
 	public void createNetwork() {
@@ -87,7 +102,7 @@ public class CreatePseudoNetwork {
 				}
 
 				if (routeLinks.size() > 0) {
-					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks, this.network);
+					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks );
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
@@ -135,7 +150,7 @@ public class CreatePseudoNetwork {
 				}
 				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
-				newFacility.setStopPostAreaId(toFacility.getId().toString());
+				newFacility.setStopAreaId(Id.create(toFacility.getId(), TransitStopArea.class));
 				newFacility.setLinkId(link.getId());
 				newFacility.setName(toFacility.getName());
 				copies.add(newFacility);
@@ -159,8 +174,8 @@ public class CreatePseudoNetwork {
 		} else {
 			link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
-		link.setFreespeed(30.0 / 3.6);
-		link.setCapacity(500);
+		link.setFreespeed(linkFreeSpeed);
+		link.setCapacity(linkCapacity);
 		link.setNumberOfLanes(1);
 		this.network.addLink(link);
 		link.setAllowedModes(this.transitModes);

@@ -23,14 +23,17 @@ package org.matsim.core.mobsim.qsim.agents;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -39,7 +42,7 @@ import org.matsim.vehicles.Vehicle;
  * <p></p>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
+public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, HasModifiablePlan {
 	// yy cannot make this final since it is overridden at 65 locations
 	// (but since all methods are final, it seems that all of these could be solved by delegation).
 	// kai, nov'14
@@ -89,7 +92,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	}
 
 	@Override
-	public final Double getExpectedTravelTime() {
+	public final OptionalTime getExpectedTravelTime() {
 		return basicAgentDelegate.getExpectedTravelTime();
 	}
 
@@ -176,30 +179,32 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	final Leg getCurrentLeg() {
 		return basicAgentDelegate.getCurrentLeg() ;
 	}
-	final int getCurrentLinkIndex() {
+	@Override
+	public final int getCurrentLinkIndex() {
 		return basicAgentDelegate.getCurrentLinkIndex() ;
 	}
 	final int getCurrentPlanElementIndex() {
 		return basicAgentDelegate.getCurrentPlanElementIndex() ;
 	}
-	final Plan getModifiablePlan() {
+	@Override
+	public final Plan getModifiablePlan() {
 		return basicAgentDelegate.getModifiablePlan() ;
 	}
 //	final void calculateAndSetDepartureTime( Activity act ) {
 //		basicAgentDelegate.calculateAndSetDepartureTime(act);
 //	}
-	final void resetCaches() {
+	@Override public final void resetCaches() {
 		basicAgentDelegate.resetCaches();
 		driverAgentDelegate.resetCaches(); 
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		return this.basicAgentDelegate.getCurrentFacility();
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
 	}
 

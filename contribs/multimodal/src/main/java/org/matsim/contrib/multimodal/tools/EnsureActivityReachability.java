@@ -31,6 +31,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 
 import java.util.HashMap;
@@ -59,7 +60,7 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 	
 	private final Counter relocateCounter = new Counter("Number of relocated activities: ");
 	
-	private Map<String, QuadTree<Facility>> facilityQuadTrees;
+	private Map<String, QuadTree<ActivityFacility>> facilityQuadTrees;
 	private Map<String, QuadTree<Link>> linkQuadTrees;
 	
 	public EnsureActivityReachability(Scenario scenario) {
@@ -171,7 +172,7 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 					 * Facility, if its located at a Link, we move it to another Link. 
 					 */
 					if (activity.getFacilityId() != null) {
-						Facility newFacility;
+						ActivityFacility newFacility;
 						if (requiredModes.size() > 1) {
 							newFacility = this.facilityQuadTrees.get(this.allModes).getClosest(activity.getCoord().getX(), activity.getCoord().getY());
 						} else {
@@ -288,11 +289,11 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 		Set<String> modes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		this.facilityQuadTrees = new HashMap<>();
 		for (String mode : modes) {
-			this.facilityQuadTrees.put(mode, new QuadTree<Facility>(minx, miny, maxx, maxy));
+			this.facilityQuadTrees.put(mode, new QuadTree<ActivityFacility>(minx, miny, maxx, maxy));
 		}
-		this.facilityQuadTrees.put(this.allModes, new QuadTree<Facility>(minx, miny, maxx, maxy));
+		this.facilityQuadTrees.put(this.allModes, new QuadTree<ActivityFacility>(minx, miny, maxx, maxy));
 		
-		for (Facility facility : scenario.getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Link link = scenario.getNetwork().getLinks().get(facility.getLinkId());
 			
 			Set<String> allowedModes = link.getAllowedModes();

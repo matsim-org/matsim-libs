@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.cadyts.car;
 
-import java.io.IOException;
-import java.util.Collections;
-
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,10 +41,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.ControlerI;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioByConfigModule;
@@ -54,18 +57,18 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
-
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collections;
+
+import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.*;
 
 /**
  * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
@@ -93,8 +96,10 @@ public class CadytsCarIT {
 		strategySettings.setWeight(1.0) ;
 		config.strategy().addStrategySettings(strategySettings);
 		CadytsConfigGroup cadytsCar = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		cadytsCar.addParam("startTime", "04:00:00");
-		cadytsCar.addParam("endTime", "20:00:00");
+//		cadytsCar.addParam("startTime", "04:00:00");
+		cadytsCar.setStartTime( 4*3600 );
+//		cadytsCar.addParam("endTime", "20:00:00");
+		cadytsCar.setEndTime( 20*3600 );
 		cadytsCar.addParam("regressionInertia", "0.95");
 		cadytsCar.addParam("useBruteForce", "true");
 		cadytsCar.addParam("minFlowStddevVehH", "8");
@@ -162,11 +167,8 @@ public class CadytsCarIT {
 		config.controler().setLastIteration(lastIteration);
 		
 		config.planCalcScore().setBrainExpBeta(beta);
-		
-		StrategySettings strategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-		strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
+
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1.0 ) );
 
 		// ===
 
@@ -187,7 +189,7 @@ public class CadytsCarIT {
 								final ScoringParameters params = parameters.getScoringParameters(person);
 
 								SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
+								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
 								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
@@ -211,56 +213,57 @@ public class CadytsCarIT {
 		//scenario data  test
 		Scenario scenario = injector.getInstance(Scenario.class);
 		Assert.assertEquals("Different number of links in network.", scenario.getNetwork().getLinks().size() , 23 );
-        Assert.assertEquals("Different number of nodes in network.", scenario.getNetwork().getNodes().size() , 15 );
+		Assert.assertEquals("Different number of nodes in network.", scenario.getNetwork().getNodes().size() , 15 );
 		
 		Assert.assertNotNull("Population is null.", scenario.getPopulation());
 
-        Assert.assertEquals("Num. of persons in population is wrong.", scenario.getPopulation().getPersons().size(), 5);
+		Assert.assertEquals("Num. of persons in population is wrong.", scenario.getPopulation().getPersons().size(), 5);
 		Assert.assertEquals("Scale factor is wrong.", scenario.getConfig().counts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
 		
 		//counts
 		Assert.assertEquals("Count file is wrong.", scenario.getConfig().counts().getCountsFileName(), inputDir + "counts5.xml");
 				
 		
-		Counts occupCounts = new Counts();
+		Counts<Link> occupCounts = new Counts<>();
 		new MatsimCountsReader(occupCounts).readFile(scenario.getConfig().counts().getCountsFileName());
 		
-		Count count =  occupCounts.getCount(Id.create(19, Link.class));
+		Count<Link> count =  occupCounts.getCount(Id.create(19, Link.class));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "link_19");
 		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON);
 
 		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".countscompare.txt";
-		CountsReaderCar reader = new CountsReaderCar(outCounts);
-		double[] simValues;
-		double[] realValues;
+		AdHocCountsReaderCar reader = new AdHocCountsReaderCar(outCounts);
 
-		Id<Link> locId11 = Id.create(11, Link.class);
-		simValues = reader.getSimulatedValues(locId11);
-		realValues= reader.getRealValues(locId11);
-		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON);
-
-		Id<Link> locId12 = Id.create("12", Link.class);
-		simValues = reader.getSimulatedValues(locId12);
-		realValues= reader.getRealValues(locId12);
-		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6] , MatsimTestUtils.EPSILON);
-
-		Id<Link> locId19 = Id.create("19", Link.class);
-		simValues = reader.getSimulatedValues(locId19);
-		realValues= reader.getRealValues(locId19);
-		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
-
-		// Id stopId10 = new IdImpl("stop10");
-		Id<Link> locId21 = Id.create("21", Link.class);
-		simValues = reader.getSimulatedValues(locId21);
-		realValues= reader.getRealValues(locId21);
-		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
-
+		Id<Link> locId11 = Id.create( 11, Link.class );
+		{
+			double[] simValues = reader.getSimulatedValues( locId11 );
+			double[] realValues = reader.getRealValues( locId11 );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON );
+		}
+		{
+			Id<Link> locId12 = Id.create( "12", Link.class );
+			double[] simValues = reader.getSimulatedValues( locId12 );
+			double[] realValues = reader.getRealValues( locId12 );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON );
+		}
+		Id<Link> locId19 = Id.create( "19", Link.class );
+		{
+			double[] simValues = reader.getSimulatedValues( locId19 );
+			double[] realValues = reader.getRealValues( locId19 );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON );
+		}
+		{
+			Id<Link> locId21 = Id.create( "21", Link.class );
+			double[] simValues = reader.getSimulatedValues( locId21 );
+			double[] realValues = reader.getRealValues( locId21 );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON );
+			Assert.assertEquals( "Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON );
+		}
 		// test calibration statistics
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();

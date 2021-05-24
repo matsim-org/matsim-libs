@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://matsim.org/files/dtd/network_v1.dtd">
+
+<network name="test network">
+<!--
+
+-->
+<nodes>
+	<node id="0" x="0" y="0" />
+	<node id="1" x="500" y="0" />
+	<node id="2" x="1000" y="0" />
+	<node id="3" x="1500" y="0" />
+</nodes>
+<links capperiod="1:00:00">
+	<link id="linkId1_" from="0" to="1" length="500.00" capacity="3600" freespeed="10" modes="car" permlanes="1" />
+	<link id="linkId2_" from="1" to="2" length="500.00" capacity="60" freespeed="10" modes="car" permlanes="1" />
+	<link id="linkId3_" from="2" to="3" length="500.00" capacity="3600" freespeed="10" modes="car" permlanes="1" />
+	<link id="linkId4_" from="3" to="0" length="500.00" capacity="3600" freespeed="10" modes="car" permlanes="1" />
+</links>
+</network>

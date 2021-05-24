@@ -38,6 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -49,8 +50,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SubsidyTestIT implements TabularFileHandler {
 	
-	private static final String gridScenarioDirectory = "http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/input/";
-
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
@@ -59,20 +58,22 @@ public class SubsidyTestIT implements TabularFileHandler {
 	public final void testSubsidyPControler() {
 		
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
-		
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+
 		PConfigGroup pConfig = (PConfigGroup) config.getModules().get(PConfigGroup.GROUP_NAME);
 		pConfig.setSubsidyApproach("perPassenger");
-		
+		String gridScenarioDirectory ="../../example-scenario/input/";
 		config.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
 		config.plans().setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		
+		config.controler().setWriteEventsInterval(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);	
 		Controler controler = new Controler(scenario);
 		
 		controler.getConfig().controler().setCreateGraphs(true);
+		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		controler.addOverridingModule(new PModule()) ;
@@ -104,7 +105,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
 		// Check final iteration
-		Assert.assertEquals("Number of budget (final iteration)", "196899047.9701666800", this.pStatsResults.get(2)[9]);	
+		Assert.assertEquals("Number of budget (final iteration)", "202319997.4909444700", this.pStatsResults.get(2)[9]);
 	}
 	
 	@Override

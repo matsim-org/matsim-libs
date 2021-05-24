@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -161,6 +161,20 @@ public class NetworkUtilsTest {
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.5)));
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.1)));
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.0)));
+
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(3.2)));
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(3.1)));
+		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(3.0)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(2.9)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(2.5)));
+		assertEquals(2, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(2.0)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(1.9)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(1.5)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(1.0)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.9)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.5)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.1)));
+		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(new PseudoLink(0.0)));
 	}
 
 	@Test
@@ -297,7 +311,7 @@ public class NetworkUtilsTest {
 		}
 
 		@Override
-		public double getNumberOfLanes(final double time) {
+		public double getNumberOfLanes() {
 			return this.nOfLanes;
 		}
 	}

@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.common.gis;
 
-import com.vividsolutions.jts.geom.Point;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Point;
 
 /**
  * @author illenberger

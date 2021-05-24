@@ -21,12 +21,12 @@ package org.matsim.contrib.signals.data.consistency;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.lanes.data.consistency.LanesConsistencyChecker;
+import org.matsim.lanes.LanesConsistencyChecker;
 
 /**
  * @author tthunig
  */
-public class LanesAndSignalsCleaner {
+public final class LanesAndSignalsCleaner {
 
     public void run(Scenario scenario){
         LanesConsistencyChecker lanesConsistency = new LanesConsistencyChecker(scenario.getNetwork(), scenario.getLanes());

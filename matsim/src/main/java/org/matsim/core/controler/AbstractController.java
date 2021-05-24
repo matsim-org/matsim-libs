@@ -22,39 +22,35 @@ package org.matsim.core.controler;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.MemoryObserver;
 
-public abstract class AbstractController {
+/*package*/ abstract class AbstractController {
+    // we already had one case where a method of this was removed, causing downstream failures; better just not
+	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
-    private static Logger log = Logger.getLogger(AbstractController.class);
+    private static final  Logger log = Logger.getLogger(AbstractController.class);
 
     private OutputDirectoryHierarchy controlerIO;
 
     private final IterationStopWatch stopwatch;
 
-    /*
-     * Strings used to identify the operations in the IterationStopWatch.
-     */
-    public static final String OPERATION_ITERATION = "iteration";
 
     /**
      * This is deliberately not even protected.  kai, jul'12
      */
-    ControlerListenerManagerImpl controlerListenerManagerImpl;
+    private ControlerListenerManagerImpl controlerListenerManagerImpl;
 
 
     private Integer thisIteration = null;
-
-    private boolean dirtyShutdown = false;
-
+    
     protected AbstractController() {
         this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
 
     AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
-        ControlerUtils.initializeOutputLogging();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controlerListenerManagerImpl = controlerListenerManager;
         this.controlerListenerManagerImpl.setControler(matsimServices);
@@ -64,15 +60,8 @@ public abstract class AbstractController {
     private void resetRandomNumbers(long seed, int iteration) {
         MatsimRandom.reset(seed + iteration);
         MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-        // "not-randomness" is the first
-        // draw...
-        // Fixme [kn] this should really be ten thousand draws instead of just
-        // one
-    }
-
-    protected final void setupOutputDirectory(final String outputDirectory, String runId, final OverwriteFileSetting overwriteFiles) {
-        this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be there before logging
-        OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
+        // "not-randomness" is the first draw...
+        // Fixme [kn] this should really be ten thousand draws instead of just one
     }
 
     final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
@@ -81,6 +70,7 @@ public abstract class AbstractController {
     }
 
     protected final void run(final Config config) {
+        MemoryObserver.start(60);
         MatsimRuntimeModifications.MyRunnable runnable = new MatsimRuntimeModifications.MyRunnable() {
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -93,11 +83,12 @@ public abstract class AbstractController {
 
             @Override
             public void shutdown(boolean unexpected) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected);
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration);
             }
         };
         MatsimRuntimeModifications.run(runnable);
         OutputDirectoryLogging.closeOutputDirLogging();
+        MemoryObserver.stop();
     }
 
     protected abstract void loadCoreListeners();
@@ -105,6 +96,8 @@ public abstract class AbstractController {
     protected abstract void runMobSim();
 
     protected abstract void prepareForSim();
+    
+    protected abstract void prepareForMobsim() ;
 
     /**
      * Stopping criterion for iterations.  Design thoughts:<ul>
@@ -114,23 +107,30 @@ public abstract class AbstractController {
      * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
      * </ul>
      */
-    protected abstract boolean continueIterations(int iteration);
+	protected abstract boolean mayTerminateAfterIteration(int iteration);
+	protected abstract boolean shouldTerminate(int iteration);
 
     private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-        for (int iteration = config.controler().getFirstIteration(); continueIterations(iteration); iteration++) {
-            iteration(config, iteration);
-        }
+    	int iteration = config.controler().getFirstIteration();
+    	
+    	// Special case if lastIteration == -1 -> Do not run any Mobsim
+    	boolean doTerminate = config.controler().getLastIteration() < iteration;
+    	
+    	while (!doTerminate) {
+    		boolean isLastIteration = mayTerminateAfterIteration(iteration);
+    		iteration(config, iteration, isLastIteration);
+    		doTerminate = isLastIteration && shouldTerminate(iteration);
+    		iteration++;
+    	}
     }
-
-
-    public static final String DIVIDER = "###################################################";
+    
     final String MARKER = "### ";
 
-    private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+    private void iteration(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         this.thisIteration = iteration;
         this.getStopwatch().beginIteration(iteration);
 
-        log.info(DIVIDER);
+        log.info(Controler.DIVIDER);
         log.info(MARKER + "ITERATION " + iteration + " BEGINS");
         this.getControlerIO().createIterationDirectory(iteration);
         resetRandomNumbers(config.global().getRandomSeed(), iteration);
@@ -138,7 +138,7 @@ public abstract class AbstractController {
         iterationStep("iterationStartsListeners", new Runnable() {
             @Override
             public void run() {
-                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration, isLastIteration);
             }
         });
 
@@ -146,18 +146,18 @@ public abstract class AbstractController {
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration, isLastIteration);
                 }
             });
         }
 
-        mobsim(config, iteration);
+        mobsim(config, iteration, isLastIteration);
 
         iterationStep("scoring", new Runnable() {
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
-                controlerListenerManagerImpl.fireControlerScoringEvent(iteration);
+                controlerListenerManagerImpl.fireControlerScoringEvent(iteration, isLastIteration);
             }
         });
 
@@ -165,20 +165,24 @@ public abstract class AbstractController {
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
-                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration, isLastIteration);
             }
         });
 
         this.getStopwatch().endIteration();
-        this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        try {
+            this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        } catch (UncheckedIOException e) {
+            log.error("Could not write stopwatch file.", e);
+        }
         if (config.controler().isCreateGraphs()) {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
-        log.info(DIVIDER);
+        log.info(Controler.DIVIDER);
     }
 
-    private void mobsim(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+    private void mobsim(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         // ControlerListeners may create managed resources in
         // beforeMobsim which need to be cleaned up in afterMobsim.
         // Hence the finally block.
@@ -188,9 +192,17 @@ public abstract class AbstractController {
             iterationStep("beforeMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
+            
+            iterationStep( "prepareForMobsim", new Runnable(){
+                    @Override
+                public void run() {
+                        prepareForMobsim() ;
+                        // todo: make replacable
+                }
+            }) ;
 
             iterationStep("mobsim", new Runnable() {
                 @Override
@@ -220,7 +232,7 @@ public abstract class AbstractController {
                 @Override
                 public void run() {
                     log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
-                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration, isLastIteration);
                 }
             });
         }
@@ -262,9 +274,5 @@ public abstract class AbstractController {
     public IterationStopWatch getStopwatch() {
         return stopwatch;
     }
-
-    public void setDirtyShutdown(boolean dirtyShutdown) {
-		this.dirtyShutdown = dirtyShutdown;
-	}
 
 }

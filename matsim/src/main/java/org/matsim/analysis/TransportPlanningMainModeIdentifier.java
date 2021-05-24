@@ -1,4 +1,25 @@
-package org.matsim.analysis;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TransportPlanningMainModeIdentifier.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +27,7 @@ import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
 
 /**
@@ -15,7 +37,7 @@ import org.matsim.core.router.MainModeIdentifier;
  * @author nagel
  *
  */
-public final class TransportPlanningMainModeIdentifier implements MainModeIdentifier {
+public final class TransportPlanningMainModeIdentifier implements AnalysisMainModeIdentifier {
 	// I am against other people changing this lightheartedly since some of my analysis depends on it.  So either please discuss,
 	// or use your own variant.  kai, sep'16
 
@@ -24,14 +46,13 @@ public final class TransportPlanningMainModeIdentifier implements MainModeIdenti
 	private final List<String> modeHierarchy = new ArrayList<>() ;
 
 	public TransportPlanningMainModeIdentifier() {
-		modeHierarchy.add( TransportMode.access_walk ) ;
-		modeHierarchy.add( TransportMode.egress_walk ) ;
-		modeHierarchy.add( TransportMode.transit_walk ) ;
+		modeHierarchy.add( TransportMode.non_network_walk ) ;
 		modeHierarchy.add( "undefined" ) ;
 		modeHierarchy.add( TransportMode.other ) ;
 		modeHierarchy.add( TransportMode.transit_walk ) ;
 		modeHierarchy.add( TransportMode.walk ) ;
 		modeHierarchy.add( TransportMode.bike ) ;
+		modeHierarchy.add( TransportMode.drt ) ;
 		modeHierarchy.add( TransportMode.pt ) ;
 		modeHierarchy.add( TransportMode.ride ) ;
 		modeHierarchy.add( TransportMode.car ) ;

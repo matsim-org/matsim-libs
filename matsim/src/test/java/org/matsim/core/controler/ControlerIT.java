@@ -20,15 +20,15 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import static org.matsim.core.config.groups.ControlerConfigGroup.SnapshotFormat;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
@@ -55,6 +55,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -93,7 +94,7 @@ public class ControlerIT {
 	
 	@Test
 	public void testScenarioLoading() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Controler controler = new Controler( config );
 
 		// need to run the controler to get Scenario initilized
@@ -110,13 +111,18 @@ public class ControlerIT {
 
 	@Test
 	public void testTerminationCriterion() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Controler controler = new Controler(config);
 		controler.setTerminationCriterion(new TerminationCriterion() {
 			@Override
-			public boolean continueIterations(int iteration) {
-				return false;
+			public boolean mayTerminateAfterIteration(int iteration) {
+				return true;
+			}
+
+			@Override
+			public boolean doTerminate(int iteration) {
+				return true;
 			}
 		});
 		controler.run();
@@ -124,7 +130,7 @@ public class ControlerIT {
 
 	@Test
 	public void testConstructor_EventsManagerTypeImmutable() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		MatsimServices controler = new Controler(config);
 		try {
 			controler.getConfig().setParam("parallelEventHandling", "numberOfThreads", "2");
@@ -230,7 +236,7 @@ public class ControlerIT {
 		// test that the plans have the correct travel times 
 		// (travel time of the plan does not contain first and last link)
 		assertEquals("ReRoute seems to have wrong travel times.", avgTravelTimeLink2,
-				((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), MatsimTestUtils.EPSILON);
+				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -461,7 +467,7 @@ public class ControlerIT {
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 		
 		int expectedPlanLength = 3 ;
-		if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
 			expectedPlanLength = 7 ;
 		}
@@ -478,7 +484,7 @@ public class ControlerIT {
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
-			if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 				assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 3 )).getRoute());
@@ -490,8 +496,46 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	@Test
+	public void testCompressionType() {
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		config.controler().setLastIteration(0);
+		config.controler().setCompressionType( CompressionType.zst );
+
+		final Controler controler = new Controler(config);
+
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
+		controler.run();
+
+		File iterationEvents = new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events));
+		assertTrue(iterationEvents.getName().endsWith("0.events.xml.zst"));
+		assertTrue(iterationEvents.exists());
+
+		File outputEvents = new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.events));
+		assertTrue(outputEvents.getName().endsWith("output_events.xml.zst"));
+		assertTrue(outputEvents.exists());
+
+		File outputPlans = new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population));
+		assertTrue(outputPlans.getName().endsWith("output_plans.xml.zst"));
+		assertTrue(outputPlans.exists());
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	@Test
 	public void testSetWriteEventsInterval() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 
@@ -517,17 +561,17 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -535,7 +579,7 @@ public class ControlerIT {
 	 */
 	@Test
 	public void testSetWriteEventsIntervalConfig() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 
@@ -558,17 +602,17 @@ public class ControlerIT {
 		controler.run();
 		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -576,7 +620,7 @@ public class ControlerIT {
 	 */
 	@Test
 	public void testSetWriteEventsNever() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 		config.controler().setWritePlansInterval(0);
 
@@ -600,8 +644,8 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -609,7 +653,7 @@ public class ControlerIT {
 	 */
 	@Test
 	public void testSetWriteEventsAlways() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 		config.controler().setWritePlansInterval(0);
 
@@ -631,8 +675,8 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -640,7 +684,7 @@ public class ControlerIT {
 	 */
 	@Test
 	public void testSetWriteEventsXml() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
@@ -663,7 +707,7 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -671,7 +715,7 @@ public class ControlerIT {
 	 */
 	@Test
 	public void testSetDumpDataAtEnd_true() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 
@@ -693,7 +737,7 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
 	}
 
 	/**
@@ -701,7 +745,7 @@ public class ControlerIT {
 	 */
 	@Test
 	public void testSetDumpDataAtEnd_false() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 
@@ -724,12 +768,12 @@ public class ControlerIT {
 		controler.run();
 
 
-		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
 	}
 
 	@Test(expected = RuntimeException.class)
-	public void testShutdown_UncaughtException() throws InterruptedException {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+	public void testShutdown_UncaughtException() {
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 
 		Controler controler = new Controler(config);
@@ -746,7 +790,7 @@ public class ControlerIT {
 
 	@Test
 	public void test_ExceptionOnMissingPopulationFile() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -782,7 +826,7 @@ public class ControlerIT {
 	@Test
 	public void test_ExceptionOnMissingNetworkFile() {
 		try {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -817,7 +861,7 @@ public class ControlerIT {
 	@Test
 	public void test_ExceptionOnMissingFacilitiesFile() {
 		try {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -851,17 +895,17 @@ public class ControlerIT {
 
 	@Test
 	public void testKMLSnapshotWriterOnQSim() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(2);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.googleearth ) );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
@@ -872,7 +916,7 @@ public class ControlerIT {
 
 	@Test
 	public void testOneSnapshotWriterInConfig() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -889,17 +933,18 @@ public class ControlerIT {
 
 	@Test
 	public void testTransimsSnapshotWriterOnQSim() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(2);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("transims"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
@@ -918,7 +963,7 @@ public class ControlerIT {
 	 */
 	@Test( expected = RuntimeException.class )
 	public void testGuiceModulesCannotAddModules() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration( 0 );
 		final Controler controler = new Controler( config );
 

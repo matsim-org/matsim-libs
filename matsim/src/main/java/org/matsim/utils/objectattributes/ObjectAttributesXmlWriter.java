@@ -54,23 +54,13 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	/*package*/ final static String ATTR_ATTRIBUTENAME = "name";
 	/*package*/ final static String ATTR_ATTRIBUTECLASS = "class";
 
-	private static final StringConverter STRING_Converter = new StringConverter();
-	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
-	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
-	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
-	private static final LongConverter LONG_Converter = new LongConverter();
+
 
 	private final ObjectAttributes attributes;
-	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
-	private final Set<Class<?>> missingConverters = new HashSet<Class<?>>();
+	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
 	public ObjectAttributesXmlWriter(final ObjectAttributes attributes) {
 		this.attributes = attributes;
-		this.converters.put(String.class.getCanonicalName(), STRING_Converter);
-		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
-		this.converters.put(Double.class.getCanonicalName(), DOUBLE_Converter);
-		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
-		this.converters.put(Long.class.getCanonicalName(), LONG_Converter);
 	}
 
 	public void writeFile(final String filename) throws UncheckedIOException {
@@ -91,18 +81,14 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
 				Class<?> clazz = objAttribute.getValue().getClass();
-				AttributeConverter<?> conv = this.converters.get(clazz.getCanonicalName());
-				if (conv != null) {
+				String value = converter.convertToString(objAttribute.getValue());
+				if (value != null) {
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTENAME, objAttribute.getKey()));
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTECLASS, clazz.getCanonicalName()));
 					writeStartTag(TAG_ATTRIBUTE, xmlAttributes);
 					xmlAttributes.clear();
-					writeContent(conv.convertToString(objAttribute.getValue()), false);
+					writeContent(value, false);
 					writeEndTag(TAG_ATTRIBUTE);
-				} else {
-					if (missingConverters.add(clazz)) {
-						log.warn("No AttributeConverter found for class " + clazz.getCanonicalName() + ". Not all attribute values will be written.");
-					}
 				}
 			}
 			writeEndTag(TAG_OBJECT);
@@ -119,14 +105,12 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
 	public AttributeConverter putAttributeConverter(final Class<?> clazz, final AttributeConverter converter) {
-		return this.converters.put(clazz.getCanonicalName(), converter);
+		return this.converter.putAttributeConverter(clazz, converter);
 	}
 
 	@Inject
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
-		for ( Map.Entry<Class<?>, AttributeConverter<?>> e : converters.entrySet() ) {
-			putAttributeConverter( e.getKey() , e.getValue() );
-		}
+		this.converter.putAttributeConverters(converters);
 	}
 
 	/**
@@ -136,7 +120,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
 	public AttributeConverter removeAttributeConverter(final Class<?> clazz) {
-		return this.converters.remove(clazz.getCanonicalName());
+		return this.converter.removeAttributeConverter(clazz);
 	}
 
 }

@@ -14,11 +14,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
 public class OneWayCarsharingRoutingModule implements RoutingModule{
@@ -32,7 +28,7 @@ public class OneWayCarsharingRoutingModule implements RoutingModule{
 		final List<PlanElement> trip = new ArrayList<PlanElement>();		
 		
 		final Leg csLeg = PopulationUtils.createLeg("oneway");
-		NetworkRoute csRoute = RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		CarsharingRoute csRoute = new CarsharingRoute(fromFacility.getLinkId(), toFacility.getLinkId());
 		csLeg.setRoute(csRoute);
 		trip.add( csLeg );	
 	
@@ -40,9 +36,4 @@ public class OneWayCarsharingRoutingModule implements RoutingModule{
 		return trip;
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		
-		return EmptyStageActivityTypes.INSTANCE;
-	}
 }

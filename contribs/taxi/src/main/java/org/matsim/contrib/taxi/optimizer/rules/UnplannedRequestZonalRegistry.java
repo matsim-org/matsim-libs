@@ -19,15 +19,16 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.contrib.zone.ZonalSystems;
 import org.matsim.contrib.zone.Zone;
@@ -45,7 +46,7 @@ public class UnplannedRequestZonalRegistry {
 
 		requestsInZones = new HashMap<>(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			requestsInZones.put(id, new HashMap<Id<Request>, TaxiRequest>());
+			requestsInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}
 	}
 
@@ -71,20 +72,11 @@ public class UnplannedRequestZonalRegistry {
 		requestCount--;
 	}
 
-	public List<TaxiRequest> findNearestRequests(Node node, int minCount) {
-		Zone zone = zonalSystem.getZone(node);
-		Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
-		List<TaxiRequest> nearestReqs = new ArrayList<>();
-
-		for (Zone z : zonesByDistance) {
-			nearestReqs.addAll(requestsInZones.get(z.getId()).values());
-
-			if (nearestReqs.size() >= minCount) {
-				return nearestReqs;
-			}
-		}
-
-		return nearestReqs;
+	public Stream<TaxiRequest> findNearestRequests(Node node, int minCount) {
+		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+				.stream()
+				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
+				.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(TaxiRequest request) {

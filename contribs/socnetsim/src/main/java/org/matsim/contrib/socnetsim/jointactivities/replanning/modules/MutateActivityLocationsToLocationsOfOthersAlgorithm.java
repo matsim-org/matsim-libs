@@ -31,13 +31,13 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.facilities.Facility;
 
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
@@ -64,17 +64,21 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 	public void run(final GroupPlans plans) {
 		final List<Facility> groupChoiceSet = choiceSet.getGroupChoiceSet( plans );
 		for ( Plan plan : plans.getAllIndividualPlans() ) {
-			for ( Activity act : TripStructureUtils.getActivities( plan , choiceSet.filter ) ) {
+			for ( Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ) ) {
 				assert act.getType().equals( choiceSet.type );
 				final Facility choice = groupChoiceSet.get( random.nextInt( groupChoiceSet.size() ) );
 				((Activity) act).setCoord( choice.getCoord() );
 				((Activity) act).setLinkId( choice.getLinkId() );
-				((Activity) act).setFacilityId( choice.getId() );
+				if ( choice instanceof Identifiable ) {
+					( (Activity) act ).setFacilityId( ((Identifiable)choice).getId() );
+				} else {
+					throw new RuntimeException( Facility.FACILITY_NO_LONGER_IDENTIFIABLE ) ;
+				}
 			}
 		}
 	}
 
-	private static class BasicFacility implements Facility {
+	private static class BasicFacility implements Facility, Identifiable {
 		private final Coord coord;
 		private final Id id;
 		private final Id link;
@@ -129,12 +133,15 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 	public static class ChoiceSet {
 		private final Map<Id, Set<Facility>> choiceSetPerPerson;
 		private final String type;
-		private final StageActivityTypes filter = new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(final String t) {
-				return !t.equals( type );
-			}
-		};
+		// TODO: This looks awkward. Not clear whether we can really assume that this in practice really identified only activity 
+		// types which end on "interaction" or whether we now miss some. In socnetsim all stage activity types are renamed to end
+		// on "interaction"
+//		private final StageActivityTypes filter = new StageActivityTypes() {
+//			@Override
+//			public boolean isStageActivity(final String t) {
+//				return !t.equals( type );
+//			}
+//		};
 
 		public ChoiceSet(
 				final Population population,
@@ -148,7 +155,7 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 				final Set<Facility> facilities = new HashSet<Facility>();
 				map.put( person.getId() , facilities );
 				for ( Plan plan : person.getPlans() ) {
-					for ( Activity act : TripStructureUtils.getActivities( plan , filter ) ) {
+					for ( Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ) ) {
 						assert act.getType().equals( type );
 						facilities.add(
 								pool.getPooledInstance( new BasicFacility( act ) ) );
@@ -170,7 +177,11 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 			Collections.sort( list , new Comparator<Facility>() {
 				@Override
 				public int compare(final Facility o1, final Facility o2) {
-					return o1.getId().compareTo( o2.getId() );
+					if ( o1 instanceof Identifiable && o2 instanceof Identifiable ) {
+						return ((Identifiable) o1).getId().compareTo( ((Identifiable) o2).getId() );
+					} else {
+						throw new RuntimeException( Facility.FACILITY_NO_LONGER_IDENTIFIABLE ) ;
+					}
 				}
 			});
 			return list;

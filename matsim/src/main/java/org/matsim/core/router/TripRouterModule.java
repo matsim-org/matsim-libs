@@ -22,13 +22,11 @@
 
 package org.matsim.core.router;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.pt.router.TransitRouterModule;
 
 
@@ -39,9 +37,11 @@ public class TripRouterModule extends AbstractModule {
 	    // yy The code below will install _one_ LeastCostPathCalculator, which will be Dijkstra or Landmarks or something.  It will be the
 	    // same Landmarks instance for all modes ... although one could do better by doing the preprocessing separately for the different modes.
 	    // kai/mm, jan'17
-	    
+
         bind(TripRouter.class); // not thread-safe, not a singleton
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
+        bind(AnalysisMainModeIdentifier.class).to(RoutingModeMainModeIdentifier.class);
+
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
         bind(SingleModeNetworksCache.class).asEagerSingleton();
@@ -64,13 +64,17 @@ public class TripRouterModule extends AbstractModule {
         }
         for (String mode : routeConfigGroup.getNetworkModes()) {
             addRoutingModuleBinding(mode).toProvider(linkToLinkRouting ? //
-                    new LinkToLinkRouting(mode) : new NetworkRouting(mode));
+                    new LinkToLinkRouting(mode) : new NetworkRoutingProvider(mode));
         }
         if (getConfig().transit().isUseTransit()) {
-            for (String mode : getConfig().transit().getTransitModes()) {
-                addRoutingModuleBinding(mode).toProvider(Transit.class);
+            if (getConfig().transit().getRoutingAlgorithmType() != TransitRoutingAlgorithmType.SwissRailRaptor) {
+                // the SwissRailRaptorModule adds the routingModuleBinding itself
+                for (String mode : getConfig().transit().getTransitModes()) {
+                    addRoutingModuleBinding(mode).toProvider(Transit.class);
+                }
             }
-            addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
+
+        this.bind( FallbackRoutingModule.class ).to( FallbackRoutingModuleDefaultImpl.class ) ;
     }
 }

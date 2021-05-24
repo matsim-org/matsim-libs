@@ -13,7 +13,6 @@ import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContain
 import org.matsim.contrib.carsharing.manager.demand.membership.PersonMembership;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -24,34 +23,32 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 	
 	private final String[] possibleModes;
 	//private boolean ignoreCarAvailability = true;
-
+	
 	private final Random rng;
 	private final Scenario scenario;
-	private MembershipContainer memberships; 
-
-	private final StageActivityTypes stageActivityTypes;
-	public ChooseRandomTripMode(final Scenario scenario, final String[] possibleModes, 
-			final Random rng, final StageActivityTypes stageActivityTypes, MembershipContainer memberships) {
+	private MembershipContainer memberships;
+	
+	public ChooseRandomTripMode(final Scenario scenario, final String[] possibleModes,
+								final Random rng, MembershipContainer memberships) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
-		this.stageActivityTypes = stageActivityTypes;
 		this.scenario = scenario;
 		this.memberships = memberships;
 	}
 	@Override
 	public void run(Plan plan) {
 		Id<Person> personId = plan.getPerson().getId();
-		List<Trip> t = TripStructureUtils.getTrips(plan, stageActivityTypes);
+		List<Trip> trips = TripStructureUtils.getTrips( plan );
 		boolean ffcard = false;
 		boolean owcard = false;
-		int cnt = t.size();
+		int cnt = trips.size();
 		if (cnt == 0) {
 			return;
 		}
-
+		
 		int rndIdx = this.rng.nextInt(cnt);
 		
-		for (Leg l:t.get(rndIdx).getLegsOnly()) {
+		for (Leg l:trips.get(rndIdx).getLegsOnly()) {
 			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twoway")) {
 				return;
 			}
@@ -65,50 +62,55 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			if (personMemmbership.getMembershipsPerCSType().containsKey("oneway"))
 				owcard = true;
 		}
+		// in case the person does not hold neither ff nor ow membership
+		// do not do anything
+		if (!ffcard && !owcard)
+			return;
 		
-			//don't change the trips between the same links
-			if (!t.get(rndIdx).getOriginActivity().getLinkId().toString().equals(t.get(rndIdx).getDestinationActivity().getLinkId().toString()))
-				setRandomTripMode(t.get(rndIdx), plan, ffcard, owcard);
-			else return;
-	}
+		// don't change the trips between the same links
+		if (trips.get(rndIdx).getOriginActivity().getFacilityId()!=null) {
+			if (! trips.get(rndIdx).getOriginActivity().getFacilityId().toString().equals(trips.get(rndIdx).getDestinationActivity().getFacilityId().toString()))
+				setRandomTripMode(trips.get(rndIdx), plan, ffcard, owcard);
+		} else{
+			if (! trips.get(rndIdx).getOriginActivity().getLinkId().toString().equals(trips.get(rndIdx).getDestinationActivity().getLinkId().toString()))
+				setRandomTripMode(trips.get(rndIdx), plan, ffcard, owcard);
+		}
 
-	private void setRandomTripMode(final Trip trip, final Plan plan, boolean ffcard, boolean owcard) {		
+	}
+	
+	private void setRandomTripMode(final Trip trip, final Plan plan, boolean ffcard, boolean owcard) {
 		
 		//carsharing is the new trip
 		if (possibleModes.length == 2) {
-		if(rng.nextBoolean()) {
-			if (owcard)
-			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					Collections.singletonList( PopulationUtils.createLeg("oneway") ),
-					trip.getDestinationActivity());
-		}
-		else {
-			if (ffcard)
-			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					Collections.singletonList( PopulationUtils.createLeg("freefloating") ),
-					trip.getDestinationActivity());
-		}
+			if(rng.nextBoolean()) {
+				if (owcard)
+					TripRouter.insertTrip(
+							plan,
+							trip.getOriginActivity(),
+							Collections.singletonList( PopulationUtils.createLeg("oneway") ),
+							trip.getDestinationActivity());
+			}
+			else {
+				if (ffcard)
+					TripRouter.insertTrip(
+							plan,
+							trip.getOriginActivity(),
+							Collections.singletonList( PopulationUtils.createLeg("freefloating") ),
+							trip.getDestinationActivity());
+			}
 		}
 		else if (possibleModes.length == 1 && possibleModes[0] != null){
 			if ((possibleModes[0].equals("freefloating") && ffcard) || (possibleModes[0].equals("oneway") && owcard))
-			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					Collections.singletonList( PopulationUtils.createLeg(possibleModes[0]) ),
-					trip.getDestinationActivity());
+				TripRouter.insertTrip(
+						plan,
+						trip.getOriginActivity(),
+						Collections.singletonList( PopulationUtils.createLeg(possibleModes[0]) ),
+						trip.getDestinationActivity());
 		}
 		else
-			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					trip.getTripElements(),
-					trip.getDestinationActivity());
-	
+			return;
+		
 	}
-
-
+	
+	
 }

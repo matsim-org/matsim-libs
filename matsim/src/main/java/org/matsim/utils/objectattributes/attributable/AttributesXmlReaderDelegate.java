@@ -1,4 +1,25 @@
-package org.matsim.utils.objectattributes.attributable;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AttributesXmlReaderDelegate.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.utils.objectattributes.attributable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,7 +28,9 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
 import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
 import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
@@ -21,7 +44,7 @@ import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
  */
 public class AttributesXmlReaderDelegate {
 	private final static Logger log = Logger.getLogger(AttributesXmlReaderDelegate.class);
-	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
+	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
 	private Attributes currentAttributes = null;
 	private String currentAttribute = null;
@@ -31,17 +54,6 @@ public class AttributesXmlReaderDelegate {
 	/*package*/ final static String TAG_ATTRIBUTE = "attribute";
 	/*package*/ final static String ATTR_ATTRIBUTENAME = "name";
 	/*package*/ final static String ATTR_ATTRIBUTECLASS = "class";
-
-	private final Set<String> missingConverters = new HashSet<String>();
-
-	public AttributesXmlReaderDelegate() {
-		this.converters.put(String.class.getCanonicalName(), new StringConverter());
-		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter());
-		this.converters.put(Float.class.getCanonicalName(), new FloatConverter());
-		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter());
-		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter());
-		this.converters.put(Long.class.getCanonicalName(), new LongConverter());
-	}
 
 	public void startTag(String name,
 						 org.xml.sax.Attributes atts,
@@ -57,15 +69,10 @@ public class AttributesXmlReaderDelegate {
 
 	public void endTag(String name, String content, Stack<String> context) {
 		if (TAG_ATTRIBUTE.equals(name)) {
-			AttributeConverter<?> c = this.converters.get(this.currentAttributeClass);
-			if (c == null) {
-				if (missingConverters.add(this.currentAttributeClass)) {
-					log.warn("No AttributeConverter found for class " + this.currentAttributeClass + ". Not all attribute values can be read.");
-				}
-			} else {
-				Object o = c.convert(content);
-				this.currentAttributes.putAttribute( this.currentAttribute, o);
-			}
+			Object o = converter.convert(this.currentAttributeClass, content);
+			if (o == null) return;
+			Gbl.assertNotNull( this.currentAttributes );
+			this.currentAttributes.putAttribute( this.currentAttribute, o);
 		}
 	}
 
@@ -81,7 +88,7 @@ public class AttributesXmlReaderDelegate {
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
 	public AttributeConverter<?> putAttributeConverter(final Class<?> clazz, final AttributeConverter<?> converter) {
-		return this.converters.put(clazz.getCanonicalName(), converter);
+		return this.converter.putAttributeConverter(clazz, converter);
 	}
 
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
@@ -97,22 +104,6 @@ public class AttributesXmlReaderDelegate {
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
 	public AttributeConverter<?> removeAttributeConverter(final Class<?> clazz) {
-		return this.converters.remove(clazz.getCanonicalName());
-	}
-	
-	/**
-	 * Convert the String into an Object of the given Class.
-	 * Needed for custom attributes in xsd format files like lanes or signals.
-	 */
-	public final Object convertObjectFromXSDFormat(String object, String clazz) {
-		AttributeConverter<?> c = this.converters.get(clazz);
-		if (c == null) {
-			if (missingConverters.add(this.currentAttributeClass)) {
-				log.warn("No AttributeConverter found for class " + clazz + ". Read as String.");
-			}
-			return object;
-		} else {
-			return c.convert(object);
-		}
+		return this.converter.removeAttributeConverter(clazz);
 	}
 }

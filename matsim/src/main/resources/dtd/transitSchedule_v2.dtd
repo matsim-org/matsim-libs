@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT transitSchedule  (attributes?,transitStops?,minimalTransferTimes?,transitLine*)>
+
+
+<!ELEMENT attributes    (attribute*)>
+
+<!ELEMENT attribute       (#PCDATA)>
+<!ATTLIST attribute
+          name             CDATA #REQUIRED
+          class            CDATA #REQUIRED>
+
+<!ELEMENT transitStops     (stopFacility)*>
+
+<!ELEMENT stopFacility     (attributes?)>
+<!ATTLIST stopFacility
+          id               CDATA   #REQUIRED
+          x                CDATA   #REQUIRED
+          y                CDATA   #REQUIRED
+          z                CDATA   #IMPLIED
+          linkRefId        CDATA   #IMPLIED
+          name             CDATA   #IMPLIED
+          stopAreaId       CDATA   #IMPLIED
+          isBlocking       (true|false)  "false">
+
+<!ELEMENT minimalTransferTimes    (relation*)>
+
+<!ELEMENT relation         EMPTY>
+<!ATTLIST relation
+          fromStop         CDATA   #REQUIRED
+          toStop           CDATA   #REQUIRED
+          transferTime     CDATA   #REQUIRED>
+<!-- relations specify the transferTime in seconds between two stop facilities in the specified direction -->
+
+<!ELEMENT transitLine      (attributes?,transitRoute*)>
+<!ATTLIST transitLine
+          id               CDATA   #REQUIRED
+          name             CDATA   #IMPLIED>
+
+<!ELEMENT transitRoute     (attributes?,description?,transportMode,routeProfile,route?,departures)>
+<!ATTLIST transitRoute
+          id               CDATA   #REQUIRED>
+<!-- transitRoute.id must be unique within a transitLine only. -->
+
+<!ELEMENT description      (#PCDATA)>
+
+<!ELEMENT transportMode    (#PCDATA)>
+<!-- describes the mode of which vehicles are that serve that line/route -->
+
+<!ELEMENT routeProfile     (stop)*>
+
+<!ELEMENT stop             EMPTY>
+<!ATTLIST stop
+          refId            CDATA   #REQUIRED
+          departureOffset  CDATA   #IMPLIED
+          arrivalOffset    CDATA   #IMPLIED
+          awaitDeparture   (true|false)  "false">
+<!--
+ * stop.departureOffset is required for all stops but the last.
+   The offsets are to be added to the departure times of the single
+   departures listed in the transitRoute.
+ * stop.refId are id-references to facilities. -->
+
+<!ELEMENT route            (link)*>
+
+<!ELEMENT link             EMPTY>
+<!ATTLIST link
+          refId            CDATA   #REQUIRED>
+
+<!ELEMENT departures       (departure*)>
+<!-- the single departures along that transitRoute -->
+
+<!ELEMENT departure        (attributes?)>
+<!ATTLIST departure
+          id               CDATA   #REQUIRED
+          departureTime    CDATA   #REQUIRED
+          vehicleRefId     CDATA   #IMPLIED>
+<!-- the departure.id must be unique within a transitLine only -->

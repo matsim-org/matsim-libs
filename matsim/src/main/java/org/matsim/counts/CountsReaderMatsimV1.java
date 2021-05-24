@@ -20,8 +20,6 @@
 
 package org.matsim.counts;
 
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,6 +28,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import java.util.Stack;
 
 /**
  * A reader for counts-files of MATSim according to <code>counts_v1.xsd</code>.
@@ -85,11 +85,6 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 	private void startCount(final Attributes meta) {
 		String locId = meta.getValue("loc_id");
 		this.currcount = this.counts.createAndAddCount(Id.create(locId, Link.class), meta.getValue("cs_id"));
-		if (this.currcount == null) {
-			log.warn("There is already a counts object for location " + locId +
-					". The counts for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");
-			return;
-		}
 		String x = meta.getValue("x");
 		String y = meta.getValue("y");
 		if (x != null && y != null) {

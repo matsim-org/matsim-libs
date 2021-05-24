@@ -19,38 +19,40 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.LanesReader;
+import org.matsim.lanes.LanesReader;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.vehicles.MatsimVehicleReader;
 
-import com.google.inject.Inject;
+
+import java.net.URL;
+import java.util.*;
+
+import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_DEPRECATION_MESSAGE;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -103,9 +105,11 @@ class ScenarioLoaderImpl {
 	 * @return the Scenario
 	 */
 	Scenario loadScenario() {
-		String currentDir = new File("tmp").getAbsolutePath();
-		currentDir = currentDir.substring(0, currentDir.length() - 3);
-		log.info("loading scenario from base directory: " + currentDir);
+//		String currentDir = new File("tmp").getAbsolutePath();
+//		currentDir = currentDir.substring(0, currentDir.length() - 3);
+//		log.info("loading scenario from base directory: " + currentDir);
+		// the above is not used and thus only causing confusion in the log output.  kai, sep'18
+
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
@@ -128,21 +132,15 @@ class ScenarioLoaderImpl {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
-			if ( config.network().getInputCRS() == null ) {
-				MatsimNetworkReader reader = new MatsimNetworkReader(this.scenario.getNetwork());
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse(networkUrl);
-			}
-			else {
-				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								config.network().getInputCRS(),
-								config.global().getCoordinateSystem() );
-				MatsimNetworkReader reader = new MatsimNetworkReader( transformation , this.scenario.getNetwork());
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse(networkUrl);
-			}
+			String inputCRS = config.network().getInputCRS();
+
+			MatsimNetworkReader reader =
+					new MatsimNetworkReader(
+							inputCRS,
+							config.global().getCoordinateSystem(),
+							this.scenario.getNetwork());
+            reader.putAttributeConverters( attributeConverters );
+            reader.parse(networkUrl);
 
 			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
@@ -163,73 +161,83 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.facilities().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
-			}
-			else {
-				log.info( "re-projecting facilities from "+inputCRS+" to "+internalCRS+" for import" );
+            MatsimFacilitiesReader reader = new MatsimFacilitiesReader(inputCRS, internalCRS, this.scenario.getActivityFacilities());
+            reader.putAttributeConverters(attributeConverters);
+            reader.parse(facilitiesFileName);
 
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				new MatsimFacilitiesReader(transformation , this.scenario).parse(facilitiesFileName);
-			}
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
 		else {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
+			if ( !this.config.facilities().isInsistingOnUsingDeprecatedFacilitiesAttributeFile() ) {
+				throw new RuntimeException(FacilitiesConfigGroup.FACILITIES_ATTRIBUTES_DEPRECATION_MESSAGE) ;
+			}
 			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), this.config.facilities().getInputFacilitiesAttributesFile());
 			log.info("loading facility attributes from " + facilitiesAttributesURL);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(facilitiesAttributesURL);
+			parseObjectAttributesToAttributable(
+					facilitiesAttributesURL,
+					scenario.getActivityFacilities().getFacilities().values(),
+					"facilityAttributes not empty after going through all facilities, meaning that it contains material for facilityIDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 		else {
 			log.info("no facility-attributes file set in config, not loading any facility attributes");
 		}
 	}
 
+
 	private void loadPopulation() {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			URL populationFileName = this.config.plans().getInputFileURL(this.config.getContext());
 			log.info("loading population from " + populationFileName);
 
-			if ( config.plans().getInputCRS() == null ) {
-				final PopulationReader reader = new PopulationReader(this.scenario);
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse( populationFileName );
-			}
-			else {
-				final String inputCRS = config.plans().getInputCRS();
-				final String internalCRS = config.global().getCoordinateSystem();
+            final String targetCRS = config.global().getCoordinateSystem();
+			final String internalCRS = config.global().getCoordinateSystem();
 
-				log.info( "re-projecting population from "+inputCRS+" to "+internalCRS+" for import" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse( populationFileName );
-			}
+            final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, this.scenario);
+            reader.putAttributeConverters( attributeConverters );
+            reader.parse( populationFileName );
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}
 		else {
 			log.info("no population file set in config, not able to load population");
 		}
+
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
 			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesURL);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(personAttributesURL);
+			parseObjectAttributesToAttributable(
+					personAttributesURL,
+					scenario.getPopulation().getPersons().values(),
+					"personAttributes not empty after going through all persons, meaning that it contains material for personIDs that " +
+							"are not in the population.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.  (We have this happening in particular when the same personAttributes " +
+							"file is used for the 10pct and the 1pct scenario. The material that is still there will follow.  kai, jun'19"
+			);
+
+			final String outputDirectory = this.config.controler().getOutputDirectory();
+//			final File outDir = new File( outputDirectory );
+//			if ( outDir.exists() && outDir.canWrite() ){
+//				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
+//				// this stage. One could maybe write to the "config.getContext()" directory.  However, sometimes this is a URL, and thus also
+//				// non-writeable, and it is even less systematic than writing into the output directory. kai, jun'19
+//
+//				String outFilename = outputDirectory + "/input_plans_with_person_attributes.xml.gz";
+//				PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
+//
+//				log.warn(
+//					  "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
+//						    "the persons. " );
+//			}
+			// TD says to rather not have this kind of side effect.  kai, jul'19
+
+			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
+				throw new RuntimeException(PERSON_ATTRIBUTES_DEPRECATION_MESSAGE) ;
+			}
 		}
 		else {
 			log.info("no person-attributes file set in config, not loading any person attributes");
@@ -248,11 +256,18 @@ class ScenarioLoaderImpl {
 		}
 		final String fn = this.config.households().getInputHouseholdAttributesFile();
 		if ((this.config.households() != null) && ( fn != null)) {
+			if (!this.config.households().isInsistingOnUsingDeprecatedHouseholdsAttributeFile()) {
+				throw new RuntimeException(HouseholdsConfigGroup.HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE);
+			}
+
 			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
 			log.info("loading household attributes from " + householdAttributesFileName);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(householdAttributesFileName);
+			parseObjectAttributesToAttributable(
+					householdAttributesFileName,
+					this.scenario.getHouseholds().getHouseholds().values(),
+					"householdAttributes not empty after going through all households, meaning that it contains material for householdIDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -266,38 +281,40 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new TransitScheduleReader(this.scenario).readURL(this.config.transit().getTransitScheduleFileURL(this.config.getContext()));
-			}
-			else {
-				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
-			}
+            new TransitScheduleReader( inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile );
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
 		}
 
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
-			URL transitLinesAttributesFileName = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
+			if (!this.config.transit().isInsistingOnUsingDeprecatedAttributeFiles()) {
+				throw new RuntimeException(TransitConfigGroup.TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE);
+			}
+
+			URL transitLinesAttributesFileName = IOUtils.extendUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(transitLinesAttributesFileName);
+			parseObjectAttributesToAttributable(
+					transitLinesAttributesFileName,
+					this.scenario.getTransitSchedule().getTransitLines().values(),
+					"transit lines attributes not empty after going through all lines, meaning that it contains material for line IDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
-			URL transitStopsAttributesURL = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
+			if (!this.config.transit().isInsistingOnUsingDeprecatedAttributeFiles()) {
+				throw new RuntimeException(TransitConfigGroup.TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE);
+			}
+
+			URL transitStopsAttributesURL = IOUtils.extendUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesURL);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(transitStopsAttributesURL);
+			parseObjectAttributesToAttributable(
+					transitStopsAttributesURL,
+					this.scenario.getTransitSchedule().getFacilities().values(),
+					"transit stops attributes not empty after going through all stops, meaning that it contains material for stop IDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 	}
 
@@ -305,7 +322,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading transit vehicles from " + vehiclesFile);
-			new VehicleReaderV1(this.scenario.getTransitVehicles()).parse(this.config.transit().getVehiclesFileURL(this.config.getContext()));
+			new MatsimVehicleReader(this.scenario.getTransitVehicles()).readURL(this.config.transit().getVehiclesFileURL(this.config.getContext() ) );
 		}
 		else {
 			log.info("no transit vehicles file set in config, not loading any transit vehicles");
@@ -315,7 +332,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			new VehicleReaderV1(this.scenario.getVehicles()).parse(IOUtils.newUrl(this.config.getContext(), vehiclesFile));
+			new MatsimVehicleReader(this.scenario.getVehicles()).readURL(IOUtils.extendUrl(this.config.getContext(), vehiclesFile ) );
 		} 
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
@@ -326,10 +343,38 @@ class ScenarioLoaderImpl {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			LanesReader reader = new LanesReader(this.scenario);
-			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
+			reader.readURL( ConfigGroup.getInputFileURL(this.config.getContext(), filename ) );
 		}
 		else {
 			log.info("no lanes file set in config, not loading any lanes");
+		}
+	}
+
+	private <T extends Identifiable<?> & Attributable> void parseObjectAttributesToAttributable(
+			URL url,
+			Iterable<T> attributables,
+			String message) {
+		final ObjectAttributes attributes = new ObjectAttributes();
+		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attributes);
+		reader.putAttributeConverters( attributeConverters );
+		reader.parse(url);
+
+		for( T facility : attributables ) {
+			Collection<String> keys = ObjectAttributesUtils.getAllAttributeNames( attributes, facility.getId().toString() );
+			for( String key : keys ){
+				Object value = attributes.getAttribute( facility.getId().toString(), key );
+				facility.getAttributes().putAttribute( key, value ) ;
+			}
+			attributes.removeAllAttributes( facility.getId().toString() );
+		}
+		// (some of the above could also become a static helper method in ObjectAttributesUtils, but this here seems the only
+		// place within matsim core where the personAttributes are automatically read so maybe there is no need for this. kai, jun'19)
+
+		if ( !attributes.toString().equals( "" ) ) {
+			log.warn( message ) ;
+			log.warn( "showing the first 1000 characters from the remaining personAttributes ...") ;
+			log.warn( attributes.toString().substring( 0, Math.min(attributes.toString().length(), 1000 ) ) );
+			log.warn("");
 		}
 	}
 

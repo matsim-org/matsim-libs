@@ -32,7 +32,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
@@ -42,7 +42,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  */
 public class RunFlexibleQNetworkFactoryExample {
 
-	static class MyQNetworkFactory extends QNetworkFactory {
+	static final class MyQNetworkFactory implements QNetworkFactory {
 		@Inject private EventsManager events ;
 		@Inject private Scenario scenario ; // yyyyyy I would like to get rid of this. kai, mar'16
 		@Inject private Network network ;
@@ -51,7 +51,8 @@ public class RunFlexibleQNetworkFactoryExample {
 		private NetsimEngineContext context;
 		private NetsimInternalInterface netsimEngine;
 
-		@Override void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+		@Override
+		public final void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
 			
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -59,23 +60,26 @@ public class RunFlexibleQNetworkFactoryExample {
 			if (! Double.isNaN(network.getEffectiveLaneWidth())){
 				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 			}
-			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 			
 			this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 			
 			this.netsimEngine = netsimEngine1 ;
 		}
-		@Override QNodeI createNetsimNode(Node node) {
-			QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		@Override
+		public final QNodeI createNetsimNode( Node node ) {
+			QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
 			return builder.build( node ) ;
 			
 		}
-		@Override QLinkI createNetsimLink(Link link, QNodeI queueNode) {
-			QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
-			
+		@Override
+		public final QLinkI createNetsimLink( Link link, QNodeI queueNode ) {
+
 			QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
-			linkBuilder.setLaneFactory(laneBuilder);
-			
+			{
+				QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder( context );
+				linkBuilder.setLaneFactory( laneBuilder );
+			}
 			return linkBuilder.build(link, queueNode) ;
 		}
 	}

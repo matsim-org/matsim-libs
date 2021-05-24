@@ -49,13 +49,14 @@ import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author thibautd
  */
 public class InsertionRemovalIterativeActionTest {
-	private static int N_COUPLES = 100;
+	private final static int N_COUPLES = 100;
 	private Config config;
 	private TripRouter tripRouter;
 	private Random random;
@@ -68,7 +69,8 @@ public class InsertionRemovalIterativeActionTest {
 	@Before
 	public void init() {
 		config = JointScenarioUtils.createConfig();
-		tripRouter = new  TripRouter();
+//		tripRouter = new  TripRouter();
+		tripRouter = new TripRouter.Builder( config ).build() ;
 		random = new Random( 1234 );
 	}
 
@@ -77,9 +79,10 @@ public class InsertionRemovalIterativeActionTest {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
-					tripRouter,
 					random,
-					false);
+					false,
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
+					);
 		JointPlan jointPlan = createPlanWithJointTrips();
 		algo.run( jointPlan );
 
@@ -119,9 +122,10 @@ public class InsertionRemovalIterativeActionTest {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
-					tripRouter,
 					random,
-					true);
+					true,
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
+					);
 		JointPlan jointPlan = createPlanWithJointTrips();
 		algo.run( jointPlan );
 
@@ -161,9 +165,10 @@ public class InsertionRemovalIterativeActionTest {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
-					tripRouter,
 					random,
-					false);
+					false,
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
+					);
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 		algo.run( jointPlan );
 
@@ -219,9 +224,10 @@ public class InsertionRemovalIterativeActionTest {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
 					ScenarioUtils.createScenario( config ),
-					tripRouter,
 					random,
-					true);
+					true,
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
+					);
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 		algo.run( jointPlan );
 
@@ -276,38 +282,36 @@ public class InsertionRemovalIterativeActionTest {
 	private JointPlan createPlanWithJointTrips() {
 		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
-		Id puLink = Id.create( "pu" , Link.class );
-		Id doLink = Id.create( "do" , Link.class );
+		Id<Link> puLink = Id.create( "pu" , Link.class );
+		Id<Link> doLink = Id.create( "do" , Link.class );
 
 		for (int i=0; i < N_COUPLES; i++) {
-			Id driverId = Id.create( "driver"+i , Person.class );
-			final Id<Person> id = driverId;
-			Person person = PopulationUtils.getFactory().createPerson(id);
+			Id<Person> driverId = Id.create( "driver"+i , Person.class );
+			Person person = PopulationUtils.getFactory().createPerson(driverId);
 			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class )).setEndTime( 10 );
-			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			Leg leg5 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 			final Id<Link> linkId = puLink;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId).setMaximumDuration( 0 );
-			Leg driverLeg1 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
+			Leg leg4 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
+			Leg driverLeg1 = leg4;
 			final Id<Link> linkId1 = doLink;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId1).setMaximumDuration( 0 );
-			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			Leg leg3 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_d"+i, Id.create( "nowhere" , Link.class ));
 
-			Id passengerId = Id.create( "passenger"+i , Person.class );
-			final Id<Person> id1 = passengerId;
-			person = PopulationUtils.getFactory().createPerson(id1);
+			Id<Person> passengerId = Id.create( "passenger"+i , Person.class );
+			person = PopulationUtils.getFactory().createPerson( passengerId );
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class )).setEndTime( 10 );
-			PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
-			final Id<Link> linkId2 = puLink;
-			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId2).setMaximumDuration( 0 );
-			Leg passengerLeg1 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.PASSENGER );
-			final Id<Link> linkId3 = doLink;
-			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId3).setMaximumDuration( 0 );
-			PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+			Leg leg2 = PopulationUtils.createAndAddLeg( plan, TransportMode.walk ) ;
+			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, puLink ).setMaximumDuration( 0 );
+			Leg leg1 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.PASSENGER ) ;
+			Leg passengerLeg1 = leg1;
+			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, doLink ).setMaximumDuration( 0 );
+			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk ) ;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_p"+i, Id.create( "space" , Link.class ));
 
 			DriverRoute driverRoute = new DriverRoute( puLink , doLink );
@@ -337,19 +341,18 @@ public class InsertionRemovalIterativeActionTest {
 			Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class ));
 			act.setEndTime( 10 );
 			act.setCoord( coord1 );
-			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_d"+i, Id.create( "nowhere" , Link.class ));
 			act.setCoord( coord2 );
 
-			Id passengerId1 = Id.create( "passenger"+i , Person.class );
-			final Id<Person> id1 = passengerId1;
-			person = PopulationUtils.getFactory().createPerson(id1);
+			Id<Person> passengerId1 = Id.create( "passenger"+i , Person.class );
+			person = PopulationUtils.getFactory().createPerson( passengerId1 );
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId1 , plan );
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class ));
 			act.setEndTime( 10 );
 			act.setCoord( coord1 );
-			PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_p"+i, Id.create( "space" , Link.class ));
 			act.setCoord( coord2 );
 		}

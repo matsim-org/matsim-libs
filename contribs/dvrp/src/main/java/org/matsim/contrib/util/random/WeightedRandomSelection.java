@@ -19,12 +19,14 @@
 
 package org.matsim.contrib.util.random;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class WeightedRandomSelection<T> {
-	private List<Entry<T>> entryList = new ArrayList<>();
+	private final List<Entry<T>> entryList = new ArrayList<>();
 	private double totalWeight = 0;
-	private UniformRandom uniform;
+	private final UniformRandom uniform;
 
 	public WeightedRandomSelection() {
 		this(RandomUtils.getGlobalUniform());
@@ -35,17 +37,25 @@ public class WeightedRandomSelection<T> {
 	}
 
 	public void add(T obj, double weight) {
+		if (weight < 0 || !Double.isFinite(weight)) {
+			throw new IllegalArgumentException("Weight must be non-negative and finite");
+		}
+
 		totalWeight += weight;
-		entryList.add(new Entry<T>(obj, totalWeight));
+		if (Double.isInfinite(totalWeight)) {
+			throw new ArithmeticException("Total weight is infinite");
+		}
+
+		entryList.add(new Entry<>(obj, totalWeight));
 	}
 
 	public T select() {
 		if (entryList.size() == 0) {
-			return null;
+			throw new IllegalStateException("No entries in the list to select from");
 		}
 
 		double rnd = uniform.nextDouble(0, totalWeight);
-		int idx = Collections.binarySearch(entryList, new Entry<T>(null, rnd));
+		int idx = Collections.binarySearch(entryList, new Entry<>(null, rnd));
 
 		if (idx < 0) {
 			idx = -idx - 1;

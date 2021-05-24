@@ -41,17 +41,20 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.analysis.TransitRouteAccessEgressAnalysis;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.analysis.VehicleTracker;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -60,14 +63,11 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import org.matsim.pt.analysis.VehicleTracker;
 
 public class BlockingStopDemo {
 
@@ -177,10 +177,10 @@ public class BlockingStopDemo {
 		Vehicles vehicles = this.scenario.getTransitVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-		VehicleCapacity capacity = vb.createVehicleCapacity();
-		capacity.setSeats(101);
-		capacity.setStandingRoom(0);
-		vehicleType.setCapacity(capacity);
+//		VehicleCapacity capacity = vb.createVehicleCapacity();
+		vehicleType.getCapacity().setSeats(101);
+		vehicleType.getCapacity().setStandingRoom(0);
+//		vehicleType.setCapacity(capacity);
 		vehicles.addVehicleType(vehicleType);
 		Id<Vehicle> id = Id.create("tr_1", Vehicle.class);
 		vehicles.addVehicle( vb.createVehicle(id, vehicleType));
@@ -204,7 +204,7 @@ public class BlockingStopDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(i-1, TransitStopFacility.class)), tLine1, tRoute1, schedule.getFacilities().get(Id.create(nOfStops-1, TransitStopFacility.class))));
+			leg.setRoute(new DefaultTransitPassengerRoute(schedule.getFacilities().get(Id.create(i-1, TransitStopFacility.class)), tLine1, tRoute1, schedule.getFacilities().get(Id.create(nOfStops-1, TransitStopFacility.class))));
 			Activity act2 = pb.createActivityFromLinkId("work", Id.create(nOfLinks-1, Link.class));
 
 			population.addPerson(person);
@@ -222,7 +222,7 @@ public class BlockingStopDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(nOfLinks+i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, TransitStopFacility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, TransitStopFacility.class))));
+			leg.setRoute(new DefaultTransitPassengerRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, TransitStopFacility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, TransitStopFacility.class))));
 			Activity act2 = pb.createActivityFromLinkId("work", Id.create(2*nOfLinks-1, Link.class));
 
 			population.addPerson(person);
@@ -289,8 +289,16 @@ public class BlockingStopDemo {
 		TravelTimeCalculator ttc = new TravelTimeCalculator(this.scenario.getNetwork(), 120, 7*3600+1800, new TravelTimeCalculatorConfigGroup());
 		events.addHandler(ttc);
 
-		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events);
-		sim.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
+		final QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.addOverridingModule( new AbstractModule() {
+					@Override
+					public void install() {
+						bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class)
+								.asEagerSingleton();
+					}
+				} ) //
+				.build(scenario, events);
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
 		OTFClientLive.run(this.scenario.getConfig(), server);

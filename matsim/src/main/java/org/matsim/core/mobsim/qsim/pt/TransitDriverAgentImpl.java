@@ -19,20 +19,27 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
@@ -41,9 +48,6 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Iterator;
-import java.util.ListIterator;
 
 /**
  * @author michaz
@@ -56,7 +60,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 		final Plan plan = PopulationUtils.createPlan();
 
-		final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
+		static final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 		public void addTrip(NetworkRoute networkRoute, String transportMode) {
 			Activity lastActivity;
@@ -186,8 +190,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 	
 	@Override
-	public Double getExpectedTravelTime() {
-		return ((Leg) this.currentPlanElement).getTravelTime() ;
+	public OptionalTime getExpectedTravelTime() {
+		return ((Leg) this.currentPlanElement).getTravelTime();
 	}
 
     @Override
@@ -284,7 +288,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		PlanElement pe = this.getCurrentPlanElement() ;
 		Activity activity ;
 		if ( pe instanceof Activity ) {
@@ -294,28 +298,19 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		} else {
 			throw new RuntimeException("unexpected type of PlanElement") ;
 		}
-		ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-		if ( fac != null ) {
-			return fac ;
-		} else {
-			return new ActivityWrapperFacility( activity ) ; 
-		}
+		return  FacilitiesUtils.toFacility( activity, this.scenario.getActivityFacilities() );
+
 		// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 		// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
 		// facility should then sit in the leg (since there it is used for routing).  kai, dec'15
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if ( pe instanceof Leg ) {
 			Activity activity = (Activity)this.getNextPlanElement() ;
-			ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-			if ( fac != null ) {
-				return fac ;
-			} else {
-				return new ActivityWrapperFacility( activity ) ; 
-			}
+			return  FacilitiesUtils.toFacility( activity, this.scenario.getActivityFacilities() );
 		} else if ( pe instanceof Activity ) {
 			return null ;
 		}

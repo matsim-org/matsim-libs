@@ -20,45 +20,23 @@
 
 package org.matsim.core.config;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
-import org.matsim.core.config.groups.ChangeModeConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.HouseholdsConfigGroup;
-import org.matsim.core.config.groups.LinkStatsConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PtCountsConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
-import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
-import org.matsim.core.config.groups.VehiclesConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.*;
+import org.matsim.core.mobsim.hermes.HermesConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -107,6 +85,7 @@ public final class Config implements MatsimExtensionPoint {
 	private VehiclesConfigGroup vehicles = null ;
 	private ChangeModeConfigGroup changeMode = null;
 	private JDEQSimConfigGroup jdeqSim = null;
+    private HermesConfigGroup hermes = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<>();
 
@@ -211,8 +190,13 @@ public final class Config implements MatsimExtensionPoint {
 		this.jdeqSim = new JDEQSimConfigGroup();
 		this.modules.put(JDEQSimConfigGroup.NAME, this.jdeqSim);
 
+        this.hermes = new HermesConfigGroup();
+        this.modules.put(HermesConfigGroup.NAME, this.hermes);
+
+
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
+		this.addConfigConsistencyChecker(new BeanValidationConfigConsistencyChecker());
 	}
 
 	/**
@@ -282,20 +266,30 @@ public final class Config implements MatsimExtensionPoint {
 		if (m != null) {
 			// (3) this is the corresponding test: m is general, module is specialized:
 			if (m.getClass() == ConfigGroup.class && specializedConfigModule.getClass() != ConfigGroup.class) {
-
 				// (4) go through everything in m (from parsing) and add it to module:
-				for (Map.Entry<String, String> e : m.getParams().entrySet()) {
-					specializedConfigModule.addParam(e.getKey(), e.getValue());
-				}
+				copyTo(m, specializedConfigModule);
 
 				// (5) register the resulting module under "name" (which will over-write m):
 				this.modules.put(name, specializedConfigModule);
-
 			} else {
 				throw new IllegalArgumentException("Module " + name + " exists already.");
 			}
 		}
 		this.modules.put(name, specializedConfigModule);
+	}
+
+	private static void copyTo(ConfigGroup source, ConfigGroup destination) {
+		for (Map.Entry<String, String> e : source.getParams().entrySet()) {
+			destination.addParam(e.getKey(), e.getValue());
+		}
+
+		for (Collection<? extends ConfigGroup> sourceSets : source.getParameterSets().values()) {
+			for (ConfigGroup sourceSet : sourceSets) {
+				ConfigGroup destinationSet = destination.createParameterSet(sourceSet.getName());
+				copyTo(sourceSet, destinationSet);
+				destination.addParameterSet(destinationSet);
+			}
+		}
 	}
 
 	/**
@@ -420,9 +414,7 @@ public final class Config implements MatsimExtensionPoint {
 			m = createModule(moduleName);
 			log.info("module \"" + moduleName + "\" added.");
 		}
-		if (m != null) {
-			m.addParam(paramName, value);
-		}
+		m.addParam(paramName, value);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -521,6 +513,10 @@ public final class Config implements MatsimExtensionPoint {
 		return this.jdeqSim;
 	}
 
+    public HermesConfigGroup hermes() {
+        return this.hermes;
+    }
+
 	// other:
 
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {
@@ -537,6 +533,12 @@ public final class Config implements MatsimExtensionPoint {
 		}
 	}
 
+	public void removeConfigConsistencyChecker( final Class clazz ) {
+		// I am not saying that I like this.  But I would like to be able to check config consistency before the iterator is created, but by then we still have
+		// unmaterialized config groups, and so I need to remove that checker at that point.  Maybe we can sort this in some different way ...
+		consistencyCheckers.removeIf( ch -> ch.getClass().equals( clazz ) );
+	}
+
 	public final boolean isLocked() {
 		return this.locked;
 	}
@@ -548,9 +550,15 @@ public final class Config implements MatsimExtensionPoint {
 	private void checkIfLocked() {
 		if ( this.isLocked() ) {
 			log.error("too late in execution sequence to set config items. Use");
-			log.error("Config config = ConfigUtils.loadConfig(filename); ");
-			log.error("config.xxx().setYyy(...); ");
-			log.error("Controler ctrl = new Controler( config );");
+			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("   config.xxx().setYyy(...); ");
+			log.error("   Controler ctrl = new Controler( config );");
+			log.error("or") ;
+			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("   config.xxx().setYyy(...); ");
+			log.error("   Scenario scenario = ScenarioUtils.loadScenario(config);") ;
+			log.error("   // do something with scenario") ;
+			log.error("   Controler ctrl = new Controler( scenario );");
 			log.error("This will be changed to an abortive error in the future."); // kai, feb'13
 		}
 	}
@@ -558,9 +566,16 @@ public final class Config implements MatsimExtensionPoint {
 	public final VehiclesConfigGroup vehicles() {
 		return vehicles;
 	}
-
+	
 	public void setContext(URL context) {
-		log.info( "setting context to [" + context + "]" ) ;
+		if ( this.context==null  ||  !(context.toString().equals( this.context.toString() ) ) ) {
+			log.info("setting context to [" + context + "]");
+			// ConfigUtils.createConfig() is used at several places, e.g. when generating an empty
+			// scenario to obtain the default factories.  This will evidently produce output here,
+			// and in some sense the wrong output, since the relevant context is probably set from
+			// some config file path and in fact _not_ changed since this here will be a different
+			// ``throwaway'' config instance.  :-(  kai, jun'18
+		}
 		this.context = context;
 	}
 

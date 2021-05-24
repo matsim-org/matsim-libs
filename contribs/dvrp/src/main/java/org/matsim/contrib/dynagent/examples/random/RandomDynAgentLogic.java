@@ -22,7 +22,11 @@ package org.matsim.contrib.dynagent.examples.random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentLogic;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.common.collect.Iterators;
@@ -51,7 +55,7 @@ public class RandomDynAgentLogic implements DynAgentLogic {
 	public DynAction computeNextAction(DynAction oldAction, double now) {
 		// I am tired, I want to stop being simulated (2% chance)
 		if (MatsimRandom.getRandom().nextInt(50) == 0) {
-			return new StaticDynActivity("Infinite laziness :-)", Double.POSITIVE_INFINITY);
+			return new IdleDynActivity("Infinite laziness :-)", Double.POSITIVE_INFINITY);
 		}
 
 		// Do I want to stay or drive? (50-50 choice)

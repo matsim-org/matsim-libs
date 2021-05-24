@@ -109,7 +109,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		
 		if (this.isGeneratingDeniedBoardingEvents) {
 			
-			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtFacility(stop.getId())) {
 				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
 					if (freeCapacity >= 1) {
 						passengersEntering.add(agent);
@@ -122,7 +122,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 		} else {
 		
-			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtFacility(stop.getId())) {
 				if (freeCapacity == 0) {
 					break;
 				}
@@ -163,6 +163,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 				this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
 //			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
+			passenger.setVehicle(vehicle);
 			eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;
@@ -172,6 +173,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	public boolean handlePassengerLeaving(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
 		boolean handled = vehicle.removePassenger(passenger);
 		if(handled){
+			passenger.setVehicle(null);
 			eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 			
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.

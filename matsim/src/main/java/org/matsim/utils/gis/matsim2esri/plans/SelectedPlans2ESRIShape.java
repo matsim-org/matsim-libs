@@ -27,6 +27,10 @@ import java.util.List;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,11 +54,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * Simple class to convert MATSim plans to ESRI shape files. Activities will be converted into points and
@@ -171,8 +170,8 @@ public class SelectedPlans2ESRIShape {
 	private SimpleFeature getActFeature(final String id, final Activity act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
-		Double startTime = act.getStartTime();
-		Double endTime = act.getEndTime();
+		Double startTime = act.getStartTime().seconds();
+		Double endTime = act.getEndTime().seconds();
 		double rx = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
@@ -192,8 +191,8 @@ public class SelectedPlans2ESRIShape {
 			return null;
 		}
 		String mode = leg.getMode();
-		Double depTime = leg.getDepartureTime();
-		Double travTime = leg.getTravelTime();
+		Double depTime = leg.getDepartureTime().seconds();
+		Double travTime = leg.getTravelTime().seconds();
 		Double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network);
 
 		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();

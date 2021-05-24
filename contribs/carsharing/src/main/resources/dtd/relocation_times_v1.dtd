@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+
+<!ELEMENT relocationTimes (company)*>
+
+<!ELEMENT company (relocationTime)*>
+<!ATTLIST company   name    CDATA #REQUIRED>
+
+<!ELEMENT relocationTime EMPTY>
+<!ATTLIST relocationTime    start_time  CDATA #REQUIRED>
+
+<!-- ============================================================ -->
+

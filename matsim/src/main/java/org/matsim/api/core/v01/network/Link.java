@@ -22,7 +22,7 @@ package org.matsim.api.core.v01.network;
 import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Link extends BasicLocation<Link>, Attributable {
+public interface Link extends BasicLocation, Attributable, Identifiable<Link> {
 
 
 	/**
@@ -97,7 +97,7 @@ public interface Link extends BasicLocation<Link>, Attributable {
 	 * This method returns the capacity as set in the xml defining the network. Be aware
 	 * that this capacity is not normalized in time, it depends on the period set
 	 * in the network file (the capperiod attribute).
-	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
+	 * @param time the time at which the capacity is requested. Use {@link Double#NEGATIVE_INFINITY} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 *
 	 * @see Network#getCapacityPeriod()
@@ -119,8 +119,13 @@ public interface Link extends BasicLocation<Link>, Attributable {
 	 */
 	public Set<String> getAllowedModes();
 
-	double getFlowCapacityPerSec();
+	double getCapacityPeriod();
 
-	double getFlowCapacityPerSec(double time);
+	default double getFlowCapacityPerSec() {
+		return getCapacity() / getCapacityPeriod();
+	}
 
+	default double getFlowCapacityPerSec(double time) {
+		return getCapacity(time) / getCapacityPeriod();
+	}
 }

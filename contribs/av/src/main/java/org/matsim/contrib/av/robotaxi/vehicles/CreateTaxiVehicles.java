@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.robotaxi.vehicles;
 
@@ -30,9 +30,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetWriter;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -56,11 +57,10 @@ public class CreateTaxiVehicles {
 		int seats = 4;
 		String networkfile = "cottbus_robotaxi/network.xml.gz";
 		String taxisFile = "./src/main/resources/cottbus_robotaxi/taxis_"+numberofVehicles+".xml";
-		List<Vehicle> vehicles = new ArrayList<>();
+		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
-		List<Id<Link>> allLinks = new ArrayList<>();
-		allLinks.addAll(scenario.getNetwork().getLinks().keySet());
+		List<Id<Link>> allLinks = new ArrayList<>(scenario.getNetwork().getLinks().keySet());
 		for (int i = 0; i< numberofVehicles;i++){
 			Link startLink;
 			do {
@@ -69,11 +69,15 @@ public class CreateTaxiVehicles {
 			}
 			while (!startLink.getAllowedModes().contains(TransportMode.car));
 			//for multi-modal networks: Only links where cars can ride should be used.
-			Vehicle v = new VehicleImpl(Id.create("taxi"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
-		    vehicles.add(v);    
-			
+			vehicles.add(ImmutableDvrpVehicleSpecification.newBuilder().id(Id.create("taxi" + i, DvrpVehicle.class))
+					.startLinkId(startLink.getId())
+					.capacity(seats)
+					.serviceBeginTime(operationStartTime)
+					.serviceEndTime(operationEndTime)
+					.build());
+
 		}
-		new VehicleWriter(vehicles).write(taxisFile);
+		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}
 
 }

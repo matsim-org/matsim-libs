@@ -38,10 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
@@ -54,8 +51,7 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
  * @author thibautd
  */
 public class OptimizeVehicleAllocationAtTourLevelTest {
-	private static StageActivityTypes stages = EmptyStageActivityTypes.INSTANCE;
-	private static String MODE = "the_vehicular_mode";
+	private static final String MODE = "the_vehicular_mode";
 
 	private final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 
@@ -112,6 +108,8 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 
 	@Test
 	public void testCannotFindBetterAllocationRandomly() throws Exception {
+		Set<String> stages = new HashSet<>();// formerly EmptyStageActivityTypes.INSTANCE;
+
 		for ( int i = 0; i < 5; i++ ) {
 			final GroupPlans optimized = createTestPlan( new Random( i ) );
 

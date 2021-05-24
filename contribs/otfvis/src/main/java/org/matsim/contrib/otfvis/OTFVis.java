@@ -30,14 +30,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -151,7 +151,10 @@ public class OTFVis {
 	
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, events);
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);
 		OTFClientLive.run(scenario.getConfig(), server);
@@ -171,19 +174,22 @@ public class OTFVis {
 
 			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
-			TransitQSimEngine transitEngine = qSim.getTransitEngine();
-			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
-			
+
+//			TransitQSimEngine transitEngine = qSim.getTransitEngine();
+//			AgentTracker agentTracker = transitEngine.getAgentTracker();
+
 //			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getagentsnapshotinfofactory();
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-			linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
-			if (! Double.isNaN(network.getEffectiveLaneWidth())){
-				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+			linkWidthCalculator.setLinkWidthForVis(config.qsim().getLinkWidthForVis());
+			if (!Double.isNaN(network.getEffectiveLaneWidth())) {
+				linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 			}
-			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-			
-			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
-			server.addAdditionalElement(facilityWriter);
+
+			var positionInfoBuilder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
+			for (AgentTracker agentTracker : qSim.getAgentTrackers()) {
+				FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, positionInfoBuilder);
+				server.addAdditionalElement(facilityWriter);
+			}
 		}
 
 		server.pause();
@@ -210,12 +216,7 @@ public class OTFVis {
 
 				@Override
 				public VisData getVisData() {
-					return new VisData() {
-						@Override
-						public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-							return Collections.emptyList();
-						}
-					};
+					return positions -> Collections.emptyList();
 				}
 			});
 		}
@@ -252,12 +253,7 @@ public class OTFVis {
 
 			@Override
 			public VisData getNonNetworkAgentSnapshots() {
-				return new VisData() {
-					@Override
-					public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-						return Collections.emptyList();
-					}
-				};
+				return positions -> Collections.emptyList();
 			}
 		});
 

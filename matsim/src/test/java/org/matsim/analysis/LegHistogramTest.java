@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -62,8 +61,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Id<Person> person2Id = person2.getId();
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
-		leg.setTravelTime(Time.UNDEFINED_TIME);
-		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
+		leg.setTravelTimeUndefined();
 		LegHistogram histo = new LegHistogram(5*60);
 		histo.handleEvent(new PersonDepartureEvent(7*3600, person1Id, linkId, leg.getMode()));
 		histo.handleEvent(new PersonDepartureEvent(7*3600 + 6*60, person2Id, linkId, leg.getMode()));
@@ -114,8 +112,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Id<Person> person1Id = person1.getId();
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
-		leg.setTravelTime(Time.UNDEFINED_TIME);
-		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
+		leg.setTravelTimeUndefined();
 
 		LegHistogram histo = new LegHistogram(5*60, 10); // latest time-bin: 2700-2999
 
@@ -155,8 +152,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Id<Person> person1Id = person1.getId();
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
-		leg.setTravelTime(Time.UNDEFINED_TIME);
-		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
+		leg.setTravelTimeUndefined();
 
 		LegHistogram histo = new LegHistogram(5*60);
 

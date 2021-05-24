@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
@@ -36,10 +34,11 @@ import java.util.Set;
 class NewControler extends AbstractController implements ControlerI {
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(NewControler.class);
+	private static final Logger log = Logger.getLogger(NewControler.class);
 
 	private final Config config;
 	private final PrepareForSim prepareForSim;
+	private final PrepareForMobsim prepareForMobsim;
 	private final EventsHandling eventsHandling;
 	private final PlansDumping plansDumping;
 	private final PlansReplanning plansReplanning;
@@ -50,11 +49,19 @@ class NewControler extends AbstractController implements ControlerI {
 	private final Set<ControlerListener> controlerListenersDeclaredByModules;
 	private final ControlerConfigGroup controlerConfigGroup;
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
-
+	
 	@Inject
-	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
+			 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
+			 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
+			 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
+			 Set<ControlerListener> controlerListenersDeclaredByModules, ControlerConfigGroup controlerConfigGroup,
+			 OutputDirectoryHierarchy outputDirectoryHierarchy
+			, PrepareForMobsim prepareForMobsim
+ ) {
 		super(controlerListenerManager, stopWatch, matsimServices);
 		this.config = config;
+		this.prepareForMobsim = prepareForMobsim;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		this.prepareForSim = prepareForSim;
 		this.eventsHandling = eventsHandling;
@@ -105,6 +112,12 @@ class NewControler extends AbstractController implements ControlerI {
 	protected final void prepareForSim() {
 		this.prepareForSim.run();
 	}
+	
+	@Override
+	protected final void prepareForMobsim() {
+		this.prepareForMobsim.run() ;
+//		this.prepareForSim.run() ;
+	}
 
 	@Override
 	protected final void runMobSim() {
@@ -112,8 +125,12 @@ class NewControler extends AbstractController implements ControlerI {
 	}
 
 	@Override
-	protected final boolean continueIterations(int it) {
-		return terminationCriterion.continueIterations(it);
+	protected final boolean mayTerminateAfterIteration(int iteration) {
+		return terminationCriterion.mayTerminateAfterIteration(iteration);
 	}
 
+	@Override
+	protected final boolean shouldTerminate(int iteration) {
+		return terminationCriterion.doTerminate(iteration);
+	}
 }

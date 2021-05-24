@@ -19,15 +19,19 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
-import org.matsim.contrib.dynagent.AbstractDynActivity;
+import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.gbl.MatsimRandom;
 
-public class RandomDynActivity extends AbstractDynActivity {
+public class RandomDynActivity implements DynActivity {
 	private double endTime;
 
 	public RandomDynActivity(double now) {
-		super("RandomActivity");
 		doRandomChoice(now);// decision made at time beginTime
+	}
+
+	@Override
+	public String getActivityType() {
+		return "RandomActivity";
 	}
 
 	@Override

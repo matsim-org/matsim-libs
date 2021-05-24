@@ -23,9 +23,14 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.*;
-import org.matsim.core.router.util.*;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
+
+import com.google.common.base.Preconditions;
 
 public class VrpPaths {
 	/**
@@ -33,12 +38,10 @@ public class VrpPaths {
 	 */
 	public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink, double departureTime,
 			LeastCostPathCalculator router, TravelTime travelTime) {
-		Path path = null;
-		if (fromLink != toLink) {
-			// calc path for departureTime+1 (we need 1 second to move over the node)
-			path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + 1, null, null);
-		}
-
+		Path path = fromLink == toLink ?
+				null :
+				router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
+						null, null);
 		return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
 	}
 
@@ -46,22 +49,30 @@ public class VrpPaths {
 		return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromTolink }, new double[] { 0 });
 	}
 
+	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, PathData pathData,
+			TravelTime travelTime) {
+		return createPath(fromLink, toLink, departureTime, pathData.getPath(), travelTime);
+	}
+
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
 			TravelTime travelTime) {
-		if (fromLink == toLink) {
+		return createPath(fromLink, toLink, departureTime, path, travelTime, true);
+	}
+
+	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
+			TravelTime travelTime, boolean considerZeroLengthPath) {
+		if (considerZeroLengthPath && fromLink == toLink) {
 			return createZeroLengthPath(fromLink, departureTime);
 		}
 
 		int count = path.links.size();
 		if (count > 0) {
-			if (fromLink.getToNode() != path.links.get(0).getFromNode()) {
-				throw new IllegalArgumentException("fromLink and path are not connected; fromLink: " + fromLink
-						+ "\n path beg" + path.links.get(0));
-			}
-			if (path.links.get(count - 1).getToNode() != toLink.getFromNode()) {
-				throw new IllegalArgumentException("path and toLink are not connected; path end:"
-						+ path.links.get(count - 1).toString() + "\n toLink: " + toLink.toString());
-			}
+			Preconditions.checkArgument(fromLink.getToNode() == path.links.get(0).getFromNode(),
+					"fromLink and path are not connected. From link: %s. First link in path: %s", fromLink,
+					path.links.get(0));
+			Preconditions.checkArgument(path.links.get(count - 1).getToNode() == toLink.getFromNode(),
+					"path and toLink are not connected. To link: %s. Last link in path: %s", toLink,
+					path.links.get(count - 1));
 		}
 
 		Link[] links = new Link[count + 2];
@@ -89,7 +100,7 @@ public class VrpPaths {
 		links[count + 1] = toLink;
 		linkTT = getLastLinkTT(toLink, currentTime);// as long as we cannot divert from the last link this is okay
 		linkTTs[count + 1] = linkTT;
-		double totalTT = 1 + path.travelTime + linkTT;
+		double totalTT = FIRST_LINK_TT + path.travelTime + linkTT;
 
 		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
 	}
@@ -97,12 +108,13 @@ public class VrpPaths {
 	public static final double FIRST_LINK_TT = 1;
 
 	public static double getLastLinkTT(Link lastLink, double time) {
-		return lastLink.getLength() / lastLink.getFreespeed(time);
+		// XXX imprecise if qsimCfg.timeStepSize != 1
+		return Math.floor(lastLink.getLength() / lastLink.getFreespeed(time));
 	}
 
 	/**
 	 * Used for OTFVis. Does not contain info on timing, distance and cost. Can be extended...
-	 * 
+	 *
 	 * @param path
 	 * @param routeFactories
 	 * @return
@@ -128,12 +140,11 @@ public class VrpPaths {
 	/**
 	 * @return The distance of a VRP path Includes the to link, but not the from link
 	 */
-	public static double calcPathDistance(VrpPath path) {
+	public static double calcDistance(VrpPath path) {
 		double distance = 0.0;
 		for (int i = 1; i < path.getLinkCount(); i++) {
 			distance += path.getLink(i).getLength();
 		}
-
 		return distance;
 	}
 }

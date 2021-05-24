@@ -19,15 +19,21 @@
 
 package org.matsim.contrib.drt.vrpagent;
 
-import org.matsim.contrib.drt.schedule.*;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.*;
-import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.*;
-import org.matsim.core.mobsim.qsim.QSim;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
-import com.google.inject.Inject;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.passenger.BusStopActivity;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.IdleDynActivity;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
@@ -35,30 +41,33 @@ import com.google.inject.Inject;
 public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String DRT_STAY_NAME = "DrtStay";
 	public final static String DRT_STOP_NAME = "DrtBusStop";
-	private final PassengerEngine passengerEngine;
-	private final VrpLegs.LegCreator legCreator;
+	private final PassengerHandler passengerHandler;
+	private final VrpLegFactory legFactory;
 
-	@Inject
-	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, QSim qSim) {
-		this.passengerEngine = passengerEngine;
-		legCreator = VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer,
-				qSim.getSimTimer());
+	public DrtActionCreator(PassengerHandler passengerHandler, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
+		this(passengerHandler, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
+				OnlineTrackerListener.NO_LISTENER, timer));
+	}
+
+	public DrtActionCreator(PassengerHandler passengerHandler, VrpLegFactory legFactory) {
+		this.passengerHandler = passengerHandler;
+		this.legFactory = legFactory;
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
-		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
-		switch (task.getDrtTaskType()) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+		Task task = vehicle.getSchedule().getCurrentTask();
+		switch (getBaseTypeOrElseThrow(task)) {
 			case DRIVE:
-				return legCreator.createLeg(vehicle);
+				return legFactory.create(vehicle);
 
 			case STOP:
 				DrtStopTask t = (DrtStopTask)task;
-				return new BusStopActivity(passengerEngine, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
+				return new BusStopActivity(passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
 						DRT_STOP_NAME);
 
 			case STAY:
-				return new VrpActivity(DRT_STAY_NAME, (DrtStayTask)task);
+				return new IdleDynActivity(DRT_STAY_NAME, task::getEndTime);
 
 			default:
 				throw new IllegalStateException();

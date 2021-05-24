@@ -54,7 +54,7 @@ public class LinkEnterEvent extends Event implements HasLinkId {
 	
 	/**
 	 * Please use getVehicleId() instead. 
-	 * Vehicle-driver relations can be made by Wait2Link and VehicleLeavesTraffic Events.
+	 * Vehicle-driver relations can be made by {@link VehicleEntersTrafficEvent} and {@link VehicleLeavesTrafficEvent}.
 	 */
 	@Deprecated
 	public Id<Person> getDriverId() {

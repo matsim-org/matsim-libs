@@ -19,6 +19,9 @@
 
 package org.matsim.facilities;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,10 +41,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author mrieser
  */
@@ -53,7 +52,7 @@ public class FacilitiesFromPopulationTest {
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
 		generator.setOneFacilityPerLink(true);
-		generator.setAssignLinksToFacilitiesIfMissing(true, f.scenario.getNetwork());
+		generator.setAssignLinksToFacilitiesIfMissing( f.scenario.getNetwork() );
 		generator.run(f.scenario.getPopulation());
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
@@ -80,7 +79,8 @@ public class FacilitiesFromPopulationTest {
 		
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
 		generator.setOneFacilityPerLink(true);
-		generator.setAssignLinksToFacilitiesIfMissing(true, f.scenario.getNetwork());
+		generator.setAddEmptyActivityOptions(true);
+		generator.setAssignLinksToFacilitiesIfMissing( f.scenario.getNetwork() );
 		PlanCalcScoreConfigGroup config = new PlanCalcScoreConfigGroup();
 		ActivityParams homeParams = new ActivityParams("home");
 		ActivityParams workParams = new ActivityParams("work");
@@ -88,7 +88,7 @@ public class FacilitiesFromPopulationTest {
 		workParams.setClosingTime(19*3600);
 		config.addActivityParams(homeParams);
 		config.addActivityParams(workParams);
-		generator.assignOpeningTimes(true, config);
+		generator.assignOpeningTimes( config );
 		generator.run(f.scenario.getPopulation());
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
@@ -115,7 +115,7 @@ public class FacilitiesFromPopulationTest {
 		
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
 		generator.setOneFacilityPerLink(false);
-		generator.setAssignLinksToFacilitiesIfMissing(true, f.scenario.getNetwork());
+		generator.setAssignLinksToFacilitiesIfMissing( f.scenario.getNetwork() );
 		generator.run(f.scenario.getPopulation());
 		
 //		for (ActivityFacility af : f.scenario.getActivityFacilities().getFacilities().values()) {

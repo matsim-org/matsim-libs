@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/electric_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="drt_veh_1_1" battery_capacity="20" initial_soc="16.0"/>
+	<vehicle id="drt_veh_1_2" battery_capacity="20" initial_soc="14.0"/>
+	<vehicle id="drt_veh_2_1" battery_capacity="20" initial_soc="15.5"/>
+	<vehicle id="drt_veh_2_2" battery_capacity="20" initial_soc="13.5"/>
+	<vehicle id="drt_veh_3_1" battery_capacity="20" initial_soc="15.0"/>
+	<vehicle id="drt_veh_3_2" battery_capacity="20" initial_soc="13.0"/>
+	<vehicle id="drt_veh_4_1" battery_capacity="20" initial_soc="14.5"/>
+	<vehicle id="drt_veh_4_2" battery_capacity="20" initial_soc="12.5"/>
+	<vehicle id="drt_veh_5_1" battery_capacity="20" initial_soc="14.0"/>
+	<vehicle id="drt_veh_5_2" battery_capacity="20" initial_soc="12.0"/>
+</vehicles>

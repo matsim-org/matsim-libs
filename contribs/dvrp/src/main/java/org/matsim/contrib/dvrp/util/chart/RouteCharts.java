@@ -19,18 +19,30 @@
 
 package org.matsim.contrib.dvrp.util.chart;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.jfree.chart.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.XYItemLabelGenerator;
-import org.jfree.chart.plot.*;
+import org.jfree.chart.plot.DefaultDrawingSupplier;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.util.chart.CoordDataset;
 import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
@@ -39,10 +51,10 @@ import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
  * @author michalm
  */
 public class RouteCharts {
-	public static JFreeChart chartRoutes(Collection<? extends Vehicle> vehicles) {
+	public static JFreeChart chartRoutes(Collection<? extends DvrpVehicle> vehicles) {
 		CoordDataset lData = new CoordDataset();
 		int i = 0;
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			Schedule schedule = v.getSchedule();
 			lData.addSeries(Integer.toString(i++), ScheduleCoordSources.createCoordSource(schedule));
 		}
@@ -63,11 +75,7 @@ public class RouteCharts {
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
 
-		renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
-			public String generateLabel(XYDataset dataset, int series, int item) {
-				return ((CoordDataset)dataset).getText(series, item);
-			}
-		});
+		renderer.setDefaultItemLabelGenerator((dataset, series, item) -> ((CoordDataset)dataset).getText(series, item));
 
 		for (int j = 1; j <= vehicles.size(); j++) {
 			renderer.setSeriesShapesVisible(j, true);
@@ -78,7 +86,7 @@ public class RouteCharts {
 		return chart;
 	}
 
-	public static JFreeChart chartRoutesByStatus(List<? extends Vehicle> vehicles) {
+	public static JFreeChart chartRoutesByStatus(List<? extends DvrpVehicle> vehicles) {
 		CoordDataset nData = new CoordDataset();
 
 		for (int i = 0; i < vehicles.size(); i++) {
@@ -105,7 +113,7 @@ public class RouteCharts {
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
 
-		renderer.setBaseItemLabelGenerator(new LabelGenerator());
+		renderer.setDefaultItemLabelGenerator(new LabelGenerator());
 
 		Paint[] paints = DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE;
 		Shape[] shapes = DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE;
@@ -142,22 +150,13 @@ public class RouteCharts {
 	}
 
 	private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(Schedule schedule) {
-		Iterable<DriveTask> tasks = Schedules.createDriveTaskIter(schedule);
+		Stream<DriveTask> tasks = Schedules.driveTasks(schedule);
 
 		// creating lists of DriveTasks
-		Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<>(TaskStatus.class);
-
-		for (TaskStatus ts : TaskStatus.values()) {
-			taskListByStatus.put(ts, new ArrayList<DriveTask>());
-		}
-
-		for (DriveTask t : tasks) {
-			taskListByStatus.get(t.getStatus()).add(t);
-		}
+		Map<TaskStatus, List<DriveTask>> taskListByStatus = tasks.collect(Collectors.groupingBy(t -> t.getStatus()));
 
 		// creating LinkSources
 		Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<>(TaskStatus.class);
-
 		for (TaskStatus ts : TaskStatus.values()) {
 			linkSourceByStatus.put(ts, ScheduleCoordSources.createCoordSource(taskListByStatus.get(ts)));
 		}

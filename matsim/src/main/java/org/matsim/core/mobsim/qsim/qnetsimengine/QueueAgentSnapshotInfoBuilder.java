@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
+
+import javax.inject.Inject;
+import java.util.Collection;
 
 
 /**
@@ -55,12 +55,10 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		}
 
 
-		double vehLen = Math.min( 
+		return Math.min(
 				curvedLength / overallStorageCapacity , // number of ``cells''
-				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles 
+				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles
 				);
-		
-		return vehLen;
 	}
 	
 
@@ -76,7 +74,23 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		}
 		else {
 			// we calculate where the vehicle would be with free speed.
-			distanceFromFNode = (1. - (remainingTravelTime / freespeedTraveltime)) * curvedLength ;
+			/*
+			 * In the old code version we had the problem that vehicles did not change position while changing the link,
+			 * i.e. they had a positionEvent at time 10 at the junction coordinate (0,0) where the previous link ends,
+			 * and the following link starts, then at time 11 they left the old link, entered the new link and had a new
+			 * positionEvent at the very same coordinate (0,0) because this is the from coord of the second link.
+			 *
+			 * This is an attempt to let the vehicle proceed further onto the second link already at the first
+			 * positionEvent on that link. Whereas previously the link change took 1 sec in which the vehicle did not
+			 * change its position, we now have to redistribute that second over the whole link. Therefore we have to
+			 * reduce the distance travelled per time step below what the freespeed of the link would suggest. Then we
+			 * add that distance once to move the first vehicle position from the from coord of the link away onto
+			 * the link.
+			 */
+
+			double distancePerSecond = curvedLength / ( freespeedTraveltime + 1 ); // the first position of the vehicle on the link is not at the from coordinate, but one time step onto the link. So we have one more time step we have to cater for by reducing the distance driven per time step.
+			distanceFromFNode = (1. - ( remainingTravelTime / freespeedTraveltime)) * ( curvedLength - distancePerSecond ) + distancePerSecond ;
+
 			if ( distanceFromFNode < 0. ) {
 				distanceFromFNode = 0. ;
 			}
@@ -103,7 +117,22 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		return distanceFromFNode;
 	}
 
-	
+	public AgentSnapshotInfo.DrivingState calculateDrivingState(double length, double spacing, double lastDistanceToFromNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 
-	
+		var distanceFromFNode = calculateFreespeedDistanceToFromNode(freespeedTraveltime, remainingTravelTime, length);
+
+		return AgentSnapshotInfo.DrivingState.CONGESTED;
+	}
+
+	private double calculateFreespeedDistanceToFromNode(double freespeedTraveltime, double remainingTravelTime, double curvedLength) {
+
+		if (freespeedTraveltime == 0) {
+			return 0;
+		}
+
+		var result = (1.0 - (remainingTravelTime / freespeedTraveltime)) * curvedLength;
+		return Math.min(result, 0.0);
+	}
+
+	private double calculateCongestedDinstanceToFromNode(double value) {return 0;}
 }

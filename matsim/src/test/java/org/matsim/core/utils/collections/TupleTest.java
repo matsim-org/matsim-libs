@@ -23,6 +23,12 @@ package org.matsim.core.utils.collections;
 import junit.framework.TestCase;
 
 public class TupleTest extends TestCase {
+	public void testOf() {
+		Tuple<Integer, Double> t1 = new Tuple<>(1, 1.1);
+		Tuple<Integer, Double> t2 = Tuple.of(1, 1.1);
+		assertEquals(t1, t2);
+	}
+
 
 	public void testEquals() {
 		// the basic Tuple we will usually compare against

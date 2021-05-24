@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.facilities.ActivityFacility;
 
 /**
  * @author dgrether
@@ -51,6 +52,8 @@ public interface PopulationFactory extends MatsimFactory {
 	 * @return the activity
 	 */
 	Activity createActivityFromLinkId(String actType, Id<Link> linkId);
+
+	Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ) ;
 
 	Leg createLeg(String legMode);
 

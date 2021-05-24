@@ -19,12 +19,16 @@
 
 package org.matsim.contrib.util;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+
 import java.io.IOException;
 import java.util.List;
-
-import org.matsim.core.utils.io.*;
-
-import com.opencsv.*;
 
 public class CSVReaders {
 	public static List<String[]> readTSV(String file) {
@@ -40,9 +44,10 @@ public class CSVReaders {
 	}
 
 	public static List<String[]> readFile(String file, char separator) {
-		try (CSVReader reader = new CSVReader(IOUtils.getBufferedReader(file), separator)) {
+		try (CSVReader reader = new CSVReaderBuilder(IOUtils.getBufferedReader(file))
+				.withCSVParser(new CSVParserBuilder().withSeparator(separator).build()).build()) {
 			return reader.readAll();
-		} catch (IOException e) {
+		} catch (IOException | CsvException e) {
 			throw new UncheckedIOException(e);
 		}
 	}

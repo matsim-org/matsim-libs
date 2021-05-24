@@ -19,20 +19,23 @@
 
 package org.matsim.contrib.zone.util;
 
-import org.matsim.contrib.util.random.*;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import java.util.function.Predicate;
 
-import com.google.common.base.Predicate;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.contrib.util.random.RandomUtils;
+import org.matsim.contrib.util.random.UniformRandom;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class RandomPointUtils {
 	public static Point getRandomPointInGeometry(final Geometry geometry) {
-		return getRandomPointInEnvelope(p -> geometry.contains(p), geometry.getEnvelopeInternal());
+		return getRandomPointInEnvelope(geometry::contains, geometry.getEnvelopeInternal());
 	}
 
 	public static Point getRandomPointInGeometry(final PreparedGeometry geometry) {
-		return getRandomPointInEnvelope(p -> geometry.contains(p), geometry.getGeometry().getEnvelopeInternal());
+		return getRandomPointInEnvelope(geometry::contains, geometry.getGeometry().getEnvelopeInternal());
 	}
 
 	private static Point getRandomPointInEnvelope(Predicate<Point> contains, Envelope envelope) {
@@ -42,12 +45,12 @@ public class RandomPointUtils {
 		double minY = envelope.getMinY();
 		double maxY = envelope.getMaxY();
 
-		Point p = null;
+		Point p;
 		do {
 			double x = uniform.nextDouble(minX, maxX);
 			double y = uniform.nextDouble(minY, maxY);
 			p = MGC.xy2Point(x, y);
-		} while (!contains.apply(p));
+		} while (!contains.test(p));
 
 		return p;
 	}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalControl xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalControl_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem refId="SignalSystem1">
+        <signalSystemController>
+            <controllerIdentifier>LaemmerSignalController</controllerIdentifier>
+        </signalSystemController>
+    </signalSystem>
+</signalControl>

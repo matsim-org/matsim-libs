@@ -52,6 +52,7 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -168,7 +169,7 @@ public class MultiModalControlerListenerTest {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
-        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+        controler.addOverridingModule(new MultiModalModule());
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
@@ -206,7 +207,7 @@ public class MultiModalControlerListenerTest {
 	void runBerlinScenario(int numberOfThreads) {
 
 		String inputDir = this.utils.getClassInputDirectory();
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
@@ -308,7 +309,7 @@ public class MultiModalControlerListenerTest {
 		Logger.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
 		Logger.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
 		Logger.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			Assert.assertEquals(
 					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
 					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);
@@ -413,7 +414,7 @@ public class MultiModalControlerListenerTest {
 			// assume that the agent is allowed to travel on the link
 			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
 
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			this.linkLeftCount++;
@@ -428,7 +429,7 @@ public class MultiModalControlerListenerTest {
 			this.arrivalCount++;
 
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);

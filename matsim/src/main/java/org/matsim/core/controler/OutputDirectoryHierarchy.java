@@ -22,6 +22,8 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -40,27 +42,40 @@ public final class OutputDirectoryHierarchy {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
-	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
+	private static final  Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
 	
 	private String runId = null;
 	
 	private final String outputPath;
+
+	private final ControlerConfigGroup.CompressionType defaultCompressionType;
 	
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
 	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+
 		this(config.getOutputDirectory(),
 				config.getRunId(),
-				config.getOverwriteFileSetting());
+				config.getOverwriteFileSetting(),
+				config.getCompressionType());
 	}
 
-	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles) {
-		this(outputPath, null, overwriteFiles, true);
+	/**
+	 * A constructor with a fairly powerful argument so that it can be adapted to functionality changes without having to change the API.
+	 *
+	 * @param config
+	 */
+	public OutputDirectoryHierarchy( Config config ) {
+		this( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting(), config.controler().getCompressionType() );
+	}
+
+	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
+		this(outputPath, null, overwriteFiles, true, defaultCompressionType);
 	}
 	
-	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles) {
-		this(outputPath, runId, overwriteFiles, true);
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
+		this(outputPath, runId, overwriteFiles, true, defaultCompressionType);
 	}	
 	/**
 	 * 
@@ -69,13 +84,14 @@ public final class OutputDirectoryHierarchy {
 	 * @param outputPath the path to the output directory
 	 * @param createDirectories create the directories or abort if they exist
 	 */
-	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories){
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories, ControlerConfigGroup.CompressionType compressionType){
 		this.overwriteFiles = overwriteFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
 		this.outputPath = outputPath;
-		this.runId = runId;	
+		this.runId = runId;
+		this.defaultCompressionType = compressionType;
 		if (createDirectories){
 			this.createDirectories();
 		}
@@ -122,6 +138,17 @@ public final class OutputDirectoryHierarchy {
 		s.append(filename);
 		return s.toString();
 	}
+
+	public final String getIterationFilename(int iteration, Controler.DefaultFiles file) {
+		return getIterationFilename(iteration, file, this.defaultCompressionType);
+	}
+
+	public final String getIterationFilename(int iteration, Controler.DefaultFiles file, ControlerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getIterationFilename(iteration, file.filename);
+		}
+		return getIterationFilename(iteration, file.filename + compression.fileEnding);
+	}
 	
 	/**
 	 * Returns the complete filename to access a file in the output-directory.
@@ -139,6 +166,17 @@ public final class OutputDirectoryHierarchy {
 		}
 		s.append(filename);
 		return s.toString();
+	}
+
+	public final String getOutputFilename(Controler.DefaultFiles file) {
+		return getOutputFilename(file, this.defaultCompressionType);
+	}
+
+	public final String getOutputFilename(Controler.DefaultFiles file, ControlerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename);
+		}
+		return getOutputFilename(Controler.OUTPUT_PREFIX + file.filename + compression.fileEnding);
 	}
 
 	
@@ -177,6 +215,9 @@ public final class OutputDirectoryHierarchy {
 						// files!
 						throw new RuntimeException(
 								"The output directory " + outputPath
+								+ " (full path: "
+								+ outputDir.getAbsolutePath()
+								+")"
 								+ " already exists and is not empty!"
 								+ " Please either delete or empty the directory or"
 								+ " configure the services via setOverwriteFileSetting()"
@@ -186,6 +227,7 @@ public final class OutputDirectoryHierarchy {
 						log.warn("###########################################################");
 						log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
 						log.warn("### " + outputPath);
+						log.warn("### full path: " + outputDir.getAbsolutePath());
 						log.warn("###########################################################");
 						System.err.flush();
 						break;
@@ -194,11 +236,12 @@ public final class OutputDirectoryHierarchy {
 						// it is too late to change his mind...
 						// I still have problems understanding why people want such a setting.
 						System.out.flush();
-						log.warn("###########################################################");
-						log.warn("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
-						log.warn("### " + outputPath);
-						log.warn("###########################################################");
-						System.err.flush();
+						log.info("###########################################################");
+						log.info("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
+						log.info("### " + outputPath);
+						log.warn("### full path: " + outputDir.getAbsolutePath());
+						log.info("###########################################################");
+						System.out.flush();
 						IOUtils.deleteDirectoryRecursively(outputDir.toPath());
 						break;
 					default:

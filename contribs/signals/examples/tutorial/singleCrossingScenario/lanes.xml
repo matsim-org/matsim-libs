@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <lanesToLinkAssignment linkIdRef="2_3">
+        <lane id="2_3.l">
+            <leadsTo>
+                <toLink refId="3_7"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>1</alignment>
+            <attributes/>
+        </lane>
+        <lane id="2_3.ol">
+            <leadsTo>
+                <toLane refId="2_3.l"/>
+                <toLane refId="2_3.s"/>
+                <toLane refId="2_3.r"/>
+            </leadsTo>
+            <representedLanes number="2.0"/>
+            <capacity vehiclesPerHour="3600.0"/>
+            <startsAt meterFromLinkEnd="1000.0"/>
+            <alignment>0</alignment>
+            <attributes/>
+        </lane>
+        <lane id="2_3.r">
+            <leadsTo>
+                <toLink refId="3_4"/>
+                <toLink refId="3_8"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>-1</alignment>
+            <attributes/>
+        </lane>
+        <lane id="2_3.s">
+            <leadsTo>
+                <toLink refId="3_4"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>0</alignment>
+            <attributes/>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="4_3">
+        <lane id="4_3.l">
+            <leadsTo>
+                <toLink refId="3_8"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>1</alignment>
+            <attributes/>
+        </lane>
+        <lane id="4_3.ol">
+            <leadsTo>
+                <toLane refId="4_3.l"/>
+                <toLane refId="4_3.s"/>
+                <toLane refId="4_3.r"/>
+            </leadsTo>
+            <representedLanes number="2.0"/>
+            <capacity vehiclesPerHour="3600.0"/>
+            <startsAt meterFromLinkEnd="1000.0"/>
+            <alignment>0</alignment>
+            <attributes/>
+        </lane>
+        <lane id="4_3.r">
+            <leadsTo>
+                <toLink refId="3_2"/>
+                <toLink refId="3_7"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>-1</alignment>
+            <attributes/>
+        </lane>
+        <lane id="4_3.s">
+            <leadsTo>
+                <toLink refId="3_2"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>0</alignment>
+            <attributes/>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="7_3">
+        <lane id="7_3.ol">
+            <leadsTo>
+                <toLink refId="3_4"/>
+                <toLink refId="3_2"/>
+                <toLink refId="3_8"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="1000.0"/>
+            <alignment>0</alignment>
+            <attributes/>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="8_3">
+        <lane id="8_3.ol">
+            <leadsTo>
+                <toLink refId="3_2"/>
+                <toLink refId="3_7"/>
+                <toLink refId="3_4"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="1000.0"/>
+            <alignment>0</alignment>
+            <attributes/>
+        </lane>
+    </lanesToLinkAssignment>
+</laneDefinitions>

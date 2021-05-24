@@ -47,9 +47,9 @@ public class RouterUtils {
 		
 		Route routeWalk = routeFactory.createRoute( Route.class, startLink.getId(), destinationLink.getId() ) ; 
 		
-		double egressDist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord()) * 1.3;
+		double egressDist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord()) * 1.05;
 		egressDist = egressDist > 0 ? egressDist : 1; 
-		routeWalk.setTravelTime( (egressDist / 1.0));
+		routeWalk.setTravelTime( (egressDist / 1.38));
 		routeWalk.setDistance(egressDist);	
 
 		final Leg walkLeg = pf.createLeg( mode );

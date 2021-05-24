@@ -22,7 +22,7 @@ package org.matsim.core.trafficmonitoring;
 
 interface TravelTimeGetter {
 
-	public void setTravelTimeAggregator(AbstractTravelTimeAggregator travelTimeAggregator);
+//	public void setTravelTimeAggregator( TimeSlotComputation travelTimeAggregator );
 	
 	public double getTravelTime(TravelTimeData travelTimeData, double time);
 }

@@ -19,15 +19,15 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
@@ -35,9 +35,6 @@ import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.contrib.zone.ZonalSystems;
 import org.matsim.contrib.zone.Zone;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 public class IdleTaxiZonalRegistry {
@@ -46,8 +43,8 @@ public class IdleTaxiZonalRegistry {
 	private final ZonalSystem zonalSystem;
 	private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
 
-	private final Map<Id<Zone>, Map<Id<Vehicle>, Vehicle>> vehiclesInZones;
-	private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
+	private final Map<Id<Zone>, Map<Id<DvrpVehicle>, DvrpVehicle>> vehiclesInZones;
+	private final Map<Id<DvrpVehicle>, DvrpVehicle> vehicles = new LinkedHashMap<>();
 
 	public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, ScheduleInquiry scheduleInquiry) {
 		this.scheduleInquiry = scheduleInquiry;
@@ -57,11 +54,11 @@ public class IdleTaxiZonalRegistry {
 
 		vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			vehiclesInZones.put(id, new HashMap<Id<Vehicle>, Vehicle>());
+			vehiclesInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}
 	}
 
-	public void addVehicle(Vehicle vehicle) {
+	public void addVehicle(DvrpVehicle vehicle) {
 		TaxiStayTask stayTask = (TaxiStayTask)vehicle.getSchedule().getCurrentTask();
 		Id<Zone> zoneId = getZoneId(stayTask);
 
@@ -74,7 +71,7 @@ public class IdleTaxiZonalRegistry {
 		}
 	}
 
-	public void removeVehicle(Vehicle vehicle) {
+	public void removeVehicle(DvrpVehicle vehicle) {
 		TaxiStayTask stayTask = (TaxiStayTask)Schedules.getPreviousTask(vehicle.getSchedule());
 		Id<Zone> zoneId = getZoneId(stayTask);
 
@@ -87,41 +84,30 @@ public class IdleTaxiZonalRegistry {
 		}
 	}
 
-	public List<Vehicle> findNearestVehicles(Node node, int minCount) {
+	public Stream<DvrpVehicle> findNearestVehicles(Node node, int minCount) {
 		return findNearestVehicles(node, minCount, null);
 	}
 
-	public List<Vehicle> findNearestVehicles(Node node, int minCount, Predicate<Vehicle> vehicleFilter) {
-		if (minCount >= vehicles.size()) {
-			return getVehicles();
-		}
+	public Stream<DvrpVehicle> findNearestVehicles(Node node, int minCount, Predicate<DvrpVehicle> vehicleFilter) {
+		Predicate<DvrpVehicle> idleVehicleFilter = vehicleFilter == null ?
+				scheduleInquiry::isIdle :
+				vehicleFilter.and(scheduleInquiry::isIdle);
 
-		Predicate<Vehicle> idleVehicleFilter = vehicleFilter == null ? scheduleInquiry::isIdle
-				: Predicates.and(vehicleFilter, scheduleInquiry::isIdle);
-
-		Zone zone = zonalSystem.getZone(node);
-		Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
-		List<Vehicle> nearestVehs = new ArrayList<>();
-
-		for (Zone z : zonesByDistance) {
-			Iterables.addAll(nearestVehs, Iterables.filter(vehiclesInZones.get(z.getId()).values(), idleVehicleFilter));
-
-			if (nearestVehs.size() >= minCount) {
-				return nearestVehs;
-			}
-		}
-
-		return nearestVehs;
+		return minCount >= vehicles.size() ?
+				vehicles.values().stream().filter(idleVehicleFilter) :
+				zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+						.stream()
+						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())
+						.filter(idleVehicleFilter)
+						.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(TaxiStayTask stayTask) {
 		return zonalSystem.getZone(stayTask.getLink().getToNode()).getId();
 	}
 
-	public List<Vehicle> getVehicles() {
-		List<Vehicle> vehs = new ArrayList<>();
-		Iterables.addAll(vehs, Iterables.filter(vehicles.values(), scheduleInquiry::isIdle));
-		return vehs;
+	public Stream<DvrpVehicle> vehicles() {
+		return vehicles.values().stream().filter(scheduleInquiry::isIdle);
 	}
 
 	public int getVehicleCount() {

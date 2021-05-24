@@ -8,3 +8,7 @@
 matsimExamples
 **/target
 /log_projects.log
+*.orig
+
+# ignore output directories:
+output/

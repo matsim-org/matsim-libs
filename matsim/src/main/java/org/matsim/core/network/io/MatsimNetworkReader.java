@@ -26,11 +26,13 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * A reader for network-files of MATSim. This reader recognizes the format of the network-file and uses
@@ -45,7 +47,8 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 	private final static String NETWORK_V2 = "network_v2.dtd";
 
 	private MatsimXmlParser delegate = null;
-	private CoordinateTransformation transformation;
+	private final String inputCRS;
+	private final String targetCRS;
 
 	private final Network network;
 	private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
@@ -56,17 +59,22 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 	 * @param network The network where to store the loaded data.
 	 */
 	public MatsimNetworkReader(Network network) {
-		this( new IdentityTransformation() , network );
+		this( null , network );
 	}
 
 	/**
 	 * Creates a new reader for MATSim network files, that transforms coordinates
 	 *
-	 * @param transformation the transformation to use to convert the input data to the desired CRS
+	 * @param targetCRS the string representation of the CRS the coordinates should be transformed to (usually an EPSG code)
 	 * @param network The network where to store the loaded data.
 	 */
-	public MatsimNetworkReader(CoordinateTransformation transformation, Network network) {
-		this.transformation = transformation;
+	public MatsimNetworkReader(String targetCRS, Network network) {
+	    this(null, targetCRS, network);
+	}
+
+	public MatsimNetworkReader(String inputCRS, String targetCRS, Network network) {
+	    this.inputCRS = inputCRS;
+		this.targetCRS = targetCRS;
 		this.network = network;
 	}
 
@@ -81,16 +89,33 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 	}
 
 	@Override
+	public void endDocument() {
+		try {
+			this.delegate.endDocument();
+		} catch (SAXException e) {
+		    throw new RuntimeException(e);
+		}
+		if (targetCRS != null) {
+			ProjectionUtils.putCRS(network, targetCRS);
+		}
+	}
+
+	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 
 		switch ( doctype ) {
 			case NETWORK_V1:
-				this.delegate = new NetworkReaderMatsimV1(transformation , this.network);
+				this.delegate =
+						new NetworkReaderMatsimV1(
+								inputCRS != null ?
+										TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS) :
+										new IdentityTransformation(),
+								this.network);
 				log.info("using network_v1-reader.");
 				break;
 			case NETWORK_V2:
-				this.delegate = new NetworkReaderMatsimV2(transformation , this.network);
+				this.delegate = new NetworkReaderMatsimV2(inputCRS, targetCRS, this.network);
 				((NetworkReaderMatsimV2) delegate).putAttributeConverters( converters );
 				log.info("using network_v2-reader.");
 				break;

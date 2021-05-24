@@ -7,108 +7,97 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.EngineInformation;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
 
 class CarrierPlanXmlParserV2 extends MatsimXmlParser {
-	
-	public static Logger logger = Logger.getLogger(CarrierPlanXmlParserV2.class);
 
-	public static String CARRIERS = "carriers";
+	public static final  Logger logger = Logger.getLogger(CarrierPlanXmlParserV2.class);
 
-	public static String CARRIER = "carrier";
-
-	public static String LINKID = "linkId";
-
-	public static String SHIPMENTS = "shipments";
-
-	public static String SHIPMENT = "shipment";
-
-	public static String ID = "id";
-
-	public static String FROM = "from";
-
-	public static String TO = "to";
-
-	public static String SIZE = "size";
-
-	public static String ACTIVITY = "act";
-
-	public static String TYPE = "type";
-
-	public static String SHIPMENTID = "shipmentId";
-
-	public static String START = "start";
-
-	public static String VEHICLE = "vehicle";
-
-	public static String VEHICLES = "vehicles";
-
+	public static final String CARRIERS = "carriers";
+	public static final String CARRIER = "carrier";
+	public static final String LINKID = "linkId";
+	public static final String SHIPMENTS = "shipments";
+	public static final String SHIPMENT = "shipment";
+	static final String SERVICES = "services";
+	static final String SERVICE = "service";
+	public static final String ID = "id";
+	public static final String FROM = "from";
+	public static final String TO = "to";
+	public static final String SIZE = "size";
+	public static final String ACTIVITY = "act";
+	public static final String TYPE = "type";
+	public static final String SHIPMENTID = "shipmentId";
+	public static final String START = "start";
+	public static final String VEHICLE = "vehicle";
+	public static final String VEHICLES = "vehicles";
 	private static final String VEHICLESTART = "earliestStart";
-
 	private static final String VEHICLEEND = "latestEnd";
+	private static final String VEHICLE_TYPES_MSG = "It used to be possible to have vehicle types both in the plans file, and in a separate file.  The " +
+										  "first option is no longer possible." ;
+	private static final String ATTRIBUTES = "attributes";
+	private static final String ATTRIBUTE = "attribute";
 
 	private Carrier currentCarrier = null;
-
 	private CarrierVehicle currentVehicle = null;
-
+	private CarrierService currentService = null;
+	private CarrierShipment currentShipment = null;
 	private Tour.Builder currentTourBuilder = null;
-
 	private Id<Link> previousActLoc = null;
-
 	private String previousRouteContent;
-
-	public Map<String, CarrierShipment> currentShipments = null;
-
-	public Map<String, CarrierVehicle> vehicles = null;
-
-	public Collection<ScheduledTour> scheduledTours = null;
-
-	public CarrierPlan currentPlan = null;
-	
-	public Double currentScore;
-	
-	public boolean selected;
-
-	public Carriers carriers;
-
+	private Map<String, CarrierShipment> currentShipments = null;
+	private Map<String, CarrierVehicle> vehicles = null;
+	private Collection<ScheduledTour> scheduledTours = null;
+	private Double currentScore;
+	private boolean selected;
+	private Carriers carriers;
 	private double currentLegTransTime;
-
 	private double currentLegDepTime;
-	
-	
 	private Builder capabilityBuilder;
 
-	private org.matsim.contrib.freight.carrier.CarrierVehicleType.Builder vehicleTypeBuilder;
-
-	private Map<Id<VehicleType>, CarrierVehicleType> vehicleTypeMap = new HashMap<>();
+//	private Map<Id<org.matsim.vehicles.VehicleType>, VehicleType> vehicleTypeMap = new HashMap<>();
 
 	private double currentStartTime;
-	
+
 	private Map<Id<CarrierService>, CarrierService> serviceMap;
+//	private VehicleType vehicleType;
+
+	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
+			new org.matsim.utils.objectattributes.attributable.Attributes();
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
-	 * 
+	 *
 	 * @param carriers which is a map that stores carriers
 	 */
-	public CarrierPlanXmlParserV2(Carriers carriers) {
+	CarrierPlanXmlParserV2( Carriers carriers ) {
 		super();
 		this.carriers = carriers;
+	}
+
+	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
+		attributesReader.putAttributeConverter( clazz , converter );
+	}
+
+	@Inject
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributesReader.putAttributeConverters( converters );
 	}
 
 	@Override
@@ -116,13 +105,13 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
 			if(id == null) throw new IllegalStateException("carrierId is missing.");
-			currentCarrier = CarrierImpl.newInstance(Id.create(id, Carrier.class));
+			currentCarrier = CarrierUtils.createCarrier(Id.create(id, Carrier.class ) );
 		}
 		//services
-		else if (name.equals("services")) {
+		else if (name.equals(SERVICES)) {
 			serviceMap = new HashMap<>();
 		}
-		else if (name.equals("service")) {
+		else if (name.equals(SERVICE)) {
 			String idString = atts.getValue("id");
 			if(idString == null) throw new IllegalStateException("service.id is missing.");
 			Id<CarrierService> id = Id.create(idString, CarrierService.class);
@@ -140,16 +129,19 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
 			String serviceTimeString = atts.getValue("serviceDuration");
 			if(serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
-			CarrierService service = serviceBuilder.build();
-			serviceMap.put(service.getId(), service);
-			currentCarrier.getServices().add(service);
+			currentService =  serviceBuilder.build();
+			serviceMap.put(currentService.getId(), currentService);
+			CarrierUtils.addService(currentCarrier, currentService);
 		}
-		
+
 		//shipments
 		else if (name.equals(SHIPMENTS)) {
 			currentShipments = new HashMap<String, CarrierShipment>();
 		}
 		else if (name.equals(SHIPMENT)) {
+			String idString = atts.getValue("id");
+			if(idString == null) throw new IllegalStateException("shipment.id is missing.");
+			Id<CarrierShipment> id = Id.create(idString, CarrierShipment.class);
 			String from = atts.getValue(FROM);
 			if(from == null) throw new IllegalStateException("shipment.from is missing.");
 			String to = atts.getValue(TO);
@@ -157,59 +149,76 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			String sizeString = atts.getValue(SIZE);
 			if(sizeString == null) throw new IllegalStateException("shipment.size is missing.");
 			int size = getInt(sizeString);
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(from, Link.class), Id.create(to, Link.class), size);
-			
+			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(id, Id.create(from, Link.class), Id.create(to, Link.class), size);
+
 			String startPickup = atts.getValue("startPickup");
 			String endPickup = atts.getValue("endPickup");
 			String startDelivery = atts.getValue("startDelivery");
 			String endDelivery = atts.getValue("endDelivery");
 			String pickupServiceTime = atts.getValue("pickupServiceTime");
 			String deliveryServiceTime = atts.getValue("deliveryServiceTime");
-			
+
 			if (startPickup != null && endPickup != null) shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
 			if(startDelivery != null && endDelivery != null) shipmentBuilder.setDeliveryTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
-			if (pickupServiceTime != null) shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime)); 
+			if (pickupServiceTime != null) shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
 			if (deliveryServiceTime != null) shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
-			
-			CarrierShipment shipment = shipmentBuilder.build();
-			currentShipments.put(atts.getValue(ID), shipment);
-			currentCarrier.getShipments().add(shipment);
+
+			currentShipment = shipmentBuilder.build();
+			currentShipments.put(atts.getValue(ID), currentShipment);
+			CarrierUtils.addShipment(currentCarrier, currentShipment);
+//			currentCarrier.getShipments().put(shipment.getId(), shipment);
 		}
-		
+
 		//capabilities
 		else if(name.equals("capabilities")){
 			String fleetSize = atts.getValue("fleetSize");
 			if(fleetSize == null) throw new IllegalStateException("fleetSize is missing.");
 			this.capabilityBuilder = CarrierCapabilities.Builder.newInstance();
-			if(fleetSize.toUpperCase().equals(FleetSize.FINITE.toString())){ 
+			if(fleetSize.toUpperCase().equals(FleetSize.FINITE.toString())){
 				this.capabilityBuilder.setFleetSize(FleetSize.FINITE);
 			}
 			else {
 				this.capabilityBuilder.setFleetSize(FleetSize.INFINITE);
 			}
 		}
-		
+
 		//vehicle-type
 		else if(name.equals("vehicleType")){
-			String typeId = atts.getValue("id");
-			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			this.vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(typeId, VehicleType.class)); 
+			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
+//			String typeIdAsString = atts.getValue("id");
+//			if(typeIdAsString == null) throw new IllegalStateException("vehicleTypeId is missing.");
+//			final Id<VehicleType> typeId = Id.create( typeIdAsString, VehicleType.class );
+////			this.vehicleTypeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( typeId );
+//			this.vehicleType = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
 		else if(name.equals("engineInformation")){
-			String fuelType = atts.getValue("fuelType");
-			String gasConsumption = atts.getValue("gasConsumption");
-			EngineInformation engineInfo = new EngineInformationImpl(parseFuelType(fuelType), Double.parseDouble(gasConsumption));
-			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
+			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
+////			EngineInformation engineInfo = new EngineInformation();
+//			EngineInformation engineInfo = this.vehicleType.getEngineInformation();;
+//			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
+//			engineInfo.setFuelConsumption(Double.parseDouble(atts.getValue("gasConsumption")));
+////			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
 		}
 		else if(name.equals("costInformation")){
-			String fix = atts.getValue("fix");
-			String perMeter = atts.getValue("perMeter");
-			String perSecond = atts.getValue("perSecond");
-			if(fix != null) this.vehicleTypeBuilder.setFixCost(Double.parseDouble(fix));
-			if(perMeter != null) this.vehicleTypeBuilder.setCostPerDistanceUnit(Double.parseDouble(perMeter));
-			if(perSecond != null) this.vehicleTypeBuilder.setCostPerTimeUnit(Double.parseDouble(perSecond));
+			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
+//			String fix = atts.getValue("fix");
+//			String perMeter = atts.getValue("perMeter");
+//			String perSecond = atts.getValue("perSecond");
+//			CostInformation costInformation = this.vehicleType.getCostInformation() ;
+//			if(fix != null){
+////				this.vehicleTypeBuilder.setFixCost(Double.parseDouble(fix));
+//				costInformation.setFixedCost( Double.parseDouble( fix ) ) ;
+//			}
+//			if(perMeter != null){
+////				this.vehicleTypeBuilder.setCostPerDistanceUnit(Double.parseDouble(perMeter));
+//				costInformation.setCostsPerMeter( Double.parseDouble( perMeter ) ) ;
+//			}
+//			if(perSecond != null){
+////				this.vehicleTypeBuilder.setCostPerTimeUnit(Double.parseDouble(perSecond));
+//				costInformation.setCostsPerSecond( Double.parseDouble( perSecond ) ) ;
+//			}
 		}
-		
+
 		//vehicle
 		else if (name.equals(VEHICLES)) {
 			vehicles = new HashMap<String, CarrierVehicle>();
@@ -222,19 +231,19 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class));
 			String typeId = atts.getValue("typeId");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			CarrierVehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, VehicleType.class));
-			vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
-			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
+//			VehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
+			vehicleBuilder.setTypeId(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
+//			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
 			String startTime = atts.getValue(VEHICLESTART);
 			if(startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
 			String endTime = atts.getValue(VEHICLEEND);
 			if(endTime != null) vehicleBuilder.setLatestEnd(parseTimeToDouble(endTime));
-			
+
 			CarrierVehicle vehicle = vehicleBuilder.build();
 			capabilityBuilder.addVehicle(vehicle);
 			vehicles.put(vId, vehicle);
 		}
-		
+
 		//plans
 		else if(name.equals("plan")){
 			String score = atts.getValue("score");
@@ -271,7 +280,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				currentStartTime = parseTimeToDouble(actEndTime);
 				previousActLoc = currentVehicle.getLocation();
 				currentTourBuilder.scheduleStart(currentVehicle.getLocation(),TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
-				
+
 			} else if (type.equals("pickup")) {
 				String id = atts.getValue(SHIPMENTID);
 				if(id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
@@ -298,37 +307,60 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				finishLeg(currentVehicle.getLocation());
 				currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(),currentVehicle.getLatestEndTime()));
 			}
-			
+		}
+		else if(name.equals(ATTRIBUTES)) {
+			switch( context.peek() ) {
+				case CARRIER:
+					currAttributes = currentCarrier.getAttributes();
+					break;
+				case SERVICE:
+					currAttributes = currentService.getAttributes();
+					break;
+				case SHIPMENT:
+					currAttributes = currentShipment.getAttributes();
+					break;
+				default:
+					throw new RuntimeException( "could not derive context for attributes. context=" + context.peek() );
+			}
+			attributesReader.startTag( name , atts , context, currAttributes );
+		}
+		else if (name.equals(ATTRIBUTE)) {
+			attributesReader.startTag( name , atts , context, currAttributes );
 		}
 	}
-	
+
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equals("capabilities")){
 			currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
 		}
-		else if(name.equals("capacity")){
-			if(content == null) throw new IllegalStateException("vehicle-capacity is missing.");
-			vehicleTypeBuilder.setCapacity(Integer.parseInt(content));
-		}
+//		else if(name.equals("capacity")){
+//			if(content == null) throw new IllegalStateException("vehicle-capacity is missing.");
+//			vehicleTypeBuilder.setCapacityWeightInTons(Integer.parseInt(content ) );
+//		}
 		else if(name.equals("vehicleType")){
-			CarrierVehicleType type = vehicleTypeBuilder.build();
-			vehicleTypeMap.put(type.getId(),type);
-			capabilityBuilder.addType(type);
+////			VehicleType type = vehicleType.build();
+//			vehicleTypeMap.put(vehicleType.getId(),vehicleType);
+//			capabilityBuilder.addType(vehicleType);
+			throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.") ;
 		}
 		else if (name.equals("route")) {
 			this.previousRouteContent = content;
 		}
-		
+
 		else if (name.equals("carrier")) {
+			Gbl.assertNotNull( currentCarrier );
+			Gbl.assertNotNull( carriers );
+			Gbl.assertNotNull( carriers.getCarriers() );
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
+			currentCarrier = null;
 		}
 		else if (name.equals("plan")) {
-			currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
-			currentPlan.setScore(currentScore);
-			currentCarrier.getPlans().add(currentPlan);
+			CarrierPlan currentPlan = new CarrierPlan( currentCarrier, scheduledTours );
+			currentPlan.setScore(currentScore );
+			currentCarrier.getPlans().add( currentPlan );
 			if(this.selected){
-				currentCarrier.setSelectedPlan(currentPlan);
+				currentCarrier.setSelectedPlan( currentPlan );
 			}
 		}
 		else if (name.equals("tour")) {
@@ -336,21 +368,21 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			scheduledTours.add(sTour);
 		}
 		else if(name.equals("description")){
-			vehicleTypeBuilder.setDescription(content);
+			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
+//			vehicleType.setDescription(content );
 		}
-	}
-
-	private FuelType parseFuelType(String fuelType) {
-		if(fuelType.equals(FuelType.diesel.toString())){
-			return FuelType.diesel;
+		else if(name.equals(SERVICE)){
+			this.currentService = null;
 		}
-		else if(fuelType.equals(FuelType.electricity.toString())){
-			return FuelType.electricity;
+		else if(name.equals(SHIPMENT)){
+			this.currentShipment = null;
 		}
-		else if(fuelType.equals(FuelType.gasoline.toString())){
-			return FuelType.gasoline;
+		else if(name.equals(ATTRIBUTE)){
+			this.attributesReader.endTag(name, content, context);
 		}
-		throw new IllegalStateException("fuelType " + fuelType + " is not supported");
+		else if(name.equals(ATTRIBUTES)){
+			this.currAttributes = null;
+		}
 	}
 
 	private void finishLeg(Id<Link> toLocation) {

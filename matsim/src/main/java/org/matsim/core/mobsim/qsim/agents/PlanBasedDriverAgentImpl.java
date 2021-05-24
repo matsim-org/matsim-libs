@@ -25,16 +25,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author nagel
- *
  */
 public final class PlanBasedDriverAgentImpl implements DriverAgent {
 
@@ -45,6 +45,7 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 	public PlanBasedDriverAgentImpl(BasicPlanAgentImpl basicAgent ) {
 		this.basicPlanAgentDelegate = basicAgent ;
 	}
+
 	private static int expectedLinkWarnCount = 0;
 
 	private Id<Link> cachedNextLinkId = null;
@@ -52,16 +53,14 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 	@Override
 	public final void notifyMoveOverNode(Id<Link> newLinkId) {
 		if (expectedLinkWarnCount < 10 && !newLinkId.equals(this.cachedNextLinkId)) {
-			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
-					"anyway ... This warning is suppressed after the first 10 warnings.") ;
+			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " + "anyway ... This warning is suppressed after the first 10 warnings.") ;
 			expectedLinkWarnCount++;
 		}
-		Gbl.assertNotNull(newLinkId);
 		this.basicPlanAgentDelegate.setCurrentLinkId( newLinkId ) ;
 		this.basicPlanAgentDelegate.incCurrentLinkIndex();
 		this.cachedNextLinkId = null; //reset cached nextLink
 	}
-	
+
 	/**
 	 * Returns the next link the vehicle will drive along.
 	 *
@@ -96,22 +95,22 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 		}
 
 		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.basicPlanAgentDelegate.getCurrentLeg().getRoute()).getLinkIds();
-		
+
 		// (3) if route has run dry, we return the destination link (except for one special case, which however may not be necessary any more):
 		if (this.basicPlanAgentDelegate.getCurrentLinkIndex() >= routeLinkIds.size() ) {
 
 			// special case:
-			if (this.getCurrentLinkId().equals( this.getDestinationLinkId() )  && this.basicPlanAgentDelegate.getCurrentLinkIndex() > routeLinkIds.size()) {
+			if (this.getCurrentLinkId().equals( this.getDestinationLinkId() ) && this.basicPlanAgentDelegate.getCurrentLinkIndex() > routeLinkIds.size()) {
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
 
 				// the condition for arrival used to be "route has run dry AND destination link not attached to current link".  now with loop links,
 				// this condition was not triggered.  So no wonder that for such cases a special condition was needed.  kai, nov'14
-				
+
 				// The special condition may not be necessary any more. kai, nov'14
 
 				return null;
 			}
-			
+
 			this.cachedNextLinkId = this.getDestinationLinkId();
 			return this.cachedNextLinkId;
 
@@ -120,12 +119,12 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 		// (4) otherwise (normal case): return the next link of the plan (after caching it):
 		this.cachedNextLinkId = routeLinkIds.get(this.basicPlanAgentDelegate.getCurrentLinkIndex());
 		return this.cachedNextLinkId;
-		
+
 	}
 
 	@Override
 	public final boolean isWantingToArriveOnCurrentLink( ) {
-		
+
 		if ( ! ( this.basicPlanAgentDelegate.getCurrentLeg().getRoute() instanceof NetworkRoute ) ) {
 			// non-network links in the past have always returned true (i.e. "null" to the chooseNextLink question). kai, nov'14
 			return true ;
@@ -133,17 +132,17 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 
 		final List<Id<Link>> routeLinkIds = ((NetworkRoute) this.basicPlanAgentDelegate.getCurrentLeg().getRoute()).getLinkIds();
 		final int routeLinkIdsSize = routeLinkIds.size();
-		
+
 		// the standard condition used to be "route has run dry AND destination link not attached to current link":
 		// 2nd condition essentially meant "destination link EQUALS current link" but really stupid way of stating this.  Thus
 		// changing the second condition to "being at destination".  This breaks old code; I will fix as far as it is covered by tests.  kai, nov'14
 		if ( this.basicPlanAgentDelegate.getCurrentLinkIndex() >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
 			return true ;
 		}
-		
-// the following are possible consistency checks on which previous code may have relied. Relatively expensive because of hash map lookups. kai, nov'14
-			
-//		Link currentLink = this.getScenario().getNetwork().getLinks().get( this.getCurrentLinkId() ) ;
+
+		// the following are possible consistency checks on which previous code may have relied. Relatively expensive because of hash map lookups. kai, nov'14
+
+		//		Link currentLink = this.getScenario().getNetwork().getLinks().get( this.getCurrentLinkId() ) ;
 //		Link destinationLink = this.getScenario().getNetwork().getLinks().get( this.getDestinationLinkId() ) ;
 //			
 //		if ( this.currentLinkIndex >= routeLinkIdsSize ) { // route has run dry
@@ -155,18 +154,17 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 //				return true ;
 //			}
 //		}
-			
-//		Link nextLink = this.getScenario().getNetwork().getLinks().get( routeLinkIds.get(this.getCurrentLinkIndex()) ) ;
+
+		//		Link nextLink = this.getScenario().getNetwork().getLinks().get( routeLinkIds.get(this.getCurrentLinkIndex()) ) ;
 //		
 //		if ( currentLink.getToNode() != nextLink.getFromNode() ) {
 //			log.error("route is inconsistent.  In consequence, vehicle has no chance to continue correctly." +  
 //					"Make it arrive here rather than explode it at the intersection." ) ;
 //			return true ;
 //		}
-			
+
 		return false ;
 	}
-
 
 	// ============================================================================================================================
 	// below there only (package-)private methods or setters/getters
@@ -179,14 +177,14 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 	 * If the Leg has not changed, calling this method should have no effect
 	 * on the Results of the Simulation!
 	 */
-	/* package */ final void resetCaches() {
+	/* package */ public final void resetCaches() {
 
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internals are
 		// known best.  kai, oct'10
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
 
 		this.cachedNextLinkId = null;
-		
+
 		if( this.basicPlanAgentDelegate.getCurrentPlanElement()==null ) {
 			throw new RuntimeException("encountered unexpected null pointer" ) ;
 		}
@@ -200,7 +198,7 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 //		else {			
 //			this.basicPlanAgentDelegate.calculateAndSetDepartureTime((Activity) this.basicPlanAgentDelegate.getCurrentPlanElement());
 //		}
-		this.basicPlanAgentDelegate.resetCaches(); 
+		this.basicPlanAgentDelegate.resetCaches();
 	}
 
 	@Override
@@ -230,12 +228,16 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
-		return this.basicPlanAgentDelegate.getPlannedVehicleId() ;
+		return this.basicPlanAgentDelegate.getPlannedVehicleId();
 	}
 
 	@Override
 	public String getMode() {
-		return this.basicPlanAgentDelegate.getMode() ;
+		return this.basicPlanAgentDelegate.getMode();
 	}
 
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("basicPlanAgentDelegate", basicPlanAgentDelegate).toString();
+	}
 }

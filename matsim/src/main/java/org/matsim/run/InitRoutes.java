@@ -23,7 +23,6 @@ package org.matsim.run;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -132,10 +131,7 @@ public class InitRoutes {
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		Network network = scenario.getNetwork();
 
-//		StreamingUtils.setIsStreaming(reader, true);
-//		final PopulationReader plansReader = new StreamingPopulationReader(scenario);
 		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		Gbl.assertNotNull(this.plansfile);
 		plansWriter.startStreaming(this.plansfile);

@@ -19,21 +19,20 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * @author mrieser
@@ -42,10 +41,11 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author nagel
  *
  */
-public abstract class ConfigUtils implements MatsimExtensionPoint {
+public class ConfigUtils implements MatsimExtensionPoint {
+	private ConfigUtils() {} // do not instantiate
 
 	public static Config createConfig(final String context) {
-		URL url = IOUtils.getUrlFromFileOrResource(context) ;
+		URL url = IOUtils.resolveFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 
@@ -70,7 +70,74 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
-		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+		return loadConfig(IOUtils.resolveFileOrResource(filename), customModules);
+	}
+
+	/**
+	 *  This variant is meant such that one can have a command line call to MATSim that first provides a config file, and then
+	 *  overrides some of it.  Should be particularly useful for integration tests for main methods, since, if those main methods are using
+	 *  this method here, it should be possible to test them via
+	 *  <pre>
+	 *        ...main( <config.xml> --config:controler.outputDir=... )
+	 *  </pre>
+	 *  i.e. the current necessity to break runnable scripts into pieces to change things like output directory or lastIteration should be gone with this.
+	 */
+	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( config, IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	/**
+	 * A standard version, where we ignore the 1st argument (which should be the config file), and take everything afterwards.  Standard usage should be
+	 * something like
+	 * <pre>
+	 *     Config config = ConfigUtils.loadConfig( args ) ; // note that this already sets the config-related arguments from the command line
+	 *     CommandLine cmd = ConfigUtils.getCommandLine( args ) ;
+	 *     ... = cmd.getOption( "abc" )... ;
+	 * </pre>
+	 *
+	 * @param args
+	 * @return
+	 */
+	public static CommandLine getCommandLine( String[] args ){
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		try{
+			return new CommandLine.Builder( typedArgs )
+					.allowPositionalArguments( false )
+					.allowAnyOption( true )
+					.build() ;
+		} catch( CommandLine.ConfigurationException e ){
+			throw new RuntimeException( e ) ;
+		}
+	}
+
+	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		Config config = loadConfig( url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config loadConfig( Config config, final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		loadConfig( config, url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config applyCommandline( Config config, String[] typedArgs ){
+		try{
+			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
+			bld.allowAnyOption( true  );
+			bld.allowPositionalArguments( false ) ;
+			CommandLine cmd = bld.build();
+			cmd.applyConfiguration( config );
+		} catch( CommandLine.ConfigurationException e ){
+			e.printStackTrace();
+			throw new RuntimeException( e ) ;
+		}
+		return config ;
 	}
 
 	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
@@ -101,14 +168,35 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 */
 	public static void loadConfig(final Config config, final String filename) throws UncheckedIOException {
 		if (config.global() == null) {
+			// if the config does not exist yet, we interpret the file name as is:
 			config.addCoreModules();
+			new ConfigReader(config).readFile(filename);
+		} else {
+			// if the config does already exist, this can be used to read a second config file to override
+			// settings from before, e.g. using a base config and then several case study configs.
+			// In this case, using the above syntax generates inconsistent behavior between
+			// gui and command line: command line takes the config file from the java root,
+			// while the gui takes it from the config file root.  The following syntax should
+			// now also take it from the config file root when it is called from the command line
+			// (same as in other places: we are making the command line behavior
+			// and GUI behavior consistent).
+			// kai, jan'18
+//			URL url = ConfigGroup.getInputFileURL(config.getContext(), filename);;
+//			new ConfigReader(config).parse(url) ;
+			// yyyyyy the above probably works, but has ramifications across many test
+			// cases.  Need to discuss first (and then find some time again).
+			// See MATSIM-776 and MATSIM-777.  kai, feb'18
+			
+			new ConfigReader(config).readFile(filename);
 		}
-		new ConfigReader(config).readFile(filename);
 	}
 
-	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+	public static void loadConfig(final Config config, final URL url, ConfigGroup... customModules ) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();
+		}
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
 		}
 		new ConfigReader(config).parse(url);
 	}
@@ -172,20 +260,23 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		String absolutePath = prefix + path;
 		return absolutePath;
 	}
-
+	@Deprecated // using this vs not using this can change results, presumably because strategies may be used in a different sequence from the registry.
+	// (Had the problem in RandomizingTransitRotuerIT.) kai, dec'19
 	public static Id<StrategySettings> createAvailableStrategyId(Config config) {
 		long maxStrategyId = 0;
-		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
-		while(iterator.hasNext()){
-			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
+		for( StrategySettings strategySettings : config.strategy().getStrategySettings() ){
+			maxStrategyId = Math.max( maxStrategyId , Long.parseLong( strategySettings.getId().toString() ) );
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);
 	}
 	
 	
 	/** 
-	 * Convenience method to all addOrGetModule with only two arguments.  
-	 * 
+	 * Convenience method to all addOrGetModule with only two arguments.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 * @param config
 	 * @param moduleClass
 	 * @return instance of moduleClass inside config
@@ -206,6 +297,10 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 * method with
 	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)
 	 * and then hit Refactor/Inline.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 */
 	public static <T extends ConfigGroup> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
 		ConfigGroup module = config.getModule(groupName);
@@ -216,7 +311,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
-        }
+		}
 		return moduleClass.cast(module);
 	}
 
@@ -226,5 +321,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+	}
+	
+	public static void writeConfig( final Config config, String filename ) {
+		new ConfigWriter(config).write(filename);
+	}
+	public static void writeMinimalConfig( final Config config, String filename ) {
+		new ConfigWriter(config,Verbosity.minimal).write(filename);
 	}
 }

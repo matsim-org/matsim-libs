@@ -22,7 +22,7 @@
 
 package org.matsim.core.replanning.modules;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,15 +32,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExternalModuleTest {
@@ -56,7 +54,23 @@ public class ExternalModuleTest {
     public void setUp() {
         scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
-        outputDirectoryHierarchy = new OutputDirectoryHierarchy(utils.getOutputDirectory(), OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        final String outputDirectory = utils.getOutputDirectory();
+        outputDirectoryHierarchy = new OutputDirectoryHierarchy(
+                outputDirectory, OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controler().getCompressionType());
+        scenario.getConfig().controler().setOutputDirectory( outputDirectory );
+//        scenario.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+
+//        // the following includes all retrofittings that were added later:
+//        com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig(), new AbstractModule(){
+//            @Override public void install(){
+//                install( new NewControlerModule() );
+//                install( new ControlerDefaultCoreListenersModule() );
+//                install( new ControlerDefaultsModule() );
+//                install( new ScenarioByInstanceModule( scenario ) );
+//            }
+//        } );;
+//        PrepareForSim prepareForSim = injector.getInstance( PrepareForSim.class ) ;
+//        prepareForSim.run();
     }
 
     @Test

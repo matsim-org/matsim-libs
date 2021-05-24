@@ -19,25 +19,30 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-public abstract class AssignmentDestinationData<D> {
-	public static class DestEntry<D> extends LinkTimePair {
+import com.google.common.collect.ImmutableList;
+
+public class AssignmentDestinationData<D> {
+	public static class DestEntry<D> {
 		public final int idx;
 		public final D destination;
+		public final Link link;
+		public final double time;
 
 		public DestEntry(int idx, D destination, Link link, double time) {
-			super(link, time);
 			this.idx = idx;
 			this.destination = destination;
+			this.link = link;
+			this.time = time;
 		}
 	}
 
-	protected final List<DestEntry<D>> entries = new ArrayList<>();
+	private final ImmutableList<DestEntry<D>> entries;
+
+	public AssignmentDestinationData(ImmutableList<DestEntry<D>> entries) {
+		this.entries = entries;
+	}
 
 	public int getSize() {
 		return entries.size();
@@ -47,7 +52,7 @@ public abstract class AssignmentDestinationData<D> {
 		return entries.get(idx);
 	}
 
-	public List<DestEntry<D>> getEntries() {
+	public ImmutableList<DestEntry<D>> getEntries() {
 		return entries;
 	}
 }

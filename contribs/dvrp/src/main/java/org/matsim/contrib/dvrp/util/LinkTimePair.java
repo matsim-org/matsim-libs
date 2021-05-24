@@ -29,4 +29,9 @@ public class LinkTimePair {
 		this.link = link;
 		this.time = time;
 	}
+
+	@Override
+	public String toString() {
+		return "[link=" + link + "][time=" + time + "]";
+	}
 }

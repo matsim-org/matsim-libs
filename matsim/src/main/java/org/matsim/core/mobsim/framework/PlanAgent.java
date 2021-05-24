@@ -35,5 +35,5 @@ public interface PlanAgent extends MobsimAgentMarkerInterface {
     public PlanElement getPreviousPlanElement();
 
     public Plan getCurrentPlan();
-
+    
 }

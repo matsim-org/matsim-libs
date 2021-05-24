@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.NetworkInverter;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -31,8 +32,8 @@ import org.matsim.core.router.costcalculators.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
-
-import junit.framework.Assert;
+import org.matsim.vehicles.Vehicle;
+import org.junit.Assert;
 
 
 /**
@@ -47,20 +48,19 @@ public class InvertertedNetworkRoutingTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() );
+		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig() );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-        Facility<?> fromFacility = new LinkWrapperFacility(//
+        Facility fromFacility = new LinkWrapperFacility(//
                 f.s.getNetwork().getLinks().get(Id.create("12", Link.class)));
-        Facility<?> toFacility = new LinkWrapperFacility(//
+        Facility toFacility = new LinkWrapperFacility(//
                 f.s.getNetwork().getLinks().get(Id.create("78", Link.class)));
 
-		LinkToLinkRoutingModule router =
-				new LinkToLinkRoutingModule(
-						"mode",
-						f.s.getPopulation().getFactory(),
-						f.s.getNetwork(), lcpFactory,tc, tt, new NetworkTurnInfoBuilder(f.s));
+		Network invertedNetwork = new NetworkInverter(f.s.getNetwork(), new NetworkTurnInfoBuilder(f.s).createAllowedTurnInfos()).getInvertedNetwork();
+		InvertedLeastPathCalculator calc = InvertedLeastPathCalculator.create(lcpFactory, tc, f.s.getNetwork(), invertedNetwork, tt);
+		LinkToLinkRoutingModule router = new LinkToLinkRoutingModule("mode", f.s.getPopulation().getFactory(), f.s.getNetwork(), invertedNetwork, calc);
+
 		//test 1
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		
@@ -100,8 +100,8 @@ public class InvertertedNetworkRoutingTest {
 		
 	}
 
-	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility<?> fromFacility,
-            final Facility<?> toFacility, final Person person)
+	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility fromFacility,
+            final Facility toFacility, final Person person)
 	{
         Leg leg = (Leg)router.calcRoute(fromFacility, toFacility, 0.0, person).get(0);
         return (NetworkRoute) leg.getRoute();
@@ -121,7 +121,7 @@ public class InvertertedNetworkRoutingTest {
 		}
 
 		@Override
-		public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
+		public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time, Person person, Vehicle vehicle) {
 			double tt = fromLink.getLength() / fromLink.getFreespeed(time);
 			if (Id.create("34", Link.class).equals(toLink.getId())){
 				tt = tt + this.turningMoveCosts34;

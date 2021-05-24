@@ -22,13 +22,13 @@ package org.matsim.vis.kml;
 
 import java.io.IOException;
 
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.ScreenOverlayType;
-import net.opengis.kml._2.UnitsEnumType;
-import net.opengis.kml._2.Vec2Type;
-
 import org.matsim.core.gbl.MatsimResource;
+
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.ScreenOverlayType;
+import net.opengis.kml.v_2_2_0.UnitsEnumType;
+import net.opengis.kml.v_2_2_0.Vec2Type;
 
 /**
  * A ScreenOverlay representing the MATSim logo

@@ -19,30 +19,42 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Set;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 
-public class MultiPassengerDropoffActivity extends VrpActivity {
-	private final PassengerEngine passengerEngine;
+public class MultiPassengerDropoffActivity extends FirstLastSimStepDynActivity {
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
-	private final Set<? extends PassengerRequest> requests;
+	private final Map<Id<Request>, ? extends PassengerRequest> requests;
 
-	public MultiPassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
-			Set<? extends PassengerRequest> requests, String activityType) {
-		super(activityType, dropoffTask);
+	private final double departureTime;
 
-		this.passengerEngine = passengerEngine;
+	public MultiPassengerDropoffActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask dropoffTask,
+			Map<Id<Request>, ? extends PassengerRequest> requests, String activityType) {
+		super(activityType);
+
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.requests = requests;
+
+		departureTime = dropoffTask.getEndTime();
 	}
 
 	@Override
-	public void finalizeAction(double now) {
-		for (PassengerRequest request : requests) {
-			passengerEngine.dropOffPassenger(driver, request, now);
+	protected boolean isLastStep(double now) {
+		return now >= departureTime;
+	}
+
+	@Override
+	protected void afterLastStep(double now) {
+		// dropoff at the end of stop activity
+		for (PassengerRequest request : requests.values()) {
+			passengerHandler.dropOffPassenger(driver, request, now);
 		}
 	}
 }

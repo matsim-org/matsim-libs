@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.cadyts.pt;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
+import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +43,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -57,8 +58,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -66,13 +67,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Provider;
-
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
-
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CadytsPtIT {
 
@@ -170,7 +168,7 @@ public class CadytsPtIT {
 				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
@@ -619,6 +617,7 @@ public class CadytsPtIT {
 		config.network().setInputFile(inputDir + "network.xml") ;
 		// ---
 		config.plans().setInputFile(inputDir + "4plans.xml") ;
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		// ---
 		config.transit().setUseTransit(true) ;
 		// ---
@@ -650,10 +649,13 @@ public class CadytsPtIT {
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		// ---
-		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+//		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+		CadytsConfigGroup cadytsPtConfig = ConfigUtils.addOrGetModule( config, CadytsConfigGroup.class );
 
-		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
-		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+//		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
+		cadytsPtConfig.setStartTime( 4*3600 );
+//		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+		cadytsPtConfig.setEndTime( 20*3600 );
 		cadytsPtConfig.addParam(CadytsConfigGroup.REGRESSION_INERTIA, "0.95") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.USE_BRUTE_FORCE, "true") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.MIN_FLOW_STDDEV, "8") ;
@@ -661,8 +663,8 @@ public class CadytsPtIT {
 		cadytsPtConfig.addParam(CadytsConfigGroup.TIME_BIN_SIZE, "3600") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.CALIBRATED_LINES, "M44,M43") ;
 
-		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
-		config.addModule(ccc) ;
+//		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
+//		config.addModule(ccc) ;
 
 
 		// ---

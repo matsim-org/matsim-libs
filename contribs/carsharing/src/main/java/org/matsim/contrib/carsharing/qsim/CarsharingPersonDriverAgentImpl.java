@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
-import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -25,7 +24,9 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -49,7 +50,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.scenario = simulation.getScenario() ;
 		this.carsharingManager = carsharingManager;
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
-		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
+		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate, TransitConfigGroup.BoardingAcceptance.checkLineAndStop) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
 		this.originalPlan = this.scenario.getPopulation().getPersons().get(this.basicAgentDelegate.getId()).getSelectedPlan();
 		//this should work with multiple qsim threads now since different instances of router are used sep '17 mb
@@ -73,7 +74,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				if (pe2 instanceof Leg && carsharingLeg(pe2))
 					countCSLegs++;
 				if (countCSLegs > this.carsharingTrips) {
-					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.getCurrentPlan(), legToBerouted.getMode(), 
+					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.originalPlan, legToBerouted.getMode(), 
 							(Leg)(pe2), now);
 					carsharingTrips++;
 					break;
@@ -176,7 +177,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 
 	@Override
-	public final Double getExpectedTravelTime() {
+	public final OptionalTime getExpectedTravelTime() {
 		return this.basicAgentDelegate.getExpectedTravelTime() ;
 
 	}
@@ -265,11 +266,11 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		return this.driverAgentDelegate.chooseNextLinkId() ;
 	}
 
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		return this.basicAgentDelegate.getCurrentFacility();
 	}
 
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
 	}
 

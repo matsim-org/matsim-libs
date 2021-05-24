@@ -19,29 +19,40 @@
 
 package org.matsim.contrib.dvrp.util.chart;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Paint;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
-import org.jfree.chart.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.labels.XYToolTipGenerator;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.gantt.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.XYDataset;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.SymbolAxis;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.data.gantt.TaskSeries;
+import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.data.gantt.XYTaskDataset;
+import org.jfree.data.time.SimpleTimePeriod;
+import org.jfree.data.time.TimePeriod;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 public class ScheduleCharts {
-	public static JFreeChart chartSchedule(List<? extends Vehicle> vehicles) {
+	public static JFreeChart chartSchedule(List<? extends DvrpVehicle> vehicles) {
 		return chartSchedule(vehicles, BASIC_DESCRIPTION_CREATOR, BASIC_PAINT_SELECTOR);
 	}
 
-	public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles,
+	public static JFreeChart chartSchedule(Collection<? extends DvrpVehicle> vehicles,
 			DescriptionCreator descriptionCreator, PaintSelector paintSelector) {
 		// data
 		TaskSeriesCollection dataset = createScheduleDataset(vehicles, descriptionCreator);
@@ -55,7 +66,7 @@ public class ScheduleCharts {
 		// Y axis
 		String[] series = new String[vehicles.size()];
 		int i = 0;
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			series[i++] = v.getId().toString();
 		}
 
@@ -76,7 +87,7 @@ public class ScheduleCharts {
 
 	@SuppressWarnings("serial")
 	private static class ChartTask extends org.jfree.data.gantt.Task {
-		private Task vrpTask;
+		private final Task vrpTask;
 
 		private ChartTask(String description, TimePeriod duration, Task vrpTask) {
 			super(description, duration);
@@ -97,12 +108,7 @@ public class ScheduleCharts {
 			setShadowVisible(false);
 			setDrawBarOutline(true);
 
-			setBaseToolTipGenerator(new XYToolTipGenerator() {
-				@Override
-				public String generateToolTip(XYDataset dataset, int series, int item) {
-					return getTask(series, item).getDescription();
-				}
-			});
+			setDefaultToolTipGenerator((dataset, series, item) -> getTask(series, item).getDescription());
 		}
 
 		@Override
@@ -111,50 +117,45 @@ public class ScheduleCharts {
 		}
 
 		private ChartTask getTask(int series, int item) {
-			ChartTask chartTask = (ChartTask)tsc.getSeries(series).get(item);
-			return chartTask;
+			return (ChartTask)tsc.getSeries(series).get(item);
 		}
 
 	}
 
-	public static interface PaintSelector {
+	public interface PaintSelector {
 		Paint select(Task task);
 	}
 
 	private static final Color WAIT_COLOR = new Color(0, 200, 0);
 	private static final Color DRIVE_COLOR = new Color(200, 0, 0);
 
-	public static final PaintSelector BASIC_PAINT_SELECTOR = new PaintSelector() {
-		public Paint select(Task task) {
-			if (task instanceof DriveTask) {
-				return DRIVE_COLOR;
-			} else if (task instanceof StayTask) {
-				return WAIT_COLOR;
-			}
-			throw new IllegalStateException();
+	public static final PaintSelector BASIC_PAINT_SELECTOR = task -> {
+		if (task instanceof DriveTask) {
+			return DRIVE_COLOR;
+		} else if (task instanceof StayTask) {
+			return WAIT_COLOR;
 		}
+		throw new IllegalStateException();
 	};
 
-	public static interface DescriptionCreator {
+	public interface DescriptionCreator {
 		String create(Task task);
 	}
 
-	public static final DescriptionCreator BASIC_DESCRIPTION_CREATOR = new DescriptionCreator() {
-		public String create(Task task) {
-			if (task instanceof StayTask) {
-				return StayTask.class.toString();
-			} else if (task instanceof DriveTask) {
-				return DriveTask.class.toString();
-			}
-			throw new RuntimeException("not implemented");
+	public static final DescriptionCreator BASIC_DESCRIPTION_CREATOR = task -> {
+		if (task instanceof StayTask) {
+			return StayTask.class.toString();
+		} else if (task instanceof DriveTask) {
+			return DriveTask.class.toString();
 		}
+		throw new RuntimeException("not implemented");
 	};
 
-	private static TaskSeriesCollection createScheduleDataset(Collection<? extends Vehicle> vehicles,
+	private static TaskSeriesCollection createScheduleDataset(Collection<? extends DvrpVehicle> vehicles,
 			DescriptionCreator descriptionCreator) {
 		TaskSeriesCollection collection = new TaskSeriesCollection();
 
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			Schedule schedule = v.getSchedule();
 
 			final TaskSeries scheduleTaskSeries = new TaskSeries(v.getId().toString());
@@ -167,8 +168,7 @@ public class ScheduleCharts {
 			for (Task t : schedule.getTasks()) {
 				String description = descriptionCreator.create(t);
 
-				TimePeriod duration = new SimpleTimePeriod(//
-						new Date((int)Math.floor(t.getBeginTime() * 1000)), //
+				TimePeriod duration = new SimpleTimePeriod(new Date((int)Math.floor(t.getBeginTime() * 1000)),
 						new Date((int)Math.ceil(t.getEndTime() * 1000)));
 
 				scheduleTaskSeries.add(new ChartTask(description, duration, t));

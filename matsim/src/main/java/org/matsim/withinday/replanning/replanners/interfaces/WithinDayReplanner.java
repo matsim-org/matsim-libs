@@ -24,11 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
-import org.matsim.withinday.utils.EditRoutes;
 
 /*
  *	Each WithinDayReplanner needs one or more AgentsToReplanIdentifier
@@ -43,15 +40,13 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 	protected final Id<WithinDayReplanner> id;
 	protected final Scenario scenario;
 	protected final ActivityEndRescheduler internalInterface;
-	protected final WithinDayAgentUtils withinDayAgentUtils;
 
-	protected double time = Time.UNDEFINED_TIME;
+	protected OptionalTime time = OptionalTime.undefined();
 
 	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
 		this.id = id;
 		this.scenario = scenario;
 		this.internalInterface = activityEndRescheduler;
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	public abstract boolean doReplanning(MobsimAgent withinDayAgent);
@@ -60,16 +55,16 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 		return this.id;
 	}
 	
-	public final double getTime() {
+	public final OptionalTime getTime() {
 		return this.time;
 	}
 	
 	public final void setTime(double time) {
-		this.time = time;
+		this.time = OptionalTime.defined(time);
 	}
 	
 	public void reset() {
-		this.time = Time.UNDEFINED_TIME;
+		this.time = OptionalTime.undefined();
 	}
 	
 	@Override	

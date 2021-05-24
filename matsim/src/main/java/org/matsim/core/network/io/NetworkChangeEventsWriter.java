@@ -18,16 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.network.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -125,6 +121,11 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 	}
 	
 	private void writeEvent(NetworkChangeEvent event) throws IOException {
+//		if ( event.getLinks().isEmpty() ) {
+//			return ;
+//			// yyyy is this a problem?  There is otherwise this condition (*) below ?? 
+		// or is it a problem to just write the empty change event?  kai, nov'17
+//		}
 		this.writer.write(TAB);
 		this.writer.write(OPEN_TAG_1);
 		this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
@@ -139,6 +140,7 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 
 		if (event.getLinks().isEmpty()) {
 			throw new IllegalArgumentException("NetworkChangeEvent must contain at least one link.");
+			// (*)
 		}
 		for(Link link : event.getLinks()) {
 			this.writer.write(TAB);
@@ -184,10 +186,18 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 		this.writer.write(NetworkChangeEventsParser.CHANGE_TYPE_TAG);
 		this.writer.write(EQUALS);
 		this.writer.write(QUOTE);
-		if(value.getType() == ChangeType.ABSOLUTE_IN_SI_UNITS) {
+		switch( value.getType() ) {
+		case ABSOLUTE_IN_SI_UNITS:
 			this.writer.write(NetworkChangeEventsParser.ABSOLUTE_VALUE);
-		} else if(value.getType() == ChangeType.FACTOR) {
+			break;
+		case FACTOR:
 			this.writer.write(NetworkChangeEventsParser.FACTOR_VALUE);
+			break;
+		case OFFSET_IN_SI_UNITS:
+			this.writer.write(NetworkChangeEventsParser.OFFSET_VALUE);
+			break;
+		default:
+			throw new RuntimeException("missing ChangeType") ;
 		}
 		this.writer.write(QUOTE);
 		

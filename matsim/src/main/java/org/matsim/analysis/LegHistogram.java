@@ -20,20 +20,24 @@
 
 package org.matsim.analysis;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.FileNotFoundException;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +55,7 @@ import java.util.TreeMap;
  */
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
-	private Population population;
+	private Set<Id<Person>> personIds;
 	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
@@ -60,7 +64,11 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Inject
 	LegHistogram(Population population, EventsManager eventsManager) {
 		this(300);
-		this.population = population;
+		if (population == null) {
+			this.personIds = null;
+		} else {
+			this.personIds = population.getPersons().keySet();
+		}
 		eventsManager.addHandler(this);
 	}
 
@@ -91,7 +99,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId())) && event.getLegMode() != null) {
+		if ((this.personIds == null || this.personIds.contains(event.getPersonId())) && event.getLegMode() != null) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsDep[index]++;
 		}
@@ -100,7 +108,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId())) && event.getLegMode() != null) {
+		if ((this.personIds == null || this.personIds.contains(event.getPersonId())) && event.getLegMode() != null) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsArr[index]++;
 		}
@@ -109,7 +117,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonStuckEvent event) {
 		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId())) && event.getLegMode() != null) {
+		if ((this.personIds == null || this.personIds.contains(event.getPersonId())) && event.getLegMode() != null) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsStuck[index]++;
 		}
@@ -127,8 +135,10 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @param filename The name of a file where to write the gathered data.
 	 */
 	public void write(final String filename) {
-		try (PrintStream stream = IOUtils.getPrintStream(filename) ) {
-			write(stream);
+		try (OutputStream stream = IOUtils.getOutputStream(IOUtils.getFileUrl(filename), false)) {
+			write(new PrintStream(stream));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -145,8 +155,8 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		stream.print("\n");
 		int allEnRoute = 0;
 		int[] modeEnRoute = new int[this.data.size()];
-        DataFrame allModesData = getAllModesData();
-        for (int i = 0; i < allModesData.countsDep.length; i++) {
+				DataFrame allModesData = getAllModesData();
+				for (int i = 0; i < allModesData.countsDep.length; i++) {
 			// data about all modes
 			allEnRoute = allEnRoute + allModesData.countsDep[i] - allModesData.countsArr[i] - allModesData.countsStuck[i];
 			stream.print(Time.writeTime(i*this.binSize) + "\t" + i*this.binSize);
@@ -165,7 +175,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		}
 	}
 
-    /**
+		/**
 	 * @return number of departures per time-bin, for all legs
 	 */
 	public int[] getDepartures() {
@@ -229,25 +239,25 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		return dataFrame.countsStuck.clone();
 	}
 
-    int getIteration() {
-        return iteration;
-    }
+	int getIteration() {
+		return this.iteration;
+	}
 
-    DataFrame getAllModesData() {
-        DataFrame result = new DataFrame(this.binSize, this.nofBins + 1);
-        for (DataFrame byMode : data.values()) {
-            for (int i=0;i<result.countsDep.length;++i) {
-                result.countsDep[i] += byMode.countsDep[i];
-            }
-            for (int i=0;i<result.countsArr.length;++i) {
-                result.countsArr[i] += byMode.countsArr[i];
-            }
-            for (int i=0;i<result.countsStuck.length;++i) {
-                result.countsStuck[i] += byMode.countsStuck[i];
-            }
-        }
-        return result;
-    }
+	DataFrame getAllModesData() {
+		DataFrame result = new DataFrame(this.binSize, this.nofBins + 1);
+		for (DataFrame byMode : this.data.values()) {
+			for (int i=0;i<result.countsDep.length;++i) {
+				result.countsDep[i] += byMode.countsDep[i];
+			}
+			for (int i=0;i<result.countsArr.length;++i) {
+				result.countsArr[i] += byMode.countsArr[i];
+			}
+			for (int i=0;i<result.countsStuck.length;++i) {
+				result.countsStuck[i] += byMode.countsStuck[i];
+			}
+		}
+		return result;
+	}
 
 	private int getBinIndex(final double time) {
 		int bin = (int)(time / this.binSize);
@@ -270,13 +280,13 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		final int[] countsDep;
 		final int[] countsArr;
 		final int[] countsStuck;
-        final int binSize;
+		final int binSize;
 
-        public DataFrame(final int binSize, final int nofBins) {
+		public DataFrame(final int binSize, final int nofBins) {
 			this.countsDep = new int[nofBins];
 			this.countsArr = new int[nofBins];
 			this.countsStuck = new int[nofBins];
-            this.binSize = binSize;
+			this.binSize = binSize;
 		}
 	}
 

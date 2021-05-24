@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Node;
  * @author cdobler
  */
 public class InitialNode {
+	//cant make final, extended by OneToManyPathSearch.ToNode
+	//need a decision. Amit Sep'17
 	
 	public Node node;
 	public final double initialCost;
@@ -39,11 +41,23 @@ public class InitialNode {
 		this.initialCost = initialCost;
 		this.initialTime = initialTime;
 	}
+
+	// allowing node as null; many duplicates of InitialNode does not require node thus removing such duplicate classes by setting node as null. Amit Sep'17
+	public InitialNode(final double initialCost, final double initialTime) {
+		this(null, initialCost, initialTime);
+	}
 	
 	@Override
 	public String toString() {
-		return "[id=" + this.node.getId() + "]" +
-				"[initialCost=" + this.initialCost + "]" +
-				"[initialTime=" + this.initialTime + "]";
+		if (node == null) {
+			return "[id=" + " null " + "]" +
+					"[initialCost=" + this.initialCost + "]" +
+					"[initialTime=" + this.initialTime + "]";
+		} else {
+			return "[id=" + this.node.getId() + "]" +
+					"[initialCost=" + this.initialCost + "]" +
+					"[initialTime=" + this.initialTime + "]";
+		}
+
 	}
 }

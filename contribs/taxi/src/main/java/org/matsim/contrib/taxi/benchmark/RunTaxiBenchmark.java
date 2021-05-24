@@ -19,15 +19,26 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
-import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -40,47 +51,34 @@ import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
  * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
 public class RunTaxiBenchmark {
-	public static void run(String configFile, int runs) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup());
+	public static void run(URL configUrl, int runs) {
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
 		createControler(config, runs).run();
 	}
 
 	public static Controler createControler(Config config, int runs) {
 		config.controler().setLastIteration(runs - 1);
-		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
-		config.checkConsistency();
+		config.controler().setDumpDataAtEnd(false);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		config.controler().setCreateGraphs(false);
+		DvrpBenchmarks.adjustConfig(config);
 
-		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new TaxiOutputModule());
+		DvrpBenchmarks.initController(controler);
 
-		controler.addOverridingModule(new TaxiModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
-				install(new DvrpBenchmarkTravelTimeModule());
-			};
-		});
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
+
+		controler.addOverridingModule(new MultiModeTaxiModule());
+
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(TaxiBenchmarkStats.class)
+				.mode(mode)
+				.objectClass(Fleet.class)
+				.listenerCreator(getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
+				.build());
 
 		return controler;
-	}
-
-	public static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime) {
-		Scenario scenario = new ScenarioBuilder(config).build();
-
-		if (config.network().isTimeVariantNetwork()) {
-			((Network)scenario.getNetwork()).getFactory()
-					.setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
-		}
-
-		ScenarioUtils.loadScenario(scenario);
-		return scenario;
-	}
-
-	public static void main(String[] args) {
-		run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml", 20);
 	}
 }

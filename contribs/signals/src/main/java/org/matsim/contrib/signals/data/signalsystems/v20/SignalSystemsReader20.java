@@ -29,11 +29,9 @@ import javax.xml.validation.SchemaFactory;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalsystems20.XMLIdRefType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
@@ -41,7 +39,8 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
@@ -49,7 +48,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalSystemsReader20 implements MatsimReader {
+public final class SignalSystemsReader20 extends AbstractSignalsReader {
 
 	private SignalSystemsData signalSystemsData;
 
@@ -57,13 +56,9 @@ public class SignalSystemsReader20 implements MatsimReader {
 		this.signalSystemsData = signalSystemData;
 	}
 
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		readStream(IOUtils.getInputStream(filename));
-	}
-
-	public void readStream(InputStream stream) {
-		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream);
+	public void read( InputSource stream ) {
+//		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream);
+		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream.getByteStream());
 
 		//convert from Jaxb types to MATSim-API conform types
 		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();

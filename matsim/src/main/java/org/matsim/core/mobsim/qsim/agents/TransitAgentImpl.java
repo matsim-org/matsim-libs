@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -42,26 +44,35 @@ import org.matsim.vehicles.Vehicle;
 public final class TransitAgentImpl implements PTPassengerAgent {
 
 	private BasicPlanAgentImpl basicAgentDelegate;
-
+	private final BoardingAcceptance boardingAcceptance ;
+	
 	public TransitAgentImpl( BasicPlanAgentImpl basicAgent ) {
+		this( basicAgent, BoardingAcceptance.checkLineAndStop ) ;
+	}
+
+	public TransitAgentImpl(BasicPlanAgentImpl basicAgent, BoardingAcceptance boardingAcceptance) {
 		this.basicAgentDelegate = basicAgent ;
+		this.boardingAcceptance = boardingAcceptance;
 	}
 
 	private static final Logger log = Logger.getLogger(TransitAgentImpl.class);
 
 	@Override
 	public final  boolean getExitAtStop(final TransitStopFacility stop) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) basicAgentDelegate.getCurrentLeg().getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
 	@Override
 	public final boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) basicAgentDelegate.getCurrentLeg().getRoute();
-		if (line.getId().equals(route.getLineId())) {
-			return containsId(stopsToCome, route.getEgressStopId());
-		} else {
-			return false;
+		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
+		switch ( boardingAcceptance ) {
+			case checkLineAndStop:
+				return line.getId().equals(route.getLineId()) && containsId(stopsToCome, route.getEgressStopId());
+			case checkStopOnly:
+				return containsId(stopsToCome, route.getEgressStopId());
+			default:
+				throw new RuntimeException("not implemented");
 		}
 	}
 
@@ -84,7 +95,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	@Override
 	public final Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = basicAgentDelegate.getCurrentLeg();
-		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+		if (!(leg.getRoute() instanceof TransitPassengerRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
@@ -92,7 +103,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 			Id<TransitStopFacility> accessStopId = route.getAccessStopId();
 			return accessStopId;
 		}
@@ -100,7 +111,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 
 	@Override
 	public final Id<TransitStopFacility> getDesiredDestinationStopId() {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) basicAgentDelegate.getCurrentLeg().getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
 		return route.getEgressStopId();
 	}
 	@Override

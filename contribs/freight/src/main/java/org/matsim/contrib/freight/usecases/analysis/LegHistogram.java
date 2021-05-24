@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -47,6 +47,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Time;
 
@@ -131,7 +132,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		
 	}
 
-	private boolean agentToBeObserved(Id personId) {
+	private boolean agentToBeObserved(Id<Person> personId) {
 		if(inclPopulation){
 			if(population == null) return false;
 			if(population.getPersons().containsKey(personId)){
@@ -363,7 +364,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 */
 	public void writeGraphic(final String filename) {
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
+			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -381,7 +382,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 */
 	public void writeGraphic(final String filename, final String legMode) {
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
+			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

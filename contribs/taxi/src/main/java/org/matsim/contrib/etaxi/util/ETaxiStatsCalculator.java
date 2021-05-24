@@ -1,0 +1,86 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.contrib.etaxi.util;
+
+import static org.matsim.contrib.util.stats.DurationStats.stateDurationByTimeBinAndState;
+
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
+import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
+import org.matsim.contrib.util.stats.DurationStats;
+import org.matsim.contrib.util.stats.DurationStats.State;
+import org.matsim.contrib.util.stats.TimeBinSample;
+import org.matsim.contrib.util.stats.TimeBinSamples;
+
+import com.google.common.collect.ImmutableList;
+
+import one.util.streamex.StreamEx;
+
+public class ETaxiStatsCalculator {
+	private final SortedMap<Integer, ETaxiStats> hourlyEStats = new TreeMap<>();
+	private final ETaxiStats dailyEStats = new ETaxiStats(TaxiStatsCalculator.DAILY_STATS_ID);
+
+	public ETaxiStatsCalculator(Iterable<? extends DvrpVehicle> vehicles) {
+		for (DvrpVehicle vehicle : vehicles) {
+			stateDurationByTimeBinAndState(getStateSampleStream(vehicle, 3600), 3600).forEach(
+					(hour, stateDurations) -> updateStateDurations(getHourlyStats(hour), stateDurations));
+
+			Map<ETaxiState, Double> dailyStateDuration = DurationStats.stateDurationByTimeBinAndState(
+					getStateSampleStream(vehicle, Integer.MAX_VALUE), Integer.MAX_VALUE)
+					.entrySet()
+					.iterator()
+					.next()
+					.getValue();
+			updateStateDurations(dailyEStats, dailyStateDuration);
+		}
+	}
+
+	public ImmutableList<ETaxiStats> getETaxiStats() {
+		return ImmutableList.<ETaxiStats>builder().addAll(hourlyEStats.values()).add(dailyEStats).build();
+	}
+
+	public ETaxiStats getDailyEStats() {
+		return dailyEStats;
+	}
+
+	private Stream<TimeBinSample<State<ETaxiState>>> getStateSampleStream(DvrpVehicle vehicle, int binSize) {
+		return StreamEx.of(vehicle.getSchedule().tasks()).select(ChargingTask.class).flatMap(t -> {
+			int arrivalTime = (int)t.getBeginTime();
+			int chargingStartTime = (int)t.getChargingStartedTime();
+			int chargingEndTime = (int)t.getEndTime();
+			return Stream.of(new State<>(ETaxiState.QUEUED, arrivalTime, chargingStartTime),
+					new State<>(ETaxiState.PLUGGED, chargingStartTime, chargingEndTime));
+		}).flatMap(eTaxiStateState -> TimeBinSamples.stateSamples(eTaxiStateState, binSize));
+	}
+
+	private ETaxiStats getHourlyStats(int hour) {
+		return hourlyEStats.computeIfAbsent(hour, h -> new ETaxiStats(h + ""));
+	}
+
+	private static void updateStateDurations(ETaxiStats stats, Map<ETaxiState, Double> stateDurations) {
+		stateDurations.forEach((state, duration) -> stats.stateDurations.merge(state, duration, Double::sum));
+	}
+}

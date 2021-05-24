@@ -33,7 +33,11 @@ public abstract class SimUnit {
 	}
 
 	public void sendMessage(Message m, SimUnit targetUnit, double messageArrivalTime) {
-		m.setSendingUnit(this);
+
+//		m.setSendingUnit(this);
+		// this info is set, but never used.  Commenting it out for the time being, especially since one can generate circumvent this method here.
+		// would (evidently) be easy to re-instantiate since it just needs the "this" pointer.  kai, feb'18
+
 		m.setReceivingUnit(targetUnit);
 		m.setMessageArrivalTime(messageArrivalTime);
 		scheduler.schedule(m);

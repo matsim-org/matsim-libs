@@ -38,7 +38,6 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -81,7 +80,9 @@ import org.matsim.vehicles.Vehicle;
  * @author lnicolas
  * @author mrieser
  */
-public class Dijkstra implements LeastCostPathCalculator {
+ public class Dijkstra implements LeastCostPathCalculator {
+ 	// yyyyyy I don't think that we should make this class publicly inheritable; as we know, will eventually lead
+	// to problems.  kai, feb'18
 
 	private final static Logger log = Logger.getLogger(Dijkstra.class);
 
@@ -203,9 +204,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param toNode
 	 *            The Node at which the route should end.
 	 * @param startTime
-	 *            The time at which the route should start. <i>Note:</i> Using
-	 *            {@link Time#UNDEFINED_TIME} does not imply "time is not relevant",
-	 *            rather, {@link Path#travelTime} will return {@link Double#NaN}.
+	 *            The time at which the route should start.
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.api.core.v01.network.Node, org.matsim.api.core.v01.network.Node, double, org.matsim.api.core.v01.population.Person, org.matsim.vehicles.Vehicle)
 	 */
 	@SuppressWarnings("unchecked")
@@ -302,7 +301,11 @@ public class Dijkstra implements LeastCostPathCalculator {
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId());
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". Some possible reasons:");
+				log.warn("  * Network is not connected.  Run NetworkCleaner().") ;
+				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
+				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
+				log.warn("This will now return null, but it may fail later with a null pointer exception.");
 				return null;
 			}
 

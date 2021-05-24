@@ -21,61 +21,71 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author michalm
  */
-final class OneTaxiOptimizer implements VrpOptimizer {
+public final class OneTaxiOptimizer implements VrpOptimizer {
+	enum OneTaxiTaskType implements Task.TaskType {
+		EMPTY_DRIVE, OCCUPIED_DRIVE, PICKUP, DROPOFF, WAIT
+	}
+
+	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	private final Vehicle vehicle;// we have only one vehicle
+	private final DvrpVehicle vehicle;// we have only one vehicle
 
 	public static final double PICKUP_DURATION = 120;
 	public static final double DROPOFF_DURATION = 60;
 
 	@Inject
-	public OneTaxiOptimizer(@Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
-		timer = qSim.getSimTimer();
+	public OneTaxiOptimizer(EventsManager eventsManager, @DvrpMode(TransportMode.taxi) Network network,
+			@DvrpMode(TransportMode.taxi) Fleet fleet, MobsimTimer timer) {
+		this.eventsManager = eventsManager;
+		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
-		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime), travelTime);
+		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
+				travelTime);
 
 		vehicle = fleet.getVehicles().values().iterator().next();
-		vehicle.resetSchedule();
-		vehicle.getSchedule().addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
-				vehicle.getStartLink(), "wait"));
+		vehicle.getSchedule()
+				.addTask(new StayTask(OneTaxiTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+						vehicle.getStartLink()));
 	}
 
 	@Override
 	public void requestSubmitted(Request request) {
+		OneTaxiRequest req = (OneTaxiRequest)request;
+
 		Schedule schedule = vehicle.getSchedule();
 		StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
 		double currentTime = timer.getTimeOfDay();
@@ -94,43 +104,46 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 				throw new IllegalStateException();
 		}
 
-		OneTaxiRequest req = (OneTaxiRequest)request;
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 
-		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ? //
-				Math.max(vehicle.getServiceBeginTime(), currentTime) : //
+		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ?
+				Math.max(vehicle.getServiceBeginTime(), currentTime) :
 				Schedules.getLastTask(schedule).getEndTime();
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,
 				travelTime);
-		schedule.addTask(new DriveTaskImpl(pathToCustomer));
+		schedule.addTask(new DriveTask(OneTaxiTaskType.EMPTY_DRIVE, pathToCustomer));
 
 		double t1 = pathToCustomer.getArrivalTime();
 		double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
-		schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, true, req));
+		schedule.addTask(new OneTaxiServeTask(OneTaxiTaskType.PICKUP, t1, t2, fromLink, req));
 
 		VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router, travelTime);
-		schedule.addTask(new DriveTaskImpl(pathWithCustomer));
+		schedule.addTask(new DriveTask(OneTaxiTaskType.OCCUPIED_DRIVE, pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
 		double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
-		schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, false, req));
+		schedule.addTask(new OneTaxiServeTask(OneTaxiTaskType.DROPOFF, t3, t4, toLink, req));
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
-		schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
+		schedule.addTask(new StayTask(OneTaxiTaskType.WAIT, t4, tEnd, toLink));
+
+		eventsManager.processEvent(
+				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),
+						req.getPassengerId(), vehicle.getId(), t1, t4));
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle1) {
+	public void nextTask(DvrpVehicle vehicle1) {
 		updateTimings();
 		vehicle1.getSchedule().nextTask();
 	}
 
 	/**
 	 * Simplified version. For something more advanced, see
-	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Schedule)} in the taxi contrib
+	 * {@link org.matsim.contrib.taxi.scheduler(DvrpVehicle)} in the taxi contrib
 	 */
 	private void updateTimings() {
 		Schedule schedule = vehicle.getSchedule();

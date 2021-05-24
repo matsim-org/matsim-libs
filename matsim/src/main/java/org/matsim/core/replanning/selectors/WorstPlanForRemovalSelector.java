@@ -54,12 +54,7 @@ public class WorstPlanForRemovalSelector implements PlanSelector<Plan, Person> {
 			if ( type==null ) {
 				type = UNDEFINED_TYPE ;
 			}
-			Integer cnt = typeCounts.get(type);
-			if (cnt == null) {
-				typeCounts.put(type, Integer.valueOf(1));
-			} else {
-				typeCounts.put(type, Integer.valueOf(cnt.intValue() + 1));
-			}
+			typeCounts.merge( type, 1, ( a, b ) -> a + b );
 		}
 
 		Plan worst = null;
@@ -70,7 +65,7 @@ public class WorstPlanForRemovalSelector implements PlanSelector<Plan, Person> {
 			if ( type==null ) {
 				type = UNDEFINED_TYPE;
 			}
-			if (typeCounts.get(type).intValue() > 1) {
+			if ( typeCounts.get( type ) > 1) {
 				// (if we have more than one plan of the same type:)
 
 				// if this plan has no score yet:
@@ -82,9 +77,9 @@ public class WorstPlanForRemovalSelector implements PlanSelector<Plan, Person> {
 					worstScore = Double.NEGATIVE_INFINITY;
 
 				// otherwise do the usual logic to find the plan with the minimum score:
-				} else if (plan.getScore().doubleValue() < worstScore) {
+				} else if ( plan.getScore() < worstScore) {
 					worst = plan;
-					worstScore = plan.getScore().doubleValue();
+					worstScore = plan.getScore();
 				}
 			}
 			// (otherwise we just keep "worst=null")
@@ -98,9 +93,9 @@ public class WorstPlanForRemovalSelector implements PlanSelector<Plan, Person> {
 				if (plan.getScore() == null || plan.getScore().isNaN() ) {
 					return plan;
 				}
-				if (plan.getScore().doubleValue() < worstScore) {
+				if ( plan.getScore() < worstScore) {
 					worst = plan;
-					worstScore = plan.getScore().doubleValue();
+					worstScore = plan.getScore();
 				}
 			}
 		}

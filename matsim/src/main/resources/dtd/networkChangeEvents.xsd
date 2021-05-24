@@ -6,7 +6,6 @@
 					 xml:lang="en">
 
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
-<!-- Network format of MATSim -->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
@@ -16,7 +15,7 @@
 	</xs:annotation>
 	<xs:complexType>
 		<xs:sequence>
-			<xs:element name="networkChangeEvent" type="networkChangeEventType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="networkChangeEvent" type="networkChangeEventType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:element>
@@ -37,16 +36,11 @@
 	  	<xs:restriction base="xs:string">
 		    <xs:enumeration value="absolute" />
 			  <xs:enumeration value="scaleFactor" />
+			  <xs:enumeration value="offset" />
 			</xs:restriction>
 		</xs:simpleType>
 	</xs:attribute>
-	<xs:attribute name="value">
-		<xs:simpleType>
-		  <xs:restriction base="xs:double">
-			  <xs:minInclusive value="0.0"/>
-	    </xs:restriction>
-		</xs:simpleType>
-	</xs:attribute>
+	<xs:attribute name="value" type="xs:double" use="required" />
 </xs:complexType>
 
 </xs:schema>

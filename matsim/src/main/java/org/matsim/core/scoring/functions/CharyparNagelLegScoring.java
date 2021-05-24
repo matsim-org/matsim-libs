@@ -20,6 +20,10 @@
 
 package org.matsim.core.scoring.functions;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -30,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -42,22 +45,47 @@ import org.matsim.pt.PtConstants;
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
 
+	private static final Logger log = Logger.getLogger( CharyparNagelLegScoring.class ) ;
+
 	protected double score;
 
 	/** The parameters used for scoring */
 	protected final ScoringParameters params;
 	protected Network network;
-	private boolean nextEnterVehicleIsFirstOfTrip = true ;
-	private boolean nextStartPtLegIsFirstOfTrip = true ;
+	private boolean nextEnterVehicleIsFirstOfTrip = true;
+	private boolean nextStartPtLegIsFirstOfTrip = true;
 	private boolean currentLegIsPtLeg = false;
-	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
+	private double lastActivityEndTime = Double.NaN;
+	private final Set<String> ptModes;
 	
-	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+	private Set<String> modesAlreadyConsideredForDailyConstants;
+	
+	private final double marginalUtilityOfMoney;
+	
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
-		this.nextEnterVehicleIsFirstOfTrip = true ;
-		this.nextStartPtLegIsFirstOfTrip = true ;
-		this.currentLegIsPtLeg = false;
+		this.ptModes = ptModes;
+		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney;
+	}
+	
+	/**
+	 * Scoring with person-specific marginal utility of money
+	 */
+	public CharyparNagelLegScoring(final ScoringParameters params, double marginalUtilityOfMoney, Network network, Set<String> ptModes) {
+		this.params = params;
+		this.network = network;
+		this.ptModes = ptModes;
+		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+	}
+
+	/**
+	 * Scoring with pt modes set to 'pt'
+	 */
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+		this(params, network, new HashSet<>(Collections.singletonList("pt")));
 	}
 
 	@Override
@@ -77,12 +105,12 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
-			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.access_walk) 
-					|| leg.getMode().equals(TransportMode.egress_walk) ) {
+			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.non_network_walk )
+					|| leg.getMode().equals(TransportMode.non_network_walk ) ) {
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
 //				modeParams = this.params.modeParams.get(TransportMode.other);
-				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode().toString() ) ;
+				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode()) ;
 			}
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
@@ -102,11 +130,20 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 				}
 			}
 			tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
-			tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
+			tmpScore += modeParams.monetaryDistanceCostRate * this.marginalUtilityOfMoney * dist;
 		}
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
+		
+		// account for the daily constants
+		if (!modesAlreadyConsideredForDailyConstants.contains(leg.getMode())) {
+			tmpScore += modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * this.marginalUtilityOfMoney;
+			modesAlreadyConsideredForDailyConstants.add(leg.getMode());
+		}
+		// yyyy the above will cause problems if we ever decide to differentiate pt mode into bus, tram, train, ...
+		// Might have to move the MainModeIdentifier then.  kai, sep'18
+		
 		return tmpScore;
 	}
 	
@@ -132,10 +169,12 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		}
 
 		if ( event instanceof PersonDepartureEvent ) {
-			this.currentLegIsPtLeg = TransportMode.pt.equals( ((PersonDepartureEvent)event).getLegMode() );
+			String mode = ((PersonDepartureEvent)event).getLegMode();
+			
+			this.currentLegIsPtLeg = this.ptModes.contains(mode);
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
-					this.score -= params.modeParams.get(TransportMode.pt).constant ;
+					this.score -= params.modeParams.get(mode).constant ;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
 					// modification is minimally invasive.  kai, dec'12)
 				}
@@ -146,9 +185,17 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleLeg(Leg leg) {
-		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		Gbl.assertIf( leg.getDepartureTime().isDefined() ) ;
+		Gbl.assertIf( leg.getTravelTime().isDefined() );
+
+		double legScore = calcLegScore(
+				leg.getDepartureTime().seconds(), leg.getDepartureTime().seconds() + leg.getTravelTime()
+						.seconds(), leg);
+		if ( Double.isNaN( legScore )) {
+			log.error( "dpTime=" + leg.getDepartureTime().seconds()
+					+ "; ttime=" + leg.getTravelTime().seconds() + "; leg=" + leg ) ;
+			throw new RuntimeException("score is NaN") ;
+		}
 		this.score += legScore;
 	}
-
-
 }

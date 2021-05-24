@@ -29,22 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.ScreenOverlayType;
-import net.opengis.kml._2.StyleType;
-import net.opengis.kml._2.TimeSpanType;
-import net.opengis.kml._2.UnitsEnumType;
-import net.opengis.kml._2.Vec2Type;
-
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -70,6 +56,20 @@ import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
+
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.FolderType;
+import net.opengis.kml.v_2_2_0.IconStyleType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
+import net.opengis.kml.v_2_2_0.PointType;
+import net.opengis.kml.v_2_2_0.ScreenOverlayType;
+import net.opengis.kml.v_2_2_0.StyleType;
+import net.opengis.kml.v_2_2_0.TimeSpanType;
+import net.opengis.kml.v_2_2_0.UnitsEnumType;
+import net.opengis.kml.v_2_2_0.Vec2Type;
 
 /**
  * @author dgrether
@@ -828,7 +828,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 	 */
 	private void writeChartToKmz(final String filename, final JFreeChart chart) throws IOException {
 		byte [] img;
-		img = ChartUtilities.encodeAsPNG(chart.createBufferedImage(CHARTWIDTH, CHARTHEIGHT));
+		img = ChartUtils.encodeAsPNG(chart.createBufferedImage(CHARTWIDTH, CHARTHEIGHT));
 		this.writer.addNonKMLFile(img, filename);
 	}
 
@@ -914,7 +914,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 			StringBuilder buffer = new StringBuilder(200);
 			buffer.append("hour \t mean relative error \t mean bias");
 			bwriter.write(buffer.toString());
-			bwriter.newLine();
+			bwriter.write("\n");
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
@@ -923,7 +923,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
-				bwriter.newLine();
+				bwriter.write("\n");
 			}
 			bwriter.close();
 		} catch (IOException e) {
@@ -970,7 +970,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 			StringBuilder buffer = new StringBuilder(200);
 			buffer.append("hour \t mean normalized relative error \t mean bias");
 			bwriter.write(buffer.toString());
-			bwriter.newLine();
+			bwriter.write("\n");
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
@@ -979,7 +979,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
-				bwriter.newLine();
+				bwriter.write("\n");
 			}
 			bwriter.close();
 		} catch (IOException e) {

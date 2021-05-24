@@ -24,10 +24,8 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
@@ -40,7 +38,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
-	private final StageActivityTypes blackList;
+	private final StageActivityHandling stageActivityHandling;
 	private final double mutationRange;
 	private final Random random;
 	private final boolean affectingDuration;
@@ -48,20 +46,20 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	/**
 	 * Initializes an instance mutating all activities in a plan
 	 * @param mutationRange
-	 * @param affectingDuration TODO
+	 * @param affectingDuration
 	 * @param random
 	 */
 	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
-		this( EmptyStageActivityTypes.INSTANCE , mutationRange , affectingDuration, random );
+		this( StageActivityHandling.StagesAsNormalActivities , mutationRange , affectingDuration, random );
 	}
 	/**
 	 * Initializes an instance mutating all non-stage activities in a plan
 	 * @param mutationRange
-	 * @param affectingDuration TODO
+	 * @param affectingDuration
 	 * @param random
 	 */
-	public PlanMutateTimeAllocationSimplified(final StageActivityTypes blackList, final double mutationRange, boolean affectingDuration, final Random random) {
-		this.blackList = blackList;
+	public PlanMutateTimeAllocationSimplified(final StageActivityHandling stageActivityHandling, final double mutationRange, boolean affectingDuration, final Random random) {
+		this.stageActivityHandling = stageActivityHandling;
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
@@ -69,14 +67,14 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		for ( Activity act : TripStructureUtils.getActivities( plan , blackList ) ) {
+		for ( Activity act : TripStructureUtils.getActivities( plan , stageActivityHandling ) ) {
 			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
-			if (act.getEndTime() != Time.UNDEFINED_TIME) {
-				act.setEndTime(mutateTime(act.getEndTime()));
+			if (act.getEndTime().isDefined()) {
+				act.setEndTime(mutateTime(act.getEndTime().seconds()));
 			}
 			if ( affectingDuration ) {
-				if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
-					act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
+				if ( act.getMaximumDuration().isDefined()) {
+					act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
 				}
 			}
 		}

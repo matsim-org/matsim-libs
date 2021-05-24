@@ -34,12 +34,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
@@ -70,7 +71,11 @@ public class JointTripInsertionWithSocialNetworkTest {
 						random,
 						sn,
 						new JointTripInsertorConfigGroup(),
-						new TripRouter() );
+//						new TripRouter() );
+//						new TripRouter.Builder( scenario.getConfig() ).build() ) ;
+//						  new MainModeIdentifierImpl() // yyyyyy ????
+							  TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
+						) ;
 
 			final JointPlan jp = groupAllPlansInJointPlan( scenario.getPopulation() );
 
@@ -123,7 +128,9 @@ public class JointTripInsertionWithSocialNetworkTest {
 			firstAct.setLinkId( linkHome );
 			plan.addActivity( firstAct );
 
-			plan.addLeg( factory.createLeg( i % 2 == 0 ? TransportMode.car : TransportMode.pt ) );
+			final Leg leg = factory.createLeg( i % 2 == 0 ? TransportMode.car : TransportMode.pt );
+			TripStructureUtils.setRoutingMode( leg, leg.getMode() );
+			plan.addLeg( leg );
 
 			final Activity secondAct = (Activity) factory.createActivityFromCoord( "h" , coordHome );
 			secondAct.setLinkId( linkHome );

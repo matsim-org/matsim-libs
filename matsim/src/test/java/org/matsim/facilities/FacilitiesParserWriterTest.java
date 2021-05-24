@@ -20,129 +20,168 @@
 
 package org.matsim.facilities;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
-import org.matsim.facilities.algorithms.FacilitiesCombine;
-import org.matsim.facilities.algorithms.FacilitiesSummary;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class FacilitiesParserWriterTest extends MatsimTestCase {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
-	private Config config = null;
+/**
+ * @author mrieser / Simunto GmbH
+ */
+public class FacilitiesParserWriterTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.config = super.loadConfig(null);
-		TriangleScenario.setUpScenarioConfig(this.config, super.getOutputDirectory());
-	}
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Override
-	protected void tearDown() throws Exception {
-		this.config = null;
-		super.tearDown();
-	}
-
-	private final void runModules(final ActivityFacilities facilities) {
-		System.out.println("  running facilities modules... ");
-		new FacilitiesSummary().run(facilities);
-		new FacilitiesCalcMinDist().run(facilities);
-		new FacilitiesCombine().run(facilities);
-		System.out.println("  done.");
-	}
-
-	private final void compareOutputFacilities(String filename) {
-		System.out.println("  comparing input and output facilities file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(filename);
-		assertEquals(checksum_ref, checksum_run);
-		System.out.println("  done.");
-	}
-
+	@Test
 	public void testParserWriter1() {
-		System.out.println("running testParserWriter1()...");
+		Config config = ConfigUtils.createConfig();
+		TriangleScenario.setUpScenarioConfig(config);
 
-	
-		System.out.println("  reading facilites xml file independent of the world...");
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		System.out.println("  done.");
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 
-		this.runModules(facilities);
+		String outputFilename = this.utils.getOutputDirectory() + "output_facilities.xml";
+		TriangleScenario.writeFacilities(facilities, outputFilename);
 
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
-	
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
-	
-		System.out.println("done.");
+		long checksum_ref = CRCChecksum.getCRCFromFile(config.facilities().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(outputFilename);
+		Assert.assertEquals(checksum_ref, checksum_run);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter2() {
-		System.out.println("running testParserWriter2()...");
-
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-	
-		System.out.println("  reading facilites xml file as a layer of the world...");
+	@Test
+	public void testWriteReadV1_withActivities() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		System.out.println("  done.");
 
-		this.runModules(facilities);
+		ActivityFacilitiesFactory factory = facilities.getFactory();
 
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
+		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+		fac1.addActivityOption(new ActivityOptionImpl("home"));
+		facilities.addActivityFacility(fac1);
 
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
+		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0));
+		ActivityOptionImpl shopOption = new ActivityOptionImpl("shop");
+		shopOption.addOpeningTime(new OpeningTimeImpl(8*3600, 20*3600));
+		fac2.addActivityOption(shopOption);
+		facilities.addActivityFacility(fac2);
 
-		System.out.println("done.");
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		new FacilitiesWriter(facilities).write(outStream);
+
+		/* ------ */
+
+		ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+		ActivityFacilities facilities2 = FacilitiesUtils.createActivityFacilities();
+		new MatsimFacilitiesReader(null, null, facilities2).parse(inStream);
+
+		Assert.assertEquals(2, facilities2.getFacilities().size());
+
+		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", ActivityFacility.class));
+		Assert.assertEquals(1, fac1b.getActivityOptions().size());
+		Assert.assertTrue(fac1b.getActivityOptions().get("home").getOpeningTimes().isEmpty());
+		Assert.assertEquals(0, fac1b.getAttributes().size());
+
+		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", ActivityFacility.class));
+		Assert.assertEquals(1, fac2b.getActivityOptions().size());
+		Assert.assertNotNull(fac2b.getActivityOptions().get("shop").getOpeningTimes());
+		Assert.assertEquals(8*3600, fac2b.getActivityOptions().get("shop").getOpeningTimes().first().getStartTime(), 0.0);
+		Assert.assertEquals(20*3600, fac2b.getActivityOptions().get("shop").getOpeningTimes().first().getEndTime(), 0.0);
+		Assert.assertEquals(0, fac2b.getAttributes().size());
 	}
 
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter3() {
-		System.out.println("running testParserWriter3()...");
-
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-
-		System.out.println("  reading facilites xml file as a layer of the world...");
+	@Test
+	public void testWriteReadV1_withAttributes() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		System.out.println("  done.");
 
-		this.runModules(facilities);
+		ActivityFacilitiesFactory factory = facilities.getFactory();
 
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
+		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+		fac1.getAttributes().putAttribute("size_m2", 100);
+		facilities.addActivityFacility(fac1);
 
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
+		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0));
+		fac2.getAttributes().putAttribute("size_m2", 500);
+		facilities.addActivityFacility(fac2);
 
-		System.out.println("done.");
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		new FacilitiesWriter(facilities).write(outStream);
+
+		/* ------ */
+
+		ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+		ActivityFacilities facilities2 = FacilitiesUtils.createActivityFacilities();
+		new MatsimFacilitiesReader(null, null, facilities2).parse(inStream);
+
+		Assert.assertEquals(2, facilities2.getFacilities().size());
+
+		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", ActivityFacility.class));
+		Assert.assertEquals(0, fac1b.getActivityOptions().size());
+		Assert.assertEquals(1, fac1b.getAttributes().size());
+		Assert.assertEquals(100, fac1b.getAttributes().getAttribute("size_m2"));
+
+		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", ActivityFacility.class));
+		Assert.assertEquals(0, fac2b.getActivityOptions().size());
+		Assert.assertEquals(1, fac2b.getAttributes().size());
+		Assert.assertEquals(500, fac2b.getAttributes().getAttribute("size_m2"));
 	}
 
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter4() {
-		System.out.println("running testParserWriter4()...");
-
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-
-		System.out.println("  reading facilites xml file as a layer of the world...");
+	@Test
+	public void testWriteReadV1_withActivitiesAndAttributes() { // MATSIM-859
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-		System.out.println("  done.");
 
-		this.runModules(facilities);
+		ActivityFacilitiesFactory factory = facilities.getFactory();
 
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
+		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+		fac1.addActivityOption(new ActivityOptionImpl("home"));
+		fac1.getAttributes().putAttribute("size_m2", 100);
+		facilities.addActivityFacility(fac1);
 
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
 
-		System.out.println("done.");
+		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0));
+		ActivityOptionImpl shopOption = new ActivityOptionImpl("shop");
+		shopOption.addOpeningTime(new OpeningTimeImpl(8*3600, 20*3600));
+		fac2.addActivityOption(shopOption);
+		fac2.getAttributes().putAttribute("size_m2", 500);
+		facilities.addActivityFacility(fac2);
+
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		new FacilitiesWriter(facilities).write(outStream);
+
+		/* ------ */
+
+		ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+		ActivityFacilities facilities2 = FacilitiesUtils.createActivityFacilities();
+		new MatsimFacilitiesReader(null, null, facilities2).parse(inStream);
+
+		Assert.assertEquals(2, facilities2.getFacilities().size());
+
+		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", ActivityFacility.class));
+		Assert.assertEquals(1, fac1b.getActivityOptions().size());
+		Assert.assertTrue(fac1b.getActivityOptions().get("home").getOpeningTimes().isEmpty());
+		Assert.assertEquals(1, fac1b.getAttributes().size());
+		Assert.assertEquals(100, fac1b.getAttributes().getAttribute("size_m2"));
+
+		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", ActivityFacility.class));
+		Assert.assertEquals(1, fac2b.getActivityOptions().size());
+		Assert.assertNotNull(fac2b.getActivityOptions().get("shop").getOpeningTimes());
+		Assert.assertEquals(8*3600, fac2b.getActivityOptions().get("shop").getOpeningTimes().first().getStartTime(), 0.0);
+		Assert.assertEquals(20*3600, fac2b.getActivityOptions().get("shop").getOpeningTimes().first().getEndTime(), 0.0);
+		Assert.assertEquals(1, fac2b.getAttributes().size());
+		Assert.assertEquals(500, fac2b.getAttributes().getAttribute("size_m2"));
 	}
+
 }

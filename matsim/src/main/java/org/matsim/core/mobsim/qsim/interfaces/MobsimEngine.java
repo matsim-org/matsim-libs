@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.interfaces;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 /**
  * Design thoughs:<ul>
@@ -32,7 +33,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
  * 
  * @author dgrether, nagel
  */
-public interface MobsimEngine extends Steppable {
+public interface MobsimEngine extends Steppable, QSimComponent {
 
   /**
    * called in a predefined Order when the simulation is started

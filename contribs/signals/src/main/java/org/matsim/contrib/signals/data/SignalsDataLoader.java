@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesReader10;
+import org.matsim.contrib.signals.data.conflicts.io.ConflictingDirectionsReader;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesReader10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsReader20;
@@ -33,6 +31,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 
 /**
@@ -51,7 +53,7 @@ public class SignalsDataLoader {
 	public SignalsDataLoader(Config config){
 		this.config = config;
 		this.signalConfig = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 	}
 
 	public SignalsData loadSignalsData() {
@@ -65,6 +67,9 @@ public class SignalsDataLoader {
 		if (this.signalConfig.isUseIntergreenTimes()){
 			this.loadIntergreenTimes(data);
 		}
+		if (this.signalConfig.getIntersectionLogic().toString().startsWith("CONFLICTING_DIRECTIONS")) {
+			this.loadConflicts(data);
+		}
 		return data;
 	}
 
@@ -73,8 +78,8 @@ public class SignalsDataLoader {
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
 			IntergreenTimesReader10 reader = new IntergreenTimesReader10(data.getIntergreenTimesData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getIntergreenTimesFile());
-			try {
-				reader.readStream(filename.openStream());
+			try (InputStream stream = filename.openStream()) {
+				reader.readStream(stream);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -85,8 +90,12 @@ public class SignalsDataLoader {
 	private void loadAmberTimes(SignalsData data) {
 		if (this.signalConfig.getAmberTimesFile() != null){
 			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData());
-			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getAmberTimesFile());
-			reader.readFile(filename.getFile());
+			URL url = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getAmberTimesFile());
+			try (InputStream stream = url.openStream()) {
+				reader.readStream(stream);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 		else {
 			log.info("Signals: No amber times file set, can't load amber times!");
@@ -97,8 +106,8 @@ public class SignalsDataLoader {
 		if (this.signalConfig.getSignalControlFile() != null){
 			SignalControlReader20 reader = new SignalControlReader20(data.getSignalControlData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalControlFile());
-			try {
-				reader.readStream(filename.openStream());
+			try (InputStream stream = filename.openStream()) {
+				reader.readStream(stream);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -127,14 +136,29 @@ public class SignalsDataLoader {
 		if (this.signalConfig.getSignalSystemFile() != null){
 			SignalSystemsReader20 reader = new SignalSystemsReader20(data.getSignalSystemsData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalSystemFile());
-			try {
-				reader.readStream(filename.openStream());
+			try (InputStream stream = filename.openStream()) {
+				reader.readStream(stream);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		}
 		else {
 			log.info("Signals: No signal systems file set, can't load signal systems information!");
+		}
+	}
+	
+	private void loadConflicts(SignalsData data) {
+		if (this.signalConfig.getConflictingDirectionsFile() != null) {
+			ConflictingDirectionsReader reader = new ConflictingDirectionsReader(data.getConflictingDirectionsData());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getConflictingDirectionsFile());
+			try (InputStream stream = filename.openStream()) {
+				reader.parse(stream);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+		else {
+			log.info("Signals: No conflicting directions file set, can't load conflicting directions information!");
 		}
 	}
 

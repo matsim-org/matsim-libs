@@ -21,9 +21,11 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
@@ -33,10 +35,10 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 public class VehicleData {
 	public static class Entry extends LinkTimePair {
 		public final int idx;
-		public final Vehicle vehicle;
+		public final DvrpVehicle vehicle;
 		public final boolean idle;
 
-		public Entry(int idx, Vehicle vehicle, Link link, double time, boolean idle) {
+		public Entry(int idx, DvrpVehicle vehicle, Link link, double time, boolean idle) {
 			super(link, time);
 			this.idx = idx;
 			this.vehicle = vehicle;
@@ -50,44 +52,31 @@ public class VehicleData {
 	private final List<Entry> entries = new ArrayList<>();
 	private final int idleCount;
 
-	public VehicleData(Iterable<Entry> vehEntries) {
-		int idx = 0;
-		int idleCounter = 0;
-		for (Entry e : vehEntries) {
-			entries.add(new Entry(idx++, e.vehicle, e.link, e.time, e.idle));
-			if (e.idle) {
-				idleCounter++;
-			}
-		}
-
-		idleCount = idleCounter;
-	}
-
-	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry, Iterable<? extends Vehicle> vehicles) {
+	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry,
+			Stream<? extends DvrpVehicle> vehicles) {
 		this(currentTime, scheduleInquiry, vehicles, NO_PLANNING_HORIZON);
 	}
 
 	// skipping vehicles with departure.time > curr_time + maxDepartureDelay
-	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry, Iterable<? extends Vehicle> vehicles,
+	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry, Stream<? extends DvrpVehicle> vehicles,
 			double planningHorizon) {
 		double maxDepartureTime = currentTime + planningHorizon;
 
-		int idx = 0;
-		int idleCounter = 0;
-		for (Vehicle v : vehicles) {
+		MutableInt idx = new MutableInt();
+		MutableInt idleCounter = new MutableInt();
+		vehicles.forEach(v -> {
 			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
 			if (departure != null && departure.time <= maxDepartureTime) {
-				boolean idle = departure.time == currentTime // to avoid unnecessary calls to Scheduler.isIdle()
-						&& scheduleInquiry.isIdle(v);
-				entries.add(new Entry(idx++, v, departure.link, departure.time, idle));
+				boolean idle = scheduleInquiry.isIdle(v);
+				entries.add(new Entry(idx.getAndIncrement(), v, departure.link, departure.time, idle));
 				if (idle) {
-					idleCounter++;
+					idleCounter.increment();
 				}
 			}
-		}
+		});
 
-		idleCount = idleCounter;
+		idleCount = idleCounter.intValue();
 	}
 
 	public int getSize() {

@@ -24,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -32,11 +36,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
 /**
  * Utility-class providing functionality related to coordinate reference
  * systems.
@@ -44,9 +43,9 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  * 
  */
-public final class CRSUtils {
+final class CRSUtils {
 
-	private static Logger logger = Logger.getLogger(CRSUtils.class);
+	private static final Logger logger = Logger.getLogger(CRSUtils.class);
 
 	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new ConcurrentHashMap<Integer, CoordinateReferenceSystem>();
 

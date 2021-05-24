@@ -20,15 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -38,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*deliberately package*/ class LinkImpl implements Link {
@@ -51,19 +44,15 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private final Id<Link> id;
 
-	private Node from = null;
-	private Node to = null;
+	private Node from;
+	private Node to;
 
 	private double length = Double.NaN;
-	private double freespeed = Double.NaN;
-	private double capacity = Double.NaN;
-	private double nofLanes = Double.NaN;
+	private double freespeed;
+	private double capacity;
+	private double nofLanes;
 
-	private Set<String> allowedModes = HashSetCache.get(new HashSet<String>());
-
-//	private String type = null;
-
-//	private String origid = null;
+	private Set<String> allowedModes = DEFAULT_ALLOWED_MODES;
 
 	private final Network network;
 
@@ -71,19 +60,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private static int cpWarnCnt = 0 ;
 	private static int plWarnCnt = 0 ;
 	private static int lengthWarnCnt = 0;
-	private static int loopWarnCnt = 0 ;
 	private static final int maxFsWarnCnt = 1;
 	private static final int maxCpWarnCnt = 1;
 	private static final int maxPlWarnCnt = 1;
 	private static final int maxLengthWarnCnt = 1;
-	private static final int maxLoopWarnCnt = 1;
 
-	private static final Set<String> DEFAULT_ALLOWED_MODES;
-	static {
-		Set<String> set = new HashSet<>();
-		set.add(TransportMode.car);
-		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
-	}
+	private static final Set<String> DEFAULT_ALLOWED_MODES = HashSetCache.get(Set.of(TransportMode.car));
 
 	private final Attributes attributes = new Attributes();
 
@@ -92,26 +74,19 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.network = network;
 		this.from = from;
 		this.to = to;
-		this.allowedModes = DEFAULT_ALLOWED_MODES;
 		this.setLength(length);
 		//for the eventual time variant attributes don't call the setter as it must be overwritten in TimeVariantLinkImpl
 		//and thus causes problems during object initialization, dg nov 2010
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 		this.capacity = capacity;
-		this.checkCapacitiySemantics();
-		this.checkCapacitiySemantics();
+		this.checkCapacitySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
-		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
-			loopWarnCnt++ ;
-			log.warn("[from=to=" + this.to + " link is a loop]");
-			if ( loopWarnCnt == maxLoopWarnCnt )
-				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
-		}
+		// loop links have become an acceptable thing for matsim.  kai, sep'19. --> warnings turned off
 	}
 
-	private void checkCapacitiySemantics() {
+	private void checkCapacitySemantics() {
 		/*
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
@@ -120,15 +95,16 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		 */
 		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
-			log.warn("[capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems]");
-			log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+			log.warn("capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems");
+			if ( cpWarnCnt==maxCpWarnCnt ){
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
 		}
 	}
 
 	private void checkFreespeedSemantics() {
 		if ((this.freespeed <= 0.0) && (fsWarnCnt < maxFsWarnCnt) ) {
 			fsWarnCnt++ ;
-			log.warn("[freespeed=" + this.freespeed + " of link id " + this.getId() + " may cause problems]");
 			if ( fsWarnCnt == maxFsWarnCnt )
 				log.warn( Gbl.FUTURE_SUPPRESSED) ;
 		}
@@ -137,7 +113,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private void checkNumberOfLanesSemantics(){
 		if ((this.nofLanes < 1) && (plWarnCnt < maxPlWarnCnt) ) {
 			plWarnCnt++ ;
-			log.warn("[permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems]");
+			log.warn("permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems");
 			if ( plWarnCnt == maxPlWarnCnt )
 				log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 		}
@@ -146,7 +122,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private void checkLengthSemantics(){
 		if ((this.getLength() <= 0.0) && (lengthWarnCnt < maxLengthWarnCnt)) {
 			lengthWarnCnt++;
-			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems]");
+			log.warn("length=" + this.length + " of link id " + this.getId() + " may cause problems");
 			if ( lengthWarnCnt == maxLengthWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED) ;
 		}
@@ -180,22 +156,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return true;
 	}
 
-//	/*deliberately package*/ final String getOrigId2() {
-//		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
-//		return this.origid ;
-//	}
-
-//	/*deliberately package*/ final String getType2() {
-//		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
-//		return this.type ;
-//	}
-	
 	// ---
 
 	@Override
 	public void setCapacity(double capacityPerNetworkCapcityPeriod){
 		this.capacity = capacityPerNetworkCapcityPeriod;
-		this.checkCapacitiySemantics();
+		this.checkCapacitySemantics();
 	}
 
 	@Override
@@ -208,17 +174,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return this.capacity;
 	}
 
-
-	@Override
-	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
-	}
-	@Override
-	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
-		return this.getCapacity(time) / network.getCapacityPeriod();
-	}
-	
-	double getCapacityPeriod() {
+	public double getCapacityPeriod() {
 		// since the link has a back pointer to network, we can as well provide this here (????)
 		// TimeVariantLinkImpl needs this ... but why?
 		return network.getCapacityPeriod() ;
@@ -229,7 +185,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public double getFreespeed() {
 		return this.freespeed;
-//		return getFreespeed(Time.UNDEFINED_TIME);
 	}
 
 	/**
@@ -263,7 +218,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public double getNumberOfLanes() {
 		return this.nofLanes;
-//		return this.getNumberOfLanes(Time.UNDEFINED_TIME);
 	}
 
 	@Override
@@ -287,16 +241,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.allowedModes = HashSetCache.get(modes);
 	}
 
-//	/*deliberately package*/ final void setOrigId2(final String id) {
-//		this.origid = id;
-//	}
-	
-	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-		ois.defaultReadObject();
-		this.from.addOutLink(this);
-		this.to.addInLink(this);
-	}
-
 	@Override
 	public String toString() {
 		return super.toString() +
@@ -308,9 +252,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		"[capacity=" + this.capacity + "]" +
 		"[permlanes=" + this.nofLanes + "]" +
 		"[modes=" + this.allowedModes ;
-//		"[origid=" + this.origid + "]" + // not in api
-//		"[type=" + this.type + "]"; // not in api
-		// yyyyyy add the "free text" attributes
 	}
 
 	@Override
@@ -331,37 +272,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	/*package*/ abstract static class HashSetCache {
-		private final static Map<Integer, List<Set<String>>> cache = new ConcurrentHashMap<>();
+		private final static ConcurrentMap<Integer, Set<String>> cache = new ConcurrentHashMap<>();
+
 		public static Set<String> get(final Set<String> set) {
 			if (set == null) {
 				return null;
 			}
-			int size = set.size();
-			List<Set<String>> list = cache.get(size);
-			if (list == null) {
-				list = new ArrayList<>(4);
-				cache.put(size, list);
-				HashSet<String> set2 = new HashSet<>(set);
-				Set<String> set3 = Collections.unmodifiableSet(set2);
-				list.add(set3);
-				return set3;
-			}
-			for (Set<String> s : list) {
-				if (s.equals(set)) {
-					return s;
-				}
-			}
-			// not yet in cache
-			HashSet<String> set2 = new HashSet<>(set);
-			Set<String> set3 = Collections.unmodifiableSet(set2);
-			list.add(set3);
-			return set3;
+			return cache.computeIfAbsent(set.hashCode(), key -> Set.copyOf(set));
 		}
-
 	}
-
-//	/*deliberately package*/ void setType2(String type2) {
-//		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
-//		this.type = type2 ;
-//	}
 }

@@ -34,12 +34,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
@@ -51,10 +53,11 @@ import javax.inject.Inject;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource {
+public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
 
 
 	private Collection<MobsimAgent> ptDrivers;
+	private final UmlaufBuilder umlaufBuilder;
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
@@ -86,11 +89,17 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker);
 	}
 
+	TransitQSimEngine(QSim queueSimulation) {
+		this(queueSimulation, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(queueSimulation.getScenario()) );
+	}
+	
 	@Inject
-	public TransitQSimEngine(QSim queueSimulation) {
+	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory, UmlaufBuilder umlaufBuilder) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
+		this.umlaufBuilder = umlaufBuilder;
 		this.agentTracker = new TransitStopAgentTracker(this.qSim.getEventsManager());
+		this.stopHandlerFactory = stopHandlerFactory;
 	}
 
 	// For tests (which create an Engine, and externally create Agents as well).
@@ -133,16 +142,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		return drivers;
 	}
 
-	private static UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
+	private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
 		UmlaufCache umlaufCache;
 
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder =
-				new ReconstructingUmlaufBuilder(
-						scenario.getNetwork(),
-						scenario.getTransitSchedule().getTransitLines().values(),
-						scenario.getTransitVehicles(),
-						scenario.getConfig().planCalcScore());
-		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
+		Collection<Umlauf> umlaeufe = umlaufBuilder.build();
 		umlaufCache = new UmlaufCache(scenario.getTransitSchedule(), umlaeufe);
 
 		return umlaufCache;
@@ -197,7 +200,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		return agentTracker;
 	}
 
-	@Inject
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
 	}

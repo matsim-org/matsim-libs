@@ -20,10 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -36,8 +32,11 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
 
 public final class StreamingPopulationWriter implements PersonAlgorithm {
 	private final static Logger log = Logger.getLogger(StreamingPopulationWriter.class);
@@ -79,7 +78,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			final CoordinateTransformation coordinateTransformation,
 			final double fraction) {
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
+		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
 	}
 
 	/**
@@ -143,12 +142,10 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			@Override public Person removePerson(Id<Person> personId) {
 				throw new RuntimeException("not implemented") ;
 			}
-			@Override public ObjectAttributes getPersonAttributes() {
-				throw new RuntimeException("not implemented") ;
-			}
 			@Override
 			public Attributes getAttributes() {
-				throw new RuntimeException( "not implemented" );
+				//A stream written Population cannot contain Population Attributes, only Person Attributes.
+				return new Attributes();
 			}
 
 		} ;

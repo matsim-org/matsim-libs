@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -51,7 +52,7 @@ import org.xml.sax.Attributes;
  * @author tthunig
  *
  */
-public class EventsConverterXML extends MatsimXmlParser{
+public final class EventsConverterXML extends MatsimXmlParser{
 
 	private static final String EVENT = "event";
 	private static final String ATTRIBUTE_PERSON = "person";
@@ -86,7 +87,7 @@ public class EventsConverterXML extends MatsimXmlParser{
 			case VehicleEntersTrafficEvent.EVENT_TYPE:
 			case "wait2link":
 				// (assumes that the reader has already converted the wait2link events)
-				Id<Person> driverId = Id.createPersonId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER));
+				Id<Person> driverId = Id.createPersonId(atts.getValue( HasPersonId.ATTRIBUTE_PERSON ) );
 				Id<Vehicle> vehicleId;
 				if (atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE).equals("null")){
 					// use the person id as vehicle id

@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -321,19 +321,18 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	public void testDepartureTimes() throws Exception {
-		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm( EmptyStageActivityTypes.INSTANCE );
+		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm();
 		for ( Fixture fixture : fixtures ) {
 			testee.run( fixture.jointPlan );
 
 			for ( Plan p : fixture.jointPlan.getIndividualPlans().values() ) {
-				for ( Activity activity : TripStructureUtils.getActivities( p , EmptyStageActivityTypes.INSTANCE ) ) {
+				for ( Activity activity : TripStructureUtils.getActivities( p , StageActivityHandling.StagesAsNormalActivities ) ) {
 					final Double endTime = fixture.expectedEndTimes.remove( activity );
 					if ( endTime == null ) continue;
 
 					Assert.assertEquals(
 							"unexpected end time for "+activity,
-							endTime.doubleValue(),
-							activity.getEndTime(),
+							endTime.doubleValue(), activity.getEndTime().seconds(),
 							MatsimTestUtils.EPSILON);
 				}
 			}

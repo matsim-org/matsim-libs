@@ -30,13 +30,14 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Notes:<ul>
@@ -49,7 +50,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author rieser (for the original StrategyManager)
  *
  */
-public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId<? extends BasicPlan, I>> implements MatsimManager {
+public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements MatsimManager {
 	// the "I extends ... <, I>" is correct, although it feels odd.  kai, nov'15
 	
 	private static final Logger log =
@@ -65,21 +66,24 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 		final Map<Integer, Map<GenericPlanStrategy<T, I>, Double>> changeRequests = new TreeMap<>();
 	}
 
-	private final Map<String, StrategyWeights<T, I>> weightsPerSubpopulation = new HashMap<>();
+	private final Map<String, StrategyWeights<PL, AG>> weightsPerSubpopulation = new HashMap<>();
 
 	private int maxPlansPerAgent = 0;
 
-	private PlanSelector<T, I> removalPlanSelector = new GenericWorstPlanForRemovalSelector<>();
+	private PlanSelector<PL, AG> removalPlanSelector = new GenericWorstPlanForRemovalSelector<>();
 
-	private String subpopulationAttributeName = null;
-
-	/**
-	 * @param name the name of the subpopulation attribute
-	 * in the person's object attributes.
-	 */
-	public final void setSubpopulationAttributeName(final String name) {
-		this.subpopulationAttributeName = name;
+//	private String subpopulationAttributeName = null;
+	
+	public GenericStrategyManager() {
 	}
+
+//	/**
+//	 * @param name the name of the subpopulation attribute
+//	 * in the person's object attributes.
+//	 */
+//	public final void setSubpopulationAttributeName(final String name) {
+//		this.subpopulationAttributeName = name;
+//	}
 
 	/**
 	 * Adds a strategy to this manager with the specified weight. This weight
@@ -88,10 +92,10 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 *
 	 */
 	public final void addStrategy(
-			final GenericPlanStrategy<T, I> strategy,
+			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation,
 			final double weight) {
-		final StrategyWeights<T, I> weights = getStrategyWeights( subpopulation );
+		final StrategyWeights<PL, AG> weights = getStrategyWeights( subpopulation );
 		if ( weights.strategies.contains( strategy ) ) {
 			log.error( "Strategy "+strategy+" is already defined for subpopulation "+subpopulation  );
 			log.error( "This can lead to undefined behavior. Please only specify each strategy once" );
@@ -111,10 +115,10 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
 	final boolean removeStrategy(
-			final GenericPlanStrategy<T, I> strategy,
+			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation)
 	{
-		final StrategyWeights<T, I> weights = getStrategyWeights( subpopulation );
+		final StrategyWeights<PL, AG> weights = getStrategyWeights( subpopulation );
 		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
 			weights.strategies.remove(idx);
@@ -127,8 +131,8 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 
 
 
-	private StrategyWeights<T, I> getStrategyWeights(final String subpop) {
-		StrategyWeights<T, I> weights = weightsPerSubpopulation.get(subpop);
+	private StrategyWeights<PL, AG> getStrategyWeights(final String subpop) {
+		StrategyWeights<PL, AG> weights = weightsPerSubpopulation.get(subpop);
 
 		if ( weights == null ) {
 			weights = new StrategyWeights<>();
@@ -145,10 +149,10 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 * 		be changed successfully, false otherwise.
 	 */
 	final boolean changeWeightOfStrategy(
-			final GenericPlanStrategy<T, I> strategy,
+			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation,
 			final double newWeight) {
-		final StrategyWeights<T, I> weights = getStrategyWeights(subpopulation);
+		final StrategyWeights<PL, AG> weights = getStrategyWeights(subpopulation);
 		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
 			double oldWeight = weights.weights.set(idx, newWeight);
@@ -167,12 +171,12 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 * @param iteration the current iteration we're handling
 	 */
 	public final void run(
-			final Iterable<? extends HasPlansAndId<T, I>> persons,
-					ObjectAttributes subpopLookup,
+			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
+					Population population,
 					final int iteration,
 					final ReplanningContext replanningContext ) {
 		handleChangeRequests(iteration);
-		run(persons, subpopLookup, replanningContext);
+		run(persons, population, replanningContext);
 	}
 
 	/**
@@ -181,17 +185,17 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 *
 	 */
 	final void run(
-			final Iterable<? extends HasPlansAndId<T, I>> persons,
-					ObjectAttributes subPopLookup,
+			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
+					Population population,
 					final ReplanningContext replanningContext) {
 
 		// initialize all strategies
-		for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
+		for (GenericPlanStrategy<PL, AG> strategy : distinctStrategies()) {
 			strategy.init(replanningContext);
 		}
 
 		// then go through the population and ...
-		for (HasPlansAndId<T, I> person : persons ) {
+		for (HasPlansAndId<PL, AG> person : persons ) {
 
 			// ... reduce the number of plans to the allowed maximum (in evol comp lang this is "selection")
 			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
@@ -199,14 +203,15 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 			}
 
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
-			String subpopName = null;
-			if (this.subpopulationAttributeName != null) {
-				subpopName = (String) subPopLookup.getAttribute(person.getId().toString(), this.subpopulationAttributeName);
-			}
-			GenericPlanStrategy<T, I> strategy = this.chooseStrategy(subpopName);
+//			String subpopName = null;
+//			if (this.subpopulationAttributeName != null) {
+//				subpopName = (String) PopulationUtils.getPersonAttribute( person, this.subpopulationAttributeName) ;
+//			}
+			String subpopName = PopulationUtils.getSubpopulation( person );
+			GenericPlanStrategy<PL, AG> strategy = this.chooseStrategy(person, subpopName);
 
 			if (strategy==null) {
-				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation?");
+				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation? Current subpopulation = " + subpopName);
 			}
 			
 			// ... and run the strategy:
@@ -214,27 +219,27 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 		}
 
 		// finally make sure all strategies have finished there work
-		for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
+		for (GenericPlanStrategy<PL, AG> strategy : distinctStrategies()) {
 			strategy.finish();
 		}
 
 	}
 
-	private Collection<GenericPlanStrategy<T, I>> distinctStrategies() {
+	private Collection<GenericPlanStrategy<PL, AG>> distinctStrategies() {
 		// Leaving out duplicate strategies in different subpopulations
-		Collection<GenericPlanStrategy<T, I>> strategies = new LinkedHashSet<>();
-		for (StrategyWeights<T, I> weights : weightsPerSubpopulation.values()) {
+		Collection<GenericPlanStrategy<PL, AG>> strategies = new LinkedHashSet<>();
+		for (StrategyWeights<PL, AG> weights : weightsPerSubpopulation.values()) {
 			strategies.addAll(weights.strategies);
 		}
 		return strategies;
 	}
 
-	private void removePlans(final HasPlansAndId<T, I> person, final int maxNumberOfPlans) {
+	private void removePlans(final HasPlansAndId<PL, AG> person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
-			T plan = this.removalPlanSelector.selectPlan(person);
+			PL plan = this.removalPlanSelector.selectPlan(person);
 			person.removePlan(plan);
 			if (plan == person.getSelectedPlan()) {
-				final T newPlanToSelect = new RandomPlanSelector<T, I>().selectPlan(person) ;
+				final PL newPlanToSelect = new RandomPlanSelector<PL, AG>().selectPlan(person) ;
 				if ( newPlanToSelect == null ) {
 					throw new IllegalStateException( "could not find a plan to select for person "+person );
 				}
@@ -250,37 +255,50 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	final void handleChangeRequests(final int iteration) {
 		for ( int ii = 0 ; ii <= iteration ; ii++ ) {
 			// (playing back history for those installations which recreate the strategy manager in every iteration)
-			for ( Map.Entry<String, StrategyWeights<T, I>> wentry : weightsPerSubpopulation.entrySet() ) {
+			for ( Map.Entry<String, StrategyWeights<PL, AG>> wentry : weightsPerSubpopulation.entrySet() ) {
 				final String subpop = wentry.getKey();
-				final StrategyWeights<T, I> weights = wentry.getValue();
-				Map<GenericPlanStrategy<T, I>, Double> changes = weights.changeRequests.remove(ii);
+				final StrategyWeights<PL, AG> weights = wentry.getValue();
+				Map<GenericPlanStrategy<PL, AG>, Double> changes = weights.changeRequests.remove(ii);
 				if (changes != null) {
-					for (Map.Entry<GenericPlanStrategy<T, I>, Double> entry : changes.entrySet()) {
+					for (Map.Entry<GenericPlanStrategy<PL, AG>, Double> entry : changes.entrySet()) {
 						changeWeightOfStrategy( entry.getKey(), subpop, entry.getValue());
 					}
 				}
 			}
 		}
 	}
+	
+	private interface StrategyChooser <T extends BasicPlan, I extends HasPlansAndId<? extends BasicPlan, I>> {
+		GenericPlanStrategy<T,I> chooseStrategy( HasPlansAndId<T,I> person, final String subpopulation ) ;
+	}
+	private class MyStrategyChooser implements StrategyChooser<PL, AG> {
+		@Override
+		public GenericPlanStrategy<PL, AG> chooseStrategy(HasPlansAndId<PL, AG> person, String subpopulation) {
+			StrategyWeights<PL, AG> weights = GenericStrategyManager.this.getStrategyWeights(subpopulation);
+			
+			double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
+			
+			double sum = 0.0;
+			for (int i = 0, max = weights.weights.size(); i < max; i++) {
+				sum += weights.weights.get(i);
+				if (rnd <= sum) {
+					return weights.strategies.get(i);
+				}
+			}
+			return null;
+		}
+	}
+	private MyStrategyChooser myStrategyChooser = new MyStrategyChooser() ;
 
 	/**
 	 * chooses a (weight-influenced) random strategy
 	 *
 	 * @return the chosen strategy
 	 */
-	protected GenericPlanStrategy<T, I> chooseStrategy(final String subpopulation) {
-		final StrategyWeights<T, I> weights = getStrategyWeights(subpopulation);
-
-		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
-
-		double sum = 0.0;
-		for (int i = 0, max = weights.weights.size(); i < max; i++) {
-			sum += weights.weights.get(i);
-			if (rnd <= sum) {
-				return weights.strategies.get(i);
-			}
-		}
-		return null;
+	/* deliberately package */ GenericPlanStrategy<PL, AG> chooseStrategy(HasPlansAndId<PL, AG> person, final String subpopulation) {
+		// yyyyyy I can see that this would need to be replaceable, but need to find some other way than inheritance.  kai, mar'18
+		// Just implemented first step towards pluggability. But ain't there yet.  kai, apr'18
+		return myStrategyChooser.chooseStrategy(person,subpopulation) ;
 	}
 
 	/**
@@ -301,12 +319,12 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 */
 	public final void addChangeRequest(
 			final int iteration,
-			final GenericPlanStrategy<T, I> strategy,
+			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation,
 			final double newWeight) {
-		final StrategyWeights<T, I> weights = getStrategyWeights( subpopulation );
+		final StrategyWeights<PL, AG> weights = getStrategyWeights( subpopulation );
 		Integer iter = iteration;
-		Map<GenericPlanStrategy<T, I>, Double> iterationRequests = weights.changeRequests.get(iter);
+		Map<GenericPlanStrategy<PL, AG>, Double> iterationRequests = weights.changeRequests.get(iter);
 		if (iterationRequests == null) {
 			iterationRequests = new HashMap<>(3);
 			weights.changeRequests.put(iter, iterationRequests);
@@ -343,7 +361,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final PlanSelector<T, I> planSelector) {
+	public final void setPlanSelectorForRemoval(final PlanSelector<PL, AG> planSelector) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector = planSelector;
 	}
@@ -352,7 +370,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 		return this.maxPlansPerAgent ;
 	}
 
-	public final List<GenericPlanStrategy<T, I>> getStrategies(String subpopulation) {
+	public final List<GenericPlanStrategy<PL, AG>> getStrategies(String subpopulation) {
 		return getStrategyWeights( subpopulation ).unmodifiableStrategies;
 	}
 

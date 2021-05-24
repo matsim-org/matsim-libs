@@ -20,8 +20,6 @@
 
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -31,6 +29,8 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+
+import java.util.ArrayList;
 
 /*package*/ abstract class AbstractFastRouterDelegate implements FastRouterDelegate {
 
@@ -49,12 +49,12 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
 	
 	@Override
 	public Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
+		ArrayList<Node> nodes = new ArrayList<>();
+		ArrayList<Link> links = new ArrayList<>();
 
 		nodes.add(0, ((RoutingNetworkNode) toNode).getNode());
 		Link tmpLink = getData(toNode).getPrevLink();
-		if (tmpLink != null) {
+//		if (tmpLink != null) {
 			// original code
 //			while (tmpLink.getFromNode() != fromNode) {
 //				links.add(0, ((RoutingNetworkLink) tmpLink).getLink());
@@ -79,12 +79,10 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
 				nodes.add(0, ((RoutingNetworkLink) tmpLink).getLink().getFromNode());
 				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 			}
-		}
+//		}
 		
 		NodeData toNodeData = getData(toNode);
-		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
-
-		return path;
+		return new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
 	}
 	
 	@Override

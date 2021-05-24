@@ -23,8 +23,14 @@ package org.matsim.core.network.algorithms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
@@ -32,14 +38,18 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkSimplifierTest {
 
-	@Test
-	public void testBuildNetwork(){
-		Network network = buildNetwork();
-		assertEquals("Wrong number of nodes.",  6, network.getNodes().size());
-		assertEquals("Wrong number of links.",  5, network.getLinks().size());
+	@Before
+	public void setUp() {
+		Id.resetCaches();
 	}
-	
-	
+
+	@Test
+	public void testBuildNetwork() {
+		Network network = buildNetwork();
+		assertEquals("Wrong number of nodes.", 6, network.getNodes().size());
+		assertEquals("Wrong number of links.", 5, network.getLinks().size());
+	}
+
 	@Test
 	public void testRun() {
 		Network network = buildNetwork();
@@ -72,6 +82,121 @@ public class NetworkSimplifierTest {
 		network = buildNetwork();
 		nst.run(network, 5.0);
 		assertEquals("Wrong number of links", 5, network.getLinks().size());
+	}
+
+	@Test
+	public void testDifferentAttributesPerDirection() {
+		/*
+		 Test-Network
+
+		 A                    J
+		 |                    |
+		 C---D---E---F---G----H
+		 |                    |
+		 B                    K
+
+		 - between all connected nodes, there are links going fore and back (.e.g AC, CA, BC, CB, CD, DC, ...)
+		 - all links are 10m, have 1 lane, freespeed 10m/s
+		 - capacities are different: default 1000veh/h, CD, DE, EF, FG, GH are 2000veh/h, in the opposite direction only FE, ED are 2000veh/h
+
+		 originally, the algorithm had a problem and corrupted the network, resulting in a non-routable network
+		 */
+
+		Network network = NetworkUtils.createNetwork();
+		Node a = NetworkUtils.createAndAddNode(network, Id.create("A", Node.class), new Coord(0.0, 10.0));
+		Node b = NetworkUtils.createAndAddNode(network, Id.create("B", Node.class), new Coord(0.0, -10.0));
+		Node c = NetworkUtils.createAndAddNode(network, Id.create("C", Node.class), new Coord(0.0, 0.0));
+		Node d = NetworkUtils.createAndAddNode(network, Id.create("D", Node.class), new Coord(10.0, 0.0));
+		Node e = NetworkUtils.createAndAddNode(network, Id.create("E", Node.class), new Coord(20.0, 0.0));
+		Node f = NetworkUtils.createAndAddNode(network, Id.create("F", Node.class), new Coord(30.0, 0.0));
+		Node g = NetworkUtils.createAndAddNode(network, Id.create("G", Node.class), new Coord(40.0, 0.0));
+		Node h = NetworkUtils.createAndAddNode(network, Id.create("H", Node.class), new Coord(50.0, 0.0));
+		Node j = NetworkUtils.createAndAddNode(network, Id.create("J", Node.class), new Coord(50.0, 10.0));
+		Node k = NetworkUtils.createAndAddNode(network, Id.create("K", Node.class), new Coord(50.0, -10.0));
+
+		Id<Link> idAC = Id.create("AC", Link.class);
+		Id<Link> idCA = Id.create("CA", Link.class);
+		Id<Link> idBC = Id.create("BC", Link.class);
+		Id<Link> idCB = Id.create("CB", Link.class);
+		Id<Link> idCD = Id.create("CD", Link.class);
+		Id<Link> idDC = Id.create("DC", Link.class);
+		Id<Link> idDE = Id.create("DE", Link.class);
+		Id<Link> idED = Id.create("ED", Link.class);
+		Id<Link> idEF = Id.create("EF", Link.class);
+		Id<Link> idFE = Id.create("FE", Link.class);
+		Id<Link> idFG = Id.create("FG", Link.class);
+		Id<Link> idGF = Id.create("GF", Link.class);
+		Id<Link> idGH = Id.create("GH", Link.class);
+		Id<Link> idHG = Id.create("HG", Link.class);
+		Id<Link> idHJ = Id.create("HJ", Link.class);
+		Id<Link> idJH = Id.create("JH", Link.class);
+		Id<Link> idHK = Id.create("HK", Link.class);
+		Id<Link> idKH = Id.create("KH", Link.class);
+
+		NetworkUtils.createAndAddLink(network, idAC, a, c, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idCA, c, a, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idBC, b, c, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idCB, c, b, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idCD, c, d, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idDC, d, c, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idDE, d, e, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idED, e, d, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idEF, e, f, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idFE, f, e, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idFG, f, g, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idGF, g, f, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idGH, g, h, 10.0, 10.0, 2000, 1);
+		NetworkUtils.createAndAddLink(network, idHG, h, g, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idHJ, h, j, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idJH, j, h, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idHK, h, k, 10.0, 10.0, 1000, 1);
+		NetworkUtils.createAndAddLink(network, idKH, k, h, 10.0, 10.0, 1000, 1);
+
+		new NetworkSimplifier().run(network);
+
+		System.out.println("resulting links:");
+		for (Link link : network.getLinks().values()) {
+			System.out.println(link.getId());
+		}
+
+		// expected links: AC, CA, BC, CB, CD-DE-EF-FG-GH, DC, FE-ED, HG-GF, HJ, JH, HK, KH
+
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		Id<Link> idCDDEEFFGGH = Id.create("CD-DE-EF-FG-GH", Link.class);
+		Id<Link> idHGGF = Id.create("HG-GF", Link.class);
+		Id<Link> idFEED = Id.create("FE-ED", Link.class);
+
+		Assert.assertEquals("Wrong number of links.", 12, links.size());
+		Assert.assertNotNull("Expected link not found.", links.get(idAC));
+		Assert.assertNotNull("Expected link not found.", links.get(idCA));
+		Assert.assertNotNull("Expected link not found.", links.get(idBC));
+		Assert.assertNotNull("Expected link not found.", links.get(idCB));
+
+		Assert.assertNotNull("Expected link not found.", links.get(idHJ));
+		Assert.assertNotNull("Expected link not found.", links.get(idJH));
+		Assert.assertNotNull("Expected link not found.", links.get(idHK));
+		Assert.assertNotNull("Expected link not found.", links.get(idKH));
+
+		Assert.assertNotNull("Expected link not found.", links.get(idCDDEEFFGGH));
+
+		Assert.assertNotNull("Expected link not found.", links.get(idHGGF));
+		Assert.assertNotNull("Expected link not found.", links.get(idFEED));
+		Assert.assertNotNull("Expected link not found.", links.get(idDC));
+
+		Assert.assertEquals(10.0, links.get(idAC).getLength(), 1e-8);
+		Assert.assertEquals(50.0, links.get(idCDDEEFFGGH).getLength(), 1e-8);
+		Assert.assertEquals(20.0, links.get(idHGGF).getLength(), 1e-8);
+		Assert.assertEquals(20.0, links.get(idFEED).getLength(), 1e-8);
+
+		Assert.assertEquals(1000.0, links.get(idAC).getCapacity(), 1e-8);
+		Assert.assertEquals(2000.0, links.get(idCDDEEFFGGH).getCapacity(), 1e-8);
+		Assert.assertEquals(2000.0, links.get(idFEED).getCapacity(), 1e-8);
+		Assert.assertEquals(1000.0, links.get(idHGGF).getCapacity(), 1e-8);
+
+		Assert.assertEquals(10.0, links.get(idAC).getFreespeed(), 1e-8);
+		Assert.assertEquals(10.0, links.get(idCDDEEFFGGH).getFreespeed(), 1e-8);
+		Assert.assertEquals(10.0, links.get(idHGGF).getFreespeed(), 1e-8);
+		Assert.assertEquals(10.0, links.get(idFEED).getFreespeed(), 1e-8);
 	}
 	
 	

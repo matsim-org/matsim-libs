@@ -19,15 +19,17 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class extracts a subnetwork from a given network containing only
@@ -65,15 +67,16 @@ public final class TransportModeNetworkFilter {
 	 */
 	public void filter(final Network subNetwork, final Set<String> extractModes) {	
 		NetworkFactory factory = subNetwork.getFactory();
-		
+
 		// first, clone all nodes to ensure their order is not changed
 		for (Node node : this.fullNetwork.getNodes().values()) {
 			Node newNode = factory.createNode(node.getId(), node.getCoord());
+			AttributesUtils.copyAttributesFromTo(node, newNode);
 			subNetwork.addNode(newNode);
 		}
-		
+
 		// second, create clones of the links allowing the extracted modes
-		Set<Id<Node>> nodesToInclude = new HashSet<>();
+		IdSet<Node> nodesToInclude = new IdSet<>(Node.class);
 		for (Link link : this.fullNetwork.getLinks().values()) {
 			Set<String> intersection = new HashSet<>(extractModes);
 			intersection.retainAll(link.getAllowedModes());
@@ -91,13 +94,14 @@ public final class TransportModeNetworkFilter {
 				link2.setFreespeed(link.getFreespeed());
 				link2.setLength(link.getLength());
 				link2.setNumberOfLanes(link.getNumberOfLanes());
-				NetworkUtils.setType( ((Link) link2), NetworkUtils.getType(((Link) link)));
+				NetworkUtils.setType(link2, NetworkUtils.getType(link));
+				AttributesUtils.copyAttributesFromTo(link, link2);
 				subNetwork.addLink(link2);
 			}
 		}
 		
 		// third, remove all nodes that are not used by the valid links
-		Set<Id<Node>> nodesToRemove = new HashSet<>();
+		IdSet<Node> nodesToRemove = new IdSet<>(Node.class);
 		for (Node node : this.fullNetwork.getNodes().values()) {
 			if (!nodesToInclude.contains(node.getId())) nodesToRemove.add(node.getId());
 		}

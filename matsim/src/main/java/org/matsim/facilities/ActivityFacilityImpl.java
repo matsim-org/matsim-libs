@@ -31,6 +31,7 @@ import org.matsim.core.api.internal.MatsimDataClassImplMarkerInterface;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * maintainer: mrieser / Senozon AG
@@ -59,6 +60,8 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	private Id<Link> linkId;
 
 	private boolean locked = false ;
+
+	private final Attributes attributes = new Attributes();
 
 	/**
 	 * Deliberately protected, see {@link MatsimDataClassImplMarkerInterface}
@@ -123,8 +126,10 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	@Override
 	public final String toString() {
 		return "[" + super.toString() +
-				" ID=" + this.id +
-		       " nof_activities=" + this.activities.size() + "]";
+				   " ID=" + this.id +
+				   "| linkID=" + this.linkId +
+				   "| nof_activities=" + this.activities.size() +
+				   "]";
 	}
 
 	@Override
@@ -156,4 +161,8 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 		}
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
+	}
 }

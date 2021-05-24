@@ -6,11 +6,11 @@
 
 <xsd:complexType name="countsType">	
 	<xsd:sequence>
-		<xsd:element name="count" type="countType" minOccurs="1" maxOccurs="unbounded"/>
+		<xsd:element name="count" type="countType" minOccurs="0" maxOccurs="unbounded"/>
 	</xsd:sequence>
 	<xsd:attribute name="name" type="xsd:string" use="required"/>
 	<xsd:attribute name="desc" type="xsd:string" use="optional"/>
-	<xsd:attribute name="year" type="xsd:gYear" use="required"/>
+	<xsd:attribute name="year" type="xsd:int" use="required"/>
 	<xsd:attribute name="layer" type="xsd:string" use="optional"/><!-- deprecated, should no longer be used. -->
 </xsd:complexType>
 

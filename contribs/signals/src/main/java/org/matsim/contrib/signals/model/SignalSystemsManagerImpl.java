@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 /**
  * @author dgrether
  */
-public class SignalSystemsManagerImpl implements SignalSystemsManager {
+public final class SignalSystemsManagerImpl implements SignalSystemsManager {
 
 	private SortedMap<Id<SignalSystem>, SignalSystem> signalSystems = new TreeMap<>();
 	
@@ -73,17 +73,6 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	@Override
 	public void setAmberLogic(AmberLogic amberLogic) {
 		this.amberLogic = amberLogic;
-	}
-
-	@Override
-	public void resetModel(Integer iterationNumber) {
-		for (SignalSystem system : this.getSignalSystems().values()){
-			system.getSignalController().reset(iterationNumber);
-			for (Signal signal : system.getSignals().values()){
-				signal.getSignalizeableItems().clear();
-			}
-		}
-	
 	}
 
 	@Override

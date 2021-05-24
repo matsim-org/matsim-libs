@@ -42,7 +42,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
@@ -106,11 +105,11 @@ import org.xml.sax.Attributes;
 
 	private Activity prevAct = null;
 
-	public PopulationReaderMatsimV5(final Scenario scenario) {
+	PopulationReaderMatsimV5(final Scenario scenario) {
 		this( new IdentityTransformation() , scenario );
 	}
 
-	public PopulationReaderMatsimV5(
+	PopulationReaderMatsimV5(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
 		this.coordinateTransformation = coordinateTransformation;
@@ -208,8 +207,7 @@ import org.xml.sax.Attributes;
 
 	private void startAct(final Attributes atts) {
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			final Id<Link> linkId1 = linkId;
+			Id<Link> linkId1 = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				final Coord coord = parseCoord( atts );
@@ -221,9 +219,12 @@ import org.xml.sax.Attributes;
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
-		this.curract.setStartTime(Time.parseTime(atts.getValue(ATTR_ACT_STARTTIME)));
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue(ATTR_ACT_MAXDUR)));
-		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
+				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
+				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
+				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 		String fId = atts.getValue(ATTR_ACT_FACILITY);
 		if (fId != null) {
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
@@ -234,7 +235,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private Coord parseCoord(Attributes atts) {
-		return coordinateTransformation.transform(
+		return this.coordinateTransformation.transform(
 				new Coord(
 						Double.parseDouble(atts.getValue( ATTR_ACT_X )),
 						Double.parseDouble(atts.getValue( ATTR_ACT_Y )) ) );
@@ -276,8 +277,8 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+		if (this.currRoute.getTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		this.routeDescription = null;
@@ -312,8 +313,10 @@ import org.xml.sax.Attributes;
 			mode = "undefined";
 		}
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
-		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
-		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
+				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_TRAVTIME))
+				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
@@ -342,7 +345,8 @@ import org.xml.sax.Attributes;
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("trav_time") != null) {
-			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+			Time.parseOptionalTime(atts.getValue("trav_time"))
+					.ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
 		}
 		if (atts.getValue("distance") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
@@ -380,8 +384,8 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+		if (this.currRoute.getTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

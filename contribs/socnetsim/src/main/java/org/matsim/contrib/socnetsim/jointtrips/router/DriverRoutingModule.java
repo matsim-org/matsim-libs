@@ -27,13 +27,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.facilities.Facility;
-
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd
@@ -76,14 +73,10 @@ public class DriverRoutingModule implements RoutingModule {
 		DriverRoute dRoute = new DriverRoute( netRoute , Collections.<Id<Person>>emptyList() );
 		leg.setRoute( dRoute );
 		leg.setDepartureTime( departureTime );
-		leg.setTravelTime( dRoute.getTravelTime() );
+		leg.setTravelTime(dRoute.getTravelTime().seconds());
 
 		return Collections.singletonList( leg );
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
 }
 

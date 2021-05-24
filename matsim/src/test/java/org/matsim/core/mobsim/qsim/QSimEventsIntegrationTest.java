@@ -1,4 +1,25 @@
-package org.matsim.core.mobsim.qsim;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * QSimEventsIntegrationTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -10,10 +31,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -23,7 +40,7 @@ public class QSimEventsIntegrationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Rule
-	public Timeout globalTimeout= new Timeout(2000);
+	public Timeout globalTimeout= new Timeout(20000);
 
 	@Test
 	public void netsimEngineHandlesExceptionCorrectly() {
@@ -42,14 +59,9 @@ public class QSimEventsIntegrationTest {
 
 			}
 		});
-		QSim qSim = new QSim(scenario, events);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim);
+		QSim qSim = new QSimBuilder(config)//
+				.useDefaults()
+				.build(scenario, events);
 		try {
 			qSim.run();
 		} catch (RuntimeException e) {

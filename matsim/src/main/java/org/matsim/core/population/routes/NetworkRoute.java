@@ -39,13 +39,13 @@ public interface NetworkRoute extends Route {
 	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId);
 
 	/**Design thoughts:<ul>
-	 * <li> It this general cost or monetary cost?  kai/benjamin, jun'11
+	 * <li> yyyy It this general cost or monetary cost?  kai/benjamin, jun'11
 	 * </ul>
 	 */
 	public void setTravelCost(final double travelCost);
 
 	/**Design thoughts:<ul>
-	 * <li> It this general cost or monetary cost?  kai/benjamin, jun'11
+	 * <li> yyyy It this general cost or monetary cost?  kai/benjamin, jun'11
 	 * </ul>
 	 */
 	public double getTravelCost();
@@ -67,6 +67,7 @@ public interface NetworkRoute extends Route {
 	 * @return subroute of this route starting at fromLinkId and ending at toLinkId
 	 */
 	public NetworkRoute getSubRoute(final Id<Link> fromLinkId, final Id<Link> toLinkId);
+	// yyyy my intuition is that this should be removed from the API (and replaced by a static method in RouteUtils). kai, oct'17
 
 	/**
 	 * Sets the id of the vehicle that should be used to drive along this route.

@@ -19,7 +19,7 @@
 
 package org.matsim.core.network.algorithms;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;

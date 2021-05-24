@@ -19,10 +19,12 @@
 
 package org.matsim.core.network;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
+import com.google.common.base.Preconditions;
 
 final class VariableIntervalTimeVariantAttribute
 implements TimeVariantAttribute
@@ -63,16 +65,25 @@ implements TimeVariantAttribute
 			for (NetworkChangeEvent event : changeEvents.values()) {
 				ChangeValue value = valueGetter.getChangeValue(event);
 				if (value != null) {
-					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
+					switch( value.getType() ) {
+					case ABSOLUTE_IN_SI_UNITS:
+						// here, we just need to replace the value:
+						this.aValues[++numEvent] = value.getValue();
+						this.aTimes[numEvent] = event.getStartTime();
+						break;
+					case FACTOR: {
 						// there, the change event multiplies what we have so far:
 						double currentValue = this.aValues[numEvent];
 						this.aValues[++numEvent] = currentValue * value.getValue();
 						this.aTimes[numEvent] = event.getStartTime();
-					}
-					else {
-						// otherwise, we just need to replace the value:
-						this.aValues[++numEvent] = value.getValue();
+						break; }
+					case OFFSET_IN_SI_UNITS: {
+						double currentValue = this.aValues[numEvent];
+						this.aValues[++numEvent] = currentValue + value.getValue();
 						this.aTimes[numEvent] = event.getStartTime();
+						break; }
+					default:
+						throw new RuntimeException( "unknown ChangeType" ) ;
 					}
 				}
 			}
@@ -88,6 +99,7 @@ implements TimeVariantAttribute
 	@Override
 	public double getValue(final double time)
 	{
+		Preconditions.checkArgument(!Double.isNaN(time), "NaN time is not supported");
 		// after we have put everything into an array by recalc, we just need a binary search:
 		int key = Arrays.binarySearch(this.aTimes, time);
 		key = key >= 0 ? key : -key - 2;

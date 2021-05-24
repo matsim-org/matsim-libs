@@ -29,10 +29,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -115,7 +112,7 @@ public class SignalControlData20ReaderWriterTest {
 		Integer cycleTime = plan.getCycleTime();
 		Assert.assertNotNull(cycleTime);
 		Assert.assertEquals(Integer.valueOf(60), cycleTime);
-		Assert.assertEquals(Integer.valueOf(3), plan.getOffset());
+		Assert.assertEquals(3, plan.getOffset());
 		
 		Assert.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
 		SignalGroupSettingsData signalGroupSettings = plan.getSignalGroupSettingsDataByGroupId().get(groupId23);

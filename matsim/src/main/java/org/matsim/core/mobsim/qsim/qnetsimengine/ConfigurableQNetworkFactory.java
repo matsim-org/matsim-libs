@@ -20,6 +20,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
+import java.util.Optional;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,68 +30,95 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 /**
- * 
  * @author knagel
- * 
  * @see DefaultQNetworkFactory
  */
-public final class ConfigurableQNetworkFactory extends QNetworkFactory {
-	private QSimConfigGroup qsimConfig ;
-	private EventsManager events ;
-	private Network network ;
-	private Scenario scenario ;
+public final class ConfigurableQNetworkFactory implements QNetworkFactory {
+	private QSimConfigGroup qsimConfig;
+	private EventsManager events;
+	private Network network;
+	private Scenario scenario;
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
-	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
+	private NetsimInternalInterface netsimEngine;
+	private Optional<LinkSpeedCalculator> linkSpeedCalculator = Optional.empty();
+	private Optional<TurnAcceptanceLogic> turnAcceptanceLogic = Optional.empty();
+	private Optional<VehicleHandler> vehicleHandler = Optional.empty();
+	private Optional<FlowEfficiencyCalculator> flowEfficiencyCalculator = Optional.empty();
+	private Optional<VehicleQ.Factory<QVehicle>> vehicleQFactory = Optional.empty();
 
-	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
+	public ConfigurableQNetworkFactory(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
-		this.network = scenario.getNetwork() ;
-		this.qsimConfig = scenario.getConfig().qsim() ;
+		this.network = scenario.getNetwork();
+		this.qsimConfig = scenario.getConfig().qsim();
 	}
+
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
+	public void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 		this.netsimEngine = netsimEngine1;
-		double effectiveCellSize = network.getEffectiveCellSize() ;
+		double effectiveCellSize = network.getEffectiveCellSize();
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
-		if (! Double.isNaN(network.getEffectiveLaneWidth())){
-			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+		linkWidthCalculator.setLinkWidthForVis(qsimConfig.getLinkWidthForVis());
+		if (!Double.isNaN(network.getEffectiveLaneWidth())) {
+			linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
-		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+		context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator);
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
-		QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context) ;
-		laneFactory.setLinkSpeedCalculator( linkSpeedCalculator );
+	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
 
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
-		linkBuilder.setLaneFactory(laneFactory);
+		// the QLink.Builder and the QueueWithBuffer.Builder pick the correct implementations of
+		// vehicleQFactory, flowEfficiencyCalculator and so on based on the config.
+		// We should only override that choice if the configured properties are explicitly set. Janek 11.19
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine);
+		{
+			QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context);
+			vehicleQFactory.ifPresent(factory -> laneFactory.setVehicleQueue(factory.createVehicleQ()));
+			flowEfficiencyCalculator.ifPresent(laneFactory::setFlowEfficiencyCalculator);
+			linkBuilder.setLaneFactory(laneFactory);
+		}
+		linkSpeedCalculator.ifPresent(linkBuilder::setLinkSpeedCalculator);
+		vehicleHandler.ifPresent(linkBuilder::setVehicleHandler);
 
-		return linkBuilder.build(link, toQueueNode) ;
+		return linkBuilder.build(link, toQueueNode);
 	}
+
 	@Override
-	QNodeI createNetsimNode(final Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+	public QNodeI createNetsimNode( final Node node ) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context, qsimConfig);
 
-		builder.setTurnAcceptanceLogic( this.turnAcceptanceLogic ) ;
+		turnAcceptanceLogic.ifPresent(builder::setTurnAcceptanceLogic);
 
-		return builder.build( node ) ;
+		return builder.build(node);
 	}
+
 	public final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
-		this.linkSpeedCalculator = linkSpeedCalculator;
+		this.linkSpeedCalculator = Optional.of(linkSpeedCalculator);
 	}
+
 	public final void setTurnAcceptanceLogic( TurnAcceptanceLogic turnAcceptanceLogic ) {
-		this.turnAcceptanceLogic = turnAcceptanceLogic;
+		this.turnAcceptanceLogic = Optional.of(turnAcceptanceLogic);
+	}
+
+	public final void setVehicleHandler(VehicleHandler vehicleHandler) {
+		this.vehicleHandler = Optional.of(vehicleHandler);
+	}
+
+	public final void setVehicleQFactory( VehicleQ.Factory<QVehicle> factory ) {
+		this.vehicleQFactory = Optional.of(factory);
+	}
+
+	public final void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
+		this.flowEfficiencyCalculator = Optional.of(flowEfficiencyCalculator);
 	}
 }

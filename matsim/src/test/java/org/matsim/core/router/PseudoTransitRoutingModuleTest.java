@@ -49,6 +49,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public class PseudoTransitRoutingModuleTest {
@@ -75,7 +76,7 @@ public class PseudoTransitRoutingModuleTest {
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(400.0, tt, 1e-8);
-			Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
@@ -86,7 +87,7 @@ public class PseudoTransitRoutingModuleTest {
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(600.0, tt, 1e-8);
-			Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
 			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
@@ -110,14 +111,14 @@ public class PseudoTransitRoutingModuleTest {
 			
 			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
 			
-			Facility<?> fromFacility = new ActivityWrapperFacility(fromAct) ;
-			Facility<?> toFacility = new ActivityWrapperFacility(toAct) ;
+			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
+			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
 			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
-			
-			Assert.assertEquals(800.0, newLeg.getTravelTime(), 1e-8);
+
+			Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
@@ -128,6 +129,10 @@ public class PseudoTransitRoutingModuleTest {
 
 		public Fixture() {
 			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			ModeRoutingParams walk = new ModeRoutingParams(TransportMode.walk);
+			walk.setBeelineDistanceFactor(1.3);
+			walk.setTeleportedModeSpeed(3.0 / 3.6);
+			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
 			
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

@@ -20,6 +20,11 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.waitTimes;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -32,24 +37,30 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
 
 /**
  * Save waiting times of agents while mobsim is running
- * 
+ *
  * @author sergioo
  */
 
-public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, Serializable {
+public class WaitTimeCalculatorSerializable implements
+		WaitTimeCalculator, PersonDepartureEventHandler,
+		PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler,
+		VehicleArrivesAtFacilityEventHandler, Serializable,
+		Provider<WaitTime> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private static int scheduleCalls;
@@ -61,45 +72,48 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 	private final Map<String, Double> agentsWaitingData = new HashMap<String, Double>();
 	private Map<String, Tuple<String, String>> linesRoutesOfVehicle = new HashMap<String, Tuple<String, String>>();
 	private Map<String, String> stopOfVehicle = new HashMap<String, String>();
-	public static void printCallStatisticsAndReset(){
+
+	public static void printCallStatisticsAndReset() {
 		Logger logger = Logger.getLogger(WaitTimeCalculatorSerializable.class);
 		logger.warn("scheduled wait time calls vs unscheduled: " + scheduleCalls + " : " + waitTimeCalls);
-		scheduleCalls=0;
-		waitTimeCalls=0;
+		scheduleCalls = 0;
+		waitTimeCalls = 0;
 	}
+
 	//Constructors
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds()));
 	}
+
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
-		for(TransitLine line:transitSchedule.getTransitLines().values())
-			for(TransitRoute route:line.getRoutes().values()) {
+		for (TransitLine line : transitSchedule.getTransitLines().values())
+			for (TransitRoute route : line.getRoutes().values()) {
 				double[] sortedDepartures = new double[route.getDepartures().size()];
-				int d=0;
-				for(Departure departure:route.getDepartures().values())
+				int d = 0;
+				for (Departure departure : route.getDepartures().values())
 					sortedDepartures[d++] = departure.getDepartureTime();
 				Arrays.sort(sortedDepartures);
 				Map<String, WaitTimeData> stopsMap = new HashMap<String, WaitTimeData>(100);
 				Map<String, double[]> stopsScheduledMap = new HashMap<String, double[]>(100);
-				for(TransitRouteStop stop:route.getStops()) {
-					stopsMap.put(stop.getStopFacility().getId().toString(), new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
-					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
-					for(int i=0; i<cacheWaitTimes.length; i++) {
-						double endTime = timeSlot*(i+1);
-						if(endTime>24*3600)
-							endTime-=24*3600;
-						cacheWaitTimes[i] = Time.UNDEFINED_TIME;
+				for (TransitRouteStop stop : route.getStops()) {
+					stopsMap.put(stop.getStopFacility().getId().toString(), new WaitTimeDataArray((int) (totalTime / timeSlot) + 1));
+					double[] cacheWaitTimes = new double[(int) (totalTime / timeSlot) + 1];
+					for (int i = 0; i < cacheWaitTimes.length; i++) {
+						double endTime = timeSlot * (i + 1);
+						if (endTime > 24 * 3600)
+							endTime -= 24 * 3600;
+						cacheWaitTimes[i] = Double.NaN;
 						SORTED_DEPARTURES:
-						for(double departure:sortedDepartures) {
-							double arrivalTime = departure+(stop.getArrivalOffset()!=Time.UNDEFINED_TIME?stop.getArrivalOffset():stop.getDepartureOffset()); 
-							if(arrivalTime>=endTime) {
-								cacheWaitTimes[i] = arrivalTime-endTime;
+						for (double departure : sortedDepartures) {
+							double arrivalTime = departure + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
+							if (arrivalTime >= endTime) {
+								cacheWaitTimes[i] = arrivalTime - endTime;
 								break SORTED_DEPARTURES;
 							}
 						}
-						if(cacheWaitTimes[i]==Time.UNDEFINED_TIME)
-							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(stop.getArrivalOffset()!=Time.UNDEFINED_TIME?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
+						if (Double.isNaN(cacheWaitTimes[i]))
+							cacheWaitTimes[i] = sortedDepartures[0] + 24 * 3600 + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds() - endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId().toString(), cacheWaitTimes);
 				}
@@ -113,7 +127,7 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 	public WaitTime getWaitTimes() {
 		return new WaitTime() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -124,49 +138,52 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 		};
 	}
 
-	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+	@Override
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
 		waitTimeCalls++;
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());
-		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
+		if (waitTimeData.getNumData((int) (time / timeSlot)) == 0) {
 			scheduleCalls++;
 			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId.toString());
-			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
-		}
-		else{
-			return waitTimeData.getWaitTime((int) (time/timeSlot));
+			return waitTimes[(int) (time / timeSlot) < waitTimes.length ? (int) (time / timeSlot) : (waitTimes.length - 1)];
+		} else {
+			return waitTimeData.getWaitTime((int) (time / timeSlot));
 		}
 	}
+
 	@Override
 	public void reset(int iteration) {
-		for(Map<String, WaitTimeData> routeData:waitTimes.values())
-			for(WaitTimeData waitTimeData:routeData.values())
+		for (Map<String, WaitTimeData> routeData : waitTimes.values())
+			for (WaitTimeData waitTimeData : routeData.values())
 				waitTimeData.resetWaitTimes();
 		agentsWaitingData.clear();
 		linesRoutesOfVehicle.clear();
 		stopOfVehicle.clear();
 	}
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(event.getLegMode().equals("pt") && agentsWaitingData.get(event.getPersonId().toString())==null)
+		if (event.getLegMode().equals("pt") && agentsWaitingData.get(event.getPersonId().toString()) == null)
 			agentsWaitingData.put(event.getPersonId().toString(), event.getTime());
-		else if(agentsWaitingData.get(event.getPersonId().toString())!=null)
+		else if (agentsWaitingData.get(event.getPersonId().toString()) != null)
 			new RuntimeException("Departing with old data");
 	}
+
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId().toString());
-		if(startWaitingTime!=null) {
+		if (startWaitingTime != null) {
 			Tuple<String, String> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId().toString());
 			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId().toString()));
-			data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+			data.addWaitTime((int) (startWaitingTime / timeSlot), event.getTime() - startWaitingTime);
 			agentsWaitingData.remove(event.getPersonId().toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(linesRoutesOfVehicle.get(event.getVehicleId().toString())!=null)
+		if (linesRoutesOfVehicle.get(event.getVehicleId().toString()) != null)
 			stopOfVehicle.put(event.getVehicleId().toString(), event.getFacilityId().toString());
 	}
 
@@ -175,4 +192,19 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 		linesRoutesOfVehicle.put(event.getVehicleId().toString(), new Tuple<String, String>(event.getTransitLineId().toString(), event.getTransitRouteId().toString()));
 	}
 
+	@Override
+	@Provides
+	public WaitTime get() {
+		return new WaitTime() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+				return WaitTimeCalculatorSerializable.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
+			}
+		};
+	}
 }
