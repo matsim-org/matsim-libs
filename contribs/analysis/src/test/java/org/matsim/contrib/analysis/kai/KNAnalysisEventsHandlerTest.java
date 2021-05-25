@@ -60,8 +60,8 @@ public class KNAnalysisEventsHandlerTest {
 	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
 
 	public static final String BASE_FILE_NAME = "stats_";
-	public static final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
-	public static final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
+	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+	public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
 	private Scenario scenario = null ;
 	private Population population = null ;

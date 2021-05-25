@@ -45,7 +45,7 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class CRSUtils {
 
-	private static Logger logger = Logger.getLogger(CRSUtils.class);
+	private static final Logger logger = Logger.getLogger(CRSUtils.class);
 
 	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new HashMap<Integer, CoordinateReferenceSystem>();
 

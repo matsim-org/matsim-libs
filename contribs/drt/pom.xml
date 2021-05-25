@@ -10,13 +10,6 @@
 	<groupId>org.matsim.contrib</groupId>
 	<artifactId>drt</artifactId>
 	<name>drt</name>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencies>
 		<dependency>

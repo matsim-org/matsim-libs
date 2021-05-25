@@ -9,13 +9,6 @@
     <groupId>org.matsim.contrib</groupId>
     <artifactId>analysis</artifactId>
     <name>analysis</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>org.matsim.contrib</groupId>

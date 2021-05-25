@@ -14,7 +14,7 @@ import org.matsim.vehicles.VehicleType;
  */
 public class CarrierVehicleTypeLoader {
 	
-	private static Logger logger = Logger.getLogger(CarrierVehicleTypeLoader.class);
+	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeLoader.class);
 	
 	private Carriers carriers;
 

@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.*;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -97,6 +98,9 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 			log.info("Unmatched links: {}, lanes: {}", n, n2);
 
 		}
+
+		if (crs.getTargetCRS() != null)
+			ProjectionUtils.putCRS(network, crs.getTargetCRS());
 
 		new NetworkWriter(network).write(output.toAbsolutePath().toString());
 		new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));

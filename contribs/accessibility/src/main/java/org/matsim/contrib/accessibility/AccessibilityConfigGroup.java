@@ -43,7 +43,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String BOUNDING_BOX_RIGHT = "boundingBoxRight";
 
 	@SuppressWarnings("unused")
-	private static Logger LOG = Logger.getLogger(AccessibilityConfigGroup.class);
+	private static final Logger LOG = Logger.getLogger(AccessibilityConfigGroup.class);
 
 	public static final String GROUP_NAME = "accessibility";
 	

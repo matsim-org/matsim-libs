@@ -45,7 +45,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  * @author thibautd
  */
 public class ScenarioByConfigInjectionTest {
-	private static Logger log = Logger.getLogger( ScenarioByConfigInjectionTest.class );
+	private static final Logger log = Logger.getLogger( ScenarioByConfigInjectionTest.class );
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 

@@ -66,8 +66,8 @@ public class WithinDayTravelTimeTest extends MatsimTestCase {
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
 	Random random = MatsimRandom.getRandom();
-	private static Link link22;
-	private static double originalFreeSpeed22;
+	private Link link22;
+	private double originalFreeSpeed22;
 	
 	@Test
 	@Parameters({"false", "true"})
@@ -160,7 +160,7 @@ public class WithinDayTravelTimeTest extends MatsimTestCase {
 	 * 
 	 * @author cdobler
 	 */
-	private static class MobsimListenerForTests implements MobsimInitializedListener, MobsimBeforeSimStepListener, 
+	private class MobsimListenerForTests implements MobsimInitializedListener, MobsimBeforeSimStepListener,
 		MobsimAfterSimStepListener {
 		
 		private TravelTime travelTime;

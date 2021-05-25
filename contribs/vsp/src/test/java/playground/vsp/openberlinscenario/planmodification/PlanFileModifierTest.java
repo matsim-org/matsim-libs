@@ -21,20 +21,15 @@ public class PlanFileModifierTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private static double SELECTION_PROBABILITY = 0.70;
-    private static CoordinateTransformation ct = new IdentityTransformation();
+    private final static double SELECTION_PROBABILITY = 0.70;
+    private final CoordinateTransformation ct = new IdentityTransformation();
 
-    private static Population originalPopulationCase;
-    private static Population modifiedPopulationCase1;
-    private static Population modifiedPopulationCase2;
-
-    private static boolean setUpDone = false;
+    private Population originalPopulationCase;
+    private Population modifiedPopulationCase1;
+    private Population modifiedPopulationCase2;
 
     @Before
     public void initializeTestPopulations() {
-
-        if (setUpDone) return;
-        setUpDone = true;
 
         String formatedInputPlansFile = utils.getClassInputDirectory() + "testPlansFormated.xml";
         String outputplansfile1 = utils.getOutputDirectory() + "testPlansModified.xml";

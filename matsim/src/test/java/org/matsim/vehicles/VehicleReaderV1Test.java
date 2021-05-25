@@ -21,7 +21,7 @@ package org.matsim.vehicles;
 
 import java.util.Map;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,7 +40,7 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@BeforeClass
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Vehicles veh = VehicleUtils.createVehiclesContainer();

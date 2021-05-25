@@ -58,7 +58,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	private static final Logger log =
 		Logger.getLogger(AllocateVehicleToPlansInGroupPlanAlgorithmTest.class);
 
-	private static String MODE = "the_vehicular_mode";
+	private static final String MODE = "the_vehicular_mode";
 
 	// uncomment to get more information in case of failure
 	//@Before

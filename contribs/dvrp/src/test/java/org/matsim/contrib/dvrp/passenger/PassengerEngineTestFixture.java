@@ -57,7 +57,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class PassengerEngineTestFixture {
 	static final String MODE = TransportMode.taxi;
 
-	static final Id<Person> PERSON_ID = Id.createPersonId("person1");
+	final Id<Person> PERSON_ID = Id.createPersonId("person1");
 	static final String START_ACTIVITY = "start";
 	static final String END_ACTIVITY = "end";
 

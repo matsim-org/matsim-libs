@@ -30,9 +30,9 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PKMbyModeCalculatorTest {
 
-	private static int car;
-	private static int pt;
-	private static int walk;
+	private int car;
+	private int pt;
+	private int walk;
 	HashMap<String, Double> modeCalc = new HashMap<String, Double>();
 	Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
@@ -231,7 +231,7 @@ public class PKMbyModeCalculatorTest {
 	}
 
 	/************ Determining the columns of the output file ************/
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

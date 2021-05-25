@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Node;
 
 class SpatialTestUtils {
 
-    private static GeometryFactory geometryFactory = new GeometryFactory();
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     static Geometry createRect(double maxX, double maxY) {
         return geometryFactory.createPolygon(new Coordinate[]{
