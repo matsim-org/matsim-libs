@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -22,92 +23,109 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
-		name = "travel-time",
-		description = "Run travel time analysis on events file."
+        name = "travel-time",
+        description = "Run travel time analysis on events file."
 )
 public class TravelTimeAnalysis implements MATSimAppCommand {
 
-	private static final Logger log = LogManager.getLogger(TravelTimeAnalysis.class);
+    private static final Logger log = LogManager.getLogger(TravelTimeAnalysis.class);
 
-	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Input run directory")
-	private Path runDirectory;
+    @CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Input run directory")
+    private Path runDirectory;
 
-	@CommandLine.Option(names = "--run-id", defaultValue = "*", description = "Pattern used to match runId", required = true)
-	private String runId;
+    @CommandLine.Option(names = "--run-id", defaultValue = "*", description = "Pattern used to match runId", required = true)
+    private String runId;
 
-	@CommandLine.Option(names = "--output", defaultValue = "travelTimeResults", description = "Name of output folder", required = true)
-	private String output;
+    @CommandLine.Option(names = "--output", defaultValue = "travelTimeResults", description = "Name of output folder", required = true)
+    private String output;
 
-	@CommandLine.Option(names = "--api-key", description = "HERE Maps API key, see here.com", required = true)
-	private String appCode;
+    @CommandLine.Option(names = "--api-key", description = "HERE Maps API key, see here.com", required = true)
+    private String appCode;
 
-	@CommandLine.Option(names = "--date", description = "The date to validate travel times for, format: YYYY-MM-DD")
-	private LocalDate date;
+    @CommandLine.Option(names = "--date", description = "The date to validate travel times for, format: YYYY-MM-DD")
+    private LocalDate date;
 
-	@CommandLine.Option(names = "--trips", description = "The number of trips to validate", defaultValue = "500")
-	private int trips;
+    @CommandLine.Option(names = "--trips", description = "The number of trips to validate", defaultValue = "500")
+    private int trips;
 
-	@CommandLine.Option(names = "--from", defaultValue = "0", description = "From time window in seconds")
-	private Double timeFrom;
+    @CommandLine.Option(names = "--from", defaultValue = "0", description = "From time window in seconds")
+    private Double timeFrom;
 
-	@CommandLine.Option(names = "--to", defaultValue = "86400", description = "To time window in seconds")
-	private Double timeTo;
+    @CommandLine.Option(names = "--to", defaultValue = "86400", description = "To time window in seconds")
+    private Double timeTo;
 
-	@CommandLine.Option(names = "--write-details", description = "Write JSON file for each calculated route")
-	private boolean writeDetails;
+    @CommandLine.Option(names = "--write-details", description = "Write JSON file for each calculated route")
+    private boolean writeDetails;
 
-	@CommandLine.Mixin
-	private CrsOptions crs = new CrsOptions();
+    @CommandLine.Mixin
+    private CrsOptions crs = new CrsOptions();
 
-	public static void main(String[] args) {
-		System.exit(new CommandLine(new TravelTimeAnalysis()).execute(args));
-	}
+    @CommandLine.Mixin
+    private ShpOptions shp = new ShpOptions();
 
-	@Override
-	public Integer call() throws Exception {
+    public static void main(String[] args) {
+        System.exit(new CommandLine(new TravelTimeAnalysis()).execute(args));
+    }
 
-		Scenario scenario = AnalysisSummary.loadScenario(runId, runDirectory, crs);
-		Path events = AnalysisSummary.glob(runDirectory, runId + ".*events.*", false)
-				.orElseThrow(() -> new IllegalArgumentException("Could not find events file."));
+    @Override
+    public Integer call() throws Exception {
 
-		Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
+        if (crs.getInputCRS()==null){
+            log.error("Input CRS is null. Please specify the input CRS");
+            return 2;
+        }
 
-		BestPlanSelector<Plan, Person> selector = new BestPlanSelector<>();
+        Scenario scenario = AnalysisSummary.loadScenario(runId, runDirectory, crs);
+        Path events = AnalysisSummary.glob(runDirectory, runId + ".*events.*", false)
+                .orElseThrow(() -> new IllegalArgumentException("Could not find events file."));
 
-		int size = populationIds.size();
+        Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
 
-		populationIds.removeIf(p -> {
-			Person person = scenario.getPopulation().getPersons().get(p);
-			return selector.selectPlan(person) != person.getSelectedPlan();
-		});
+        BestPlanSelector<Plan, Person> selector = new BestPlanSelector<>();
 
-		log.info("Removed {} agents not selecting their best plan", size - populationIds.size());
+        int size = populationIds.size();
 
-		if (date == null)
-			date = LocalDate.now();
+        populationIds.removeIf(p -> {
+            Person person = scenario.getPopulation().getPersons().get(p);
+            return selector.selectPlan(person) != person.getSelectedPlan();
+        });
 
-		log.info("Running analysis for {} trips at {} on file {}", trips, date, events);
+        if (shp.getShapeFile() != null){
+            HomeLocationFilter homeLocationFilter = new HomeLocationFilter
+                    (shp, crs.getInputCRS(), scenario.getPopulation());
+            populationIds.removeIf(p -> {
+                Person person = scenario.getPopulation().getPersons().get(p);
+                return !homeLocationFilter.considerAgent(person);
+            });
+        }
 
+        log.info("Removed {} agents not selecting their best plan", size - populationIds.size());
 
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
+        if (date == null)
+            date = LocalDate.now();
 
-		String outputFolder = runDirectory.resolve(output).toString();
-		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation);
-		validator.setWriteDetailedFiles(writeDetails);
-
-		TravelTimeValidationRunner runner;
-
-		if (timeFrom != null && timeTo != null) {
-			Tuple<Double, Double> timeWindow = new Tuple<Double, Double>(timeFrom, timeTo);
-			runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder,
-					validator, trips, timeWindow);
-		} else {
-			runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips);
-		}
+        log.info("Running analysis for {} trips at {} on file {}", trips, date, events);
 
 
-		runner.run();
+        CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
-		return 0;
-	}
+        String outputFolder = runDirectory.resolve(output).toString();
+        HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation);
+        validator.setWriteDetailedFiles(writeDetails);
+
+        TravelTimeValidationRunner runner;
+
+        if (timeFrom != null && timeTo != null) {
+            Tuple<Double, Double> timeWindow = new Tuple<Double, Double>(timeFrom, timeTo);
+            runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder,
+                    validator, trips, timeWindow);
+        } else {
+            runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips);
+        }
+
+
+        runner.run();
+
+        return 0;
+    }
 }
