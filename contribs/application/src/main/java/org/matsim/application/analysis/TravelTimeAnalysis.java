@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 @CommandLine.Command(
         name = "travel-time",
@@ -70,7 +72,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @Override
     public Integer call() throws Exception {
 
-        if (crs.getInputCRS()==null){
+        if (crs.getInputCRS() == null){
             log.error("Input CRS is null. Please specify the input CRS");
             return 2;
         }
@@ -90,13 +92,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             return selector.selectPlan(person) != person.getSelectedPlan();
         });
 
-        if (shp.getShapeFile() != null){
-            HomeLocationFilter homeLocationFilter = new HomeLocationFilter
-                    (shp, crs.getInputCRS(), scenario.getPopulation());
-            populationIds.removeIf(p -> {
-                Person person = scenario.getPopulation().getPersons().get(p);
-                return !homeLocationFilter.considerAgent(person);
-            });
+        Predicate<CarTrip> tripFilter = carTrip -> true;
+        if (shp.getShapeFile() != null) {
+            ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "__");
+            tripFilter = carTrip -> index.contains(carTrip.getArrivalLocation()) && index.contains(carTrip.getDepartureLocation());
         }
 
         log.info("Removed {} agents not selecting their best plan", size - populationIds.size());
@@ -113,16 +112,13 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation);
         validator.setWriteDetailedFiles(writeDetails);
 
-        TravelTimeValidationRunner runner;
+		Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 30);
+		if (timeFrom != null && timeTo != null) {
+			timeWindow = new Tuple<>(timeFrom, timeTo);
+		}
 
-        if (timeFrom != null && timeTo != null) {
-            Tuple<Double, Double> timeWindow = new Tuple<Double, Double>(timeFrom, timeTo);
-            runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder,
-                    validator, trips, timeWindow);
-        } else {
-            runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips);
-        }
-
+		TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder,
+				validator, trips, timeWindow, tripFilter);
 
         runner.run();
 
