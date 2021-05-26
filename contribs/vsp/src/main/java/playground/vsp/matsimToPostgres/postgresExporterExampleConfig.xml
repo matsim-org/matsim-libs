@@ -6,7 +6,7 @@
 		<param name="dbParamFile" value="./dbParam.xml" />
 		
 		<!-- Possible values: failIfRunIdExists, overwriteExistingRunId-->
-		<param name="overwriteRun" value="failIfRunIdExists" />
+		<param name="overwriteRun" value="overwriteExistingRunId" />
 			
 		<parameterset type="initialData" >
 			<!-- Possible values: importOverwrite, importIfNotExist, NoImport-->

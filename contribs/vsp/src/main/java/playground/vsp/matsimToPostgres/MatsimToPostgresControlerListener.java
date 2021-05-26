@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-
 public class MatsimToPostgresControlerListener implements ShutdownListener {
     private final Logger log = Logger.getLogger(MatsimToPostgresControlerListener.class);
 
@@ -26,6 +25,7 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
         final PostgresExporterConfigGroup exporterConfigGroup = (PostgresExporterConfigGroup)config.getModules().get(PostgresExporterConfigGroup.GROUP_NAME);
         DBParameters params = new DBParameters(exporterConfigGroup.dbParamFile);
         Connection connection = params.createDBConnection();
+        String overwriteRun = exporterConfigGroup.getOverwriteRun().toString(); // values: failIfRunIdExists, overwriteExistingRunId
 
         if (connection != null) {
             log.info("Connected to the database!");
@@ -36,13 +36,16 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
         try{
             // Import tripsCSV
             String tripsCSVFile = outputDir + "/" + runID + ".output_trips.csv.gz";
-            CsvToPostgresExporter tripsExporter = new CsvToPostgresExporter(connection, tripsCSVFile, params.getDatabaseName(), runID);
-            tripsExporter.export(params.getDatabaseName(), runID);
+            log.info("Start generate Databse for " + runID + ".output_trips.csv.gz");
+            CsvToPostgresExporter tripsExporter = new CsvToPostgresExporter(connection, tripsCSVFile, runID, overwriteRun);
+            tripsExporter.export(runID);
+            log.info("Finished generate Databse for " + runID + ".output_trips.csv.gz");
 
             // Import legsCSV
             String legsCSVFile = outputDir + "/" + runID + ".output_legs.csv.gz";
-            CsvToPostgresExporter legsExporter = new CsvToPostgresExporter(connection, legsCSVFile, params.getDatabaseName(), runID);
-            legsExporter.export(params.getDatabaseName(), runID);
+            log.info("Start generate Databse for " + runID + ".output_legs.csv.gz");
+            CsvToPostgresExporter legsExporter = new CsvToPostgresExporter(connection, legsCSVFile, runID, overwriteRun);
+            legsExporter.export(runID);
 
             assert connection != null;
             connection.close();
@@ -54,10 +57,5 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
             log.error("Some sql error. See Strack Trace...");
             e.printStackTrace();
         }
-
-
-
     }
-
-
 }

@@ -77,16 +77,16 @@ public class TestRunner {
         config.controler().setLastIteration(1);
 
         // ToDo: Friedrich to change for his own purposes/ pc structure
-        config.plans().setInputFile("C:\\Users\\david\\Desktop\\populationReduced.xml.gz");
+        config.plans().setInputFile("/Users/friedrichvolkers/populationReduced.xml.gz");
 
         ConfigUtils.addOrGetModule(config, PostgresExporterConfigGroup.class);
         PostgresExporterConfigGroup exporterConfigGroup = (PostgresExporterConfigGroup) config.getModules().get(PostgresExporterConfigGroup.GROUP_NAME);
 
         // ToDo: Friedrich to change for his own purposes/ pc structure
-        exporterConfigGroup.setDbParamFile("C:\\Users\\david\\Documents\\03_Repositories\\matsim-libs\\contribs\\vsp\\src\\main\\java\\playground\\vsp\\matsimToPostgres\\dbParam.xml");
+        //exporterConfigGroup.setDbParamFile("C:\\Users\\david\\Documents\\03_Repositories\\matsim-libs\\contribs\\vsp\\src\\main\\java\\playground\\vsp\\matsimToPostgres\\dbParam.xml");
+        exporterConfigGroup.setDbParamFile("/Users/friedrichvolkers/GIT/matsim-libs/contribs/vsp/src/main/java/playground/vsp/matsimToPostgres/dbParam.xml");
 
         return config;
-
     }
 
     // Copied from https://github.com/matsim-vsp/mosaik-2/blob/master/src/main/java/org/matsim/mosaik2/Utils.java
