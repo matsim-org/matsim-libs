@@ -13,7 +13,7 @@ public class CsvToPostgresExporter {
     private final String csvFile;
     private final String tableName;
     private final String runID;
-    private String overwrite; // should be final!
+    private final PostgresExporterConfigGroup.OverwriteRunSettings overwrite; // should be final!
 
     private final String schema = "matsim_output";
 
@@ -26,7 +26,7 @@ public class CsvToPostgresExporter {
     Map<Integer, String> indexToColumnNames = new HashMap<>();
 
 
-    CsvToPostgresExporter(Connection conn, String csvFile, String runID, String overwrite){
+    CsvToPostgresExporter(Connection conn, String csvFile, String runID, PostgresExporterConfigGroup.OverwriteRunSettings overwrite){
         this.conn = conn;
         this.csvFile = csvFile;
         this.tableName = getTableName(csvFile);
@@ -36,8 +36,6 @@ public class CsvToPostgresExporter {
 
     public void export(String runID) throws IOException {
 
-        this.overwrite = "overwriteExistingRunId"; // just for testing cases
-
         // Check if run_id exists
         if (checkIfSchemaExists()) {
             // Check if the table already exists
@@ -46,9 +44,9 @@ public class CsvToPostgresExporter {
                 if (checkIfRunIdColumnExists()) {
                     // Check if the run id already exists
                     if (checkIfRunIdExists()) {
-                        if (overwrite.equals("failIfRunIdExists")) {
+                        if (overwrite.equals(PostgresExporterConfigGroup.OverwriteRunSettings.failIfRunIdExists)) {
                             log.error("This Run ID already exists in " + tableName);
-                        } else if (overwrite.equals("overwriteExistingRunId")) {
+                        } else if (overwrite.equals(PostgresExporterConfigGroup.OverwriteRunSettings.overwriteExistingRunId)) {
                             String deleteRows = "DELETE FROM " + schema + "." + tableName + " WHERE run_id='" + runID + "';";
                             sqlExecute(conn, deleteRows);
                             log.info("All columns in " + schema + "." + tableName + " with the Run ID: " + runID + " was deleted!");

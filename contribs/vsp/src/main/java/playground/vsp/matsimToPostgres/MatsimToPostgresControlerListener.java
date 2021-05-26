@@ -25,7 +25,7 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
         final PostgresExporterConfigGroup exporterConfigGroup = (PostgresExporterConfigGroup)config.getModules().get(PostgresExporterConfigGroup.GROUP_NAME);
         DBParameters params = new DBParameters(exporterConfigGroup.dbParamFile);
         Connection connection = params.createDBConnection();
-        String overwriteRun = exporterConfigGroup.getOverwriteRun().toString(); // values: failIfRunIdExists, overwriteExistingRunId
+        PostgresExporterConfigGroup.OverwriteRunSettings overwriteRunSettings = exporterConfigGroup.getOverwriteRun();
 
         if (connection != null) {
             log.info("Connected to the database!");
@@ -37,14 +37,14 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
             // Import tripsCSV
             String tripsCSVFile = outputDir + "/" + runID + ".output_trips.csv.gz";
             log.info("Start generate Databse for " + runID + ".output_trips.csv.gz");
-            CsvToPostgresExporter tripsExporter = new CsvToPostgresExporter(connection, tripsCSVFile, runID, overwriteRun);
+            CsvToPostgresExporter tripsExporter = new CsvToPostgresExporter(connection, tripsCSVFile, runID, overwriteRunSettings);
             tripsExporter.export(runID);
             log.info("Finished generate Databse for " + runID + ".output_trips.csv.gz");
 
             // Import legsCSV
             String legsCSVFile = outputDir + "/" + runID + ".output_legs.csv.gz";
             log.info("Start generate Databse for " + runID + ".output_legs.csv.gz");
-            CsvToPostgresExporter legsExporter = new CsvToPostgresExporter(connection, legsCSVFile, runID, overwriteRun);
+            CsvToPostgresExporter legsExporter = new CsvToPostgresExporter(connection, legsCSVFile, runID, overwriteRunSettings);
             legsExporter.export(runID);
 
             assert connection != null;

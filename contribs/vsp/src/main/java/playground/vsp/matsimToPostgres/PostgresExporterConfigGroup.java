@@ -46,7 +46,7 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringSetter(OVERWRITE_RUN)
-    public void setDbParamFile(OverwriteRunSettings overwriteRunSettings){
+    public void setOverwriteRun (OverwriteRunSettings overwriteRunSettings){
         this.overwriteRunSettings = overwriteRunSettings;
     }
 

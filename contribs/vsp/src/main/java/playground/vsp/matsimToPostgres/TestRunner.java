@@ -72,7 +72,7 @@ public class TestRunner {
 
 
         // ToDo: As of here relevant...
-        config.controler().setRunId("Test123");
+        config.controler().setRunId("BillyID");
         config.controler().setWriteTripsInterval(1);
         config.controler().setLastIteration(1);
 
@@ -81,6 +81,7 @@ public class TestRunner {
 
         ConfigUtils.addOrGetModule(config, PostgresExporterConfigGroup.class);
         PostgresExporterConfigGroup exporterConfigGroup = (PostgresExporterConfigGroup) config.getModules().get(PostgresExporterConfigGroup.GROUP_NAME);
+        exporterConfigGroup.setOverwriteRun(PostgresExporterConfigGroup.OverwriteRunSettings.failIfRunIdExists);
 
         // ToDo: Friedrich to change for his own purposes/ pc structure
         //exporterConfigGroup.setDbParamFile("C:\\Users\\david\\Documents\\03_Repositories\\matsim-libs\\contribs\\vsp\\src\\main\\java\\playground\\vsp\\matsimToPostgres\\dbParam.xml");
