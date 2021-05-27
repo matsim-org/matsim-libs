@@ -92,8 +92,8 @@ public class CommuterDemandWriter {
 			this.municipalityMap = new HashMap<String, SimpleFeature>();
 			for (SimpleFeature ft : gemeindenFeatures) {
 				String gemeindeId = ft.getAttribute("NR").toString();
-				Geometry geometry = JTS.transform((Geometry) ft.getDefaultGeometry(), transformation);
-				ft.setDefaultGeometry(geometry);
+				//Geometry geometry = JTS.transform((Geometry) ft.getDefaultGeometry(), transformation);
+				//ft.setDefaultGeometry(geometry);
 				this.municipalityMap.put(gemeindeId, ft);
 			}
 		} catch (Exception e) {
@@ -291,8 +291,8 @@ public class CommuterDemandWriter {
 		MathTransform transformation = null;
 		transformation = CRS.findMathTransform(landuse.getSecond(), this.targetCrs, true);
 		for (SimpleFeature ft : landuse.getFirst()) {
-			Geometry geometry = JTS.transform((Geometry) ft.getDefaultGeometry(), transformation);
-			ft.setDefaultGeometry(geometry);
+			//Geometry geometry = JTS.transform((Geometry) ft.getDefaultGeometry(), transformation);
+			//ft.setDefaultGeometry(geometry);
 			for (Entry<String, SimpleFeature> entry : this.municipalityMap.entrySet()) {
 				SimpleFeature municipalityFeature = entry.getValue();
 				if (((Geometry) municipalityFeature.getDefaultGeometry()).contains((Geometry) ft.getDefaultGeometry())

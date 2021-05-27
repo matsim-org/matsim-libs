@@ -1,30 +1,27 @@
-package playground.vsp.matsimToPostgres;
+package playground.vsp.matsimToPostgres.testRunner;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.vsp.matsimToPostgres.PostgresExporterConfigGroup;
+import playground.vsp.matsimToPostgres.PostgresExporterModule;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 
-public class TestRunner {
-    private static final Logger log = Logger.getLogger( TestRunner.class );
+public class TestRunnerBerlin {
+    private static final Logger log = Logger.getLogger( TestRunnerBerlin.class );
 
     public static void main(String[] args) {
-        Config config = TestRunner.prepareConfig();
-        Scenario scenario = TestRunner.prepareScenario(config);
-        Controler controler = TestRunner.prepareControler(scenario);
+        Config config = TestRunnerBerlin.prepareConfig();
+        Scenario scenario = TestRunnerBerlin.prepareScenario(config);
+        Controler controler = TestRunnerBerlin.prepareControler(scenario);
         controler.run();
 
     }
@@ -72,20 +69,22 @@ public class TestRunner {
 
 
         // ToDo: As of here relevant...
-        config.controler().setRunId("BillyID");
+        config.controler().setRunId("New14573");
         config.controler().setWriteTripsInterval(1);
         config.controler().setLastIteration(1);
 
         // ToDo: Friedrich to change for his own purposes/ pc structure
-        config.plans().setInputFile("/Users/friedrichvolkers/populationReduced.xml.gz");
+        //config.plans().setInputFile("/Users/friedrichvolkers/populationReduced.xml.gz");
+        config.plans().setInputFile("C:/Users/david/Desktop/populationReduced.xml.gz");
 
         ConfigUtils.addOrGetModule(config, PostgresExporterConfigGroup.class);
         PostgresExporterConfigGroup exporterConfigGroup = (PostgresExporterConfigGroup) config.getModules().get(PostgresExporterConfigGroup.GROUP_NAME);
-        exporterConfigGroup.setOverwriteRun(PostgresExporterConfigGroup.OverwriteRunSettings.failIfRunIdExists);
+        exporterConfigGroup.setOverwriteRun(PostgresExporterConfigGroup.OverwriteRunSettings.overwriteExistingRunId);
 
         // ToDo: Friedrich to change for his own purposes/ pc structure
         //exporterConfigGroup.setDbParamFile("C:\\Users\\david\\Documents\\03_Repositories\\matsim-libs\\contribs\\vsp\\src\\main\\java\\playground\\vsp\\matsimToPostgres\\dbParam.xml");
-        exporterConfigGroup.setDbParamFile("/Users/friedrichvolkers/GIT/matsim-libs/contribs/vsp/src/main/java/playground/vsp/matsimToPostgres/dbParam.xml");
+        exporterConfigGroup.setDbParamFile("C:/Users/david/Desktop/dbParam.xml");
+        exporterConfigGroup.setAnalyzerQueryDir("C:/Users/david/Documents/03_Repositories/matsim-libs/contribs/vsp/src/main/java/playground/vsp/matsimToPostgres/analyzerQueries");
 
         return config;
     }

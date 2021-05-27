@@ -82,7 +82,7 @@ public class DgPopulation2ShapeWriter {
 							Double endTime = activity.getEndTime().seconds();
 
 							Coordinate actCoordinate = MGC.coord2Coordinate(activity.getCoord());
-							actCoordinate = JTS.transform(actCoordinate, actCoordinate, transformation);
+							//actCoordinate = JTS.transform(actCoordinate, actCoordinate, transformation);
 							
 							f = factory.createPoint(actCoordinate, new Object[] {id, type, startTime, endTime}, null);
 							features.add(f);

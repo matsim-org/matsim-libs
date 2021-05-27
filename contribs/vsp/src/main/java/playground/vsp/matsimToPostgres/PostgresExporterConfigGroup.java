@@ -10,10 +10,13 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
 
     private static final String DB_PARAM_FILE = "dbParamFile";
     private static final String OVERWRITE_RUN = "overwriteRun";
+    private static final String QUERY_DIR = "sqlAnalyzerDir";
 
     public String dbParamFile;
     public enum OverwriteRunSettings { failIfRunIdExists, overwriteExistingRunId }
-    private OverwriteRunSettings overwriteRunSettings = OverwriteRunSettings.failIfRunIdExists ;
+    private OverwriteRunSettings overwriteRunSettings = OverwriteRunSettings.failIfRunIdExists;
+
+    private String analyzerQueryDir;
 
     private PostgresExporterConfigGroup.InitialDataSettings initialDataSettings;
 
@@ -30,6 +33,23 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
         return comments;
     }
 
+    @Override
+    public ConfigGroup createParameterSet(String type) {
+        if (PostgresExporterConfigGroup.InitialDataSettings.TYPE.equals(type)) {
+            return new PostgresExporterConfigGroup.InitialDataSettings();
+        } else {
+            throw new IllegalArgumentException("Unsupported parameterset-type: " + type);
+        }
+    }
+
+    public void addParameterSet(ConfigGroup cfg) {
+        if (cfg instanceof PostgresExporterConfigGroup.InitialDataSettings) {
+            this.setInitialDataSettings((InitialDataSettings)cfg);
+        } else {
+            throw new IllegalArgumentException("Unsupported parameterset: " + cfg.getClass().getName());
+        }
+    }
+
     @StringGetter(DB_PARAM_FILE)
     public String getDbParamFile(){
         return this.dbParamFile;
@@ -38,6 +58,16 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(DB_PARAM_FILE)
     public void setDbParamFile(String dbParamFile){
         this.dbParamFile = dbParamFile;
+    }
+
+    @StringGetter(QUERY_DIR)
+    public String getAnalyzerQueryDir(){
+        return this.analyzerQueryDir;
+    }
+
+    @StringSetter(QUERY_DIR)
+    public void setAnalyzerQueryDir(String analyzerQueryDir){
+        this.analyzerQueryDir = analyzerQueryDir;
     }
 
     @StringGetter(OVERWRITE_RUN)
@@ -49,26 +79,6 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
     public void setOverwriteRun (OverwriteRunSettings overwriteRunSettings){
         this.overwriteRunSettings = overwriteRunSettings;
     }
-
-
-    @Override
-    public ConfigGroup createParameterSet(String type) {
-        if (PostgresExporterConfigGroup.InitialDataSettings.TYPE.equals(type)) {
-            return new PostgresExporterConfigGroup.InitialDataSettings();
-        } else {
-            throw new IllegalArgumentException("Unsupported parameterset-type: " + type);
-        }
-    }
-
-
-    public void addParameterSet(ConfigGroup cfg) {
-        if (cfg instanceof PostgresExporterConfigGroup.InitialDataSettings) {
-            this.setInitialDataSettings((InitialDataSettings)cfg);
-        } else {
-            throw new IllegalArgumentException("Unsupported parameterset: " + cfg.getClass().getName());
-        }
-    }
-
 
     public PostgresExporterConfigGroup.InitialDataSettings setInitialDataSettings(PostgresExporterConfigGroup.InitialDataSettings cfg) {
         PostgresExporterConfigGroup.InitialDataSettings old = getInitialDataSettings();
@@ -88,10 +98,15 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
 
         private static final String IMPORT_MODE = "importMode";
         private static final String AGGREGATION_AREAS_FILE = "aggregationAreasFile";
+        private static final String AGGREGATION_AREAS_CRS = "aggregationAreasCrs";
+        private static final String DATABASE_CRS = "databaseCrs";
 
         public enum InitialImportModeSettings { importOverwrite, importIfNotExist, NoImport }
         private PostgresExporterConfigGroup.InitialDataSettings.InitialImportModeSettings modeSettings = PostgresExporterConfigGroup.InitialDataSettings.InitialImportModeSettings.importIfNotExist ;
-        public String aggregationAreasFile;
+        private String aggregationAreasFile;
+        private String aggregationAreasCrs;
+        private String databaseCrs;
+
 
         public InitialDataSettings() {
             super(TYPE);
@@ -125,6 +140,26 @@ public class PostgresExporterConfigGroup extends ReflectiveConfigGroup {
         @StringSetter(AGGREGATION_AREAS_FILE)
         public void setAggregationAreasFile(String aggregationAreasFile){
             this.aggregationAreasFile = aggregationAreasFile;
+        }
+
+        @StringGetter(AGGREGATION_AREAS_CRS)
+        public String getAggregationAreasCrs(){
+            return this.aggregationAreasCrs;
+        }
+
+        @StringSetter(AGGREGATION_AREAS_CRS)
+        public void setAggregationAreasCrs(String aggregationAreasCrs){
+            this.aggregationAreasCrs = aggregationAreasCrs;
+        }
+
+        @StringGetter(DATABASE_CRS)
+        public String getDatabaseCrs(){
+            return this.aggregationAreasCrs;
+        }
+
+        @StringSetter(DATABASE_CRS)
+        public void setDatabaseCrs(String databaseCrs){
+            this.databaseCrs = databaseCrs;
         }
 
     }

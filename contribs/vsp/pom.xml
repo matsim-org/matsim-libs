@@ -11,6 +11,13 @@
 	<artifactId>vsp</artifactId>
 	<name>vsp</name>
 
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -187,6 +194,11 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.matsim-scenarios</groupId>
+			<artifactId>matsim-stuttgart</artifactId>
+			<version>add-freight-trips-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

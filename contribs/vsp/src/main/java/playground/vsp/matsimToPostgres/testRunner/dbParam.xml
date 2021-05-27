@@ -4,5 +4,5 @@
 	<param name="databaseName" value="testitest" />
 	<param name="port" value="5432" />
 	<param name="user" value="postgres" />
-	<param name="password" value="dWS8GFklQZltTFwZmdvz" />
+	<param name="password" value="yourPassword" />
 </dbParams>

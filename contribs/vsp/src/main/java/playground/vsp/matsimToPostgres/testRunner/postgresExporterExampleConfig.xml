@@ -7,13 +7,18 @@
 		
 		<!-- Possible values: failIfRunIdExists, overwriteExistingRunId-->
 		<param name="overwriteRun" value="overwriteExistingRunId" />
+
+		<!-- directory of where sql analyzer queries are stored-->
+		<param name="sqlAnalyzerDir" value="./analyzerQueries" />
 			
 		<parameterset type="initialData" >
 			<!-- Possible values: importOverwrite, importIfNotExist, NoImport-->
 			<param name="importMode" value="importIfNotExist" />
-			
-			<!-- csv-File containing geo data of aggregation areas such as counties, communities, hexagons etc... -->
-			<param name="aggregationAreasFile" value="./aggregationAreas.csv" />
+
+			<!-- shp-File containing geo data of aggregation areas such as counties, communities, hexagons etc... -->
+			<param name="aggregationAreasFile" value="./aggregationAreas.shp" />
+			<param name="aggregationAreasCrs" value="" />
+			<param name="databaseCrs" value="" />
 
 		</parameterset>
 	</module>

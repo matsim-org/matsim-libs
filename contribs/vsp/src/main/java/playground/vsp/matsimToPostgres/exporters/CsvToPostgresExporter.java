@@ -1,26 +1,20 @@
-package playground.vsp.matsimToPostgres;
+package playground.vsp.matsimToPostgres.exporters;
 
 import org.apache.log4j.Logger;
+import playground.vsp.matsimToPostgres.PostgresExporterConfigGroup;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public class ShpToPostgresExporter {
-    private final Logger log = Logger.getLogger(ShpToPostgresExporter.class);
+public class CsvToPostgresExporter {
+    private final Logger log = Logger.getLogger(CsvToPostgresExporter.class);
     private final Connection conn;
     private final String csvFile;
-    private final String databaseName;
     private final String tableName;
     private final String runID;
+    private final PostgresExporterConfigGroup.OverwriteRunSettings overwrite;
 
     private final String schema = "matsim_output";
 
@@ -33,18 +27,43 @@ public class ShpToPostgresExporter {
     Map<Integer, String> indexToColumnNames = new HashMap<>();
 
 
-    ShpToPostgresExporter(Connection conn, String csvFile, String databaseName, String runID){
+    public CsvToPostgresExporter(Connection conn, String csvFile, String runID, PostgresExporterConfigGroup.OverwriteRunSettings overwrite){
         this.conn = conn;
         this.csvFile = csvFile;
         this.tableName = getTableName(csvFile);
-        this.databaseName = databaseName;
         this.runID = runID;
+        this.overwrite = overwrite;
     }
 
-    public void export(String databaseName, String runID) throws IOException {
+    public void export(String runID) throws IOException {
+
+        // Check if run_id exists
+        if (checkIfSchemaExists()) {
+            // Check if the table already exists
+            if (checkIfTableExists()) {
+                // Check if the run id column already exists
+                if (checkIfRunIdColumnExists()) {
+                    // Check if the run id already exists
+                    if (checkIfRunIdExists()) {
+                        if (overwrite.equals(PostgresExporterConfigGroup.OverwriteRunSettings.failIfRunIdExists)) {
+                            log.error("This Run ID already exists in " + tableName);
+                        } else if (overwrite.equals(PostgresExporterConfigGroup.OverwriteRunSettings.overwriteExistingRunId)) {
+                            String deleteRows = "DELETE FROM " + schema + "." + tableName + " WHERE run_id='" + runID + "';";
+                            sqlExecute(conn, deleteRows);
+                            log.info("All columns in " + schema + "." + tableName + " with the Run ID: " + runID + " was deleted!");
+                        } else {
+                            log.error("The overwriteRun settings in the postgresExporterExampleConfig.xml are wrong!");
+                        }
+                    }
+                }
+            }
+        } else {
+            log.error("The schema: " + schema  + " doesn't exist!");
+        }
+        
         // set database and the table name
         String tableName = getTableName(csvFile);
-
+        
         // analyze csv File
         analyzeFile();
 
@@ -57,8 +76,78 @@ public class ShpToPostgresExporter {
         // insert rows
         insertRows(insertStatement);
 
+        log.info("Export finished for: " + tableName);
+
     }
 
+    private boolean checkIfTableExists() {
+        String tableExistsStatement = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = '" + schema + "' AND table_name = '" + tableName + "');";
+        boolean tableExists = false;
+
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(tableExistsStatement);
+            while(rs.next()) {
+                if (rs.getObject("exists", Boolean.class)) {
+                    tableExists = true;
+                }
+            }
+        } catch (SQLException ignored) {
+
+        }
+        return tableExists;
+    }
+
+    private boolean checkIfSchemaExists() {
+        String shemaExistsStatement = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = '" + schema + "';";
+        boolean shemaExists = false;
+
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(shemaExistsStatement);
+            while(rs.next()) {
+                if (rs.getString("schema_name").equals(schema)) {
+                    shemaExists = true;
+                }
+            }
+        } catch (SQLException ignored) {
+
+        }
+        return shemaExists;
+    }
+
+    private boolean checkIfRunIdColumnExists() {
+        String runIdColumnExistsStatement = "SELECT column_name FROM information_schema.columns WHERE table_name = '" + tableName + "'";
+        boolean runIdColumnExists = false;
+
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(runIdColumnExistsStatement);
+            while(rs.next()) {
+                if (rs.getString("column_name").equals("run_id")) {
+                    runIdColumnExists = true;
+                }
+            }
+        } catch (SQLException ignored) {
+
+        }
+        return runIdColumnExists;
+    }
+
+    private boolean checkIfRunIdExists() {
+        String runIdExistsStatement = "SELECT run_id FROM " + schema + "." + tableName + ";";
+        boolean runIdExists = false;
+
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(runIdExistsStatement);
+            while(rs.next()) {
+                if (rs.getString("run_id").equals(runID)) {
+                    runIdExists = true;
+                    break;
+                }
+            }
+        } catch (SQLException ignored) {
+
+        }
+        return runIdExists;
+    }
 
     private void insertRows(String insertStatement) {
         sqlExecute(conn, insertStatement);
@@ -165,13 +254,13 @@ public class ShpToPostgresExporter {
 
         br.close();
         return insertStatement.toString();
-
     }
-
 
     private String getTableName(String csvFile){
         // The table name is automatic the a part from the input file
-        return csvFile.split("/")[csvFile.split("/").length - 1].split("\\.")[csvFile.split("/")[csvFile.split("/").length - 1].split("\\.").length - 3];
+        String tableName = csvFile.split("/")[csvFile.split("/").length - 1].split("\\.")[csvFile.split("/")[csvFile.split("/").length - 1].split("\\.").length - 3];
+        log.info("table name: " + tableName);
+        return tableName;
     }
 
     private Long convertTimeStringToSeconds(String timeString){
@@ -179,7 +268,6 @@ public class ShpToPostgresExporter {
         return Integer.parseInt(splitTime[0]) * 3600L + Integer.parseInt(splitTime[1]) * 60L + Integer.parseInt(splitTime[2]);
 
     }
-
 
     private void sqlExecute(Connection conn, String sql) {
         try {
