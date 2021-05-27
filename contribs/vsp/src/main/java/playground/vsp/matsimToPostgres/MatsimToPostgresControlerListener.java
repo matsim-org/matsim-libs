@@ -60,8 +60,9 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
             legsExporter.export(runID);
             log.info("Finish database import for " + runID + ".output_legs.csv.gz");
 
+            // import pe
             // create and update views
-            log.info("Create (if no exist) and update analyzer (materialized) views...");
+            log.info("Create (if not exists) and update analyzer (materialized) views...");
             List<String> viewNames = createMissingViews(connection, exporterConfigGroup.getAnalyzerQueryDir());
             updateViews(connection, viewNames);
             log.info("Analyzer completed.");

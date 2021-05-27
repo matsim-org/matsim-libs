@@ -2,11 +2,8 @@ package playground.vsp.matsimToPostgres.testRunner;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.stuttgart.run.RunStuttgart;
-import org.matsim.stuttgart.run.StuttgartAnalysisMainModeIdentifier;
 import playground.vsp.matsimToPostgres.PostgresExporterConfigGroup;
 import playground.vsp.matsimToPostgres.PostgresExporterModule;
 
