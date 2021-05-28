@@ -123,8 +123,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 			timeWindow = new Tuple<>(timeFrom, timeTo);
 		}
 
-		TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder,
-				validator, trips, timeWindow, tripFilter);
+		TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips, timeWindow, tripFilter);
 
         runner.run();
 

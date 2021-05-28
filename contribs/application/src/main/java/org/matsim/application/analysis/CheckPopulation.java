@@ -37,7 +37,7 @@ public class CheckPopulation implements MATSimAppCommand {
 	private Path input;
 
 	@CommandLine.Option(names = "--attribute", arity = "0..*", description = "Print full distribution for selected attributes", required = false)
-	private List<String> queryAttr;
+	private List<String> queryAttr = new ArrayList<>();
 
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions();
