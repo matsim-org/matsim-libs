@@ -50,6 +50,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--trips", description = "The number of trips to validate", defaultValue = "500")
     private int trips;
 
+    @CommandLine.Option(names = "--within-shp", description = "Only consider trips that have start and end within provided shp", defaultValue = "false")
+    private boolean withInShp;
+
     @CommandLine.Option(names = "--from", defaultValue = "0", description = "From time window in seconds")
     private Double timeFrom;
 
@@ -95,7 +98,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         Predicate<CarTrip> tripFilter = carTrip -> true;
         if (shp.getShapeFile() != null) {
             ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "__");
-            tripFilter = carTrip -> index.contains(carTrip.getArrivalLocation()) && index.contains(carTrip.getDepartureLocation());
+            if (withInShp)
+                tripFilter = carTrip -> index.contains(carTrip.getArrivalLocation()) && index.contains(carTrip.getDepartureLocation());
+            else
+                tripFilter = carTrip -> index.contains(carTrip.getArrivalLocation()) || index.contains(carTrip.getDepartureLocation());
         }
 
         log.info("Removed {} agents not selecting their best plan", size - populationIds.size());
