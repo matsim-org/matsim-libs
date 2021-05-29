@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,24 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.common.util;
 
-import java.util.Map;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.common.collections.SpecificationContainer;
+import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * @author michalm
  */
-public final class FleetSpecificationImpl implements FleetSpecification {
-	private final SpecificationContainer<DvrpVehicle, DvrpVehicleSpecification> container = new SpecificationContainer<>();
-
-	@Override
-	public Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications() {
-		return container.getSpecifications();
-	}
-
-	@Override
-	public void addVehicleSpecification(DvrpVehicleSpecification specification) {
-		container.addSpecification(specification);
-	}
-
-	@Override
-	public void replaceVehicleSpecification(DvrpVehicleSpecification specification) {
-		container.replaceSpecification(specification);
-	}
-
-	@Override
-	public void removeVehicleSpecification(Id<DvrpVehicle> vehicleId) {
-		container.removeSpecification(vehicleId);
+public class ChartSaveUtils {
+	public static void saveAsPNG(JFreeChart chart, String filename, int width, int height) {
+		try (var out = new BufferedOutputStream(new FileOutputStream(filename + ".png"))) {
+			ChartUtils.writeChartAsPNG(out, chart, width, height);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
-

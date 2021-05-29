@@ -18,10 +18,10 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.common.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.util.PartialSort.kSmallestElements;
+import static org.matsim.contrib.common.collections.PartialSort.kSmallestElements;
 
 import java.util.Comparator;
 import java.util.stream.Stream;

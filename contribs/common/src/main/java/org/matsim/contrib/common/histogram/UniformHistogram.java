@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,21 +15,37 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-package org.matsim.contrib.util.histogram;
-
-/**
- * This is a read-only interface: you can get but cannot set values.
- * 
- * @param <T>
+ * *********************************************************************** *
  */
-public interface Histogram<T> {
-	int getBinCount();
 
-	T getBin(int idx);
+package org.matsim.contrib.common.histogram;
 
-	long getCount(int idx);
+public class UniformHistogram extends AbstractHistogram<Double> {
+	public static UniformHistogram create(double binSize, int binCount, double[] values) {
+		UniformHistogram histogram = new UniformHistogram(binSize, binCount);
+		histogram.addValues(values);
+		return histogram;
+	}
 
-	long getTotalCount();
+	private final double binSize;
+
+	public UniformHistogram(double binSize, int binCount) {
+		super(binCount);
+		this.binSize = binSize;
+	}
+
+	public void addValues(double[] values) {
+		for (double v : values) {
+			addValue(v);
+		}
+	}
+
+	public void addValue(double value) {
+		increment(Math.min((int)(value / binSize), counts.length - 1));
+	}
+
+	@Override
+	public Double getBin(int idx) {
+		return idx * binSize;
+	}
 }

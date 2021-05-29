@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,19 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
-
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.common.collections.SpecificationContainer;
+package org.matsim.contrib.common.histogram;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * This is a read-only interface: you can get but cannot set values.
+ *
+ * @param <T>
  */
-public final class FleetSpecificationImpl implements FleetSpecification {
-	private final SpecificationContainer<DvrpVehicle, DvrpVehicleSpecification> container = new SpecificationContainer<>();
+public interface Histogram<T> {
+	int getBinCount();
 
-	@Override
-	public Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications() {
-		return container.getSpecifications();
-	}
+	T getBin(int idx);
 
-	@Override
-	public void addVehicleSpecification(DvrpVehicleSpecification specification) {
-		container.addSpecification(specification);
-	}
+	long getCount(int idx);
 
-	@Override
-	public void replaceVehicleSpecification(DvrpVehicleSpecification specification) {
-		container.replaceSpecification(specification);
-	}
-
-	@Override
-	public void removeVehicleSpecification(Id<DvrpVehicle> vehicleId) {
-		container.removeSpecification(vehicleId);
-	}
+	long getTotalCount();
 }
-

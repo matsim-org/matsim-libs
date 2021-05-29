@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,32 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util.histogram;
+package org.matsim.contrib.common.histogram;
 
-public class UniformHistogram extends AbstractHistogram<Double> {
-	public static UniformHistogram create(double binSize, int binCount, double[] values) {
-		UniformHistogram histogram = new UniformHistogram(binSize, binCount);
+import java.util.Arrays;
+
+public class BoundedHistogram extends AbstractHistogram<Double> {
+	public static BoundedHistogram create(double[] bounds, double[] values) {
+		BoundedHistogram histogram = new BoundedHistogram(bounds);
 		histogram.addValues(values);
 		return histogram;
 	}
 
-	private final double binSize;
+	private final double[] bounds;
 
-	public UniformHistogram(double binSize, int binCount) {
-		super(binCount);
-		this.binSize = binSize;
+	public BoundedHistogram(double[] bounds) {
+		super(bounds.length - 1);
+
+		for (int i = 1; i < bounds.length; i++) {
+			if (bounds[i - 1] >= bounds[i]) {
+				throw new IllegalArgumentException("Bounds are not sorted");
+			}
+		}
+
+		this.bounds = bounds;
 	}
 
 	public void addValues(double[] values) {
@@ -40,11 +50,20 @@ public class UniformHistogram extends AbstractHistogram<Double> {
 	}
 
 	public void addValue(double value) {
-		increment(Math.min((int)(value / binSize), counts.length - 1));
+		if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
+			throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
+		}
+
+		int idx = Arrays.binarySearch(bounds, value);
+		if (idx < 0) {
+			idx = -idx - 2;
+		}
+
+		increment(idx);
 	}
 
 	@Override
 	public Double getBin(int idx) {
-		return idx * binSize;
+		return bounds[idx];
 	}
 }

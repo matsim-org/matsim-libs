@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.common.util;
 
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +26,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.collections.PartialSort;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 /**
  * @author michalm

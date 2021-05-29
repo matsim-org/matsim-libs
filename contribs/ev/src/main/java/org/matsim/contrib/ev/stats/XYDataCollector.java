@@ -22,8 +22,8 @@ package org.matsim.contrib.ev.stats;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.contrib.util.CSVLineBuilder;
-import org.matsim.contrib.util.CompactCSVWriter;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
