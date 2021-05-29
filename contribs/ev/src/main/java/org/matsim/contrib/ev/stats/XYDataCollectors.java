@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,15 +15,16 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.ev.stats;
 
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
+import org.matsim.contrib.ev.stats.XYDataCollector.XYDataCalculator;
 
 /**
  * @author michalm

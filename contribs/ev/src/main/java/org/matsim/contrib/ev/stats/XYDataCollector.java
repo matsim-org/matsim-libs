@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,12 +15,15 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.ev.stats;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
