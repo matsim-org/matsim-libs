@@ -53,6 +53,7 @@ public final class RunAverageEmissionToolOfflineExample{
 	// =======================================================================================================
 
 	public static void main (String[] args){
+		// see testcase for an example
 		Config config ;
 		if ( args==null || args.length==0 || args[0]==null ) {
 			config = ConfigUtils.loadConfig( "./scenarios/sampleScenario/testv2_Vehv2/config_average.xml" );
