@@ -45,10 +45,10 @@ public class CSVToXML {
                     if(Double.parseDouble(row[1]) > 0){
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
-                                .id(Id.create("Charger" +row[0], Charger.class))
+                                .id(Id.create("charger" +row[0], Charger.class))
                                 .chargerType("3.7kW")
                                 .plugCount((int) Math.round(Double.parseDouble(row[1])))
-                                .plugPower(3.7)
+                                .plugPower(3.7*1000)
                                 .build());
 
 
@@ -56,39 +56,39 @@ public class CSVToXML {
                     else if (Double.parseDouble(row[2]) > 0){
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
-                                .id(Id.create("Charger" +row[0], Charger.class))
+                                .id(Id.create("charger" +row[0], Charger.class))
                                 .chargerType("11kW")
                                 .plugCount((int) Math.round(Double.parseDouble(row[2])))
-                                .plugPower(11)
+                                .plugPower(11*1000)
                                 .build());
                     }
                     else if (Double.parseDouble(row[3]) > 0){
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
-                                .id(Id.create("Charger" +row[0], Charger.class))
+                                .id(Id.create("charger" +row[0], Charger.class))
                                 .chargerType("22kW")
                                 .plugCount((int) Math.round(Double.parseDouble(row[3])))
-                                .plugPower(22)
+                                .plugPower(22*1000)
                                 .build());
                     }
 
                     else if (Double.parseDouble(row[4]) > 0){
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
-                                .id(Id.create("Charger" + row[0], Charger.class))
+                                .id(Id.create("charger" + row[0], Charger.class))
                                 .chargerType("50kW")
                                 .plugCount((int) Math.round(Double.parseDouble(row[4])))
-                                .plugPower(50)
+                                .plugPower(50*1000)
                                 .build());
                     }
 
                     else if(Double.parseDouble(row[5]) > 0){
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
-                                .id(Id.create("Charger" +row[0], Charger.class))
+                                .id(Id.create("charger" +row[0], Charger.class))
                                 .chargerType("150kW")
                                 .plugCount((int) Math.round(Double.parseDouble(row[5])))
-                                .plugPower(150)
+                                .plugPower(150*1000)
                                 .build());
                     }
 
@@ -107,7 +107,7 @@ public class CSVToXML {
     public static void main(String[] args) throws IOException, CsvException {
         String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
         CSVToXML csvreader = new CSVToXML(fileName);
-        new ChargerWriter(csvreader.chargers.stream()).write( "C:\\Users\\admin\\Desktop\\chargers1.xml");
+        new ChargerWriter(csvreader.chargers.stream()).write( "C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/chargers1.xml");
 
 
         //new CreateNewXML(csvreader.chargers);
