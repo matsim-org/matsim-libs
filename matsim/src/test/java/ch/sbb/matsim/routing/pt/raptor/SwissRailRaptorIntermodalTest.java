@@ -941,6 +941,8 @@ public class SwissRailRaptorIntermodalTest {
     
     @Test
     public void testIntermodalTrip_activityInteraction() {
+    	double bikeInteractionDuration = 1.0;
+    	double walkSpeed = 1.1;
         IntermodalFixture f = new IntermodalFixture();
         final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
@@ -950,7 +952,7 @@ public class SwissRailRaptorIntermodalTest {
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
-            new TeleportationRoutingModule(TransportMode.walk, f.scenario, 1.1, 1.3));
+            new TeleportationRoutingModule(TransportMode.walk, f.scenario, walkSpeed, 1.3));
         
         
         routingModules.put(TransportMode.bike,
@@ -969,22 +971,22 @@ public class SwissRailRaptorIntermodalTest {
 					leg.setDepartureTime(departureTime);
 					double walkDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), bikeCoord);
 					
-					leg.setTravelTime(walkDistance/1.1);
+					leg.setTravelTime(walkDistance/walkSpeed);
 					
 					leg.setRoute(new GenericRouteImpl(fromFacility.getLinkId(), Id.createLinkId("pt_1")));
 					allElements.add(leg);
 										
 					// Create activity where the bike is pickedup
 					Activity activity = populationFactory.createActivityFromLinkId("bike interaction", Id.createLinkId("pt_1"));
-					activity.setStartTime(departureTime+10.0);
-					activity.setMaximumDuration(1.0);
+					activity.setStartTime(departureTime + walkDistance/walkSpeed);
+					activity.setMaximumDuration(bikeInteractionDuration);
 					allElements.add(activity);
 
 					// Route bike stage
 					double distance = CoordUtils.calcEuclideanDistance(bikeCoord, toFacility.getCoord());
 					
 					Leg bikeLeg = populationFactory.createLeg("bike");
-					bikeLeg.setDepartureTime(departureTime + 1.0 + 10.0);
+					bikeLeg.setDepartureTime(departureTime + bikeInteractionDuration + walkDistance/walkSpeed);
 					bikeLeg.setTravelTime(distance/60.0);
 					bikeLeg.setRoute(new GenericRouteImpl(Id.createLinkId("pt_1"), toFacility.getLinkId()));
 					allElements.add(bikeLeg);
@@ -1022,7 +1024,6 @@ public class SwissRailRaptorIntermodalTest {
         for (PlanElement leg : legs) {
             System.out.println(leg);
         }
-
         Assert.assertEquals("wrong number of segments.", 6, legs.size());
         Leg leg = (Leg) legs.get(0);
         Assert.assertEquals(TransportMode.walk, leg.getMode());
@@ -1035,6 +1036,7 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(TransportMode.bike, leg.getMode());
         Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        double arrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
         leg = (Leg) legs.get(3);
         Assert.assertEquals(TransportMode.walk, leg.getMode());
         Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
@@ -1043,6 +1045,7 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(TransportMode.pt, leg.getMode());
         Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        Assert.assertTrue((int)leg.getDepartureTime().seconds() >= (int)arrivalTime );
         leg = (Leg) legs.get(5);
         Assert.assertEquals(TransportMode.walk, leg.getMode());
         Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
@@ -1057,6 +1060,8 @@ public class SwissRailRaptorIntermodalTest {
      */    
     @Test
     public void testIntermodalTrip_activityInteractionAdd() {
+    	double bikeInteractionDuration = 1.0;
+    	double walkSpeed = 1.1;
         IntermodalFixture f = new IntermodalFixture();
         final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
@@ -1066,7 +1071,7 @@ public class SwissRailRaptorIntermodalTest {
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
-            new TeleportationRoutingModule(TransportMode.walk, f.scenario, 1.1, 1.3));
+            new TeleportationRoutingModule(TransportMode.walk, f.scenario, walkSpeed, 1.3));
         
         
         routingModules.put(TransportMode.bike,
@@ -1085,22 +1090,22 @@ public class SwissRailRaptorIntermodalTest {
 					leg.setDepartureTime(departureTime);
 					double walkDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), bikeCoord);
 					
-					leg.setTravelTime(walkDistance/1.1);
+					leg.setTravelTime(walkDistance/walkSpeed);
 					
 					leg.setRoute(new GenericRouteImpl(fromFacility.getLinkId(), Id.createLinkId("pt_1")));
 					allElements.add(leg);
 										
 					// Create activity where the bike is pickedup
 					Activity activity = populationFactory.createActivityFromLinkId("bike interaction", Id.createLinkId("pt_1"));
-					activity.setStartTime(departureTime+10.0);
-					activity.setMaximumDuration(1.0);
+					activity.setStartTime(departureTime + walkDistance/walkSpeed);
+					activity.setMaximumDuration(bikeInteractionDuration);
 					allElements.add(activity);
 
 					// Route bike stage
 					double distance = CoordUtils.calcEuclideanDistance(bikeCoord, toFacility.getCoord());
 					
 					Leg bikeLeg = populationFactory.createLeg("bike");
-					bikeLeg.setDepartureTime(departureTime + 1.0 + 10.0);
+					bikeLeg.setDepartureTime(departureTime + bikeInteractionDuration + walkDistance/walkSpeed);
 					bikeLeg.setTravelTime(distance/60.0);
 					bikeLeg.setRoute(new GenericRouteImpl(Id.createLinkId("pt_1"), toFacility.getLinkId()));
 					allElements.add(bikeLeg);
@@ -1147,19 +1152,25 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getEndLinkId());
         Activity act = (Activity)legs.get(1);
         Assert.assertEquals("bike interaction", act.getType());
-        Assert.assertEquals(1.0, act.getMaximumDuration().seconds(), 0.01);
+        Assert.assertEquals(bikeInteractionDuration, act.getMaximumDuration().seconds(), 0.01);
         leg = (Leg) legs.get(2);
         Assert.assertEquals(TransportMode.bike, leg.getMode());
         Assert.assertEquals(Id.create("pt_1", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        act = (Activity)legs.get(3);
+        Assert.assertEquals("pt interaction", act.getType());
         leg = (Leg) legs.get(4);
         Assert.assertEquals(TransportMode.walk, leg.getMode());
         Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
+        act = (Activity)legs.get(5);
+        Assert.assertEquals("pt interaction", act.getType());
         leg = (Leg) legs.get(6);
         Assert.assertEquals(TransportMode.pt, leg.getMode());
         Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        act = (Activity)legs.get(7);
+        Assert.assertEquals("pt interaction", act.getType());
         leg = (Leg) legs.get(8);
         Assert.assertEquals(TransportMode.walk, leg.getMode());
         Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
