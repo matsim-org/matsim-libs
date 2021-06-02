@@ -54,6 +54,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
+import org.matsim.core.router.util.ArrayRoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -61,6 +62,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.utils.EditPlans;
+import scala.Int;
 
 import javax.inject.Provider;
 import java.util.*;
@@ -115,10 +117,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
- 		if(! (e.getQueueSimulation() instanceof QSim)){
+		if (!(e.getQueueSimulation() instanceof QSim)) {
 			throw new IllegalStateException(UrbanEVTripsPlanner.class.toString() + " only works with a mobsim of type " + QSim.class);
 		}
- 		//collect all selected plans that contain ev legs and map them to the set of ev used
+		//collect all selected plans that contain ev legs and map them to the set of ev used
 		Map<Plan, Set<Id<Vehicle>>> selectedEVPlans = StreamEx.of(scenario.getPopulation().getPersons().values())
 				.mapToEntry(p -> p.getSelectedPlan(), p -> getUsedEV(p.getSelectedPlan()))
 				.filterValues(evSet -> !evSet.isEmpty())
@@ -130,10 +132,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	/**
 	 * retrieve all used EV in the given plan
+	 *
 	 * @param plan
 	 * @return
 	 */
-	private Set<Id<Vehicle>> getUsedEV(Plan plan){
+	private Set<Id<Vehicle>> getUsedEV(Plan plan) {
 		return TripStructureUtils.getLegs(plan).stream()
 				.map(leg -> VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode()))
 				.filter(vehicleId -> isEV(vehicleId))
@@ -146,15 +149,21 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	private void processPlans(Map<Plan, Set<Id<Vehicle>>> selectedEVPlans) {
 
+
 		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
 
 		for (Plan plan : selectedEVPlans.keySet()) {
 
 			//from here we deal with the modifiable plan (only!?)
+
 			MobsimAgent mobsimagent = qsim.getAgents().get(plan.getPerson().getId());
 			Plan modifiablePlan = WithinDayAgentUtils.getModifiablePlan(mobsimagent);
+			TripRouter tripRouter = tripRouterProvider.get();
+			Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
+			modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
 
-			for(Id<Vehicle> ev : selectedEVPlans.get(plan)){
+
+			for (Id<Vehicle> ev : selectedEVPlans.get(plan)) {
 				//only replan cnt times per vehicle and person. otherwise, there might be a leg which is just too long and we end up in an infinity loop...
 				int cnt = configGroup.getMaximumChargingProceduresPerAgent();
 
@@ -162,18 +171,54 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				 * i had all of this implemented without so many if-statements and without do-while-loop. However, i felt like when replanning takes place, we need to start
 				 * consumption estimation all over. The path to avoid this would be by complicated date/method structure, which would also be bad (especially to maintain...)
 				 * ts, nov' 27, 2020
-				  */
-
+				 */
 				ElectricVehicleSpecification electricVehicleSpecification = electricFleetSpecification.getVehicleSpecifications()
 						.get(getWrappedElectricVehicleId(ev));
 				Leg legWithCriticalSOC;
-				do{
-					 legWithCriticalSOC = getLegWithCriticalSOC(modifiablePlan, ev, electricVehicleSpecification);
-					 if(legWithCriticalSOC != null){
-					 	replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
-						cnt --;
-					 }
+				ElectricVehicle pseudoVehicle;
+
+
+
+
+
+
+				do {
+					pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
+					legWithCriticalSOC = getLegWithCriticalSOC(modifiablePlan, pseudoVehicle, ev);
+
+
+
+					if (legWithCriticalSOC != null) {
+
+						String mode = legWithCriticalSOC.getMode();
+						List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
+
+
+						if (evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs) && pseudoVehicle.getBattery().getSoc() > 0) {
+
+							//trip leads to location of the first activity in the plan and there is a charger and so we can charge at home do not search for opportunity charge before
+							Activity originalActWhileCharging = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(legWithCriticalSOC));
+							Activity lastAct = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(legWithCriticalSOC));
+							Network modeNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(legWithCriticalSOC.getMode());
+							Link chargingLink = modeNetwork.getLinks().get(lastAct.getLinkId());
+							String routingMode = TripStructureUtils.getRoutingMode(legWithCriticalSOC);
+
+							planPluginTrip(modifiablePlan, routingMode, originalActWhileCharging, lastAct, chargingLink, tripRouter);
+							log.info(mobsimagent + " is charging at home.");
+							break;
+
+						} else {
+							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
+							cnt--;
+
+
+						}
+
+					}
+
 				} while (legWithCriticalSOC != null && cnt > 0);
+
+
 			}
 
 		}
@@ -183,15 +228,15 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	 * retruns leg for which the crtitical soc is exceeded or null energy is estimated to be sufficient
 	 *
 	 * @param modifiablePlan
-	 * @param ev
-	 * @param electricVehicleSpecification
+	 * @param pseudoVehicle
+	 * @param originalVehicleId
 	 * @return
 	 */
-	private Leg getLegWithCriticalSOC(Plan modifiablePlan, Id<Vehicle> ev, ElectricVehicleSpecification electricVehicleSpecification) {
+	private Leg getLegWithCriticalSOC(Plan modifiablePlan, ElectricVehicle pseudoVehicle, Id<Vehicle> originalVehicleId) {
 		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
 
-		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
-		double capacityThreshold = electricVehicleSpecification.getBatteryCapacity() * (configGroup.getCriticalRelativeSOC()); //TODO randomize? Might also depend on the battery size!
+
+		double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC()); //TODO randomize? Might also depend on the battery size!
 
 		Double chargingBegin = null;
 
@@ -199,31 +244,31 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
 
 		for (PlanElement planElement : modifiablePlan.getPlanElements()) {
-			if(planElement instanceof Leg){
+			if (planElement instanceof Leg) {
 
 				Leg leg = (Leg) planElement;
-				if( modesWithVehicles.contains(leg.getMode()) && VehicleUtils.getVehicleId(modifiablePlan.getPerson(), leg.getMode()).equals(ev)){
-					emulateVehicleDischarging(pseudoVehicle,leg);
+				if (modesWithVehicles.contains(leg.getMode()) && VehicleUtils.getVehicleId(modifiablePlan.getPerson(), leg.getMode()).equals(originalVehicleId)) {
+					emulateVehicleDischarging(pseudoVehicle, leg);
 					if (pseudoVehicle.getBattery().getSoc() <= capacityThreshold) {
 						return leg;
 					}
 				}
-			} else if (planElement instanceof Activity){
-				if(((Activity) planElement).getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
+			} else if (planElement instanceof Activity) {
+				if (((Activity) planElement).getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)) {
 					Leg legToCharger = (Leg) modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(planElement) - 1);
-					chargingBegin =  legToCharger.getDepartureTime().seconds() + legToCharger.getTravelTime().seconds();
+					chargingBegin = legToCharger.getDepartureTime().seconds() + legToCharger.getTravelTime().seconds();
 
-				} else if(((Activity) planElement).getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)){
+				} else if (((Activity) planElement).getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
 
 					Leg legFromCharger = (Leg) modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(planElement) + 1);
-					if(chargingBegin == null) throw new IllegalStateException();
+					if (chargingBegin == null) throw new IllegalStateException();
 					double chargingDuration = legFromCharger.getDepartureTime().seconds() - chargingBegin;
 
 					ChargerSpecification chargerSpecification = chargingInfrastructureSpecification.getChargerSpecifications()
 							.values()
 							.stream()
 							.filter(charger -> charger.getLinkId().equals(((Activity) planElement).getLinkId()))
-							.filter(charger -> electricVehicleSpecification.getChargerTypes().contains(charger.getChargerType()))
+							.filter(charger -> pseudoVehicle.getChargerTypes().contains(charger.getChargerType()))
 							.findAny().orElseThrow();
 
 					pseudoVehicle.getBattery().changeSoc(pseudoVehicle.getChargingPower().calcChargingPower(chargerSpecification) * chargingDuration);
@@ -236,14 +281,14 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	}
 
 	/**
-	 *
-	 *
 	 * @param mobsimagent
 	 * @param modifiablePlan
 	 * @param electricVehicleSpecification
 	 * @param leg
 	 */
 	private void replanPrecedentAndCurrentEVLegs(MobsimAgent mobsimagent, Plan modifiablePlan, ElectricVehicleSpecification electricVehicleSpecification, Leg leg) {
+
+
 		Network modeNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(leg.getMode());
 
 		String routingMode = TripStructureUtils.getRoutingMode(leg);
@@ -254,26 +299,28 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Activity actWhileCharging = activityWhileChargingFinder.findActivityWhileChargingBeforeLeg(modifiablePlan, (Leg) modifiablePlan.getPlanElements().get(legIndex));
 
 		Preconditions.checkNotNull(actWhileCharging, "could not insert plugin activity in plan of agent " + mobsimagent.getId() +
-		".\n One reason could be that the agent has no suitable activity prior to the leg for which the " +
+				".\n One reason could be that the agent has no suitable activity prior to the leg for which the " +
 				" energy threshold is expected to be exceeded. \n" +
 				" Another reason  might be that it's vehicle is running beyond energy threshold during the first leg of the day." +
-		"That could possibly be avoided by using EVNetworkRoutingModule..."); //TODO let the sim just run and let the ev run empty!?
+				"That could possibly be avoided by using EVNetworkRoutingModule..."); //TODO let the sim just run and let the ev run empty!?
 
 		//TODO what if actWhileCharging does not hold a link id?
+
 		ChargerSpecification selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
+
 		Link chargingLink = modeNetwork.getLinks().get(selectedCharger.getLinkId());
 
 		Activity pluginTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
 
 //		critical leg should always be the plugout leg, shouldn't it? tschlenther jan' '21
-//		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
-		Leg plugoutLeg = leg;
+		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
+//		Leg plugoutLeg = leg;
 //		Activity plugoutTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 //		Activity plugoutTripDestination = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 		Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
-		{	//some consistency checks.. //TODO consider to put in a JUnit test..
+		{    //some consistency checks.. //TODO consider to put in a JUnit test..
 			Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
 			Preconditions.checkState(!pluginTripOrigin.equals(actWhileCharging), "pluginTripOrigin is equal to actWhileCharging. should never happen..");
 
@@ -303,23 +350,25 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		TripRouter tripRouter = tripRouterProvider.get();
 		planPluginTrip(modifiablePlan, routingMode, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter);
 		planPlugoutTrip(modifiablePlan, routingMode, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
+
 	}
 
 	private void planPlugoutTrip(Plan plan, String routingMode, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, double now) {
+
 		Facility fromFacility = FacilitiesUtils.toFacility(origin, scenario.getActivityFacilities());
 		Facility chargerFacility = new LinkWrapperFacility(chargingLink);
 		Facility toFacility = FacilitiesUtils.toFacility(destination, scenario.getActivityFacilities());
 
 		List<? extends PlanElement> routedSegment;
 		//actually destination can not be null based on how we determine the actWhileCharging = origin at the moment...
-		if(destination == null) throw new RuntimeException("should not happen");
+		if (destination == null) throw new RuntimeException("should not happen");
 
-		List<PlanElement> trip  = new ArrayList<>();
+		List<PlanElement> trip = new ArrayList<>();
 
 		//add leg to charger
-		routedSegment = tripRouter.calcRoute(TransportMode.walk,fromFacility, chargerFacility,
+		routedSegment = tripRouter.calcRoute(TransportMode.walk, fromFacility, chargerFacility,
 				now, plan.getPerson());
-		Leg accessLeg = (Leg)routedSegment.get(0);
+		Leg accessLeg = (Leg) routedSegment.get(0);
 		now = TripRouter.calcEndOfPlanElement(now, accessLeg, config);
 		TripStructureUtils.setRoutingMode(accessLeg, routingMode);
 		trip.add(accessLeg);
@@ -332,15 +381,27 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		//add leg to destination
 		routedSegment = tripRouter.calcRoute(routingMode, chargerFacility, toFacility, now, plan.getPerson());
-		Leg mainLeg = (Leg) routedSegment.get(0);
-		trip.add(mainLeg);
-		now = TripRouter.calcEndOfPlanElement(now, mainLeg, config);
+		trip.addAll(routedSegment);
+
+		for (PlanElement element : routedSegment) {
+
+			now = TripRouter.calcEndOfPlanElement(now, element, config);
+
+		}
+
 
 		//insert trip
-		TripRouter.insertTrip(plan, origin, trip, destination ) ;
+		TripRouter.insertTrip(plan, origin, trip, destination);
+
 
 		//reset activity end time
-		destination.setEndTime(PopulationUtils.decideOnActivityEndTime(destination, now, config ).seconds());
+
+		if (!plan.getPlanElements().get(plan.getPlanElements().size() - 1).equals(destination)) {
+
+			destination.setEndTime(PopulationUtils.decideOnActivityEndTime(destination, now, config).seconds());
+		}
+
+
 	}
 
 	private void planPluginTrip(Plan plan, String routingMode, Activity actBeforeCharging, Activity actWhileCharging, Link chargingLink, TripRouter tripRouter) {
@@ -350,35 +411,61 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		List<PlanElement> trip = new ArrayList<>();
 		//add leg to charger
-		List<? extends PlanElement> routedSegment = tripRouter.calcRoute(routingMode,fromFacility, chargerFacility,
+		List<? extends PlanElement> routedSegment = tripRouter.calcRoute(routingMode, fromFacility, chargerFacility,
 				PlanRouter.calcEndOfActivity(actBeforeCharging, plan, config), plan.getPerson());
-		Leg mainLeg = (Leg)routedSegment.get(0);
-		double now = mainLeg.getDepartureTime().seconds() + mainLeg.getRoute().getTravelTime().seconds();
-		trip.add(mainLeg);
+
+
+
+		/*Leg mainLeg = null;
+
+		for (Leg leg : TripStructureUtils.getLegs(routedSegment)) {
+			if(leg.getMode().equals(routingMode)){
+				if(mainLeg != null){
+					throw new RuntimeException("Found more than one leg with routing mode "+ routingMode + ". Trip= " + routedSegment);
+				}
+
+				mainLeg = leg;
+			}
+		}*/
+
+
+		//double now = mainLeg.getDepartureTime().seconds() + mainLeg.getRoute().getTravelTime().seconds();
+		//trip.add(mainLeg);
+
+		Leg lastLeg = (Leg) routedSegment.get(routedSegment.size() - 1);
+		double now = lastLeg.getDepartureTime().seconds() + lastLeg.getRoute().getTravelTime().seconds();
+		trip.addAll(routedSegment);
+
 
 		//add plugin act
 		Activity pluginAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
 				chargingLink.getId(), routingMode + UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER);
 		trip.add(pluginAct);
+
+
 		now = TripRouter.calcEndOfPlanElement(now, pluginAct, config);
 
 		//add walk leg to destination
-		routedSegment = tripRouter.calcRoute(TransportMode.walk,chargerFacility, toFacility, now, plan.getPerson());
+		routedSegment = tripRouter.calcRoute(TransportMode.walk, chargerFacility, toFacility, now, plan.getPerson());
 		Leg egress = (Leg) routedSegment.get(0);
 		TripStructureUtils.setRoutingMode(egress, routingMode);
 		trip.add(egress);
 		now = TripRouter.calcEndOfPlanElement(now, egress, config);
 
 		//insert trip
-		TripRouter.insertTrip(plan, actBeforeCharging, trip, actWhileCharging ) ;
+		TripRouter.insertTrip(plan, actBeforeCharging, trip, actWhileCharging);
 
 		//reset activity end time
-		actWhileCharging.setEndTime(PopulationUtils.decideOnActivityEndTime(actWhileCharging, now, config ).seconds());
+
+		if (!plan.getPlanElements().get(plan.getPlanElements().size()-1).equals(actWhileCharging)) {
+
+			actWhileCharging.setEndTime(PopulationUtils.decideOnActivityEndTime(actWhileCharging, now, config).seconds());
+		}
 	}
 
 
 	//TODO possibly put behind interface
-	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network){
+	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network) {
 		StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
 				1, l -> l.getFromNode().getCoord(), s -> network.getLinks().get(s.getLinkId()).getToNode().getCoord()); //TODO get closest X chargers and choose randomly?
 		List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(network.getLinks().get(linkId),
@@ -386,18 +473,19 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 						.values()
 						.stream()
 						.filter(charger -> vehicleSpecification.getChargerTypes().contains(charger.getChargerType())));
-		if (nearestChargers.isEmpty()){
+		if (nearestChargers.isEmpty()) {
 			throw new RuntimeException("no charger could be found for vehicle type " + vehicleSpecification.getVehicleType());
 		}
-		if (NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()) >= 1000){
+		if (NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()) >= 1000) {
 			//throw new RuntimeException("There are no chargers within 1000m");
-			log.warn("Charger out of range. Inefficient charging");
+			log.warn("Charger out of range. Inefficient charging " + NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()));
 		}
 		return nearestChargers.get(0);
 	}
 
 	/**
 	 * this method has the side effect that the soc of the ev is altered by estimated energy consumption of the leg
+	 *
 	 * @param ev
 	 * @param leg
 	 */
@@ -412,7 +500,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		}
 
 //		Map<Link, Double> consumptions = new LinkedHashMap<>();
-		NetworkRoute route = (NetworkRoute)leg.getRoute();
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 
 		DriveEnergyConsumption driveEnergyConsumption = ev.getDriveEnergyConsumption();
@@ -434,47 +522,59 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 //	the following methods are modified versions of EditPlans.findRealActBefore() and EditPlans.findRealActAfter()
 
 	private Activity findRealOrChargingActBefore(MobsimAgent agent, int index) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
-		List<PlanElement> planElements = plan.getPlanElements() ;
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+		List<PlanElement> planElements = plan.getPlanElements();
 
-		Activity prevAct = null ;
-		for ( int ii=0 ; ii<index ; ii++ ) {
-			if ( planElements.get(ii) instanceof Activity ) {
-				Activity act = (Activity) planElements.get(ii) ;
-				if ( !StageActivityTypeIdentifier.isStageActivity( act.getType() )  ||
+		Activity prevAct = null;
+		for (int ii = 0; ii < index; ii++) {
+			if (planElements.get(ii) instanceof Activity) {
+				Activity act = (Activity) planElements.get(ii);
+				if (!StageActivityTypeIdentifier.isStageActivity(act.getType()) ||
 						act.getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ||
 						act.getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
-					prevAct = act ;
+					prevAct = act;
 				}
 			}
 		}
 		return prevAct;
 	}
 
-	private  Activity findRealOrChargingActAfter(MobsimAgent agent, int index) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
-		List<PlanElement> planElements = plan.getPlanElements() ;
-		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ;
+	private Activity findRealOrChargingActAfter(MobsimAgent agent, int index) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+		List<PlanElement> planElements = plan.getPlanElements();
+		return (Activity) planElements.get(findIndexOfRealActAfter(agent, index));
 	}
 
 	private int findIndexOfRealActAfter(MobsimAgent agent, int index) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
-		List<PlanElement> planElements = plan.getPlanElements() ;
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+		List<PlanElement> planElements = plan.getPlanElements();
 
-		int theIndex = -1 ;
-		for ( int ii=planElements.size()-1 ; ii>index; ii-- ) {
-			if ( planElements.get(ii) instanceof Activity ) {
-				Activity act = (Activity) planElements.get(ii) ;
-				if ( !StageActivityTypeIdentifier.isStageActivity( act.getType() )   ||
+		int theIndex = -1;
+		for (int ii = planElements.size() - 1; ii > index; ii--) {
+			if (planElements.get(ii) instanceof Activity) {
+				Activity act = (Activity) planElements.get(ii);
+				if (!StageActivityTypeIdentifier.isStageActivity(act.getType()) ||
 						act.getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ||
-						act.getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION) ) {
-					theIndex = ii ;
+						act.getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
+					theIndex = ii;
 				}
 			}
 		}
-		return theIndex ;
+		return theIndex;
 	}
 
+	private Boolean isHomeChargingTrip(MobsimAgent mobsimAgent, Plan modifiablePlan, List<Leg> evLegs) {
+
+		int firstEvLegIndex = modifiablePlan.getPlanElements().indexOf(evLegs.get(0));
+		Id<Link> homeLink = EditPlans.findRealActBefore(mobsimAgent,firstEvLegIndex).getLinkId();
+		boolean isHomeTrip = EditPlans.findRealActAfter(mobsimAgent,modifiablePlan.getPlanElements().indexOf(evLegs.get(evLegs.size()-1))).getLinkId().equals(homeLink);
+		boolean hasHomeCharger = chargingInfrastructureSpecification.getChargerSpecifications().values().stream()
+				.map(chargerSpecification -> chargerSpecification.getLinkId())
+				.anyMatch(linkId -> linkId.equals(homeLink));
+
+		return isHomeTrip && hasHomeCharger;
+	}
 }
+
 
 
