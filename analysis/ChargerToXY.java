@@ -52,7 +52,6 @@ public class ChargerToXY implements ChargingEndEventHandler, ChargingStartEventH
 
     private final ChargingInfrastructureSpecification chargingInfrastructureSpecification;
     private final Network network;
-    ///List<Id<ElectricVehicle>> crtVehicles = new ArrayList<>();
     Map<Id<Charger>, List<Id<ElectricVehicle>>> crtChargers = new HashMap<>();
     static List<XYDataContainer> dataContainers = new ArrayList<>();
 
@@ -82,7 +81,7 @@ public static List<XYDataContainer> getDataContainers(){ return dataContainers; 
         XYDataContainer dataContainer = new XYDataContainer(event.getTime(),
                 event.getChargerId(),
                 chargingInfrastructureSpecification.getChargerSpecifications().get(event.getChargerId()).getLinkId(),
-                crtChargers.values().size()-1);
+                crtChargers.get(event.getChargerId()).size());
         this.dataContainers.add(dataContainer);
 
 
@@ -95,8 +94,6 @@ public static List<XYDataContainer> getDataContainers(){ return dataContainers; 
             list.add(event.getVehicleId());
             return list;
         });
-        //crtVehicles.add(event.getVehicleId());
-       // this.crtChargers.put(event.getChargerId(), crtVehicles);
         XYDataContainer dataContainer = new XYDataContainer(event.getTime(),
                 event.getChargerId(),
                 chargingInfrastructureSpecification.getChargerSpecifications().get(event.getChargerId()).getLinkId(),
