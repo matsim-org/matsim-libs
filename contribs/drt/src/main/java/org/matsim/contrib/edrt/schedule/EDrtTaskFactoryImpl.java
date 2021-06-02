@@ -23,8 +23,8 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
-import org.matsim.contrib.ev.dvrp.VrpPathEnergyConsumptions;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
+import org.matsim.contrib.evrp.VrpPathEnergyConsumptions;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 

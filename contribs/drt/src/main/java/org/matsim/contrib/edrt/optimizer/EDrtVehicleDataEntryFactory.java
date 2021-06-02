@@ -29,9 +29,9 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
-import org.matsim.contrib.ev.dvrp.ETask;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
-import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
+import org.matsim.contrib.evrp.ETask;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
+import org.matsim.contrib.evrp.tracker.ETaskTracker;
 import org.matsim.contrib.ev.fleet.Battery;
 
 import com.google.inject.Provider;
