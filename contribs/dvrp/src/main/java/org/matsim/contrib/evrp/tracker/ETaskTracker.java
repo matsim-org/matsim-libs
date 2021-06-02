@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,35 +15,16 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.dvrp.tracker;
+package org.matsim.contrib.evrp.tracker;
 
-import org.matsim.contrib.ev.dvrp.ETask;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
-import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 /**
  * @author michalm
  */
-public class OfflineETaskTracker implements ETaskTracker {
-	private final MobsimTimer timer;
-	private final ETask task;
-	private final double socAtStart;
-
-	public OfflineETaskTracker(EvDvrpVehicle vehicle, MobsimTimer timer) {
-		this.timer = timer;
-		task = (ETask)vehicle.getSchedule().getCurrentTask();
-		socAtStart = vehicle.getElectricVehicle().getBattery().getSoc();
-	}
-
-	@Override
-	public double predictEndTime() {
-		return Math.max(task.getEndTime(), timer.getTimeOfDay());
-	}
-
-	@Override
-	public double predictSocAtEnd() {
-		return socAtStart - task.getTotalEnergy();
-	}
+public interface ETaskTracker extends TaskTracker {
+	double predictSocAtEnd();
 }

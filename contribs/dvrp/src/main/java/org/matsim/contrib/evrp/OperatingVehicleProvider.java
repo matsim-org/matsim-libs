@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,42 +18,37 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.dvrp;
+package org.matsim.contrib.evrp;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import com.google.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class EvDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
-	public EvDvrpFleetQSimModule(String mode) {
-		super(mode);
+public class OperatingVehicleProvider implements AuxDischargingHandler.VehicleProvider {
+	private final DvrpVehicleLookup dvrpVehicleLookup;
+
+	@Inject
+	public OperatingVehicleProvider(DvrpVehicleLookup dvrpVehicleLookup) {
+		this.dvrpVehicleLookup = dvrpVehicleLookup;
 	}
 
 	@Override
-	public void configureQSim() {
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
-			@Inject
-			private ElectricFleet evFleet;
+	public ElectricVehicle getVehicle(ActivityStartEvent event) {
+		//assumes driverId == vehicleId
+		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle(Id.create(event.getPersonId(), DvrpVehicle.class));
 
-			@Override
-			public Fleet get() {
-				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
-				Network network = getModalInstance(Network.class);
-				return Fleets.createCustomFleet(fleetSpecification,
-						s -> EvDvrpVehicle.create(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())),
-								evFleet));
-
-			}
-		}).asEagerSingleton();
+		//do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the schedule
+		return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE) ?
+				null :
+				((EvDvrpVehicle)vehicle).getElectricVehicle();
 	}
 }

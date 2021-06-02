@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,15 +15,23 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.dvrp;
+package org.matsim.contrib.evrp;
 
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * @author michalm
  */
-public interface ETask extends Task {
-	double getTotalEnergy();
+public interface ChargingTask extends ETask {
+	ChargingWithAssignmentLogic getChargingLogic();
+
+	ElectricVehicle getElectricVehicle();
+
+	double getChargingStartedTime();
+
+	void setChargingStartedTime(double chargingStartedTime);
 }

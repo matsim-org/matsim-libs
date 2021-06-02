@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,33 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.dvrp;
+package org.matsim.contrib.evrp;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.charging.ChargingListener;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
-import com.google.inject.Inject;
-
 /**
- * @author Michal Maciejewski (michalm)
+ * @author michalm
  */
-public class OperatingVehicleProvider implements AuxDischargingHandler.VehicleProvider {
-	private final DvrpVehicleLookup dvrpVehicleLookup;
+public class DvrpChargingListener implements ChargingListener {
+	private final ChargingActivity chargingActivity;
 
-	@Inject
-	public OperatingVehicleProvider(DvrpVehicleLookup dvrpVehicleLookup) {
-		this.dvrpVehicleLookup = dvrpVehicleLookup;
+	public DvrpChargingListener(ChargingActivity chargingActivity) {
+		this.chargingActivity = chargingActivity;
 	}
 
 	@Override
-	public ElectricVehicle getVehicle(ActivityStartEvent event) {
-		//assumes driverId == vehicleId
-		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle(Id.create(event.getPersonId(), DvrpVehicle.class));
+	public void notifyVehicleQueued(ElectricVehicle ev, double now) {
+		chargingActivity.vehicleQueued(now);
+	}
 
-		//do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the schedule
-		return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE) ?
-				null :
-				((EvDvrpVehicle)vehicle).getElectricVehicle();
+	@Override
+	public void notifyChargingStarted(ElectricVehicle ev, double now) {
+		chargingActivity.chargingStarted(now);
+	}
+
+	@Override
+	public void notifyChargingEnded(ElectricVehicle ev, double now) {
+		chargingActivity.chargingEnded(now);
 	}
 }

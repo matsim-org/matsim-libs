@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,35 +15,36 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.dvrp;
+package org.matsim.contrib.evrp.tracker;
 
-import org.matsim.contrib.ev.charging.ChargingListener;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.evrp.ETask;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
-public class DvrpChargingListener implements ChargingListener {
-	private final ChargingActivity chargingActivity;
+public class OfflineETaskTracker implements ETaskTracker {
+	private final MobsimTimer timer;
+	private final ETask task;
+	private final double socAtStart;
 
-	public DvrpChargingListener(ChargingActivity chargingActivity) {
-		this.chargingActivity = chargingActivity;
+	public OfflineETaskTracker(EvDvrpVehicle vehicle, MobsimTimer timer) {
+		this.timer = timer;
+		task = (ETask)vehicle.getSchedule().getCurrentTask();
+		socAtStart = vehicle.getElectricVehicle().getBattery().getSoc();
 	}
 
 	@Override
-	public void notifyVehicleQueued(ElectricVehicle ev, double now) {
-		chargingActivity.vehicleQueued(now);
+	public double predictEndTime() {
+		return Math.max(task.getEndTime(), timer.getTimeOfDay());
 	}
 
 	@Override
-	public void notifyChargingStarted(ElectricVehicle ev, double now) {
-		chargingActivity.chargingStarted(now);
-	}
-
-	@Override
-	public void notifyChargingEnded(ElectricVehicle ev, double now) {
-		chargingActivity.chargingEnded(now);
+	public double predictSocAtEnd() {
+		return socAtStart - task.getTotalEnergy();
 	}
 }
