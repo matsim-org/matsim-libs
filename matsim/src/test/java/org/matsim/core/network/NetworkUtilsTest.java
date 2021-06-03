@@ -18,11 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +33,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
+import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
