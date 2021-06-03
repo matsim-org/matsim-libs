@@ -257,6 +257,36 @@ public class NetworkUtilsTest {
 			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
 		}
 	}
+
+	/**
+	 * Have this test here since I first had a bug where empty origgeom attributes would cause exceptions because String.split
+	 * splits an empty string ("") into string[""]...
+	 */
+	@Test
+	public void getOriginalGeometry_emptyGeometryStored() {
+
+		var network = NetworkUtils.createNetwork();
+		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, "");
+		network.addLink(link);
+
+		var expectedNodeList = List.of(fromNode, toNode);
+
+		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(expectedNodeList.size(), actualNodeList.size());
+
+		for (var i = 0; i < expectedNodeList.size(); i++) {
+			var expectedNode = expectedNodeList.get(i);
+			var actualNode = actualNodeList.get(i);
+
+			assertEquals(expectedNode.getId(), actualNode.getId());
+			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+		}
+
+	}
 }
 
 
