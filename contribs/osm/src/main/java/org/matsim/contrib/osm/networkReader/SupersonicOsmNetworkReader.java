@@ -117,6 +117,16 @@ public class SupersonicOsmNetworkReader {
                 .forEach(this::addLinkToNetwork);
     }
 
+    private ProcessedOsmNode getNodeFromWay(ProcessedOsmWay way, int index) {
+        long nodeId = way.getNodeIds().get(index);
+        ProcessedOsmNode node = nodes.get(nodeId);
+        if (node == null) {
+            throw new RuntimeException("A node with id: " + nodeId + " was null. " +
+                    "Ensure you pass the 'completeWays=yes' argument when executing osmosis commands.");
+        }
+        return node;
+    }
+
     Collection<WaySegment> createWaySegments(ProcessedOsmWay way) {
 
         List<WaySegment> segments = new ArrayList<>();
@@ -126,10 +136,10 @@ public class SupersonicOsmNetworkReader {
         for (int i = 1; i < way.getNodeIds().size(); i++) {
 
             // get the first node of the segment
-            ProcessedOsmNode fromNodeForSegment = nodes.get(way.getNodeIds().get(fromNodeForSegmentIndex));
+            ProcessedOsmNode fromNodeForSegment = getNodeFromWay(way, fromNodeForSegmentIndex);
             // get the from and to nodes for a sub segment of the current way
-            ProcessedOsmNode fromOsmNode = nodes.get(way.getNodeIds().get(i - 1));
-            ProcessedOsmNode toOsmNode = nodes.get(way.getNodeIds().get(i));
+            ProcessedOsmNode fromOsmNode = getNodeFromWay(way, i - 1);
+            ProcessedOsmNode toOsmNode = getNodeFromWay(way, i);
 
             // add the distance between those nodes to the overall length of segment
             segmentLength += CoordUtils.calcEuclideanDistance(fromOsmNode.getCoord(), toOsmNode.getCoord());
