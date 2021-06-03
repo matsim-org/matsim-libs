@@ -21,7 +21,7 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import static java.util.stream.Collectors.toMap;
-import static org.matsim.contrib.util.distance.DistanceUtils.calculateSquaredDistance;
+import static org.matsim.contrib.common.util.DistanceUtils.calculateSquaredDistance;
 
 import java.util.Comparator;
 import java.util.Map;
