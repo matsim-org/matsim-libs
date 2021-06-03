@@ -20,7 +20,7 @@
 package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtTaskType;
-import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
+import org.matsim.contrib.evrp.ChargingTaskImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 

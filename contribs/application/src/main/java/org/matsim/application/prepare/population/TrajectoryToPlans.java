@@ -5,9 +5,11 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 
@@ -43,6 +45,9 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
     private Path population;
 
+    @CommandLine.Mixin
+    private CrsOptions crs = new CrsOptions();
+
     @CommandLine.Option(names = "--attributes", description = "Input person attributes file", required = false)
     private Path attributes;
 
@@ -74,10 +79,24 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         // Clear wrong coordinate system
         scenario.getPopulation().getAttributes().clear();
 
-        scenario.getPopulation().getPersons().forEach((k, v) -> v.getAttributes().putAttribute("subpopulation", "person"));
+        scenario.getPopulation().getPersons().forEach((k, v) -> {
+
+            if (!v.getAttributes().getAsMap().containsKey("subpopulation"))
+                v.getAttributes().putAttribute("subpopulation", "person");
+
+        });
+
+        if (crs.getTargetCRS() != null) {
+            ProjectionUtils.putCRS(scenario.getPopulation(), crs.getTargetCRS());
+            log.info("Setting crs to: {}", ProjectionUtils.getCRS(scenario.getPopulation()));
+        }
+
+        if (crs.getInputCRS() != null) {
+            ProjectionUtils.putCRS(scenario.getPopulation(), crs.getInputCRS());
+            log.info("Setting crs to: {}", ProjectionUtils.getCRS(scenario.getPopulation()));
+        }
 
         splitActivityTypesBasedOnDuration(scenario.getPopulation());
-
 
         PopulationUtils.writePopulation(scenario.getPopulation(),
                 output.resolve(String.format("%s-%dpct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());

@@ -30,7 +30,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 /**
  * Computes inter-zonal flows at the zonal (aggregated) level (i.e. without looking into individual vehicles)
