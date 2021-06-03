@@ -256,7 +256,9 @@ public class SupersonicOsmNetworkReader {
         link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), properties, adjustCapacityLength) * link.getNumberOfLanes());
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
         link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
-        if (storeOriginalGeometry)
+        if (storeOriginalGeometry && segment.getNodesForSegment().size() > 2)
+            // this is optional functionality. Also, the first and last nodeforsegment are the from and to node of the simplified link
+            // it makes only sense to store more geometry information if there are intermediate nodes.
             link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, getOriginalGeometry(segment.getNodesForSegment(), direction));
         afterLinkCreated.accept(link, segment.getTags(), direction);
         return link;
