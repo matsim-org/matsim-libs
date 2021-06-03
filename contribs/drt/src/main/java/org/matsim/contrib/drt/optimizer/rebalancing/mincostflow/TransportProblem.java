@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 import graphs.flows.MinCostFlow;
 import graphs.flows.MinCostFlow.Edge;
