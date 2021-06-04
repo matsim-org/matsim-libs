@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecificationImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -89,10 +90,10 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 			public ImmutableList<String> getChargerTypes() { return EVUtils.getChargerTypes(vehicle.getType().getEngineInformation()); }
 
 			@Override
-			public double getInitialSoc() { return EVUtils.getInitialEnergy(vehicle.getType().getEngineInformation()) * 3_600_000; }
+			public double getInitialSoc() { return EVUtils.getInitialEnergy(vehicle.getType().getEngineInformation()) * EvUnits.J_PER_kWh; }
 
 			@Override
-			public double getBatteryCapacity() { return VehicleUtils.getEnergyCapacity(vehicle.getType().getEngineInformation()) * 3_600_000; }
+			public double getBatteryCapacity() { return VehicleUtils.getEnergyCapacity(vehicle.getType().getEngineInformation()) * EvUnits.J_PER_kWh; }
 
 			@Override
 			public Id<ElectricVehicle> getId() { return getWrappedElectricVehicleId(vehicle.getId()); }

@@ -37,7 +37,9 @@ import org.matsim.contrib.ev.fleet.ElectricFleets;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.ChargerPowerCollector;
 import org.matsim.contrib.ev.stats.EvStatsModule;
+import org.matsim.contrib.ev.stats.IndividualSocTimeProfileCollectorProvider;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -69,25 +71,31 @@ public class UrbanEVModule extends AbstractModule {
 		if(configGroup == null) throw new IllegalArgumentException("no config group of type " + UrbanEVConfigGroup.GROUP_NAME + " was specified in the config");
 
 
-
 		//standard EV stuff except for ElectricFleetModule
 		install(new ChargingInfrastructureModule());
 		install(new ChargingModule());
 		install(new DischargingModule());
 		install(new EvStatsModule());
-		//install(new XYModule());
-		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
-		addControlerListenerBinding().to(ChargerToXY.class);
-		addMobsimListenerBinding().to(ChargerToXY.class);
-		addEventHandlerBinding().to(ActsWhileChargingAnalyzer.class).in(Singleton.class);
-		addControlerListenerBinding().to(ActsWhileChargingAnalyzer.class);
 
+		//bind custom EVFleet stuff
+		bind(MATSimVehicleWrappingEVSpecificationProvider.class).in(Singleton.class);
+		bind(ElectricFleetSpecification.class).toProvider(MATSimVehicleWrappingEVSpecificationProvider.class);
+		addControlerListenerBinding().to(MATSimVehicleWrappingEVSpecificationProvider.class);
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				//this is responsible for charging vehicles according to person activity start and end events..
+				bind(UrbanVehicleChargingHandler.class).in(Singleton.class);
+				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
 
+				//if we use agent-specific vehicle types (with specific initial energies), we transfer the final SOCs of every iteration to the vehicle type and thus to the next iter
+				if(config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)){
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
+							new FinalSoc2VehicleTypeProvider());
+				}
 
-
-
-
-
+			}
+		});
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
@@ -110,28 +118,20 @@ public class UrbanEVModule extends AbstractModule {
 			}
 		});
 
-		//bind custom EVFleet stuff
-		bind(MATSimVehicleWrappingEVSpecificationProvider.class).in(Singleton.class);
-		bind(ElectricFleetSpecification.class).toProvider(MATSimVehicleWrappingEVSpecificationProvider.class);
-		addControlerListenerBinding().to(MATSimVehicleWrappingEVSpecificationProvider.class);
+		//bind urban ev planning stuff
 		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class).in(Singleton.class);
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				//this is responsible for charging vehicles according to person activity start and end events..
-				bind(UrbanVehicleChargingHandler.class).in(Singleton.class);
-				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
-				bind(UseSocOfPreviousIteration.class).in(Singleton.class);
-				addMobsimListenerBinding().to(UseSocOfPreviousIteration.class);
-
-			}
-		});
 		//TODO find a better solution for this
 		Collection<String> whileChargingActTypes = configGroup.getWhileChargingActivityTypes().isEmpty() ? config.planCalcScore().getActivityTypes() : configGroup.getWhileChargingActivityTypes();
-		//Collection<String> whileChargingActTypes = getOpenBerlinActivityTypes();
-		//Collection<String> whileChargingActTypes =
-
 		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(whileChargingActTypes, configGroup.getMinWhileChargingActivityDuration_s()));
+
+		//TODO maybe move this out of this module...
+		//bind custom analysis
+		//install(new XYModule());
+		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
+		addControlerListenerBinding().to(ChargerToXY.class);
+		addMobsimListenerBinding().to(ChargerToXY.class);
+		addEventHandlerBinding().to(ActsWhileChargingAnalyzer.class).in(Singleton.class);
+		addControlerListenerBinding().to(ActsWhileChargingAnalyzer.class);
 	}
 
 
