@@ -40,6 +40,9 @@ import java.util.*;
 
 class CreateUrbanEVTestScenario {
 
+	static final double CAR_INITIAL_ENERGY = 5.;
+	static final double BIKE_INITIAL_ENERGY = 4.;
+
 	static Scenario createTestScenario(){
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
@@ -50,7 +53,6 @@ class CreateUrbanEVTestScenario {
 		Config config = ConfigUtils.loadConfig("test/input/chessboard/chessboard-config.xml", evConfigGroup);
 		RunUrbanEVExample.prepareConfig(config);
 		config.network().setInputFile("1pctNetwork.xml");
-		config.controler().setOutputDirectory("test/output/urbanEV");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(1);
 		//set VehicleSource
@@ -65,13 +67,13 @@ class CreateUrbanEVTestScenario {
 		VehicleType carVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
 		VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 		VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
-		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), 5);
+		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), CAR_INITIAL_ENERGY);
 		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
 		VehicleType bikeVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.bike, VehicleType.class));
 		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
 		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
-		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), 4);
+		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), BIKE_INITIAL_ENERGY);
 		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
 		scenario.getVehicles().addVehicleType(carVehicleType);
