@@ -23,17 +23,12 @@ package org.matsim.urbanEV;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.vehicles.Vehicle;
@@ -82,31 +77,28 @@ class CreateUrbanEVTestScenario {
 		scenario.getVehicles().addVehicleType(carVehicleType);
 		scenario.getVehicles().addVehicleType(bikeVehicleType);
 
-		Map<String, VehicleType> mode2VehicleType = new HashMap<>();
-
-		mode2VehicleType.put(TransportMode.car, carVehicleType);
-		mode2VehicleType.put(TransportMode.bike, bikeVehicleType);
-		createAndRegisterVehicles(scenario, mode2VehicleType);
-
+		createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		return scenario;
 	}
 
-	private static void createAndRegisterVehicles(Scenario scenario, Map<String, VehicleType> mode2VehicleType){
+	static void createAndRegisterPersonalCarAndBikeVehicles(Scenario scenario){
+		VehiclesFactory vehicleFactory = scenario.getVehicles().getFactory();
 
-
-
-		VehiclesFactory vFactory = scenario.getVehicles().getFactory();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
-			Map<String,Id<Vehicle>> mode2VehicleId = new HashMap<>();
-			for (String mode : mode2VehicleType.keySet()) {
+			VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.car, VehicleType.class));
+			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car), carType);
+			scenario.getVehicles().addVehicle(carVehicle);
 
-				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode);
-				Vehicle vehicle = vFactory.createVehicle(vehicleId, mode2VehicleType.get(mode));
+			VehicleType bikeType = scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.bike, VehicleType.class));
+			Vehicle bikeVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.bike), bikeType);
+			scenario.getVehicles().addVehicle(bikeVehicle);
 
-				scenario.getVehicles().addVehicle(vehicle);
-				mode2VehicleId.put(mode, vehicleId);
-			}
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2VehicleId);//probably unnecessary
+			Map<String, Id<Vehicle>> mode2Vehicle = new HashMap<>();
+			mode2Vehicle.put(TransportMode.car, carVehicle.getId());
+			mode2Vehicle.put(TransportMode.bike, bikeVehicle.getId());
+
+			//override the attribute - we assume to need car and bike only
+			person.getAttributes().putAttribute("vehicles", Collections.unmodifiableMap(mode2Vehicle));
 		}
 	}
 

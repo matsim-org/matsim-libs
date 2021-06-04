@@ -62,10 +62,16 @@ public class UrbanEVTests {
 	@BeforeClass
 	public static void run(){
 		Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
+
+		//modify population
 		overridePopulation(scenario);
 		plannedActivitiesPerPerson = scenario.getPopulation().getPersons().values().stream()
 				.collect(Collectors.toMap(p -> p.getId(),
 						p -> TripStructureUtils.getActivities(p.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities)));
+
+		//insert vehicles
+		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
+		CreateUrbanEVTestScenario.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 
 		///controler with Urban EV module
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
