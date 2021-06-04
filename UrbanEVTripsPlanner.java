@@ -54,7 +54,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
-import org.matsim.core.router.util.ArrayRoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -62,7 +61,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.utils.EditPlans;
-import scala.Int;
 
 import javax.inject.Provider;
 import java.util.*;
@@ -177,16 +175,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				Leg legWithCriticalSOC;
 				ElectricVehicle pseudoVehicle;
 
-
-
-
-
-
 				do {
 					pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
 					legWithCriticalSOC = getLegWithCriticalSOC(modifiablePlan, pseudoVehicle, ev);
-
-
 
 					if (legWithCriticalSOC != null) {
 
@@ -203,7 +194,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							Link chargingLink = modeNetwork.getLinks().get(lastAct.getLinkId());
 							String routingMode = TripStructureUtils.getRoutingMode(legWithCriticalSOC);
 
-							planPluginTrip(modifiablePlan, routingMode, originalActWhileCharging, lastAct, chargingLink, tripRouter);
+							planPluginTrip(modifiablePlan, routingMode, electricVehicleSpecification, originalActWhileCharging, lastAct, chargingLink, tripRouter);
 							log.info(mobsimagent + " is charging at home.");
 							break;
 
@@ -287,8 +278,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	 * @param leg
 	 */
 	private void replanPrecedentAndCurrentEVLegs(MobsimAgent mobsimagent, Plan modifiablePlan, ElectricVehicleSpecification electricVehicleSpecification, Leg leg) {
-
-
 		Network modeNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(leg.getMode());
 
 		String routingMode = TripStructureUtils.getRoutingMode(leg);
@@ -348,13 +337,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		}
 
 		TripRouter tripRouter = tripRouterProvider.get();
-		planPluginTrip(modifiablePlan, routingMode, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter);
-		planPlugoutTrip(modifiablePlan, routingMode, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
-
+		planPluginTrip(modifiablePlan, routingMode, electricVehicleSpecification, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter);
+		planPlugoutTrip(modifiablePlan, routingMode, electricVehicleSpecification, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
 	}
 
-	private void planPlugoutTrip(Plan plan, String routingMode, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, double now) {
-
+	private void planPlugoutTrip(Plan plan, String routingMode, ElectricVehicleSpecification electricVehicleSpecification, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, double now) {
 		Facility fromFacility = FacilitiesUtils.toFacility(origin, scenario.getActivityFacilities());
 		Facility chargerFacility = new LinkWrapperFacility(chargingLink);
 		Facility toFacility = FacilitiesUtils.toFacility(destination, scenario.getActivityFacilities());
@@ -384,27 +371,27 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		trip.addAll(routedSegment);
 
 		for (PlanElement element : routedSegment) {
-
 			now = TripRouter.calcEndOfPlanElement(now, element, config);
-
+			//insert vehicle id
+			if(element instanceof Leg){
+				Leg leg = (Leg) element;
+				if(leg.getMode().equals(routingMode)){
+					NetworkRoute route = ((NetworkRoute) leg.getRoute());
+					if(route.getVehicleId() == null) route.setVehicleId(Id.createVehicleId(electricVehicleSpecification.getId()));
+				}
+			}
 		}
-
 
 		//insert trip
 		TripRouter.insertTrip(plan, origin, trip, destination);
 
-
 		//reset activity end time
-
 		if (!plan.getPlanElements().get(plan.getPlanElements().size() - 1).equals(destination)) {
-
 			destination.setEndTime(PopulationUtils.decideOnActivityEndTime(destination, now, config).seconds());
 		}
-
-
 	}
 
-	private void planPluginTrip(Plan plan, String routingMode, Activity actBeforeCharging, Activity actWhileCharging, Link chargingLink, TripRouter tripRouter) {
+	private void planPluginTrip(Plan plan, String routingMode, ElectricVehicleSpecification electricVehicleSpecification, Activity actBeforeCharging, Activity actWhileCharging, Link chargingLink, TripRouter tripRouter) {
 		Facility fromFacility = FacilitiesUtils.toFacility(actBeforeCharging, scenario.getActivityFacilities());
 		Facility chargerFacility = new LinkWrapperFacility(chargingLink);
 		Facility toFacility = FacilitiesUtils.toFacility(actWhileCharging, scenario.getActivityFacilities());
@@ -414,23 +401,13 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		List<? extends PlanElement> routedSegment = tripRouter.calcRoute(routingMode, fromFacility, chargerFacility,
 				PlanRouter.calcEndOfActivity(actBeforeCharging, plan, config), plan.getPerson());
 
-
-
-		/*Leg mainLeg = null;
-
+		//set the vehicle id
 		for (Leg leg : TripStructureUtils.getLegs(routedSegment)) {
 			if(leg.getMode().equals(routingMode)){
-				if(mainLeg != null){
-					throw new RuntimeException("Found more than one leg with routing mode "+ routingMode + ". Trip= " + routedSegment);
-				}
-
-				mainLeg = leg;
+				NetworkRoute route = ((NetworkRoute) leg.getRoute());
+				if(route.getVehicleId() == null) route.setVehicleId(Id.createVehicleId(electricVehicleSpecification.getId()));
 			}
-		}*/
-
-
-		//double now = mainLeg.getDepartureTime().seconds() + mainLeg.getRoute().getTravelTime().seconds();
-		//trip.add(mainLeg);
+		}
 
 		Leg lastLeg = (Leg) routedSegment.get(routedSegment.size() - 1);
 		double now = lastLeg.getDepartureTime().seconds() + lastLeg.getRoute().getTravelTime().seconds();
@@ -441,7 +418,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Activity pluginAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
 				chargingLink.getId(), routingMode + UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER);
 		trip.add(pluginAct);
-
 
 		now = TripRouter.calcEndOfPlanElement(now, pluginAct, config);
 
@@ -456,9 +432,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		TripRouter.insertTrip(plan, actBeforeCharging, trip, actWhileCharging);
 
 		//reset activity end time
-
 		if (!plan.getPlanElements().get(plan.getPlanElements().size()-1).equals(actWhileCharging)) {
-
 			actWhileCharging.setEndTime(PopulationUtils.decideOnActivityEndTime(actWhileCharging, now, config).seconds());
 		}
 	}
