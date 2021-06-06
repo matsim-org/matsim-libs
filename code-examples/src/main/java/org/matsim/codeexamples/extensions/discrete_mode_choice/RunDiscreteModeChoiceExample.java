@@ -3,26 +3,17 @@ package org.matsim.codeexamples.extensions.discrete_mode_choice;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contribs.discrete_mode_choice.modules.*;
-import org.matsim.contribs.discrete_mode_choice.modules.ModelModule.ModelType;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.matsim.core.config.groups.StrategyConfigGroup.*;
+import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 public final class RunDiscreteModeChoiceExample{
 	// The code below works with v14 since approx jun'21.  kai
@@ -58,7 +49,7 @@ public final class RunDiscreteModeChoiceExample{
 			dmcConfig.getVehicleTourConstraintConfig().setRestrictedModes( CollectionUtils.stringArrayToSet( modes ) );
 			// (yy I don't know the difference to the subtour constraint.  kai, jun'21)
 
-			dmcConfig.setModelType( ModelType.Tour );
+			dmcConfig.setModelType( ModelModule.ModelType.Tour );
 			// (yy I assume that this means that the algorithm is working at the tour level.  As opposed to trip level.  kai, jun'21)
 
 			dmcConfig.setSelector( SelectorModule.RANDOM );
