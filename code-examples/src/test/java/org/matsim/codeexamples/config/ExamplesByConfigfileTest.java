@@ -80,7 +80,7 @@ public class ExamplesByConfigfileTest {
 		// before running each test. kai, jul'16
 	}
 
-	private static String outputDir ;
+	private String outputDir ;
 
 
 	/**
