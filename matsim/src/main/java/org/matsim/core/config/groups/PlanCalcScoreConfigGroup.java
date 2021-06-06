@@ -106,7 +106,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		//  test: Assume we end up with a config that has _less_ material than the defaults.  Then we write this to file, and read it back in.  If
 		//  the defaults are not cleared, they would now be fully there.
 		//  * The reason why this works here is that all the material is written out with the fully hierarchical format.  I.e. it actually clears the
-		//  defaults when being read it.
+		//  defaults when being read in.
 
 		// I am not sure if it can stay the way it is right now; took me several hours to understand it (and fix a problem we had not by
 		// trial-and-error but by understanding the root cause).  Considerations:
@@ -128,6 +128,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
 		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
 		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
+
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 
 		// yyyyyy find better solution for this. kai, dec'15
@@ -531,7 +532,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public void addParameterSet(final ConfigGroup set) {
+	protected void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
 		case ActivityParams.SET_TYPE:
 			addActivityParams((ActivityParams) set);
@@ -575,7 +576,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	/* parameter set handling */
 	@Override
-	public ConfigGroup createParameterSet(final String type) {
+	protected ConfigGroup createParameterSet(final String type) {
 		switch (type) {
 		case ActivityParams.SET_TYPE:
 			return new ActivityParams();
@@ -658,7 +659,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		String interactionActivityType = createStageActivityType( mode );
 		ActivityParams set = scoringParameterSet.getActivityParamsPerType().get( interactionActivityType );
 		if( set == null ){
-//						 (we do not want to overwrite this if the use has already set it with other params!)
+//						 (we do not want to overwrite this if the user has already set it with other params!)
 			scoringParameterSet.addActivityParams( createStageActivityParams( mode ) );
 		}
 	}
@@ -1090,7 +1091,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 
 		final static String SET_TYPE = "modeParams";
-		
+
+		final String MARGINAL_UTILITY_OF_DISTANCE = "marginalUtilityOfDistance_util_m";
+
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";
 
@@ -1135,16 +1138,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@Override
 		public Map<String, String> getComments() {
 			final Map<String, String> map = super.getComments();
-			map.put(MARGINAL_UTILITY_OF_TRAVELING,
-					"[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top "
-							+ "of the opportunity cost of time");
-			map.put("marginalUtilityOfDistance_util_m",
-					"[utils/m] utility of traveling (e.g. walking or driving) per m, normally negative.  this is "
-							+ "on top of the time (dis)utility.");
+			map.put(MARGINAL_UTILITY_OF_TRAVELING, "[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time");
+			map.put( MARGINAL_UTILITY_OF_DISTANCE, "[utils/m] utility of traveling (e.g. walking or driving) per m, normally negative.  this is on top of the time (dis)utility." );
 			map.put(MONETARY_DISTANCE_RATE, MONETARY_DISTANCE_RATE_CMT);
 			map.put(CONSTANT, CONSTANT_CMT );
-			map.put(DAILY_UTILITY_CONSTANT, "[utils] daily utility constant. "
-					+ "default=0 to be backwards compatible");
+			map.put(DAILY_UTILITY_CONSTANT, "[utils] daily utility constant. default=0 to be backwards compatible");
 			map.put(DAILY_MONETARY_CONSTANT, DAILY_MONETARY_CONSTANT_CMT ) ;
 			return map;
 		}
@@ -1171,11 +1169,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return this.traveling;
 		}
 		// ---
-		@StringGetter("marginalUtilityOfDistance_util_m")
+		@StringGetter(MARGINAL_UTILITY_OF_DISTANCE)
 		public double getMarginalUtilityOfDistance() {
 			return distance;
 		}
-		@StringSetter("marginalUtilityOfDistance_util_m")
+		@StringSetter(MARGINAL_UTILITY_OF_DISTANCE)
 		public ModeParams setMarginalUtilityOfDistance(double distance) {
 			testForLocked();
 			this.distance = distance;
@@ -1191,7 +1189,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return this.constant;
 		}
 		/**
-		 * @param constant -- {@value #CONSTANT_CMT}
+		 * @param constant {@value #CONSTANT_CMT}
 		 */
 		@StringSetter(CONSTANT)
 		public ModeParams setConstant(double constant) {
@@ -1372,7 +1370,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		/* parameter set handling */
 		@Override
-		public ConfigGroup createParameterSet(final String type) {
+		protected ConfigGroup createParameterSet(final String type) {
 			switch (type) {
 			case ActivityParams.SET_TYPE:
 				return new ActivityParams();
@@ -1407,6 +1405,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			default:
 				throw new IllegalArgumentException(module.getName());
 			}
+		}
+
+		@Override
+		protected boolean removeParameterSet( final ConfigGroup set ) {
+			return super.removeParameterSet( set );
 		}
 
 		public Collection<String> getActivityTypes() {
