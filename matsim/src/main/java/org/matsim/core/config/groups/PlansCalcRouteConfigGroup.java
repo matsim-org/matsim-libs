@@ -356,14 +356,18 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  If you want to avoid this " );
 			log.warn( "    warning, use clearModeRoutingParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
 			// A bit more info:
-			//
+
 			// (1) I wanted to keep the default teleportation routers ... since for novice users I find it better if they all use the same teleportation
 			// speeds.  kai, nov'19
-			//
+
 			// (2) The result of "add" and "remove" in code evidently depends on the sequence. In contrast, our "config" object
 			// is a state ... as one notices when we write it out, since there we cannot play back additions and removal.  So if
 			// we add to and remove from the default entries, and write the final result to file, then re-reading these entries
 			// needs to trigger removal of the defaults since otherwise they will exist in addition. kai, nov'19
+
+			// (3) Removing the warning by setting the switch in the config only works if it is written _above_ the first mode routing
+			// parameter set.  Most people will intuitively do it in this way.  Also, the writer will first write the normal settings and
+			// then the parameter sets, i.e. also here the switch will come first.  kai, jun'21
 		}
 		ModeRoutingParams pars = (ModeRoutingParams) set ;
 		// for the time being pushing the "global" factor into the local ones if they are not initialized by

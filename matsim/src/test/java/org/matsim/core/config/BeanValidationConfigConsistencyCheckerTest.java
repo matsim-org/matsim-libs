@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.core.config.consistency;
+package org.matsim.core.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -98,7 +99,7 @@ public class BeanValidationConfigConsistencyCheckerTest {
 					Tuple.of("snapshotPeriod", PositiveOrZero.class),
 					Tuple.of("numberOfThreads", PositiveOrZero.class));
 
-			Assertions.assertThatThrownBy(() -> new BeanValidationConfigConsistencyChecker().checkConsistency(config))
+			Assertions.assertThatThrownBy(() -> new BeanValidationConfigConsistencyChecker().checkConsistency(config ) )
 					.isExactlyInstanceOf(ConstraintViolationException.class)
 					.hasMessageStartingWith("3 error(s) found in the config:")
 					.hasMessageContaining(partialMessage(config.global(), "numberOfThreads"))

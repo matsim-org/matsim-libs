@@ -148,7 +148,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	 * Override if parameter sets of a certain type need a special implementation
 	 */
 	@SuppressWarnings("static-method")
-	public ConfigGroup createParameterSet(final String type) {
+	protected ConfigGroup createParameterSet(final String type) {
 		return new ConfigGroup( type );
 	}
 
@@ -164,7 +164,12 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	//	return m;
 	//}
 
-	public void addParameterSet(final ConfigGroup set) {
+	protected void addParameterSet(final ConfigGroup set) {
+		// trying to make this protected so it can be used by inheriting classes, but not by user code.
+		// many inheriting classes presumably make this public anyway, but this should be retracted.
+		// we should proceed similarly with the other methods related to parameter sets.
+		// kai, jun'21
+
 		checkParameterSet( set );
 		Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
 
@@ -176,7 +181,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 		parameterSets.add( set );
 	}
 
-	public boolean removeParameterSet( final ConfigGroup set ) {
+	protected boolean removeParameterSet( final ConfigGroup set ) {
 		final Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
 		return parameterSets != null ?
 			parameterSets.remove( set ) :

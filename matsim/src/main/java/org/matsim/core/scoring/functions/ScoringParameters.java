@@ -96,6 +96,10 @@ public class ScoringParameters implements MatsimParameters {
 		private boolean usingOldScoringBelowZeroUtilityDuration;
 		private double simulationPeriodInDays = 1.0;
 
+		/**
+		 * This constructor makes defensive copies of both the activity and the mode params.
+		 * Rather use the other constructor.
+		 */
 		@Deprecated
 		public Builder(
 				final Scenario scenario,
