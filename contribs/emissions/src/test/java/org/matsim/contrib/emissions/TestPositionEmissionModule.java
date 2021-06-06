@@ -99,7 +99,7 @@ public class TestPositionEmissionModule {
         strategy.setStrategyName("ChangeExpBeta");
         strategy.setWeight(1.0);
 
-        config.strategy().addParameterSet(strategy);
+        config.strategy().addStrategySettings( strategy );
 
         // activate snapshots
         config.qsim().setSnapshotPeriod(1);
