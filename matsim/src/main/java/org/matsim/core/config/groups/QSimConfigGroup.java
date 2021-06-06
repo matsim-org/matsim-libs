@@ -73,8 +73,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 * <li>{@code INFLOW_FROM_FDIAG} sets the inflow capacity to maximum flow capacity according to the fundamental diagram, assuming the nr of lanes in the link attributes to be correct.</li>
 	 * <li>{@code NR_OF_LANES_FROM_FDIAG} sets the number of lanes to minimum required according to the fundamental diagram, assuming the flow capacity in the link attributes to be correct.</li>
 	 */
-	public enum InFlowCapacitySetting {INFLOW_FROM_FDIAG, NR_OF_LANES_FROM_FDIAG, MAX_CAP_FOR_ONE_LANE }
-	private InFlowCapacitySetting inFlowCapacitySetting = InFlowCapacitySetting.INFLOW_FROM_FDIAG;
+	public enum InflowCapacitySetting {INFLOW_FROM_FDIAG, NR_OF_LANES_FROM_FDIAG, MAX_CAP_FOR_ONE_LANE }
+	private InflowCapacitySetting inflowCapacitySetting = InflowCapacitySetting.INFLOW_FROM_FDIAG;
 
 	public enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime }
 	public enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime }
@@ -631,12 +631,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		this.nodeTransitionLogic = nodeTransitionLogic;
 	}
 
-	public InFlowCapacitySetting getInFlowCapacitySetting() {
-		return this.inFlowCapacitySetting;
+	public InflowCapacitySetting getInflowCapacitySetting() {
+		return this.inflowCapacitySetting;
 	}
 
-	public void setInFlowCapacitySetting(InFlowCapacitySetting inFlowCapacitySetting) {
-		this.inFlowCapacitySetting = inFlowCapacitySetting;
+	public void setInflowCapacitySetting(InflowCapacitySetting inflowCapacitySetting) {
+		this.inflowCapacitySetting = inflowCapacitySetting;
 	}
 
 ////	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)

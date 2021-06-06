@@ -22,12 +22,14 @@ import picocli.CommandLine;
  * Removes route information from a plans file.
  *
  * @author rakow
+ * @deprecated Use {@link CleanPopulation}
  */
 @CommandLine.Command(
         name = "remove-routes",
         description = "Remove route information from a plans file.",
         showDefaultValues = true
 )
+@Deprecated
 public class RemoveRoutesFromPlans implements Callable<Integer> {
 
     @CommandLine.Option(names = "--plans", description = "Input original plan file", required = true)

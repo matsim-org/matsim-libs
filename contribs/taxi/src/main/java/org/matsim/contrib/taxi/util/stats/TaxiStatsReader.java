@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.List;
 
-import org.matsim.contrib.util.CSVReaders;
+import org.matsim.contrib.common.csv.CSVReaders;
 
 public class TaxiStatsReader {
 	public enum Section {

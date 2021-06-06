@@ -255,9 +255,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				case modeVehicleTypesFromVehiclesData:
 					type = scenario.getVehicles().getVehicleTypes().get(Id.create(mode, VehicleType.class));
 					if ( type==null ) {
-						log.fatal( "Could not find requested vehicle type =" + type + ". With config setting " + modeVehicleTypesFromVehiclesData.toString() + ", you need");
+						log.fatal( "Could not find requested vehicle type =" + mode + ". With config setting " + modeVehicleTypesFromVehiclesData.toString() + ", you need");
 						log.fatal( "to add, for each mode that performs network routing and/or is used as network/main mode in the qsim, a vehicle type for that mode." );
-						throw new RuntimeException("Could not find requested vehicle type = " + type + ". See above.");
+						throw new RuntimeException("Could not find requested vehicle type = " + mode + ". See above.");
 					}
 					break;
 				default:

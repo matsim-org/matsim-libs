@@ -1,11 +1,15 @@
 package org.matsim.application.prepare;
 
 import com.conveyal.gtfs.model.Stop;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -39,6 +43,8 @@ import java.util.function.Predicate;
 )
 public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
+    private static final Logger log = LogManager.getLogger(CreateTransitScheduleFromGtfs.class);
+
     @CommandLine.Parameters(arity = "1..*", paramLabel = "INPUT", description = "Input GTFS zip files")
     private List<Path> gtfsFiles;
 
@@ -58,7 +64,10 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
     private Class<?> includeStops;
 
     @CommandLine.Mixin
-    private CrsOptions crs = new CrsOptions();
+    private CrsOptions crs = new CrsOptions("EPSG:4326");
+
+    @CommandLine.Mixin
+    private ShpOptions shp = new ShpOptions();
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new CreateTransitScheduleFromGtfs()).execute(args));
@@ -67,7 +76,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
     @Override
     public Integer call() throws Exception {
 
-        CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), crs.getTargetCRS());
+        CoordinateTransformation ct = crs.getTransformation();
 
         // Output files
         File scheduleFile = new File(output, name + "-transitSchedule.xml.gz");
@@ -75,6 +84,17 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
         File transitVehiclesFile = new File(output, name + "-transitVehicles.xml.gz");
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+        Predicate<Stop> filter = (stop) -> true;
+        if (shp.getShapeFile() != null) {
+            // default input is set to lat lon
+            ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "_");
+            filter = (stop) -> index.contains(new Coord(stop.stop_lon, stop.stop_lat));
+        }
+
+        if (includeStops != null) {
+            filter = filter.and((Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance());
+        }
 
         for (Path gtfsFile : gtfsFiles) {
 
@@ -84,7 +104,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
                     .setDate(date)
                     .setFeed(gtfsFile)
                     //.setIncludeAgency(agency -> agency.equals("rbg-70"))
-                    .setIncludeStop(includeStops != null ? (Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance() : (stop) -> true)
+                    .setIncludeStop(filter)
                     .setMergeStops(true)
                     .build();
 

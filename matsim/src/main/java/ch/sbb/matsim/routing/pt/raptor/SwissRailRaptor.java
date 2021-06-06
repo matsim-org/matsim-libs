@@ -4,13 +4,19 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -18,12 +24,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
 
 /**
  * Provides public transport route search capabilities using an implementation of the
@@ -57,7 +59,7 @@ public class SwissRailRaptor implements TransitRouter {
     }
 
     @Override
-    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         if (parameters.getConfig().isUseRangeQuery()) {
             return this.performRangeQuery(fromFacility, toFacility, departureTime, person, parameters);
@@ -109,7 +111,7 @@ public class SwissRailRaptor implements TransitRouter {
             foundRoute = directWalk;
         }
 
-		List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
+		List<? extends PlanElement> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         return legs;
     }
     
@@ -123,7 +125,7 @@ public class SwissRailRaptor implements TransitRouter {
 		return true;
 	}
 
-    private List<Leg> performRangeQuery(Facility fromFacility, Facility toFacility, double desiredDepartureTime, Person person, RaptorParameters parameters) {
+    private List<? extends PlanElement> performRangeQuery(Facility fromFacility, Facility toFacility, double desiredDepartureTime, Person person, RaptorParameters parameters) {
         SwissRailRaptorConfigGroup srrConfig = parameters.getConfig();
 
         String subpopulation = PopulationUtils.getSubpopulation(person);
@@ -145,11 +147,11 @@ public class SwissRailRaptor implements TransitRouter {
         return this.calcRoute(fromFacility, toFacility, earliestDepartureTime, desiredDepartureTime, latestDepartureTime, person, this.defaultRouteSelector);
     }
 
-    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person) {
+    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person) {
         return calcRoute(fromFacility, toFacility, earliestDepartureTime, desiredDepartureTime, latestDepartureTime, person, this.defaultRouteSelector);
     }
 
-    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person, RaptorRouteSelector selector) {
+    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person, RaptorRouteSelector selector) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         List<InitialStop> accessStops = findAccessStops(fromFacility, toFacility, person, desiredDepartureTime, parameters);
         List<InitialStop> egressStops = findEgressStops(fromFacility, toFacility, person, desiredDepartureTime, parameters);
@@ -169,7 +171,7 @@ public class SwissRailRaptor implements TransitRouter {
         if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
         }
-		List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
+		List<? extends PlanElement> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         // TODO adapt the activity end time of the activity right before this trip
         /* Sadly, it's not that easy to find the previous activity, as we only have from- and to-facility
          * and the departure time. One would have to search through the person's selectedPlan to find

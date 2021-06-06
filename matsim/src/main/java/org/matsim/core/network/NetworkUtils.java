@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -913,10 +914,10 @@ public final class NetworkUtils {
 		// use a list since order is important
 		List<Node> result = new ArrayList<>();
 		result.add(link.getFromNode());
-		var attr = link.getAttributes().getAttribute(ORIG_GEOM);
+		var attr = (String)link.getAttributes().getAttribute(ORIG_GEOM);
 
-		if (attr != null) {
-			var data = ((String)attr).split(" ");
+		if (!StringUtils.isBlank(attr)) {
+			var data = attr.split(" ");
 			for (String date : data) {
 				var values = date.split(",");
 				if (values.length != 3) throw new RuntimeException("expected three values per node but found: " + date);

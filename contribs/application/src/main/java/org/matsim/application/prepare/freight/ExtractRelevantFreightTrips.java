@@ -19,6 +19,7 @@ import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -271,6 +272,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 generated += 1;
             }
         }
+
+        if (crs.getTargetCRS() != null)
+            ProjectionUtils.putCRS(originalPlans, crs.getTargetCRS());
 
         // Write population
         log.info("Writing population file...");
