@@ -11,7 +11,7 @@ public class RunDiscreteModeChoiceExampleTest{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Ignore
+	@Ignore // this works with with 14.x since approx jun.  kai, jun'21
 	public void main(){
 		RunDiscreteModeChoiceExample.main(null);
 	}

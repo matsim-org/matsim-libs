@@ -22,8 +22,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.matsim.core.config.groups.StrategyConfigGroup.*;
+
 public final class RunDiscreteModeChoiceExample{
-	// yyyyyy The code below fails with an OptionalTime exception.  :-(  kai, jun'21
+	// The code below works with v14 since approx jun'21.  kai
 
 	public static void main ( String [] args ) {
 
@@ -38,29 +40,12 @@ public final class RunDiscreteModeChoiceExample{
 		String modeB = "modeB";
 		final String[] modes = {TransportMode.car, modeB};
 
-		{
-			PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams( modeB );
-			pars.setTeleportedModeSpeed( 10. );
-			config.plansCalcRoute().addModeRoutingParams( pars );
-		}
-		{
-			PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.walk );
-			pars.setTeleportedModeSpeed( 4./3.6 );
-			config.plansCalcRoute().addModeRoutingParams( pars );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( modeB );
-			params.setConstant( 13. );
-			config.planCalcScore().addModeParams( params );
-		}
+		config.plansCalcRoute().addModeRoutingParams( new PlansCalcRouteConfigGroup.ModeRoutingParams( modeB ).setTeleportedModeSpeed( 10. ) );
+		config.plansCalcRoute().addModeRoutingParams( new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.walk ).setTeleportedModeSpeed( 4./3.6 ) );
+		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
 
 		// the following is first inlined and then adapted from DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement( config );
-		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-			stratSets.setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME );
-			stratSets.setWeight( 0.1 );
-			config.strategy().addStrategySettings( stratSets );
-		}
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME ).setWeight( 0.1 ) );
 		{
 			DiscreteModeChoiceConfigGroup dmcConfig = ConfigUtils.addOrGetModule( config, DiscreteModeChoiceConfigGroup.class );
 
@@ -77,9 +62,16 @@ public final class RunDiscreteModeChoiceExample{
 			// (yy I assume that this means that the algorithm is working at the tour level.  As opposed to trip level.  kai, jun'21)
 
 			dmcConfig.setSelector( SelectorModule.RANDOM );
+			// (yyyy I don't know what this does.  kai, jun'21)
+
 			dmcConfig.setTourConstraints( CollectionUtils.stringArrayToSet( new String[]{ConstraintModule.VEHICLE_CONTINUITY, ConstraintModule.SUBTOUR_MODE} ) );
+			// (yyyy I don't know what this does.  kai, jun'21)
+
 			dmcConfig.setTourEstimator( EstimatorModule.UNIFORM );
+			// (yyyy I don't know what this does.  kai, jun'21)
+
 			dmcConfig.setTourFinder( TourFinderModule.PLAN_BASED );
+			// (yyyy I don't know what this does.  kai, jun'21)
 
 			dmcConfig.setModeAvailability( ModeAvailabilityModule.DEFAULT );
 			// (do not consider car availability.  If one looks into the code, this is in fact cleverly programmed as a replacable guice binding.)
