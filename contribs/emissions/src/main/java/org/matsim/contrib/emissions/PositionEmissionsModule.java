@@ -286,6 +286,7 @@ public class PositionEmissionsModule extends AbstractModule {
             // call super second, so that the event type get overridden
             var attr = position.getAttributes();
             attr.putAll(super.getAttributes());
+            attr.put("emissionType", emissionType);
 
             for (var pollutant : emissions.entrySet()) {
                 attr.put(pollutant.getKey().toString(), pollutant.getValue().toString());
