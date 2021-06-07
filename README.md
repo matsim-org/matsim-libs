@@ -43,4 +43,3 @@ Snapshots, with the usual use-at-your-own-risk disclaimer, are at http://oss.jfr
 An example how to get started with your own project, including a complete pom.xml, is at https://github.com/matsim-org/matsim-example-project .
 
 Code examples are at https://github.com/matsim-org/matsim-code-examples .
-
