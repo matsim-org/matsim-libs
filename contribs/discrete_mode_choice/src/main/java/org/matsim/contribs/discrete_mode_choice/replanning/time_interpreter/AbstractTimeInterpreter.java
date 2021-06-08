@@ -80,10 +80,13 @@ public abstract class AbstractTimeInterpreter implements TimeInterpreter {
 
 	@Override
 	public void addLeg(Leg leg) {
-		if (leg.getRoute() == null) {
+		if (leg.getRoute() != null && leg.getRoute().getTravelTime().isDefined()) {
+			advance(currentTime + leg.getRoute().getTravelTime().seconds());
+		} else if (leg.getTravelTime().isDefined()) {
 			advance(currentTime + leg.getTravelTime().seconds());
 		} else {
-			advance(currentTime + leg.getRoute().getTravelTime().seconds());
+			// This means we have no timing information. This should usually not happen, but
+			// if it happens we just assume a duration of zero.
 		}
 	}
 

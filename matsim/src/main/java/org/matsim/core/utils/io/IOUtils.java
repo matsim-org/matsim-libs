@@ -123,6 +123,34 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 final public class IOUtils {
+
+/*
+The following says something about URLs vs Strings as file"names" (by Marcel):
+
+Generell sollten File-Zugriffe entweder per URL oder per String erfolgen. Früher waren alles Strings, neu gibt es mit dem Config-Context auch URLs. Man sollte aber, wenn
+man URLs verwendet, möglichst die ganze Aufruf-Kette als URL durchziehen, da es ansonsten Probleme geben kann (und eben nicht versuchen, die URL in einen String
+umzuwandeln, wie ich in meiner Commit-Message geschrieben hatte).
+
+Da wird eine URL erzeugt und in einen String umgewandelt, was definitiv zu Problemen führen wird, wenn der Pfad Leerzeichen enthält.
+
+Zudem wird durch die Umwandlung in einen String dann im Code ein anderer Pfad aufgerufen (nämlich der für String-Pfade), welcher dann mit der verschachtelten URL für das File innerhalb eines Jars Probleme hat. In kurz:
+
+		String urlString = "jar:file:/Users/kainagel/.m2/repository/org/matsim/matsim-examples/12.0-SNAPSHOT/matsim-examples-12.0-SNAPSHOT.jar!/test/scenarios/equil/config.xml”;
+		URL url = new URL(urlString);
+		InputStream is = new FileInputStream(new File(url.toURI()); // produces an exception, as it cannot access the file inside a Jar.
+		InputStream is = url.openStream(); // this works
+		InputStream is = new FileInputStream(new File(“file:/Users/kainagel/.m2/repository/org/matsim/matsim-examples/12.0-SNAPSHOT/matsim-examples-12.0-SNAPSHOT.jar"); // this works, as it is an actual file on the file system
+
+In ConfigUtils.loadConfig( String[] ) wird nun IOUtils.resolveFileOrResource(String) aufgerufen, das unter der Annahme, dass weil das Argument ein String ist, es sich um ein File im Filesystem handeln muss, versucht mittels new File() darauf zuzugreifen. Da es sich aber eigentlich um eine URL handelt, die dazu noch ein File innerhalb eines Jar spezifiziert, schlägt das fehl.
+
+Ich habe nun IOUtils.resolveFileOrResource(String) so angepasst, dass es versucht zu erkennen, ob das String-Argument eine URL ist, und in diesem Falle dies einfach als URL
+zurückgibt und nicht noch all die anderen Tests durchführt, welche die Methode sonst macht.
+
+Damit scheint dann auch dein Test zu funktionieren.
+
+PR ist hier: https://github.com/matsim-org/matsim/pull/646
+*/
+
 	/**
 	 * This is only a static helper class.
 	 */
