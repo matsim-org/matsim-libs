@@ -44,7 +44,7 @@ class FacilityPenalty {
 	private final double scaleNumberOfPersons;
 	private FacilityLoad facilityLoad;
 	private double capacity = 0.0;
-	private static int numberOfTimeBins = 4*24;
+	private static final  int numberOfTimeBins = 4*24;
 	private double sumCapacityPenaltyFactor = 0.0;
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;

@@ -54,7 +54,7 @@ import java.net.URL;
 
 class RunJointDemandDRTExample {
 
-    private static String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
+    private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
     private static final Logger log = Logger.getLogger(RunJointDemandDRTExample.class);
 
     public static void main(String[] args) throws IOException {

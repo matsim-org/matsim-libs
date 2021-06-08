@@ -48,8 +48,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class CalcLegTimesTest extends MatsimTestCase {
 
 	public static final String BASE_FILE_NAME = "legdurations.txt";
-	public static final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
-	public static final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
+	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+	public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
 	private Population population = null;
 	private Network network = null;

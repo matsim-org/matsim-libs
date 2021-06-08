@@ -48,7 +48,7 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	// bind( PrepareForSimImpl.class ) ;
 	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
 
-	private static Logger log = Logger.getLogger(PrepareForMobsimImpl.class);
+	private static final  Logger log = Logger.getLogger(PrepareForMobsimImpl.class);
 	
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;

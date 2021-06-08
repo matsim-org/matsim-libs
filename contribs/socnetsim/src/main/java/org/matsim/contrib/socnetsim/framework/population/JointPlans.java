@@ -50,7 +50,7 @@ public class JointPlans implements MatsimToplevelContainer {
 
 	private final JointPlanFactory factory = new JointPlanFactory();
 
-	private static AtomicInteger globalInstanceCount = new AtomicInteger( 0 );
+	private static final  AtomicInteger globalInstanceCount = new AtomicInteger( 0 );
 	private final int instanceId = globalInstanceCount.getAndIncrement();
 	
 	public JointPlan getJointPlan(final Plan indivPlan) {

@@ -37,7 +37,6 @@ import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamicsCorrectionApproach;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -185,7 +184,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private final VisData visData = new VisDataImpl() ;
 	private final NetsimEngineContext context;
 
-	private double maxFlowUsedInQsim = Double.POSITIVE_INFINITY ;
+	private double maxInflowUsedInQsim = Double.POSITIVE_INFINITY ;
 	private double effectiveNumberOfLanesUsedInQsim = Double.POSITIVE_INFINITY ;
 
 	private double accumulatedInflowCap = 1. ;
@@ -373,8 +372,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
 		// I am currently not sure if this statement is correct. kai, feb'18
 		
-		double now = context.getSimTimer().getTimeOfDay() ;
-		
+//		double now = context.getSimTimer().getTimeOfDay() ;
+
 		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
 //		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
@@ -383,7 +382,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		
 		// start with the base assumption, might be adjusted below depending on the traffic dynamics
 		this.effectiveNumberOfLanesUsedInQsim = this.effectiveNumberOfLanes;
-		this.maxFlowUsedInQsim = this.flowCapacityPerTimeStep;
+		this.maxInflowUsedInQsim = this.flowCapacityPerTimeStep;
 		
 		switch (context.qsimConfig.getTrafficDynamics()) {
 			case queue:
@@ -400,53 +399,63 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// also have to be re-computed with each freespeed change. kai, feb'18
 				
 				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
-				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ); 
-						
-				if ( maxFlowFromFdiag < flowCapacityPerTimeStep ) {
-					
+				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() );
+
+				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInflowCapacitySetting();
+
+				if(inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE){
 					if (wrnCnt<10) {
 						wrnCnt++ ;
-						log.warn( "max flow from fdiag < flow cap in network file; linkId=" + qLink.getId() +
-											  "; network file flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
-											  "; max flow from fdiag/h=" + 3600*maxFlowFromFdiag/context.qsimConfig.getTimeStepSize() ) ;
-						
-						log.warn( "number of lanes from fdiag > number of lanes in network file; linkId=" + qLink.getId() +
-								  "; number of lanes in network file=" + this.effectiveNumberOfLanes +
-								  "; number of lanes from fdiag=" + minimumNumberOfLanesFromFdiag ) ;
-							
-						if ( wrnCnt==10 ) {
+						log.warn("you are using the maximum capacity for one lane as the inflow capacity. This is the old standard behavior of the qsim and probably leads to wrong results " +
+								" as it does not respect the actual number of lanes nor the user-defined flow capacity. Please consider using" +
+								"InflowCapacitySetting.INCREASE_NUMBER_OF_LANES or InflowCapacitySetting.REDUCE_INFLOW_CAPACITY instead.");
+					}
+					if ( wrnCnt==5 ) { //this verbose warning is only given 5 times
+						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+					}
+
+					this.maxInflowUsedInQsim = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
+					// write out the modified qsim behavior as link attribute
+					qLink.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600* maxInflowUsedInQsim /context.qsimConfig.getTimeStepSize());
+
+				} else  {
+					if ( maxFlowFromFdiag < flowCapacityPerTimeStep ){ //warnings
+						if (wrnCnt<10) {
+							wrnCnt++ ;
+							log.warn( "max flow from fdiag < flow cap in network file; linkId=" + qLink.getId() +
+									"; network file flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
+									"; max flow from fdiag/h=" + 3600*maxFlowFromFdiag/context.qsimConfig.getTimeStepSize() ) ;
+
+							log.warn( "number of lanes from fdiag > number of lanes in network file; linkId=" + qLink.getId() +
+									"; number of lanes in network file=" + this.effectiveNumberOfLanes +
+									"; number of lanes from fdiag=" + minimumNumberOfLanesFromFdiag ) ;
+
+							if ( wrnCnt==10 ) {
 								log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+							}
+						}
+						if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
+							if (wrnCnt<10) {
+								log.warn("The flow capacity will be reduced. See link attribute 'maxInflowUsedInQsim' written into the output network.");
+							}
+						} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
+							if (wrnCnt<10) {
+								log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
+							}
 						}
 					}
-					
 					// now either correct the flow capacity or the number of lanes!
-					
-					TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = context.qsimConfig.getTrafficDynamicsCorrectionApproach();
-					
-					if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY) {
-						this.maxFlowUsedInQsim = maxFlowFromFdiag;
-						
-						if (wrnCnt<10) {
-							log.warn("The flow capacity will be reduced. See link attribute 'maxFlowUsedInQsim' written into the output network.");
-						}
-
+					if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
+						this.maxInflowUsedInQsim = maxFlowFromFdiag;
 						// write out the modified qsim behavior as link attribute
-						qLink.getLink().getAttributes().putAttribute("maxFlowUsedInQsim", 3600*maxFlowUsedInQsim/context.qsimConfig.getTimeStepSize());
-					
-					} else if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES) {
+						qLink.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600* maxInflowUsedInQsim /context.qsimConfig.getTimeStepSize());
+					} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
 						this.effectiveNumberOfLanesUsedInQsim = minimumNumberOfLanesFromFdiag;
-						
-						if (wrnCnt<10) {
-							log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
-						}
-						
 						// write out the modified qsim behavior as link attribute
 						qLink.getLink().getAttributes().putAttribute("effectiveNumberOfLanesUsedInQsim", effectiveNumberOfLanesUsedInQsim);
-					
 					} else {
-						throw new RuntimeException("The approach "+trafficDynamicsCorrectionApproach.toString()+" is not implemented yet.");
+						throw new RuntimeException("The approach "+ inflowCapacitySetting.toString()+" is not implemented yet.");
 					}
-
 				}
 				break;
 			
@@ -560,7 +569,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				this.processArrivalOfHoles( ) ;
 				break;
 			case kinematicWaves:
-				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowUsedInQsim, maxFlowUsedInQsim);
+				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxInflowUsedInQsim, maxInflowUsedInQsim);
 				this.processArrivalOfHoles( ) ;
 				break;
 			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
@@ -1017,12 +1026,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private int noOfSeepModeBringFwd = 0;
 
 	private QVehicle peekFromVehQueue(){
-		double now = context.getSimTimer().getTimeOfDay() ;
 
 		QVehicle returnVeh = vehQueue.peek();
 
 		if( context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ ) {
-			
+			double now = context.getSimTimer().getTimeOfDay();
+
 			int maxSeepModeAllowed = 4;
 			if( context.qsimConfig.isRestrictingSeepage() && noOfSeepModeBringFwd == maxSeepModeAllowed) {
 				noOfSeepModeBringFwd = 0;

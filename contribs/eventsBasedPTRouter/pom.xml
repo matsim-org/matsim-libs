@@ -8,11 +8,4 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>events-based-pt-router</artifactId>
   <name>eventsBasedPTRouter</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

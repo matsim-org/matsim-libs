@@ -51,7 +51,7 @@ import org.matsim.vehicles.VehicleUtils;
  class FreightAgentSource implements AgentSource {
 	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
-	private static Logger log = Logger.getLogger(FreightAgentSource.class);
+	private static final  Logger log = Logger.getLogger(FreightAgentSource.class);
 	private final CarrierAgentTracker tracker;
 
 	private Collection<MobsimAgent> mobSimAgents;

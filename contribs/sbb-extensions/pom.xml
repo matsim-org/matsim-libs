@@ -10,12 +10,5 @@
     <groupId>org.matsim.contrib</groupId>
     <artifactId>sbb-extensions</artifactId>
     <name>sbb-extensions</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

@@ -51,7 +51,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
  */
 public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
-	private static Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
+	private static final  Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
 	
 	private static class Candidate {
 		final Subtour subtour;

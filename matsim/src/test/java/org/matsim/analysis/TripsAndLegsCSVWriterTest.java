@@ -65,37 +65,37 @@ public class TripsAndLegsCSVWriterTest {
 	final Id<Link> link2 = Id.create(123160, Link.class);
 	final Id<Link> link3 = Id.create(130181, Link.class);
 	
-	private static int dep_time;
-	private static int trav_time;
-	private static int traveled_distance;
-	private static int euclidean_distance;
-	private static int main_mode;
-	private static int longest_distance_mode;
-	private static int modes;
-	private static int start_activity_type;
-	private static int end_activity_type;
-	private static int start_facility_id;
-	private static int start_link;
-	private static int start_x;
-	private static int start_y;
-	private static int end_facility_id;
-	private static int end_link;
-	private static int end_x;
-	private static int end_y;
-	private static int trip_id;
-	private static int distance;
-	private static int mode;
-	private static int wait_time;
-	private static int access_stop_id;
-	private static int egress_stop_id;
-	private static int transit_line;
-	private static int transit_route;
-	private static int first_pt_boarding_stop;
-	private static int last_pt_egress_stop;
-	private static int trip_number;
-	private static int person;
-	private static int transitStopsVisited;
-	private static int isIntermodalWalkPt;
+	private int dep_time;
+	private int trav_time;
+	private int traveled_distance;
+	private int euclidean_distance;
+	private int main_mode;
+	private int longest_distance_mode;
+	private int modes;
+	private int start_activity_type;
+	private int end_activity_type;
+	private int start_facility_id;
+	private int start_link;
+	private int start_x;
+	private int start_y;
+	private int end_facility_id;
+	private int end_link;
+	private int end_x;
+	private int end_y;
+	private int trip_id;
+	private int distance;
+	private int mode;
+	private int wait_time;
+	private int access_stop_id;
+	private int egress_stop_id;
+	private int transit_line;
+	private int transit_route;
+	private int first_pt_boarding_stop;
+	private int last_pt_egress_stop;
+	private int trip_number;
+	private int person;
+	private int transitStopsVisited;
+	private int isIntermodalWalkPt;
 	
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	ArrayList<Object> legsfromplan = new ArrayList<Object>();
@@ -491,7 +491,7 @@ public class TripsAndLegsCSVWriterTest {
 
 	}
 	/*******************************Deciding the columns of the output files************************************/
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

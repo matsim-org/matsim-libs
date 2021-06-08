@@ -128,6 +128,7 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
+		acg.setUseParallelization(false);
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
 		config.planCalcScore().addModeParams(ptParams);

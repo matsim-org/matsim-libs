@@ -42,7 +42,7 @@ public final class OutputDirectoryHierarchy {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
-	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
+	private static final  Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
 	
 	private String runId = null;
 	
@@ -215,6 +215,9 @@ public final class OutputDirectoryHierarchy {
 						// files!
 						throw new RuntimeException(
 								"The output directory " + outputPath
+								+ " (full path: "
+								+ outputDir.getAbsolutePath()
+								+")"
 								+ " already exists and is not empty!"
 								+ " Please either delete or empty the directory or"
 								+ " configure the services via setOverwriteFileSetting()"
@@ -224,6 +227,7 @@ public final class OutputDirectoryHierarchy {
 						log.warn("###########################################################");
 						log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
 						log.warn("### " + outputPath);
+						log.warn("### full path: " + outputDir.getAbsolutePath());
 						log.warn("###########################################################");
 						System.err.flush();
 						break;
@@ -235,6 +239,7 @@ public final class OutputDirectoryHierarchy {
 						log.info("###########################################################");
 						log.info("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
 						log.info("### " + outputPath);
+						log.warn("### full path: " + outputDir.getAbsolutePath());
 						log.info("###########################################################");
 						System.out.flush();
 						IOUtils.deleteDirectoryRecursively(outputDir.toPath());

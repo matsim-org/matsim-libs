@@ -74,7 +74,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class MatsimJspritFactory {
 
-	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
+	private static final  Logger log = Logger.getLogger(MatsimJspritFactory.class);
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18

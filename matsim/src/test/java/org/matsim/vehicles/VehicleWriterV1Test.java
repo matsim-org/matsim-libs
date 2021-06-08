@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -42,7 +42,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 	private Id<Vehicle> id42;
 	private Id<Vehicle> id42_23;
 
-	@BeforeClass
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -54,7 +54,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	public void testWriter() throws FileNotFoundException, IOException {
+	public void testWriter() {
 
 		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
 

@@ -859,6 +859,83 @@ public class SwissRailRaptorIntermodalTest {
         
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs2);        
     }
+    /**
+     * 
+     * The agent has a super-fast bike. So in theory it is faster to travel
+     * from stop_3 to the destination. However, with the introduced trip share
+     * constraint it will still take the closest stop accessible by the bike.
+     * If this constraint is not used the agent will take pt_3 stop as an 
+     * access stop to his final destination.
+     * 
+     */
+    @Test
+    public void testIntermodalTrip_tripLengthShare() {
+        IntermodalFixture f = new IntermodalFixture();
+
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
+
+        Map<String, RoutingModule> routingModules = new HashMap<>();
+        routingModules.put(TransportMode.walk,
+            new TeleportationRoutingModule(TransportMode.walk, f.scenario, 1.1, 1.3));
+        routingModules.put(TransportMode.bike,
+            new TeleportationRoutingModule(TransportMode.bike, f.scenario, 60, 1.0));
+
+        f.srrConfig.setUseIntermodalAccessEgress(true);
+        IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
+        walkAccess.setMode(TransportMode.walk);
+        walkAccess.setMaxRadius(1000);
+        walkAccess.setInitialSearchRadius(1000);
+        walkAccess.setSearchExtensionRadius(0.0);
+        f.srrConfig.addIntermodalAccessEgress(walkAccess);
+        IntermodalAccessEgressParameterSet bikeAccess = new IntermodalAccessEgressParameterSet();
+        bikeAccess.setMode(TransportMode.bike);
+        bikeAccess.setMaxRadius(30000);
+        bikeAccess.setInitialSearchRadius(30000);
+        bikeAccess.setStopFilterAttribute("bikeAccessible");
+        bikeAccess.setLinkIdAttribute("accessLinkId_bike");
+        bikeAccess.setStopFilterValue("true");
+        bikeAccess.setSearchExtensionRadius(0.0);
+        bikeAccess.setShareTripSearchRadius(0.0001);
+        f.srrConfig.addIntermodalAccessEgress(bikeAccess);
+
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
+
+        Facility fromFac = new FakeFacility(new Coord(8500, 10000), Id.create("from", Link.class));
+        Facility toFac = new FakeFacility(new Coord(40000, 10500), Id.create("to", Link.class));
+
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        for (Leg leg : legs) {
+            System.out.println(leg);
+        }
+
+        Assert.assertEquals("wrong number of legs.", 5, legs.size());
+        Leg leg = legs.get(0);
+        Assert.assertEquals(TransportMode.bike, leg.getMode());
+        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
+        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getEndLinkId());
+        leg = legs.get(1);
+        Assert.assertEquals(TransportMode.walk, leg.getMode());
+        Assert.assertEquals(Id.create("bike_0", Link.class), leg.getRoute().getStartLinkId());
+        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getEndLinkId());
+        leg = legs.get(2);
+        Assert.assertEquals(TransportMode.pt, leg.getMode());
+        Assert.assertEquals(Id.create("pt_0", Link.class), leg.getRoute().getStartLinkId());
+        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getEndLinkId());
+        leg = legs.get(3);
+        Assert.assertEquals(TransportMode.walk, leg.getMode());
+        Assert.assertEquals(Id.create("pt_5", Link.class), leg.getRoute().getStartLinkId());
+        Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getEndLinkId());
+        leg = legs.get(4);
+        Assert.assertEquals(TransportMode.bike, leg.getMode());
+        Assert.assertEquals(Id.create("bike_5", Link.class), leg.getRoute().getStartLinkId());
+        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+    }
+    
+    
 
     /* for test of intermodal routing requiring transfers at the beginning or end of the pt trip,
      * the normal IntermodalFixture does not work, so create a special mini scenario here.

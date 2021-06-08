@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 class TourPlanning {
 
-	private static Logger log = Logger.getLogger(TourPlanning.class);
+	private static final Logger log = Logger.getLogger(TourPlanning.class);
 
 	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
 			TravelTime travelTime) throws InterruptedException, ExecutionException {

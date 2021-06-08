@@ -64,25 +64,26 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 	}
 
 	@Override
-	public List<InitialStop> findStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, RaptorStopFinder.Direction type) {
+	public List<InitialStop> findStops(Facility fromFacility, Facility toFacility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, RaptorStopFinder.Direction type) {
 		if (type == Direction.ACCESS) {
-			return findAccessStops(facility, person, departureTime, parameters, data);
+			return findAccessStops(fromFacility, toFacility, person, departureTime, parameters, data);
 		}
 		if (type == Direction.EGRESS) {
-			return findEgressStops(facility, person, departureTime, parameters, data);
+			return findEgressStops(fromFacility, toFacility, person, departureTime, parameters, data);
 		}
 		return Collections.emptyList();
 	}
 
-	private List<InitialStop> findAccessStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data) {
+	private List<InitialStop> findAccessStops(Facility fromFacility, Facility toFacility, Person person, double departureTime,
+			RaptorParameters parameters, SwissRailRaptorData data) {
 		SwissRailRaptorConfigGroup srrCfg = parameters.getConfig();
 		if (srrCfg.isUseIntermodalAccessEgress()) {
-			return findIntermodalStops(facility, person, departureTime, Direction.ACCESS, parameters, data);
+			return findIntermodalStops(fromFacility, toFacility, person, departureTime, Direction.ACCESS, parameters, data);
 		} else {
 			double distanceFactor = data.config.getBeelineWalkDistanceFactor();
-			List<TransitStopFacility> stops = findNearbyStops(facility, parameters, data);
+			List<TransitStopFacility> stops = findNearbyStops(fromFacility, parameters, data);
 			List<InitialStop> initialStops = stops.stream().map(stop -> {
-				double beelineDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), facility.getCoord());
+				double beelineDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), fromFacility.getCoord());
 				double travelTime = Math.ceil(beelineDistance / parameters.getBeelineWalkSpeed());
 				double disutility = travelTime * -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk);
 				return new InitialStop(stop, disutility, travelTime, beelineDistance * distanceFactor, TransportMode.walk);
@@ -91,15 +92,15 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 		}
 	}
 
-	private List<InitialStop> findEgressStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data) {
+	private List<InitialStop> findEgressStops(Facility fromFacility, Facility toFacility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data) {
 		SwissRailRaptorConfigGroup srrCfg = parameters.getConfig();
 		if (srrCfg.isUseIntermodalAccessEgress()) {
-			return findIntermodalStops(facility, person, departureTime, Direction.EGRESS, parameters, data);
+			return findIntermodalStops(fromFacility, toFacility, person, departureTime, Direction.EGRESS, parameters, data);
 		} else {
 			double distanceFactor = data.config.getBeelineWalkDistanceFactor();
-			List<TransitStopFacility> stops = findNearbyStops(facility, parameters, data);
+			List<TransitStopFacility> stops = findNearbyStops(toFacility, parameters, data);
 			List<InitialStop> initialStops = stops.stream().map(stop -> {
-				double beelineDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), facility.getCoord());
+				double beelineDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toFacility.getCoord());
 				double travelTime = Math.ceil(beelineDistance / parameters.getBeelineWalkSpeed());
 				double disutility = travelTime * -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk);
 				return new InitialStop(stop, disutility, travelTime, beelineDistance * distanceFactor, TransportMode.walk);
@@ -108,22 +109,24 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 		}
 	}
 
-	private List<InitialStop> findIntermodalStops(Facility facility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data) {
+	private List<InitialStop> findIntermodalStops(Facility fromFacility, Facility toFacility, Person person, double departureTime,
+			Direction direction, RaptorParameters parameters, SwissRailRaptorData data) {
 		SwissRailRaptorConfigGroup srrCfg = parameters.getConfig();
+		Facility facility = Direction.ACCESS == direction ? fromFacility : toFacility;
 		double x = facility.getCoord().getX();
 		double y = facility.getCoord().getY();
 		List<InitialStop> initialStops = new ArrayList<>();
         switch (srrCfg.getIntermodalAccessEgressModeSelection()) {
             case CalcLeastCostModePerStop:
                 for (IntermodalAccessEgressParameterSet parameterSet : srrCfg.getIntermodalAccessEgressParameterSets()) {
-                    addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y, initialStops, parameterSet);
+                    addInitialStopsForParamSet(fromFacility, toFacility, person, departureTime, direction, parameters, data, x, y, initialStops, parameterSet);
                 }
                 break;
             case RandomSelectOneModePerRoutingRequestAndDirection:
                 int counter = 0;
                 do {
                     int rndSelector = random.nextInt(srrCfg.getIntermodalAccessEgressParameterSets().size());
-                    addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y,
+                    addInitialStopsForParamSet(fromFacility, toFacility, person, departureTime, direction, parameters, data, x, y,
                             initialStops, srrCfg.getIntermodalAccessEgressParameterSets().get(rndSelector));
                     counter++;
                     // try again if no initial stop was found for the parameterset. Avoid infinite loop by limiting number of tries.
@@ -135,7 +138,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
         return initialStops;
     }
 
-    private void addInitialStopsForParamSet(Facility facility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data, double x, double y, List<InitialStop> initialStops, IntermodalAccessEgressParameterSet paramset) {
+    private void addInitialStopsForParamSet(Facility fromFacility, Facility toFacility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data, double x, double y, List<InitialStop> initialStops, IntermodalAccessEgressParameterSet paramset) {
         String mode = paramset.getMode();
         String linkIdAttribute = paramset.getLinkIdAttribute();
         String personFilterAttribute = paramset.getPersonFilterAttribute();
@@ -143,6 +146,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
         String stopFilterAttribute = paramset.getStopFilterAttribute();
         String stopFilterValue = paramset.getStopFilterValue();
 
+        Facility facility = Direction.ACCESS == direction ? fromFacility : toFacility;
         boolean personMatches = true;
         if (personFilterAttribute != null) {
             Object attr = person.getAttributes().getAttribute(personFilterAttribute);
@@ -158,7 +162,11 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
             } else {
                 filteredStopsQT = data.stopsQT;
             }
+            
+            double distance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord());
+            double tripBasedSearchRadius = distance * paramset.getShareTripSearchRadius();
             double searchRadius = Math.min(paramset.getInitialSearchRadius(), paramset.getMaxRadius());
+            searchRadius  = Math.min(searchRadius, tripBasedSearchRadius);
             Collection<TransitStopFacility> stopFacilities = filteredStopsQT.getDisk(x, y, searchRadius);
             if (stopFacilities.size() < 2) {
                 TransitStopFacility nearestStop = filteredStopsQT.getClosest(x, y);
