@@ -1,6 +1,7 @@
 package org.matsim.application.analysis;
 
 
+import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.doubles.Double2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.doubles.Double2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
@@ -110,7 +111,7 @@ public class CheckPopulation implements MATSimAppCommand {
 
 				for (Object2IntMap.Entry<Object> oe : e.getValue().object2IntEntrySet()) {
 
-					log.info("\t\t{}: {} ({}%)", oe.getKey(), oe.getIntValue(), oe.getIntValue() * 100d / total );
+					log.info("\t\t{}: {} ({}%)", oe.getKey(), oe.getIntValue(), oe.getIntValue() * 100d / total);
 
 				}
 			}
@@ -158,6 +159,9 @@ public class CheckPopulation implements MATSimAppCommand {
 		Object2IntMap<String> firstAct = new Object2IntAVLTreeMap<>();
 		Object2IntMap<String> lastAct = new Object2IntAVLTreeMap<>();
 
+		// number of persons having at least one activity of type
+		Object2IntMap<String> haveActivity = new Object2IntAVLTreeMap<>();
+
 		List<TripStructureUtils.Subtour> subtours = new ArrayList<>();
 
 		for (Person agent : agents) {
@@ -174,15 +178,23 @@ public class CheckPopulation implements MATSimAppCommand {
 
 			subtours.addAll(TripStructureUtils.getSubtours(agent.getSelectedPlan()));
 
-			List<Activity> activities = TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+			List<String> activities = TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities)
+					.stream().map(CheckPopulation::actName).collect(Collectors.toList());
 
 			if (activities.size() == 0)
 				continue;
 
-			firstAct.mergeInt(actName(activities.get(0)), 1, Integer::sum);
-			lastAct.mergeInt(actName(activities.get(activities.size() - 1)), 1, Integer::sum);
-			activities.forEach(act -> acts.mergeInt(actName(act), 1, Integer::sum));
+			firstAct.mergeInt(activities.get(0), 1, Integer::sum);
+			lastAct.mergeInt(activities.get(activities.size() - 1), 1, Integer::sum);
+			activities.forEach(act -> acts.mergeInt(act, 1, Integer::sum));
+
+			for (String act : Sets.newHashSet(activities)) {
+				haveActivity.mergeInt(act, 1, Integer::sum);
+			}
 		}
+
+		log.info("Number of persons having at least one activity:");
+		haveActivity.forEach((k, v) -> log.info("\t{}: {} ({}%)", k, v, Math.round((v * 1000d) / agents.size()) / 10d));
 
 		log.info("Activity distribution (total):");
 
