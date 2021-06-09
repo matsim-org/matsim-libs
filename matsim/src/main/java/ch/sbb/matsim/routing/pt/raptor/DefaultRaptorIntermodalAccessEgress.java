@@ -6,6 +6,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -33,6 +34,11 @@ public class DefaultRaptorIntermodalAccessEgress implements RaptorIntermodalAcce
                     tTime += travelTime.seconds();
                     disutility += travelTime.seconds() * -params.getMarginalUtilityOfTravelTime_utl_s(mode);
                 }
+            }
+            else if (pe instanceof Activity) {
+            	if (((Activity) pe).getMaximumDuration().isDefined()) {
+            		tTime += ((Activity) pe).getMaximumDuration().seconds();
+            	}
             }
         }
         return new RIntermodalAccessEgress(legs, disutility, tTime, direction);

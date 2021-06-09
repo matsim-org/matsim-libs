@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -120,25 +121,25 @@ public class SwissRailRaptorInVehicleCostTest {
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<Leg> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
 		Assert.assertNotNull(route1);
 
 		System.out.println("calculated route:");
-		for (Leg leg : route1) {
-			System.out.println(leg.toString() + "  > " + leg.getRoute().getRouteDescription());
+		for (PlanElement leg : route1) {
+			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
 		}
 
 		Assert.assertEquals(3, route1.size());
 
-		Leg leg1 = route1.get(0);
+		Leg leg1 = (Leg) route1.get(0);
 		Assert.assertEquals("walk", leg1.getMode());
 
-		Leg leg2 = route1.get(1);
+		Leg leg2 = (Leg) route1.get(1);
 		Assert.assertEquals("pt", leg2.getMode());
 		TransitPassengerRoute paxRoute1 = (TransitPassengerRoute) leg2.getRoute();
 		Assert.assertEquals(expectedTransitLine, paxRoute1.getLineId());
 
-		Leg leg3 = route1.get(2);
+		Leg leg3 = (Leg) route1.get(2);
 		Assert.assertEquals("walk", leg3.getMode());
 	}
 

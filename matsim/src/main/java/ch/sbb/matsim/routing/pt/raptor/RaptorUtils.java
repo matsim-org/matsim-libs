@@ -4,13 +4,14 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -22,6 +23,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 
 /**
  * @author mrieser / SBB
@@ -93,8 +96,8 @@ public final class RaptorUtils {
         return raptorParams;
     }
 
-    public static List<Leg> convertRouteToLegs(RaptorRoute route, double transferWalkMargin) {
-        List<Leg> legs = new ArrayList<>(route.parts.size());
+    public static List<? extends PlanElement> convertRouteToLegs(RaptorRoute route, double transferWalkMargin) {
+        List<PlanElement> legs = new ArrayList<>(route.parts.size());
         double lastArrivalTime = Double.NaN;
         boolean firstPtLegProcessed = false;
         Leg previousTransferWalkleg = null;
@@ -108,6 +111,10 @@ public final class RaptorUtils {
                             leg.setDepartureTime(lastArrivalTime);
                         }
                         lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
+                    }
+                    else {
+                    	Activity act = (Activity) pe;
+                    	legs.add(act);
                     }
                 }
             } else if (part.line != null) {

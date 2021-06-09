@@ -5,7 +5,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.etaxi.util.ETaxiStats;
 import org.matsim.contrib.etaxi.util.ETaxiStatsCalculator;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
-import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
