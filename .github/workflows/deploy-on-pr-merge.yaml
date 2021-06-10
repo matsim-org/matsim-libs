@@ -4,15 +4,14 @@ on:
   push:
     branches:
       - master # snapshot deployment
-      - 13.x
   pull_request:
     types:
-      - closed # pr-labelled deployment (only if PR is merged to master or 13.x)
+      - closed # pr-labelled deployment (only if PR is merged to master)
 
 jobs:
   deploy-snapshot:
     name: deploy snapshot/PR-labelled version
-    if: github.event_name == 'push' || (github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == '13.x'))
+    if: github.event_name == 'push' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master')
 
     runs-on: ubuntu-latest
 
