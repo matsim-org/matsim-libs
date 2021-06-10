@@ -59,6 +59,7 @@ jobs:
           - contribs/osm
           - contribs/application
           - contribs/sbb-extensions
+          - benchmark
 
     steps:
       - name: Checkout git repo
