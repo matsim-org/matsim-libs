@@ -109,6 +109,17 @@ jobs:
     if: always() && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository)
     needs: build
     runs-on: ubuntu-latest
+
+    # When running this workflow for internal PRs "verify-all-jobs-successful" is marked as skipped,
+    # which GitHub takes as a green flag and will allow merging before "verify-all-jobs-successful"
+    # is completed for the push event.
+    # One way to avoid this is to create a job from a matrix on the fly. They will be created for
+    # push events and PR events from forks (but not for PR events coming from internal forks),
+    # so we can safely add a check "verify-all-jobs-successful (push-or-external-PR)"
+    strategy:
+      matrix:
+        name: [ "push-or-external-PR" ]
+
     steps:
       - name: check if the whole job matrix is successful
         if: needs.build.result != 'success'
