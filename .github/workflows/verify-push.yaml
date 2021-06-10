@@ -58,6 +58,7 @@ jobs:
           - contribs/otfvis
           - contribs/osm
           - contribs/sbb-extensions
+          - benchmark
 
     steps:
       - name: Checkout git repo
