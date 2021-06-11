@@ -1,17 +1,20 @@
 name: deploy-on-pr-merge
 
 on:
-  push:
+  push: # snapshot deployment
     branches:
-      - master # snapshot deployment
-  pull_request:
+      - master
+  pull_request: # pr-labelled deployment
+    branches:
+      - master
     types:
-      - closed # pr-labelled deployment (only if PR is merged to master)
+      - closed
 
 jobs:
   deploy-snapshot:
     name: deploy snapshot/PR-labelled version
-    if: github.event_name == 'push' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master')
+    # for PR-labelled deployment -- only if closed by merging
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
 
     runs-on: ubuntu-latest
 
@@ -30,7 +33,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 15
           distribution: 'adopt'
           server-id: ${{ github.event_name == 'push' && 'matsim-snapshots' || 'matsim-releases' }} #choose mvn repo
           server-username: MAVEN_USERNAME
