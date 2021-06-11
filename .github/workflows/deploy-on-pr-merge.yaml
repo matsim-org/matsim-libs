@@ -33,7 +33,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 15
           distribution: 'adopt'
           server-id: ${{ github.event_name == 'push' && 'matsim-snapshots' || 'matsim-releases' }} #choose mvn repo
           server-username: MAVEN_USERNAME

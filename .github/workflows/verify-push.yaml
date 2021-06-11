@@ -88,7 +88,7 @@ jobs:
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 15
           distribution: 'adopt'
 
       - name: Build module (with dependencies)
