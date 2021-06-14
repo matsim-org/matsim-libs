@@ -76,7 +76,7 @@ public class TransitRouterWrapper implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		List<Leg> baseTrip = router.calcRoute(
+		List<? extends PlanElement> baseTrip = router.calcRoute(
 				fromFacility,
 				toFacility,
 				departureTime,
@@ -97,18 +97,19 @@ public class TransitRouterWrapper implements RoutingModule {
 	 * must be filled in (distance, travel-time in routes).
 	 */
 	private List<PlanElement> fillWithActivities(
-			final List<Leg> baseTrip,
+			final List<? extends PlanElement> baseTrip,
 			final Facility fromFacility,
 			final Facility toFacility, double departureTime, Person person) {
 		List<PlanElement> trip = new ArrayList<>();
 		Coord nextCoord = null;
 		int i = 0;
-		for (Leg leg : baseTrip) {
+		for (PlanElement pe : baseTrip) {
+			Leg leg = (Leg)pe;
 			if (i == 0) {
 				// (access leg)
 				Facility firstToFacility;
 				if (baseTrip.size() > 1) { // at least one pt leg available
-					TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(1).getRoute();
+					TransitPassengerRoute tRoute = (TransitPassengerRoute) ((Leg)baseTrip.get(1)).getRoute();
 					firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
 				} else {
 					firstToFacility = toFacility;
@@ -134,7 +135,7 @@ public class TransitRouterWrapper implements RoutingModule {
 					if (i == baseTrip.size() - 1) {
 						// if this is the last leg, we don't believe the leg from the TransitRouter.  Why?
 
-						TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
+						TransitPassengerRoute tRoute = (TransitPassengerRoute) ((Leg)baseTrip.get(baseTrip.size() - 2)).getRoute();
 						Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
 
 						Route route = createWalkRoute(lastFromFacility, departureTime, person,

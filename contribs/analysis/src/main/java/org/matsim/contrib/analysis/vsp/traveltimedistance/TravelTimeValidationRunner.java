@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
@@ -57,37 +58,34 @@ public class TravelTimeValidationRunner {
 	private final Network network;
 	private final String eventsFile;
 	private final TravelTimeDistanceValidator travelTimeValidator;
-	private int numberOfTripsToValidate;
+	private final int numberOfTripsToValidate;
 	private final Set<Id<Person>> populationIds;
 	private final String outputfolder;
 	private final int eventsQueueSize = 1048576 * 32;
 	private final Tuple<Double, Double> timeWindow;
+	private final Predicate<CarTrip> tripFilter;
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate) {
-		this.network = network;
-		this.eventsFile = eventsFile;
-		this.travelTimeValidator = travelTimeValidator;
-		this.numberOfTripsToValidate = numberOfTripsToValidate;
-		this.outputfolder = outputFolder;
-		this.populationIds = populationIds;
-		this.timeWindow = new Tuple<Double, Double>((double) 0, (double) 3600 * 30);
+		this(network, populationIds, eventsFile, outputFolder, travelTimeValidator,
+				numberOfTripsToValidate, new Tuple<>((double) 0, (double) 3600 * 30), null);
 	}
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator) {
-		this.network = network;
-		this.eventsFile = eventsFile;
-		this.travelTimeValidator = travelTimeValidator;
-		this.numberOfTripsToValidate = Integer.MAX_VALUE;
-		this.outputfolder = outputFolder;
-		this.populationIds = populationIds;
-		this.timeWindow = new Tuple<Double, Double>((double) 0, (double) 3600 * 30);
+		this(network, populationIds, eventsFile, outputFolder, travelTimeValidator,
+				Integer.MAX_VALUE, new Tuple<>((double) 0, (double) 3600 * 30), null);
 	}
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
 			Tuple<Double, Double> timeWindow) {
+		this(network, populationIds, eventsFile, outputFolder, travelTimeValidator, numberOfTripsToValidate, timeWindow, null);
+	}
+
+	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
+	                                  String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
+	                                  Tuple<Double, Double> timeWindow, Predicate<CarTrip> tripFilter) {
 		this.network = network;
 		this.eventsFile = eventsFile;
 		this.travelTimeValidator = travelTimeValidator;
@@ -95,11 +93,14 @@ public class TravelTimeValidationRunner {
 		this.outputfolder = outputFolder;
 		this.populationIds = populationIds;
 		this.timeWindow = timeWindow;
+		this.tripFilter = tripFilter;
+
 		if (timeWindow.getFirst() > timeWindow.getSecond()) {
 			throw new IllegalArgumentException(
 					"Time window is not valid (the first element should be smaller than the second element in the Time Window Tuple)");
 		}
 	}
+
 
 	public void run() {
 		ParallelEventsManager eventManager = new ParallelEventsManager(false, eventsQueueSize);
@@ -113,6 +114,10 @@ public class TravelTimeValidationRunner {
 		Collections.shuffle(carTrips, MatsimRandom.getRandom());
 		int i = 0;
 		for (CarTrip trip : carTrips) {
+
+			if (tripFilter != null && !tripFilter.test(trip))
+				continue;
+
 			if (trip.getDepartureTime() >= timeWindow.getFirst() && trip.getDepartureTime() <= timeWindow.getSecond()) {
 				Tuple<Double, Double> timeDistance = travelTimeValidator.getTravelTime(trip);
 				double validatedTravelTime = timeDistance.getFirst();

@@ -201,7 +201,7 @@ public final class ShpOptions {
 				shpCrs = "EPSG:" + CRS.lookupEpsgCode(crs, true);
 				log.info("Using detected crs for {}: {}", shp, shpCrs);
 
-			} catch (IOException | FactoryException e) {
+			} catch (IOException | FactoryException | NullPointerException e) {
 				throw new IllegalStateException("Could not determine crs of the shape file. Try to specify it manually using --shp-crs.", e);
 			}
 		}

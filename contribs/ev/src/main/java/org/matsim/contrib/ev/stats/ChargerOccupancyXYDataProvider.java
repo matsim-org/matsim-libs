@@ -25,9 +25,7 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.util.XYDataCollector;
-import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
-import org.matsim.contrib.util.XYDataCollectors;
+import org.matsim.contrib.ev.stats.XYDataCollector.XYDataCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 

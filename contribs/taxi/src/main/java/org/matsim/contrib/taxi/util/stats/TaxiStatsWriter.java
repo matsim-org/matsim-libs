@@ -25,9 +25,9 @@ import java.util.List;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.schedule.TaxiTaskTypes;
-import org.matsim.contrib.util.CSVLineBuilder;
-import org.matsim.contrib.util.CompactCSVWriter;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.google.common.collect.ImmutableList;

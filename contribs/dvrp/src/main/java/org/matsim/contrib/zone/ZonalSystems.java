@@ -34,7 +34,7 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.common.collect.Maps;
