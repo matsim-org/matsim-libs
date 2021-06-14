@@ -58,6 +58,20 @@ public class RunPtStop2StopOffline {
         String sep2 = ";";
         String coordinateReferenceSystem = "EPSG:31468";
 
+        if (args.length >= 2) {
+            String pathInclRunIdAndDot = args[0];
+            eventsFile = pathInclRunIdAndDot + "output_events.xml.gz";
+            networkFile = pathInclRunIdAndDot + "output_network.xml.gz";
+            transitScheduleFile = pathInclRunIdAndDot + "output_transitSchedule.xml.gz";
+            transitVehiclesFile = pathInclRunIdAndDot + "output_transitVehicles.xml.gz";
+            outputCsvByDeparture = pathInclRunIdAndDot + "pt_stop2stop_departures.csv.gz";
+            outputCsvByLine = pathInclRunIdAndDot + "pt_stop2stop_lines.csv.gz";
+            outputShpByLine = pathInclRunIdAndDot + "pt_stop2stop_lines.shp";
+            sep = ",";
+            sep2 = ";";
+            coordinateReferenceSystem = args[1];
+        }
+
         Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
         //read network and schedule for shapefile coord drawing
