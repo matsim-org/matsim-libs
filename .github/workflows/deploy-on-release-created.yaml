@@ -24,7 +24,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 16
           distribution: 'adopt'
           server-id: matsim-releases
           server-username: MAVEN_USERNAME

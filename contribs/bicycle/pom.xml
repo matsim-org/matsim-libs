@@ -13,6 +13,12 @@
           <groupId>org.geotools</groupId>
           <artifactId>gt-geotiff</artifactId>
           <version>${geotools.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.glassfish.jaxb</groupId>
+                  <artifactId>jaxb-runtime</artifactId>
+              </exclusion>
+          </exclusions>
       </dependency>
       <dependency>
           <groupId>org.matsim.contrib</groupId>
