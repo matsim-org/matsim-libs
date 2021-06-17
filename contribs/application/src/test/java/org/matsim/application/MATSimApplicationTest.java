@@ -1,5 +1,12 @@
 package org.matsim.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,14 +20,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
 import picocli.CommandLine;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 public class MATSimApplicationTest {
 
@@ -81,7 +84,7 @@ public class MATSimApplicationTest {
 	}
 
 	@Test
-	public void population() {
+	public void population() throws MalformedURLException {
 
 		Path input = Path.of(utils.getClassInputDirectory());
 		Path output = Path.of(utils.getOutputDirectory());
@@ -107,13 +110,12 @@ public class MATSimApplicationTest {
 				"--num-trips", "2"
 		);
 
+		var actualContent = IOUtils.getInputStream(
+				output.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
+		var expectedContent = IOUtils.getInputStream(
+				input.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
 
-		Path result = output.resolve("test-100pct.plans-with-trips.xml.gz");
-
-		assertThat(result)
-				.exists()
-				.hasSameBinaryContentAs(input.resolve("test-100pct.plans-with-trips.xml.gz"));
-
+		assertThat(IOUtils.isEqual(actualContent, expectedContent)).isTrue();
 	}
 
 	@Test
