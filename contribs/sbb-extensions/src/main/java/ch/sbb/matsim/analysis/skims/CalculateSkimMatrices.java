@@ -172,6 +172,10 @@ public class CalculateSkimMatrices {
         skims.calculateBeelineMatrix();
     }
 
+    public Map<String, Coord[]> getCoordsPerZone() {
+        return coordsPerZone;
+    }
+
     public final void calculateSamplingPointsPerZoneFromFacilities(String facilitiesFilename, int numberOfPointsPerZone, String zonesShapeFilename, String zonesIdAttributeName, Random r,
             ToDoubleFunction<ActivityFacility> weightFunction) throws IOException {
         // load facilities
