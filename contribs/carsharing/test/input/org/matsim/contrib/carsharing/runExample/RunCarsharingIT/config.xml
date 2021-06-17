@@ -38,7 +38,7 @@
 	</module>
 
     <module name="Carsharing" >
-	    <param name="statsWriterFrequency" value="1" />
+	    <param name="statsWriterInterval" value="1" />
 		<param name="vehiclelocations" value="CarsharingStations.xml" />
 		<param name="membership" value="CSMembership.xml" />
 	</module>
@@ -52,12 +52,12 @@
 	<module name="OneWayCarsharing" >	    
         <param name="useOneWayCarsharing" value="true" />
         <!--  currently not used -->
-        <param name="searchDistanceOneWayCarsharing" value="1000.0" />
+        <param name="searchDistanceOneWayCarsharing" value="500.0" />
 	</module>
 
 	<module name="TwoWayCarsharing" >
         <param name="useTwoWayCarsharing" value="true" />
-        <param name="searchDistanceTwoWayCarsharing" value="10000.0" />
+        <param name="searchDistanceTwoWayCarsharing" value="500.0" />
 
 	</module>
 
