@@ -198,7 +198,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							log.info(mobsimagent + " is charging at home.");
 							break;
 
-						} else {
+						}
+						else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && !isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs) && pseudoVehicle.getBattery().getSoc() > 0) break;
+
+						else {
 							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
 							cnt--;
 
@@ -234,13 +237,16 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 		modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
 
+		String evMode = "car";
+		List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(evMode)).collect(toList());
+
 		for (PlanElement planElement : modifiablePlan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 
 				Leg leg = (Leg) planElement;
 				if (modesWithVehicles.contains(leg.getMode()) && VehicleUtils.getVehicleId(modifiablePlan.getPerson(), leg.getMode()).equals(originalVehicleId)) {
 					emulateVehicleDischarging(pseudoVehicle, leg);
-					if (pseudoVehicle.getBattery().getSoc() <= capacityThreshold) {
+					if (pseudoVehicle.getBattery().getSoc() <= capacityThreshold || evLegs.indexOf(leg) == evLegs.size()-1) {
 						return leg;
 					}
 				}
@@ -480,6 +486,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		DriveEnergyConsumption driveEnergyConsumption = ev.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = ev.getAuxEnergyConsumption();
 		double linkEnterTime = leg.getDepartureTime().seconds();
+
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, leg.getDepartureTime().seconds(), null, null);
 
