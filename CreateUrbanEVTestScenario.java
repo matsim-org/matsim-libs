@@ -40,7 +40,7 @@ import java.util.*;
 
 class CreateUrbanEVTestScenario {
 
-	static final double CAR_INITIAL_ENERGY = 5.;
+	static final double CAR_INITIAL_ENERGY = 4.;
 	static final double BIKE_INITIAL_ENERGY = 4.;
 
 	static Scenario createTestScenario(){
