@@ -93,20 +93,24 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        if (!TripStructureUtils.isStageActivityType(event.getActType()) || event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION))
+        if (!TripStructureUtils.isStageActivityType(event.getActType()))
         containers.stream()
                 .filter(container -> container.personId.equals(event.getPersonId()))
                 .findAny()
                 .get()
                 .acts.add(event.getActType());
 
-        if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
-            PersonContainer personContainer = new PersonContainer(event.getPersonId(), event.getActType(), event.getTime(), chargersAtLinks.get(event.getLinkId()));
+        else if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
+            String chargingActAndTime = event.getActType()+ String.valueOf(event.getTime());
+            containers.stream()
+                    .filter(container -> container.personId.equals(event.getPersonId()))
+                    .findAny()
+                    .get()
+                    .acts.add(chargingActAndTime);
+
+            PersonContainer personContainer = new PersonContainer(event.getPersonId(), chargingActAndTime , event.getTime(), chargersAtLinks.get(event.getLinkId()));
             personContainers.add(personContainer);
         }
-//        if(!TripStructureUtils.isStageActivityType(event.getActType())) {
-//            compute(actsPerPersons, event);
-//        }
 
     }
 
