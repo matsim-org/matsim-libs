@@ -650,7 +650,8 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
 //		}
-		return link.getAttributes().getAttribute(ORIGID).toString();
+		Object o = link.getAttributes().getAttribute(ORIGID);
+		return o == null ? null : o.toString();
 	}
 
 	public static void setOrigId( Link link, String id ) {
