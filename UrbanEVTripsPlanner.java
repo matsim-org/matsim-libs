@@ -177,7 +177,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 				do {
 					pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
-					legWithCriticalSOC = getLegWithCriticalSOC(modifiablePlan, pseudoVehicle, ev);
+					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
+					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
 
 					if (legWithCriticalSOC != null) {
 
@@ -199,7 +200,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							break;
 
 						}
-						else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && !isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs) && pseudoVehicle.getBattery().getSoc() > 0) break;
+
+						else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && pseudoVehicle.getBattery().getSoc() > capacityThreshold ) break;
 
 						else {
 							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
@@ -219,14 +221,14 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	}
 
 	/**
-	 * retruns leg for which the crtitical soc is exceeded or null energy is estimated to be sufficient
+	 * retruns leg for which the crtitical soc is exceeded or the last of all ev legs.
 	 *
 	 * @param modifiablePlan
 	 * @param pseudoVehicle
 	 * @param originalVehicleId
 	 * @return
 	 */
-	private Leg getLegWithCriticalSOC(Plan modifiablePlan, ElectricVehicle pseudoVehicle, Id<Vehicle> originalVehicleId) {
+	private Leg getCriticalOrLastEvLeg(Plan modifiablePlan, ElectricVehicle pseudoVehicle, Id<Vehicle> originalVehicleId) {
 		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
 
 
@@ -273,8 +275,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			} else throw new IllegalArgumentException();
 		}
 
-		//no crtitcal soc estimated
-		return null;
+
+		throw new IllegalStateException("should always return last ev leg");
 	}
 
 	/**
