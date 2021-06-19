@@ -63,9 +63,9 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -138,7 +138,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					.asEagerSingleton();
 		}
 
-		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
+		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
 			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
@@ -183,7 +183,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private DrtRouteCreatorProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
-			leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(drtCfg.getNumberOfThreads());
+			leastCostPathCalculatorFactory = new SpeedyALTFactory();
 		}
 
 		@Override

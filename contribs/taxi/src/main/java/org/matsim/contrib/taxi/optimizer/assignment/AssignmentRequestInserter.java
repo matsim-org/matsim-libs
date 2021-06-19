@@ -30,7 +30,7 @@ import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.Ass
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -50,7 +50,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	public AssignmentRequestInserter(Fleet fleet, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, TaxiScheduler scheduler, AssignmentTaxiOptimizerParams params) {
 		this(fleet, timer, network, travelTime, travelDisutility, scheduler, params,
-				new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime));
+				new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime));
 	}
 
 	public AssignmentRequestInserter(Fleet fleet, MobsimTimer timer, Network network, TravelTime travelTime,
