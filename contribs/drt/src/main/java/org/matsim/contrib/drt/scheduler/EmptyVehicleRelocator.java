@@ -32,7 +32,7 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -55,7 +55,7 @@ public class EmptyVehicleRelocator {
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
 	public void relocateVehicle(DvrpVehicle vehicle, Link link) {

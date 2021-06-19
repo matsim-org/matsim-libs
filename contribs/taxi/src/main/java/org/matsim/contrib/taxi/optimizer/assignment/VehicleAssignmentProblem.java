@@ -63,7 +63,7 @@ public class VehicleAssignmentProblem<D> {
 	private AssignmentDestinationData<D> dData;
 
 	public VehicleAssignmentProblem(Network network, TravelTime travelTime, TravelDisutility travelDisutility) {
-		// we do not need Euclidean router when there is no kNN filtering
+		// we do not need router when there is no kNN filtering
 		this(network, travelTime, travelDisutility, null, -1, -1);
 	}
 

@@ -33,8 +33,8 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
@@ -58,9 +58,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		this.network = network;
 		this.population = population;
 
-		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
-		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		LeastCostPathCalculatorFactory factory = new FastAStarEuclideanFactory();
+		LeastCostPathCalculatorFactory factory = new SpeedyALTFactory();
 		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
 				.mapToObj(i -> new DrtRouteCreator(drtCfg, network, factory, travelTime, travelDisutilityFactory))
@@ -80,7 +78,8 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
 		RouteFactories routeFactories = population.getFactory().getRouteFactories();
-		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, routeFactories));
+		drtLeg.setRoute(
+				drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, routeFactories));
 	}
 
 	@Override

@@ -32,8 +32,8 @@ import org.matsim.contrib.taxi.fare.TaxiFareHandler;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 
 /**
  * @author michalm
@@ -53,7 +53,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		install(new DvrpModeRoutingNetworkModule(getMode(), taxiCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new DvrpModeRoutingModule(getMode(), new FastAStarLandmarksFactory(getConfig().global())));
+		install(new DvrpModeRoutingModule(getMode(), new SpeedyALTFactory()));
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
