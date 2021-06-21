@@ -65,7 +65,11 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		}
 	}
 
+	/**
+	 * @deprecated use {@link #addDrtConfig(DrtConfigGroup)} instead.  kai, jun'21
+	 */
 	@Override
+	@Deprecated // use addDrtConfig(...) instead.  kai, jun'21
 	public void addParameterSet(ConfigGroup set) {
 		if (set instanceof DrtConfigGroup) {
 			super.addParameterSet(set);

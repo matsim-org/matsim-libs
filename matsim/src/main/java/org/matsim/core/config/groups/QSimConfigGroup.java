@@ -599,7 +599,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
 	
-	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING = //
+	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING =
 			"Flow capacity easing is activated for vehicles of size equal or smaller than the specified threshold. "
 			+ "Introduced to minimise the chances of buses being severely delayed in downsampled scenarios";
 	

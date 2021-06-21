@@ -218,6 +218,27 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		initSingletonParameterSets();
 	}
 
+	// typed setters (to make life easier):
+	public final void setDrtInsertionSearchParams( DrtInsertionSearchParams drtInsertionSearchParams ){
+		this.addParameterSet( drtInsertionSearchParams );
+	}
+	public final void setDrtZonalSystemParams( DrtZonalSystemParams drtZonalSystemParams ) {
+		this.addParameterSet( drtZonalSystemParams );
+	}
+	public final void setRebalancingParams( RebalancingParams rebalancingParams ) {
+		this.addParameterSet( rebalancingParams );
+	}
+	public final void setDrtFareParams( DrtFareParams drtFareParams ) {
+		this.addParameterSet( drtFareParams );
+	}
+	public final void setDrtSpeedUpParams( DrtSpeedUpParams drtSpeedUpParams ) {
+		this.addParameterSet( drtSpeedUpParams );
+	}
+	public final void setDrtRequestInsertionRetryParams( DrtRequestInsertionRetryParams drtRequestInsertionRetryParams ) {
+		this.addParameterSet( drtRequestInsertionRetryParams );
+	}
+
+
 	private void initSingletonParameterSets() {
 		//rebalancing (optional)
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
