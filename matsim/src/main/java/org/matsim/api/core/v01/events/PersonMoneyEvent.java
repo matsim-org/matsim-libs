@@ -86,7 +86,7 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	/**
 	 * @deprecated -- add "reference"
 	 */
-	@Deprecated // add "purpose" and "transactionPartner" and "reference"
+	@Deprecated // add "reference"
 	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
 							final String transactionPartner) {
 		this( time, agentId, amount, purpose, transactionPartner, null);
