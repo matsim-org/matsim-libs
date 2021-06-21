@@ -61,6 +61,7 @@ public abstract class ReflectiveConfigGroupWithConfigurableParameterSets extends
 
 	protected <T extends ConfigGroup> void addDefinition(String type, Supplier<T> creator, Supplier<ConfigGroup> getter,
 			Consumer<ConfigGroup> setter) {
+		// FIXME @michalm, could you please add javadoc to this method?  Thanks.  kai, jun'21
 		var oldDefinition = definitions.put(type, new Definition<>(creator, getter, setter));
 		Preconditions.checkState(oldDefinition == null, "Parameter set for type (%s) already defined", type);
 	}
