@@ -52,6 +52,8 @@ class RunDrtExample{
 			config = ConfigUtils.loadConfig( args );
 		} else {
 			configFile = "scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
+			// (we need a config file so that we have a relative path to other input files)
+
 			config = ConfigUtils.loadConfig( configFile );
 			config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");
 			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
@@ -74,7 +76,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -83,7 +85,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -92,7 +94,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
@@ -113,11 +115,6 @@ class RunDrtExample{
 		config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
 		config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
 		config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
-
-//		config.planCalcScore().addModeParams( new ModeParams( "drt_A_walk" ) );
-//		config.planCalcScore().addModeParams( new ModeParams( "drt_B_walk" ) );
-//		config.planCalcScore().addModeParams( new ModeParams( "drt_C_walk" ) );
-		// now seems to work without these.  kai, dec'20
 
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
