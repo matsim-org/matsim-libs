@@ -34,6 +34,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Collects all {@link PersonMoneyEvent}s and writes them out into a tsv file.
+ *
+ * @author vsp-gleich
+ */
 public class PersonMoneyEventsCollector implements PersonMoneyEventHandler {
 
     private final List<PersonMoneyEvent> personMoneyEventList = new ArrayList<>();

@@ -33,6 +33,12 @@ import org.matsim.core.controler.listener.StartupListener;
 
 import javax.inject.Inject;
 
+/**
+ * Adds aggregated personMoneyEvent table {@link PersonMoneyEventsAggregator} at each iteration and writes out all
+ * {@link org.matsim.api.core.v01.events.PersonMoneyEvent}s of the last iteration {@link PersonMoneyEventsCollector}.
+ *
+ * @author vsp-gleich
+ */
 public class PersonMoneyEventsAnalysisControlerListener implements IterationStartsListener, IterationEndsListener, ShutdownListener, StartupListener {
 
     @Inject

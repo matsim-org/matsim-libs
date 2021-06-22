@@ -23,6 +23,11 @@ package org.matsim.analysis.personMoney;
 import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
+/**
+ * Installs PersonMoneyEventsAnalysis
+ *
+ * @author vsp-gleich
+ */
 public class PersonMoneyEventsAnalysisModule extends AbstractModule {
     @Override
     public void install() {

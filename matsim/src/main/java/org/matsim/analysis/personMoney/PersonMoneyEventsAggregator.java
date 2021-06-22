@@ -35,6 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Sums up the amount of personMoneyEvents by purpose and transactionPartner
+ *
+ * @author vsp-gleich
+ */
 public class PersonMoneyEventsAggregator implements PersonMoneyEventHandler {
 
     private final Map<String, Map<String, Double>> personMoneyAmountSumByPurposeAndTransactionPartner = new HashMap<>();
