@@ -61,12 +61,12 @@ public class PersonMoneyEventsCollector implements PersonMoneyEventHandler {
     void writeAllPersonMoneyEvents(String outputFilename) {
         try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(outputFilename),
                 CSVFormat.DEFAULT.withDelimiter(DEL.charAt(0)))) {
-            csvPrinter.printRecord("time", "person", "amount", "purpose", "transactionPartner");
+            csvPrinter.printRecord("time", "person", "amount", "purpose", "transactionPartner", "reference");
 
             for (PersonMoneyEvent personMoneyEvent: personMoneyEventList) {
                 csvPrinter.printRecord(personMoneyEvent.getTime(), personMoneyEvent.getPersonId(),
                         personMoneyEvent.getAmount(), personMoneyEvent.getPurpose(),
-                        personMoneyEvent.getTransactionPartner());
+                        personMoneyEvent.getTransactionPartner(), personMoneyEvent.getReference());
             }
         } catch (IOException e) {
             Logger.getLogger(getClass()).error("Could not write " + outputFilename + ".");
