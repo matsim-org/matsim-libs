@@ -62,7 +62,7 @@ public class PersonMoneyEventsAnalysisControlerListener implements IterationStar
     public void notifyShutdown(ShutdownEvent event) {
         personMoneyEventsAggregator.writeOutput(outputDirectoryHierarchy.getOutputFilename("output_personMoneyEventsSums.tsv"));
         /* if write extensive output */
-        personMoneyEventsCollector.writeAllPersonMoneyEvents(outputDirectoryHierarchy.getOutputFilename("output_personMoneyEvents.tsv"));
+        personMoneyEventsCollector.writeAllPersonMoneyEvents(outputDirectoryHierarchy.getOutputFilename("output_personMoneyEvents.tsv.gz"));
     }
 
     @Override
