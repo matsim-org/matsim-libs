@@ -27,10 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +59,7 @@ public class PersonMoneyEventsCollector implements PersonMoneyEventHandler {
     }
 
     void writeAllPersonMoneyEvents(String outputFilename) {
-        try (CSVPrinter csvPrinter = new CSVPrinter(
-                Files.newBufferedWriter(Paths.get(outputFilename)),
+        try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(outputFilename),
                 CSVFormat.DEFAULT.withDelimiter(DEL.charAt(0)))) {
             csvPrinter.printRecord("time", "person", "amount", "purpose", "transactionPartner");
 
