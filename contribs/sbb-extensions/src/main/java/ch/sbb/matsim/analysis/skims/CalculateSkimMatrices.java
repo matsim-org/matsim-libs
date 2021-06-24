@@ -75,17 +75,17 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class CalculateSkimMatrices {
 
-    public static final String CAR_TRAVELTIMES_FILENAME = "car_traveltimes.csv.gz";
+    public static final String CAR_TRAVELTIMES_FILENAME = "car_travel_times.csv.gz";
     public static final String CAR_DISTANCES_FILENAME = "car_distances.csv.gz";
     public static final String PT_DISTANCES_FILENAME = "pt_distances.csv.gz";
-    public static final String PT_TRAVELTIMES_FILENAME = "pt_traveltimes.csv.gz";
-    public static final String PT_ACCESSTIMES_FILENAME = "pt_accesstimes.csv.gz";
-    public static final String PT_EGRESSTIMES_FILENAME = "pt_egresstimes.csv.gz";
+    public static final String PT_TRAVELTIMES_FILENAME = "pt_travel_times.csv.gz";
+    public static final String PT_ACCESSTIMES_FILENAME = "pt_access_times.csv.gz";
+    public static final String PT_EGRESSTIMES_FILENAME = "pt_egress_times.csv.gz";
     public static final String PT_FREQUENCIES_FILENAME = "pt_frequencies.csv.gz";
     public static final String PT_ADAPTIONTIMES_FILENAME = "pt_adaptiontimes.csv.gz";
-    public static final String PT_TRAINSHARE_BYDISTANCE_FILENAME = "pt_trainshare_bydistance.csv.gz";
-    public static final String PT_TRAINSHARE_BYTIME_FILENAME = "pt_trainshare_bytime.csv.gz";
-    public static final String PT_TRANSFERCOUNTS_FILENAME = "pt_transfercounts.csv.gz";
+    public static final String PT_TRAINSHARE_BYDISTANCE_FILENAME = "pt_train_distance_shares.csv.gz";
+    public static final String PT_TRAINSHARE_BYTIME_FILENAME = "pt_train_traveltime_shares.csv.gz";
+    public static final String PT_TRANSFERCOUNTS_FILENAME = "pt_transfer_counts.csv.gz";
     public static final String BEELINE_DISTANCE_FILENAME = "beeline_distances.csv.gz";
     public static final String ZONE_LOCATIONS_FILENAME = "zone_coordinates.csv";
     private static final Logger log = Logger.getLogger(CalculateSkimMatrices.class);
