@@ -206,9 +206,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			// (starts off relatively small (rightmost vehicle))
 
 			final double vehicleSpacing = mveh.getSizeInEquivalents() * spacingOfOnePCE;
-			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, vehicleSpacing, distanceFromFromNode,
-					now, freespeedTraveltime, remainingTravelTime);
-			// (starts off relatively large (rightmost vehicle))
+			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(
+					now, curvedLength, freeSpeed, vehicleSpacing, distanceFromFromNode, remainingTravelTime
+			);
 
 			int lane = VisUtils.guessLane(veh, numberOfLanesAsInt);
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
@@ -240,8 +240,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
-	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode,
-																 double now, double freespeedTraveltime, double remainingTravelTime);
+	public abstract double calculateOdometerDistanceFromFromNode(double time, double linkLength, double freespeed,
+			double spacing, double prevVehicleDistance, double remainingTravelTime);
 
 	private int positionStack(final Collection<AgentSnapshotInfo> positions, final Collection<QVehicle> vehicles, final int startCount) {
 
