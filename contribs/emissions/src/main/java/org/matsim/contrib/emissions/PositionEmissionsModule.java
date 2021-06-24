@@ -241,7 +241,13 @@ public class PositionEmissionsModule extends AbstractModule {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                     var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
                     eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
+                } else if (!previousPosition.getLinkId().equals(Id.createLinkId(1))) {
+                    log.warn("speed was too fast: " + speed + "m/s Current time: " + event.getTime() + " prev time: " + previousPosition.getTime() + " current linkId: " + event.getLinkId() + " prev linkId: " + previousPosition.getLinkId() + " agentId: " + event.getPersonId());
+                } else {
+                    log.warn("speed was to fast for first link change (" + speed + "m/s)");
                 }
+            } else {
+                log.warn("Distance was 0 or less. Distance: " + distanceToLastPosition + "m");
             }
         }
     }
