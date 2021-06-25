@@ -180,8 +180,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
 
-					if (legWithCriticalSOC != null) {
 
+					if (legWithCriticalSOC != null) {
 						String mode = legWithCriticalSOC.getMode();
 						List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
 
@@ -206,14 +206,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 						else {
 							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
 							cnt--;
-
-
 						}
-
+					} else {
+						throw new IllegalStateException("critical leg is null. should not happen");
 					}
 
 				} while (legWithCriticalSOC != null && cnt > 0);
-
 
 			}
 
@@ -239,16 +237,16 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
 		modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
 
-		String evMode = "car";
-		List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(evMode)).collect(toList());
+		Leg lastLegWithVehicle = null;
 
 		for (PlanElement planElement : modifiablePlan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 
 				Leg leg = (Leg) planElement;
 				if (modesWithVehicles.contains(leg.getMode()) && VehicleUtils.getVehicleId(modifiablePlan.getPerson(), leg.getMode()).equals(originalVehicleId)) {
+					lastLegWithVehicle = leg;
 					emulateVehicleDischarging(pseudoVehicle, leg);
-					if (pseudoVehicle.getBattery().getSoc() <= capacityThreshold || evLegs.indexOf(leg) == evLegs.size()-1) {
+					if (pseudoVehicle.getBattery().getSoc() <= capacityThreshold) {
 						return leg;
 					}
 				}
@@ -275,8 +273,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			} else throw new IllegalArgumentException();
 		}
 
-
-		throw new IllegalStateException("should always return last ev leg");
+		return lastLegWithVehicle;
 	}
 
 	/**
