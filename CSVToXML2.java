@@ -16,6 +16,7 @@ import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.run.drt.BerlinShpUtils;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
@@ -42,6 +43,10 @@ public class CSVToXML2 {
 
         List<List<String>> records = new ArrayList<>();
 
+
+        //matsim-berlin is in DHDN-GK4 (EPSG:31468)
+        CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -58,12 +63,7 @@ public class CSVToXML2 {
 
                 double x = Double.parseDouble(record.get(0));
                 double y = Double.parseDouble(record.get(1));
-                Coord coord1 = new Coord(x,y);
-
-
-
-
-
+                Coord coord1 = transformer.transform(new Coord(x,y));
 
                Link chargerLink = NetworkUtils.getNearestLink(network,coord1);
 
