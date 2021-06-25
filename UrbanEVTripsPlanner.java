@@ -185,7 +185,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 						String mode = legWithCriticalSOC.getMode();
 						List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
 
-
 						if (evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs) && pseudoVehicle.getBattery().getSoc() > 0) {
 
 							//trip leads to location of the first activity in the plan and there is a charger and so we can charge at home do not search for opportunity charge before
@@ -199,11 +198,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							log.info(mobsimagent + " is charging at home.");
 							break;
 
-						}
-
-						else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && pseudoVehicle.getBattery().getSoc() > capacityThreshold ) break;
-
-						else {
+						} else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && pseudoVehicle.getBattery().getSoc() > capacityThreshold ){
+							break;
+						} else {
 							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
 							cnt--;
 						}
@@ -417,7 +414,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Leg lastLeg = (Leg) routedSegment.get(routedSegment.size() - 1);
 		double now = lastLeg.getDepartureTime().seconds() + lastLeg.getRoute().getTravelTime().seconds();
 		trip.addAll(routedSegment);
-
 
 		//add plugin act
 		Activity pluginAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
