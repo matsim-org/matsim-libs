@@ -9,27 +9,18 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerWriter;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
-import org.matsim.core.network.NetworkUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVToXML {
+public class CSVToXMLmpm {
 
     public String fileName;
     List<ChargerSpecification> chargers = new ArrayList<>();
-    public CSVToXML(String fileName) throws IOException, CsvException {
+
+    public CSVToXMLmpm(String fileName) throws IOException, CsvException {
 
 
         try (CSVReader reader = new CSVReader(new FileReader(fileName))) {
@@ -106,7 +97,7 @@ public class CSVToXML {
 
     public static void main(String[] args) throws IOException, CsvException {
         String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
-        CSVToXML csvreader = new CSVToXML(fileName);
+        CSVToXMLmpm csvreader = new CSVToXMLmpm(fileName);
         new ChargerWriter(csvreader.chargers.stream()).write( "C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/chargers1.xml");
 
 
