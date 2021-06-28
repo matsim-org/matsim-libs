@@ -233,6 +233,10 @@ public final class VehicleUtils {
 	public static String getHbefaTechnology( EngineInformation ei ){
 		return (String) ei.getAttributes().getAttribute( HBEFA_TECHNOLOGY ) ;
 	}
+	/**
+	 * @param engineInformation -- from {@link VehicleType}
+	 * @param hbefaTechnology -- e.g. "petrol" or "diesel"
+	 */
 	public static void setHbefaTechnology( EngineInformation engineInformation, String hbefaTechnology ) {
 		engineInformation.getAttributes().putAttribute( HBEFA_TECHNOLOGY, hbefaTechnology ) ;
 	}
@@ -240,6 +244,10 @@ public final class VehicleUtils {
 	public static String getHbefaVehicleCategory( EngineInformation ei ){
 		return (String) ei.getAttributes().getAttribute( HBEFA_VEHICLE_CATEGORY_ ) ;
 	}
+	/**
+	 * @param engineInformation -- from {@link VehicleType}
+	 * @param hbefaVehicleCategory -- e.g. PASSENGER_CAR; valid categories are in HbefaVehicleCategory in the emissions contrib but cannot be javadoc-referenced from here.
+	 */
 	public static void setHbefaVehicleCategory( EngineInformation engineInformation, String hbefaVehicleCategory ) {
 		engineInformation.getAttributes().putAttribute( HBEFA_VEHICLE_CATEGORY_, hbefaVehicleCategory ) ;
 	}
@@ -247,6 +255,10 @@ public final class VehicleUtils {
 	public static String getHbefaSizeClass( EngineInformation ei ) {
 		return (String) ei.getAttributes().getAttribute(HBEFA_SIZE_CLASS);
 	}
+	/**
+	 * @param engineInformation -- from {@link VehicleType}
+	 * @param hbefaSizeClass -- e.g. "<1,4L" or ">=2L";
+	 */
 	public static void setHbefaSizeClass( EngineInformation engineInformation, String hbefaSizeClass ) {
 		engineInformation.getAttributes().putAttribute( HBEFA_SIZE_CLASS, hbefaSizeClass ) ;
 	}
@@ -254,6 +266,10 @@ public final class VehicleUtils {
 	public static String getHbefaEmissionsConcept( EngineInformation ei ) {
 		return (String) ei.getAttributes().getAttribute(HBEFA_EMISSIONS_CONCEPT);
 	}
+	/**
+	 * @param engineInformation -- from {@link VehicleType}
+	 * @param emissionsConcept -- e.g. "PC-P-Euro1" for petrol, or "PC-D-Euro-3" for diesel
+	 */
 	public static void setHbefaEmissionsConcept( EngineInformation engineInformation, String emissionsConcept ) {
 		engineInformation.getAttributes().putAttribute( HBEFA_EMISSIONS_CONCEPT, emissionsConcept ) ;
 	}

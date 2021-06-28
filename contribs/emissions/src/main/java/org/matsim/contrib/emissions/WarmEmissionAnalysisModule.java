@@ -567,7 +567,15 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		if (trafficSpeeds == null || !trafficSpeeds.containsKey(FREEFLOW)) {
 			throw new RuntimeException("At least the FREEFLOW condition must be specified for all emission factor keys. " +
-					"It was not found for " + efkey);
+					"It was not found for " +
+								   "vehicleCategory=" + efkey.getVehicleCategory() +
+								   ", hbefaEmissionsConcept=" + efkey.getVehicleAttributes().getHbefaEmConcept() +
+								   ", hbefaSizeClass=" + efkey.getVehicleAttributes().getHbefaSizeClass() +
+								   ", hbefaTechnology=" + efkey.getVehicleAttributes().getHbefaTechnology() +
+								   ", roadCategory=" + efkey.getRoadCategory()
+//								   ", trafficSituation=" + efkey.getTrafficSituation() +
+//								   ", component=" + efkey.getComponent() +
+			);
 		}
 
 		HbefaTrafficSituation trafficSituation  = FREEFLOW;
