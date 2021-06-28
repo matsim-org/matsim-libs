@@ -372,4 +372,13 @@ public final class VehicleUtils {
 		}
 		return vehicle ;
 	}
+
+	public static void writeVehicles( Vehicles vehicles, String filename) {
+		new MatsimVehicleWriter( vehicles ).writeFile( filename );
+	}
+
+	public static void writeAllvehicles( Scenario scenario, String filename ) {
+		new MatsimVehicleWriter( VehicleUtils.getOrCreateAllvehicles( scenario ) ).writeFile( filename );
+	}
+
 }
