@@ -67,6 +67,7 @@ public final class EmissionModule {
 		this.scenario = scenario;
 		this.emissionConfigGroup = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 		this.eventsManager = emissionConfigGroup.isWritingEmissionsEvents() ? eventsManager : EventsUtils.createEventsManager();
+		// yyyy I think that it would be better to force people to provide the EventsManager.  kai, jun'21
 
 		checkConfigConsistency();
 		//TODO: create roadtype mapping here from config
