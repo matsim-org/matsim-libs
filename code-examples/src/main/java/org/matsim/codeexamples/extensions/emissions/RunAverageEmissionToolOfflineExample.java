@@ -86,6 +86,8 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
+		// examples for how to set attributes to links and vehicles in order to make this work (already there for example scenario):
+
 //		for( Link link : scenario.getNetwork().getLinks().values() ){
 //			if ( true ) {
 //				EmissionUtils.setHbefaRoadType( link, "URB/Local/50" );
@@ -103,6 +105,8 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		// ---
 
+		// we do not want to run the full Controler.  In consequence, we plug together the infrastructure one needs in order to run the emissions contrib:
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		AbstractModule module = new AbstractModule(){
@@ -116,21 +120,20 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		com.google.inject.Injector injector = Injector.createInjector( config, module );
 
-		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
+		// the EmissionModule must be instantiated, otherwise it does not work:
+		injector.getInstance(EmissionModule.class);
 
 		// ---
 
-		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
-		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventOutputFileName );
-		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+		// add events writer into emissions event handler
+		eventsManager.addHandler( new EventWriterXML( config.controler().getOutputDirectory() + emissionEventOutputFileName ) );
 
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-		matsimEventsReader.readFile(eventsFile);
+		// read events file into the events reader.  EmissionsModule and events writer have been added as handlers, and will act accordingly.
+		new MatsimEventsReader(eventsManager).readFile(eventsFile );
 
-		emissionEventWriter.closeFile();
-
-		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( outputDirectory + "vehicles.xml.gz" );
-		NetworkUtils.writeNetwork( scenario.getNetwork(), outputDirectory + "network.xml.gz" );
+		// also write vehicles and network as a service so we have all out files in one directory:
+		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( config.controler().getOutputDirectory() + "vehicles.xml.gz" );
+		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "network.xml.gz" );
 
 	}
 
