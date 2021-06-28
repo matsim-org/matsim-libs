@@ -126,10 +126,14 @@ public final class RunAverageEmissionToolOfflineExample{
 		// ---
 
 		// add events writer into emissions event handler
-		eventsManager.addHandler( new EventWriterXML( config.controler().getOutputDirectory() + emissionEventOutputFileName ) );
+		final EventWriterXML eventWriterXML = new EventWriterXML( config.controler().getOutputDirectory() + emissionEventOutputFileName );
+		eventsManager.addHandler( eventWriterXML );
 
 		// read events file into the events reader.  EmissionsModule and events writer have been added as handlers, and will act accordingly.
 		new MatsimEventsReader(eventsManager).readFile(eventsFile );
+
+		// events writer needs to be explicitly closed, otherwise it does not work:
+		eventWriterXML.closeFile();
 
 		// also write vehicles and network as a service so we have all out files in one directory:
 		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( config.controler().getOutputDirectory() + "vehicles.xml.gz" );
