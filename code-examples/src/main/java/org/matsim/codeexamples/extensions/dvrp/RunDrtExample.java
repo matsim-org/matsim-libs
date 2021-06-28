@@ -100,22 +100,23 @@ class RunDrtExample{
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 		}
+		{
+			// clear strategy settings from config file:
+			config.strategy().clearStrategySettings();
 
-		// clear strategy settings from config file:
-		config.strategy().clearStrategySettings();
+			// configure mode choice so that travellers start using drt:
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.ChangeSingleTripMode ).setWeight( 0.1 ) );
+			config.changeMode().setModes( new String[]{TransportMode.car, DRT_A, DRT_B, DRT_C} );
 
-		// configure mode choice so that travellers start using drt:
-		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultStrategy.SubtourModeChoice ).setWeight( 0.1 ) );
-		config.subtourModeChoice().setModes( new String [] {TransportMode.car, DRT_A, DRT_B, DRT_C} );
-
-		// have a "normal" plans choice strategy:
-		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
-
-		// add params so that scoring works:
-		config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
-		config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
-		config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
-
+			// have a "normal" plans choice strategy:
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
+		}
+		{
+			// add params so that scoring works:
+			config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
+			config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
+			config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
+		}
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		ScenarioUtils.loadScenario( scenario );
@@ -132,7 +133,7 @@ class RunDrtExample{
 		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
 		otfVisConfigGroup.setLinkWidth( 5 );
 		otfVisConfigGroup.setDrawNonMovingItems( true );
-		controler.addOverridingModule( new OTFVisLiveModule() );
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 	}
