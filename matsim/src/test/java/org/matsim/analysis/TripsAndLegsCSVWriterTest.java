@@ -65,37 +65,38 @@ public class TripsAndLegsCSVWriterTest {
 	final Id<Link> link2 = Id.create(123160, Link.class);
 	final Id<Link> link3 = Id.create(130181, Link.class);
 	
-	private int dep_time;
-	private int trav_time;
-	private int traveled_distance;
-	private int euclidean_distance;
-	private int main_mode;
-	private int longest_distance_mode;
-	private int modes;
-	private int start_activity_type;
-	private int end_activity_type;
-	private int start_facility_id;
-	private int start_link;
-	private int start_x;
-	private int start_y;
-	private int end_facility_id;
-	private int end_link;
-	private int end_x;
-	private int end_y;
-	private int trip_id;
-	private int distance;
-	private int mode;
-	private int wait_time;
-	private int access_stop_id;
-	private int egress_stop_id;
-	private int transit_line;
-	private int transit_route;
-	private int first_pt_boarding_stop;
-	private int last_pt_egress_stop;
-	private int trip_number;
-	private int person;
-	private int transitStopsVisited;
-	private int isIntermodalWalkPt;
+	// initialize column array index with negative value -> note if they have been set
+	private int dep_time = -1;
+	private int trav_time = -1;
+	private int traveled_distance = -1;
+	private int euclidean_distance = -1;
+	private int main_mode = -1;
+	private int longest_distance_mode = -1;
+	private int modes = -1;
+	private int start_activity_type = -1;
+	private int end_activity_type = -1;
+	private int start_facility_id = -1;
+	private int start_link = -1;
+	private int start_x = -1;
+	private int start_y = -1;
+	private int end_facility_id = -1;
+	private int end_link = -1;
+	private int end_x = -1;
+	private int end_y = -1;
+	private int trip_id = -1;
+	private int distance = -1;
+	private int mode = -1;
+	private int wait_time = -1;
+	private int access_stop_id = -1;
+	private int egress_stop_id = -1;
+	private int transit_line = -1;
+	private int transit_route = -1;
+	private int first_pt_boarding_stop = -1;
+	private int last_pt_egress_stop = -1;
+	private int trip_number = -1;
+	private int person = -1;
+	private int transitStopsVisited = -1;
+	private int isIntermodalWalkPt = -1;
 	
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	ArrayList<Object> legsfromplan = new ArrayList<Object>();
@@ -347,18 +348,21 @@ public class TripsAndLegsCSVWriterTest {
 					if (boardingTime != null) {
 			            waitingTime = boardingTime - leg.getDepartureTime().seconds();
 			        }
+					String transitLine = "";
+					String transitRoute = "";
+					String ptAccessStop = "";
+					String ptEgressStop = "";
 					if (leg.getRoute() instanceof TransitPassengerRoute) {
 						 TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
-				         String transitLine = route.getLineId().toString();
-				         String transitRoute = route.getRouteId().toString();
-				         String ptAccessStop = route.getAccessStopId().toString();
-				         String ptEgressStop = route.getEgressStopId().toString();
-				         
-				         legvalues.put("access_stop_id", ptAccessStop);
-				         legvalues.put("egress_stop_id", ptEgressStop);
-				         legvalues.put("transit_line", transitLine);
-				         legvalues.put("transit_route", transitRoute);
+				         transitLine = route.getLineId().toString();
+				         transitRoute = route.getRouteId().toString();
+				         ptAccessStop = route.getAccessStopId().toString();
+				         ptEgressStop = route.getEgressStopId().toString();
 					 }
+					legvalues.put("access_stop_id", ptAccessStop);
+					legvalues.put("egress_stop_id", ptEgressStop);
+					legvalues.put("transit_line", transitLine);
+					legvalues.put("transit_route", transitRoute);
 					boolean containsWalk = false;
 					boolean containsPt = false;
 					if (leg.getMode().equals(TransportMode.walk) || leg.getMode().equals("walk_teleportation")) {
@@ -400,7 +404,7 @@ public class TripsAndLegsCSVWriterTest {
 			Iterator<Object> legItr = legsfromplan.iterator();
 			decideColumns(columnNames);
 			while ((line = br.readLine()) != null && legItr.hasNext()) {
-				String[] column = line.split(";");
+				String[] column = line.split(";", -1);
 				Map<String, Object> nextleg = (Map<String, Object>) legItr.next();
 				Assert.assertEquals("dep_time is not as expected", String.valueOf(nextleg.get("dep_time")) , column[dep_time]);
 				Assert.assertEquals("trav_time is not as expected", String.valueOf(nextleg.get("trav_time")) , column[trav_time]);
@@ -415,13 +419,12 @@ public class TripsAndLegsCSVWriterTest {
 				Assert.assertEquals("end_y is not as expected", String.valueOf(nextleg.get("end_y")) , column[end_y]);
 				Assert.assertEquals("person is not as expected", String.valueOf(nextleg.get("person")) , column[person]);
 				Assert.assertEquals("trip_id is not as expected", String.valueOf(nextleg.get("trip_id")) , column[trip_id]);
-				if(column.length > 13) {
-					Assert.assertEquals("access_stop_id is not as expected", String.valueOf(nextleg.get("access_stop_id")) , column[access_stop_id]);
-					Assert.assertEquals("egress_stop_id is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id]);
-					Assert.assertEquals("transit_line is not as expected", String.valueOf(nextleg.get("transit_line")) , column[transit_line]);
-					Assert.assertEquals("transit_route is not as expected", String.valueOf(nextleg.get("transit_route")) , column[transit_route]);
-				}
-				if(column.length > 17) {
+				Assert.assertEquals("access_stop_id is not as expected", String.valueOf(nextleg.get("access_stop_id")) , column[access_stop_id] != null ? column[access_stop_id] : "");
+				Assert.assertEquals("egress_stop_id is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id] != null ? column[egress_stop_id] : "");
+				Assert.assertEquals("transit_line is not as expected", String.valueOf(nextleg.get("transit_line")) , column[transit_line] != null ? column[transit_line] : "");
+				Assert.assertEquals("transit_route is not as expected", String.valueOf(nextleg.get("transit_route")) , column[transit_route] != null ? column[transit_route] : "");
+				if (isIntermodalWalkPt >= 0) {
+					// column from CustomLegsWriterExtension is present
 					Assert.assertEquals("isIntermodalWalkPt is not as expected", String.valueOf(nextleg.get("isIntermodalWalkPt")) , column[isIntermodalWalkPt]);
 				}
 			}
