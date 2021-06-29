@@ -75,6 +75,8 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	private final String dvrpMode;
 
+	private boolean wasConsolidatedInThisIteration = false;
+
 	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
 			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
 		this.dvrpMode = dvrpMode;
@@ -98,16 +100,19 @@ public class DrtVehicleOccupancyProfileCalculator
 				.orElse(0);
 	}
 
-	public void consolidate() {
-		for (VehicleState state : vehicleStates.values()) {
-			if (state.taskType != null) {
-				increment(state, analysisEndTime);
+	private void consolidate() {
+		if (!wasConsolidatedInThisIteration) {
+			for (VehicleState state : vehicleStates.values()) {
+				if (state.taskType != null) {
+					increment(state, analysisEndTime);
+				}
 			}
-		}
-		vehicleStates.clear();
+			vehicleStates.clear();
 
-		nonPassengerServingTaskProfiles.values().forEach(this::normalizeProfile);
-		vehicleOccupancyProfiles.forEach(this::normalizeProfile);
+			nonPassengerServingTaskProfiles.values().forEach(this::normalizeProfile);
+			vehicleOccupancyProfiles.forEach(this::normalizeProfile);
+			wasConsolidatedInThisIteration = true;
+		}
 	}
 
 	private void normalizeProfile(double[] profile) {
@@ -117,10 +122,16 @@ public class DrtVehicleOccupancyProfileCalculator
 	}
 
 	public Map<Task.TaskType, double[]> getNonPassengerServingTaskProfiles() {
+		if (!wasConsolidatedInThisIteration) {
+			this.consolidate();
+		}
 		return nonPassengerServingTaskProfiles;
 	}
 
 	public List<double[]> getVehicleOccupancyProfiles() {
+		if (!wasConsolidatedInThisIteration) {
+			this.consolidate();
+		}
 		return vehicleOccupancyProfiles;
 	}
 
@@ -227,5 +238,6 @@ public class DrtVehicleOccupancyProfileCalculator
 				.collect(toImmutableList());
 
 		nonPassengerServingTaskProfiles = new HashMap<>();
+		wasConsolidatedInThisIteration = false;
 	}
 }
