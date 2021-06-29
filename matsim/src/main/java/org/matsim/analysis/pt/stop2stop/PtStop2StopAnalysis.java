@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.pt.stop2stop;
+package org.matsim.analysis.pt.stop2stop;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -403,7 +403,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         }
     }
 
-    public static final BinaryOperator<Stop2StopAggregation> aggregateStop2StopAggregations() {
+    public static BinaryOperator<Stop2StopAggregation> aggregateStop2StopAggregations() {
         return (entry1, entry2) -> new PtStop2StopAnalysis.Stop2StopAggregation(entry1.getDepartures() + entry2.getDepartures(), entry1.getPassengers() + entry2.getPassengers(),
                 entry1.getTotalVehicleCapacity() + entry2.getTotalVehicleCapacity());
     }

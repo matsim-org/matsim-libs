@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.pt.stop2stop;
+package org.matsim.analysis.pt.stop2stop;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static playground.vsp.analysis.modules.pt.stop2stop.PtStop2StopAnalysis.aggregateStop2StopAggregations;
+import static org.matsim.analysis.pt.stop2stop.PtStop2StopAnalysis.aggregateStop2StopAggregations;
 
 /**
  * Write a shape file with passenger volumes, delays and similar information for each stop to stop
@@ -107,7 +107,7 @@ public class PtStop2StopAnalysis2Shp {
     }
 
     public static void writePtStop2StopAnalysisByTransitLine2CsvFile(
-            final Scenario scenario, final List<PtStop2StopAnalysis.Stop2StopEntry> stop2StopEntriesForEachDeparture, String fileNameCsv, String separatorCsv) {
+            final List<PtStop2StopAnalysis.Stop2StopEntry> stop2StopEntriesForEachDeparture, String fileNameCsv, String separatorCsv) {
 
         // sum per link and transit line
         Map<Id<Link>, Map<Id<TransitLine>, PtStop2StopAnalysis.Stop2StopAggregation>> stop2stopByLinkAndTransitLineAggregates = aggregatePerLinkAndLine(stop2StopEntriesForEachDeparture);
@@ -131,7 +131,7 @@ public class PtStop2StopAnalysis2Shp {
     }
 
     private static Map<Id<Link>, Map<Id<TransitLine>, PtStop2StopAnalysis.Stop2StopAggregation>> aggregatePerLinkAndLine(List<PtStop2StopAnalysis.Stop2StopEntry> stop2StopEntriesForEachDeparture) {
-        Map<Id<Link>, Map<Id<TransitLine>, PtStop2StopAnalysis.Stop2StopAggregation>> stop2stopByLinkAndTransitLineAggregates = stop2StopEntriesForEachDeparture.stream()
+        return stop2StopEntriesForEachDeparture.stream()
                 .flatMap(stop2StopEntry -> stop2StopEntry.linkIdsSincePreviousStop.stream()
                         .map(linkId -> new AbstractMap.SimpleEntry<>(linkId, stop2StopEntry)))
                 .collect(Collectors.groupingBy(entry -> entry.getKey(), Collectors.toMap(
@@ -139,7 +139,6 @@ public class PtStop2StopAnalysis2Shp {
                         entry -> new PtStop2StopAnalysis.Stop2StopAggregation(1, entry.getValue().passengersAtArrival, entry.getValue().totalVehicleCapacity),
                         aggregateStop2StopAggregations(),
                         TreeMap::new)));
-        return stop2stopByLinkAndTransitLineAggregates;
     }
 
     private static void createLinkFeatureFromStop2StopAggregation(Scenario scenario, SimpleFeatureBuilder linkFeatureBuilder, Collection<SimpleFeature> features, GeometryFactory geofac, Id<Link> linkId, String transitLineId, PtStop2StopAnalysis.Stop2StopAggregation stop2StopAggregation) {

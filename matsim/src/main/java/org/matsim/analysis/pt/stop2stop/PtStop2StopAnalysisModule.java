@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.pt.stop2stop;
+package org.matsim.analysis.pt.stop2stop;
 
 import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.pt.stop2stop;
+package org.matsim.analysis.pt.stop2stop;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -55,7 +55,7 @@ public class PtStop2StopAnalysisControlerListener implements IterationStartsList
     public void notifyIterationStarts(IterationStartsEvent event) {
         if (event.isLastIteration()) {
             // the above hopefully points to TerminationCriterion, if not working should be fixed in IterationStartsEvent.isLastIteration()
-            // registering this handler here hopefully avoids having it running in previous iterations, when we prefer saving computation time over havinfg this analysis output
+            // registering this handler here hopefully avoids having it running in previous iterations, when we prefer saving computation time over having this analysis output
             eventsManager.addHandler(ptStop2StopAnalysis);
         }
     }
