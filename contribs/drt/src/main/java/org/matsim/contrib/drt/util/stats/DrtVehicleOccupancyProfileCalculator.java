@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.Id;
@@ -142,9 +143,12 @@ public class DrtVehicleOccupancyProfileCalculator
 		return timeDiscretizer;
 	}
 
-	public double getMinStayTaskVehiclesOverDay() {
+	public OptionalDouble getMinStayTaskVehiclesOverDay() {
 		double[] stayTask = getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
-		return Arrays.stream(stayTask).min().orElse(0.0);
+		if (stayTask == null) {
+			return OptionalDouble.empty();
+		}
+		return Arrays.stream(stayTask).min();
 	}
 
 	private void increment(VehicleState state, double endTime) {

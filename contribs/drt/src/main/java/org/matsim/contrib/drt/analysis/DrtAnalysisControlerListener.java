@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -71,6 +72,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final String runId;
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
+	private final String notAvailableString = "NA";
 
 	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
 										DrtVehicleDistanceStats drtVehicleStats, MatsimServices matsimServices,
@@ -84,7 +86,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		this.drtVehicleOccupancyProfileCalculator = drtVehicleOccupancyProfileCalculator;
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
-		runId = Optional.ofNullable(config.controler().getRunId()).orElse("N/A");
+		runId = Optional.ofNullable(config.controler().getRunId()).orElse(notAvailableString);
 		maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -134,11 +136,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 						rejectionRate), event.getIteration());
 		double l_d = DrtTripsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (trips.size()
 				* directDistanceMean);
+		OptionalDouble minStayTaskVehiclesOverDay = drtVehicleOccupancyProfileCalculator.getMinStayTaskVehiclesOverDay();
 		String vehStats = DrtTripsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), ";")
 				+ ";"
 				+ format.format(l_d)
 				+ ";"
-				+ format.format(drtVehicleOccupancyProfileCalculator.getMinStayTaskVehiclesOverDay());
+				+ (minStayTaskVehiclesOverDay.isPresent() ? format.format(minStayTaskVehiclesOverDay.getAsDouble()) : notAvailableString);
 		String occStats = DrtTripsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), ";",
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
