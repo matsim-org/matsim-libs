@@ -65,7 +65,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
-	private boolean acceptModeParamsWithoutClearing = false;
+	private boolean acceptModeParamsWithoutClearing;
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
@@ -468,10 +468,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		} else if (RANDOMNESS.equals( key ) ) {
 			this.setRoutingRandomness( Double.parseDouble( value ) );
 		}
-//		else if (ISINSERTINGACCESSEGRESSWALK.equals( key ) ) {
-//			this.setInsertingAccessEgressWalk(AccessEgressType.valueOf(value));
-//		}
-//		TODO: uncomment this for release 13.0
+		else if (ACCESSEGRESSTYPE.equals( key ) ) {
+			this.setAccessEgressType(AccessEgressType.valueOf(value));
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -483,8 +482,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
-//		map.put(  ISINSERTINGACCESSEGRESSWALK,getAccessEgressType().toString()) ;
-//TODO: uncomment this for release 13.0
+		map.put(  ACCESSEGRESSTYPE, getAccessEgressType().toString()) ;
 		return map;
 	}
 

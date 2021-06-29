@@ -42,7 +42,7 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.router.FastAStarLandmarksFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -72,7 +72,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(),
-				new FastAStarLandmarksFactory(drtCfg.getNumberOfThreads()));
+				new SpeedyALTFactory());
 	}
 
 	@VisibleForTesting

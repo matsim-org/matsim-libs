@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 
@@ -30,7 +31,7 @@ import picocli.CommandLine;
         showDefaultValues = true
 )
 @Deprecated
-public class RemoveRoutesFromPlans implements Callable<Integer> {
+public class RemoveRoutesFromPlans implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--plans", description = "Input original plan file", required = true)
     private Path plans;

@@ -51,8 +51,8 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -118,8 +118,8 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				Network network = getModalInstance(Network.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				LeastCostPathCalculator router = new FastAStarLandmarksFactory(
-						getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
+				LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility,
+						travelTime);
 				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
 			}
 		}).asEagerSingleton();

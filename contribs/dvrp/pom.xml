@@ -37,16 +37,6 @@
 			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>locationchoice</artifactId>
-			<version>14.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>sbb-extensions</artifactId>
-			<version>14.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 		</dependency>

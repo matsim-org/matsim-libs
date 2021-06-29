@@ -38,8 +38,8 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.core.router.AStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 
 import com.google.inject.Singleton;
 
@@ -61,7 +61,7 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		install(new DvrpModeRoutingNetworkModule(getMode(), false));
 
-		install(new DvrpModeRoutingModule(getMode(), new AStarEuclideanFactory()));
+		install(new DvrpModeRoutingModule(getMode(), new SpeedyDijkstraFactory()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new FleetModule(getMode(), fleetSpecificationUrl));

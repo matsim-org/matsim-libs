@@ -47,8 +47,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.TeleportationRoutingModule;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.facilities.ActivityFacilities;
@@ -91,7 +91,7 @@ public class DrtRoutingModuleTest {
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
+				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,

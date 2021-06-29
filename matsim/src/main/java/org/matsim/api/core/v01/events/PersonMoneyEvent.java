@@ -41,11 +41,13 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 	public static final String ATTRIBUTE_PURPOSE = "purpose";
 	public static final String ATTRIBUTE_TRANSACTION_PARTNER = "transactionPartner";
+	public static final String ATTRIBUTE_REFERENCE = "reference";
 
 	private final Id<Person> personId;
 	private final double amount;
 	private final String purpose;
 	private final String transactionPartner;
+	private final String reference;
 
 	/**
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
@@ -62,21 +64,32 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	 * @param amount
 	 * @param purpose (not required by dtd)
 	 * @param transactionPartner (not required by dtd)
+	 * @param reference (not required by dtd)
 	 */
 	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
-				final String transactionPartner) {
+				final String transactionPartner, final String reference) {
 		super(time);
 		this.personId = agentId;
 		this.amount = amount;
 		this.purpose = purpose;
 		this.transactionPartner = transactionPartner;
+		this.reference = reference;
 	}
 	/**
-	 * @deprecated -- add "purpose" and "transactionPartner"
+	 * @deprecated -- add "purpose" and "transactionPartner" and "reference"
 	 */
-	@Deprecated // add "purpose" and "transactionPartner"
+	@Deprecated // add "purpose" and "transactionPartner" and "reference"
 	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
-		this( time, agentId, amount, null, null);
+		this( time, agentId, amount, null, null, null);
+	}
+
+	/**
+	 * @deprecated -- add "reference"
+	 */
+	@Deprecated // add "reference"
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
+							final String transactionPartner) {
+		this( time, agentId, amount, purpose, transactionPartner, null);
 	}
 
 	public Id<Person> getPersonId() {
@@ -95,6 +108,10 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 		return this.transactionPartner;
 	}
 
+	public String getReference() {
+		return this.reference;
+	}
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
@@ -110,6 +127,9 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 		}
 		if (this.transactionPartner != null) {
 			attr.put(ATTRIBUTE_TRANSACTION_PARTNER, this.transactionPartner);
+		}
+		if (this.reference != null) {
+			attr.put(ATTRIBUTE_REFERENCE, this.reference);
 		}
 		return attr;
 	}
