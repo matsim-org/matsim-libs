@@ -46,6 +46,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Collects data to create Route-Time-Diagrams based on the actual simulation.
@@ -59,24 +61,16 @@ public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, V
 	/**
 	 * Map containing for each vehicle a list of positions, stored as StopFacility Ids and the time.
 	 */
-	private final Map<Id, List<Tuple<Id, Double>>> positions = new HashMap<Id, List<Tuple<Id, Double>>>();
+	private final Map<Id<Vehicle>, List<Tuple<Id<TransitStopFacility>, Double>>> positions = new HashMap<>();
 
 	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
-		List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
-		if (list == null) {
-			list = new ArrayList<Tuple<Id, Double>>();
-			this.positions.put(event.getVehicleId(), list);
-		}
-		list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
+		List<Tuple<Id<TransitStopFacility>, Double>> list = this.positions.computeIfAbsent(event.getVehicleId(), k -> new ArrayList<>());
+		list.add(new Tuple<>(event.getFacilityId(), event.getTime()));
 	}
 
 	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
-		List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
-		if (list == null) {
-			list = new ArrayList<Tuple<Id, Double>>();
-			this.positions.put(event.getVehicleId(), list);
-		}
-		list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
+		List<Tuple<Id<TransitStopFacility>, Double>> list = this.positions.computeIfAbsent(event.getVehicleId(), k -> new ArrayList<>());
+		list.add(new Tuple<>(event.getFacilityId(), event.getTime()));
 	}
 
 	public void reset(final int iteration) {
@@ -84,8 +78,8 @@ public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, V
 	}
 
 	public void writeData() {
-		for (List<Tuple<Id, Double>> list : this.positions.values()) {
-			for (Tuple<Id, Double> info : list) {
+		for (List<Tuple<Id<TransitStopFacility>, Double>> list : this.positions.values()) {
+			for (Tuple<Id<TransitStopFacility>, Double> info : list) {
 				System.out.println(info.getFirst().toString() + "\t" + info.getSecond().toString());
 			}
 			System.out.println();
@@ -94,14 +88,14 @@ public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, V
 
 	public void createGraph(final String filename, final TransitRoute route) {
 
-		HashMap<Id, Integer> stopIndex = new HashMap<Id, Integer>();
+		HashMap<Id<TransitStopFacility>, Integer> stopIndex = new HashMap<>();
 		int idx = 0;
 		for (TransitRouteStop stop : route.getStops()) {
 			stopIndex.put(stop.getStopFacility().getId(), idx);
 			idx++;
 		}
 
-		HashSet<Id> vehicles = new HashSet<Id>();
+		HashSet<Id<Vehicle>> vehicles = new HashSet<>();
 		for (Departure dep : route.getDepartures().values()) {
 			vehicles.add(dep.getVehicleId());
 		}
@@ -111,13 +105,13 @@ public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, V
 		double earliestTime = Double.POSITIVE_INFINITY;
 		double latestTime = Double.NEGATIVE_INFINITY;
 
-		for (Map.Entry<Id, List<Tuple<Id, Double>>> entry : this.positions.entrySet()) {
+		for (Map.Entry<Id<Vehicle>, List<Tuple<Id<TransitStopFacility>, Double>>> entry : this.positions.entrySet()) {
 			if (vehicles.contains(entry.getKey())) {
 				XYSeries series = new XYSeries("t", false, true);
-				for (Tuple<Id, Double> pos : entry.getValue()) {
+				for (Tuple<Id<TransitStopFacility>, Double> pos : entry.getValue()) {
 					Integer stopIdx = stopIndex.get(pos.getFirst());
 					if (stopIdx != null) {
-						double time = pos.getSecond().doubleValue();
+						double time = pos.getSecond();
 						series.add(stopIdx.intValue(), time);
 						if (time < earliestTime) {
 							earliestTime = time;

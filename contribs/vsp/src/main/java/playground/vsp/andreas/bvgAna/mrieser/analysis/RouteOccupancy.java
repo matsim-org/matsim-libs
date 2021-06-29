@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Keeps track of the total number of passengers entering and leaving a transit
@@ -41,13 +43,13 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class RouteOccupancy implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private static final Integer Int1 = Integer.valueOf(1);
+	private static final Integer Int1 = 1;
 
 	private final TransitRoute transitRoute;
 	private final VehicleTracker tracker;
-	private Set<Id> routeVehicles = null;
-	private final Map<Id, Integer> enteringPassengers = new HashMap<Id, Integer>();
-	private final Map<Id, Integer> leavingPassengers = new HashMap<Id, Integer>();
+	private Set<Id<Vehicle>> routeVehicles = null;
+	private final Map<Id<TransitStopFacility>, Integer> enteringPassengers = new HashMap<>();
+	private final Map<Id<TransitStopFacility>, Integer> leavingPassengers = new HashMap<>();
 
 	public RouteOccupancy(final TransitRoute transitRoute, final VehicleTracker tracker) {
 		this.transitRoute = transitRoute;
@@ -59,12 +61,12 @@ public class RouteOccupancy implements PersonEntersVehicleEventHandler, PersonLe
 			collectVehiclesInfo();
 		}
 		if (this.routeVehicles.contains(event.getVehicleId())) {
-			Id facilityId = this.tracker.getFacilityIdForVehicle(event.getVehicleId());
+			Id<TransitStopFacility> facilityId = this.tracker.getFacilityIdForVehicle(event.getVehicleId());
 			Integer count = this.enteringPassengers.get(facilityId);
 			if (count == null) {
 				this.enteringPassengers.put(facilityId, Int1);
 			} else {
-				this.enteringPassengers.put(facilityId, Integer.valueOf(1 + count.intValue()));
+				this.enteringPassengers.put(facilityId, 1 + count);
 			}
 		}
 	}
@@ -74,12 +76,12 @@ public class RouteOccupancy implements PersonEntersVehicleEventHandler, PersonLe
 			collectVehiclesInfo();
 		}
 		if (this.routeVehicles.contains(event.getVehicleId())) {
-			Id facilityId = this.tracker.getFacilityIdForVehicle(event.getVehicleId());
+			Id<TransitStopFacility> facilityId = this.tracker.getFacilityIdForVehicle(event.getVehicleId());
 			Integer count = this.leavingPassengers.get(facilityId);
 			if (count == null) {
 				this.leavingPassengers.put(facilityId, Int1);
 			} else {
-				this.leavingPassengers.put(facilityId, Integer.valueOf(1 + count.intValue()));
+				this.leavingPassengers.put(facilityId, 1 + count);
 			}
 		}
 	}
@@ -90,27 +92,27 @@ public class RouteOccupancy implements PersonEntersVehicleEventHandler, PersonLe
 		this.leavingPassengers.clear();
 	}
 
-	public int getNumberOfEnteringPassengers(final Id stopFacilityId) {
+	public int getNumberOfEnteringPassengers(final Id<TransitStopFacility> stopFacilityId) {
 		Integer count = this.enteringPassengers.get(stopFacilityId);
 		if (count == null) {
 			return 0;
 		}
-		return count.intValue();
+		return count;
 	}
 
-	public int getNumberOfLeavingPassengers(final Id stopFacilityId) {
+	public int getNumberOfLeavingPassengers(final Id<TransitStopFacility> stopFacilityId) {
 		Integer count = this.leavingPassengers.get(stopFacilityId);
 		if (count == null) {
 			return 0;
 		}
-		return count.intValue();
+		return count;
 	}
 
 	/**
 	 * Lazy initialization, as the vehicle info may not be available from the beginning.
 	 */
 	private void collectVehiclesInfo() {
-		Set<Id> set = new HashSet<Id>(this.transitRoute.getDepartures().size()*2);
+		Set<Id<Vehicle>> set = new HashSet<>(this.transitRoute.getDepartures().size()*2);
 
 		for (Departure departure : this.transitRoute.getDepartures().values()) {
 			if (departure.getVehicleId() != null) {
