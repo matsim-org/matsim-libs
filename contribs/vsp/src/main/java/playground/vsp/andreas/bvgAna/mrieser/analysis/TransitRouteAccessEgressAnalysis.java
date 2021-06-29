@@ -35,6 +35,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Keeps track of the number of passengers entering and leaving each single
@@ -45,9 +47,9 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 public class TransitRouteAccessEgressAnalysis implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	public final TransitRoute transitRoute;
-	public Map<Id, Departure> headings = null;
-	private final Map<Departure, Map<Id, Integer>> accessCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
-	private final Map<Departure, Map<Id, Integer>> egressCounters = new LinkedHashMap<Departure, Map<Id, Integer>>();
+	public Map<Id<Vehicle>, Departure> headings = null;
+	private final Map<Departure, Map<Id<TransitStopFacility>, Integer>> accessCounters = new LinkedHashMap<>();
+	private final Map<Departure, Map<Id<TransitStopFacility>, Integer>> egressCounters = new LinkedHashMap<>();
 	private final VehicleTracker vehTracker;
 
 	public TransitRouteAccessEgressAnalysis(final TransitRoute transitRoute, final VehicleTracker vehicleTracker) {
@@ -61,14 +63,9 @@ public class TransitRouteAccessEgressAnalysis implements PersonEntersVehicleEven
 		}
 		Departure dep = this.headings.get(event.getVehicleId());
 		if (dep != null) {
-			Id fId = this.vehTracker.getFacilityIdForVehicle(event.getVehicleId());
-			Map<Id, Integer> counter = getAccessCounter(dep);
-			Integer count = counter.get(fId);
-			if (count == null) {
-				counter.put(fId, Integer.valueOf(1));
-			} else {
-				counter.put(fId, Integer.valueOf(1 + count.intValue()));
-			}
+			Id<TransitStopFacility> fId = this.vehTracker.getFacilityIdForVehicle(event.getVehicleId());
+			Map<Id<TransitStopFacility>, Integer> counter = getAccessCounter(dep);
+			counter.merge(fId, 1, Integer::sum);
 		}
 	}
 
@@ -78,14 +75,9 @@ public class TransitRouteAccessEgressAnalysis implements PersonEntersVehicleEven
 		}
 		Departure dep = this.headings.get(event.getVehicleId());
 		if (dep != null) {
-			Id fId = this.vehTracker.getFacilityIdForVehicle(event.getVehicleId());
-			Map<Id, Integer> counter = getEgressCounter(dep);
-			Integer count = counter.get(fId);
-			if (count == null) {
-				counter.put(fId, Integer.valueOf(1));
-			} else {
-				counter.put(fId, Integer.valueOf(1 + count.intValue()));
-			}
+			Id<TransitStopFacility> fId = this.vehTracker.getFacilityIdForVehicle(event.getVehicleId());
+			Map<Id<TransitStopFacility>, Integer> counter = getEgressCounter(dep);
+			counter.merge(fId, 1, Integer::sum);
 		}
 	}
 
@@ -96,35 +88,35 @@ public class TransitRouteAccessEgressAnalysis implements PersonEntersVehicleEven
 	}
 
 	public void printStats() {
-		List<Id> stopFacilityIds = new ArrayList<Id>(this.transitRoute.getStops().size());
+		List<Id<TransitStopFacility>> stopFacilityIds = new ArrayList<>(this.transitRoute.getStops().size());
 		for (TransitRouteStop stop : this.transitRoute.getStops()) {
 			stopFacilityIds.add(stop.getStopFacility().getId());
 		}
 
 		System.out.print("stops/departure");
-		for (Id id : stopFacilityIds) {
+		for (Id<TransitStopFacility> id : stopFacilityIds) {
 			System.out.print("\t" + id);
 		}
 		System.out.println();
 		for (Departure departure : this.headings.values()) {
 			System.out.print(Time.writeTime(departure.getDepartureTime()));
-			Map<Id, Integer> accessCounter = getAccessCounter(departure);
-			for (Id id : stopFacilityIds) {
+			Map<Id<TransitStopFacility>, Integer> accessCounter = getAccessCounter(departure);
+			for (Id<TransitStopFacility> id : stopFacilityIds) {
 				Integer value = accessCounter.get(id);
 				System.out.print("\t");
 				if (value != null) {
-					System.out.print(value.toString());
+					System.out.print(value);
 				} else {
 					System.out.print("0");
 				}
 			}
 			System.out.println();
-			Map<Id, Integer> egressCounter = getEgressCounter(departure);
-			for (Id id : stopFacilityIds) {
+			Map<Id<TransitStopFacility>, Integer> egressCounter = getEgressCounter(departure);
+			for (Id<TransitStopFacility> id : stopFacilityIds) {
 				Integer value = egressCounter.get(id);
 				System.out.print("\t");
 				if (value != null) {
-					System.out.print(value.toString());
+					System.out.print(value);
 				} else {
 					System.out.print("0");
 				}
@@ -133,29 +125,19 @@ public class TransitRouteAccessEgressAnalysis implements PersonEntersVehicleEven
 		}
 	}
 
-	public Map<Id, Integer> getAccessCounter(final Departure departure) {
-		Map<Id, Integer> counter = this.accessCounters.get(departure);
-		if (counter == null) {
-			counter = new HashMap<Id, Integer>();
-			this.accessCounters.put(departure, counter);
-		}
-		return counter;
+	public Map<Id<TransitStopFacility>, Integer> getAccessCounter(final Departure departure) {
+		return this.accessCounters.computeIfAbsent(departure, k -> new HashMap<>());
 	}
 
-	public Map<Id, Integer> getEgressCounter(final Departure departure) {
-		Map<Id, Integer> counter = this.egressCounters.get(departure);
-		if (counter == null) {
-			counter = new HashMap<Id, Integer>();
-			this.egressCounters.put(departure, counter);
-		}
-		return counter;
+	public Map<Id<TransitStopFacility>, Integer> getEgressCounter(final Departure departure) {
+		return this.egressCounters.computeIfAbsent(departure, k -> new HashMap<>());
 	}
 
 	/**
 	 * Lazy initialization, as the vehicle info may not be available from the beginning.
 	 */
 	private void collectHeadingsInfo() {
-		Map<Id, Departure> map = new HashMap<Id, Departure>(this.transitRoute.getDepartures().size()*2);
+		Map<Id<Vehicle>, Departure> map = new HashMap<>(this.transitRoute.getDepartures().size()*2);
 
 		for (Departure departure : this.transitRoute.getDepartures().values()) {
 			if (departure.getVehicleId() != null) {
