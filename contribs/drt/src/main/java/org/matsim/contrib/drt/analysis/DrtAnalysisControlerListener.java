@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -52,6 +53,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
+ * TODO: replace hard coded ; with delimiter variable
+ *
  * @author jbischoff
  */
 public class DrtAnalysisControlerListener implements IterationEndsListener {
@@ -60,6 +63,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final MatsimServices matsimServices;
 	private final Network network;
 	private final DrtRequestAnalyzer drtRequestAnalyzer;
+	private final DrtVehicleOccupancyProfileCalculator drtVehicleOccupancyProfileCalculator;
 	private final DrtConfigGroup drtCfg;
 	private final QSimConfigGroup qSimCfg;
 	private boolean headerWritten = false;
@@ -69,12 +73,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final int maxcap;
 
 	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
-			DrtVehicleDistanceStats drtVehicleStats, MatsimServices matsimServices, Network network,
-			DrtRequestAnalyzer drtRequestAnalyzer) {
+										DrtVehicleDistanceStats drtVehicleStats, MatsimServices matsimServices,
+										Network network,
+										DrtRequestAnalyzer drtRequestAnalyzer,
+										DrtVehicleOccupancyProfileCalculator drtVehicleOccupancyProfileCalculator) {
 		this.drtVehicleStats = drtVehicleStats;
 		this.matsimServices = matsimServices;
 		this.network = network;
 		this.drtRequestAnalyzer = drtRequestAnalyzer;
+		this.drtVehicleOccupancyProfileCalculator = drtVehicleOccupancyProfileCalculator;
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = Optional.ofNullable(config.controler().getRunId()).orElse("N/A");
@@ -129,7 +136,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				* directDistanceMean);
 		String vehStats = DrtTripsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), ";")
 				+ ";"
-				+ format.format(l_d);
+				+ format.format(l_d)
+				+ ";"
+				+ format.format(drtVehicleOccupancyProfileCalculator.getMinStayTaskVehiclesOverDay());
 		String occStats = DrtTripsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), ";",
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
@@ -218,7 +227,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			if (!vheaderWritten) {
 				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio",
 						"totalPassengerDistanceTraveled", "averageDrivenDistance", "averageEmptyDistance",
-						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det"));
+						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det", "minShareOfStayTaskVehiclesOverDay"));
 			}
 			bw.write(line(runId, it, summarizeVehicles));
 		} catch (IOException e) {

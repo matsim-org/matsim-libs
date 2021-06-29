@@ -19,6 +19,7 @@ package org.matsim.contrib.drt.util.stats;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -137,6 +140,11 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	public TimeDiscretizer getTimeDiscretizer() {
 		return timeDiscretizer;
+	}
+
+	public double getMinStayTaskVehiclesOverDay() {
+		double[] stayTask = getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
+		return Arrays.stream(stayTask).min().orElse(0.0);
 	}
 
 	private void increment(VehicleState state, double endTime) {
