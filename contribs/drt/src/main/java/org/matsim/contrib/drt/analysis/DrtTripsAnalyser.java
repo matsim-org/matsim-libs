@@ -121,13 +121,14 @@ public class DrtTripsAnalyser {
 	}
 
 	public static String summarizeTrips(List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
-			String delimiter) {
+			String delimiter, double sumFaresNotReferencingATrip) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
 		DescriptiveStatistics traveltimes = new DescriptiveStatistics();
+		DescriptiveStatistics fares = new DescriptiveStatistics();
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -144,6 +145,7 @@ public class DrtTripsAnalyser {
 			distanceStats.addValue(travelDistances.get(trip.request));
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
+			fares.addValue(trip.fare);
 		}
 
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
@@ -157,7 +159,11 @@ public class DrtTripsAnalyser {
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
-				format.format(traveltimes.getMean()));
+				format.format(traveltimes.getMean()) + "",//
+				// add daily fares and other fare components not referencing a particular trip
+				// -> mean fare per trip including share of daily subscription fare and similar
+				format.format(fares.getMean() +
+						sumFaresNotReferencingATrip / (waitStats.getValues().length == 0.0 ? 1 : waitStats.getValues().length)));
 	}
 
 	public static double getDirectDistanceMean(List<DrtTrip> trips) {

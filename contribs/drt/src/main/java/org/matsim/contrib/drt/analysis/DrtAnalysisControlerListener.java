@@ -120,7 +120,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 		double rejectionRate = (double)drtRequestAnalyzer.getRejectedRequestSequences().size()
 				/ drtRequestAnalyzer.getRequestSubmissions().size();
-		String tripsSummarize = DrtTripsAnalyser.summarizeTrips(trips, drtVehicleStats.getTravelDistances(), ";");
+		String tripsSummarize = DrtTripsAnalyser.summarizeTrips(trips, drtVehicleStats.getTravelDistances(),
+				";", drtRequestAnalyzer.getSumFaresNotReferencingATrip());
 		double directDistanceMean = DrtTripsAnalyser.getDirectDistanceMean(trips);
 		writeIterationPassengerStats(
 				tripsSummarize + ";" + drtRequestAnalyzer.getRejectedRequestSequences().size() + ";" + format.format(
@@ -147,7 +148,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					"arrivalTime",//
 					"travelTime",//
 					"travelDistance_m",//
-					"direcTravelDistance_m");
+					"direcTravelDistance_m",//
+					"fareForTrip");
 
 			DrtTripsAnalyser.collection2Text(trips, filename(event, "drt_trips", ".csv"), header,
 					trip -> String.join(";",//
@@ -164,7 +166,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 							trip.arrivalTime + "",//
 							(trip.arrivalTime - trip.departureTime - trip.waitTime) + "",//
 							format.format(drtVehicleStats.getTravelDistances().get(trip.request)),//
-							format.format(trip.unsharedDistanceEstimate_m)));
+							format.format(trip.unsharedDistanceEstimate_m),//
+							format.format(trip.fare)));
 		}
 		DrtTripsAnalyser.writeVehicleDistances(drtVehicleStats.getVehicleStates(),
 				filename(event, "vehicleDistanceStats", ".csv"));
@@ -200,7 +203,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				headerWritten = true;
 				bw.write(line("runId", "iteration", "rides", "wait_average", "wait_max", "wait_p95", "wait_p75",
 						"wait_median", "percentage_WT_below_10", "percentage_WT_below_15", "inVehicleTravelTime_mean",
-						"distance_m_mean", "directDistance_m_mean", "totalTravelTime_mean", "rejections", "rejectionRate"));
+						"distance_m_mean", "directDistance_m_mean", "totalTravelTime_mean",
+						"fare_mean_including_daily_fare", "rejections", "rejectionRate"));
 			}
 			bw.write(runId + ";" + it + ";" + summarizeTrips);
 			bw.newLine();

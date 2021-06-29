@@ -47,6 +47,7 @@ final class DrtTrip {
 	final double unsharedDistanceEstimate_m;
 	final double unsharedTimeEstimate_m;
 	final double arrivalTime;
+	final double fare;
 
 	DrtTrip(PerformedRequestEventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
 		Preconditions.checkArgument(sequence.isCompleted());
@@ -64,5 +65,7 @@ final class DrtTrip {
 		this.unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
 		this.arrivalTime = sequence.getDroppedOff().get().getTime();
+		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
+		this.fare = sequence.getDrtFare().isPresent() ? -sequence.getDrtFare().get().getAmount() : 0.0;
 	}
 }
