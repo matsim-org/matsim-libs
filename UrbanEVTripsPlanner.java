@@ -180,6 +180,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
 
+					if (pseudoVehicle.getBattery().getSoc() <= 0) {
+
+						break;
+					}
+
 
 					if (legWithCriticalSOC != null) {
 						String mode = legWithCriticalSOC.getMode();
