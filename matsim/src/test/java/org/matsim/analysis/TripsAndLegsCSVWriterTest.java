@@ -1,6 +1,23 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TripsCSVWriter.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.analysis;
 
 import java.io.BufferedReader;
@@ -46,6 +63,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Aravind
@@ -91,6 +109,7 @@ public class TripsAndLegsCSVWriterTest {
 	private int egress_stop_id = -1;
 	private int transit_line = -1;
 	private int transit_route = -1;
+	private int vehicle_id = -1;
 	private int first_pt_boarding_stop = -1;
 	private int last_pt_egress_stop = -1;
 	private int trip_number = -1;
@@ -99,8 +118,8 @@ public class TripsAndLegsCSVWriterTest {
 	private int isIntermodalWalkPt = -1;
 	
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
-	ArrayList<Object> legsfromplan = new ArrayList<Object>();
-	Map<String, Object> persontrips = new HashMap<String, Object>();
+	ArrayList<Object> legsfromplan = new ArrayList<>();
+	Map<String, Object> persontrips = new HashMap<>();
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -184,8 +203,8 @@ public class TripsAndLegsCSVWriterTest {
 			Iterator<Trip> tripItr = trips.iterator();
 			int tripNo = 1;
 			while(tripItr.hasNext()) {
-				Map<String, Object> tripvalues = new HashMap<String, Object>();
-				String modes = "";
+				Map<String, Object> tripvalues = new HashMap<>();
+				StringBuilder modes = new StringBuilder();
 				int traveled_distance = 0;
 				double waiting_time = 0;
 				Trip trip = tripItr.next();
@@ -220,7 +239,7 @@ public class TripsAndLegsCSVWriterTest {
 				int euclideanDistance = (int) CoordUtils.calcEuclideanDistance(start_coord, end_coord);
 				double departureTime = trip.getOriginActivity().getEndTime().orElse(0);
 	            double travelTime = trip.getDestinationActivity().getStartTime().orElse(0) - departureTime;
-	            Map<String, Double> modeDistance = new HashMap<String, Double>();
+	            Map<String, Double> modeDistance = new HashMap<>();
 	            modeDistance.put(TransportMode.walk, 0.0);
 	            modeDistance.put(TransportMode.pt, 0.0);
 	            modeDistance.put(TransportMode.car, 0.0);
@@ -230,7 +249,7 @@ public class TripsAndLegsCSVWriterTest {
 					double dis = leg.getRoute().getDistance();
 					traveled_distance += dis;
 					String mode_val = leg.getMode();
-					modes += mode_val + "-";
+					modes.append(mode_val).append("-");
 					dis += modeDistance.get(mode_val);
 					modeDistance.put(mode_val, dis);
 					//trav_time += leg.getTravelTime();
@@ -274,7 +293,7 @@ public class TripsAndLegsCSVWriterTest {
 					transitStopsVisited = transitStopsVisited.substring(0, transitStopsVisited.length() - 1);
 				}
 				
-				StringBuffer modestrim = new StringBuffer(modes);
+				StringBuffer modestrim = new StringBuffer(modes.toString());
 				modestrim.deleteCharAt(modestrim.length()-1);
 				tripvalues.put("start_link", start_link);
 	            tripvalues.put("start_x", start_x);
@@ -322,7 +341,7 @@ public class TripsAndLegsCSVWriterTest {
 				Trip trip = tripItr.next();
 				List<Leg> legs = trip.getLegsOnly();
 				for(Leg leg : legs) {
-					Map<String, Object> legvalues = new HashMap<String, Object>();
+					Map<String, Object> legvalues = new HashMap<>();
 					OptionalTime travel_time = leg.getTravelTime();
 					OptionalTime departure_time = leg.getDepartureTime();
 					int leg_distance = (int) leg.getRoute().getDistance();
@@ -358,11 +377,14 @@ public class TripsAndLegsCSVWriterTest {
 				         transitRoute = route.getRouteId().toString();
 				         ptAccessStop = route.getAccessStopId().toString();
 				         ptEgressStop = route.getEgressStopId().toString();
-					 }
+					}
 					legvalues.put("access_stop_id", ptAccessStop);
 					legvalues.put("egress_stop_id", ptEgressStop);
 					legvalues.put("transit_line", transitLine);
 					legvalues.put("transit_route", transitRoute);
+					Id<Vehicle> vehicleId = (Id<Vehicle>) leg.getAttributes().getAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME);
+					String vehicleIdString = vehicleId != null ? vehicleId.toString() : "";
+					legvalues.put("vehicle_id", vehicleIdString);
 					boolean containsWalk = false;
 					boolean containsPt = false;
 					if (leg.getMode().equals(TransportMode.walk) || leg.getMode().equals("walk_teleportation")) {
@@ -423,6 +445,7 @@ public class TripsAndLegsCSVWriterTest {
 				Assert.assertEquals("egress_stop_id is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id] != null ? column[egress_stop_id] : "");
 				Assert.assertEquals("transit_line is not as expected", String.valueOf(nextleg.get("transit_line")) , column[transit_line] != null ? column[transit_line] : "");
 				Assert.assertEquals("transit_route is not as expected", String.valueOf(nextleg.get("transit_route")) , column[transit_route] != null ? column[transit_route] : "");
+				Assert.assertEquals("vehicleId is not as expected", String.valueOf(nextleg.get("vehicle_id")) , column[vehicle_id] != null ? column[vehicle_id] : "");
 				if (isIntermodalWalkPt >= 0) {
 					// column from CustomLegsWriterExtension is present
 					Assert.assertEquals("isIntermodalWalkPt is not as expected", String.valueOf(nextleg.get("isIntermodalWalkPt")) , column[isIntermodalWalkPt]);
@@ -496,7 +519,7 @@ public class TripsAndLegsCSVWriterTest {
 	/*******************************Deciding the columns of the output files************************************/
 	private void decideColumns(String[] columnNames) {
 
-		Integer i = 0;
+		int i = 0;
 		while (i < columnNames.length) {
 			String name = columnNames[i];
 			switch (name) {
@@ -600,7 +623,11 @@ public class TripsAndLegsCSVWriterTest {
 			case "transit_route":
 				transit_route = i;
 				break;
-				
+
+			case "vehicle_id":
+				vehicle_id = i;
+				break;
+
 			case "first_pt_boarding_stop":
 				first_pt_boarding_stop = i;
 				break;
@@ -648,7 +675,7 @@ public class TripsAndLegsCSVWriterTest {
 		NetworkUtils.writeNetwork(network, utils.getOutputDirectory() + "/network.xml");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getOutputDirectory() + "/network.xml");
 	}
-	private class CustomTripsWriterExtesion implements TripsAndLegsCSVWriter.CustomTripsWriterExtension{
+	private static class CustomTripsWriterExtesion implements TripsAndLegsCSVWriter.CustomTripsWriterExtension{
 
 		@Override
 		public String[] getAdditionalTripHeader() {
