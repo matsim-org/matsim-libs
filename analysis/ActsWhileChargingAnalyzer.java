@@ -124,6 +124,9 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
 
     @Override
     public void reset(int iteration) {
+        containers.clear();
+        personContainers.clear();
+        actsPerPersons.clear();
 
     }
 
