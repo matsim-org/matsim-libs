@@ -47,6 +47,7 @@ public class CSVToXML2 {
         //matsim-berlin is in DHDN-GK4 (EPSG:31468)
         CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 
+
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -63,9 +64,9 @@ public class CSVToXML2 {
 
                 double x = Double.parseDouble(record.get(0));
                 double y = Double.parseDouble(record.get(1));
-                Coord coord1 = transformer.transform(new Coord(x,y));
+                Coord coord = transformer.transform(new Coord(x,y));
 
-               Link chargerLink = NetworkUtils.getNearestLink(network,coord1);
+               Link chargerLink = NetworkUtils.getNearestLink(network,coord);
 
 
 

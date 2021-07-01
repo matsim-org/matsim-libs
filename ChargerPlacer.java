@@ -119,15 +119,17 @@ public class ChargerPlacer {
                         .build());
                 i++;
             }
+
 //            URL url = new URL("https://download.geofabrik.de/europe/germany/berlin-latest-free.shp.zip")
 //            SimpleFeatureSource shp = ShapeFileReader.readDataFile("C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\SHPfile\\lor_bzr.shp");
 //             List<Geometry> berlinSHP = ShpGeometryUtils.loadGeometries(url);
-//            String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\chargersBerlin.csv";
-//            CSVToXML2 csvreader =new CSVToXML2(file, scenario.getNetwork());
-//            chargers.addAll(csvreader.chargers);
+
+
         }
 
-
+        String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\chargersBerlin.csv";
+        CSVToXML2 csvreader =new CSVToXML2(file, scenario.getNetwork());
+        chargers.addAll(csvreader.chargers);
         new ChargerWriter(chargers.stream()).write("C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/HomeChargersBerlin.xml");
 
 
