@@ -21,8 +21,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -82,7 +80,7 @@ final class ColdEmissionAnalysisModule {
 	private int detailedFallbackAverageTableWarnCnt = 0;
 	private int averageReadingInfoCnt = 0;
 	private int vehInfoWarnHDVCnt = 0;
-	private static final int maxWarnCnt = 3;
+	private static final int maxWarnCnt = 5;
 
 	/*package-private*/ ColdEmissionAnalysisModule( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
 													Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
@@ -156,53 +154,25 @@ final class ColdEmissionAnalysisModule {
 		//see https://www.hbefa.net/e/documents/HBEFA41_Development_Report.pdf (WP 4 , page 23)  kturner, may'20
 		//Mapping everything except "motorcycle" to "pass.car", since this was done in the last years for HGV.
 		//This may can be improved: What should be better set to LGV or zero???? kturner, may'20
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
-			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if (vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-		}
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)) {
-			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if (vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.URBAN_BUS +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-		}
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.COACH)) {
-			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if (vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.COACH +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-		}
-		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)){
+		/* Actually, only mapping the vehicle category breaks, because HGV for example have different emission concepts than passenger cars.
+		 * Thus, one would have to make a vehicleCategory-and-emissionConcept-depending mapping.
+		 * We (kmt + ts) decided, to rather ignore the cold emission for vehicle categories, that are not included in HBEFA tables. ts, jul '21
+		 */
+		if ( !(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.PASSENGER_CAR) || vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE) ) ) {
 			for ( Pollutant coldPollutant : coldPollutants) {
 				coldEmissionsOfEvent.put( coldPollutant, 0.0 );
 				// yyyyyy todo replace by something more meaningful. kai, jan'20
+				// we would need a mapping of vehicle category and emission concept, see comment above method signature, ts jul '21
 			}
-			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+			if (vehInfoWarnHDVCnt < maxWarnCnt) {
 				vehInfoWarnHDVCnt++;
 				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.MOTORCYCLE +
-					//	". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-						"Currently, this code is setting the emissions of such vehicles to zero - as it was in the last years" +
-					"Might be necessary to find a better solution for this.  kturner, may'20" );
-				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+						vehicleInformationTuple.getFirst() +
+						". Currently, this code is setting the cold emissions of such vehicles to zero !!");
+				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			return coldEmissionsOfEvent;
 		}
-
 		if(this.detailedHbefaColdTable != null) {
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
@@ -413,7 +383,7 @@ final class ColdEmissionAnalysisModule {
 
 		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
 				"the config OR you should use another fallback setting when using detailed calculation OR " +
-				"values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+				"values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey);
 	}
 
 	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {
