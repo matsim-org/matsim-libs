@@ -26,7 +26,6 @@ import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +60,10 @@ public class DrtRoute extends AbstractRoute {
 
 	public double getMaxWaitTime() {
 		return routeDescription.getMaxWaitTime();
+	}
+
+	public List<String> getUnsharedPath() {
+		return routeDescription.getUnsharedPath();
 	}
 
 	public double getMaxTravelTime() {

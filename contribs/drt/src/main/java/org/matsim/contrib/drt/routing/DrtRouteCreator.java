@@ -81,7 +81,12 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		route.setTravelTime(maxTravelTime);
 		route.setDirectRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
-		route.setUnsharedPath(unsharedPath);
+
+		if(this.drtCfg.getStoreUnsharedPath())
+		{
+			route.setUnsharedPath(unsharedPath);
+		}
+
 		return route;
 	}
 }

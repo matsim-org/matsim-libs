@@ -142,6 +142,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 
+	public static final String STORE_UNSHARED_PATH = "storeUnsharedPath";
+	static final String STORE_UNSHARED_PATH_EXP = "Store planned unshared drt route as a link sequence";
+
+
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
@@ -190,6 +194,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	@PositiveOrZero
 	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
+
+	private boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
@@ -321,6 +327,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
+		map.put(STORE_UNSHARED_PATH, STORE_UNSHARED_PATH_EXP);
 		return map;
 	}
 
@@ -614,6 +621,22 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public DrtConfigGroup setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 		return this;
+	}
+
+	/**
+	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
+	 */
+	@StringGetter(STORE_UNSHARED_PATH)
+	public boolean getStoreUnsharedPath() {
+		return storeUnsharedPath;
+	}
+
+	/**
+	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
+	 */
+	@StringSetter(STORE_UNSHARED_PATH)
+	void setStoreUnsharedPath(boolean storeUnsharedPath) {
+		this.storeUnsharedPath = storeUnsharedPath;
 	}
 
 	public double getAdvanceRequestPlanningHorizon() {
