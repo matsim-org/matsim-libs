@@ -80,7 +80,7 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
 		if (this.routingMode != null) {
-			attr.put(ATTRIBUTE_LEGMODE, this.routingMode);
+			attr.put(ATTRIBUTE_ROUTING_MODE, this.routingMode);
 		}
 		return attr;
 	}
