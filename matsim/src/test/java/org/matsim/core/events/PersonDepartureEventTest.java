@@ -39,6 +39,6 @@ public class PersonDepartureEventTest extends MatsimTestCase {
 		assertEquals("921", event.getPersonId().toString());
 		assertEquals("390", event.getLinkId().toString());
 		assertEquals("bike", event.getLegMode());
-		assertEquals("bikeRoutingMode", event.getLegMode());
+		assertEquals("bikeRoutingMode", event.getRoutingMode());
 	}
 }
