@@ -71,7 +71,7 @@ public class TeleportingPassengerEngineTest {
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null, departureTime,
 						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null),
 				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, fixture.PERSON_ID, null),
@@ -92,7 +92,7 @@ public class TeleportingPassengerEngineTest {
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, fixture.PERSON_ID, "invalid"),
 				new PersonStuckEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}

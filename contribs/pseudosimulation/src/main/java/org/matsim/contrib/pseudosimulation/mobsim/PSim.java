@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
@@ -237,7 +238,7 @@ public class PSim implements Mobsim {
                         Leg nextLeg = (Leg) elements.get( idx + 1 );
                         ActivityEndEvent endEvent = new ActivityEndEvent( actEndTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
                         eventQueue.add( endEvent );
-                        PersonDepartureEvent departureEvent = new PersonDepartureEvent( actEndTime, personId, act.getLinkId(), nextLeg.getMode() );
+                        PersonDepartureEvent departureEvent = new PersonDepartureEvent( actEndTime, personId, act.getLinkId(), nextLeg.getMode(), TripStructureUtils.getRoutingMode(nextLeg) );
 
                         eventQueue.add( departureEvent );
                     }

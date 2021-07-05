@@ -57,7 +57,7 @@ public class AgentId2PtTripTravelTimeMapTest {
 	        ActivityStartEvent event1 = new ActivityStartEvent(1.0, agentId1, linkId1, facilId1, "w", new Coord( 234., 5.67 ));
 	        ActivityEndEvent event2 = new ActivityEndEvent(1.2, agentId1, linkId1, facilId1, "w", new Coord( 234., 5.67 ));
 	        
-	        PersonDepartureEvent event3 = new PersonDepartureEvent(1.2, agentId1, linkId2, "pt");
+	        PersonDepartureEvent event3 = new PersonDepartureEvent(1.2, agentId1, linkId2, "pt", "pt");
 	        PersonArrivalEvent event4 = new PersonArrivalEvent(1.9, agentId1, linkId3, "pt");
 	        
 	        ActivityStartEvent event5 = new ActivityStartEvent(1.9, agentId1, linkId3, facilId2, "h", new Coord( 123., 45.67 ));	//home mit anderen werten

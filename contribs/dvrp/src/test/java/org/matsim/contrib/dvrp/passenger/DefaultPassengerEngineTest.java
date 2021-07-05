@@ -99,7 +99,7 @@ public class DefaultPassengerEngineTest {
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
@@ -120,7 +120,7 @@ public class DefaultPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "invalid"),
 				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
@@ -135,7 +135,7 @@ public class DefaultPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "rejecting_all_requests"),
 				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}

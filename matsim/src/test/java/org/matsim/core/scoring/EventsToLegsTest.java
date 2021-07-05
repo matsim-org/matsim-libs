@@ -66,7 +66,7 @@ public class EventsToLegsTest {
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.addLegHandler(lh);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), TransportMode.walk));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), TransportMode.walk, TransportMode.walk));
 		eventsToLegs.handleEvent(new TeleportationArrivalEvent(30.0, Id.create("1", Person.class), 50.0, TransportMode.walk));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, Id.create("1", Person.class), Id.create("l2", Link.class), TransportMode.walk));
 		assertLeg(lh, 10., 20., 50.0, "walk");
@@ -80,7 +80,7 @@ public class EventsToLegsTest {
 		eventsToLegs.addLegHandler(lh);
 		Id<Person> agentId = Id.create("1", Person.class);
 		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, Id.createLinkId("l1"), "car"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, Id.createLinkId("l1"), "car", "car"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId, vehId));
 		eventsToLegs.handleEvent(new VehicleEntersTrafficEvent(10.0, agentId, Id.createLinkId("l1"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, vehId, Id.createLinkId("l2")));
@@ -102,12 +102,12 @@ public class EventsToLegsTest {
 
 		//agent 1 enters vehicle
 		Id<Person> agentId1 = Id.create("1", Person.class);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId1, Id.createLinkId("l1"), "car"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId1, Id.createLinkId("l1"), "car", "car"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId1, vehId));
 
 		//agent 2 enters vehicle
 		Id<Person> agentId2 = Id.create("2", Person.class);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId2, Id.createLinkId("l1"), "ride"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId2, Id.createLinkId("l1"), "ride", "ride"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId2, vehId));
 
 		//vehicle drives from l1 to l2
@@ -143,7 +143,7 @@ public class EventsToLegsTest {
 		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
 
 		Id<Person> agentId1 = Id.create("1", Person.class);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId1, Id.createLinkId("l1"), "car"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId1, Id.createLinkId("l1"), "car", "car"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId1, vehId));
 		//driver leaves out vehicle after 10 seconds, no driving at all
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
@@ -161,7 +161,7 @@ public class EventsToLegsTest {
 		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
 
 		Id<Person> agentId1 = Id.create("1", Person.class);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId1, Id.createLinkId("l1"), "car"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId1, Id.createLinkId("l1"), "car", "car"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId1, vehId));
 		//driver leaves out vehicle after 10 seconds of driving from one end to the other of the initial link
 		eventsToLegs.handleEvent(
@@ -223,7 +223,7 @@ public class EventsToLegsTest {
 		Id<Person> passengerId = Id.createPersonId("passenger");
 		
 		eventsToLegs.handleEvent(new TransitDriverStartsEvent(0.0, transitDriverId, transitVehiceId, transitLineId, transitRouteId, departureId));
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, passengerId, accessLinkId, "pt"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, passengerId, accessLinkId, "pt", "pt"));
 		eventsToLegs.handleEvent(new VehicleArrivesAtFacilityEvent(50.0, transitVehiceId, accessFacilityId, 0.0));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(100.0, passengerId, transitVehiceId));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(1000.0, passengerId, accessLinkId, "pt"));

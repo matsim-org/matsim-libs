@@ -222,11 +222,11 @@ public class OccupancyTrackerTest {
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), this.veh0, this.stop1, 0.0));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:00:30"), this.veh0, this.stop1, 0.0));
 
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:03:00"), this.pax1, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:03:00"), this.pax1, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:03:00"), this.pax1, this.stop1, this.stop2));
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:06:00"), this.pax2, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:06:00"), this.pax2, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:06:00"), this.pax2, this.stop1, this.stop2));
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:08:00"), this.pax3, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:08:00"), this.pax3, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:08:00"), this.pax3, this.stop1, this.stop2));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:10:00"), this.veh1, this.stop1, 0.0));
@@ -234,11 +234,11 @@ public class OccupancyTrackerTest {
 			events.processEvent(new PersonEntersVehicleEvent(Time.parseTime("07:10:20"), this.pax2, this.veh1));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:10:30"), this.veh1, this.stop1, 0.0));
 
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:11:00"), this.pax4, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:11:00"), this.pax4, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:11:00"), this.pax4, this.stop1, this.stop2));
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:16:00"), this.pax5, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:16:00"), this.pax5, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:16:00"), this.pax5, this.stop1, this.stop2));
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:18:00"), this.pax6, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:18:00"), this.pax6, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:18:00"), this.pax6, this.stop1, this.stop2));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:20:00"), this.veh2, this.stop1, 0.0));
@@ -246,9 +246,9 @@ public class OccupancyTrackerTest {
 			events.processEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:20"), this.pax4, this.veh2));
 			events.processEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:30"), this.veh2, this.stop1, 0.0));
 
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:24:00"), this.pax7, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:24:00"), this.pax7, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:24:00"), this.pax7, this.stop1, this.stop2));
-			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:27:00"), this.pax8, linkId, "pt"));
+			events.processEvent(new PersonDepartureEvent(Time.parseTime("07:27:00"), this.pax8, linkId, "pt", "pt"));
 			events.processEvent(new AgentWaitingForPtEvent(Time.parseTime("07:27:00"), this.pax8, this.stop1, this.stop2));
 
 			events.processEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:30:00"), this.veh3, this.stop1, 0.0));

@@ -431,14 +431,14 @@ public class CountsControlerListenerTest {
 			for (int i = 0; i < 100; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car));
+				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car, TransportMode.car));
 				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.car, 1.0));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
 			}
 			for (int i = 100; i < 150; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
+				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk, TransportMode.walk));
 				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.walk, 1.0));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
 			}

@@ -36,9 +36,9 @@ public class TestEventLibrary extends MatsimTestCase {
 	
 	public void testGetTravelTime(){
 		LinkedList<Event> events=new LinkedList<Event>();
-		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
+		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
 		events.add(new PersonArrivalEvent(30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
-		events.add(new PersonDepartureEvent(90, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
+		events.add(new PersonDepartureEvent(90, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
 		events.add(new PersonArrivalEvent(110, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
 		
 		assertEquals(20.0, EventLibrary.getTravelTime(events,1), EPSILON);
@@ -46,9 +46,9 @@ public class TestEventLibrary extends MatsimTestCase {
 	
 	public void testGetAverageTravelTime(){
 		LinkedList<Event> events=new LinkedList<Event>();
-		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
+		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
 		events.add(new PersonArrivalEvent(30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
-		events.add(new PersonDepartureEvent(90, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
+		events.add(new PersonDepartureEvent(90, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
 		events.add(new PersonArrivalEvent(110, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
 		
 		assertEquals(30.0, EventLibrary.getSumTravelTime(events), EPSILON);
