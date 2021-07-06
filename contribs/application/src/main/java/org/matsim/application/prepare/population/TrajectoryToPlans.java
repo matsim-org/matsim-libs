@@ -39,7 +39,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     @CommandLine.Option(names = "--sample-size", description = "Sample size of the given input data in (0, 1]", required = true)
     private double sampleSize;
 
-    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]", arity = "1..*", required = false)
+    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]", arity = "1..*")
     private List<Double> samples;
 
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
@@ -48,11 +48,14 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
 
-    @CommandLine.Option(names = "--attributes", description = "Input person attributes file", required = false)
+    @CommandLine.Option(names = "--attributes", description = "Input person attributes file")
     private Path attributes;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
     private Path output;
+
+    public TrajectoryToPlans() {
+    }
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new TrajectoryToPlans()).execute(args));
@@ -124,12 +127,11 @@ public class TrajectoryToPlans implements MATSimAppCommand {
 
     /**
      * Split activities into typical durations to improve value of travel time savings calculation.
-     *
-     * @see playground.vsp.openberlinscenario.planmodification.CemdapPopulationTools
      */
     private void splitActivityTypesBasedOnDuration(Population population) {
 
-        final double timeBinSize_s = 600.;
+        final int timeBinSize_s = 600;
+        final int maxCategories = 86400 / timeBinSize_s; // limit categories to 24h * 3600s / timeBinSize
 
         // Calculate activity durations for the next step
         for (Person p : population.getPersons().values()) {
@@ -149,8 +151,8 @@ public class TrajectoryToPlans implements MATSimAppCommand {
                         durationCategoryNr = 1;
                     }
 
-                    if (durationCategoryNr >= 24) {
-                        durationCategoryNr = 24;
+                    if (durationCategoryNr >= maxCategories) {
+                        durationCategoryNr = maxCategories;
                     }
 
                     String newType = act.getType() + "_" + (durationCategoryNr * timeBinSize_s);
@@ -163,9 +165,6 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         }
     }
 
-    /**
-     * See {@link playground.vsp.openberlinscenario.planmodification.CemdapPopulationTools}.
-     */
     private void mergeOvernightActivities(Plan plan) {
 
         if (plan.getPlanElements().size() > 1) {
@@ -183,6 +182,5 @@ public class TrajectoryToPlans implements MATSimAppCommand {
                 lastActivity.setType(lastBaseActivity + "_" + mergedDuration);
             }
         }  // skipping plans with just one activity
-
     }
 }
