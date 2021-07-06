@@ -49,6 +49,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -93,6 +94,7 @@ public class PassengerEngineTestFixture {
 		route.setTravelTime(toLink.getLength() / toLink.getFreespeed());
 		Leg leg = factory.createLeg(MODE);
 		leg.setRoute(route);
+		TripStructureUtils.setRoutingMode(leg, MODE);
 		plan.addLeg(leg);
 
 		plan.addActivity(factory.createActivityFromLinkId(END_ACTIVITY, toLink.getId()));
