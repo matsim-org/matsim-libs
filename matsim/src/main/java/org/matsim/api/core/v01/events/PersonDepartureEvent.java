@@ -34,7 +34,7 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
-	public static final String ATTRIBUTE_ROUTING_MODE = "routingMode";
+	public static final String ATTRIBUTE_ROUTING_MODE = "computationalRoutingMode";
 
 	private final Id<Person> personId;
 	private final Id<Link> linkId;
