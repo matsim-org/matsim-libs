@@ -28,6 +28,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -96,10 +97,24 @@ public class DrtRoute extends AbstractRoute {
 
 	@Override
 	public void setRouteDescription(String routeDescription) {
-		try {
-			this.routeDescription = new ObjectMapper().readValue(routeDescription, RouteDescription.class);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+
+		Pattern pat = Pattern.compile("[0-9.]+ [0-9.]+");
+
+		// Handle old routeDescription (non-json)
+		if (pat.matcher(routeDescription).find()) {
+			String[] values = routeDescription.split(" ");
+			this.routeDescription.setMaxWaitTime(requiresZeroOrPositive(Double.parseDouble(values[0])));
+			this.routeDescription.setDirectRideTime(requiresZeroOrPositive(Double.parseDouble(values[1])));
+
+			// Handle new routeDescription (json)
+		} else if (routeDescription.startsWith("{")) {
+			try {
+				this.routeDescription = new ObjectMapper().readValue(routeDescription, RouteDescription.class);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			throw new RuntimeException("Unsupported RouteDescription");
 		}
 	}
 
@@ -111,6 +126,11 @@ public class DrtRoute extends AbstractRoute {
 	@Override
 	public DrtRoute clone() {
 		return (DrtRoute)super.clone();
+	}
+
+	private double requiresZeroOrPositive(double value) {
+		checkArgument(value >= 0 || value <= Double.MAX_VALUE, "Value: (%s) must be zero or positive", value);
+		return value;
 	}
 
 
