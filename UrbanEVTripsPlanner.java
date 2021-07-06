@@ -64,6 +64,8 @@ import org.matsim.withinday.utils.EditPlans;
 
 import javax.inject.Provider;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 import static org.matsim.urbanEV.MATSimVehicleWrappingEVSpecificationProvider.getWrappedElectricVehicleId;
@@ -175,20 +177,24 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				Leg legWithCriticalSOC;
 				ElectricVehicle pseudoVehicle;
 
+
+
 				do {
 					pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
+					String mode = legWithCriticalSOC.getMode();
+					List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
 
-					if (pseudoVehicle.getBattery().getSoc() <= 0) {
 
+					if (evLegs.get(0).equals(legWithCriticalSOC)) {
+						log.warn("SoC of Agent" + mobsimagent + "is running beyond capacity threshold during the first leg of the day.");
 						break;
 					}
 
 
 					if (legWithCriticalSOC != null) {
-						String mode = legWithCriticalSOC.getMode();
-						List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
+
 
 						if (evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs) && pseudoVehicle.getBattery().getSoc() > 0) {
 
@@ -293,59 +299,65 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		//find suitable non-stage activity before SOC threshold passover
 		Activity actWhileCharging = activityWhileChargingFinder.findActivityWhileChargingBeforeLeg(modifiablePlan, (Leg) modifiablePlan.getPlanElements().get(legIndex));
+			if (actWhileCharging == null){
+				log.warn(mobsimagent + " can't find a suitable activity befor the critical leg!");
+			}
 
-		Preconditions.checkNotNull(actWhileCharging, "could not insert plugin activity in plan of agent " + mobsimagent.getId() +
-				".\n One reason could be that the agent has no suitable activity prior to the leg for which the " +
-				" energy threshold is expected to be exceeded. \n" +
-				" Another reason  might be that it's vehicle is running beyond energy threshold during the first leg of the day." +
-				"That could possibly be avoided by using EVNetworkRoutingModule..."); //TODO let the sim just run and let the ev run empty!?
+//		Preconditions.checkNotNull(actWhileCharging, "could not insert plugin activity in plan of agent " + mobsimagent.getId() +
+//				".\n One reason could be that the agent has no suitable activity prior to the leg for which the " +
+//				" energy threshold is expected to be exceeded. \n" +
+//				" Another reason  might be that it's vehicle is running beyond energy threshold during the first leg of the day." +
+//				"That could possibly be avoided by using EVNetworkRoutingModule..."); //TODO let the sim just run and let the ev run empty!?
 
 		//TODO what if actWhileCharging does not hold a link id?
 
-		ChargerSpecification selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
+		if(actWhileCharging != null) {
 
-		Link chargingLink = modeNetwork.getLinks().get(selectedCharger.getLinkId());
+			ChargerSpecification selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
 
-		Activity pluginTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
+			Link chargingLink = modeNetwork.getLinks().get(selectedCharger.getLinkId());
+
+			Activity pluginTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
 
 //		critical leg should always be the plugout leg, shouldn't it? tschlenther jan' '21
-		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
+			Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
 //		Leg plugoutLeg = leg;
 //		Activity plugoutTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 //		Activity plugoutTripDestination = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
-		Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
-		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
+			Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
+			Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
-		{    //some consistency checks.. //TODO consider to put in a JUnit test..
-			Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
-			Preconditions.checkState(!pluginTripOrigin.equals(actWhileCharging), "pluginTripOrigin is equal to actWhileCharging. should never happen..");
+			{    //some consistency checks.. //TODO consider to put in a JUnit test..
+				Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
+				Preconditions.checkState(!pluginTripOrigin.equals(actWhileCharging), "pluginTripOrigin is equal to actWhileCharging. should never happen..");
 
-			PlanElement legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(pluginTripOrigin) + 1);
-			Preconditions.checkState(legToBeReplaced instanceof Leg);
-			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg after pluginTripOrigin has the wrong routing mode. should not happen..");
+				PlanElement legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(pluginTripOrigin) + 1);
+				Preconditions.checkState(legToBeReplaced instanceof Leg);
+				Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg after pluginTripOrigin has the wrong routing mode. should not happen..");
 
-			legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(actWhileCharging) - 1);
-			Preconditions.checkState(legToBeReplaced instanceof Leg);
-			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before actWhileCharging has the wrong routing mode. should not happen..");
+				legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(actWhileCharging) - 1);
+				Preconditions.checkState(legToBeReplaced instanceof Leg);
+				Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before actWhileCharging has the wrong routing mode. should not happen..");
 
-			Preconditions.checkState(!plugoutTripDestination.equals(actWhileCharging), "plugoutTripDestination is equal to actWhileCharging. should never happen..");
+				Preconditions.checkState(!plugoutTripDestination.equals(actWhileCharging), "plugoutTripDestination is equal to actWhileCharging. should never happen..");
 
-			Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(pluginTripOrigin) < modifiablePlan.getPlanElements().indexOf(actWhileCharging));
-			Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(actWhileCharging) <= modifiablePlan.getPlanElements().indexOf(plugoutTripOrigin));
-			Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(plugoutTripOrigin) < modifiablePlan.getPlanElements().indexOf(plugoutTripDestination));
+				Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(pluginTripOrigin) < modifiablePlan.getPlanElements().indexOf(actWhileCharging));
+				Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(actWhileCharging) <= modifiablePlan.getPlanElements().indexOf(plugoutTripOrigin));
+				Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(plugoutTripOrigin) < modifiablePlan.getPlanElements().indexOf(plugoutTripDestination));
 
-			legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(plugoutTripOrigin) + 1);
-			Preconditions.checkState(legToBeReplaced instanceof Leg);
-			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg after plugoutTripOrigin has the wrong routing mode. should not happen..");
+				legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(plugoutTripOrigin) + 1);
+				Preconditions.checkState(legToBeReplaced instanceof Leg);
+				Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg after plugoutTripOrigin has the wrong routing mode. should not happen..");
 
-			legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(plugoutTripDestination) - 1);
-			Preconditions.checkState(legToBeReplaced instanceof Leg);
-			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before plugoutTripDestination has the wrong routing mode. should not happen..");
+				legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(plugoutTripDestination) - 1);
+				Preconditions.checkState(legToBeReplaced instanceof Leg);
+				Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before plugoutTripDestination has the wrong routing mode. should not happen..");
+			}
+
+			TripRouter tripRouter = tripRouterProvider.get();
+			planPluginTrip(modifiablePlan, routingMode, electricVehicleSpecification, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter);
+			planPlugoutTrip(modifiablePlan, routingMode, electricVehicleSpecification, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
 		}
-
-		TripRouter tripRouter = tripRouterProvider.get();
-		planPluginTrip(modifiablePlan, routingMode, electricVehicleSpecification, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter);
-		planPlugoutTrip(modifiablePlan, routingMode, electricVehicleSpecification, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
 	}
 
 	private void planPlugoutTrip(Plan plan, String routingMode, ElectricVehicleSpecification electricVehicleSpecification, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, double now) {
@@ -446,20 +458,24 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	//TODO possibly put behind interface
 	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network) {
+
+		List<ChargerSpecification> chargerList = chargingInfrastructureSpecification.getChargerSpecifications()
+				.values()
+				.stream()
+				.filter(charger -> vehicleSpecification.getChargerTypes().contains(charger.getChargerType()))
+				.collect(Collectors.toList());
+
+
 		StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
 				1, l -> l.getFromNode().getCoord(), s -> network.getLinks().get(s.getLinkId()).getToNode().getCoord()); //TODO get closest X chargers and choose randomly?
-		List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(network.getLinks().get(linkId),
-				chargingInfrastructureSpecification.getChargerSpecifications()
-						.values()
-						.stream()
-						.filter(charger -> vehicleSpecification.getChargerTypes().contains(charger.getChargerType())));
+		List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(network.getLinks().get(linkId),chargerList.stream());
 		if (nearestChargers.isEmpty()) {
 			throw new RuntimeException("no charger could be found for vehicle type " + vehicleSpecification.getVehicleType());
 		}
-		if (NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()) >= 1000) {
-			//throw new RuntimeException("There are no chargers within 1000m");
-			log.warn("Charger out of range. Inefficient charging " + NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()));
-		}
+//		if (NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()) >= 1000) {
+//			//throw new RuntimeException("There are no chargers within 1000m");
+//			log.warn("Charger out of range. Inefficient charging " + NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()));
+//		}
 		return nearestChargers.get(0);
 	}
 
