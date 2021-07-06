@@ -96,9 +96,9 @@ public class CSVToXMLmpm {
     }
 
     public static void main(String[] args) throws IOException, CsvException {
-        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
+        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_01.csv";
         CSVToXMLmpm csvreader = new CSVToXMLmpm(fileName);
-        new ChargerWriter(csvreader.chargers.stream()).write( "C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/chargers1.xml");
+        new ChargerWriter(csvreader.chargers.stream()).write( "C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/chargers_mpm_günstigste_Lösung.xml");
 
 
         //new CreateNewXML(csvreader.chargers);

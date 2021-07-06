@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -19,6 +20,7 @@ import org.matsim.contrib.ev.infrastructure.ChargerWriter;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
@@ -33,10 +35,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -112,7 +111,7 @@ public class ChargerPlacer {
                 ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
                 chargers.add(builder
                         .linkId(homeLink)
-                        .id(Id.create("HomeCharger" + homeLink.toString(), Charger.class))
+                        .id(Id.create("HomeCharger" + person.getId().toString(), Charger.class))
                         .chargerType(person.getId().toString())
                         .plugCount(1)
                         .plugPower(11000)
@@ -127,8 +126,18 @@ public class ChargerPlacer {
 
         }
 
-        String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\chargersBerlin.csv";
-        CSVToXML2 csvreader =new CSVToXML2(file, scenario.getNetwork());
+        String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\Ladesäulen_in_Deutschland_v2.csv";
+
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+
+        Network subNetwork = NetworkUtils.createNetwork();
+
+        Set<String> modes = Set.of(TransportMode.car);
+        filter.filter(subNetwork, modes);
+
+
+
+        CSVToXML2 csvreader =new CSVToXML2(file, subNetwork);
         chargers.addAll(csvreader.chargers);
         new ChargerWriter(chargers.stream()).write("C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/HomeChargersBerlin.xml");
 

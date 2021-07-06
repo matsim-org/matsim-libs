@@ -57,8 +57,8 @@ public class CSVToXML2 {
 
 
             }
+            List<Link> chargerLinks = new ArrayList<>();
             for (List<String> record : Iterables.skip(records, 2)) {
-
 //                URL url = new URL("https://download.geofabrik.de/europe/germany/berlin-latest-free.shp.zip");
 //                List<Geometry> berlinSHP = ShpGeometryUtils.loadGeometries(url);
 
@@ -67,18 +67,25 @@ public class CSVToXML2 {
                 Coord coord = transformer.transform(new Coord(x,y));
 
                Link chargerLink = NetworkUtils.getNearestLink(network,coord);
+               if (!chargerLinks.contains(chargerLink)){
+                   chargerLinks.add(chargerLink);
+                   ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
+                   chargers.add(builder
+                           .linkId(Id.createLinkId(chargerLink.getId()))
+                           .id(Id.create("charger" + record.get(11), Charger.class))
+                           .chargerType(record.get(3)+ "kW")
+//                           .plugCount((int) Math.round(parseDouble(record.get(5))))
+                           .plugCount(5)
+                           .plugPower((int) Math.round(parseDouble(record.get(3))*1000))
+                           .build());
+
+               }
 
 
 
 
-                ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
-                chargers.add(builder
-                        .linkId(Id.createLinkId(chargerLink.getId()))
-                        .id(Id.create("charger" + chargerLink.getId(), Charger.class))
-                        .chargerType(record.get(4))
-                        .plugCount((int) Math.round(parseDouble(record.get(2))))
-                        .plugPower((int) Math.round(parseDouble(record.get(4))*1000))
-                        .build());
+
+
         }
 
 
