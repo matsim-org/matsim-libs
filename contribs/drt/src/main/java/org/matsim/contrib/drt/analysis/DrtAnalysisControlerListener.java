@@ -121,7 +121,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		double rejectionRate = (double)drtRequestAnalyzer.getRejectedRequestSequences().size()
 				/ drtRequestAnalyzer.getRequestSubmissions().size();
 		String legsSummarize = DrtLegsAnalyser.summarizeLegs(legs, drtVehicleStats.getTravelDistances(),
-				";", drtRequestAnalyzer.getSumFaresNotReferencingALeg());
+				drtRequestAnalyzer.getDrtFarePersonMoneyEvents(), ";");
 		double directDistanceMean = DrtLegsAnalyser.getDirectDistanceMean(legs);
 		writeIterationPassengerStats(
 				legsSummarize + ";" + drtRequestAnalyzer.getRejectedRequestSequences().size() + ";" + format.format(
@@ -204,7 +204,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				bw.write(line("runId", "iteration", "rides", "wait_average", "wait_max", "wait_p95", "wait_p75",
 						"wait_median", "percentage_WT_below_10", "percentage_WT_below_15", "inVehicleTravelTime_mean",
 						"distance_m_mean", "directDistance_m_mean", "totalTravelTime_mean",
-						"fare_mean_including_daily_fare", "rejections", "rejectionRate"));
+						"fareAllReferences_mean", "rejections", "rejectionRate"));
 			}
 			bw.write(runId + ";" + it + ";" + summarizeLegs);
 			bw.newLine();

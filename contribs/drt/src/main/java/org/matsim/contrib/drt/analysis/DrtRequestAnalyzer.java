@@ -19,10 +19,7 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.Nullable;
 
@@ -42,6 +39,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
+
+import static org.matsim.contrib.drt.fare.DrtFareHandler.PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE;
 
 /**
  * Creates PerformedRequestEventSequence (for scheduled requests) and RejectedRequestEventSequence (for rejected requests).
@@ -130,7 +129,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	private final Map<Id<Request>, DrtRequestSubmittedEvent> requestSubmissions = new HashMap<>();
 	private final Map<Id<Request>, RejectedRequestEventSequence> rejectedRequestSequences = new HashMap<>();
 	private final Map<Id<Request>, PerformedRequestEventSequence> performedRequestSequences = new HashMap<>();
-	private double sumFaresNotReferencingALeg = 0.0d;
+	private final List<PersonMoneyEvent> drtFarePersonMoneyEvents = new ArrayList<>();
 
 	public DrtRequestAnalyzer(String mode) {
 		this.mode = mode;
@@ -148,8 +147,8 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		return performedRequestSequences;
 	}
 
-	public double getSumFaresNotReferencingALeg() {
-		return sumFaresNotReferencingALeg;
+	public List<PersonMoneyEvent> getDrtFarePersonMoneyEvents() {
+		return drtFarePersonMoneyEvents;
 	}
 
 	@Override
@@ -157,7 +156,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		requestSubmissions.clear();
 		rejectedRequestSequences.clear();
 		performedRequestSequences.clear();
-		sumFaresNotReferencingALeg = 0.0d;
+		drtFarePersonMoneyEvents.clear();
 	}
 
 	@Override
@@ -203,15 +202,13 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 				event.getPurpose() != null && event.getPurpose().equals(DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE)) {
 			if (event.getReference() == null) {
 				log.error("Found a PersonMoneyEvent with purpose " + event.getPurpose()  + " and transactionPartner " +
-						event.getTransactionPartner() + " but no drt request reference (null). This should not happen. Terminating.");
+						event.getTransactionPartner() + " but without field reference (null). This field should be the drt request id or " +
+						PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE + " or similar. Terminating.");
 				throw new RuntimeException();
 			}
+			drtFarePersonMoneyEvents.add(event);
 			PerformedRequestEventSequence sequence = performedRequestSequences.get(Id.create(event.getReference(), Request.class));
-			if (sequence == null) {
-				// fare not directly referencing a specific leg. E.g. a daily fare independent from the leg.
-				// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
-				sumFaresNotReferencingALeg -= event.getAmount();
-			} else {
+			if (sequence != null) {
 				sequence.drtFare = event;
 			}
 		}

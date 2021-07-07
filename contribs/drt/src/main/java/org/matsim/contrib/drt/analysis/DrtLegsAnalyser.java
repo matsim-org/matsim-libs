@@ -34,6 +34,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -121,7 +122,7 @@ public class DrtLegsAnalyser {
 	}
 
 	public static String summarizeLegs(List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances,
-									   String delimiter, double sumFaresNotReferencingALeg) {
+									   List<PersonMoneyEvent> drtFarePersonMoneyEvents, String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
@@ -145,7 +146,6 @@ public class DrtLegsAnalyser {
 			distanceStats.addValue(travelDistances.get(leg.request));
 			directDistanceStats.addValue(leg.unsharedDistanceEstimate_m);
 			traveltimes.addValue(leg.arrivalTime - leg.departureTime);
-			fares.addValue(leg.fare);
 		}
 
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
@@ -160,10 +160,10 @@ public class DrtLegsAnalyser {
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
 				format.format(traveltimes.getMean()) + "",//
-				// add daily fares and other fare components not referencing a particular leg
-				// -> mean fare per leg including share of daily subscription fare and similar
-				format.format(fares.getMean() +
-						sumFaresNotReferencingALeg / (waitStats.getValues().length == 0 ? 1 : waitStats.getValues().length)));
+				// all fares referencing this drt operator. Including daily fares independent from the legs.
+				// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
+				format.format(- drtFarePersonMoneyEvents.stream().mapToDouble(PersonMoneyEvent::getAmount).sum() /
+						(waitStats.getValues().length == 0 ? 1 : waitStats.getValues().length)));
 	}
 
 	public static double getDirectDistanceMean(List<DrtLeg> legs) {
