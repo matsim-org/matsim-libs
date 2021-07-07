@@ -1214,7 +1214,9 @@ public class TransitRouteTrimmerTest {
                 // TODO: real deep copy of value Object
                 copiedTransitLine.getAttributes().putAttribute(entry.getKey(), entry.getValue());
             }
-            copiedTransitLine.setName(new String(transitLine.getName()));
+            if (transitLine.getName() != null) {
+                copiedTransitLine.setName(new String(transitLine.getName()));
+            }
             copiedScenario.getTransitSchedule().addTransitLine(copiedTransitLine);
 
             for (TransitRoute transitRoute: transitLine.getRoutes().values()) {
@@ -1231,7 +1233,9 @@ public class TransitRouteTrimmerTest {
                         transitRoute.getId(), transitRoute.getRoute().clone(),
                         copiedTransitRouteStops,
                         new String(transitRoute.getTransportMode()));
-                copiedTransitRoute.setDescription(transitRoute.getDescription());
+                if (transitRoute.getDescription() != null) {
+                    copiedTransitRoute.setDescription(transitRoute.getDescription());
+                }
                 copiedTransitLine.addRoute(copiedTransitRoute);
 
                 for (Departure departure: transitRoute.getDepartures().values()) {
@@ -1255,7 +1259,7 @@ public class TransitRouteTrimmerTest {
         }
 
         for (Vehicle vehicle: inputScenario.getTransitVehicles().getVehicles().values()) {
-            Vehicle copiedVehicle = copiedScenario.getTransitVehicles().getFactory().createVehicle(vehicle.getId(), copiedScenario.getTransitVehicles().getVehicleTypes().get(vehicle.getType().getId()));
+            Vehicle copiedVehicle = copiedScenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId(vehicle.getId()), copiedScenario.getTransitVehicles().getVehicleTypes().get(vehicle.getType().getId()));
             copiedScenario.getTransitVehicles().addVehicle(copiedVehicle);
         }
 
