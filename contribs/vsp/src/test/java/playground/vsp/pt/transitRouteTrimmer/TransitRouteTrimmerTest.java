@@ -1281,7 +1281,9 @@ public class TransitRouteTrimmerTest {
         }
 
         for (Vehicle vehicle: inputScenario.getTransitVehicles().getVehicles().values()) {
-            Vehicle copiedVehicle = copiedScenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId(vehicle.getId()), copiedScenario.getTransitVehicles().getVehicleTypes().get(vehicle.getType().getId()));
+            Vehicle copiedVehicle = copiedScenario.getTransitVehicles().getFactory().createVehicle(
+                    Id.createVehicleId(vehicle.getId()),
+                    copiedScenario.getTransitVehicles().getVehicleTypes().get(vehicle.getType().getId()));
             copiedScenario.getTransitVehicles().addVehicle(copiedVehicle);
         }
 
