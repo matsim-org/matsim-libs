@@ -72,7 +72,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final String runId;
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
-	private final String notAvailableString = "NA";
+	private static final String notAvailableString = "NA";
 
 	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
 										DrtVehicleDistanceStats drtVehicleStats, MatsimServices matsimServices,
