@@ -35,21 +35,21 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RunTransitRouteTrimmerGladbeckExample {
+public class RunTransitRouteTrimmerBerlinSimpleExample {
     public static void main(String[] args) throws IOException, SchemaException {
 
-        final String inScheduleFile = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v0/optimizedSchedule.xml.gz";
-        final String inVehiclesFile = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v0/optimizedVehicles.xml.gz";
-        final String inNetworkFile = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v0/optimizedNetwork.xml.gz";
-        final String zoneShpFile = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/Gladbeck_area_b_en_detail_bus_hubs_Schnellbus_cut_out.shp";
+        final String inScheduleFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-schedule.xml.gz";
+        final String inVehiclesFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-vehicles.xml.gz";
+        final String inNetworkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
+        final String zoneShpFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-inner-city-area/inner-city-area.shp";
         final String outputPath = "output/";
-        final String epsgCode = "25832";
+        final String epsgCode = "31468";
 
 
         Config config = ConfigUtils.createConfig();
@@ -69,16 +69,16 @@ public class RunTransitRouteTrimmerGladbeckExample {
                 .filterTransitLinesForMode(transitSchedule.getTransitLines().values(), modes2Trim);
 
 
-        Set<Id<TransitLine>> linesSB = transitSchedule.getTransitLines().values().stream()
-                .filter(v -> v.getId().toString().contains("SB"))
+        Set<Id<TransitLine>> linesX = transitSchedule.getTransitLines().values().stream()
+                .filter(v -> v.getId().toString().contains("X"))
                 .map(v -> v.getId())
                 .collect(Collectors.toSet()
                 );
 
-        linesToModify.removeAll(linesSB);
+        linesToModify.removeAll(linesX);
 
 
-        Set<Id<TransitStopFacility>> stopsInZone = TransitRouteTrimmerUtils.getStopsInZone(scenario.getTransitSchedule(), new File(zoneShpFile).toURI().toURL());
+        Set<Id<TransitStopFacility>> stopsInZone = TransitRouteTrimmerUtils.getStopsInZone(scenario.getTransitSchedule(), new URL(zoneShpFile));
         Pair<TransitSchedule, Vehicles> results = TransitRouteTrimmer.splitRoute(scenario.getTransitSchedule(), scenario.getVehicles(), stopsInZone,
                 linesToModify, true, modes2Trim, 2, true, false, false, 0);
 
@@ -91,8 +91,8 @@ public class RunTransitRouteTrimmerGladbeckExample {
 
 
         TransitRouteTrimmerUtils.transitSchedule2ShapeFile(transitScheduleNew, outputPath + "output-trimmed-routes.shp",epsgCode);
-        new TransitScheduleWriter(transitScheduleNew).writeFile(outputPath + "optimizedSchedule_nonSB-bus-split-at-hubs.xml.gz");
-        new MatsimVehicleWriter(vehiclesNew).writeFile(outputPath + "optimizedVehicles_nonSB-bus-split-at-hubs.xml.gz");
+        new TransitScheduleWriter(transitScheduleNew).writeFile(outputPath + "transitScheduleNew.xml.gz");
+        new MatsimVehicleWriter(vehiclesNew).writeFile(outputPath + "vehiclesNew.xml.gz");
 
     }
 }
