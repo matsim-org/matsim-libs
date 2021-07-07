@@ -52,6 +52,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
+import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 
@@ -69,7 +70,7 @@ public class TripsAndLegsCSVWriter {
 
     public static final String[] LEGSHEADER_BASE = {"person", "trip_id",
             "dep_time", "trav_time", "wait_time", "distance", "mode", "start_link",
-            "start_x", "start_y", "end_link", "end_x", "end_y", "access_stop_id", "egress_stop_id", "transit_line", "transit_route"};
+            "start_x", "start_y", "end_link", "end_x", "end_y", "access_stop_id", "egress_stop_id", "transit_line", "transit_route", "vehicle_id"};
 
     private final String[] TRIPSHEADER;
     private final String[] LEGSHEADER;
@@ -264,6 +265,7 @@ public class TripsAndLegsCSVWriter {
 		record.add(Time.writeTime(leg.getDepartureTime().seconds()));
 		record.add(Time.writeTime(leg.getTravelTime().seconds()));
         Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
+        Id<Vehicle> vehicleId = (Id<Vehicle>) leg.getAttributes().getAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME);
         double waitingTime = 0.;
         if (boardingTime != null) {
 			waitingTime = boardingTime - leg.getDepartureTime().seconds();
@@ -294,6 +296,7 @@ public class TripsAndLegsCSVWriter {
         record.add(ptEgressStop);
         record.add(transitLine);
         record.add(transitRoute);
+        record.add(vehicleId != null ? vehicleId.toString() : "");
 
         record.addAll(legsWriterExtension.getAdditionalLegColumns(trip, leg));
         if (LEGSHEADER.length != record.size()) {
