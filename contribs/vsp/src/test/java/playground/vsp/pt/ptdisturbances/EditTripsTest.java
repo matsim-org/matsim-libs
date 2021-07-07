@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 
-package playground.vsp.ptdisturbances;
+package playground.vsp.pt.ptdisturbances;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
