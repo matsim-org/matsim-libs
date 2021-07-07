@@ -26,14 +26,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.withinday.utils.EditPlans;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ActivityWhileChargingFinder {
@@ -56,10 +55,20 @@ public class ActivityWhileChargingFinder {
 	 * @return null if no suitable activity was found
 	 */
 	@Nullable
-	Activity findActivityWhileChargingBeforeLeg(Plan plan, Leg leg){
+	Activity findActivityWhileChargingBeforeLeg(MobsimAgent mobsimAgent, Plan plan, Leg leg){
 		String evRoutingMode = TripStructureUtils.getRoutingMode(leg);
 		Preconditions.checkState(plan.getPlanElements().contains(leg));
 		List<PlanElement> planElementsBeforeLeg = plan.getPlanElements().subList(0, plan.getPlanElements().indexOf(leg));
+
+		List<PlanElement> precedentPluginInteractions = planElementsBeforeLeg.stream().filter(planElement -> planElement.equals(UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER)).collect(Collectors.toList());
+		List<Activity> precedentActsWhileCharging = new ArrayList<>();
+
+		for (PlanElement precedentPluginInteraction : precedentPluginInteractions) {
+
+		int index = plan.getPlanElements().indexOf(precedentPluginInteraction);
+		precedentActsWhileCharging.add(EditPlans.findRealActAfter(mobsimAgent, index));
+
+		}
 
 		List<Activity> activities = TripStructureUtils.getActivities(planElementsBeforeLeg, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 		List<Tuple<Leg, Activity>> evLegsWithFollowingActs = activities.stream()
@@ -80,7 +89,7 @@ public class ActivityWhileChargingFinder {
 			Leg nextEVLeg = getNextLegOfRoutingModeAfterActivity(plan.getPlanElements(), tuple.getSecond(), evRoutingMode);
 			Preconditions.checkNotNull(nextEVLeg, "should not happen");
 			double end = nextEVLeg.getDepartureTime().seconds();
-			if(end - begin >= minimumActDuration) return tuple.getSecond();
+			if(end - begin >= minimumActDuration && !precedentActsWhileCharging.contains(tuple.getSecond())) return tuple.getSecond();
 		}
 		return null;
 	}
