@@ -1070,7 +1070,6 @@ public class TransitRouteTrimmerTest {
 
         //Start of left route
         TransitRouteStop routeNew1Start = transitRouteNew1.getStops().get(0);
-        TransitRouteStop routeOld1Start = transitRouteOld.getStops().get(0);
 
         Assert.assertEquals(0., routeNew1Start.getDepartureOffset().seconds(),0.);
         Assert.assertEquals(0., routeNew1Start.getArrivalOffset().seconds(), 0.);
