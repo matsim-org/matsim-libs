@@ -26,24 +26,32 @@ import org.junit.Test;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
+/**
+ * TODO: reduce size of input files: either cut files to only include relevant TransitLines or use different scenario
+ * Maybe the latter would be better such that we can include those files on this repository / write them as Fixture in Java.
+ *
+ * @author jakobrehmann
+ */
 public class TransitRouteTrimmerTest {
 
     final String inZoneShpFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-berlin-hundekopf-areas/berlin_hundekopf.shp";
@@ -51,6 +59,7 @@ public class TransitRouteTrimmerTest {
     final String inVehiclesFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-vehicles.xml.gz";
     final String inNetworkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
 
+    private static Scenario inputScenario;
 
     /**
      * This test class examines three different types of routes:
@@ -88,7 +97,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void test_AllIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.allIn.transitLineId;
@@ -117,7 +126,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void test_HalfIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.halfIn.transitLineId;
@@ -144,7 +153,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void test_MiddleIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -177,7 +186,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testDeleteRoutesEntirelyInsideZone_AllIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.allIn.transitLineId;
@@ -212,7 +221,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testDeleteRoutesEntirelyInsideZone_HalfIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.halfIn.transitLineId;
@@ -258,7 +267,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testDeleteRoutesEntirelyInsideZone_MiddleIn() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -305,7 +314,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testTrimEnds_AllIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.allIn.transitLineId;
@@ -339,7 +348,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testTrimEnds_HalfIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.halfIn.transitLineId;
@@ -395,7 +404,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testTrimEnds_MiddleIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -442,7 +451,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testSkipStops_AllIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.allIn.transitLineId;
@@ -473,7 +482,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testSkipStops_HalfIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         // Before trim
@@ -524,7 +533,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testSkipStops_MiddleIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
 
@@ -573,7 +582,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testSplitRoutes_AllIn() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.allIn.transitLineId;
@@ -606,7 +615,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_HalfIn() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.halfIn.transitLineId;
@@ -656,7 +665,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_MiddleIn() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -721,7 +730,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_MiddleIn_Hub_ValidateReach() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -790,7 +799,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_MiddleIn_Hub_IncludeFirstHubInZone() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
         Id<TransitRoute> transitRouteId = routeType.middleIn.transitRouteId;
@@ -866,7 +875,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_MiddleIn_Hub_MultipleHubs() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -934,7 +943,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_MiddleIn_Hub_OverlapRoutes() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -989,7 +998,7 @@ public class TransitRouteTrimmerTest {
      */
     @Test
     public void testSplitRoutes_MiddleIn_AllowableStopsWithin() {
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
         Id<TransitRoute> transitRouteId = routeType.middleIn.transitRouteId;
@@ -1032,7 +1041,7 @@ public class TransitRouteTrimmerTest {
     @Test
     public void testDeparturesAndOffsetsAndDescription() {
 
-        Scenario scenario = createScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
+        Scenario scenario = provideCopyOfScenario(this.inScheduleFile, this.inNetworkFile, this.inVehiclesFile);
         Set<Id<TransitStopFacility>> stopsInZone = getStopsInZone(scenario.getTransitSchedule(), inZoneShpFile);
 
         Id<TransitLine> transitLineId = routeType.middleIn.transitLineId;
@@ -1150,14 +1159,105 @@ public class TransitRouteTrimmerTest {
         return stopsInZone;
     }
 
-    private Scenario createScenario(String scheduleFile, String networkFile, String vehiclesFile) {
+    /*
+     * TODO: copy this scenario cloning stuff somewhere else and test it.
+     * TODO: There is some overlap with the copies the main class to be tested does, but maybe deep copies are less necessary there
+     */
+    private Scenario provideCopyOfScenario(String scheduleFile, String networkFile, String vehiclesFile) {
 
-        Config config = ConfigUtils.createConfig();
-        config.transit().setTransitScheduleFile(scheduleFile);
-        config.network().setInputFile(networkFile);
-        config.transit().setVehiclesFile(vehiclesFile);
+        if (inputScenario == null) {
+            Config config = ConfigUtils.createConfig();
+            config.transit().setTransitScheduleFile(scheduleFile);
+            config.network().setInputFile(networkFile);
+            config.transit().setVehiclesFile(vehiclesFile);
 
-        return ScenarioUtils.loadScenario(config);
+            inputScenario = ScenarioUtils.loadScenario(config);
+        }
+
+        // copy scenario
+        Scenario copiedScenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+
+        // copy Network
+        for (Node node: inputScenario.getNetwork().getNodes().values()) {
+            copiedScenario.getNetwork().addNode(
+                    copiedScenario.getNetwork().getFactory().createNode(
+                            node.getId(), CoordUtils.createCoord(node.getCoord().getX(), node.getCoord().getY())));
+        }
+
+        for (Link link: inputScenario.getNetwork().getLinks().values()) {
+            copiedScenario.getNetwork().addLink(
+                    copiedScenario.getNetwork().getFactory().createLink(
+                            link.getId(),
+                            copiedScenario.getNetwork().getNodes().get(link.getFromNode().getId()),
+                            copiedScenario.getNetwork().getNodes().get(link.getToNode().getId())));
+        }
+
+        // copy TransitSchedule
+        for (TransitStopFacility transitStopFacility: inputScenario.getTransitSchedule().getFacilities().values()) {
+            TransitStopFacility copiedTransitStopFacility = copiedScenario.getTransitSchedule().getFactory().
+                    createTransitStopFacility(                    transitStopFacility.getId(),
+                    CoordUtils.createCoord(
+                            transitStopFacility.getCoord().getX(), transitStopFacility.getCoord().getY()),
+                    transitStopFacility.getIsBlockingLane());
+            for (Map.Entry<String, Object> entry: transitStopFacility.getAttributes().getAsMap().entrySet()) {
+                // TODO: real deep copy of value Object
+                copiedTransitStopFacility.getAttributes().putAttribute(entry.getKey(), entry.getValue());
+            }
+            copiedTransitStopFacility.setLinkId(transitStopFacility.getLinkId());
+            copiedScenario.getTransitSchedule().addStopFacility(copiedTransitStopFacility);
+        }
+
+        for (TransitLine transitLine: inputScenario.getTransitSchedule().getTransitLines().values()) {
+            TransitLine copiedTransitLine = copiedScenario.getTransitSchedule().getFactory().createTransitLine(
+                    transitLine.getId());
+            for (Map.Entry<String, Object> entry: transitLine.getAttributes().getAsMap().entrySet()) {
+                // TODO: real deep copy of value Object
+                copiedTransitLine.getAttributes().putAttribute(entry.getKey(), entry.getValue());
+            }
+            copiedScenario.getTransitSchedule().addTransitLine(copiedTransitLine);
+
+            for (TransitRoute transitRoute: transitLine.getRoutes().values()) {
+                List<TransitRouteStop> copiedTransitRouteStops = new ArrayList<>();
+                for (TransitRouteStop transitRouteStop: transitRoute.getStops()) {
+                    copiedTransitRouteStops.add(
+                            copiedScenario.getTransitSchedule().getFactory().createTransitRouteStop(
+                                    copiedScenario.getTransitSchedule().getFacilities().get(
+                                            transitRouteStop.getStopFacility().getId()),
+                                    transitRouteStop.getArrivalOffset(),
+                                    transitRouteStop.getDepartureOffset()));
+                }
+                TransitRoute copiedTransitRoute = copiedScenario.getTransitSchedule().getFactory().createTransitRoute(
+                        transitRoute.getId(), transitRoute.getRoute().clone(),
+                        copiedTransitRouteStops,
+                        new String(transitRoute.getTransportMode()));
+                copiedTransitLine.addRoute(copiedTransitRoute);
+
+                for (Departure departure: transitRoute.getDepartures().values()) {
+                    Departure copiedDeparture = copiedScenario.getTransitSchedule().getFactory().createDeparture(
+                            departure.getId(), departure.getDepartureTime());
+                    copiedDeparture.setVehicleId(departure.getVehicleId());
+                    copiedTransitRoute.addDeparture(copiedDeparture);
+                }
+            }
+        }
+
+        // copy TransitVehicles
+        for (VehicleType vehicleType: inputScenario.getTransitVehicles().getVehicleTypes().values()) {
+            VehicleType copiedVehicleType = copiedScenario.getTransitVehicles().getFactory().createVehicleType(vehicleType.getId());
+            copiedVehicleType.getCapacity().setSeats(vehicleType.getCapacity().getSeats());
+            copiedVehicleType.getCapacity().setStandingRoom(vehicleType.getCapacity().getStandingRoom());
+            VehicleUtils.setDoorOperationMode(copiedVehicleType, VehicleUtils.getDoorOperationMode(vehicleType));
+            VehicleUtils.setAccessTime(copiedVehicleType, VehicleUtils.getAccessTime(vehicleType));
+            VehicleUtils.setEgressTime(copiedVehicleType, VehicleUtils.getEgressTime(vehicleType));
+            copiedScenario.getTransitVehicles().addVehicleType(copiedVehicleType);
+        }
+
+        for (Vehicle vehicle: inputScenario.getTransitVehicles().getVehicles().values()) {
+            Vehicle copiedVehicle = copiedScenario.getTransitVehicles().getFactory().createVehicle(vehicle.getId(), copiedScenario.getTransitVehicles().getVehicleTypes().get(vehicle.getType().getId()));
+            copiedScenario.getTransitVehicles().addVehicle(copiedVehicle);
+        }
+
+        return copiedScenario;
     }
 
     private Set<Id<Vehicle>> getVehiclesUsedInTransitSchedule(TransitSchedule transitScheduleNew) {
