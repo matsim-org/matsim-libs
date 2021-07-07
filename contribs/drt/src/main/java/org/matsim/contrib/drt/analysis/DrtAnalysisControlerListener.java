@@ -148,7 +148,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					"arrivalTime",//
 					"travelTime",//
 					"travelDistance_m",//
-					"direcTravelDistance_m",//
+					"directTravelDistance_m",//
 					"fareForTrip");
 
 			DrtTripsAnalyser.collection2Text(trips, filename(event, "drt_trips", ".csv"), header,

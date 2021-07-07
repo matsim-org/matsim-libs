@@ -163,7 +163,7 @@ public class DrtTripsAnalyser {
 				// add daily fares and other fare components not referencing a particular trip
 				// -> mean fare per trip including share of daily subscription fare and similar
 				format.format(fares.getMean() +
-						sumFaresNotReferencingATrip / (waitStats.getValues().length == 0.0 ? 1 : waitStats.getValues().length)));
+						sumFaresNotReferencingATrip / (waitStats.getValues().length == 0 ? 1 : waitStats.getValues().length)));
 	}
 
 	public static double getDirectDistanceMean(List<DrtTrip> trips) {
