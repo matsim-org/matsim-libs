@@ -34,7 +34,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 
 import com.google.common.base.Preconditions;
 
-final class DrtTrip {
+final class DrtLeg {
 	final Id<Request> request;
 	final double departureTime;
 	final Id<Person> person;
@@ -49,7 +49,7 @@ final class DrtTrip {
 	final double arrivalTime;
 	final double fare;
 
-	DrtTrip(PerformedRequestEventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
+	DrtLeg(PerformedRequestEventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
 		Preconditions.checkArgument(sequence.isCompleted());
 		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
 		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();

@@ -45,7 +45,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 
 /**
  * Creates PerformedRequestEventSequence (for scheduled requests) and RejectedRequestEventSequence (for rejected requests).
- * Almost all data for request/trip analysis is there (except info on actual paths), so should be quite reusable.
+ * Almost all data for request/leg analysis is there (except info on actual paths), so should be quite reusable.
  *
  * @author jbischoff
  * @author Michal Maciejewski
@@ -130,7 +130,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	private final Map<Id<Request>, DrtRequestSubmittedEvent> requestSubmissions = new HashMap<>();
 	private final Map<Id<Request>, RejectedRequestEventSequence> rejectedRequestSequences = new HashMap<>();
 	private final Map<Id<Request>, PerformedRequestEventSequence> performedRequestSequences = new HashMap<>();
-	private double sumFaresNotReferencingATrip = 0.0d;
+	private double sumFaresNotReferencingALeg = 0.0d;
 
 	public DrtRequestAnalyzer(String mode) {
 		this.mode = mode;
@@ -148,8 +148,8 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		return performedRequestSequences;
 	}
 
-	public double getSumFaresNotReferencingATrip() {
-		return sumFaresNotReferencingATrip;
+	public double getSumFaresNotReferencingALeg() {
+		return sumFaresNotReferencingALeg;
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		requestSubmissions.clear();
 		rejectedRequestSequences.clear();
 		performedRequestSequences.clear();
-		sumFaresNotReferencingATrip = 0.0d;
+		sumFaresNotReferencingALeg = 0.0d;
 	}
 
 	@Override
@@ -208,9 +208,9 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			}
 			PerformedRequestEventSequence sequence = performedRequestSequences.get(Id.create(event.getReference(), Request.class));
 			if (sequence == null) {
-				// fare not directly referencing a specific trip. E.g. a daily fare independent from the trip.
+				// fare not directly referencing a specific leg. E.g. a daily fare independent from the leg.
 				// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
-				sumFaresNotReferencingATrip -= event.getAmount();
+				sumFaresNotReferencingALeg -= event.getAmount();
 			} else {
 				sequence.drtFare = event;
 			}
