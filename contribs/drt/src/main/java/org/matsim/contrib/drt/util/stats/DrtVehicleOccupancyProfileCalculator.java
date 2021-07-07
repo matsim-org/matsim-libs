@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
@@ -47,6 +48,8 @@ import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Verify;
@@ -58,7 +61,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DrtVehicleOccupancyProfileCalculator
 		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
-		TaskEndedEventHandler {
+		TaskEndedEventHandler, AfterMobsimListener {
 
 	private static class VehicleState {
 		private Task.TaskType taskType;
@@ -66,6 +69,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		private double beginTime;
 	}
 
+	private final static Logger log = Logger.getLogger(DrtVehicleOccupancyProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
@@ -80,6 +84,7 @@ public class DrtVehicleOccupancyProfileCalculator
 	private final String dvrpMode;
 
 	private boolean wasConsolidatedInThisIteration = false;
+	private boolean mobsimHasFinished = false;
 
 	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
 			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
@@ -105,7 +110,12 @@ public class DrtVehicleOccupancyProfileCalculator
 	}
 
 	private void consolidate() {
+		if (!mobsimHasFinished) {
+			log.error("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
+			throw new RuntimeException("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
+		}
 		if (!wasConsolidatedInThisIteration) {
+			// consolidate
 			for (VehicleState state : vehicleStates.values()) {
 				if (state.taskType != null) {
 					increment(state, analysisEndTime);
@@ -126,16 +136,12 @@ public class DrtVehicleOccupancyProfileCalculator
 	}
 
 	public Map<Task.TaskType, double[]> getNonPassengerServingTaskProfiles() {
-		if (!wasConsolidatedInThisIteration) {
-			this.consolidate();
-		}
+		this.consolidate();
 		return nonPassengerServingTaskProfiles;
 	}
 
 	public List<double[]> getVehicleOccupancyProfiles() {
-		if (!wasConsolidatedInThisIteration) {
-			this.consolidate();
-		}
+		this.consolidate();
 		return vehicleOccupancyProfiles;
 	}
 
@@ -242,6 +248,11 @@ public class DrtVehicleOccupancyProfileCalculator
 	}
 
 	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		mobsimHasFinished = true;
+	}
+
+	@Override
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
@@ -251,5 +262,6 @@ public class DrtVehicleOccupancyProfileCalculator
 
 		nonPassengerServingTaskProfiles = new HashMap<>();
 		wasConsolidatedInThisIteration = false;
+		mobsimHasFinished = false;
 	}
 }

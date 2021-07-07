@@ -70,6 +70,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				getter -> new DrtVehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 						300, getter.get(QSimConfigGroup.class), nonPassengerServingTaskTypes))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
+		addControlerListenerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,
