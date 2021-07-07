@@ -28,18 +28,18 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-public class QueueAgentSnapshotInfoBuilderTest {
+public class EquiDistAgentSnapshotInfoBuilderTest {
 
     @Test
-    public void positionVehiclesAlongLine_singleVehicleFreeFlow() {
+    public void positionVehiclesAlongLine_singleVehicleFreeFlow(){
 
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
         var now = 1.0;
         var vehicles = createVehicles(setUp.link, 1, setUp.linkEnterTime + setUp.linkLength / setUp.freespeed);
-        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
+        var builder = new EquiDistAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
 
         // act
         builder.positionVehiclesAlongLine(
@@ -60,17 +60,8 @@ public class QueueAgentSnapshotInfoBuilderTest {
         assertEquals(1, outCollection.size());
         AgentSnapshotInfo firstEntry = outCollection.iterator().next();
 
-        double expectedEasting = setUp.freespeed * now;
-
-        assertEquals(expectedEasting, firstEntry.getEasting(), 0.00001);
-        assertEquals(-18.75, firstEntry.getNorthing(), 0.00001); // the calculator assumes an offset to the right of the driving direction ...
-
-        var vehicle = vehicles.iterator().next();
-        assertEquals(vehicle.getDriver().getId(), firstEntry.getId());
-        assertEquals(vehicle.getCurrentLink().getId(), firstEntry.getLinkId());
-        assertEquals(vehicle.getId(), firstEntry.getVehicleId());
-        assertEquals(1.0, firstEntry.getColorValueBetweenZeroAndOne(), 0.00001);
-        assertEquals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, firstEntry.getAgentState());
+        // i guess this belong into the center of the link
+        assertEquals(setUp.linkLength / 2, firstEntry.getEasting(), 0.00001);
     }
 
     @Test
@@ -109,134 +100,6 @@ public class QueueAgentSnapshotInfoBuilderTest {
             assertEquals(expectedEasting, info.getEasting(), 0.0001);
             expectedEasting -= offsetBetweenVehicles;
         }
-    }
-
-    @Test
-    public void positionVehiclesAlongLine_queueAtEnd() {
-
-        var setUp = new SimpleTestSetUp();
-        // use other vehicle list than in simple set up
-        var vehicles = createVehicles(setUp.link, 5, 0);
-        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
-
-        // act
-        builder.positionVehiclesAlongLine(
-                outCollection,
-                setUp.now,
-                vehicles,
-                setUp.linkLength,
-                setUp.linkCapacity,
-                setUp.fromCoord,
-                setUp.toCoord,
-                1 / setUp.linkCapacity,
-                setUp.freespeed,
-                1,
-                new LinkedList<>()
-        );
-
-        // assert
-        assertEquals(5, outCollection.size());
-
-        // we expect 2 cars to be congested at the end of the link with an offset of 10 and a speed of 0
-        var vehicle1 = outCollection.get(0);
-        assertEquals(100, vehicle1.getEasting(), 0.0001);
-        assertEquals(0.0, vehicle1.getColorValueBetweenZeroAndOne(), 0.00001);
-        var vehicle2 = outCollection.get(1);
-        assertEquals(90, vehicle2.getEasting(), 0.00001);
-        assertEquals(0.0, vehicle2.getColorValueBetweenZeroAndOne(), 0.00001);
-
-        // we expect 1 car to be at the beginning of the queue (2 vehicles * 10 + 10 [its own offset]) with a speed of 1.0
-        var vehicle3 = outCollection.get(2);
-        assertEquals(80, vehicle3.getEasting(), 0.0001);
-        assertEquals(1.0, vehicle3.getColorValueBetweenZeroAndOne(), 0.0001);
-
-        // we expect 2 cars to be at freeflow somewhere on the link
-        var vehicle4 = outCollection.get(3);
-        // linkLength 100, freespeed 10m/s, 5s till earliest exit time -> 100 - 10 * 5 = 50
-        assertEquals(50, vehicle4.getEasting(), 0.0001);
-        assertEquals(1.0, vehicle4.getColorValueBetweenZeroAndOne(), 0.0001);
-        var vehicle5 = outCollection.get(4);
-        // linkLength 100, freespeed 10m/s, 10s till earliest exit time -> 100 - 10 * 10 = 0
-        assertEquals(0, vehicle5.getEasting(), 0.0001);
-        assertEquals(1.0, vehicle5.getColorValueBetweenZeroAndOne(), 0.0001);
-    }
-
-    private static void assertStackedPositions(Collection<AgentSnapshotInfo> positions, double expectedEasting, double expectedFirstNothing, AgentSnapshotInfo.AgentState expectedState) {
-
-        // the positions should be at (expectedEasting, -18.75 - 3.75 * waitingListIndex)
-        // all should drive a car
-        // agentId, vehicleId, linkId should all be 1 if they come out of 'createVehicles' or 'createAgents'
-        var expectedNorthing = expectedFirstNothing;
-        for (AgentSnapshotInfo info : positions) {
-
-            assertEquals(expectedEasting, info.getEasting(), 0.000001);
-            assertEquals(expectedNorthing, info.getNorthing(), 0.00001);
-            assertEquals(expectedState, info.getAgentState());
-            assertEquals(Id.createPersonId(1), info.getId());
-            assertEquals(Id.createLinkId(1), info.getLinkId());
-
-            expectedNorthing -= 3.75;
-        }
-    }
-
-    @Test
-    public void positionAgentsInActivities() {
-
-        var setUp = new SimpleTestSetUp();
-        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
-        var waitingList = createAgents(20);
-
-        // act
-        var newCount = builder.positionAgentsInActivities(outCollection, setUp.link, waitingList, setUp.counter);
-
-        // assert
-        assertEquals(setUp.counter + waitingList.size(), newCount);
-        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -15, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
-
-    }
-
-    @Test
-    public void positionVehiclesFromWaitingList() {
-
-        var setUp = new SimpleTestSetUp();
-        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
-
-        // act
-        var newCount = builder.positionVehiclesFromWaitingList(outCollection, setUp.link, setUp.counter, setUp.waitingList);
-
-        // assert
-        assertEquals(setUp.waitingList.size(), outCollection.size());
-        assertEquals(setUp.counter + setUp.waitingList.size(), newCount);
-
-        // the positions should be at (0.9 * linkLength, -18.75 - 3.75 * waitingListIndex)
-        // all should drive a car
-        // agentId, vehicleId, linkId should all be 1
-        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -15, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
-        outCollection.forEach(position -> assertEquals(Id.createVehicleId(1), position.getVehicleId()));
-    }
-
-    @Test
-    public void positionVehiclesFromTransitStop() {
-
-        var setUp = new SimpleTestSetUp();
-        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
-        var waitingList = createTransitVehicles(setUp.link, 1, 100);
-
-        // act
-        var newCount = builder.positionVehiclesFromTransitStop(outCollection, setUp.link, waitingList, setUp.counter);
-
-        // this is the driver
-        var firstPosition = outCollection.remove(0);
-        assertEquals(AgentSnapshotInfo.AgentState.TRANSIT_DRIVER, firstPosition.getAgentState());
-        assertEquals(setUp.linkLength * 0.9, firstPosition.getEasting(), 0.00001);
-        assertEquals(-15, firstPosition.getNorthing(), 0.00001);
-
-
-        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -18.75, AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE);
     }
 
     private static class SimpleTestSetUp {
@@ -473,4 +336,5 @@ public class QueueAgentSnapshotInfoBuilderTest {
         }
         return result;
     }
+
 }

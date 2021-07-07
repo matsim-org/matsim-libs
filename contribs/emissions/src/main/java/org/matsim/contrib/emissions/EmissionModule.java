@@ -86,6 +86,15 @@ public final class EmissionModule {
 		return this.coldEmissionHandler.getColdEmissionAnalysisModule();
 	}
 
+	// make these available for position emission module
+	Set<Pollutant> getWarmPollutants() {
+		return warmPollutants;
+	}
+
+	Set<Pollutant> getColdPollutants() {
+		return coldPollutants;
+	}
+
 	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
 	// for the analysis purpose. Need a test. Amit Apr'17
 	public EventsManager getEmissionEventsManager() {

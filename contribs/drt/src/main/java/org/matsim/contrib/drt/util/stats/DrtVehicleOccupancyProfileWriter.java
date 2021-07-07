@@ -71,7 +71,6 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
-		calculator.consolidate();
 
 		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getNonPassengerServingTaskProfiles()
 						.entrySet()
