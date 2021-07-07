@@ -28,6 +28,7 @@ import org.matsim.vis.snapshotwriters.PositionEvent;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class PositionEmissionsModule extends AbstractModule {
 
@@ -241,7 +242,19 @@ public class PositionEmissionsModule extends AbstractModule {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                     var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
                     eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
+
+                } else {
+                    log.warn("speed was too fast: " + speed + "m/s Current time: " + event.getTime() + " prev time: " + previousPosition.getTime() + " current linkId: " + event.getLinkId() + " prev linkId: " + previousPosition.getLinkId() + " agentId: " + event.getPersonId());
                 }
+            } else {
+                // if the vehicle hasn't moved, issue an event with 0 emissions. This way there is an event for every timestep
+                // we want that for the palm integration. The more appropriate fix would be to not issue an event here
+                // but generate the 0 emission positions in the necdf module in the palm project but this is much easier
+                // and will do for now
+                // janek july'21
+                var emissions = emissionCalculator.emissionModule.getWarmPollutants().stream()
+                        .collect(Collectors.toMap(key -> key, key -> 0.0));
+                eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
             }
         }
     }
