@@ -298,9 +298,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Preconditions.checkState(legIndex > -1, "could not locate leg in plan");
 
 		//find suitable non-stage activity before SOC threshold passover
-		Activity actWhileCharging = activityWhileChargingFinder.findActivityWhileChargingBeforeLeg(modifiablePlan, (Leg) modifiablePlan.getPlanElements().get(legIndex));
+		Activity actWhileCharging = activityWhileChargingFinder.findActivityWhileChargingBeforeLeg(mobsimagent, modifiablePlan, (Leg) modifiablePlan.getPlanElements().get(legIndex));
 			if (actWhileCharging == null){
-				log.warn(mobsimagent + " can't find a suitable activity befor the critical leg!");
+				log.warn(mobsimagent + " can't find a suitable activity before the critical leg!");
 			}
 
 //		Preconditions.checkNotNull(actWhileCharging, "could not insert plugin activity in plan of agent " + mobsimagent.getId() +

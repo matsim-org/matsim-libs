@@ -60,7 +60,7 @@ public class ActivityWhileChargingFinder {
 		Preconditions.checkState(plan.getPlanElements().contains(leg));
 		List<PlanElement> planElementsBeforeLeg = plan.getPlanElements().subList(0, plan.getPlanElements().indexOf(leg));
 
-		List<PlanElement> precedentPluginInteractions = planElementsBeforeLeg.stream().filter(planElement -> planElement.equals(UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER)).collect(Collectors.toList());
+		List<PlanElement> precedentPluginInteractions = planElementsBeforeLeg.stream().filter(planElement -> planElement.toString().contains((UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER))).collect(Collectors.toList());
 		List<Activity> precedentActsWhileCharging = new ArrayList<>();
 
 		for (PlanElement precedentPluginInteraction : precedentPluginInteractions) {
