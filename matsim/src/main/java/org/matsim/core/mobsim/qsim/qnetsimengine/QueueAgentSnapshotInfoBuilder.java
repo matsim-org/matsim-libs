@@ -49,7 +49,7 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 	}
 
 	@Override
-	public double calculateVehicleSpacing(double curvedLength, double overallStorageCapacity,
+	double calculateVehicleSpacing(double curvedLength, double overallStorageCapacity,
 			Collection<? extends VisVehicle> vehs) {
 		// the length of a vehicle in visualization
 		
@@ -64,12 +64,13 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		);
 	}
 
-	public double calculateOdometerDistanceFromFromNode(
-			double time, double linkLength, double freespeed, double spacing, double prevVehicleDistance, double remainingTravelTime
+	@Override
+	double calculateOdometerDistanceFromFromNode(
+			double time, double curvedLength, double freespeed, double spacing, double prevVehiclesDistance, double remainingTravelTime
 	) {
 
 		// avoid divide by 0 and place vehicles at root of link when link has zero length
-		if (linkLength == 0) {
+		if (curvedLength == 0) {
 			return 0;
 		}
 
@@ -82,29 +83,29 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		 *
 		 * The current version tries to simplify this logic by calculating the vehicle's position by simply using
 		 * v = s/t -> s = v*t. Because t is the remaining time s is the distance to the toNode. We have to therefore
-		 * subtract s from the overall linkLength to receive the distance from fromNode:
-		 * linkLength - s -> linkLength - v*t -> linkLength - freespeed * remainingTravelTime
+		 * subtract s from the overall curvedLength to receive the distance from fromNode:
+		 * curvedLength - s -> curvedLength - v*t -> curvedLength - freespeed * remainingTravelTime
 		 *
 		 * This will produce a constant motion since the qsim will generate only a single position for the timestep in
 		 * which the vehicle has its link enter, link leave event when crossing two links. The last position on the old
 		 * link will be the position of the toNode. The first position generated on the new link is going to be the
 		 * timestep after the link enter event for that link occurred. janek june'21
 		 */
-		var result = linkLength - freespeed * remainingTravelTime;
+		var result = curvedLength - freespeed * remainingTravelTime;
 
 		// if someone passes negative parameters place the vehicle at the beginning of the link
 		if (result < 0.0) { result = 0.0; }
 
-		// This is a bit weird if prevVehicleDistance is NAN, this is the first vehicle. I guess this is a little uncommon
+		// This is a bit weird if prevVehiclesDistance is NAN, this is the first vehicle. I guess this is a little uncommon
 		// in Java, but this is how I found things.
 		// Place a virtual vehicle at the end of the link + spacing so this vehicle can queue at the link's end
-		if (Double.isNaN(prevVehicleDistance)) {
-			prevVehicleDistance = linkLength + spacing;
+		if (Double.isNaN(prevVehiclesDistance)) {
+			prevVehiclesDistance = curvedLength + spacing;
 		}
 		// if the freeflow position is further along the link as the prev vehicle, this vehicle has to queue behind the
 		// previous.
-		if (result >= prevVehicleDistance - spacing) {
-			result = prevVehicleDistance - spacing;
+		if (result >= prevVehiclesDistance - spacing) {
+			result = prevVehiclesDistance - spacing;
 		}
 
 		return result;

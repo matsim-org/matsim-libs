@@ -195,8 +195,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		// yyyyyy might be faster by sorting holes into a regular array list ...
 
-		double freespeedTraveltime = curvedLength / freeSpeed ;
-
 		double distanceFromFromNode = Double.NaN;
 
 		for ( MobsimVehicle mveh : vehs) {
@@ -238,9 +236,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	}
 
 
-	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
+	abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
-	public abstract double calculateOdometerDistanceFromFromNode(double time, double linkLength, double freespeed,
+	abstract double calculateOdometerDistanceFromFromNode(double time, double linkLength, double freespeed,
 			double spacing, double prevVehicleDistance, double remainingTravelTime);
 
 	private int positionStack(final Collection<AgentSnapshotInfo> positions, final Collection<QVehicle> vehicles, final int startCount) {

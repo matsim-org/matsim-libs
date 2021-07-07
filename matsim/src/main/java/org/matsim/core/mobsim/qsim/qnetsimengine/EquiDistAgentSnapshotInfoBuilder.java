@@ -37,7 +37,7 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 
 	
 	@Override
-	public double calculateVehicleSpacing(double linkLength, double overallStorageCapacity,
+	double calculateVehicleSpacing(double linkLength, double overallStorageCapacity,
 			Collection<? extends VisVehicle> vehs) {
 		double sum = 0. ;
 		for ( VisVehicle veh : vehs ) {
@@ -47,7 +47,7 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 	}
 
 	@Override
-	public double calculateOdometerDistanceFromFromNode(
+	double calculateOdometerDistanceFromFromNode(
 			double time, double linkLength, double freespeed, double spacing, double prevVehicleDistance, double remainingTravelTime
 	) {
 		return Double.isNaN(prevVehicleDistance) ? linkLength - (spacing / 2.0) : prevVehicleDistance - spacing;
