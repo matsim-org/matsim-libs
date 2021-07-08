@@ -34,6 +34,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -45,33 +46,33 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-public class DrtTripsAnalyser {
+public class DrtLegsAnalyser {
 
-	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
-			int binSize_s) {
-		LinkedList<DrtTrip> alltrips = new LinkedList<>(trips);
-		DrtTrip currentTrip = alltrips.pollFirst();
-		if (currentTrip.departureTime > endTime) {
-			Logger.getLogger(DrtTripsAnalyser.class).error("wrong end / start Times for analysis");
+	public static Map<Double, List<DrtLeg>> splitLegsIntoBins(Collection<DrtLeg> legs, int startTime, int endTime,
+															  int binSize_s) {
+		LinkedList<DrtLeg> allLegs = new LinkedList<>(legs);
+		DrtLeg currentLeg = allLegs.pollFirst();
+		if (currentLeg.departureTime > endTime) {
+			Logger.getLogger(DrtLegsAnalyser.class).error("wrong end / start Times for analysis");
 		}
-		Map<Double, List<DrtTrip>> splitTrips = new TreeMap<>();
+		Map<Double, List<DrtLeg>> splitLegs = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
-			List<DrtTrip> currentList = new ArrayList<>();
-			splitTrips.put((double)time, currentList);
-			while (currentTrip.departureTime < time + binSize_s) {
-				currentList.add(currentTrip);
-				currentTrip = alltrips.pollFirst();
-				if (currentTrip == null) {
-					return splitTrips;
+			List<DrtLeg> currentList = new ArrayList<>();
+			splitLegs.put((double)time, currentList);
+			while (currentLeg.departureTime < time + binSize_s) {
+				currentList.add(currentLeg);
+				currentLeg = allLegs.pollFirst();
+				if (currentLeg == null) {
+					return splitLegs;
 				}
 			}
 		}
 
-		return splitTrips;
+		return splitLegs;
 	}
 
-	public static void analyzeBoardingsAndDeboardings(List<DrtTrip> trips, String delimiter, double startTime,
-			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+	public static void analyzeBoardingsAndDeboardings(List<DrtLeg> legs, String delimiter, double startTime,
+													  double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
@@ -79,18 +80,18 @@ public class DrtTripsAnalyser {
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
 		int bins = (int)((endTime - startTime) / timeBinSize);
 
-		for (DrtTrip trip : trips) {
-			int[] board = boardings.getOrDefault(trip.fromLinkId, new int[bins]);
-			int startTimeBin = (int)((trip.departureTime + trip.waitTime - startTime) / timeBinSize);
+		for (DrtLeg leg : legs) {
+			int[] board = boardings.getOrDefault(leg.fromLinkId, new int[bins]);
+			int startTimeBin = (int)((leg.departureTime + leg.waitTime - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
-				boardings.put(trip.fromLinkId, board);
+				boardings.put(leg.fromLinkId, board);
 			}
-			int[] deboard = deboardings.getOrDefault(trip.toLink, new int[bins]);
-			int arrivalTimeBin = (int)((trip.arrivalTime - startTime) / timeBinSize);
+			int[] deboard = deboardings.getOrDefault(leg.toLink, new int[bins]);
+			int arrivalTimeBin = (int)((leg.arrivalTime - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
-				deboardings.put(trip.fromLinkId, deboard);
+				deboardings.put(leg.fromLinkId, deboard);
 			}
 		}
 		writeBoardings(boardingsFile, network, boardings, startTime, timeBinSize, bins, delimiter);
@@ -120,14 +121,15 @@ public class DrtTripsAnalyser {
 		}
 	}
 
-	public static String summarizeTrips(List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
-			String delimiter) {
+	public static String summarizeLegs(List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances,
+									   List<PersonMoneyEvent> drtFarePersonMoneyEvents, String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
 		DescriptiveStatistics traveltimes = new DescriptiveStatistics();
+		DescriptiveStatistics fares = new DescriptiveStatistics();
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -135,15 +137,15 @@ public class DrtTripsAnalyser {
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
 
-		for (DrtTrip trip : trips) {
-			if (trip.toLink == null) {
+		for (DrtLeg leg : legs) {
+			if (leg.toLink == null) {
 				continue;
 			}
-			waitStats.addValue(trip.waitTime);
-			rideStats.addValue(trip.arrivalTime - trip.departureTime - trip.waitTime);
-			distanceStats.addValue(travelDistances.get(trip.request));
-			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
-			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
+			waitStats.addValue(leg.waitTime);
+			rideStats.addValue(leg.arrivalTime - leg.departureTime - leg.waitTime);
+			distanceStats.addValue(travelDistances.get(leg.request));
+			directDistanceStats.addValue(leg.unsharedDistanceEstimate_m);
+			traveltimes.addValue(leg.arrivalTime - leg.departureTime);
 		}
 
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
@@ -157,26 +159,30 @@ public class DrtTripsAnalyser {
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
-				format.format(traveltimes.getMean()));
+				format.format(traveltimes.getMean()) + "",//
+				// all fares referencing this drt operator. Including daily fares independent from the legs.
+				// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
+				format.format(- drtFarePersonMoneyEvents.stream().mapToDouble(PersonMoneyEvent::getAmount).sum() /
+						(waitStats.getValues().length == 0 ? 1 : waitStats.getValues().length)));
 	}
 
-	public static double getDirectDistanceMean(List<DrtTrip> trips) {
+	public static double getDirectDistanceMean(List<DrtLeg> legs) {
 
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
-		for (DrtTrip trip : trips) {
-			if (trip.toLink == null) {
+		for (DrtLeg leg : legs) {
+			if (leg.toLink == null) {
 				continue;
 			}
 
-			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
+			directDistanceStats.addValue(leg.unsharedDistanceEstimate_m);
 		}
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
-			DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
-		if (trips == null)
+	public static void analyseDetours(Network network, List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances,
+									  DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
+		if (legs == null)
 			return;
 
 		List<String> detours = new ArrayList<>();
@@ -184,25 +190,25 @@ public class DrtTripsAnalyser {
 		XYSeries travelTimes = new XYSeries("travel times");
 		XYSeries rideTimes = new XYSeries("ride times");
 
-		for (DrtTrip trip : trips) {
-			if (trip.toLink == null) {
-				continue; // unfinished trip (simulation stopped before arrival)
+		for (DrtLeg leg : legs) {
+			if (leg.toLink == null) {
+				continue; // unfinished leg (simulation stopped before arrival)
 			}
 
-			double travelDistance = travelDistances.get(trip.request);
-			double travelTime = trip.arrivalTime - trip.departureTime;
-			distances.add(travelDistance, trip.unsharedDistanceEstimate_m);
-			travelTimes.add(travelTime, trip.unsharedTimeEstimate_m);
-			rideTimes.add(trip.arrivalTime - trip.departureTime - trip.waitTime, trip.unsharedTimeEstimate_m);
+			double travelDistance = travelDistances.get(leg.request);
+			double travelTime = leg.arrivalTime - leg.departureTime;
+			distances.add(travelDistance, leg.unsharedDistanceEstimate_m);
+			travelTimes.add(travelTime, leg.unsharedTimeEstimate_m);
+			rideTimes.add(leg.arrivalTime - leg.departureTime - leg.waitTime, leg.unsharedTimeEstimate_m);
 
-			double distanceDetour = travelDistance / trip.unsharedDistanceEstimate_m;
-			double timeDetour = travelTime / trip.unsharedTimeEstimate_m;
-			detours.add(String.join(";", trip.person + "",//
+			double distanceDetour = travelDistance / leg.unsharedDistanceEstimate_m;
+			double timeDetour = travelTime / leg.unsharedTimeEstimate_m;
+			detours.add(String.join(";", leg.person + "",//
 					travelDistance + "",//
-					trip.unsharedDistanceEstimate_m + "",//
+					leg.unsharedDistanceEstimate_m + "",//
 					distanceDetour + "",//
 					travelTime + "",//
-					trip.unsharedTimeEstimate_m + "",//
+					leg.unsharedTimeEstimate_m + "",//
 					timeDetour + ""));
 		}
 
@@ -226,12 +232,12 @@ public class DrtTripsAnalyser {
 		}
 	}
 
-	public static void analyseWaitTimes(String fileName, List<DrtTrip> trips, int binsize_s, boolean createGraphs) {
-		if (trips.size() == 0)
+	public static void analyseWaitTimes(String fileName, List<DrtLeg> legs, int binsize_s, boolean createGraphs) {
+		if (legs.size() == 0)
 			return;
-		int startTime = ((int)(trips.get(0).departureTime / binsize_s)) * binsize_s;
-		int endTime = ((int)(trips.get(trips.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
-		Map<Double, List<DrtTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
+		int startTime = ((int)(legs.get(0).departureTime / binsize_s)) * binsize_s;
+		int endTime = ((int)(legs.get(legs.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
+		Map<Double, List<DrtLeg>> splitLegs = splitLegsIntoBins(legs, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -251,8 +257,8 @@ public class DrtTripsAnalyser {
 		TimeSeries requests = new TimeSeries("Ride requests");
 
 		try {
-			bw.write("timebin;trips;average_wait;min;p_5;p_25;median;p_75;p_95;max");
-			for (Entry<Double, List<DrtTrip>> e : splitTrips.entrySet()) {
+			bw.write("timebin;legs;average_wait;min;p_5;p_25;median;p_75;p_95;max");
+			for (Entry<Double, List<DrtLeg>> e : splitLegs.entrySet()) {
 				long rides = 0;
 				double averageWait = 0;
 				double min = 0;
@@ -264,7 +270,7 @@ public class DrtTripsAnalyser {
 				double max = 0;
 				if (!e.getValue().isEmpty()) {
 					DescriptiveStatistics stats = new DescriptiveStatistics();
-					for (DrtTrip t : e.getValue()) {
+					for (DrtLeg t : e.getValue()) {
 						stats.addValue(t.waitTime);
 					}
 					rides = stats.getN();
@@ -306,8 +312,8 @@ public class DrtTripsAnalyser {
 				dataset.addSeries(p_5Wait);
 				dataset.addSeries(p_95Wait);
 				datasetrequ.addSeries(requests);
-				JFreeChart chart = chartProfile(splitTrips.size(), dataset, "Waiting times", "Wait time (s)");
-				JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests per hour",
+				JFreeChart chart = chartProfile(splitLegs.size(), dataset, "Waiting times", "Wait time (s)");
+				JFreeChart chart2 = chartProfile(splitLegs.size(), datasetrequ, "Ride requests per hour",
 						"Requests per hour (req/h)");
 				ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
 				ChartSaveUtils.saveAsPNG(chart2, fileName + "_requests", 1500, 1000);
