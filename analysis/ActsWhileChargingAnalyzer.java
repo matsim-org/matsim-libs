@@ -98,7 +98,7 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                 .acts.add(event.getActType());
 
         else if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
-            String chargingActAndTime = event.getActType()+ String.valueOf(event.getTime());
+            String chargingActAndTime = event.getActType()+ event.getTime();
             containers.stream()
                     .filter(container -> container.personId.equals(event.getPersonId()))
                     .findAny()
@@ -133,7 +133,7 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
         CSVPrinter csvPrinter = null;
         try {
             csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "actsPerCharger.csv"))), CSVFormat.DEFAULT.withDelimiter(';').
-                    withHeader("ChargerId", "Activity type", "Time"));
+                    withHeader("PersonID", "ChargerId", "Activity type", "Time"));
 
             for (PersonContainer personContainer : personContainers) {
                 List<String> plan = containers.stream()
@@ -141,10 +141,9 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                         .findAny()
                         .get()
                         .acts;
-
-
-                csvPrinter.printRecord(personContainer.chargerId, plan.get(plan.indexOf(personContainer.chargingAct)+1) , Time.writeTime(personContainer.time));
-
+                if(plan.get(plan.indexOf(personContainer.chargingAct)) != plan.get(plan.size()-1) ) {
+                    csvPrinter.printRecord(personContainer.personId, personContainer.chargerId, plan.get(plan.indexOf(personContainer.chargingAct) + 1), Time.writeTime(personContainer.time));
+                }
 
             }
 
