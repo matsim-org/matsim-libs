@@ -91,7 +91,7 @@ public class ActivityWhileChargingFinder {
 			double end = nextEVLeg.getDepartureTime().seconds();
 			if(end - begin >= minimumActDuration && !precedentActsWhileCharging.contains(tuple.getSecond())) return tuple.getSecond();
 		}
-		return null;
+		return null ;
 	}
 
 	/**
