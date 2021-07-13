@@ -4,16 +4,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CongestedLinkIdentifier {
     // At the first step this is a run script
@@ -58,10 +56,10 @@ public class CongestedLinkIdentifier {
             double freeTravelTime = Math.floor(link.getLength() / link.getFreespeed() + 1);
             double freeFlowVolume = link.getCapacity() / 4 / 4; // 900s interval, 25% scenario
 
-            if (trafficVolumeCar > 0.8 * freeFlowVolume) {
+            if (trafficVolumeCar > 0.85 * freeFlowVolume) {
                 int newValue = highTrafficVolumeLinkMap.getOrDefault(linkId, 0) - 10;
                 highTrafficVolumeLinkMap.put(linkId, newValue);
-            } else if (trafficVolumeCar > 0.7 * freeFlowVolume) {
+            } else if (trafficVolumeCar > 0.75 * freeFlowVolume) {
                 int newValue = highTrafficVolumeLinkMap.getOrDefault(linkId, 0) - 3;
                 highTrafficVolumeLinkMap.put(linkId, newValue);
             } else if (trafficVolumeCar > 0.6 * freeFlowVolume) {
@@ -69,13 +67,13 @@ public class CongestedLinkIdentifier {
                 highTrafficVolumeLinkMap.put(linkId, newValue);
             }
 
-            if (avgTravelTime > 1.5 * freeTravelTime + 10) {
+            if (avgTravelTime > 2.0 * freeTravelTime && avgTravelTime > 30) {
                 int newValue = longTravelTimeLinkMap.getOrDefault(linkId, 0) - 10;
                 longTravelTimeLinkMap.put(linkId, newValue);
-            } else if (avgTravelTime > 1.2 * freeTravelTime + 5) {
+            } else if (avgTravelTime > 1.5 * freeTravelTime && avgTravelTime > 15) {
                 int newValue = longTravelTimeLinkMap.getOrDefault(linkId, 0) - 3;
                 longTravelTimeLinkMap.put(linkId, newValue);
-            } else if (avgTravelTime > 1.0 * freeTravelTime + 2) {
+            } else if (avgTravelTime > 1.0 * freeTravelTime + 5) {
                 int newValue = longTravelTimeLinkMap.getOrDefault(linkId, 0) - 1;
                 longTravelTimeLinkMap.put(linkId, newValue);
             }
@@ -96,58 +94,76 @@ public class CongestedLinkIdentifier {
 
         FileWriter csvWriter1 = new FileWriter("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/high-traffic-volume-links.csv");
         FileWriter csvWriter2 = new FileWriter("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/long-travel-time-links.csv");
-        csvWriter1.append("link-id");
-        csvWriter1.append(",");
-        csvWriter1.append("to-node-id");
-        csvWriter1.append(",");
-        csvWriter1.append("X");
-        csvWriter1.append(",");
-        csvWriter1.append("Y");
-        csvWriter1.append(",");
-        csvWriter1.append("score");
-        csvWriter1.append("\n");
+        writeTitle(csvWriter1);
+        writeTitle(csvWriter2);
 
-        csvWriter2.append("link-id");
-        csvWriter2.append(",");
-        csvWriter2.append("to-node-id");
-        csvWriter2.append(",");
-        csvWriter2.append("X");
-        csvWriter2.append(",");
-        csvWriter2.append("Y");
-        csvWriter2.append(",");
-        csvWriter2.append("score");
-        csvWriter2.append("\n");
-
+        Set<Node> nodePool1 = new HashSet<>();
+        Set<Node> nodePool2 = new HashSet<>();
         for (int i = 0; i < 100; i++) {
             if (i < highTrafficVolumeLinksSize) {
                 Link highTrafficVolumeLink = network.getLinks().get(trafficVolumeRank.get(i).getKey());
-                csvWriter1.append(highTrafficVolumeLink.getId().toString());
-                csvWriter1.append(",");
-                csvWriter1.append(highTrafficVolumeLink.getToNode().getId().toString());
-                csvWriter1.append(",");
-                csvWriter1.append(Double.toString(highTrafficVolumeLink.getToNode().getCoord().getX()));
-                csvWriter1.append(",");
-                csvWriter1.append(Double.toString(highTrafficVolumeLink.getToNode().getCoord().getY()));
-                csvWriter1.append(",");
-                csvWriter1.append(Integer.toString(trafficVolumeRank.get(i).getValue()));
-                csvWriter1.append("\n");
+                nodePool1.add(highTrafficVolumeLink.getToNode());
+                writeEntry(csvWriter1, highTrafficVolumeLink, trafficVolumeRank.get(i).getValue());
             }
 
             if (i < longTravelTimeLinksSize) {
                 Link longTravelTimeLink = network.getLinks().get(travelTimeRank.get(i).getKey());
-                csvWriter2.append(longTravelTimeLink.getId().toString());
-                csvWriter2.append(",");
-                csvWriter2.append(longTravelTimeLink.getToNode().getId().toString());
-                csvWriter2.append(",");
-                csvWriter2.append(Double.toString(longTravelTimeLink.getToNode().getCoord().getX()));
-                csvWriter2.append(",");
-                csvWriter2.append(Double.toString(longTravelTimeLink.getToNode().getCoord().getY()));
-                csvWriter2.append(",");
-                csvWriter2.append(Integer.toString(travelTimeRank.get(i).getValue()));
-                csvWriter2.append("\n");
+                nodePool2.add(longTravelTimeLink.getToNode());
+                writeEntry(csvWriter2, longTravelTimeLink, travelTimeRank.get(i).getValue());
             }
         }
         csvWriter1.close();
         csvWriter2.close();
+
+        nodePool1.retainAll(nodePool2); // intersection of the two set
+        FileWriter csvWriter3 = new FileWriter("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/nodes-to-improve.csv");
+        csvWriter3.append("Sequence");
+        csvWriter3.append(",");
+        csvWriter3.append("node-id");
+        csvWriter3.append(",");
+        csvWriter3.append("X");
+        csvWriter3.append(",");
+        csvWriter3.append("Y");
+        csvWriter3.append("\n");
+
+        int sequence = 1;
+        for (Node node:nodePool1) {
+            csvWriter3.append(Integer.toString(sequence));
+            csvWriter3.append(",");
+            csvWriter3.append(node.getId().toString());
+            csvWriter3.append(",");
+            csvWriter3.append(Double.toString(node.getCoord().getX()));
+            csvWriter3.append(",");
+            csvWriter3.append(Double.toString(node.getCoord().getY()));
+            csvWriter3.append("\n");
+            sequence += 1;
+        }
+        csvWriter3.close();
+    }
+
+    private static void writeTitle (FileWriter csvWriter) throws IOException {
+        csvWriter.append("link-id");
+        csvWriter.append(",");
+        csvWriter.append("to-node-id");
+        csvWriter.append(",");
+        csvWriter.append("X");
+        csvWriter.append(",");
+        csvWriter.append("Y");
+        csvWriter.append(",");
+        csvWriter.append("score");
+        csvWriter.append("\n");
+    }
+
+    private static void writeEntry (FileWriter csvWriter, Link link, int score) throws IOException {
+        csvWriter.append(link.getId().toString());
+        csvWriter.append(",");
+        csvWriter.append(link.getToNode().getId().toString());
+        csvWriter.append(",");
+        csvWriter.append(Double.toString(link.getToNode().getCoord().getX()));
+        csvWriter.append(",");
+        csvWriter.append(Double.toString(link.getToNode().getCoord().getY()));
+        csvWriter.append(",");
+        csvWriter.append(Integer.toString(score));
+        csvWriter.append("\n");
     }
 }
