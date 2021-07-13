@@ -37,7 +37,6 @@ import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,11 +44,18 @@ import java.util.stream.Collectors;
 public class RunTransitRouteTrimmerBerlinSimpleExample {
     public static void main(String[] args) throws IOException, SchemaException {
 
-        final String inScheduleFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-schedule.xml.gz";
-        final String inVehiclesFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-vehicles.xml.gz";
-        final String inNetworkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
-        final String zoneShpFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-inner-city-area/inner-city-area.shp";
-        final String outputPath = "output/";
+//        final String inScheduleFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-schedule.xml.gz";
+//        final String inVehiclesFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-vehicles.xml.gz";
+//        final String inNetworkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
+//        final String zoneShpFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-inner-city-area/inner-city-area.shp";
+//        final String outputPath = "output/";
+//        final String epsgCode = "31468";
+
+        final String inScheduleFile = "D:/VW/AP3/i501/i501.output_transitSchedule.xml.gz";
+        final String inVehiclesFile = "D:/VW/AP3/i501/i501.output_transitVehicles.xml.gz";
+        final String inNetworkFile = "D:/VW/AP3/i501/i501.output_network.xml.gz";
+        final String zoneShpFile = "D:/VW/AP3/i501/drtSubstitutesPTAnalysis/zones/zone1/polygons.shp";
+        final String outputPath = "D:/VW/AP3/i501/drtSubstitutesPTAnalysis/results/";
         final String epsgCode = "31468";
 
 
@@ -89,7 +95,6 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
 
         TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(transitScheduleNew, scenario.getNetwork());
         System.out.println(validationResult.getErrors());
-
 
         TransitRouteTrimmerUtils.transitSchedule2ShapeFile(transitScheduleNew, outputPath + "output-trimmed-routes.shp",epsgCode);
         new TransitScheduleWriter(transitScheduleNew).writeFile(outputPath + "transitScheduleNew.xml.gz");
