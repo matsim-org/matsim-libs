@@ -39,15 +39,15 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
 	private final QSimConfigGroup.FilterSnapshots filterSnapshots;
+	private final int snapshotPeriod;
 
 	/**
 	 * time since last snapshot
 	 */
 	private double snapshotTime = 0.0;
 
-	final private int snapshotPeriod;
-
 	public SnapshotWriterManager(int snapshotPeriod, QSimConfigGroup.FilterSnapshots filterSnapshots) {
+		if (snapshotPeriod < 1) throw new IllegalArgumentException("snapshot period must be at least 1 second.");
 		this.snapshotPeriod = snapshotPeriod;
 		this.filterSnapshots = filterSnapshots;
 
@@ -91,7 +91,9 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 				if (isGenerateSnapshot(link.getLink()))
 					link.getVisData().addAgentSnapshotInfo(positions);
 			}
-*/
+
+
+		 */
 			// why not do it parallel
 			var positions = visMobsim.getVisNetwork().getVisLinks().values().parallelStream()
 					.filter(visLink -> isGenerateSnapshot(visLink.getLink()))

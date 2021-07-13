@@ -13,6 +13,7 @@ import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -21,7 +22,6 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
 @CommandLine.Command(
@@ -63,10 +63,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     private boolean writeDetails;
 
     @CommandLine.Mixin
-    private CrsOptions crs = new CrsOptions();
+    private final CrsOptions crs = new CrsOptions();
 
     @CommandLine.Mixin
-    private ShpOptions shp = new ShpOptions();
+    private final ShpOptions shp = new ShpOptions();
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new TravelTimeAnalysis()).execute(args));
@@ -75,7 +75,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @Override
     public Integer call() throws Exception {
 
-        if (crs.getInputCRS() == null){
+        if (crs.getInputCRS() == null) {
             log.error("Input CRS is null. Please specify the input CRS");
             return 2;
         }
@@ -83,6 +83,8 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         Scenario scenario = AnalysisSummary.loadScenario(runId, runDirectory, crs);
         Path events = AnalysisSummary.glob(runDirectory, runId + ".*events.*", false)
                 .orElseThrow(() -> new IllegalArgumentException("Could not find events file."));
+
+        var scenario = ScenarioUtils.loadScenario()
 
         Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
 

@@ -64,24 +64,6 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>com.github.matsim-vsp</groupId>
-			<artifactId>matsim-analysis</artifactId>
-			<!-- <version>v2.5</version> -->
-			<version>v3.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.geotools</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.matsim</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-
 		<!-- Command line parser -->
 		<dependency>
 			<groupId>info.picocli</groupId>
