@@ -19,7 +19,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 
 /**

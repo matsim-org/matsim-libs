@@ -67,6 +67,7 @@ public final class EventsToLegs
 		VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
+	public static final String VEHICLE_ID_ATTRIBUTE_NAME = "vehicleId";
 
 	private static class PendingTransitTravel {
 		final Id<Vehicle> vehicleId;
@@ -194,6 +195,7 @@ public final class EventsToLegs
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Leg leg = legs.get(event.getPersonId());
 		leg.getAttributes().putAttribute(ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, event.getTime());
+		leg.getAttributes().putAttribute(VEHICLE_ID_ATTRIBUTE_NAME, event.getVehicleId());
 		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
 		if (lineAndRoute != null) {
 			if (!event.getPersonId().equals(lineAndRoute.driverId)) {

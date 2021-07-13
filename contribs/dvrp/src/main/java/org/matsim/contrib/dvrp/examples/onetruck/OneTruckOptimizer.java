@@ -39,7 +39,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.DijkstraFactory;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -69,7 +69,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 			MobsimTimer timer) {
 		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
-		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
+		router = new SpeedyDijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
 				travelTime);
 
 		vehicle = fleet.getVehicles().values().iterator().next();

@@ -425,7 +425,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         private String mode;
         private double maxRadius;
         private double initialSearchRadius = Double.NEGATIVE_INFINITY;
-        private double searchExtensionRadius = Double.NEGATIVE_INFINITY;
+        private double searchExtensionRadius = 200;
         private String linkIdAttribute;
         private String personFilterAttribute;
         private String personFilterValue;
@@ -557,7 +557,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             map.put(PARAM_PERSON_FILTER_VALUE, "Only persons where the filter attribute has the value specified here can use this mode for access or egress. The attribute should be of type String.");
             map.put(PARAM_MAX_RADIUS, "Radius from the origin / destination coord in which transit stops are accessible by this mode.");
             map.put(PARAM_INITIAL_SEARCH_RADIUS, "Radius from the origin / destination coord in which transit stops are searched. Only if less than 2 transit stops are found the search radius is increased step-wise until the maximum search radius set in param radius is reached.");
-            map.put(PARAM_SEARCH_EXTENSION_RADIUS, "If less than 2 stops were found in initialSearchRadius take the distance of the closest transit stop and add this extension radius to search again.The search radius will not exceed the maximum search radius set in param radius.");
+            map.put(PARAM_SEARCH_EXTENSION_RADIUS, "If less than 2 stops were found in initialSearchRadius take the distance of the closest transit stop and add this extension radius to search again.The search radius will not exceed the maximum search radius set in param radius. Default is 200 meters.");
             map.put(PARAM_SHARE_TRIP_SEARCH_RADIUS, "The share of the trip crowfly distance within which the stops for access and egress will be searched for. This is a harder constraint than initial search radius. Default is positive infinity.");
             
             return map;

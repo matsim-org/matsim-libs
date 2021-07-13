@@ -27,11 +27,11 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts.ChartType;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 

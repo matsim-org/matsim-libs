@@ -36,10 +36,10 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
-import org.matsim.contrib.util.CSVLineBuilder;
-import org.matsim.contrib.util.CompactCSVWriter;
-import org.matsim.contrib.util.chart.ChartSaveUtils;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.common.util.ChartSaveUtils;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -71,7 +71,6 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
-		calculator.consolidate();
 
 		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getNonPassengerServingTaskProfiles()
 						.entrySet()

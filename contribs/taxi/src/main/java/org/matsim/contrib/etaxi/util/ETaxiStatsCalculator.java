@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
-import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.evrp.ChargingTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
 import org.matsim.contrib.util.stats.DurationStats;
 import org.matsim.contrib.util.stats.DurationStats.State;

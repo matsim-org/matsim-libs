@@ -18,11 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +33,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
+import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -256,6 +255,36 @@ public class NetworkUtilsTest {
 			assertEquals(expectedNode.getId(), actualNode.getId());
 			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
 		}
+	}
+
+	/**
+	 * Have this test here since I first had a bug where empty origgeom attributes would cause exceptions because String.split
+	 * splits an empty string ("") into string[""]...
+	 */
+	@Test
+	public void getOriginalGeometry_emptyGeometryStored() {
+
+		var network = NetworkUtils.createNetwork();
+		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, "");
+		network.addLink(link);
+
+		var expectedNodeList = List.of(fromNode, toNode);
+
+		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(expectedNodeList.size(), actualNodeList.size());
+
+		for (var i = 0; i < expectedNodeList.size(); i++) {
+			var expectedNode = expectedNodeList.get(i);
+			var actualNode = actualNodeList.get(i);
+
+			assertEquals(expectedNode.getId(), actualNode.getId());
+			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+		}
+
 	}
 }
 

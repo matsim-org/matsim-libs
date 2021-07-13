@@ -398,6 +398,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
 			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.filteredNetwork));
+			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 

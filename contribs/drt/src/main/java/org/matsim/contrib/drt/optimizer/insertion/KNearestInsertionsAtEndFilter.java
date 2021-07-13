@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
-import org.matsim.contrib.util.PartialSort;
+import org.matsim.contrib.common.collections.PartialSort;
 
 /**
  * "Insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride

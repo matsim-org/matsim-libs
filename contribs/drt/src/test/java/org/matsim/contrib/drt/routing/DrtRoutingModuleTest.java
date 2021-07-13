@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.drt.routing;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -47,8 +48,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.TeleportationRoutingModule;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.facilities.ActivityFacilities;
@@ -91,7 +92,7 @@ public class DrtRoutingModuleTest {
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
+				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
@@ -213,6 +214,34 @@ public class DrtRoutingModuleTest {
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList6);
+
+	}
+
+	@Test
+	public void testRouteDescriptionHandling() {
+		String oldRouteFormat = "600 400";
+		String newRouteFormat = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+
+		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+
+		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
+		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
+		Facility hf = FacilitiesUtils.toFacility(h, facilities);
+
+		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
+		Facility wf = FacilitiesUtils.toFacility(w, facilities);
+
+		DrtRoute drtRoute = new DrtRoute(h.getLinkId(),w.getLinkId());
+
+		drtRoute.setRouteDescription(oldRouteFormat);
+		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+
+		drtRoute.setRouteDescription(newRouteFormat);
+		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+		Assert.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
 
 	}
 

@@ -25,6 +25,14 @@ public final class CrsOptions {
     }
 
     /**
+     * Construct crs options with default input and target crs.
+     */
+    public CrsOptions(String inputCRS, String targetCRS) {
+        this.inputCRS = inputCRS;
+        this.targetCRS = targetCRS;
+    }
+
+    /**
      * Default with new predefined options.
      */
     public CrsOptions() { }

@@ -41,7 +41,7 @@ import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -92,8 +92,8 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 			return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater,
 					chargingInfrastructure, zonalRegisters, dispatchFinder, requestInserter);
 		} else if (type.equals(AssignmentETaxiOptimizerParams.SET_NAME)) {
-			LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network,
-					travelDisutility, travelTime);
+			LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility,
+					travelTime);
 			return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, network, travelTime,
 					travelDisutility, eScheduler, scheduleTimingUpdater, chargingInfrastructure, router);
 		} else {

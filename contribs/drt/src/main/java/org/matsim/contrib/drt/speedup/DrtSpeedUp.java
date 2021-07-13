@@ -33,7 +33,7 @@ import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
