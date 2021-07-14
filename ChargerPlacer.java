@@ -73,7 +73,7 @@ public class ChargerPlacer {
 
         for (Person person : scenario.getPopulation().getPersons().values()) {
 
-            if (person.getId().toString().contains("freight") || PopulationUtils.getPersonAttribute(person, "home-activity-zone").equals("brandenburg")) {
+            if (!person.getId().toString().contains("freight") && !PopulationUtils.getPersonAttribute(person, "home-activity-zone").equals("brandenburg")) {
                 String mode = "car";
                 List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 //                List<Activity> activities = TripStructureUtils.getActivities(planElements, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
@@ -126,20 +126,23 @@ public class ChargerPlacer {
 
         }
 
-        String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\Ladesäulen_in_Deutschland_v2.csv";
+//        String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\Ladesäulen_in_Deutschland_v2.csv";
+//
+//        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+//
+//        Network subNetwork = NetworkUtils.createNetwork();
+//
+//        Set<String> modes = Set.of(TransportMode.car);
+//        filter.filter(subNetwork, modes);
+//
+//
+//
+//        CSVToXML2 csvreader =new CSVToXML2(file, subNetwork);
 
-        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-
-        Network subNetwork = NetworkUtils.createNetwork();
-
-        Set<String> modes = Set.of(TransportMode.car);
-        filter.filter(subNetwork, modes);
-
-
-
-        CSVToXML2 csvreader =new CSVToXML2(file, subNetwork);
+        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
+        CSVToXMLmpm csvreader = new CSVToXMLmpm(fileName);
         chargers.addAll(csvreader.chargers);
-        new ChargerWriter(chargers.stream()).write("C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/HomeChargersBerlin.xml");
+        new ChargerWriter(chargers.stream()).write("C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/HomeChargers+MPM_mittel.xml");
 
 
     }

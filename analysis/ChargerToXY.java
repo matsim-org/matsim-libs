@@ -63,7 +63,7 @@ public ChargerToXY (ChargingInfrastructureSpecification chargingInfrastructureSp
     for (Id<Charger> chargerId : chargingInfrastructureSpecification.getChargerSpecifications().keySet()) {
         XYDataContainer dataContainer = new XYDataContainer(0,
                                                                                      chargerId,
-                chargingInfrastructureSpecification.getChargerSpecifications().get(chargerId).getLinkId(),
+                                                             chargingInfrastructureSpecification.getChargerSpecifications().get(chargerId).getLinkId(),
                                                                                                  0);
         dataContainers.add(dataContainer);
     }
@@ -144,9 +144,6 @@ public static List<XYDataContainer> getDataContainers(){ return dataContainers; 
     @Override
     public void reset(int iteration) {
 
-    if (iteration > 0){
-        System.out.println("ITERATION = " + iteration);
-    }
     crtChargers.clear();
     dataContainers.clear();
     }

@@ -70,14 +70,28 @@ public class CSVToXML2 {
                if (!chargerLinks.contains(chargerLink)){
                    chargerLinks.add(chargerLink);
                    ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
-                   chargers.add(builder
-                           .linkId(Id.createLinkId(chargerLink.getId()))
-                           .id(Id.create("charger" + record.get(11), Charger.class))
-                           .chargerType(record.get(3)+ "kW")
+
+                   if(record.get(7).equals("43")||Math.round(parseDouble(record.get(7)))>=50){
+                       chargers.add(builder
+                               .linkId(Id.createLinkId(chargerLink.getId()))
+                               .id(Id.create("charger" + record.get(11), Charger.class))
+                               .chargerType("DC")
 //                           .plugCount((int) Math.round(parseDouble(record.get(5))))
-                           .plugCount(5)
-                           .plugPower((int) Math.round(parseDouble(record.get(3))*1000))
-                           .build());
+                               .plugCount(5)
+                               .plugPower((int) Math.round(parseDouble(record.get(7))*1000))
+                               .build());
+                   }
+                   else{
+                       chargers.add(builder
+                               .linkId(Id.createLinkId(chargerLink.getId()))
+                               .id(Id.create("charger" + record.get(11), Charger.class))
+                               .chargerType("AC")
+//                           .plugCount((int) Math.round(parseDouble(record.get(5))))
+                               .plugCount(5)
+                               .plugPower((int) Math.round(parseDouble(record.get(7))*1000))
+                               .build());
+                   }
+
 
                }
 

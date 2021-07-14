@@ -37,8 +37,9 @@ public class CSVToXMLmpm {
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
                                 .id(Id.create("charger" +row[0], Charger.class))
-                                .chargerType("3.7kW")
-                                .plugCount((int) Math.round(Double.parseDouble(row[1])))
+                                .chargerType("AC")
+//                                .plugCount((int) Math.round(Double.parseDouble(row[1])))
+                                .plugCount(10)
                                 .plugPower(3.7*1000)
                                 .build());
 
@@ -48,8 +49,9 @@ public class CSVToXMLmpm {
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
                                 .id(Id.create("charger" +row[0], Charger.class))
-                                .chargerType("11kW")
-                                .plugCount((int) Math.round(Double.parseDouble(row[2])))
+                                .chargerType("AC")
+//                                .plugCount((int) Math.round(Double.parseDouble(row[2])))
+                                .plugCount(10)
                                 .plugPower(11*1000)
                                 .build());
                     }
@@ -57,8 +59,9 @@ public class CSVToXMLmpm {
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
                                 .id(Id.create("charger" +row[0], Charger.class))
-                                .chargerType("22kW")
-                                .plugCount((int) Math.round(Double.parseDouble(row[3])))
+                                .chargerType("AC")
+//                                .plugCount((int) Math.round(Double.parseDouble(row[3])))
+                                .plugCount(10)
                                 .plugPower(22*1000)
                                 .build());
                     }
@@ -67,8 +70,9 @@ public class CSVToXMLmpm {
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
                                 .id(Id.create("charger" + row[0], Charger.class))
-                                .chargerType("50kW")
-                                .plugCount((int) Math.round(Double.parseDouble(row[4])))
+                                .chargerType("DC")
+//                                .plugCount((int) Math.round(Double.parseDouble(row[4])))
+                                .plugCount(10)
                                 .plugPower(50*1000)
                                 .build());
                     }
@@ -77,8 +81,9 @@ public class CSVToXMLmpm {
                         chargers.add(builder
                                 .linkId(Id.createLinkId(row[0]))
                                 .id(Id.create("charger" +row[0], Charger.class))
-                                .chargerType("150kW")
-                                .plugCount((int) Math.round(Double.parseDouble(row[5])))
+                                .chargerType("DC")
+//                                .plugCount((int) Math.round(Double.parseDouble(row[5])))
+                                .plugCount(10)
                                 .plugPower(150*1000)
                                 .build());
                     }
@@ -96,9 +101,9 @@ public class CSVToXMLmpm {
     }
 
     public static void main(String[] args) throws IOException, CsvException {
-        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_01.csv";
+        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
         CSVToXMLmpm csvreader = new CSVToXMLmpm(fileName);
-        new ChargerWriter(csvreader.chargers.stream()).write( "C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/chargers_mpm_günstigste_Lösung.xml");
+        new ChargerWriter(csvreader.chargers.stream()).write( "C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/chargers_mpm_mittlere_Lösung.xml");
 
 
         //new CreateNewXML(csvreader.chargers);
