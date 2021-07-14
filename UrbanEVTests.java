@@ -104,14 +104,14 @@ public class UrbanEVTests {
 	@Test
 	public void testCarAndBikeAgent(){
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Charge during leisure + bike"));
-		Assert.assertEquals(plugins.size(), 1, 0);
+		Assert.assertEquals( 2, plugins.size(), 0);
 
 		ActivityStartEvent pluginActStart = plugins.get(0);
 		Assert.assertEquals("wrong charging start time",  40491d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart.getLinkId().toString() );
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Charge during leisure + bike"));
-		Assert.assertEquals(plugouts.size(), 1, 0);
+		Assert.assertEquals( 1, plugouts.size(),0);
 
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
 		Assert.assertEquals("wrong charging end time",  50400d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON);
@@ -157,7 +157,7 @@ public class UrbanEVTests {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Charging during shopping"));
 		Assert.assertEquals( 1, plugins.size(), 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
-		Assert.assertEquals("wrong charging start time",  44309d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start time",  36891d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "172", pluginActStart.getLinkId().toString());
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Charging during shopping"));
@@ -187,7 +187,7 @@ public class UrbanEVTests {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Charger Selection long distance twin"));
 		Assert.assertEquals( 1, plugins.size(),0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
-		Assert.assertEquals("wrong charging start time", 36099,  pluginActStart.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start time", 31300,  pluginActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "89", pluginActStart.getLinkId().toString());
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Charger Selection long distance twin"));
@@ -205,7 +205,7 @@ public class UrbanEVTests {
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart.getLinkId().toString());
 
 		ActivityStartEvent pluginActStart2 = plugins.get(1);
-		Assert.assertEquals("wrong charging start time",  40004d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start time",  39640d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart2.getLinkId().toString());
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Double Charger"));
@@ -221,17 +221,17 @@ public class UrbanEVTests {
 
 	@Test
 	public void testNotEnoughTimeCharger(){
-	List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Not enough time Charger"));
-	Assert.assertEquals(1, plugins.size(),0);
-	ActivityStartEvent pluginActStart = plugins.get(0);
-	Assert.assertEquals("wrong charging start time",  24940d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
-	Assert.assertEquals("wrong charging start location", "89", pluginActStart.getLinkId().toString());
+		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Not enough time Charger"));
+		Assert.assertEquals(1, plugins.size(),0);
+		ActivityStartEvent pluginActStart = plugins.get(0);
+		Assert.assertEquals("wrong charging start time",  24940d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start location", "89", pluginActStart.getLinkId().toString());
 
-	List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Not enough time Charger"));
-	Assert.assertEquals( 1, plugouts.size(),0);
-	ActivityEndEvent plugoutActStart = plugouts.get(0);
-	Assert.assertEquals("wrong charging end time",  47729d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON);
-	Assert.assertEquals("wrong charging end location", "89", plugoutActStart.getLinkId().toString());
+		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Not enough time Charger"));
+		Assert.assertEquals( 1, plugouts.size(),0);
+		ActivityEndEvent plugoutActStart = plugouts.get(0);
+		Assert.assertEquals("wrong charging end time",  47729d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging end location", "89", plugoutActStart.getLinkId().toString());
 	}
 
 	@Test
@@ -783,8 +783,8 @@ public class UrbanEVTests {
 
 				//TODO move the following assert statements out of the simulation loop? Or do we want to explicitly check these _every_ iteration?
 
-				Assert.assertEquals("there should be 9 people plugging in in this test", 8, plugInCntPerPerson.size(), 0);
-				Assert.assertEquals("there should be 8 people plugging out this test", 8, plugOutCntPerPerson.size(), 0);
+				Assert.assertEquals("there should be 9 people plugging in in this test", 9, plugInCntPerPerson.size(), 0);
+				Assert.assertEquals("there should be 8 people plugging out this test", 9, plugOutCntPerPerson.size(), 0);
 //				Assert.assertEquals( plugInCntPerPerson.size(), plugOutCntPerPerson.size()); //not necessary
 
 //				Assert.assertTrue(plugInCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));

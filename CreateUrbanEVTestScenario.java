@@ -54,30 +54,23 @@ class CreateUrbanEVTestScenario {
 		RunUrbanEVExample.prepareConfig(config);
 		config.network().setInputFile("1pctNetwork.xml");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(3);
 		//set VehicleSource
-		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//manually insert car vehicle type with attributes (hbefa technology, initial energy etc....)
-		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
 
-		VehicleType carVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
-		VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
-		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), CAR_INITIAL_ENERGY);
-		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
-		VehicleType bikeVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.bike, VehicleType.class));
-		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
-		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
-		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), BIKE_INITIAL_ENERGY);
-		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
-		scenario.getVehicles().addVehicleType(carVehicleType);
-		scenario.getVehicles().addVehicleType(bikeVehicleType);
+//		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
+//		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
+//		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), BIKE_INITIAL_ENERGY);
+//		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
+
+
 
 		createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		return scenario;
@@ -87,12 +80,23 @@ class CreateUrbanEVTestScenario {
 		VehiclesFactory vehicleFactory = scenario.getVehicles().getFactory();
 
 		for(Person person : scenario.getPopulation().getPersons().values()) {
-			VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.car, VehicleType.class));
-			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car), carType);
+
+			Set<String> chargerTypes = new HashSet<>();
+			chargerTypes.add("DC");
+
+
+			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString() + "_car", VehicleType.class));
+			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
+			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
+			EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), CAR_INITIAL_ENERGY);
+			EVUtils.setChargerTypes(carVehicleType.getEngineInformation(),chargerTypes);
+			scenario.getVehicles().addVehicleType(carVehicleType);
+			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car), carVehicleType);
 			scenario.getVehicles().addVehicle(carVehicle);
 
-			VehicleType bikeType = scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.bike, VehicleType.class));
-			Vehicle bikeVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.bike), bikeType);
+			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString() +"_bike", VehicleType.class));
+			Vehicle bikeVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.bike), bikeVehicleType);
+			scenario.getVehicles().addVehicleType(bikeVehicleType);
 			scenario.getVehicles().addVehicle(bikeVehicle);
 
 			Map<String, Id<Vehicle>> mode2Vehicle = new HashMap<>();
