@@ -15,15 +15,17 @@ import java.util.*;
 
 public class CongestedLinkIdentifier {
     // At the first step this is a run script
+    private static final String DIRECTORY = "/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base-1.4";
+
 
     public static void main(String[] args) throws IOException {
         Config config = ConfigUtils.createConfig();
         config.global().setCoordinateSystem("EPSG:25832");
-        config.network().setInputFile("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/dd.output_network.xml.gz");
+        config.network().setInputFile(DIRECTORY + "/dd.output_network.xml.gz");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
 
-        String linkStatsData = "/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/linkStats.csv.gz";
+        String linkStatsData = DIRECTORY + "/linkStats.csv.gz";
         BufferedReader csvReader = IOUtils.getBufferedReader(linkStatsData);
         String title = csvReader.readLine();
         System.out.println(title);
@@ -92,8 +94,8 @@ public class CongestedLinkIdentifier {
         trafficVolumeRank.sort(Map.Entry.comparingByValue());
         travelTimeRank.sort(Map.Entry.comparingByValue());
 
-        FileWriter csvWriter1 = new FileWriter("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/high-traffic-volume-links.csv");
-        FileWriter csvWriter2 = new FileWriter("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/long-travel-time-links.csv");
+        FileWriter csvWriter1 = new FileWriter(DIRECTORY + "/high-traffic-volume-links.csv");
+        FileWriter csvWriter2 = new FileWriter(DIRECTORY + "/long-travel-time-links.csv");
         writeTitle(csvWriter1);
         writeTitle(csvWriter2);
 
@@ -116,7 +118,7 @@ public class CongestedLinkIdentifier {
         csvWriter2.close();
 
         nodePool1.retainAll(nodePool2); // intersection of the two set
-        FileWriter csvWriter3 = new FileWriter("/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base/nodes-to-improve.csv");
+        FileWriter csvWriter3 = new FileWriter(DIRECTORY + "/nodes-to-improve.csv");
         csvWriter3.append("Sequence");
         csvWriter3.append(",");
         csvWriter3.append("node-id");
@@ -127,7 +129,7 @@ public class CongestedLinkIdentifier {
         csvWriter3.append("\n");
 
         int sequence = 1;
-        for (Node node:nodePool1) {
+        for (Node node : nodePool1) {
             csvWriter3.append(Integer.toString(sequence));
             csvWriter3.append(",");
             csvWriter3.append(node.getId().toString());
@@ -141,7 +143,7 @@ public class CongestedLinkIdentifier {
         csvWriter3.close();
     }
 
-    private static void writeTitle (FileWriter csvWriter) throws IOException {
+    private static void writeTitle(FileWriter csvWriter) throws IOException {
         csvWriter.append("link-id");
         csvWriter.append(",");
         csvWriter.append("to-node-id");
@@ -154,7 +156,7 @@ public class CongestedLinkIdentifier {
         csvWriter.append("\n");
     }
 
-    private static void writeEntry (FileWriter csvWriter, Link link, int score) throws IOException {
+    private static void writeEntry(FileWriter csvWriter, Link link, int score) throws IOException {
         csvWriter.append(link.getId().toString());
         csvWriter.append(",");
         csvWriter.append(link.getToNode().getId().toString());
