@@ -1,7 +1,5 @@
 package org.matsim.application.analysis;
 
-import org.apache.log4j.Logger;
-import org.matsim.analysis.AgentFilter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -12,8 +10,9 @@ import org.matsim.application.options.ShpOptions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
-public class HomeLocationFilter implements AgentFilter {
+public class HomeLocationFilter implements Predicate<Person> {
 
 	private final Set<Id<Person>> consider = new HashSet<>();
 	private static final String HOME_ACTIVITY_TYPE_PREFIX = "home";
@@ -45,13 +44,7 @@ public class HomeLocationFilter implements AgentFilter {
 	}
 
 	@Override
-	public boolean considerAgent(Person person) {
+	public boolean test(Person person) {
 		return consider.contains(person.getId());
 	}
-
-	@Override
-	public String toFileName() {
-		return "homeLocation";
-	}
-
 }

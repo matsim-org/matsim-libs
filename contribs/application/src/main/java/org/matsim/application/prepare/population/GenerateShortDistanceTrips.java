@@ -45,7 +45,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--output", description = "Output filename")
     private Path output;
 
-    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    @CommandLine.ArgGroup(multiplicity = "1")
     private Generate generate;
 
     @CommandLine.Mixin
@@ -63,6 +63,9 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     private final Random rnd = new Random(4711);
 
     private Population population;
+
+    public GenerateShortDistanceTrips() {
+    }
 
     @Override
     public Integer call() throws Exception {
@@ -86,7 +89,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
             log.info("Using shape file {}", shp.getShapeFile());
             HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp, crs.getInputCRS(), population);
             for (Person person : population.getPersons().values()) {
-                if (homeLocationFilter.considerAgent(person)) {
+                if (homeLocationFilter.test(person)) {
                     personsInCityBoundary.add(person.getId());
                 }
             }
@@ -169,9 +172,8 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                 var activities = TripStructureUtils.getActivities(plan.getPlanElements(),
                         TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
                 var filterActivities = activityFilter(activities);
-                List<Activity> markedActivities = new ArrayList<>();
 
-                markedActivities = filterActivities.stream().filter(x -> rnd.nextDouble() < probability)
+                List<Activity> markedActivities = filterActivities.stream().filter(x -> rnd.nextDouble() < probability)
                         .collect(Collectors.toList());
 
                 if (markedActivities.size() > 0) {
@@ -300,7 +302,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     static class Generate {
 
         @CommandLine.Option(names = "--num-trips", description = "Number of trips to generate", required = true)
-        private int numOfMissingTrips = -1;
+        private final int numOfMissingTrips = -1;
 
         @CommandLine.Option(names = "--trip-share", description = "Generate as many trips needed to match the share", required = true)
         private double tripShare;

@@ -3,7 +3,6 @@ package org.matsim.application.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimAppCommand;
@@ -12,8 +11,9 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import static org.matsim.application.ApplicationUtils.globFile;
 
 @CommandLine.Command(
         name = "travel-time",
@@ -80,20 +82,22 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             return 2;
         }
 
-        Scenario scenario = AnalysisSummary.loadScenario(runId, runDirectory, crs);
-        Path events = AnalysisSummary.glob(runDirectory, runId + ".*events.*", false)
-                .orElseThrow(() -> new IllegalArgumentException("Could not find events file."));
+        Path events = globFile(runDirectory, runId + ".*events.*");
+        Path plans = globFile(runDirectory, runId + ".*plans.");
+        Path networkPath = globFile(runDirectory, runId + ".*network.");
 
-        var scenario = ScenarioUtils.loadScenario()
+        var population = PopulationUtils.readPopulation(plans.toString());
+        var network = NetworkUtils.readNetwork(networkPath.toString());
 
-        Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
+
+        Set<Id<Person>> populationIds = population.getPersons().keySet();
 
         BestPlanSelector<Plan, Person> selector = new BestPlanSelector<>();
 
         int size = populationIds.size();
 
         populationIds.removeIf(p -> {
-            Person person = scenario.getPopulation().getPersons().get(p);
+            Person person = population.getPersons().get(p);
             return selector.selectPlan(person) != person.getSelectedPlan();
         });
 
@@ -120,15 +124,17 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation);
         validator.setWriteDetailedFiles(writeDetails);
 
-		Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 30);
-		if (timeFrom != null && timeTo != null) {
-			timeWindow = new Tuple<>(timeFrom, timeTo);
-		}
+        Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 30);
+        if (timeFrom != null && timeTo != null) {
+            timeWindow = new Tuple<>(timeFrom, timeTo);
+        }
 
-		TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips, timeWindow, tripFilter);
+        TravelTimeValidationRunner runner = new TravelTimeValidationRunner(network, populationIds, events.toString(), outputFolder, validator, trips, timeWindow, tripFilter);
 
         runner.run();
 
         return 0;
     }
+
+
 }

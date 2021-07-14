@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.AnalysisSummary;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
@@ -53,6 +52,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 
+import static org.matsim.application.ApplicationUtils.globFile;
+
 
 @CommandLine.Command(
 		name = "air-pollution-by-vehicle",
@@ -74,20 +75,18 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 	@CommandLine.Option(names = "--hbefa-cold", required = true)
 	private Path hbefaColdFile;
 
-	@CommandLine.Option(names = "-p", description = "Password for encrypted hbefa files", interactive = true, required = false)
+	@CommandLine.Mixin
+	private final CrsOptions crs = new CrsOptions();
+	@CommandLine.Option(names = "-p", description = "Password for encrypted hbefa files", interactive = true)
 	private char[] password;
-
-	@CommandLine.Option(names = "--output", description = "Output events file", required = false)
-	private Path output;
 
 	@CommandLine.Option(names = "--vehicle-type", description = "Map vehicle type to Hbefa category", defaultValue = "defaultVehicleType=PASSENGER_CAR")
 	private Map<String, HbefaVehicleCategory> vehicleCategories;
 
 	@CommandLine.Option(names = "--use-default-road-types", description = "Add default hbefa_road_type link attributes to the network", defaultValue = "false")
 	private boolean useDefaultRoadTypes;
-
-	@CommandLine.Mixin
-	private CrsOptions crs = new CrsOptions();
+	@CommandLine.Option(names = "--output", description = "Output events file")
+	private Path output;
 
 	public AirPollutionByVehicleCategory() {
 	}
@@ -110,10 +109,10 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		}
 
 		Config config = ConfigUtils.createConfig();
-		config.vehicles().setVehiclesFile(AnalysisSummary.globFile(runDirectory, runId, "vehicles"));
-		config.network().setInputFile(AnalysisSummary.globFile(runDirectory, runId, "network"));
-		config.transit().setTransitScheduleFile(AnalysisSummary.globFile(runDirectory, runId, "transitSchedule"));
-		config.transit().setVehiclesFile(AnalysisSummary.globFile(runDirectory, runId, "transitVehicles"));
+		config.vehicles().setVehiclesFile(globFile(runDirectory, runId, "vehicles"));
+		config.network().setInputFile(globFile(runDirectory, runId, "network"));
+		config.transit().setTransitScheduleFile(globFile(runDirectory, runId, "transitSchedule"));
+		config.transit().setVehiclesFile(globFile(runDirectory, runId, "transitVehicles"));
 		config.global().setCoordinateSystem(crs.getInputCRS());
 		config.plans().setInputFile(null);
 		config.parallelEventHandling().setNumberOfThreads(null);
@@ -127,7 +126,7 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		eConfig.setHbefaRoadTypeSource(HbefaRoadTypeSource.fromLinkAttributes);
 		eConfig.setNonScenarioVehicles(NonScenarioVehicles.ignore);
 
-		final String eventsFile = AnalysisSummary.globFile(runDirectory, runId, "events");
+		final String eventsFile = globFile(runDirectory, runId, "events");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -198,7 +197,7 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		// network
 		for (Link link : network.getLinks().values()) {
 
-			double freespeed = Double.NaN;
+			double freespeed;
 
 			if (link.getFreespeed() <= 13.888889) {
 				freespeed = link.getFreespeed() * speedFactor;
