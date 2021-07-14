@@ -25,16 +25,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.sun.istack.Nullable;
 import one.util.streamex.StreamEx;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
@@ -46,6 +45,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.*;
 import org.matsim.contrib.util.StraightLineKnnFinder;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -56,14 +57,19 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.urbanEV.analysis.ActsWhileChargingAnalyzer;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.utils.EditPlans;
 
 import javax.inject.Provider;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -110,11 +116,17 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	ActivityWhileChargingFinder activityWhileChargingFinder;
 
 	@Inject
+	OutputDirectoryHierarchy controlerIO;
+	@Inject
+	IterationCounter iterationCounter;
+
+	@Inject
 	Config config;
 
 	private QSim qsim;
 
 	private static final Logger log = Logger.getLogger(UrbanEVTripsPlanner.class);
+	private static List<PersonContainer2> personContainer2s = new ArrayList<>();
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
@@ -129,6 +141,27 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		this.qsim = (QSim) e.getQueueSimulation();
 		processPlans(selectedEVPlans);
+		CSVPrinter csvPrinter = null;
+		try {
+			csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "outOfEnergy.csv"))), CSVFormat.DEFAULT.withDelimiter(';').
+					withHeader("PersonID", "Reason"));
+
+			{
+				for (PersonContainer2 personContainer2 : personContainer2s) {
+
+
+					csvPrinter.printRecord(personContainer2.personId, personContainer2.reason);
+				}
+			}
+
+
+
+
+			csvPrinter.close();
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -188,8 +221,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
 
 
+
 					if (evLegs.get(0).equals(legWithCriticalSOC)) {
 						log.warn("SoC of Agent" + mobsimagent + "is running beyond capacity threshold during the first leg of the day.");
+						PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "is running beyond capacity threshold during the first leg of the day.");
+						personContainer2s.add(personContainer2);
 						break;
 					}
 
@@ -305,6 +341,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			actWhileCharging = activityWhileChargingFinder.findActivityWhileChargingBeforeLeg(mobsimagent, modifiablePlan, (Leg) modifiablePlan.getPlanElements().get(legIndexCounter));
 			if (actWhileCharging == null){
 				log.warn(mobsimagent + " can't find a suitable activity prior the critical leg!");
+				PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "can't find a suitable activity prior the critical leg!");
+				personContainer2s.add(personContainer2);
 				return;
 			}
 			selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
@@ -583,12 +621,30 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Id<Link> homeLink = EditPlans.findRealActBefore(mobsimAgent,firstEvLegIndex).getLinkId();
 		boolean isHomeTrip = EditPlans.findRealActAfter(mobsimAgent,modifiablePlan.getPlanElements().indexOf(evLegs.get(evLegs.size()-1))).getLinkId().equals(homeLink);
 		boolean hasHomeCharger = chargingInfrastructureSpecification.getChargerSpecifications().values().stream()
-				.filter(chargerSpecification -> chargerSpecification.getChargerType().equals(ev.getChargerTypes()))
+				.filter(chargerSpecification -> ev.getChargerTypes().contains(chargerSpecification.getChargerType()))
 				.map(chargerSpecification -> chargerSpecification.getLinkId())
 				.anyMatch(linkId -> linkId.equals(homeLink));
 
+
 		return isHomeTrip && hasHomeCharger;
 	}
+
+
+
+
+class PersonContainer2{
+	private final Id<Person> personId;
+	private final String reason;
+
+
+	PersonContainer2 (Id<Person> personId, String reason){
+		this.personId = personId;
+		this.reason = reason;
+
+	}
+
+
+}
 }
 
 
