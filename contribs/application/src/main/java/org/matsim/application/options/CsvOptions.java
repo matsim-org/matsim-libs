@@ -20,10 +20,10 @@ public final class CsvOptions {
     @CommandLine.Option(names = "--csv-format", description = "CSV Format", defaultValue = "Default")
     private CSVFormat.Predefined csvFormat;
 
-    @CommandLine.Option(names = "--csv-delimiter", description = "CSV Delimiter", defaultValue = ";")
+    @CommandLine.Option(names = "--csv-delimiter", description = "CSV Delimiter", defaultValue = ",")
     private Character csvDelimiter;
 
-    @CommandLine.Option(names = "--csv-charset", description = "CSV input encoding", defaultValue = "ISO-8859-1")
+    @CommandLine.Option(names = "--csv-charset", description = "CSV input encoding", defaultValue = "UTF8")
     private Charset csvCharset;
 
     /**
