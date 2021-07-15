@@ -42,12 +42,13 @@ public class MATSimApplicationTest {
 	public void config() {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
-				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4");
+				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4", "--config:plans.inputCRS", "EPSG:1234");
 
 		Config config = controler.getConfig();
 
 		assertThat(config.controler().getRunId()).isEqualTo("Test123");
 		assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
+		assertThat(config.plans().getInputCRS()).isEqualTo("EPSG:1234");
 
 	}
 

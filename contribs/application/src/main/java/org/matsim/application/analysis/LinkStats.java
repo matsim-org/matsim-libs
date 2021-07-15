@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-@CommandLine.Command(name = "link-stats", description = "Compute aggregated link statistics")
+@CommandLine.Command(name = "link-stats", description = "Compute aggregated link statistics, like volume and travel time")
 public class LinkStats implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(LinkStats.class);
@@ -41,7 +41,7 @@ public class LinkStats implements MATSimAppCommand {
 	//@CommandLine.Option(names = "--link-to-link", description = "Also calculate link to link travel times", defaultValue = "false")
 	//private boolean l2l;
 
-	@CommandLine.Option(names = "--max-time", description = "Maximum time used in aggregation0", defaultValue = "86399")
+	@CommandLine.Option(names = "--max-time", description = "Maximum time used in aggregation", defaultValue = "86399")
 	private int maxTime;
 
 	@CommandLine.Option(names = "--time-slice", description = "Number of seconds per time slice", defaultValue = "900")
