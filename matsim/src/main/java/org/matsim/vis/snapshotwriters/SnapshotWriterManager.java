@@ -84,14 +84,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	
 	private void doSnapshot(final double time, VisMobsim visMobsim) {
 		if (!this.snapshotWriters.isEmpty()) {
-		/*	Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			for (VisLink link : visMobsim.getVisNetwork().getVisLinks().values()) {
-				if (isGenerateSnapshot(link.getLink()))
-					link.getVisData().addAgentSnapshotInfo(positions);
-			}
 
-
-		 */
 			// why not do it parallel
 			var positions = visMobsim.getVisNetwork().getVisLinks().values().parallelStream()
 					.filter(visLink -> isGenerateSnapshot(visLink.getLink()))
@@ -101,7 +94,6 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 			// We do not put non-network agents in movies.
 			// Otherwise, we would add snapshots from visMobsim.getNonNetworkAgentSnapshots() here.
 
-			// I guess each writer could also be called in parallel.
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (AgentSnapshotInfo position : positions) {

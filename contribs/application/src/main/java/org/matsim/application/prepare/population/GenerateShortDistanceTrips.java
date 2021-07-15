@@ -49,10 +49,10 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     private Generate generate;
 
     @CommandLine.Mixin
-    private final ShpOptions shp = new ShpOptions();
+    private ShpOptions shp = new ShpOptions();
 
     @CommandLine.Mixin
-    private final CrsOptions crs = new CrsOptions();
+    private CrsOptions crs = new CrsOptions();
 
     @CommandLine.Option(names = "--range", description = "Maximum distance in meter", defaultValue = "1000")
     private double range;
@@ -63,9 +63,6 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     private final Random rnd = new Random(4711);
 
     private Population population;
-
-    public GenerateShortDistanceTrips() {
-    }
 
     @Override
     public Integer call() throws Exception {
@@ -302,7 +299,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     static class Generate {
 
         @CommandLine.Option(names = "--num-trips", description = "Number of trips to generate", required = true)
-        private final int numOfMissingTrips = -1;
+        private int numOfMissingTrips = -1;
 
         @CommandLine.Option(names = "--trip-share", description = "Generate as many trips needed to match the share", required = true)
         private double tripShare;

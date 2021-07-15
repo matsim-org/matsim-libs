@@ -65,10 +65,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     private boolean writeDetails;
 
     @CommandLine.Mixin
-    private final CrsOptions crs = new CrsOptions();
+    private CrsOptions crs = new CrsOptions();
 
     @CommandLine.Mixin
-    private final ShpOptions shp = new ShpOptions();
+    private ShpOptions shp = new ShpOptions();
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new TravelTimeAnalysis()).execute(args));
