@@ -20,15 +20,19 @@
 
 package org.matsim.urbanEV;
 
-import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecificationImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripStructureUtils;
@@ -36,10 +40,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import javax.inject.Provider;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
 
 class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricFleetSpecification>, IterationStartsListener {
 
@@ -75,28 +76,18 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 				.filter(vehicle -> VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation()) != null &&
 						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation()).equals("electricity"))
 				.collect(Collectors.toSet());
-		vehSet.forEach(vehicle -> wrapEV(vehicle));
+		vehSet.forEach(vehicle -> createEV(vehicle));
 	}
 
-	private void wrapEV(Vehicle vehicle) {
+	private void createEV(Vehicle vehicle) {
 		if (this.fleetSpecification.getVehicleSpecifications().containsKey(getWrappedElectricVehicleId(vehicle.getId()))) return;
-		//			consider using ImmutableElectricVehicleSpecification.newBuilder()
-		ElectricVehicleSpecification electricVehicleSpecification = new ElectricVehicleSpecification() {
-			@Override
-			public String getVehicleType() { return vehicle.getType().getId().toString(); }
-
-			@Override
-			public ImmutableList<String> getChargerTypes() { return EVUtils.getChargerTypes(vehicle.getType().getEngineInformation()); }
-
-			@Override
-			public double getInitialSoc() { return EVUtils.getInitialEnergy(vehicle.getType().getEngineInformation()) * 3_600_000; }
-
-			@Override
-			public double getBatteryCapacity() { return VehicleUtils.getEnergyCapacity(vehicle.getType().getEngineInformation()) * 3_600_000; }
-
-			@Override
-			public Id<ElectricVehicle> getId() { return getWrappedElectricVehicleId(vehicle.getId()); }
-		};
+		var electricVehicleSpecification = ImmutableElectricVehicleSpecification.newBuilder()
+				.vehicleType(vehicle.getType().getId().toString())
+				.chargerTypes(EVUtils.getChargerTypes(vehicle.getType().getEngineInformation()))
+				.initialSoc(EVUtils.getInitialEnergy(vehicle.getType().getEngineInformation()) * 3_600_000)
+				.batteryCapacity(VehicleUtils.getEnergyCapacity(vehicle.getType().getEngineInformation()) * 3_600_000)
+				.id(getWrappedElectricVehicleId(vehicle.getId()))
+				.build();
 		this.fleetSpecification.addVehicleSpecification(electricVehicleSpecification);
 	}
 
