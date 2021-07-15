@@ -99,7 +99,7 @@ public class DrtVehicleDistanceStats
 	}
 
 	private void initializeVehicles() {
-		int maxCapacity = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
+		int maxCapacity = DrtLegsAnalyser.findMaxVehicleCapacity(fleetSpecification);
 		fleetSpecification.getVehicleSpecifications()
 				.keySet()
 				.stream()

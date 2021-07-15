@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.drt.routing;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -213,6 +214,34 @@ public class DrtRoutingModuleTest {
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList6);
+
+	}
+
+	@Test
+	public void testRouteDescriptionHandling() {
+		String oldRouteFormat = "600 400";
+		String newRouteFormat = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+
+		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+
+		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
+		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
+		Facility hf = FacilitiesUtils.toFacility(h, facilities);
+
+		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
+		Facility wf = FacilitiesUtils.toFacility(w, facilities);
+
+		DrtRoute drtRoute = new DrtRoute(h.getLinkId(),w.getLinkId());
+
+		drtRoute.setRouteDescription(oldRouteFormat);
+		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+
+		drtRoute.setRouteDescription(newRouteFormat);
+		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+		Assert.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
 
 	}
 
