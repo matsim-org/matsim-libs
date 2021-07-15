@@ -47,10 +47,8 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private double snapshotTime = 0.0;
 
 	public SnapshotWriterManager(int snapshotPeriod, QSimConfigGroup.FilterSnapshots filterSnapshots) {
-		if (snapshotPeriod < 1) throw new IllegalArgumentException("snapshot period must be at least 1 second.");
 		this.snapshotPeriod = snapshotPeriod;
 		this.filterSnapshots = filterSnapshots;
-
 	}
 
 	@Override
