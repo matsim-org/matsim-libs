@@ -33,11 +33,13 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
+import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -274,8 +276,9 @@ public class DrtSpeedUpTest {
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
 		var dropoffEvent = new PassengerDroppedOffEvent(submittedTime + waitTime + rideTime, MODE, requestId, null,
 				null);
+		var drtFare = new PersonMoneyEvent(submittedTime, null, 5.5, DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, MODE, requestId.toString());
 		return new PerformedRequestEventSequence(submittedEvent, mock(PassengerRequestScheduledEvent.class),
-				pickupEvent, dropoffEvent);
+				pickupEvent, dropoffEvent, drtFare);
 	}
 
 	DvrpVehicleSpecification vehicleSpecification(String id) {

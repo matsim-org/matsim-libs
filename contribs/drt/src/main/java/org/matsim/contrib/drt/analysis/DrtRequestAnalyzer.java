@@ -17,19 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.contrib.drt.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.Nullable;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -42,15 +40,20 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 
+import static org.matsim.contrib.drt.fare.DrtFareHandler.PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE;
+
 /**
  * Creates PerformedRequestEventSequence (for scheduled requests) and RejectedRequestEventSequence (for rejected requests).
- * Almost all data for request/trip analysis is there (except info on actual paths), so should be quite reusable.
+ * Almost all data for request/leg analysis is there (except info on actual paths), so should be quite reusable.
  *
  * @author jbischoff
  * @author Michal Maciejewski
  */
 public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler,
-		DrtRequestSubmittedEventHandler, PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler {
+		DrtRequestSubmittedEventHandler, PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler,
+		PersonMoneyEventHandler {
+
+	private static final Logger log = Logger.getLogger(DrtRequestAnalyzer.class);
 
 	public static class PerformedRequestEventSequence {
 		private final DrtRequestSubmittedEvent submitted;
@@ -60,19 +63,22 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		private PassengerPickedUpEvent pickedUp;
 		@Nullable
 		private PassengerDroppedOffEvent droppedOff;
+		@Nullable
+		private PersonMoneyEvent drtFare;
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled) {
-			this(submitted, scheduled, null, null);
+			this(submitted, scheduled, null, null, null);
 		}
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
-				PassengerDroppedOffEvent droppedOff) {
+				PassengerDroppedOffEvent droppedOff, PersonMoneyEvent drtFare) {
 			this.submitted = Objects.requireNonNull(submitted);
 			this.scheduled = Objects.requireNonNull(scheduled);
 			this.pickedUp = pickedUp;
 			this.droppedOff = droppedOff;
+			this.drtFare = drtFare;
 		}
 
 		public DrtRequestSubmittedEvent getSubmitted() {
@@ -89,6 +95,10 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 		public Optional<PassengerDroppedOffEvent> getDroppedOff() {
 			return Optional.ofNullable(droppedOff);
+		}
+
+		public Optional<PersonMoneyEvent> getDrtFare() {
+			return Optional.ofNullable(drtFare);
 		}
 
 		public boolean isCompleted() {
@@ -119,6 +129,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	private final Map<Id<Request>, DrtRequestSubmittedEvent> requestSubmissions = new HashMap<>();
 	private final Map<Id<Request>, RejectedRequestEventSequence> rejectedRequestSequences = new HashMap<>();
 	private final Map<Id<Request>, PerformedRequestEventSequence> performedRequestSequences = new HashMap<>();
+	private final List<PersonMoneyEvent> drtFarePersonMoneyEvents = new ArrayList<>();
 
 	public DrtRequestAnalyzer(String mode) {
 		this.mode = mode;
@@ -136,11 +147,16 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		return performedRequestSequences;
 	}
 
+	public List<PersonMoneyEvent> getDrtFarePersonMoneyEvents() {
+		return drtFarePersonMoneyEvents;
+	}
+
 	@Override
 	public void reset(int iteration) {
 		requestSubmissions.clear();
 		rejectedRequestSequences.clear();
 		performedRequestSequences.clear();
+		drtFarePersonMoneyEvents.clear();
 	}
 
 	@Override
@@ -177,6 +193,24 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	public void handleEvent(PassengerDroppedOffEvent event) {
 		if (event.getMode().equals(mode)) {
 			performedRequestSequences.get(event.getRequestId()).droppedOff = event;
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		if (event.getTransactionPartner() != null && event.getTransactionPartner().equals(mode) &&
+				event.getPurpose() != null && event.getPurpose().equals(DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE)) {
+			if (event.getReference() == null) {
+				log.error("Found a PersonMoneyEvent with purpose " + event.getPurpose()  + " and transactionPartner " +
+						event.getTransactionPartner() + " but without field reference (null). This field should be the drt request id or " +
+						PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE + " or similar. Terminating.");
+				throw new RuntimeException();
+			}
+			drtFarePersonMoneyEvents.add(event);
+			PerformedRequestEventSequence sequence = performedRequestSequences.get(Id.create(event.getReference(), Request.class));
+			if (sequence != null) {
+				sequence.drtFare = event;
+			}
 		}
 	}
 }

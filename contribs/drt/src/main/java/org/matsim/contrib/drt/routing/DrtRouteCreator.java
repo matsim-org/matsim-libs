@@ -35,6 +35,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
 
+import java.util.List;
+
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
@@ -79,6 +81,12 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		route.setTravelTime(maxTravelTime);
 		route.setDirectRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
+
+		if(this.drtCfg.getStoreUnsharedPath())
+		{
+			route.setUnsharedPath(unsharedPath);
+		}
+
 		return route;
 	}
 }
