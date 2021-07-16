@@ -56,7 +56,7 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
     /**
      * determines the minimum duration for activities to be determined suitable for charging the vehicle during the performance of the activity. In seconds.
      */
-    private double minWhileChargingActivityDuration_s = 20 * 60;
+    private double minWhileChargingActivityDuration_s = 60 * 60;
 
     private static final String WHILE_CHARGING_ACT_TYPES = "whileChargingActivityTypes";
     /**

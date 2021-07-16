@@ -141,7 +141,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		this.qsim = (QSim) e.getQueueSimulation();
 		processPlans(selectedEVPlans);
-		CSVPrinter csvPrinter = null;
+		CSVPrinter csvPrinter;
 		try {
 			csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "outOfEnergy.csv"))), CSVFormat.DEFAULT.withDelimiter(';').
 					withHeader("PersonID", "Reason"));
@@ -161,7 +161,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
-
+	personContainer2s.clear();
 	}
 
 	/**
@@ -511,13 +511,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				.stream()
 				.filter(charger -> vehicleSpecification.getChargerTypes().contains(charger.getChargerType()))
 				.collect(Collectors.toList());
-//
-//		List<Id<Link>> chargerLinkList = chargerList.stream().map(chargerSpecification -> chargerSpecification.getLinkId()).collect(toList());
-//		Map<Id<Link>, Double> distanceToAct = new HashMap<>();
-//		for (Id<Link> id : chargerLinkList) {
-//			double distance = NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(id).getToNode().getCoord());
-//			distanceToAct.put(id, distance);
-//		}
+
 		StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
 				1, l -> l.getFromNode().getCoord(), s -> network.getLinks().get(s.getLinkId()).getToNode().getCoord()); //TODO get closest X chargers and choose randomly?
 		List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(network.getLinks().get(linkId),chargerList.stream());
