@@ -63,24 +63,24 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		final int nActs = activities.size();
 		// when mutating durations "blindly", avoid creating activities ending before
 		// the previous activity.
-		double lastEndTime = Double.NEGATIVE_INFINITY;
+		OptionalTime lastEndTime = OptionalTime.undefined();
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
-					a.setMaximumDuration( mutateTime(a.getMaximumDuration()) );
+					a.getMaximumDuration().ifDefined(d -> a.setMaximumDuration(mutateTime(d)));
 					break;
 				case MUTATE_END:
-					a.setEndTime( mutateTime(a.getEndTime()) );
-					if ( a.getEndTime().isUndefined() &&
-							a.getEndTime().seconds() < lastEndTime ) {
-						a.setEndTime( lastEndTime );
+					if (a.getEndTime().isDefined()) {
+						a.setEndTime(  mutateTime(a.getEndTime().seconds()));
+						lastEndTime = a.getEndTime();
+					} else if (lastEndTime.isDefined()) {
+						a.setEndTime( lastEndTime.seconds() );
 					}
-					lastEndTime = a.getEndTime().seconds();
 					break;
 				case MUTATE_END_AS_DUR:
 					final OptionalTime oldTime = a.getEndTime();
 					if ( oldTime.isUndefined() ) break;
-					final double newTime = mutateTime( oldTime );
+					final double newTime = mutateTime( oldTime.seconds() );
 					// doing this so rather than sampling mut directly allows
 					// to avoid negative times
 					final double mut = newTime - oldTime.seconds();
@@ -95,11 +95,8 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		}
 	}
 
-	private double mutateTime(final OptionalTime time) {
-		// do not do anything if time is undefined
-		if ( time.isUndefined() ) return time.seconds();
-
-		final double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
+	private double mutateTime(final double time) {
+		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 		return t < 0 ? 0 : t;
 	}
 

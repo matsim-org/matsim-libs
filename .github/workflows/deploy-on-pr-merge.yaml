@@ -4,7 +4,7 @@ on:
   push: # snapshot deployment
     branches:
       - master
-  pull_request: # pr-labelled deployment
+  pull_request_target: # pr-labelled deployment
     branches:
       - master
     types:
@@ -40,7 +40,7 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Set MATSim version (if PR-labelled version)
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         run: mvn versions:set --batch-mode -DnewVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/SNAPSHOT//')PR${{ github.event.pull_request.number }} -DgenerateBackupPoms=false
 
       # Build and publish are separated so we start deploying only after all jars are built successfully
