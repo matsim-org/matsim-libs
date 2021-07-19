@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
@@ -215,6 +216,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 				do {
 					pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
+					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev).getType().getEngineInformation())* EvUnits.J_PER_kWh;
+					pseudoVehicle.getBattery().setSoc(newSoC);
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
 					String mode = legWithCriticalSOC.getMode();
@@ -226,7 +229,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 						log.warn("SoC of Agent" + mobsimagent + "is running beyond capacity threshold during the first leg of the day.");
 						PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "is running beyond capacity threshold during the first leg of the day.");
 						personContainer2s.add(personContainer2);
-						break;
+						cnt = 0 ;
 					}
 
 
@@ -247,9 +250,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							break;
 
 						} else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && pseudoVehicle.getBattery().getSoc() > capacityThreshold ){
-							break;
+							cnt = 0;
 						} else {
 							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
+							log.info(mobsimagent + " is charging on the route.");
 							cnt--;
 						}
 					} else {
@@ -346,7 +350,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				return;
 			}
 			selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
-			legIndexCounter = legIndexCounter-2;
+			if(selectedCharger == null) legIndexCounter = legIndexCounter - 6;
 		} while (actWhileCharging != null && selectedCharger == null);
 
 
@@ -505,6 +509,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	//TODO possibly put behind interface
 	@Nullable
 	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network) {
+
 
 		List<ChargerSpecification> chargerList = chargingInfrastructureSpecification.getChargerSpecifications()
 				.values()
