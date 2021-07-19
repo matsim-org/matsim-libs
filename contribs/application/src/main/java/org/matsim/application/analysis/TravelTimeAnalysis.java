@@ -3,6 +3,7 @@ package org.matsim.application.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimAppCommand;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.matsim.application.ApplicationUtils.globFile;
+import static org.matsim.application.ApplicationUtils.loadScenario;
 
 @CommandLine.Command(
         name = "travel-time",
@@ -83,21 +85,17 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         }
 
         Path events = globFile(runDirectory, runId + ".*events.*");
-        Path plans = globFile(runDirectory, runId + ".*plans.");
-        Path networkPath = globFile(runDirectory, runId + ".*network.");
-
-        var population = PopulationUtils.readPopulation(plans.toString());
-        var network = NetworkUtils.readNetwork(networkPath.toString());
+        Scenario scenario = loadScenario(runId, runDirectory, crs);
 
 
-        Set<Id<Person>> populationIds = population.getPersons().keySet();
+        Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
 
         BestPlanSelector<Plan, Person> selector = new BestPlanSelector<>();
 
         int size = populationIds.size();
 
         populationIds.removeIf(p -> {
-            Person person = population.getPersons().get(p);
+            Person person = scenario.getPopulation().getPersons().get(p);
             return selector.selectPlan(person) != person.getSelectedPlan();
         });
 
@@ -129,7 +127,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             timeWindow = new Tuple<>(timeFrom, timeTo);
         }
 
-        TravelTimeValidationRunner runner = new TravelTimeValidationRunner(network, populationIds, events.toString(), outputFolder, validator, trips, timeWindow, tripFilter);
+        TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips, timeWindow, tripFilter);
 
         runner.run();
 
