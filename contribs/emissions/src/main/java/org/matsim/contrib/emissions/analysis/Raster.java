@@ -107,6 +107,24 @@ public class Raster {
         return (int) ((y - bounds.minY) / cellSize);
     }
 
+    /**
+     * Returns the value in the raster at specific grid
+     * @param xi x index between 0 and {@code #getXLength} - 1
+     * @param yi y index between 0 and {@code #getYLength} - 1
+     * @return value in the raster
+     */
+    public double getValueByIndex(int xi, int yi) {
+        var index = getIndex(xi, yi);
+        return data[index];
+    }
+
+    /**
+     * Convert index back to a coordinate.
+     */
+    public Coord getCoordForIndex(int xi, int yi) {
+        return new Coord(xi * cellSize + bounds.minX, yi * cellSize + bounds.minY);
+    }
+
     int getIndexForCoord(double x, double y) {
         var xi = getXIndex(x);
         var yi = getYIndex(y);
@@ -133,12 +151,6 @@ public class Raster {
 
     int getIndex(int xi, int yi) {
         return yi * xLength + xi;
-    }
-
-    double getValueByIndex(int xi, int yi) {
-
-        var index = getIndex(xi, yi);
-        return data[index];
     }
 
     double getValueByCoord(double x, double y) {

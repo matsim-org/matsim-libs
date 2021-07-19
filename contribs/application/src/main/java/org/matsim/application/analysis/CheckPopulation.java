@@ -37,7 +37,7 @@ public class CheckPopulation implements MATSimAppCommand {
 	@CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Path to population")
 	private Path input;
 
-	@CommandLine.Option(names = "--attribute", arity = "0..*", description = "Print full distribution for selected attributes", required = false)
+	@CommandLine.Option(names = "--attribute", arity = "0..*", description = "Print full distribution for selected attributes")
 	private List<String> queryAttr = new ArrayList<>();
 
 	@CommandLine.Mixin
@@ -120,7 +120,7 @@ public class CheckPopulation implements MATSimAppCommand {
 		sep();
 
 		List<? extends Person> agents = population.getPersons().values().stream()
-				.filter(filter::considerAgent)
+				.filter(filter)
 				.collect(Collectors.toList());
 
 		// agents with trips
