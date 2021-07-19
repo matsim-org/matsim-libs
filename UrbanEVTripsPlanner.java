@@ -223,20 +223,16 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					String mode = legWithCriticalSOC.getMode();
 					List <Leg> evLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
 
-
-
-					if (evLegs.get(0).equals(legWithCriticalSOC)) {
-						log.warn("SoC of Agent" + mobsimagent + "is running beyond capacity threshold during the first leg of the day.");
-						PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "is running beyond capacity threshold during the first leg of the day.");
-						personContainer2s.add(personContainer2);
-						cnt = 0 ;
-					}
-
-
 					if (legWithCriticalSOC != null) {
 
+						if (evLegs.get(0).equals(legWithCriticalSOC)) {
+							log.warn("SoC of Agent" + mobsimagent.getId() + "is running beyond capacity threshold during the first leg of the day.");
+							PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "is running beyond capacity threshold during the first leg of the day.");
+							personContainer2s.add(personContainer2);
+							break;
+						}
 
-						if (evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs, pseudoVehicle) && pseudoVehicle.getBattery().getSoc() > 0) {
+						else if (evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && isHomeChargingTrip(mobsimagent, modifiablePlan, evLegs, pseudoVehicle) && pseudoVehicle.getBattery().getSoc() > 0) {
 
 							//trip leads to location of the first activity in the plan and there is a charger and so we can charge at home do not search for opportunity charge before
 							Activity originalActWhileCharging = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(legWithCriticalSOC));
@@ -246,14 +242,19 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							String routingMode = TripStructureUtils.getRoutingMode(legWithCriticalSOC);
 
 							planPluginTrip(modifiablePlan, routingMode, electricVehicleSpecification, originalActWhileCharging, lastAct, chargingLink, tripRouter);
-							log.info(mobsimagent + " is charging at home.");
+							log.info(mobsimagent.getId() + " is charging at home.");
+							PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "is charging at home.");
+							personContainer2s.add(personContainer2);
 							break;
 
 						} else if( evLegs.get(evLegs.size()-1).equals(legWithCriticalSOC) && pseudoVehicle.getBattery().getSoc() > capacityThreshold ){
 							cnt = 0;
+
 						} else {
 							replanPrecedentAndCurrentEVLegs(mobsimagent, modifiablePlan, electricVehicleSpecification, legWithCriticalSOC);
-							log.info(mobsimagent + " is charging on the route.");
+							log.info(mobsimagent.getId() + " is charging on the route.");
+							PersonContainer2 personContainer2 = new PersonContainer2(mobsimagent.getId(), "is charging on the route.");
+							personContainer2s.add(personContainer2);
 							cnt--;
 						}
 					} else {
