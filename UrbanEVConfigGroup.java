@@ -56,13 +56,19 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
     /**
      * determines the minimum duration for activities to be determined suitable for charging the vehicle during the performance of the activity. In seconds.
      */
-    private double minWhileChargingActivityDuration_s = 60 * 60;
+    private double minWhileChargingActivityDuration_s = 20 * 60;
 
     private static final String WHILE_CHARGING_ACT_TYPES = "whileChargingActivityTypes";
     /**
      * the activity types during which agents can charge their vehicle
      */
     private Set<String> whileChargingActivityTypes = new HashSet<>();
+
+    private double maxDistanceBetweenActAndCharger_m = 5000;
+    /**
+     * determines the maximum distance between act while charging and charger
+     */
+    private static final String MAXIMUM_DISTANCE_TO_CHARGER ="maxDistanceToCharger";
 
     //-------------------------------------------------------------------------------------------
 
@@ -106,5 +112,14 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
         this.whileChargingActivityTypes = whileChargingActivityTypes;
     }
 
+    // @StringGetter(MAXIMUM_DISTANCE_TO_CHARGER)
+    public double getMaxDistanceBetweenActAndCharger_m(){
+        return maxDistanceBetweenActAndCharger_m;
+    }
+
+    //  @StringSetter(MAXIMUM_DISTANCE_TO_CHARGER)
+    public void setMaxDistanceBetweenActAndCharger_m(double maxDistanceBetweenActAndCharger_m){
+        this.maxDistanceBetweenActAndCharger_m = maxDistanceBetweenActAndCharger_m;
+    }
 
 }

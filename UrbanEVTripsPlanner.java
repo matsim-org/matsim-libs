@@ -510,6 +510,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	@Nullable
 	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network) {
 
+		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
+		double maxDistanceToAct = configGroup.getMaxDistanceBetweenActAndCharger_m();
 
 		List<ChargerSpecification> chargerList = chargingInfrastructureSpecification.getChargerSpecifications()
 				.values()
@@ -523,7 +525,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		if (nearestChargers.isEmpty()) {
 			throw new RuntimeException("no charger could be found for vehicle type " + vehicleSpecification.getVehicleType());
 		}
-		if (NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()) >= 5000) {
+		double distanceFromActToCharger = NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord());
+		if (distanceFromActToCharger >= maxDistanceToAct) {
 			return null;
 		}
 //			//throw new RuntimeException("There are no chargers within 1000m");
