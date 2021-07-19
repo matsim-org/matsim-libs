@@ -15,7 +15,7 @@ import java.util.*;
 
 public class CongestedLinkIdentifier {
     // At the first step this is a run script
-    private static final String DIRECTORY = "/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base-1.4";
+    private static final String DIRECTORY = "/Users/luchengqi/Documents/MATSimScenarios/Dusseldorf/output/base";
 
 
     public static void main(String[] args) throws IOException {
