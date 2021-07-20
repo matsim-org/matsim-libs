@@ -61,6 +61,7 @@ public final class PScoreContainer {
 		}
 		this.costs += operatorCostContainer.getRunningCostDistance();
 		this.costs += operatorCostContainer.getRunningCostTime();
+		this.costs += operatorCostContainer.getOtherExpenses();
 	}
 
 	public double getTotalRevenue(){
