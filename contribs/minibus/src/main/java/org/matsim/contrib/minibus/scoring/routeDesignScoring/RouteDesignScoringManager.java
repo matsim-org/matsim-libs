@@ -39,13 +39,12 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class RouteDesignScoringManager {
 
-	public static enum RouteDesignScoreFunctionName {
+	public enum RouteDesignScoreFunctionName {
 		stop2StopVsBeelinePenalty, areaBtwStopsVsBeelinePenalty, areaBtwLinksVsBeelinePenalty,
 		stopServedMultipleTimesPenalty
 	}
 
-	private List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
-	private Map<RouteDesignScoreFunctionName, RouteDesignScoreParams> paramMap = new HashMap<>();
+	private final List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
 	private final static Logger log = Logger.getLogger(RouteDesignScoringManager.class);
 
 	public final double scoreRouteDesign(PPlan pPlan) {
@@ -74,7 +73,7 @@ public class RouteDesignScoringManager {
 	}
 
 	public final void init(final PConfigGroup pConfig, Network network) {
-		paramMap = pConfig.getRouteDesignScoreParams();
+		Map<RouteDesignScoreFunctionName, RouteDesignScoreParams> paramMap = pConfig.getRouteDesignScoreParams();
 
 		paramMap.forEach((name, params) -> {
 			switch (name) {

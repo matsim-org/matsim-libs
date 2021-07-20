@@ -28,12 +28,12 @@ package org.matsim.contrib.minibus.scoring;
  */
 interface OperatorCostContainerHandler {
 
-	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer);
+	void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer);
 
 	/**
 	 * Reset everything
 	 *
      */
-	public void reset();
+	void reset();
 	
 }

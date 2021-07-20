@@ -38,6 +38,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -50,15 +51,15 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
-	private Network network;
+	Network network;
 	private final String pIdentifier;
 	private final double costPerVehicleAndDay;
 	private final double expensesPerMeter;
 	private final double expensesPerSecond;
 	
 	private final List<OperatorCostContainerHandler> operatorCostContainerHandlerList = new LinkedList<>();
-	private HashMap<Id<Vehicle>, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<>();
-	
+	HashMap<Id<Vehicle>, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<>();
+
 	public OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
 		this.pIdentifier = pIdentifier;
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
@@ -66,11 +67,11 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 		this.expensesPerSecond = expensesPerSecond;
 		log.info("enabled");
 	}
-	
+
 	public void init(Network network){
 		this.network = network;
 	}
-	
+
 	public void addOperatorCostContainerHandler(OperatorCostContainerHandler operatorCostContainerHandler){
 		this.operatorCostContainerHandlerList.add(operatorCostContainerHandler);
 	}
@@ -164,5 +165,9 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 				}
 			}
 		}
+	}
+
+	public Map<Id<Vehicle>, OperatorCostContainer> getVehicleIdToOperatorCostContainerMap(){
+		return this.vehId2OperatorCostContainer;
 	}
 }
