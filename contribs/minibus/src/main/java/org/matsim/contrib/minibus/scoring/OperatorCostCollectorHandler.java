@@ -21,14 +21,8 @@ package org.matsim.contrib.minibus.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -47,7 +41,7 @@ import java.util.Map;
  * @author aneumann
  *
  */
-public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler {
+public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
@@ -169,5 +163,26 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 
 	public Map<Id<Vehicle>, OperatorCostContainer> getVehicleIdToOperatorCostContainerMap(){
 		return this.vehId2OperatorCostContainer;
+	}
+
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		if(event.getPersonId().toString().contains(this.pIdentifier)){
+			/* It is a minibus driver. Now find the correct vehicle this person is driving. */
+			for(Id<Vehicle> vehicleId : vehId2OperatorCostContainer.keySet()){
+				/* The driver Id contains the vehicle Id. For example, if the
+				vehicle Id is para_1_2 then you will find that the driver's Id
+				is something like pt_para_1_2_para_. I do not know where this
+				is set/created, but it may change in the future (JWJ '21) */
+				if(vehicleId.toString().contains(this.pIdentifier) &
+						event.getPersonId().toString().contains(vehicleId.toString())){
+					/* This is the correct vehicle. */
+
+					/* A PersonMoneyEvent assumes a positive value is an income,
+					and a negative value is a cost. Keep it consistent here too. */
+					vehId2OperatorCostContainer.get(vehicleId).addMoney(event.getAmount());
+				}
+			}
+		}
 	}
 }

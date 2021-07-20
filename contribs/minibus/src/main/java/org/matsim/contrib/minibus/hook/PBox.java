@@ -260,10 +260,6 @@ public final class PBox implements POperators {
 		return operators;
 	}
 
-	public OperatorCostCollectorHandler getOperatorCostCollectorHandler(){
-		return operatorCostCollectorHandler;
-	}
-
 	private void writeScheduleToFile(TransitSchedule schedule, String iterationFilename) {
 		TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
 		writer.writeFile(iterationFilename);

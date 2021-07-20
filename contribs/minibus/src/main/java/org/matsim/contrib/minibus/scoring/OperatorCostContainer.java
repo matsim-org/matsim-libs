@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public final class OperatorCostContainer {
+final class OperatorCostContainer {
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(OperatorCostContainer.class);
@@ -52,7 +52,7 @@ public final class OperatorCostContainer {
 	private VehicleAbortsEvent vehicleAbortE;
 
 	private double meterTravelled = 0.0;
-	private double otherExpensesIncurred = 0.0;
+	private double otherMonetaryTransactionsIncurred = 0.0;
 
 	public OperatorCostContainer(double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond) {
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
@@ -74,11 +74,13 @@ public final class OperatorCostContainer {
 	}
 
 	/**
-	 * Adds any additional expense that the vehicle may incur, for example toll
-	 * or fines.
+	 * Adds any additional monetary transaction that the vehicle may incur,
+	 * for example toll or fines. This is specifically not called 'expense'
+	 * since it may be an income, like a driver tip. A positive value
+	 * indicates an income, and a negative value indicates an expense.
 	 */
-	public void addArbitraryExpense(double expense){
-		this.otherExpensesIncurred += expense;
+	public void addMoney(double value){
+		this.otherMonetaryTransactionsIncurred += value;
 	}
 
 
@@ -129,8 +131,8 @@ public final class OperatorCostContainer {
 		return this.expensesPerSecond * timeInService;
 	}
 
-	public double getOtherExpenses(){
-		return this.otherExpensesIncurred;
+	public double getOtherMonetaryTransactions(){
+		return this.otherMonetaryTransactionsIncurred;
 	}
 
 	public Id<Vehicle> getVehicleId() {
@@ -146,7 +148,7 @@ public final class OperatorCostContainer {
 				"transitDriverAlightsE " + transitDriverAlightsE + "; " +
 				"vehicleAbortE " + vehicleAbortE + "; " +
 				"meterTravelled " + meterTravelled + "; " +
-				"additionalExpenses " + otherExpensesIncurred;
+				"additionalMoney " + otherMonetaryTransactionsIncurred;
 	}
 
 }
