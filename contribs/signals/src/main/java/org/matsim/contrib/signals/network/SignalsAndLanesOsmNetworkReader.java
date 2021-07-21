@@ -74,7 +74,8 @@ import org.matsim.lanes.LanesWriter;
 import org.xml.sax.Attributes;
 /**
  * Osm reader that extends the basic OSMNetworkReader and in addition reads in signals and lanes information.
- * This tool is based on the master thesis of Nils Schirrmacher from 2017 at VSP.
+ * This tool is based on the master thesis of Nils Schirrmacher from 2017 at VSP 
+ * and intensively debugged, simplified and cleaned up by Soehnke Braun and Theresa Ziemke (Thunig)
  * 
  * @author tthunig, nschirrmacher, sbraun
  */
@@ -124,13 +125,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private Set<Id<Link>> loopLinks = new HashSet<>();
 
 	// Node stuff
-	Set<Long> signalizedOsmNodes = new HashSet<>();
-	Set<Long> crossingOsmNodes = new HashSet<>();
-	Map<Long, OsmNode> oldToMergedJunctionNodeMap = new HashMap<>();
-	Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
+	private Set<Long> signalizedOsmNodes = new HashSet<>();
+	private Set<Long> crossingOsmNodes = new HashSet<>();
+	private Map<Long, OsmNode> oldToMergedJunctionNodeMap = new HashMap<>();
+	private Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
 	// we change a few Nodes in setOrModifyLinkAttributes -> idea: save old Links as key and the old coordinates of 1. FromNode, 2. ToNode
-	Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap();
-	Set<Long> NodesNotToMerge = new HashSet<>();
+	private Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap<>();
+	private Set<Long> nodesNotToMerge = new HashSet<>();
 
 
 	private boolean mergeOnewaySignalSystems = false;
@@ -147,112 +148,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final Lanes lanes;
 
 	private BoundingBox bbox = null;
-
-	public static void main(String[] args) {
-//		String inputOSM = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/osm/brandenburg.osm";
-//		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
-//		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
-//		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
-//		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
-
-// 		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
-		String inputOSM = "../shared-svn/studies/tthunig/osmData/10122020berlin_brandenburgMerged.osm";
-
-//		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_12_22";
-// 		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/cottbus2020_09_18";
-
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
-				TransformationFactory.WGS84_UTM33N);
-
-		// create a config
-		Config config = ConfigUtils.createConfig();
-		SignalSystemsConfigGroup signalSystemsConfigGroup = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
-		signalSystemsConfigGroup.setUseSignalSystems(true);
-		config.qsim().setUseLanes(true);
-
-		// create a scenario
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		// pick network, lanes and signals data from the scenario
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		Lanes lanes = scenario.getLanes();
-		Network network = scenario.getNetwork();
-
-		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
-
-
-		reader.setMergeOnewaySignalSystems(false);
-		reader.setAllowUTurnAtLeftLaneOnly(true);
-		reader.setMakePedestrianSignals(false);
-
-
-		//fuer Cottbus
-		//spree neisse
-//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
-//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 2);
-//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 3);
-//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 4);
-//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 5);
-//		//cottbus innenstadt
-//		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 6);
-//		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 7);
-//		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 8);
-//
-//      //BoundingBox Cottbus
-//		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
-																	// (south,west,north,east)
-
-//		 //fuer Berlin
-//		reader.setHierarchyLayer( 52.57667+10, 13.25544-10, 52.44844-10, 13.52695+10, 1);
-//		reader.setHierarchyLayer( 52.57667+10, 13.25544-10, 52.44844-10, 13.52695+10, 2);
-//		reader.setHierarchyLayer( 52.57667+10, 13.25544-10, 52.44844-10, 13.52695+10, 3);
-//		reader.setHierarchyLayer( 52.57667+10, 13.25544-10, 52.44844-10, 13.52695+10, 4);
-//		reader.setHierarchyLayer( 52.57667+10, 13.25544-10, 52.44844-10, 13.52695+10, 5);
-//		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 6);
-//		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 7);
-//		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 8);
-
-
-        // BOundingBox Berlin
-		reader.setBoundingBox(52.448, 13.23, 52.57, 13.5); // setting Bounding Box for signals and lanes
-
-		// (south,west,north,east)
-
-		reader.parse(inputOSM);
-		reader.stats();
-
-
-		/*
-        Simplify the network except the junctions with signals as this might mess up already created plans
-        */
-
-		NetworkSimplifier netSimplify = new NetworkSimplifier();
-		netSimplify.setNodesNotToMerge(reader.NodesNotToMerge);
-		netSimplify.run(network);
-
-
-        /*
-         * Clean the Network. Cleaning means removing disconnected components, so that
-         * afterwards there is a route from every link to every other link. This may not
-         * be the case in the initial network converted from OpenStreetMap.
-         */
-		new NetworkCleaner().run(network);
-		new LanesAndSignalsCleaner().run(scenario);
-
-		/*
-		 * Write the files out: network, lanes, signalSystems, signalGroups,
-		 * signalControl
-		 */
-		new NetworkWriter(network).write(outputDir + "network.xml");
-		new LanesWriter(lanes).write(outputDir + "lanes.xml");
-		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename(outputDir + "signalSystems.xml");
-		signalsWriter.setSignalGroupsOutputFilename(outputDir + "signalGroups.xml");
-		signalsWriter.setSignalControlOutputFilename(outputDir + "signalControl.xml");
-		signalsWriter.writeSignalsData(scenario);
-	}
 
 	public SignalsAndLanesOsmNetworkReader(Network network, CoordinateTransformation transformation,
 			final SignalsData signalsData, final Lanes lanes) {
@@ -453,8 +348,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 
-		//sbraun 07052020 add Network Cleaner here to create plans on the precleaned network
-		//sbraun 07052020 That causes errors
 		LOG.info("Start pre-cleaning network before Creation of the Signal plans.");
 		new NetworkCleaner().run(network);
 
@@ -585,16 +478,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 				for(Link outlink : signalNode.getOutLinks().values()){
 					Long temp3 = new Long(outlink.getToNode().getId().toString());
-					this.NodesNotToMerge.add(temp3);
+					this.nodesNotToMerge.add(temp3);
 				}
 				Long temp1 = new Long(signalNode.getId().toString());
 				Long temp2 = new Long(network.getLinks().get(signaldata.getLinkId()).getFromNode().getId().toString());
-				this.NodesNotToMerge.add(temp1);
-				this.NodesNotToMerge.add(temp2);
+				this.nodesNotToMerge.add(temp1);
+				this.nodesNotToMerge.add(temp2);
 
 			}
 		}
 
+		stats();
 	}
 
 	//sbraun 30092020 Attempt to speed up this method:
@@ -2477,6 +2371,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + linkId.toString() + ":" + dir);
 			}
 		}
+	}
+
+
+	public Set<Long> getNodesNotToMerge() {
+		return nodesNotToMerge;
 	}
 
 

@@ -401,7 +401,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         signalReader.parse(inputfile.toString());
 
         NetworkSimplifier netsimplify = new NetworkSimplifier();
-        netsimplify.setNodesNotToMerge(signalReader.NodesNotToMerge);
+        netsimplify.setNodesNotToMerge(signalReader.getNodesNotToMerge());
         netsimplify.run(network);
 
 
