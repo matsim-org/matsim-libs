@@ -75,11 +75,12 @@ public class ActivityWhileChargingFinder {
 				.filter(activity -> activityTypes.contains(activity.getType()))
 				.map(activity -> planElementsBeforeLeg.indexOf(activity))
 				.filter(idx -> idx > 0)
-				.map(idx -> new Tuple<>((Leg) planElementsBeforeLeg.get(idx - 1), (Activity) planElementsBeforeLeg.get(idx)))
-				.filter(tuple -> TripStructureUtils.getRoutingMode(tuple.getFirst()).equals(evRoutingMode))
+				.map(idx -> new Tuple<>(getEvLegBeforeActivity(planElementsBeforeLeg, (Activity) planElementsBeforeLeg.get(idx), evRoutingMode), (Activity) planElementsBeforeLeg.get(idx)))
+//				.filter(tuple -> TripStructureUtils.getRoutingMode(tuple.getFirst()).equals(evRoutingMode))
 				.collect(Collectors.toList());
 
 		if(evLegsWithFollowingActs.isEmpty()) return null;
+		evLegsWithFollowingActs.removeIf(legActivityTuple -> legActivityTuple.getFirst() == null);
 		evLegsWithFollowingActs.sort(Comparator.comparingDouble(tuple -> tuple.getFirst().getDepartureTime().seconds()));
 
 		for (int i = evLegsWithFollowingActs.size() - 1; i >= 0; i--) {
@@ -114,8 +115,29 @@ public class ActivityWhileChargingFinder {
 		}
 		for (int ii = actIndex + 1; ii < planElements.size(); ii++){
 			PlanElement element = planElements.get(ii);
-			if(element instanceof Leg && TripStructureUtils.getRoutingMode((Leg) element).equals(routingMode)){
-				return (Leg) element;
+			if(element instanceof Leg)
+				if(((Leg) element).getMode().equals(routingMode)){
+					return (Leg) element;
+			}
+		}
+		return null;
+	}
+
+	Leg getEvLegBeforeActivity (List<PlanElement> planElements, Activity activity, String routingMode){
+		int actIndex = planElements.indexOf(activity);
+		if(actIndex < 0){
+			log.warn("could not find activity within given list of plan elements");
+			return null;
+		}
+		if(actIndex == planElements.size() - 1) {
+			log.warn("the given activity is the last activity in the given list of plan elements");
+			return null;
+		}
+		for (int ii = actIndex ; ii > 0 ; ii--){
+			PlanElement element = planElements.get(ii);
+			if(element instanceof Leg)
+				if(((Leg) element).getMode().equals(routingMode)){
+					return (Leg) element;
 			}
 		}
 		return null;
