@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -53,8 +52,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.vehicles.Vehicle;
-
-import javax.inject.Inject;
 
 
 /**
@@ -210,7 +207,7 @@ public class TripsAndLegsCSVWriter {
             tripRecord.add(Double.toString(toCoord.getY()));
             tripRecord.add(firstPtBoardingStop != null ? firstPtBoardingStop : "");
             tripRecord.add(lastPtEgressStop != null ? lastPtEgressStop : "");
-            tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(trip));
+            tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(personId, trip));
             if (TRIPSHEADER.length != tripRecord.size()) {
                 // put the whole error message also into the RuntimeException, so maven shows it on the command line output (log messages are shown incompletely)
                 StringBuilder str = new StringBuilder();
@@ -340,11 +337,15 @@ public class TripsAndLegsCSVWriter {
         return scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord();
     }
 
-
     public interface CustomTripsWriterExtension {
+
         String[] getAdditionalTripHeader();
 
         List<String> getAdditionalTripColumns(TripStructureUtils.Trip trip);
+
+        default List<String> getAdditionalTripColumns(Id<Person> personId, TripStructureUtils.Trip trip) {
+            return getAdditionalTripColumns(trip);
+        }
     }
 
     public interface CustomLegsWriterExtension {
@@ -363,6 +364,7 @@ public class TripsAndLegsCSVWriter {
         public List<String> getAdditionalTripColumns(TripStructureUtils.Trip trip) {
             return Collections.EMPTY_LIST;
         }
+
     }
 
     static class NoLegsWriterExtension implements CustomLegsWriterExtension {
