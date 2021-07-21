@@ -440,10 +440,6 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         if (setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
             Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
             Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 246, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
             Assert.assertEquals("Assert number of Systems", 65, signalsData.getSignalSystemsData().getSignalSystemData().size());
             Assert.assertEquals("Assert number of total SignalGroups", 136, noSignalGroups);
             Assert.assertEquals("Assert number of total Signals", 266, noSignals);
@@ -451,25 +447,17 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         }
 
         if (setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
-            Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
-            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 246, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
-            Assert.assertEquals("Assert number of Systems", 65, signalsData.getSignalSystemsData().getSignalSystemData().size());
-            Assert.assertEquals("Assert number of total SignalGroups", 136, noSignalGroups);
-            Assert.assertEquals("Assert number of total Signals", 266, noSignals);
-            Assert.assertEquals("Assert no of links with lanes",128,scenario.getLanes().getLanesToLinkAssignments().size());
+            Assert.assertEquals("Assert number of nodes", 339, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 692, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 82, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 157, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 302, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",137,scenario.getLanes().getLanesToLinkAssignments().size());
         }
 
         if (setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
             Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
             Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 245, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
             Assert.assertEquals("Assert number of Systems", 65, signalsData.getSignalSystemsData().getSignalSystemData().size());
             Assert.assertEquals("Assert number of total SignalGroups", 136, noSignalGroups);
             Assert.assertEquals("Assert number of total Signals", 265, noSignals);
@@ -479,10 +467,6 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         if (!setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
             Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
             Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 213, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
             Assert.assertEquals("Assert number of Systems", 41, signalsData.getSignalSystemsData().getSignalSystemData().size());
             Assert.assertEquals("Assert number of total SignalGroups", 112, noSignalGroups);
             Assert.assertEquals("Assert number of total Signals", 223, noSignals);
@@ -490,38 +474,26 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         }
 
         if (setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
-            Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
-            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 245, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
-            Assert.assertEquals("Assert number of Systems", 65, signalsData.getSignalSystemsData().getSignalSystemData().size());
-            Assert.assertEquals("Assert number of total SignalGroups", 136, noSignalGroups);
-            Assert.assertEquals("Assert number of total Signals", 265, noSignals);
-            Assert.assertEquals("Assert no of links with lanes",128,scenario.getLanes().getLanesToLinkAssignments().size());
+            Assert.assertEquals("Assert number of nodes", 339, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 692, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 82, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 157, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 301, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",137,scenario.getLanes().getLanesToLinkAssignments().size());
         }
 
         if (!setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
-            Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
-            Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 213, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
-            Assert.assertEquals("Assert number of Systems", 41, signalsData.getSignalSystemsData().getSignalSystemData().size());
-            Assert.assertEquals("Assert number of total SignalGroups", 112, noSignalGroups);
-            Assert.assertEquals("Assert number of total Signals", 223, noSignals);
-            Assert.assertEquals("Assert no of links with lanes",115,scenario.getLanes().getLanesToLinkAssignments().size());
+            Assert.assertEquals("Assert number of nodes", 314, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 56, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 131, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 252, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",122,scenario.getLanes().getLanesToLinkAssignments().size());
         }
 
         if (!setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
             Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
             Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 212, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
             Assert.assertEquals("Assert number of Systems", 41, signalsData.getSignalSystemsData().getSignalSystemData().size());
             Assert.assertEquals("Assert number of total SignalGroups", 112, noSignalGroups);
             Assert.assertEquals("Assert number of total Signals", 222, noSignals);
@@ -529,16 +501,12 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         }
 
         if (!setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
-            Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
-            Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
-//            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
-//            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
-//            Assert.assertEquals("Assert number of total Signals", 212, noSignals);
-//            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
-            Assert.assertEquals("Assert number of Systems", 41, signalsData.getSignalSystemsData().getSignalSystemData().size());
-            Assert.assertEquals("Assert number of total SignalGroups", 112, noSignalGroups);
-            Assert.assertEquals("Assert number of total Signals", 222, noSignals);
-            Assert.assertEquals("Assert no of links with lanes",115,scenario.getLanes().getLanesToLinkAssignments().size());
+            Assert.assertEquals("Assert number of nodes", 314, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 56, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 131, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 251, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",122,scenario.getLanes().getLanesToLinkAssignments().size());
         }
 
 

@@ -277,10 +277,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		LOG.info("Found all Two-Node-Junctions");
 
         // This method the most time consuming as it has inner loops over all nodes.
-		if (this.mergeOnewaySignalSystems)
+		if (this.mergeOnewaySignalSystems) {
 			LOG.info("Start merging One-Way signal systems...");
 			mergeOnewaySignalSystems(addingNodes, checkedNodes);
 			LOG.info("Done merging One-Way signal systems...");
+		}
 
 		for (OsmNode node : addingNodes) {
 			super.nodes.put(node.id, node);
