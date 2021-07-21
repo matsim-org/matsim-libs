@@ -258,14 +258,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	protected void simplifyOsmData() {
 		super.simplifyOsmData();
 		
-		// TODO TZ: move this into the general osm network reader (with a flag)
-		// (afterwards, make nodes private again)
-
-		// Trying to simplify four-node- and two-node-junctions to one-node-junctions
+		LOG.info("Simplify four node and two node junctions to one node junctions...");
 		List<OsmNode> addingNodes = new ArrayList<>();
 		List<OsmNode> checkedNodes = new ArrayList<>();
 		List<OsmWay> checkedWays = new ArrayList<>();
-
 
 		findingFourNodeJunctions(addingNodes, checkedNodes);
 		LOG.info("Found all Four-Node-Junctions");
@@ -276,8 +272,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		findingTwoNodeJunctions(addingNodes, checkedNodes);
 		LOG.info("Found all Two-Node-Junctions");
 
-        // This method the most time consuming as it has inner loops over all nodes.
-		if (this.mergeOnewaySignalSystems) {
+        if (this.mergeOnewaySignalSystems) {
 			LOG.info("Start merging One-Way signal systems...");
 			mergeOnewaySignalSystems(addingNodes, checkedNodes);
 			LOG.info("Done merging One-Way signal systems...");
@@ -287,11 +282,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			super.nodes.put(node.id, node);
 		}
 
-
 		addingNodes.clear();
 		checkedNodes.clear();
-		// TODO check and clean this methods
-		LOG.info("Finished simplification of OSM-Data");
+		LOG.info("...done simplifying multiple node junctions.");
 
 	}
 	
@@ -313,7 +306,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		for (Id<Link> linkId : loopLinks){
 			network.removeLink(linkId);
 		}
-
 
 		// lanes were already created (via setOrModifyLinkAttributes()) but without toLinks. add toLinks now:
 		for (Link link : network.getLinks().values()) {
@@ -464,7 +456,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				badSignalSystemData.add(signalsystem);
 			}
 		}
-		LOG.warn("Found "+badSignalSystemData.size()+" incomplete or incorrect SignalSystemData -> remove them from the system...");
+//		LOG.warn("Found "+badSignalSystemData.size()+" incomplete or incorrect SignalSystemData -> remove them from the system...");
 		for(Id<SignalSystem> badData :badSignalSystemData) {
 			this.systems.getSignalSystemData().remove(badData);
 		}
@@ -1135,7 +1127,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							} else {
 								if (topLayerPos == -1 || topLayerNeg == -1) {
 									if (topLayerPos == -1 && topLayerNeg == -1) {
-										//TODO stattdessen anzahl lanes
+										//TODO use number of lanes instead
 										if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
 											junctionNode = junctionNodePosDir;
 										} else junctionNode = junctionNodeNegDir;
@@ -1169,9 +1161,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								junctionNode = junctionNodePosDir;
 							} else junctionNode = junctionNodeNegDir;
 						}
-
-
-
 
                         /*
 						OsmNode nextNode = this.nodes.get(way.nodes.get(i + 1));
@@ -1759,11 +1748,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		return toLinkVectors;
 	}
 
-	/*
+	/**
 	 * Fills already created Lanes of a Link with available informations: toLinks,
 	 * ... (more planned). nschirrmacher on 170613
 	 */
-
 	private void fillLanesAndCheckRestrictions(Link link) {
 		// create a List of all toLinks
 		List<LinkVector> linkVectors = constructOrderedOutLinkVectors(link);
@@ -1817,7 +1805,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				return;
 			}
 
-			//sbraun08082020 dieser Fall oben führt zu falschen ergebnissen -> finde reverse Link mit Node-Koordinaten:
+			//sbraun08082020 the case above leads to wrong results -> find reverse link with node coordinates:
 			if (toLinks.size()==2){
 				for (int i = 1; i < toLinks.size(); i++){
 					Link tempLink = toLinks.get(i).getLink();
@@ -2090,7 +2078,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 																	//sbraun24072020: added 99 -> a direction which has been not understood previously
 				alignmentAnte = lane.getAlignment(); // look for the most "forward" link (closest to 180° or pi) and
 														// take it
-				//sbraun 08082020added special case rounabouts where through should actually be left //TODO Theresa fragen
+				//sbraun 08082020added special case rounabouts where through should actually be left
 
 				boolean unclearThrough = false;
 				if (toLinks.size()==2) {
@@ -2261,9 +2249,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-
-	//TODO sbraun20200128: Problem mit dem Set signalizedOSMNodes
-	//sbraun 20200204 Node n wird gar nicht benutzt
 	@Override
 	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
 		// create empty signal system for the node
@@ -2315,8 +2300,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		if (turnLanesOsm != null) {
 			createLaneStack(turnLanesOsm, turnLanesOfThisLink, l.getNumberOfLanes(), l.getId());
 			if (l.getNumberOfLanes() < turnLanesOfThisLink.size()) {
-				// TODO dies stellt die info der turn lanes über die info der #lanes.
-				// konsistent? adapt capacity too?
+				// TODO this prioritizes turn:lanes over #lanes. consistent? adapt capacity too?
 				if(turnLanesOfThisLink.size()==0.5) LOG.warn(turnLanesOfThisLink.size());
                 l.setNumberOfLanes(turnLanesOfThisLink.size());
 			}
