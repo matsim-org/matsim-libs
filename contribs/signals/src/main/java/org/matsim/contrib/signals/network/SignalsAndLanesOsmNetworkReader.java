@@ -32,16 +32,11 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.data.consistency.LanesAndSignalsCleaner;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
@@ -55,22 +50,15 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkSimplifier;
-import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.lanes.LanesWriter;
 import org.xml.sax.Attributes;
 /**
  * Osm reader that extends the basic OSMNetworkReader and in addition reads in signals and lanes information.
@@ -104,10 +92,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
     private final static String ORIG_ID = "origid";
 	private final static String TYPE = "type";
 	private final static String TO_LINKS_ANGLES = "toLinksAngles";
-	private final static String TO_LINK_REFERENCE = "toLinkReference";
-	private final static String NON_CRIT_LANES = "non_critical_lane";
-	private final static String CRIT_LANES = "critical_lane";
-	private final static String IS_ORIG_LANE = "isOrigLane";
 
 	private final String OSM_TURN_INFO = "osmTurnInfo";
 
@@ -116,7 +100,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 	private final Map<Id<Link>, Stack<Stack<Integer>>> laneStacks = new HashMap<>();
-	private final Map<Long, OsmNode> roundaboutNodes = new HashMap<>();
 	private final Map<Id<Link>, Map<Id<Link>, Double>> allToLinksAngles = new HashMap<>();
 	private final Map<Id<Lane>, List<Id<Lane>>> nonCritLanes = new HashMap<>();
 	private final Map<Id<Lane>, List<Id<Lane>>> critLanes = new HashMap<>();
@@ -129,8 +112,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private Set<Long> crossingOsmNodes = new HashSet<>();
 	private Map<Long, OsmNode> oldToMergedJunctionNodeMap = new HashMap<>();
 	private Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
-	// we change a few Nodes in setOrModifyLinkAttributes -> idea: save old Links as key and the old coordinates of 1. FromNode, 2. ToNode
-	private Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap<>();
 	private Set<Long> nodesNotToMerge = new HashSet<>();
 
 
@@ -139,7 +120,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private boolean makePedestrianSignals = false;
 	private boolean acceptFourPlusCrossings = true;
 	private boolean saveTurnLanes = false; // add turn info as attribute in lane file
-
 
 
 	private final SignalSystemsData systems;
