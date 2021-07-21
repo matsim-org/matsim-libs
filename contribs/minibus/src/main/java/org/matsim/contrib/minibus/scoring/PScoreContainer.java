@@ -65,7 +65,7 @@ public final class PScoreContainer {
 		specifically convert them to costs here. */
         double value = operatorCostContainer.getOtherMonetaryTransactions();
         if (value < 0.0) {
-            this.costs += value;
+            this.costs += -value;
         } else{
             this.earnings += value;
         }
