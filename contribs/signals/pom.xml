@@ -7,7 +7,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
   <artifactId>signals</artifactId>
-  <name>signals</name>
+  <name>signals</name>  
+  <repositories>
+    <repository>
+      <id>topobyte</id>
+      <url>https://mvn.topobyte.de</url>
+    </repository>
+    <repository>
+      <id>slimjars</id>
+      <url>https://mvn.slimjars.com</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.matsim</groupId>
@@ -26,5 +36,15 @@
  		<version>3.15.0</version>
  		<scope>test</scope>
  	</dependency>
+    <dependency>
+      <groupId>de.topobyte</groupId>
+      <artifactId>osm4j-pbf</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>de.topobyte</groupId>
+      <artifactId>osm4j-xml</artifactId>
+      <version>1.2.0</version>
+    </dependency>
   </dependencies>
 </project>
