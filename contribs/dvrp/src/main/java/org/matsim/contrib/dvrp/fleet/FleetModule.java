@@ -22,13 +22,18 @@ package org.matsim.contrib.dvrp.fleet;
 
 import java.net.URL;
 
-import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.vehicles.Vehicles;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -49,11 +54,29 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		bindModal(FleetSpecification.class).toProvider(() -> {
-			FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-			new FleetReader(fleetSpecification).parse(fleetSpecificationUrl);
-			return fleetSpecification;
-		}).asEagerSingleton();
+		// 3 options:
+		// - vehicle specifications provided in a separate XML file (http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd)
+		// - vehicle specifications derived from the "standard" matsim vehicles (only if they are read from a file,
+		//     i.e. VehiclesSource.fromVehiclesData)
+		// - vehicle specifications provided via a custom binding for FleetSpecification
+		if (fleetSpecificationUrl != null) {
+			bindModal(FleetSpecification.class).toProvider(() -> {
+				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
+				new FleetReader(fleetSpecification).parse(fleetSpecificationUrl);
+				return fleetSpecification;
+			}).asEagerSingleton();
+		} else if (getConfig().qsim().getVehiclesSource() == QSimConfigGroup.VehiclesSource.fromVehiclesData) {
+			bind(FleetSpecification.class).toProvider(new Provider<>() {
+				@Inject
+				private Vehicles vehicles;
+
+				@Override
+				public FleetSpecification get() {
+					return DvrpVehicleSpecificationWithMatsimVehicle.createFleetSpecificationFromMatsimVehicles(
+							getMode(), vehicles);
+				}
+			}).asEagerSingleton();
+		}
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -73,9 +96,8 @@ public class FleetModule extends AbstractDvrpModeModule {
 					.build());
 		}
 
-		bindModal(FleetControlerListener.class).toProvider(modalProvider(getter ->
-				new FleetControlerListener(getMode(),
-						getter.get(OutputDirectoryHierarchy.class),
+		bindModal(FleetControlerListener.class).toProvider(modalProvider(
+				getter -> new FleetControlerListener(getMode(), getter.get(OutputDirectoryHierarchy.class),
 						getter.getModal(FleetSpecification.class)))).in(Singleton.class);
 		addControlerListenerBinding().to(modalKey(FleetControlerListener.class));
 	}

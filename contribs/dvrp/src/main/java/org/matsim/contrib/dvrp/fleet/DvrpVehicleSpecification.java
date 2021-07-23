@@ -20,9 +20,12 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import java.util.Optional;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * DvrpVehicleSpecification is assumed to be immutable.
@@ -35,6 +38,10 @@ import org.matsim.api.core.v01.network.Link;
  * @author Michal Maciejewski (michalm)
  */
 public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
+	//provided only if the vehicle specification is created from a corresponding standard matsim vehicle
+	//(see FleetModule)
+	Optional<Vehicle> getMatsimVehicle();
+
 	/**
 	 * @return id of the link where the vehicle stays at the beginning of simulation
 	 */

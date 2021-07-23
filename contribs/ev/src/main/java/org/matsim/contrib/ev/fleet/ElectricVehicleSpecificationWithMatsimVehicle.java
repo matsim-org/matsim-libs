@@ -38,7 +38,7 @@ import com.google.common.collect.ImmutableList;
 public class ElectricVehicleSpecificationWithMatsimVehicle implements ElectricVehicleSpecification {
 	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
 
-		public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
+	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
 	public static final String CHARGER_TYPES = "chargerTypes";
 
 	public static ElectricFleetSpecification createFleetSpecificationFromMatsimVehicles(Vehicles vehicles) {
