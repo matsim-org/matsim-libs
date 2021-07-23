@@ -40,9 +40,6 @@ public class ElectricFleetModule extends AbstractModule {
 	@Inject
 	private EvConfigGroup evCfg;
 
-	@Inject
-	private QSimConfigGroup qSimCfg;
-
 	@Override
 	public void install() {
 		// 3 options:
@@ -57,7 +54,7 @@ public class ElectricFleetModule extends AbstractModule {
 						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getVehiclesFile()));
 				return fleetSpecification;
 			}).asEagerSingleton();
-		} else if (qSimCfg.getVehiclesSource() == QSimConfigGroup.VehiclesSource.fromVehiclesData) {
+		} else if (getConfig().qsim().getVehiclesSource() == QSimConfigGroup.VehiclesSource.fromVehiclesData) {
 			bind(ElectricFleetSpecification.class).toProvider(new Provider<>() {
 				@Inject
 				private Vehicles vehicles;
