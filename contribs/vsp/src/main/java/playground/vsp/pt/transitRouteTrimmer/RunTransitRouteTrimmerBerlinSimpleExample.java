@@ -56,12 +56,6 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
         final String scenarioCRS = "EPSG:31468";
         final String shapeFileCRS = "EPSG:31468";
 
-//        final String inScheduleFile = "D:/VW/AP3/i501/i501.output_transitSchedule.xml.gz";
-//        final String inVehiclesFile = "D:/VW/AP3/i501/i501.output_transitVehicles.xml.gz";
-//        final String inNetworkFile = "D:/VW/AP3/i501/i501.output_network.xml.gz";
-//        final String zoneShpFile = "D:/VW/AP3/i501/drtSubstitutesPTAnalysis/zones/zone1/polygons.shp";
-//        final String outputPath = "D:/VW/AP3/i501/drtSubstitutesPTAnalysis/results/";
-
 
         Config config = ConfigUtils.createConfig();
         config.global().setCoordinateSystem(scenarioCRS);
