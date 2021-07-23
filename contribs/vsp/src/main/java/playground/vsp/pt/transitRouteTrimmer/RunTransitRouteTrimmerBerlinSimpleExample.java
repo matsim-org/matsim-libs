@@ -27,6 +27,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -35,9 +37,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
+import org.osgeo.proj4j.CoordinateTransformFactory;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,11 +53,12 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
         final String inNetworkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
         final String zoneShpFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-inner-city-area/inner-city-area.shp";
         final String outputPath = "output/";
-        final String epsgCode = "31468";
+        final String scenarioCRS = "EPSG:31468";
+        final String shapeFileCRS = "EPSG:31468";
 
 
         Config config = ConfigUtils.createConfig();
-        config.global().setCoordinateSystem("EPSG:" + epsgCode);
+        config.global().setCoordinateSystem(scenarioCRS);
         config.transit().setTransitScheduleFile(inScheduleFile);
         config.network().setInputFile(inNetworkFile);
         config.vehicles().setVehiclesFile(inVehiclesFile);
@@ -78,8 +82,8 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
 
         linesToModify.removeAll(linesX);
 
-
-        Set<Id<TransitStopFacility>> stopsInZone = TransitRouteTrimmerUtils.getStopsInZone(scenario.getTransitSchedule(), IOUtils.resolveFileOrResource(zoneShpFile));
+        CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation(scenarioCRS, shapeFileCRS);
+        Set<Id<TransitStopFacility>> stopsInZone = TransitRouteTrimmerUtils.getStopsInZone(scenario.getTransitSchedule(), IOUtils.resolveFileOrResource(zoneShpFile), transformer);
         Pair<TransitSchedule, Vehicles> results = TransitRouteTrimmer.splitRoute(scenario.getTransitSchedule(), scenario.getVehicles(), stopsInZone,
                 linesToModify, true, modes2Trim, 2, true, false, false, 0);
 
@@ -90,9 +94,9 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
         TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(transitScheduleNew, scenario.getNetwork());
         System.out.println(validationResult.getErrors());
 
-
-        TransitRouteTrimmerUtils.transitSchedule2ShapeFile(transitScheduleNew, outputPath + "output-trimmed-routes.shp",epsgCode);
-        new TransitScheduleWriter(transitScheduleNew).writeFile(outputPath + "transitScheduleNew.xml.gz");
+        new File(outputPath).mkdirs();
+        TransitRouteTrimmerUtils.transitSchedule2ShapeFile(transitScheduleNew, outputPath + "trimmed-transitRoutes.shp", scenarioCRS.substring(scenarioCRS.lastIndexOf(":") + 1));
+        new TransitScheduleWriter(transitScheduleNew).writeFile(outputPath + "trimmed-transitSchedule.xml.gz");
         new MatsimVehicleWriter(vehiclesNew).writeFile(outputPath + "vehiclesNew.xml.gz");
 
     }

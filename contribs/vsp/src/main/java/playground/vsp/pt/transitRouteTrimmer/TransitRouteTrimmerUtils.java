@@ -39,6 +39,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -58,6 +59,7 @@ public class TransitRouteTrimmerUtils {
     public static void transitSchedule2ShapeFile(TransitSchedule tS, String outputFilename, String epsgCode ) throws SchemaException, IOException {
 
         File newFile = new File(outputFilename);
+        newFile.mkdirs();
 
         final SimpleFeatureType TYPE =
                 DataUtilities.createType(
@@ -206,6 +208,20 @@ public class TransitRouteTrimmerUtils {
         Set<Id<TransitStopFacility>> stopsInZone = new HashSet<>();
         for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
             if (ShpGeometryUtils.isCoordInPreparedGeometries(stop.getCoord(), geometries)) {
+                stopsInZone.add(stop.getId());
+            }
+        }
+
+        return stopsInZone;
+    }
+
+    static Set<Id<TransitStopFacility>> getStopsInZone(TransitSchedule transitSchedule, URL zoneShpFileUrl, CoordinateTransformation stopCoord2ShapeFileCrsTransformer) {
+
+        List<PreparedGeometry> geometries = ShpGeometryUtils.loadPreparedGeometries(zoneShpFileUrl);
+        Set<Id<TransitStopFacility>> stopsInZone = new HashSet<>();
+        for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
+            Coord transformed = stopCoord2ShapeFileCrsTransformer.transform(stop.getCoord());
+            if (ShpGeometryUtils.isCoordInPreparedGeometries(transformed, geometries)) {
                 stopsInZone.add(stop.getId());
             }
         }
