@@ -43,17 +43,17 @@ public final class PScoreContainer {
     private double costs = 0;
     private double earnings = 0;
 
-    public PScoreContainer(Id<Vehicle> vehicleId, TicketMachineI ticketMachine) {
+    PScoreContainer(Id<Vehicle> vehicleId, TicketMachineI ticketMachine) {
         this.vehicleId = vehicleId;
         this.ticketMachine = ticketMachine;
     }
 
-    public void handleStageContainer(StageContainer stageContainer) {
+    void handleStageContainer(StageContainer stageContainer) {
         this.servedTrips++;
         this.earnings += this.ticketMachine.getFare(stageContainer);
     }
 
-    public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
+    void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
         if (this.isFirstTour) {
             this.costs += operatorCostContainer.getFixedCostPerDay();
             this.isFirstTour = false;
@@ -71,17 +71,27 @@ public final class PScoreContainer {
         }
     }
 
+    /**
+     * @deprecated use {@link #getProfit()}
+     */
+    @Deprecated // use getProfit()
     public double getTotalRevenue() {
+        // has to be "profit".  Revenue is same as earnings.  kai, jul'21
+        return this.getProfit();
+    }
+
+    public double getProfit() {
         return this.earnings - this.costs;
     }
 
-    public double getTotalRevenuePerPassenger() {
-        if (this.servedTrips == 0) {
-            return Double.NaN;
-        } else {
-            return (this.earnings - this.costs) / this.servedTrips;
-        }
-    }
+//    public double getTotalRevenuePerPassenger() {
+//        if (this.servedTrips == 0) {
+//            return Double.NaN;
+//        } else {
+//            return (this.earnings - this.costs) / this.servedTrips;
+//        }
+//    }
+    // never used, and can be computed from other public getters of this class.  kai, jul'21
 
     public int getTripsServed() {
         return this.servedTrips;

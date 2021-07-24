@@ -29,10 +29,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -41,11 +38,11 @@ import java.util.Map;
  * @author aneumann
  *
  */
-public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
+public  final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
-	Network network;
+	private Network network;
 	private final String pIdentifier;
 	private final double costPerVehicleAndDay;
 	private final double expensesPerMeter;
@@ -162,11 +159,15 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 	}
 
 	public Map<Id<Vehicle>, OperatorCostContainer> getVehicleIdToOperatorCostContainerMap(){
-		return this.vehId2OperatorCostContainer;
+		return Collections.unmodifiableMap( this.vehId2OperatorCostContainer );
 	}
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
+		// yyyy what comes below is not so beautiful since it depends on conventions: If some string contains something of some other string,
+		// then ... It looks like this was the original design of the minibus contrib, so in principle it should be operated out at some
+		// point, but probably not now.  kai, jul'21
+
 		if(event.getPersonId().toString().contains(this.pIdentifier)){
 			/* It is a minibus driver. Now find the correct vehicle this person is driving. */
 			for(Id<Vehicle> vehicleId : vehId2OperatorCostContainer.keySet()){

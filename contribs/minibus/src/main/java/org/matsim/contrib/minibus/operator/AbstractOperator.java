@@ -283,7 +283,7 @@ abstract class AbstractOperator implements Operator{
 		int totalTripsServed = 0;
 
 		for (Id<Vehicle> vehId : plan.getVehicleIds()) {
-			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
+			totalLineScore += driverId2ScoreMap.get(vehId).getProfit();
 			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
 		}
 

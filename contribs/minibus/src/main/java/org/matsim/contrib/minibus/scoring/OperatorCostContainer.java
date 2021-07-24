@@ -54,7 +54,7 @@ final class OperatorCostContainer {
 	private double meterTravelled = 0.0;
 	private double otherMonetaryTransactionsIncurred = 0.0;
 
-	public OperatorCostContainer(double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond) {
+	OperatorCostContainer(double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond) {
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
 		this.expensesPerMeter = expensesPerMeter;
 		this.expensesPerSecond = expensesPerSecond;
@@ -65,11 +65,11 @@ final class OperatorCostContainer {
 	// out the rest internally. That would make it much more flexible with respect
 	// to replacement. kai, jan'17
 
-	public void handleTransitDriverStarts(TransitDriverStartsEvent transitDriverStartsE1) {
+	void handleTransitDriverStarts(TransitDriverStartsEvent transitDriverStartsE1) {
 		this.transitDriverStartsE = transitDriverStartsE1;
 	}
 
-	public void addDistanceTravelled(double meterTravelled1) {
+	void addDistanceTravelled(double meterTravelled1) {
 		this.meterTravelled += meterTravelled1;
 	}
 
@@ -79,7 +79,7 @@ final class OperatorCostContainer {
 	 * since it may be an income, like a driver tip. A positive value
 	 * indicates an income, and a negative value indicates an expense.
 	 */
-	public void addMoney(double value){
+	void addMoney(double value){
 		this.otherMonetaryTransactionsIncurred += value;
 	}
 
@@ -87,7 +87,7 @@ final class OperatorCostContainer {
 	/**
 	 * This terminates the stage
 	 */
-	public void handleTransitDriverAlights(PersonLeavesVehicleEvent event) {
+	void handleTransitDriverAlights(PersonLeavesVehicleEvent event) {
 		this.transitDriverAlightsE = event;
 	}
 
@@ -97,19 +97,19 @@ final class OperatorCostContainer {
 	 * TransitDriverStartsEvent, so there is either a PersonLeavesVehicleEvent or a
 	 * PersonStuckEvent.
 	 */
-	public void handleVehicleAborts(VehicleAbortsEvent event) {
+	void handleVehicleAborts(VehicleAbortsEvent event) {
 		this.vehicleAbortE = event;
 	}
 
-	public double getFixedCostPerDay() {
+	double getFixedCostPerDay() {
 		return this.costPerVehicleAndDay;
 	}
 
-	public double getRunningCostDistance() {
+	double getRunningCostDistance() {
 		return this.expensesPerMeter * this.meterTravelled;
 	}
 
-	public double getRunningCostTime() {
+	double getRunningCostTime() {
 		double timeInService;
 		
 		if (this.transitDriverAlightsE != null) {
@@ -131,11 +131,11 @@ final class OperatorCostContainer {
 		return this.expensesPerSecond * timeInService;
 	}
 
-	public double getOtherMonetaryTransactions(){
+	double getOtherMonetaryTransactions(){
 		return this.otherMonetaryTransactionsIncurred;
 	}
 
-	public Id<Vehicle> getVehicleId() {
+	Id<Vehicle> getVehicleId() {
 		return this.transitDriverStartsE.getVehicleId();
 	}
 
