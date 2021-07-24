@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +38,7 @@ import java.util.*;
  * @author aneumann
  *
  */
-public  final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
+final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
@@ -51,7 +51,7 @@ public  final class OperatorCostCollectorHandler implements TransitDriverStartsE
 	private final List<OperatorCostContainerHandler> operatorCostContainerHandlerList = new LinkedList<>();
 	HashMap<Id<Vehicle>, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<>();
 
-	public OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
+	OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
 		this.pIdentifier = pIdentifier;
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
 		this.expensesPerMeter = expensesPerMeter;
@@ -59,11 +59,11 @@ public  final class OperatorCostCollectorHandler implements TransitDriverStartsE
 		log.info("enabled");
 	}
 
-	public void init(Network network){
+	void init(Network network){
 		this.network = network;
 	}
 
-	public void addOperatorCostContainerHandler(OperatorCostContainerHandler operatorCostContainerHandler){
+	void addOperatorCostContainerHandler(OperatorCostContainerHandler operatorCostContainerHandler){
 		this.operatorCostContainerHandlerList.add(operatorCostContainerHandler);
 	}
 	

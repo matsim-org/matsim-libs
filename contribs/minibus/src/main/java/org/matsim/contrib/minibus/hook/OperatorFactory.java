@@ -17,23 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.minibus.PConfigGroup;
 
 /**
- * 
- * Handles {@link OperatorCostContainer} and does something meaningful with them. 
  * 
  * @author aneumann
  *
  */
-interface OperatorCostContainerHandler {
-
-	void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer);
-
-	/**
-	 * Reset everything
-	 *
-     */
-	void reset();
+final class OperatorFactory {
 	
+	private final static Logger log = Logger.getLogger(OperatorFactory.class);
+	
+	private final PConfigGroup pConfig;
+	private final PFranchise franchise;
+	
+	public OperatorFactory(PConfigGroup pConfig, PFranchise franchise){
+		this.pConfig = pConfig;
+		this.franchise = franchise;
+	}
+	
+	public Operator createNewOperator(Id<Operator> id){
+		if(this.pConfig.getOperatorType().equalsIgnoreCase(BasicOperator.OPERATOR_NAME)){
+			return new BasicOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(MultiPlanOperator.OPERATOR_NAME)){
+			return new MultiPlanOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(CarefulMultiPlanOperator.OPERATOR_NAME)){
+			return new CarefulMultiPlanOperator(id, this.pConfig, this.franchise);
+		} else {
+			log.error("There is no operator type specified. " + this.pConfig.getOperatorType() + " unknown");
+			return null;
+		}
+	}
 }

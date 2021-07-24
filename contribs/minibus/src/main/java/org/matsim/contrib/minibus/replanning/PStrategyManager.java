@@ -24,7 +24,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.PStrategySettings;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
-import org.matsim.contrib.minibus.operator.TimeProvider;
+import org.matsim.contrib.minibus.hook.TimeProvider;
 import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.ArrayList;

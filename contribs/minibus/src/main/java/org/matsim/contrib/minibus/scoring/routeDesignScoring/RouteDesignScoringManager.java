@@ -20,7 +20,6 @@
 package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**

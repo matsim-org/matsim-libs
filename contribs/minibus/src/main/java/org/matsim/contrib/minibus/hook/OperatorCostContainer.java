@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

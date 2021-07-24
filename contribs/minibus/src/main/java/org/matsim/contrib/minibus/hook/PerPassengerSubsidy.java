@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.minibus.operator;
+package org.matsim.contrib.minibus.hook;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +49,7 @@ import com.google.inject.Inject;
  * @author ikaddoura
  *
  */
-public class PerPassengerSubsidy implements SubsidyI {
+class PerPassengerSubsidy implements SubsidyI {
 
 //	private Map<Id<Person>, Double> personId2initialBenefits;
 //	private Map<Id<Person>, Double> personId2benefits;

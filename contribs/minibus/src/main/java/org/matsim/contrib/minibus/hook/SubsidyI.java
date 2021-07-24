@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.operator;
+package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.minibus.PConfigGroup;
 
 /**
- * 
- * @author aneumann
- *
- */
-final class OperatorFactory {
+* @author ikaddoura
+*/
+
+public interface SubsidyI {
+	// yyyyyy Müssten wir nicht im Endergebnis etwas bauen, was der normalen person scoring Logik ähnelt?  Ansonsten läuft es doch nur darauf hinaus, dass wir
+	// es alle drei Jahre wieder anfassen?
 	
-	private final static Logger log = Logger.getLogger(OperatorFactory.class);
+	double getSubsidy(Id<PPlan> id);
+	// yy My intuition would be to pass objects rather than IDs. kai, mar'17
+	// yyyyyy If you look into how it is called, it passes an ad-hoc ID, relying on a convention.  We should try to avoid that.  kai, mar'17
 	
-	private final PConfigGroup pConfig;
-	private final PFranchise franchise;
+	void computeSubsidy();
+	// yy My intuition would be to try to do without this. kai, mar'17
 	
-	public OperatorFactory(PConfigGroup pConfig, PFranchise franchise){
-		this.pConfig = pConfig;
-		this.franchise = franchise;
-	}
-	
-	public Operator createNewOperator(Id<Operator> id){
-		if(this.pConfig.getOperatorType().equalsIgnoreCase(BasicOperator.OPERATOR_NAME)){
-			return new BasicOperator(id, this.pConfig, this.franchise);
-		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(MultiPlanOperator.OPERATOR_NAME)){
-			return new MultiPlanOperator(id, this.pConfig, this.franchise);
-		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(CarefulMultiPlanOperator.OPERATOR_NAME)){
-			return new CarefulMultiPlanOperator(id, this.pConfig, this.franchise);
-		} else {
-			log.error("There is no operator type specified. " + this.pConfig.getOperatorType() + " unknown");
-			return null;
-		}
-	}
 }
+

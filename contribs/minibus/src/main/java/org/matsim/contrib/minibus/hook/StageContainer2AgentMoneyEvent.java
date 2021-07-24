@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,7 +41,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
  * 
  * @author aneumann
  */
-public final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
+final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
 
 	private final EventsManager eventsManager;
 	private final double mobsimShutdownTime;

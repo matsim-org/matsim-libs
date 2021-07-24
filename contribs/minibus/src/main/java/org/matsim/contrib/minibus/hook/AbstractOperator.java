@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.operator;
+package org.matsim.contrib.minibus.hook;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +32,6 @@ import org.matsim.contrib.minibus.performance.PTransitLineMerger;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
-import org.matsim.contrib.minibus.scoring.PScoreContainer;
 import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
