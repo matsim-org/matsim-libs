@@ -49,11 +49,11 @@ import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
@@ -122,7 +122,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
-	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
+	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet."
+			+ " The file format according to dvrp_vehicles_v1.dtd"
+			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
+			+ " See FleetModule.";
 
 	public static final String TRANSIT_STOP_FILE = "transitStopFile";
 	static final String TRANSIT_STOP_FILE_EXP =
@@ -144,7 +147,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	public static final String STORE_UNSHARED_PATH = "storeUnsharedPath";
 	static final String STORE_UNSHARED_PATH_EXP = "Store planned unshared drt route as a link sequence";
-
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
@@ -676,7 +678,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
 	 */
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
-		addParameterSet( pars );
+		addParameterSet(pars);
 	}
 
 }
