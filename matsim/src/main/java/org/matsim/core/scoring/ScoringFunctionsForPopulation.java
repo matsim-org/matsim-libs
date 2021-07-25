@@ -24,14 +24,19 @@ import com.google.inject.Inject;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,9 +45,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -68,23 +74,14 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
  * @author michaz
  *
  */
- final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
-	// there is currently only one place outside package where this is used, and I think it
-	// can be changed there.  kai, sep'17
-	// I just removed that.  kai, apr'18
+ final class ScoringFunctionsForPopulation implements BasicEventHandler {
 	
-	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-	
-	/*
-	 * Replaced List with TDoubleCollection (TDoubleArrayList) in the partialScores map. This collection allows
-	 * storing primitive objects, i.e. its double entries don't have to be wrapped into Double objects which
-	 * should be faster and reduce the memory overhead.
-	 *
-	 * cdobler, nov'15
-	 */
+
+	private final EventsToLegs legsDelegate;
+	private final EventsToActivities actsDelegate;
+
 	private final IdMap<Person, ScoringFunction> agentScorers = new IdMap<>(Person.class);
 	private final IdMap<Person, TDoubleCollection> partialScores = new IdMap<>(Person.class);
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
@@ -93,19 +90,17 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
-	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 						 Population population, ScoringFunctionFactory scoringFunctionFactory) {
-		controlerListenerManager.addControlerListener(new IterationStartsListener() {
-			@Override
-			public void notifyIterationStarts(IterationStartsEvent event) {
-				init();
-			}
-		});
+		controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());
 		this.population = population;
+		this.legsDelegate = eventsToLegs;
+		this.actsDelegate = eventsToActivities;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+
 		eventsManager.addHandler(this);
-		eventsToActivities.addActivityHandler(this);
-		eventsToLegs.addLegHandler(this);
+		eventsToActivities.addActivityHandler(this::handleActivity);
+		eventsToLegs.addLegHandler(this::handleLeg);
 	}
 
 	private void init() {
@@ -118,7 +113,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	}
 
 	@Override
-	synchronized public void handleEvent(Event o) {
+	public void handleEvent(Event o) {
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those which are aggregated into legs and activities.
 		// for the time being, not all PersonEvents may "implement HasPersonId".
@@ -136,10 +131,8 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 				} else if (o instanceof PersonScoreEvent) {
 					scoringFunction.addScore(((PersonScoreEvent) o).getAmount());
 				}
-//				else {
-					scoringFunction.handleEvent(o);
-					// passing this on in any case, see comment above.  kai, mar'17
-//				}
+				scoringFunction.handleEvent(o);
+				// passing this on in any case, see comment above.  kai, mar'17
 			}
 		}
 
@@ -158,7 +151,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		 * plans service in fact does the same thing, so we should be able to get away without having to do this twice.
 		 * kai, mar'17)
 		 */
-		if ( o instanceof LinkEnterEvent ) {
+		if (o instanceof LinkEnterEvent) {
 			Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId();
 			Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId);
 			ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
@@ -167,10 +160,29 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 				scoringFunction.handleEvent(o);
 			}
 		}
+
+		/* Now also handle events for eventsToLegs and eventsToActivities.
+		 * This class deliberately only implements BasicEventHandler and not the individual event handlers required
+		 * by EventsToLegs and EventsToActivities to better control the order in which events are passed to scoring
+		 * functions. By handling the delegation here *after* having the events passed to scoringFunction.handleEvent()
+		 * makes sure that the corresponding event was already seen by a scoring function when the call to handleActivity(),
+		 * handleLeg() or handleTrip() is done.
+		 */
+		if (o instanceof ActivityStartEvent) this.actsDelegate.handleEvent((ActivityStartEvent) o);
+		if (o instanceof ActivityEndEvent) this.actsDelegate.handleEvent((ActivityEndEvent) o);
+
+		if (o instanceof PersonDepartureEvent) this.legsDelegate.handleEvent((PersonDepartureEvent) o);
+		if (o instanceof PersonArrivalEvent) this.legsDelegate.handleEvent((PersonArrivalEvent) o);
+		if (o instanceof LinkEnterEvent) this.legsDelegate.handleEvent((LinkEnterEvent) o);
+		if (o instanceof TeleportationArrivalEvent) this.legsDelegate.handleEvent((TeleportationArrivalEvent) o);
+		if (o instanceof TransitDriverStartsEvent) this.legsDelegate.handleEvent((TransitDriverStartsEvent) o);
+		if (o instanceof PersonEntersVehicleEvent) this.legsDelegate.handleEvent((PersonEntersVehicleEvent) o);
+		if (o instanceof VehicleArrivesAtFacilityEvent) this.legsDelegate.handleEvent((VehicleArrivesAtFacilityEvent) o);
+		if (o instanceof VehicleEntersTrafficEvent) this.legsDelegate.handleEvent((VehicleEntersTrafficEvent) o);
+		if (o instanceof VehicleLeavesTrafficEvent) this.legsDelegate.handleEvent((VehicleLeavesTrafficEvent) o);
 	}
 
-	@Override
-	synchronized public void handleLeg(PersonExperiencedLeg o) {
+	void handleLeg(PersonExperiencedLeg o) {
 		Id<Person> agentId = o.getAgentId();
 		Leg leg = o.getLeg();
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
@@ -185,8 +197,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		}
 	}
 
-	@Override
-	synchronized public void handleActivity(PersonExperiencedActivity o) {
+	void handleActivity(PersonExperiencedActivity o) {
 		Id<Person> agentId = o.getAgentId();
 		Activity activity = o.getActivity();
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
@@ -278,7 +289,8 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	@Override
 	public void reset(int iteration) {
-
+		this.legsDelegate.reset(iteration);
+		this.actsDelegate.reset(iteration);
 	}
 
 }
