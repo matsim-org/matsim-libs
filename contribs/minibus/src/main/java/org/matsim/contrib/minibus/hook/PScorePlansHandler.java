@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public final class PScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
+final class PScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PScorePlansHandler.class);

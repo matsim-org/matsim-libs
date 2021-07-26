@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.operator;
+package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +39,7 @@ import java.util.LinkedList;
  * @author aneumann
  *
  */
-public final class OperatorInitializer {
+final class OperatorInitializer {
 
 	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
 	private final PConfigGroup pConfig;
@@ -49,7 +49,7 @@ public final class OperatorInitializer {
 	private int counter;
 
 
-	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, MatsimServices controler, 
+	OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, MatsimServices controler,
 			TimeProvider timeProvider) {
 		this.pConfig = pConfig;
 		this.operatorFactory = new OperatorFactory(this.pConfig, franchise);
