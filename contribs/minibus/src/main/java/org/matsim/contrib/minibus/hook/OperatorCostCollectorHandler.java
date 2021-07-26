@@ -17,27 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 
@@ -46,7 +38,7 @@ import java.util.List;
  * @author aneumann
  *
  */
-public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler {
+final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler, PersonMoneyEventHandler {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
@@ -57,21 +49,21 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 	private final double expensesPerSecond;
 	
 	private final List<OperatorCostContainerHandler> operatorCostContainerHandlerList = new LinkedList<>();
-	private HashMap<Id<Vehicle>, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<>();
-	
-	public OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
+	HashMap<Id<Vehicle>, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<>();
+
+	OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
 		this.pIdentifier = pIdentifier;
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
 		this.expensesPerMeter = expensesPerMeter;
 		this.expensesPerSecond = expensesPerSecond;
 		log.info("enabled");
 	}
-	
-	public void init(Network network){
+
+	void init(Network network){
 		this.network = network;
 	}
-	
-	public void addOperatorCostContainerHandler(OperatorCostContainerHandler operatorCostContainerHandler){
+
+	void addOperatorCostContainerHandler(OperatorCostContainerHandler operatorCostContainerHandler){
 		this.operatorCostContainerHandlerList.add(operatorCostContainerHandler);
 	}
 	
@@ -161,6 +153,35 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 				// call all OperatorCostContainerHandler
 				for (OperatorCostContainerHandler operatorCostContainerHandler : this.operatorCostContainerHandlerList) {
 					operatorCostContainerHandler.handleOperatorCostContainer(operatorCostContainer);
+				}
+			}
+		}
+	}
+
+	public Map<Id<Vehicle>, OperatorCostContainer> getVehicleIdToOperatorCostContainerMap(){
+		return Collections.unmodifiableMap( this.vehId2OperatorCostContainer );
+	}
+
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		// yyyy what comes below is not so beautiful since it depends on conventions: If some string contains something of some other string,
+		// then ... It looks like this was the original design of the minibus contrib, so in principle it should be operated out at some
+		// point, but probably not now.  kai, jul'21
+
+		if(event.getPersonId().toString().contains(this.pIdentifier)){
+			/* It is a minibus driver. Now find the correct vehicle this person is driving. */
+			for(Id<Vehicle> vehicleId : vehId2OperatorCostContainer.keySet()){
+				/* The driver Id contains the vehicle Id. For example, if the
+				vehicle Id is para_1_2 then you will find that the driver's Id
+				is something like pt_para_1_2_para_. I do not know where this
+				is set/created, but it may change in the future (JWJ '21) */
+				if(vehicleId.toString().contains(this.pIdentifier) &
+						event.getPersonId().toString().contains(vehicleId.toString())){
+					/* This is the correct vehicle. */
+
+					/* A PersonMoneyEvent assumes a positive value is an income,
+					and a negative value is a cost. Keep it consistent here too. */
+					vehId2OperatorCostContainer.get(vehicleId).addMoney(event.getAmount());
 				}
 			}
 		}
