@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,51 +20,62 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.EvUnits;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Immutable implementation of ElectricVehicleSpecification
- *
  * @author Michal Maciejewski (michalm)
  */
-public final class ImmutableElectricVehicleSpecification implements ElectricVehicleSpecification {
+public class ElectricVehicleSpecificationWithMatsimVehicle implements ElectricVehicleSpecification {
+	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
+
+	public static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
+	public static final String CHARGER_TYPES = "chargerTypes";
+
+	public static ElectricFleetSpecification createFleetSpecificationFromMatsimVehicles(Vehicles vehicles) {
+		ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
+		vehicles.getVehicles()
+				.values()
+				.stream()
+				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(
+						VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
+				.map(ElectricVehicleSpecificationWithMatsimVehicle::new)
+				.forEach(fleetSpecification::addVehicleSpecification);
+		return fleetSpecification;
+	}
+
 	private final Id<ElectricVehicle> id;
+	private final Vehicle matsimVehicle;// matsim vehicle is mutable!
 	private final String vehicleType;
 	private final ImmutableList<String> chargerTypes;
 	private final double initialSoc;
 	private final double batteryCapacity;
 
-	private ImmutableElectricVehicleSpecification(Builder builder) {
-		id = Objects.requireNonNull(builder.id);
-		vehicleType = Objects.requireNonNull(builder.vehicleType);
-		chargerTypes = Objects.requireNonNull(builder.chargerTypes);
-		initialSoc = Objects.requireNonNull(builder.initialSoc);
-		batteryCapacity = Objects.requireNonNull(builder.batteryCapacity);
+	public ElectricVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle) {
+		id = Objects.requireNonNull(Id.create(matsimVehicle.getId(), ElectricVehicle.class));
+		this.matsimVehicle = matsimVehicle;
+		vehicleType = matsimVehicle.getType().getId().toString();
+
+		//provided per vehicle type (in engine info)
+		var engineInfo = matsimVehicle.getType().getEngineInformation();
+		chargerTypes = ImmutableList.copyOf((Collection<String>)engineInfo.getAttributes().getAttribute(CHARGER_TYPES));
+		batteryCapacity = VehicleUtils.getEnergyCapacity(engineInfo) * EvUnits.J_PER_kWh;
+
+		//provided per vehicle
+		initialSoc = (double)matsimVehicle.getAttributes().getAttribute(INITIAL_ENERGY_kWh) * EvUnits.J_PER_kWh;
 
 		if (initialSoc < 0 || initialSoc > batteryCapacity) {
 			throw new IllegalArgumentException("Invalid initialSoc/batteryCapacity of vehicle: " + id);
 		}
-	}
-
-	public static Builder newBuilder() {
-		return new Builder();
-	}
-
-	public static Builder newBuilder(ElectricVehicleSpecification copy) {
-		Builder builder = new Builder();
-		builder.id = copy.getId();
-		builder.vehicleType = copy.getVehicleType();
-		builder.chargerTypes = copy.getChargerTypes();
-		builder.initialSoc = copy.getInitialSoc();
-		builder.batteryCapacity = copy.getBatteryCapacity();
-		return builder;
 	}
 
 	@Override
@@ -74,7 +85,7 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 
 	@Override
 	public Optional<Vehicle> getMatsimVehicle() {
-		return Optional.empty();
+		return Optional.of(matsimVehicle);
 	}
 
 	@Override
@@ -95,56 +106,5 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 	@Override
 	public double getBatteryCapacity() {
 		return batteryCapacity;
-	}
-
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("id", id)
-				.add("vehicleType", vehicleType)
-				.add("chargerTypes", chargerTypes)
-				.add("initialSoc", initialSoc)
-				.add("batteryCapacity", batteryCapacity)
-				.toString();
-	}
-
-	public static final class Builder {
-		private Id<ElectricVehicle> id;
-		private String vehicleType;
-		private ImmutableList<String> chargerTypes;
-		private Double initialSoc;
-		private Double batteryCapacity;
-
-		private Builder() {
-		}
-
-		public Builder id(Id<ElectricVehicle> val) {
-			id = val;
-			return this;
-		}
-
-		public Builder vehicleType(String val) {
-			vehicleType = val;
-			return this;
-		}
-
-		public Builder chargerTypes(ImmutableList<String> val) {
-			chargerTypes = val;
-			return this;
-		}
-
-		public Builder initialSoc(double val) {
-			initialSoc = val;
-			return this;
-		}
-
-		public Builder batteryCapacity(double val) {
-			batteryCapacity = val;
-			return this;
-		}
-
-		public ImmutableElectricVehicleSpecification build() {
-			return new ImmutableElectricVehicleSpecification(this);
-		}
 	}
 }

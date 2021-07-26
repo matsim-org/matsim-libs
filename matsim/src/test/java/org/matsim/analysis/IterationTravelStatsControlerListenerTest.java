@@ -31,7 +31,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ExperiencedPlansModule;
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -106,7 +106,7 @@ public class IterationTravelStatsControlerListenerTest {
 			public void install() {
 				install(new IterationTravelStatsModule());
 				install(new ScenarioByInstanceModule(scenario));
-				install(new ExperiencedPlansModule());
+				install(new StandaloneExperiencedPlansModule());
 				// an AnalysisMainModeIdentifier must be bound to avoid injection creation errors. TripRouterModule should do this. Check thereby that TripRouterModule still does that by installing TripRouterModule instead of binding AnalysisMainModeIdentifier directly
 				install(new TripRouterModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
