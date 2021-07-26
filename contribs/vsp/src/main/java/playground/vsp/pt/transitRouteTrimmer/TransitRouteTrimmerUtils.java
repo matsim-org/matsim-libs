@@ -59,7 +59,6 @@ public class TransitRouteTrimmerUtils {
     public static void transitSchedule2ShapeFile(TransitSchedule tS, String outputFilename, String epsgCode ) throws SchemaException, IOException {
 
         File newFile = new File(outputFilename);
-        newFile.mkdirs();
 
         final SimpleFeatureType TYPE =
                 DataUtilities.createType(

@@ -25,6 +25,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -52,7 +53,7 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
         final String inVehiclesFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-transit-vehicles.xml.gz";
         final String inNetworkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
         final String zoneShpFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-inner-city-area/inner-city-area.shp";
-        final String outputPath = "output/";
+        String outputPath = "output/";
         final String scenarioCRS = "EPSG:31468";
         final String shapeFileCRS = "EPSG:31468";
 
@@ -94,10 +95,12 @@ public class RunTransitRouteTrimmerBerlinSimpleExample {
         TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(transitScheduleNew, scenario.getNetwork());
         System.out.println(validationResult.getErrors());
 
+        outputPath = outputPath.endsWith("/") ? outputPath : outputPath.concat("/");
         new File(outputPath).mkdirs();
         TransitRouteTrimmerUtils.transitSchedule2ShapeFile(transitScheduleNew, outputPath + "trimmed-transitRoutes.shp", scenarioCRS.substring(scenarioCRS.lastIndexOf(":") + 1));
         new TransitScheduleWriter(transitScheduleNew).writeFile(outputPath + "trimmed-transitSchedule.xml.gz");
         new MatsimVehicleWriter(vehiclesNew).writeFile(outputPath + "vehiclesNew.xml.gz");
-
+        //copy network (SimWrapper needs it next to the schedule)
+        new NetworkWriter(scenario.getNetwork()).write(outputPath + inNetworkFile.substring(inNetworkFile.lastIndexOf("/") + 1));
     }
 }
