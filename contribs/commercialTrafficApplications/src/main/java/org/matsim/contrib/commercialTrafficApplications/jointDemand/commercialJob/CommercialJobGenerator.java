@@ -27,6 +27,12 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 public interface CommercialJobGenerator extends BeforeMobsimListener, AfterMobsimListener {
 
+	String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
+	String CUSTOMER_ATTRIBUTE_NAME = "customer";
+	String SERVICEID_ATTRIBUTE_NAME = "serviceId";
+	String EXPECTED_ARRIVALTIME_NAME = "eta";
+	String SERVICE_DURATION_NAME = "duration";
+
 	/**
 	 * Converts Jsprit tours to MATSim freight agents and inserts them into the population
 	 */

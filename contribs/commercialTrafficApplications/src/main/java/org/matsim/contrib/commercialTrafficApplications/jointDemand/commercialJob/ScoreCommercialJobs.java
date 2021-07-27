@@ -81,9 +81,9 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
             Queue<Id<CarrierService>> servicesServedByFreightAgent = new LinkedList<>();
             freightPlan.getPlanElements().stream()
                     .filter(pE -> pE instanceof Activity)
-                    .filter(act -> ((Activity) act).getType().startsWith(DefaultCommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX))
+                    .filter(act -> ((Activity) act).getType().startsWith(CommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX))
                     .forEach(act -> {
-                        Id<CarrierService> serviceId = Id.create((String) act.getAttributes().getAttribute(DefaultCommercialJobGenerator.SERVICEID_ATTRIBUTE_NAME),
+                        Id<CarrierService> serviceId = Id.create((String) act.getAttributes().getAttribute(CommercialJobGenerator.SERVICEID_ATTRIBUTE_NAME),
                                 CarrierService.class);
                         servicesServedByFreightAgent.add(serviceId);
                     });
@@ -95,13 +95,13 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
-        } else if (event.getActType().startsWith(DefaultCommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) {
+        } else if (event.getActType().startsWith(CommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) {
 
             Id<Carrier> carrierId = JointDemandUtils.getCarrierIdFromDriver(event.getPersonId());
             Carrier carrier = carriers.getCarriers().get(carrierId);
             CarrierService job = carrier.getServices().get(freightAgent2Jobs.get(event.getPersonId()).poll());
 
-            Id<Person> customerAboutToBeServed = Id.createPersonId((String) job.getAttributes().getAttribute(DefaultCommercialJobGenerator.CUSTOMER_ATTRIBUTE_NAME));
+            Id<Person> customerAboutToBeServed = Id.createPersonId((String) job.getAttributes().getAttribute(CommercialJobGenerator.CUSTOMER_ATTRIBUTE_NAME));
 
             double timeDifference = calcDifference(job, event.getTime());
             double score = scoreCalculator.calcScore(timeDifference);

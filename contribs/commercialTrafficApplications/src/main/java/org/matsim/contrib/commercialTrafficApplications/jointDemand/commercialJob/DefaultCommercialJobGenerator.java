@@ -67,13 +67,7 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.comme
 class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 
-    static final String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
-    static final String CUSTOMER_ATTRIBUTE_NAME = "customer";
-    static final String SERVICEID_ATTRIBUTE_NAME = "serviceId";
-	static final String EXPECTED_ARRIVALTIME_NAME = "eta";
-	static final String SERVICE_DURATION_NAME = "duration";
-
-    private final double firsttourTraveltimeBuffer;
+	private final double firsttourTraveltimeBuffer;
     private final int timeSliceWidth;
 
     private Scenario scenario;
