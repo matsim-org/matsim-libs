@@ -52,8 +52,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -66,7 +64,7 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.comme
 /**
  * Generates carriers and tours depending on next iteration's freight demand
  */
-class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
+class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 
     static final String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
@@ -79,7 +77,6 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
     private final int timeSliceWidth;
 
     private Scenario scenario;
-    private Population population;
 
     private Carriers carriers;
 
@@ -99,7 +96,6 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
         this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
         this.timeSliceWidth = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getTravelTimeSliceWidth();
         this.scenario = scenario;
-        this.population = scenario.getPopulation();
         carTT = travelTimes.get(TransportMode.car);
         getDrtModes(scenario.getConfig());
     }
@@ -108,7 +104,7 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 	 * Converts Jsprit tours to MATSim freight agents and adjusts departure times of
 	 * leg and end times of activities
 	 */
-	private void createFreightAgents() {
+	public void createAndAddFreightAgents(Carriers carriers, Population population) {
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			int nextId = 0;
@@ -127,12 +123,10 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 				
 				driverPerson.addPlan(plainPlan);
 				plainPlan.setPerson(driverPerson);
-				scenario.getPopulation().addPerson(driverPerson);
+				population.addPerson(driverPerson);
 				buildVehicleAndDriver(carrier, driverPerson, carrierVehicle);
 			}
-
 		}
-
 	}
 	
 	/**
@@ -307,15 +301,15 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
 
-        CommercialTrafficChecker.run(population,carriers);
-        generateIterationServices();
+        CommercialTrafficChecker.run(scenario.getPopulation(), carriers);
+        generateIterationServices(carriers, scenario.getPopulation());
         try {
 			buildTours();
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        createFreightAgents();
+        createAndAddFreightAgents(this.carriers, this.scenario.getPopulation());
 
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
@@ -334,7 +328,7 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 	/**
 	 * generates the services (out of the person population) and assigns them to the carriers
 	 */
-	private void generateIterationServices() {
+	public void generateIterationServices(Carriers carriers, Population population) {
 
         Map<Person,Set<Activity>> customer2ActsWithJobs = new HashMap();
 
@@ -392,18 +386,19 @@ class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        removeFreightAgents();
+        removeFreightAgents(scenario);
+        //clear carrier plans
+		carriers.getCarriers().values().forEach(carrier -> {
+			carrier.getServices().clear();
+			carrier.getShipments().clear();
+			carrier.clearPlans();
+		});
     }
 
-    private void removeFreightAgents() {
+    public void removeFreightAgents(Scenario scenario) {
         freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
         freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
         CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-        carriers.getCarriers().values().forEach(carrier -> {
-            carrier.getServices().clear();
-            carrier.getShipments().clear();
-            carrier.clearPlans();
-        });
     }
 
 }
