@@ -53,7 +53,7 @@ public class JointDemandModule extends AbstractModule {
 
         bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
-        addControlerListenerBinding().to(CommercialJobGenerator.class);
+        addControlerListenerBinding().to(DefaultCommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
 //        addControlerListenerBinding().to(ScoreCommercialJobs.class);
 

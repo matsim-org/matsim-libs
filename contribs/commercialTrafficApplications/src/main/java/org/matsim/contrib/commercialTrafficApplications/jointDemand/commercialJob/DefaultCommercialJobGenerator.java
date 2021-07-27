@@ -66,7 +66,7 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.comme
 /**
  * Generates carriers and tours depending on next iteration's freight demand
  */
-class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
+class DefaultCommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
 
 
     static final String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
@@ -88,12 +88,12 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
     private Set<Id<Person>> freightDrivers = new HashSet<>();
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
 
-    private final static Logger log = Logger.getLogger(CommercialJobGenerator.class);
+    private final static Logger log = Logger.getLogger(DefaultCommercialJobGenerator.class);
 
     private Set<String> drtModes = new HashSet<>();
 
     @Inject
-    /* package */ CommercialJobGenerator( Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
+    /* package */ DefaultCommercialJobGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
         JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
