@@ -216,8 +216,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				List <Leg> evCarLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(TransportMode.car)).collect(toList());
 				pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
 				boolean pluginBeforeStart = configGroup.getPluginBeforeStartingThePlan();
+				Activity firstAct = (Activity) modifiablePlan.getPlanElements().get(0);
 
-				if(hasHomeCharger(mobsimagent, modifiablePlan, evCarLegs, pseudoVehicle) && (pseudoVehicle.getBattery().getSoc() == 0 || pseudoVehicle.getBattery().getSoc() == pseudoVehicle.getBattery().getCapacity()) && pluginBeforeStart){
+				if(pluginBeforeStart && hasHomeCharger(mobsimagent, modifiablePlan, evCarLegs, pseudoVehicle) &&
+						(pseudoVehicle.getBattery().getSoc() > 0 &&
+								pseudoVehicle.getBattery().getSoc() > pseudoVehicle.getBattery().getCapacity()) &&
+									firstAct.getEndTime().seconds() > 10*60){
 					Leg firstEvLeg = evCarLegs.get(0);
 //					Activity originalActWhileCharging = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(firstEvLeg));
 //					Activity lastAct = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(firstEvLeg));
@@ -225,9 +229,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					Network modeNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(firstEvLeg.getMode());
 					Link chargingLink = modeNetwork.getLinks().get(actWhileCharging.getLinkId());
 					String routingMode = TripStructureUtils.getRoutingMode(firstEvLeg);
-
-					int index = modifiablePlan.getPlanElements().indexOf(firstEvLeg);
-
 					planPluginTripFromHomeToCharger(modifiablePlan, routingMode, electricVehicleSpecification, actWhileCharging, chargingLink, tripRouter);
 					Leg plugoutLeg = firstEvLeg;
 					Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
