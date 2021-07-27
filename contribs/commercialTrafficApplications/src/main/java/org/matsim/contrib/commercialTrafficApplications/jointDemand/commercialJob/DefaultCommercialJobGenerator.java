@@ -366,7 +366,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     }
 
     private void buildTours() throws InterruptedException, ExecutionException {
-        TourPlanning.runTourPlanningForCarriers(carriers,scenario, timeSliceWidth,carTT );
+        TourPlanning.runTourPlanningForCarriersWithNetBasedCosts(carriers,scenario, timeSliceWidth,carTT );
     }
 
     private static Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x) {
