@@ -108,7 +108,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 	 * Converts Jsprit tours to MATSim freight agents and adjusts departure times of
 	 * leg and end times of activities
 	 */
-	private void buildFreightAgents() {
+	private void createFreightAgents() {
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			int nextId = 0;
@@ -315,7 +315,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        buildFreightAgents();
+        createFreightAgents();
 
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
@@ -401,99 +401,6 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
             carrier.getShipments().clear();
             carrier.clearPlans();
         });
-    }
-
-    @Deprecated
-    private void createFreightAgents() {
-        for (Carrier carrier : carriers.getCarriers().values()) {
-            int nextId = 0;
-            String modeForCarrier = CarrierUtils.getCarrierMode( carrier ) ;
-            for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-
-                CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
-
-                Id<Person> driverId = JointDemandUtils.generateDriverId(carrier, carrierVehicle, nextId);
-                nextId++;
-
-                Person driverPerson = createDriverPerson(driverId);
-                Plan plan = PopulationUtils.createPlan();
-                Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLocation());
-                plan.addActivity(startActivity);
-                Activity lastTourElementActivity = null;
-                Leg lastTourLeg = null;
-
-
-                for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
-                    if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
-
-
-                        org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
-                        Route route = tourLeg.getRoute();
-                        if(route == null) throw new IllegalStateException("missing route for carrier " + carrier.getId());
-                        Leg leg = PopulationUtils.createLeg(modeForCarrier);
-                        if(drtModes.contains(modeForCarrier)){
-                            leg.setRoute(null); //let the DrtRoute be calculated later
-                        } else{
-                            double routeDistance = RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0, scenario.getNetwork());
-                            route.setDistance(routeDistance);
-                            route.setTravelTime(tourLeg.getExpectedTransportTime());
-                        }
-
-                        leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
-                        leg.setTravelTime(tourLeg.getExpectedTransportTime());
-						leg.setTravelTime(tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime()
-								.seconds());
-                        plan.addLeg(leg);
-                        if (lastTourElementActivity != null) {
-                            lastTourElementActivity.setEndTime(tourLeg.getExpectedDepartureTime());
-                            if (startActivity.getEndTime().isUndefined()) {
-								startActivity.setEndTime(lastTourElementActivity.getEndTime().seconds()
-										- lastTourElementActivity.getMaximumDuration().seconds()
-                                        - lastTourLeg.getTravelTime().seconds() * firsttourTraveltimeBuffer);
-                                lastTourElementActivity.setMaximumDurationUndefined();
-                            }
-                        }
-                        lastTourLeg = leg;
-
-                    } else if (tourElement instanceof Tour.TourActivity) {
-                        if(! (tourElement instanceof  Tour.ServiceActivity)) throw new RuntimeException("currently only services (not shipments) are supported!");
-
-                        Tour.ServiceActivity act = (Tour.ServiceActivity) tourElement;
-
-                        CarrierService service = carrier.getServices().get(act.getService().getId()); //for some reason, the serviceAct only has a copy of the CarrierService object and this copy does not have the attributes..
-                        String actType = COMMERCIALJOB_ACTIVITYTYPE_PREFIX + "_" + carrier.getId();
-                        String customer = (String) service.getAttributes().getAsMap().get(CUSTOMER_ATTRIBUTE_NAME);
-
-
-                        //here we would pass over the service Activity type containing the customer id...
-                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(actType, act.getLocation());
-                        tourElementActivity.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer);
-                        tourElementActivity.getAttributes().putAttribute(SERVICEID_ATTRIBUTE_NAME, service.getId().toString());
-
-                        plan.addActivity(tourElementActivity);
-                        if (lastTourElementActivity == null) {
-                            tourElementActivity.setMaximumDuration(act.getDuration());
-                        }
-
-                        lastTourElementActivity = tourElementActivity;
-
-                    }
-                }
-                Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLocation());
-                plan.addActivity(endActivity);
-                driverPerson.addPlan(plan);
-                plan.setPerson(driverPerson);
-
-                scenario.getPopulation().addPerson(driverPerson);
-                if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
-                    scenario.getVehicles().addVehicleType(carrierVehicle.getType());
-                Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-                VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
-                scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
-                freightVehicles.add(vid);
-                freightDrivers.add(driverPerson.getId());
-            }
-        }
     }
 
 }
