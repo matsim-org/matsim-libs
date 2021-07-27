@@ -85,7 +85,7 @@ public class UrbanEVModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				//this is responsible for charging vehicles according to person activity start and end events..
-				bind(UrbanVehicleChargingHandler.class).in(Singleton.class);
+				bind(UrbanVehicleChargingHandler.class);
 				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
 
 				//if we use agent-specific vehicle types (with specific initial energies), we transfer the final SOCs of every iteration to the vehicle type and thus to the next iter
@@ -119,7 +119,7 @@ public class UrbanEVModule extends AbstractModule {
 		});
 
 		//bind urban ev planning stuff
-		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class).in(Singleton.class);
+		addMobsimListenerBinding().to(UrbanEVTripsPlanner.class);
 		//TODO find a better solution for this
 		Collection<String> whileChargingActTypes = configGroup.getWhileChargingActivityTypes().isEmpty() ? config.planCalcScore().getActivityTypes() : configGroup.getWhileChargingActivityTypes();
 		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(whileChargingActTypes, configGroup.getMinWhileChargingActivityDuration_s()));

@@ -70,6 +70,14 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
      */
     private static final String MAXIMUM_DISTANCE_TO_CHARGER ="maxDistanceToCharger";
 
+    private static boolean pluginBeforeStartingThePlan = true;
+
+    /**
+     * determines the plug in act before the start of the plan to simulate charging between last act of the plan and first
+     */
+
+    private static final String PLUGIN_BEFORE_STARTING_THE_PLAN = "pluginBeforeTheStartingThePlan";
+
     //-------------------------------------------------------------------------------------------
 
     //	@StringGetter(MAXIMUM_CHARGING_PROCEDURES)
@@ -120,6 +128,17 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
     //  @StringSetter(MAXIMUM_DISTANCE_TO_CHARGER)
     public void setMaxDistanceBetweenActAndCharger_m(double maxDistanceBetweenActAndCharger_m){
         this.maxDistanceBetweenActAndCharger_m = maxDistanceBetweenActAndCharger_m;
+    }
+
+
+    //@StringGetter(PLUGIN_BEFORE_STARTING_THE_PLAN)
+    public boolean getPluginBeforeStartingThePlan(){
+        return pluginBeforeStartingThePlan;
+    }
+
+    //@StringSetter(PLUGIN_BEFORE_STARTING_THE_PLAN)
+    public void setPluginBeforeStartingThePlan(boolean pluginBeforeStartingThePlan){
+     this.pluginBeforeStartingThePlan = pluginBeforeStartingThePlan;
     }
 
 }
