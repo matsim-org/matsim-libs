@@ -213,13 +213,13 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 					Double travelTimeToFirstJob = ((Leg) planElements.get(i+1)).getTravelTime().seconds();
 					Double departureTimeAtFirstJob = ((Leg) planElements.get(i+3)).getDepartureTime().seconds();
 					Double jobServiceDuration = (double) ((Activity) planElements.get(i+2)).getAttributes().getAttribute(SERVICE_DURATION_NAME);
-					Double initalLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;
-					Double expactedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;					
+					Double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob * this.firsttourTraveltimeBuffer;
+					Double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;
 					
 					//Set optimal endTimes to avoid an too early arrival at first job
-					 ((Activity) planElements.get(i+2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expactedArrivalTimeAtFirstJob );
-					currentActivity.setEndTime(initalLegDepartureTime);
-					((Leg) planElements.get(i+1)).setDepartureTime(initalLegDepartureTime);
+					 ((Activity) planElements.get(i+2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expectedArrivalTimeAtFirstJob );
+					currentActivity.setEndTime(initialLegDepartureTime);
+					((Leg) planElements.get(i+1)).setDepartureTime(initialLegDepartureTime);
 					
 				}
 			}
@@ -331,7 +331,10 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         }
     }
 
-    private void generateIterationServices() {
+	/**
+	 * generates the services (out of the person population) and assigns them to the carriers
+	 */
+	private void generateIterationServices() {
 
         Map<Person,Set<Activity>> customer2ActsWithJobs = new HashMap();
 
