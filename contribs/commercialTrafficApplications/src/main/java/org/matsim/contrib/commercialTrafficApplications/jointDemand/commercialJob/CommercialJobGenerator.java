@@ -128,7 +128,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 				driverPerson.addPlan(plainPlan);
 				plainPlan.setPerson(driverPerson);
 				scenario.getPopulation().addPerson(driverPerson);
-				builldVehicleAndDriver(carrier, driverPerson, carrierVehicle);
+				buildVehicleAndDriver(carrier, driverPerson, carrierVehicle);
 			}
 
 		}
@@ -141,7 +141,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 	 * @param driverPerson
 	 * @param carrierVehicle
 	 */
-	private void builldVehicleAndDriver(Carrier carrier, Person driverPerson, CarrierVehicle carrierVehicle) {
+	private void buildVehicleAndDriver(Carrier carrier, Person driverPerson, CarrierVehicle carrierVehicle) {
 		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
 			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
 		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
@@ -164,7 +164,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 	 * 
 	 * @param plan
 	 */
-	void manageJspritDepartureTimes(Plan plan) {
+	private void manageJspritDepartureTimes(Plan plan) {
 		List<PlanElement> planElements = plan.getPlanElements();
 
 		for (int i = 0; i < planElements.size(); i++) {
@@ -232,7 +232,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 	 * @param scheduledTour
 	 * @return
 	 */
-	Plan createPlainPlanFromTour(Carrier carrier, ScheduledTour scheduledTour) {
+	private Plan createPlainPlanFromTour(Carrier carrier, ScheduledTour scheduledTour) {
 
 		String carrierMode = CarrierUtils.getCarrierMode(carrier);
 
