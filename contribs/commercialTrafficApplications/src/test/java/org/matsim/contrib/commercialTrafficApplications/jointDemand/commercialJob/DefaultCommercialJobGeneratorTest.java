@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommercialJobGeneratorTest {
+public class DefaultCommercialJobGeneratorTest {
 
 
     @Rule
@@ -27,14 +27,14 @@ public class CommercialJobGeneratorTest {
 
     @org.junit.Test
     @Ignore //set to ignore since this is tested in integration test anyways. Currently, this test here would fail anyways
-    //since we use the injector in CommercialJobGenerator.notifyBeforeMobsim()
+    //since we use the injector in DefaultCommercialJobGenerator.notifyBeforeMobsim()
     public void notifyBeforeMobsim() {
         Carriers carriers = TestScenarioGeneration.generateCarriers();
         Scenario scenario = TestScenarioGeneration.generateScenario();
         Map<String,TravelTime> travelTimes = new HashMap<>();
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
 
-        CommercialJobGenerator generator = new CommercialJobGenerator(scenario,travelTimes, carriers );
+        DefaultCommercialJobGenerator generator = new DefaultCommercialJobGenerator(scenario,travelTimes, carriers );
         new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(utils.getOutputDirectory() + "vehicleTypes.xml");
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         int iteration = 0;

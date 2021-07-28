@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -52,8 +52,9 @@ final class OperatorCostContainer {
 	private VehicleAbortsEvent vehicleAbortE;
 
 	private double meterTravelled = 0.0;
+	private double otherMonetaryTransactionsIncurred = 0.0;
 
-	public OperatorCostContainer(double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond) {
+	OperatorCostContainer(double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond) {
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
 		this.expensesPerMeter = expensesPerMeter;
 		this.expensesPerSecond = expensesPerSecond;
@@ -64,18 +65,29 @@ final class OperatorCostContainer {
 	// out the rest internally. That would make it much more flexible with respect
 	// to replacement. kai, jan'17
 
-	public void handleTransitDriverStarts(TransitDriverStartsEvent transitDriverStartsE1) {
+	void handleTransitDriverStarts(TransitDriverStartsEvent transitDriverStartsE1) {
 		this.transitDriverStartsE = transitDriverStartsE1;
 	}
 
-	public void addDistanceTravelled(double meterTravelled1) {
+	void addDistanceTravelled(double meterTravelled1) {
 		this.meterTravelled += meterTravelled1;
 	}
 
 	/**
+	 * Adds any additional monetary transaction that the vehicle may incur,
+	 * for example toll or fines. This is specifically not called 'expense'
+	 * since it may be an income, like a driver tip. A positive value
+	 * indicates an income, and a negative value indicates an expense.
+	 */
+	void addMoney(double value){
+		this.otherMonetaryTransactionsIncurred += value;
+	}
+
+
+	/**
 	 * This terminates the stage
 	 */
-	public void handleTransitDriverAlights(PersonLeavesVehicleEvent event) {
+	void handleTransitDriverAlights(PersonLeavesVehicleEvent event) {
 		this.transitDriverAlightsE = event;
 	}
 
@@ -85,20 +97,20 @@ final class OperatorCostContainer {
 	 * TransitDriverStartsEvent, so there is either a PersonLeavesVehicleEvent or a
 	 * PersonStuckEvent.
 	 */
-	public void handleVehicleAborts(VehicleAbortsEvent event) {
+	void handleVehicleAborts(VehicleAbortsEvent event) {
 		this.vehicleAbortE = event;
 	}
 
-	public double getFixedCostPerDay() {
+	double getFixedCostPerDay() {
 		return this.costPerVehicleAndDay;
 	}
 
-	public double getRunningCostDistance() {
+	double getRunningCostDistance() {
 		return this.expensesPerMeter * this.meterTravelled;
 	}
 
-	public double getRunningCostTime() {
-		double timeInService = 0;
+	double getRunningCostTime() {
+		double timeInService;
 		
 		if (this.transitDriverAlightsE != null) {
 			if (this.vehicleAbortE != null) {
@@ -119,21 +131,24 @@ final class OperatorCostContainer {
 		return this.expensesPerSecond * timeInService;
 	}
 
-	public Id<Vehicle> getVehicleId() {
+	double getOtherMonetaryTransactions(){
+		return this.otherMonetaryTransactionsIncurred;
+	}
+
+	Id<Vehicle> getVehicleId() {
 		return this.transitDriverStartsE.getVehicleId();
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer strB = new StringBuffer();
-		strB.append("costPerVehicleAndDay " + costPerVehicleAndDay + "; ");
-		strB.append("expensesPerMeter " + expensesPerMeter + "; ");
-		strB.append("expensesPerSecond " + expensesPerSecond + "; ");
-		strB.append("transitDriverStartsE " + transitDriverStartsE + "; ");
-		strB.append("transitDriverAlightsE " + transitDriverAlightsE + "; ");
-		strB.append("vehicleAbortE " + vehicleAbortE + "; ");
-		strB.append("meterTravelled " + meterTravelled + "; ");
-		return strB.toString();
+		return "costPerVehicleAndDay " + costPerVehicleAndDay + "; " +
+				"expensesPerMeter " + expensesPerMeter + "; " +
+				"expensesPerSecond " + expensesPerSecond + "; " +
+				"transitDriverStartsE " + transitDriverStartsE + "; " +
+				"transitDriverAlightsE " + transitDriverAlightsE + "; " +
+				"vehicleAbortE " + vehicleAbortE + "; " +
+				"meterTravelled " + meterTravelled + "; " +
+				"additionalMoney " + otherMonetaryTransactionsIncurred;
 	}
 
 }

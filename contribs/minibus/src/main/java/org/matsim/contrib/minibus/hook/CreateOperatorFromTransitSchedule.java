@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.operator;
+package org.matsim.contrib.minibus.hook;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

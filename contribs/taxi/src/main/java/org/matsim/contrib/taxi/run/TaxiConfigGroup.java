@@ -105,7 +105,10 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	// input
 	public static final String TAXIS_FILE = "taxisFile";
 	static final String TAXIS_FILE_EXP = "An XML file specifying the taxi fleet."
-			+ " The file format according to dvrp_vehicles_v1.dtd";
+			+ " The file format according to dvrp_vehicles_v1.dtd."
+			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
+			+ " See FleetModule.";
+
 
 	// output
 	public static final String TIME_PROFILES = "timeProfiles";
