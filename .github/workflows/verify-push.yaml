@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  build1:
+  build:
     # run if push or pull_requests from fork
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
 
@@ -40,59 +40,6 @@ jobs:
           - contribs/emissions
           - contribs/decongestion
           - contribs/noise
-
-    steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v2
-
-      - name: Detect changes against master
-        # we only want to build matsim (module) if changes are not limited to contribs
-        id: detect-changes
-        uses: dorny/paths-filter@v2
-        if: ${{matrix.module == 'matsim'}}
-        with:
-          filters: |
-            outside-contribs:
-              - '!contribs/**'
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Setup Java
-        if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        uses: actions/setup-java@v2
-        with:
-          java-version: 16
-          distribution: 'adopt'
-
-      - name: Build module (with dependencies)
-        if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn install --batch-mode --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip
-
-      - name: Test module
-        if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
-        working-directory: ${{matrix.module}}
-
-    env:
-      MAVEN_OPTS: -Xmx2g
-
-  build2:
-    # run if push or pull_requests from fork
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        module:
           - contribs/accidents
           - contribs/freight
           - contribs/parking
@@ -160,7 +107,7 @@ jobs:
     # always() - to ensure this job is executed (regardless of the status of the previous job)
     # run if push or pull_requests from fork
     if: always() && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository)
-    needs: [build1, build2]
+    needs: build
     runs-on: ubuntu-latest
 
     # When running this workflow for internal PRs "verify-all-jobs-successful" is marked as skipped,
@@ -175,5 +122,5 @@ jobs:
 
     steps:
       - name: check if the whole job matrix is successful
-        if: needs.build1.result != 'success' || needs.build2.result != 'success'
+        if: needs.build.result != 'success'
         run: exit 1 # fail if "build" was not successful
