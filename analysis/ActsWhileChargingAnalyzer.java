@@ -26,6 +26,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
@@ -40,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, IterationEndsListener {
+public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, ChargingStartEventHandler, IterationEndsListener {
 
     @Inject
     OutputDirectoryHierarchy controlerIO;
@@ -52,7 +53,7 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
 
 //   private Map<Id<Charger>, List<String>> actsPerCharger = new HashMap<>();
    private Map<Id<Person>, List<String>> actsPerPersons = new HashMap<>();
-   private Map<Id<Link>, Id<Charger>> chargersAtLinks = new HashMap<>();
+   private Map<Id<Charger>, Id<Link>> chargersAtLinks = new HashMap<>();
    static List<Container> containers = new ArrayList<>();
    static List<PersonContainer> personContainers = new ArrayList<>();
 
@@ -77,7 +78,7 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                                     .map(chargerSpecification -> chargerSpecification.getLinkId())
                                     .findAny()
                                     .get();
-            chargersAtLinks.put(chargerLink, chargerId);
+            chargersAtLinks.put(chargerId, chargerLink);
 
         }
 
@@ -90,13 +91,15 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        if (!TripStructureUtils.isStageActivityType(event.getActType()))
-        containers.stream()
-                .filter(container -> container.personId.equals(event.getPersonId()))
-                .findAny()
-                .get()
-                .acts.add(event.getActType());
+        if (!TripStructureUtils.isStageActivityType(event.getActType())) {
 
+            containers.stream()
+                    .filter(container -> container.personId.equals(event.getPersonId()))
+                    .findAny()
+                    .get()
+                    .acts.add(event.getActType());
+
+        }
         else if (event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
             String chargingActAndTime = event.getActType()+ event.getTime();
             containers.stream()
@@ -105,20 +108,28 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                     .get()
                     .acts.add(chargingActAndTime);
 
-            PersonContainer personContainer = new PersonContainer(event.getPersonId(), chargingActAndTime , event.getTime(), chargersAtLinks.get(event.getLinkId()));
+            PersonContainer personContainer = new PersonContainer(event.getPersonId().toString(), chargingActAndTime , event.getTime(), null);
             personContainers.add(personContainer);
         }
 
     }
 
-    private static void compute(Map<Id<Person>, List<String>> map, ActivityStartEvent event) {
-        map.compute(event.getPersonId(), (person,list) ->{
-            if (list == null) list = new ArrayList<>();
-            list.add(event.getActType());
-            return list;
-        });
-    }
+    @Override
+    public void handleEvent(ChargingStartEvent event) {
 
+       Id<Person> personsId = Id.createPersonId(event.getVehicleId().toString());
+
+        for (PersonContainer personContainer : personContainers) {
+            if (personContainer.personId.equals(personsId.toString())){
+                personContainer.setChargerId(event.getChargerId());
+            }
+        }
+//      String chargingActAndTime =event.getEventType() + event.getTime();
+//      containers.stream().filter(container -> container.personId.equals(personsId)).findAny().get().acts.add(chargingActAndTime);
+//      PersonContainer personContainer = new PersonContainer(personsId.toString(), chargingActAndTime , event.getTime(), event.getChargerId());
+//      personContainers.add(personContainer);
+
+    }
     @Override
     public void reset(int iteration) {
 
@@ -136,8 +147,11 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                     withHeader("PersonID", "ChargerId", "Activity type", "Time"));
 
             for (PersonContainer personContainer : personContainers) {
+                Id<Person> personId = Id.createPersonId(personContainer.personId);
+                Person person = scenario.getPopulation().getPersons().get(personId);
+
                 List<String> plan = containers.stream()
-                        .filter(container -> container.personId.equals(personContainer.personId))
+                        .filter(container -> container.personId.equals(personId))
                         .findAny()
                         .get()
                         .acts;
@@ -155,6 +169,10 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
 
     }
 
+
+
+
+
     private class Container  {
         private final Id<Person> personId;
         private final List<String> acts;
@@ -166,15 +184,19 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
     }
 
     private  class PersonContainer{
-        private final Id<Person> personId;
+        private final String personId;
         private final String chargingAct;
         private final double time;
-        private final Id<Charger> chargerId;
+        private  Id<Charger> chargerId;
 
-        PersonContainer (Id<Person> personId, String chargingAct, double time, Id<Charger> chargerId){
+        PersonContainer (String personId, String chargingAct, double time, Id<Charger> chargerId){
             this.personId = personId;
             this.chargingAct = chargingAct;
             this.time = time;
+            this.chargerId = chargerId;
+        }
+
+        void setChargerId(Id<Charger> chargerId){
             this.chargerId = chargerId;
         }
 
