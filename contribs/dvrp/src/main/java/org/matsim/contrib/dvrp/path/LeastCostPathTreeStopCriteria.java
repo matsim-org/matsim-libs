@@ -22,6 +22,8 @@ package org.matsim.contrib.dvrp.path;
 
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.OptionalInt;
+import java.util.function.IntToDoubleFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -65,8 +67,53 @@ public class LeastCostPathTreeStopCriteria {
 				if (nodesToVisit.get(nodeIndex)) {
 					counter--;
 				}
-				return counter == 0;
+				return counter == 0; // stop if all end nodes reached
 			}
 		};
+	}
+
+	public static class LeastCostEndNodeReached implements StopCriterion {
+		// zero or positive values allowed
+		private final IntToDoubleFunction additionalCostByNodeIndex;
+
+		private final BitSet nodesToVisit = new BitSet(Id.getNumberOfIds(Node.class));
+		private int counter;
+
+		private int bestEndNodeIndex = -1;
+		private double bestEndNodeCost = Double.POSITIVE_INFINITY;
+
+		public LeastCostEndNodeReached(Collection<Node> endNodes, IntToDoubleFunction additionalCostByNodeIndex) {
+			Preconditions.checkArgument(!endNodes.isEmpty(), "At least one end node must be provided.");
+
+			this.additionalCostByNodeIndex = additionalCostByNodeIndex;
+			endNodes.forEach(node -> nodesToVisit.set(node.getId().index()));
+			counter = nodesToVisit.cardinality();
+		}
+
+		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
+				double departureTime) {
+			if (travelCost >= bestEndNodeCost) {
+				return true; // stop - no other end node can be better than the current bestEndNode
+			}
+
+			if (nodesToVisit.get(nodeIndex)) {
+				counter--;
+
+				double endNodeCost = travelCost + additionalCostByNodeIndex.applyAsDouble(nodeIndex);
+				if (endNodeCost < bestEndNodeCost) {
+					bestEndNodeIndex = nodeIndex;
+					bestEndNodeCost = endNodeCost;
+
+					if (endNodeCost == travelCost) {// additionalCost is 0
+						return true; // stop - no other end node can be better than the current bestEndNode
+					}
+				}
+			}
+			return counter == 0; // stop if all end nodes reached
+		}
+
+		public OptionalInt getBestEndNodeIndex() {
+			return bestEndNodeIndex == -1 ? OptionalInt.empty() : OptionalInt.of(bestEndNodeIndex);
+		}
 	}
 }
