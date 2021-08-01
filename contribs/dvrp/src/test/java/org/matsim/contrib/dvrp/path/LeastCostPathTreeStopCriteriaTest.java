@@ -25,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.matsim.contrib.dvrp.path.LeastCostPathTreeStopCriteria.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.IntToDoubleFunction;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -62,13 +64,13 @@ public class LeastCostPathTreeStopCriteriaTest {
 
 	@Test
 	public void testMaxTravelTime() {
-		StopCriterion max100 = maxTravelTime(100);
+		StopCriterion sc = maxTravelTime(100);
 
 		//TT is 100 - continue
-		assertThat(max100.stop(0, 500, 0, 0, 400)).isFalse();
+		assertThat(sc.stop(0, 500, 0, 0, 400)).isFalse();
 
 		//TT is 101 - stop
-		assertThat(max100.stop(0, 501, 0, 0, 400)).isTrue();
+		assertThat(sc.stop(0, 501, 0, 0, 400)).isTrue();
 	}
 
 	@Test
@@ -81,38 +83,126 @@ public class LeastCostPathTreeStopCriteriaTest {
 	public void testAllEndNodesReached_oneEndNode() {
 		var endNode = new FakeNode(Id.createNodeId("end_node"));
 		var otherNode = new FakeNode(Id.createNodeId("other_node"));
-		StopCriterion noEndNodes = allEndNodesReached(List.of(endNode));
+		StopCriterion sc = allEndNodesReached(List.of(endNode));
 
 		//endNode not yet reached
-		assertThat(noEndNodes.stop(otherNode.getId().index(), 0, 0, 0, 0)).isFalse();
+		assertThat(sc.stop(otherNode.getId().index(), 0, 0, 0, 0)).isFalse();
 
 		//endNode now reached
-		assertThat(noEndNodes.stop(endNode.getId().index(), 0, 0, 0, 0)).isTrue();
+		assertThat(sc.stop(endNode.getId().index(), 0, 0, 0, 0)).isTrue();
 
 		//endNode already reached
-		assertThat(noEndNodes.stop(otherNode.getId().index(), 0, 0, 0, 0)).isTrue();
+		assertThat(sc.stop(otherNode.getId().index(), 0, 0, 0, 0)).isTrue();
 	}
 
 	@Test
-	public void testAllendNodesReached_twoEndNodes() {
+	public void testAllEndNodesReached_twoEndNodes() {
 		var endNode1 = new FakeNode(Id.createNodeId("end_node_1"));
 		var endNode2 = new FakeNode(Id.createNodeId("end_node_2"));
 		var otherNode = new FakeNode(Id.createNodeId("other_node"));
-		StopCriterion noEndNodes = allEndNodesReached(List.of(endNode1, endNode2));
+		StopCriterion sc = allEndNodesReached(List.of(endNode1, endNode2));
 
 		//none end node yet reached
-		assertThat(noEndNodes.stop(otherNode.getId().index(), 0, 0, 0, 0)).isFalse();
+		assertThat(sc.stop(otherNode.getId().index(), 0, 0, 0, 0)).isFalse();
 
 		//endNode1 now reached
-		assertThat(noEndNodes.stop(endNode1.getId().index(), 0, 0, 0, 0)).isFalse();
+		assertThat(sc.stop(endNode1.getId().index(), 0, 0, 0, 0)).isFalse();
 
 		//endNode2 not yet reached
-		assertThat(noEndNodes.stop(otherNode.getId().index(), 0, 0, 0, 0)).isFalse();
+		assertThat(sc.stop(otherNode.getId().index(), 0, 0, 0, 0)).isFalse();
 
 		//endNode2 now reached
-		assertThat(noEndNodes.stop(endNode2.getId().index(), 0, 0, 0, 0)).isTrue();
+		assertThat(sc.stop(endNode2.getId().index(), 0, 0, 0, 0)).isTrue();
 
 		//both end nodes already reached
-		assertThat(noEndNodes.stop(otherNode.getId().index(), 0, 0, 0, 0)).isTrue();
+		assertThat(sc.stop(otherNode.getId().index(), 0, 0, 0, 0)).isTrue();
+	}
+
+	@Test
+	public void testLeastCostEndNodeReached_noEndNodes() {
+		assertThatThrownBy(() -> new LeastCostEndNodeReached(List.of(), value -> 0)).isExactlyInstanceOf(
+				IllegalArgumentException.class).hasMessage("At least one end node must be provided.");
+	}
+
+	@Test
+	public void testLeastCostEndNodeReached_oneEndNode() {
+		var endNodeId = Id.createNodeId("end_node");
+		var otherNodeId = Id.createNodeId("other_node");
+
+		IntToDoubleFunction endNodeAdditionalCost = index -> {
+			if (index == endNodeId.index()) {
+				return 10;
+			}
+			throw new IllegalArgumentException("not an end node");
+		};
+		LeastCostEndNodeReached sc = new LeastCostEndNodeReached(List.of(new FakeNode(endNodeId)),
+				endNodeAdditionalCost);
+
+		//endNode not yet reached
+		assertThat(sc.stop(otherNodeId.index(), 0, 0, 0, 0)).isFalse();
+		assertThat(sc.getBestEndNodeIndex()).isEmpty();
+
+		//endNode now reached
+		assertThat(sc.stop(endNodeId.index(), 0, 0, 0, 0)).isTrue();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId.index());
+
+		//endNode already reached
+		assertThat(sc.stop(otherNodeId.index(), 0, 0, 0, 0)).isTrue();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId.index());
+	}
+
+	@Test
+	public void testLeastCostEndNodeReached_twoEndNodes_stopBeforeReachingTheOtherEndNode() {
+		var endNodeId1 = Id.createNodeId("end_node");
+		var endNodeId2 = Id.createNodeId("end_node_2");
+		var otherNodeId = Id.createNodeId("other_node");
+
+		IntToDoubleFunction endNodeAdditionalCost = Map.of(endNodeId1.index(), 3, endNodeId2.index(), 2)::get;
+		LeastCostEndNodeReached sc = new LeastCostEndNodeReached(
+				List.of(new FakeNode(endNodeId1), new FakeNode(endNodeId2)), endNodeAdditionalCost);
+
+		//endNode1 reached
+		//travelCost == 2, totalCost == 2 + 3 == 5
+		assertThat(sc.stop(endNodeId1.index(), 0, 2, 0, 0)).isFalse();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId1.index());
+
+		//stop - travelCost >= 5
+		assertThat(sc.stop(otherNodeId.index(), 0, 5, 0, 0)).isTrue();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId1.index());
+	}
+
+	@Test
+	public void testLeastCostEndNodeReached_twoEndNodes_bothVisited_fartherEndNodeWithLowerTotalCost() {
+		var endNodeId1 = Id.createNodeId("end_node");
+		var endNodeId2 = Id.createNodeId("end_node_2");
+
+		IntToDoubleFunction endNodeAdditionalCost = Map.of(endNodeId1.index(), 10, endNodeId2.index(), 1)::get;
+		LeastCostEndNodeReached sc = new LeastCostEndNodeReached(
+				List.of(new FakeNode(endNodeId1), new FakeNode(endNodeId2)), endNodeAdditionalCost);
+
+		//endNode1 now reached
+		//travelCost == 2, totalCost == 2 + 10 == 12
+		assertThat(sc.stop(endNodeId1.index(), 0, 2, 0, 0)).isFalse();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId1.index());
+
+		//endNode2 now reached
+		//travelCost == 3, totalCost == 3 + 1 == 4
+		assertThat(sc.stop(endNodeId2.index(), 0, 3, 0, 0)).isTrue();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId2.index());
+	}
+
+	@Test
+	public void testLeastCostEndNodeReached_twoEndNodes_noAdditionalCost_stopAfterVisitingFirstEndNode() {
+		var endNodeId1 = Id.createNodeId("end_node");
+		var endNodeId2 = Id.createNodeId("end_node_2");
+
+		IntToDoubleFunction endNodeAdditionalCost = Map.of(endNodeId1.index(), 0, endNodeId2.index(), 0)::get;
+		LeastCostEndNodeReached sc = new LeastCostEndNodeReached(
+				List.of(new FakeNode(endNodeId1), new FakeNode(endNodeId2)), endNodeAdditionalCost);
+
+		//endNode1 now reached
+		//travelCost == 2, totalCost == 2 + 10 == 12
+		assertThat(sc.stop(endNodeId1.index(), 0, 2, 0, 0)).isTrue();
+		assertThat(sc.getBestEndNodeIndex()).hasValue(endNodeId1.index());
 	}
 }
