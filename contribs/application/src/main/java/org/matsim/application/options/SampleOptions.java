@@ -101,9 +101,11 @@ public final class SampleOptions {
 	}
 
 	/**
-	 * Adjust file name for selected sample size.
+	 * Adjust file name for selected sample size if it was set explicitly.
 	 */
 	public String adjustName(String name) {
+		if (!set) return name;
+
 		String postfix = getSize() + "pct";
 
 		return PATTERN.matcher(name).replaceAll(postfix);
