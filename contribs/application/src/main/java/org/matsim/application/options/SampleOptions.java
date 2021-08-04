@@ -34,6 +34,11 @@ public final class SampleOptions {
 	private int sample;
 
 	/**
+	 * Whether sample size was set explicitly.
+	 */
+	private boolean set;
+
+	/**
 	 * Create Sample options with the available sample size.
 	 * First sample size is the default option.
 	 *
@@ -77,6 +82,7 @@ public final class SampleOptions {
 	}
 
 	private void setSize(int sample) {
+		this.set = true;
 		this.sample = sample;
 	}
 
@@ -85,6 +91,13 @@ public final class SampleOptions {
 	 */
 	public int getSize() {
 		return sample;
+	}
+
+	/**
+	 * Check whether the sample size was set explicitly.
+	 */
+	public boolean isSet() {
+		return set;
 	}
 
 	/**
