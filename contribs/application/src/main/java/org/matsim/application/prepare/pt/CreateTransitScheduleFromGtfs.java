@@ -126,6 +126,9 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 		Network network = Files.exists(networkFile) ? NetworkUtils.readNetwork(networkFile.toString()) : scenario.getNetwork();
 
+		// Create a network around the schedule
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), network, "pt_").createNetwork();
+
 		if (validate) {
 			//Check schedule and network
 			TransitScheduleValidator.ValidationResult checkResult = TransitScheduleValidator.validateAll(scenario.getTransitSchedule(), network);
@@ -138,8 +141,6 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			}
 		}
 
-		// Create a network around the schedule
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), network, "pt_").createNetwork();
 		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
 
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(scheduleFile.getAbsolutePath());
