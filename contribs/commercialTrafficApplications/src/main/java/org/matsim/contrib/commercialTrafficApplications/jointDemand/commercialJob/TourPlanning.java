@@ -25,6 +25,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.log4j.Logger;
@@ -58,11 +59,13 @@ class TourPlanning {
 
 	private static final Logger log = Logger.getLogger(TourPlanning.class);
 
-	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
-			TravelTime travelTime) throws InterruptedException, ExecutionException {
+	static void runTourPlanningForCarriersWithNetBasedCosts(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
+															TravelTime travelTime) throws ExecutionException, InterruptedException {
+
 		Set<VehicleType> vehicleTypes = new HashSet<>();
 		carriers.getCarriers().values()
 				.forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
+
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder
 				.newInstance(scenario.getNetwork(), vehicleTypes);
 		log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
@@ -71,6 +74,14 @@ class TourPlanning {
 		netBuilder.setTravelTime(travelTime);
 
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+
+		runTourPlanningForCarriers(carriers, scenario, netBasedCosts);
+	}
+
+	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, VehicleRoutingTransportCosts transportCosts) throws InterruptedException, ExecutionException {
+
+		if(! (transportCosts instanceof NetworkBasedTransportCosts)) throw new IllegalArgumentException("currently, carrier plans can only be routed with " + NetworkBasedTransportCosts.class +
+				". Sorry! We aim to provide another solution. Please refer to tschlenther or kmt...");
 
 		HashMap<Id<Carrier>, Integer> carrierServiceCounterMap = new HashMap<>();
 
@@ -100,7 +111,7 @@ class TourPlanning {
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier,
 					scenario.getNetwork());
 
-			vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
+			vrpBuilder.setRoutingCost(transportCosts);
 
 			VehicleRoutingProblem problem = vrpBuilder.build();
 
@@ -159,7 +170,7 @@ class TourPlanning {
 			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
 			log.info("routing plan for carrier " + carrier.getId());
-			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, netBasedCosts); // we need to route
+			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, (NetworkBasedTransportCosts) transportCosts); // we need to route
 																									// the plans in
 																									// order to create
 																									// reasonable

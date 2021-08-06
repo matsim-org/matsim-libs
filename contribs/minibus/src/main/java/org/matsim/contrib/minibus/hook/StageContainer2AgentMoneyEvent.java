@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.scoring;
+package org.matsim.contrib.minibus.hook;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,12 +36,12 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 /**
- * Collects {@link StageContainer} and creates {@link PersonMoneyEvent}.
+ * Collects {@link StageContainer} and creates {@link PersonMoneyEvent} for
+ * each (commuter) agent.
  * 
  * @author aneumann
- *
  */
-public final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
+final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
 
 	private final EventsManager eventsManager;
 	private final double mobsimShutdownTime;
@@ -63,15 +63,13 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
 				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
 			}
-			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent, "minibus", null));
+			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent, "minibus", null, null));
 		}
 	}
 
 	@Override
 	public void handleFareContainer(StageContainer stageContainer) {
-		if (this.agentId2stageContainerListMap.get(stageContainer.getAgentId()) == null) {
-			this.agentId2stageContainerListMap.put(stageContainer.getAgentId(), new LinkedList<StageContainer>());
-		}
+		this.agentId2stageContainerListMap.computeIfAbsent(stageContainer.getAgentId(), k -> new LinkedList<>());
 		
 		this.agentId2stageContainerListMap.get(stageContainer.getAgentId()).add(stageContainer);
 	}
