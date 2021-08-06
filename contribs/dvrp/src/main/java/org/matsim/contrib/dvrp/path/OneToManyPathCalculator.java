@@ -21,7 +21,8 @@
 package org.matsim.contrib.dvrp.path;
 
 import static java.util.stream.Collectors.toList;
-import static org.matsim.contrib.dvrp.path.LeastCostPathTreeStopCriteria.*;
+import static org.matsim.contrib.dvrp.path.LeastCostPathTreeStopCriteria.allEndNodesReached;
+import static org.matsim.contrib.dvrp.path.LeastCostPathTreeStopCriteria.withMaxTravelTime;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -40,8 +41,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.speedy.LeastCostPathTree;
 import org.matsim.core.utils.misc.OptionalTime;
-
-import com.google.common.base.Preconditions;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -67,18 +66,13 @@ class OneToManyPathCalculator {
 	}
 
 	void calculateDijkstraTree(Collection<Link> toLinks, double maxTravelTime) {
-		Preconditions.checkArgument(!Double.isNaN(maxTravelTime) && maxTravelTime >= 0);
-
-		int fromNodeIdx = getStartNode(fromLink).getId().index();
 		var toNodes = toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode).collect(toList());
 		if (toNodes.size() == 0) {
 			return;
 		}
 
-		var allEndNodes = allEndNodesReached(toNodes);
-		var stopCriterion = maxTravelTime < Double.POSITIVE_INFINITY ?
-				or(maxTravelTime(maxTravelTime), allEndNodes) :
-				allEndNodes;
+		int fromNodeIdx = getStartNode(fromLink).getId().index();
+		var stopCriterion = withMaxTravelTime(allEndNodesReached(toNodes), maxTravelTime);
 
 		if (forwardSearch) {
 			dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);

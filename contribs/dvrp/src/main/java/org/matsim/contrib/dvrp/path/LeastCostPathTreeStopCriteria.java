@@ -48,7 +48,14 @@ public class LeastCostPathTreeStopCriteria {
 						|| sc2.stop(nodeIndex, arrivalTime, travelCost, distance, departureTime);
 	}
 
+	public static StopCriterion withMaxTravelTime(StopCriterion chainedCriterion, double maxTravelTime) {
+		return maxTravelTime < Double.POSITIVE_INFINITY ?
+				or(maxTravelTime(maxTravelTime), chainedCriterion) :
+				chainedCriterion;
+	}
+
 	public static StopCriterion maxTravelTime(double maxTravelTime) {
+		Preconditions.checkArgument(maxTravelTime >= 0);
 		return (nodeIndex, arrivalTime, travelCost, distance, departureTime) -> arrivalTime - departureTime
 				> maxTravelTime;
 	}
