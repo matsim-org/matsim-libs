@@ -733,12 +733,13 @@ public class MatsimJspritFactory {
 	public static VehicleRoutingAlgorithm loadOrCreateVehicleRoutingAlgorithm(Scenario scenario,
 			FreightConfigGroup freightConfig, NetworkBasedTransportCosts netBasedCosts, VehicleRoutingProblem problem) {
 		VehicleRoutingAlgorithm algorithm;
-		final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgorithmFile();
-		if (vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals("")) {
-			log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
+		final String vehicleRoutingAlgorithmFile = freightConfig.getVehicleRoutingAlgorithmFile();
+
+		if (vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.equals("")) {
+			log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgorithmFile);
 			URL vraURL;
 			try {
-				vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgortihmFile);
+				vraURL = IOUtils.extendUrl(scenario.getConfig().getContext(), vehicleRoutingAlgorithmFile);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
