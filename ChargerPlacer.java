@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -26,10 +27,12 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.run.RunBerlinScenario;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.matsim.withinday.utils.EditPlans;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -55,7 +58,7 @@ public class ChargerPlacer {
         }
 
         if (args.length == 0) {
-            args = new String[]{"scenarios/berlin-v5.5-1pct/input/ev/berlin-v5.5-1pct.config-ev-test2.xml"};
+            args = new String[]{"scenarios/berlin-v5.5-1pct/input/ev/berlin-v5.5-10pct.config-ev-MPM-günstig.xml"};
         }
 
         Config config = RunBerlinScenario.prepareConfig(args);
@@ -67,14 +70,18 @@ public class ChargerPlacer {
 
 
 
+        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_9619.csv";
+        String fileName2 ="C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/Used_3.csv";
+        CSVToXMLmpm csvreader = new CSVToXMLmpm(fileName, fileName2);
+        chargers.addAll(csvreader.chargers);
 
-        List<Map<Id<Person>, Id<Link>>> homeChargerLinks = new ArrayList<>();
+        Map<Id<Person>, Id<Link>> homeChargerLinks = new HashMap<>();
         List<Person> personsWithEvs = new ArrayList<>();
 
         for (Person person : scenario.getPopulation().getPersons().values()) {
 
             if (!person.getId().toString().contains("freight") && !PopulationUtils.getPersonAttribute(person, "home-activity-zone").equals("brandenburg")) {
-                String mode = "car";
+                String mode = TransportMode.car;
                 List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 //                List<Activity> activities = TripStructureUtils.getActivities(planElements, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
                 List<Leg> evLegs = TripStructureUtils.getLegs(person.getSelectedPlan()).stream().filter(leg -> leg.getMode().equals(mode)).collect(toList());
@@ -84,29 +91,31 @@ public class ChargerPlacer {
                 }
 
                 if (evLegs.size() > 0 && evLegs.get(0).getRoute().getStartLinkId().equals(evLegs.get(evLegs.size() - 1).getRoute().getEndLinkId())) {
-                    Map<Id<Person>, Id<Link>> possibleHomeLink = new HashMap<>();
-                    possibleHomeLink.put(person.getId(), evLegs.get(0).getRoute().getStartLinkId());
-                    homeChargerLinks.add(possibleHomeLink);
+
+                    homeChargerLinks.put(person.getId(), evLegs.get(0).getRoute().getStartLinkId());
+//
                 }
             }
 
 
         }
+//        try (CSVReader reader2 = new CSVReader(new FileReader(fileName2))) {
+//            List<String[]> rows2 = reader2.readAll();
+//            for (String[] row : Iterables.skip(rows2, 1)) {
+//                usedChargers.add(row[0]);
+//            }
+//        }
 
-
-        for (int i = 0; i < personsWithEvs.size() * 0.6; ) {
+        Collections.shuffle(personsWithEvs);
+        List<Id<Link>> chargerLinks = chargers.stream().map(chargerSpecification -> chargerSpecification.getLinkId()).collect(toList());
+        for (int i = 0; i < personsWithEvs.size() * 0.4; ) {
             Person person = personsWithEvs.get(i);
 
-            if (homeChargerLinks.stream()
-                    .map(idMap -> idMap.keySet())
-                    .anyMatch(ids -> ids.contains(person.getId()))) {
+            if (homeChargerLinks.keySet().contains(person.getId())){
 
-                Id<Link> homeLink = homeChargerLinks.stream()
-                        .filter(idIdMap -> idIdMap.containsKey(person.getId()))
-                        .findAny()
-                        .get()
-                        .get(person.getId());
+                Id<Link> homeLink = homeChargerLinks.get(person.getId());
 
+                if(!chargerLinks.contains(homeLink)){
 
                 ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
                 chargers.add(builder
@@ -118,31 +127,58 @@ public class ChargerPlacer {
                         .build());
                 i++;
             }
-
-//            URL url = new URL("https://download.geofabrik.de/europe/germany/berlin-latest-free.shp.zip")
-//            SimpleFeatureSource shp = ShapeFileReader.readDataFile("C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\SHPfile\\lor_bzr.shp");
-//             List<Geometry> berlinSHP = ShpGeometryUtils.loadGeometries(url);
-
+            }
 
         }
 
 //        String file = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\scenarios\\berlin-v5.5-1pct\\input\\ev\\AktuelleChargerInBerlin\\Ladesäulen_in_Deutschland_v2.csv";
-//
-//        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-//
-//        Network subNetwork = NetworkUtils.createNetwork();
-//
-//        Set<String> modes = Set.of(TransportMode.car);
-//        filter.filter(subNetwork, modes);
-//
-//
-//
-//        CSVToXML2 csvreader =new CSVToXML2(file, subNetwork);
 
-        String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
-        CSVToXMLmpm csvreader = new CSVToXMLmpm(fileName);
-        chargers.addAll(csvreader.chargers);
-        new ChargerWriter(chargers.stream()).write("C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/HomeChargers+MPM_mittel.xml");
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+
+        Network subNetwork = NetworkUtils.createNetwork();
+
+        Set<String> modes = Set.of(TransportMode.car);
+        filter.filter(subNetwork, modes);
+//        for (Id<Link> linkId : subNetwork.getLinks().keySet()) {
+//            ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
+//                chargers.add(builder
+//                        .linkId(linkId)
+//                        .id(Id.create("Charger" + linkId , Charger.class))
+//                        .chargerType("AC")
+//                        .plugCount(10)
+//                        .plugPower(11000)
+//                        .build());
+//
+//        }
+
+
+
+//       CSVToXML2 csvreader =new CSVToXML2(file, subNetwork);
+//        URL url = new URL("https://tsb-opendata.s3.eu-central-1.amazonaws.com/detailnetz_strassenabschnitte/Detailnetz-Strassenabschnitte.shp.zip");
+//        berlinSHP = ShpGeometryUtils.loadGeometries(url);
+//
+//        List<Geometry> berlinSHP = ShpGeometryUtils.loadGeometries(url);
+//
+//        for (Id<Link> linkId : subNetwork.getLinks().keySet()) {
+//            Coord coord = subNetwork.getLinks().get(linkId).getCoord();
+//            Link link = subNetwork.getLinks().get(linkId);
+//
+//           if(ShpGeometryUtils.isCoordInGeometries(coord, berlinSHP)){
+//               ImmutableChargerSpecification.Builder builder = ImmutableChargerSpecification.newBuilder();
+//               chargers.add(builder
+//                       .linkId(linkId)
+//                        .id(Id.create("Charger" + linkId , Charger.class))
+//                        .chargerType("AC")
+//                        .plugCount(10)
+//                        .plugPower(22000)
+//                        .build());
+//           };
+//
+//        }
+
+
+
+        new ChargerWriter(chargers.stream()).write("C:/Users/admin/IdeaProjects/matsim-berlin/scenarios/berlin-v5.5-1pct/input/ev/New_+_homeCharger.xml");
 
 
     }
