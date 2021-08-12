@@ -209,6 +209,20 @@ public class FreightUtils {
 		}
 		return types;
 	}
+	
+	/** Adds the CarrierVehicleTypes to the scenario.
+	 * @param scenario
+	 * @param newTypes
+	 */
+	public static void addCarrierVehicleTypes(Scenario scenario, CarrierVehicleTypes newTypes) {
+		CarrierVehicleTypes existingTypestypes = (CarrierVehicleTypes) scenario.getScenarioElement(CARRIERVEHICLETYPES);
+		if (existingTypestypes == null) 
+			scenario.addScenarioElement(CARRIERVEHICLETYPES, newTypes);
+		else
+			for (Id<VehicleType> newTypeId : newTypes.getVehicleTypes().keySet()) {
+				FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().put(newTypeId, newTypes.getVehicleTypes().get(newTypeId));
+			}
+	}
 
 	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
