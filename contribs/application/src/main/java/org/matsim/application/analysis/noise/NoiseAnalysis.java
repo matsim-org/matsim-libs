@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.contrib.noise.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
@@ -12,8 +13,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
-
-import java.nio.file.Path;
 
 @CommandLine.Command(
         name = "noise-analysis",
@@ -25,19 +24,27 @@ import java.nio.file.Path;
 public class NoiseAnalysis implements MATSimAppCommand {
     private static final Logger log = LogManager.getLogger(NoiseAnalysis.class);
 
-    @CommandLine.Parameters(paramLabel = "INPUT", arity = "1", description = "Path to run directory")
-    private Path runDirectory;
+    @CommandLine.Option(names = "--directory", description = "Path to run directory", required = true)
+    private String runDirectory;
 
     @CommandLine.Option(names = "--runId", description = "Pattern to match runId.", defaultValue = "*")
     private String runId;
 
+    @CommandLine.Mixin
+    private CrsOptions crs = new CrsOptions();
+
+    public static void main(String[] args) {
+        System.exit(new CommandLine(new NoiseAnalysis()).execute(args));
+    }
+
     @Override
     public Integer call() throws Exception {
         Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
+        config.global().setCoordinateSystem(crs.getInputCRS());
         config.controler().setRunId(runId);
         config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
         config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
-        config.controler().setOutputDirectory(runDirectory.toString());
+        config.controler().setOutputDirectory(runDirectory);
 
         // adjust the default noise parameters
         NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config,NoiseConfigGroup.class) ;
