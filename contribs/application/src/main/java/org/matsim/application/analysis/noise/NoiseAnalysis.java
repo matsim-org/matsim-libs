@@ -27,7 +27,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--directory", description = "Path to run directory", required = true)
     private String runDirectory;
 
-    @CommandLine.Option(names = "--runId", description = "Pattern to match runId.", defaultValue = "*")
+    @CommandLine.Option(names = "--runId", description = "Pattern to match runId.", defaultValue = "")
     private String runId;
 
     @CommandLine.Mixin
@@ -41,14 +41,19 @@ public class NoiseAnalysis implements MATSimAppCommand {
     public Integer call() throws Exception {
         Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
         config.global().setCoordinateSystem(crs.getInputCRS());
-        config.controler().setRunId(runId);
-        config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
-        config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
+        if (runId != null) {
+            runId = runId + ".";
+            config.controler().setRunId(runId);
+        }
+        config.network().setInputFile(runDirectory + "/" + runId + "output_network.xml.gz");
+        config.plans().setInputFile(runDirectory + runId + "output_plans.xml.gz");
         config.controler().setOutputDirectory(runDirectory);
 
         // adjust the default noise parameters
-        NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config,NoiseConfigGroup.class) ;
-        noiseParameters.setReceiverPointGap(12345789.);
+        NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
+        noiseParameters.setReceiverPointGap(250);
+        noiseParameters.setConsideredActivitiesForReceiverPointGridArray(new String[]{"h", "w", "home", "work"});
+        noiseParameters.setConsideredActivitiesForDamageCalculationArray(new String[]{"h", "w", "home", "work"});
         // ...
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -64,10 +69,10 @@ public class NoiseAnalysis implements MATSimAppCommand {
         ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
         process.run();
 
-        final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
-        final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
+        final String[] labels = {"immission", "consideredAgentUnits", "damages_receiverPoint"};
+        final String[] workingDirectories = {outputFilePath + "/immissions/", outputFilePath + "/consideredAgentUnits/", outputFilePath + "/damages_receiverPoint/"};
 
-        MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+        MergeNoiseCSVFile merger = new MergeNoiseCSVFile();
         merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
         merger.setOutputDirectory(outputFilePath);
         merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
