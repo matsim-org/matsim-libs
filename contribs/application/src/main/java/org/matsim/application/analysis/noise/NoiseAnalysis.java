@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.noise.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
@@ -12,6 +13,7 @@ import org.matsim.contrib.noise.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -32,6 +34,10 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
+
+    @CommandLine.Mixin
+    private ShpOptions shp = new ShpOptions();
+
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new NoiseAnalysis()).execute(args));
@@ -54,6 +60,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
         noiseParameters.setReceiverPointGap(250);
         noiseParameters.setConsideredActivitiesForReceiverPointGridArray(new String[]{"h", "w", "home", "work"});
         noiseParameters.setConsideredActivitiesForDamageCalculationArray(new String[]{"h", "w", "home", "work"});
+        CoordinateTransformation ct = shp.createInverseTransformation(crs.getInputCRS());
         // ...
 
         Scenario scenario = ScenarioUtils.loadScenario(config);

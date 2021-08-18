@@ -191,6 +191,13 @@ public final class ShpOptions {
 		return TransformationFactory.getCoordinateTransformation(fromCRS, detectCRS());
 	}
 
+	/**
+	 * Create an inverse coordinate transformation from the shape file crs. Tries to autodetect the crs of the shape file.
+	 */
+	public CoordinateTransformation createInverseTransformation(String toCRS) {
+		return TransformationFactory.getCoordinateTransformation(detectCRS(), toCRS);
+	}
+
 	private String detectCRS() {
 
 		if (shpCrs == null) {
