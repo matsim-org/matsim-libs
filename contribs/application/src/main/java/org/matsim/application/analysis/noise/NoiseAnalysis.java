@@ -74,8 +74,8 @@ public class NoiseAnalysis implements MATSimAppCommand {
             double maxY = Double.MIN_VALUE;
             double minX = Double.MAX_VALUE;
             double minY = Double.MAX_VALUE;
-            List<Coord> coords = Arrays.asList(shp.getGeometry().getCoordinates()).
-                    stream().map(c -> new Coord(c.x, c.y)).
+            List<Coord> coords = Arrays.stream(shp.getGeometry().getCoordinates()).
+                    map(c -> new Coord(c.x, c.y)).
                     collect(Collectors.toList());
             for (Coord coord : coords) {
                 ct.transform(coord);
