@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class DrtIdleVehicleWritter {
-	private static final Logger log = LogManager.getLogger(DrtIdleVehicleWritter.class);
+public class DrtIdleVehicleWriter {
+	private static final Logger log = LogManager.getLogger(DrtIdleVehicleWriter.class);
 	private final int eventsQueueSize = 1048576 * 32;
 	private final double endTime = 30 * 3600;
 
@@ -30,7 +30,7 @@ public class DrtIdleVehicleWritter {
 	private final String networkFile;
 	private final String outputPath;
 
-	public DrtIdleVehicleWritter(Path directory) {
+	public DrtIdleVehicleWriter(Path directory) {
 		Path eventsPath = glob(directory, "*output_events*", true).orElseThrow(() -> new IllegalStateException("No events file found."));
 		Path networkPath = glob(directory, "*output_network*", true).orElseThrow(() -> new IllegalStateException("No network file found."));
 		this.eventsFile = eventsPath.toString();
@@ -40,8 +40,8 @@ public class DrtIdleVehicleWritter {
 
 	public static void main(String[] args) throws IOException {
 		// Input in argument: directory of the simulation output
-		DrtIdleVehicleWritter drtIdleVehicleWritter = new DrtIdleVehicleWritter(Path.of(args[0]));
-		drtIdleVehicleWritter.run();
+		DrtIdleVehicleWriter drtIdleVehicleWriter = new DrtIdleVehicleWriter(Path.of(args[0]));
+		drtIdleVehicleWriter.run();
 	}
 
 	public void run() throws IOException {

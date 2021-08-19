@@ -24,7 +24,7 @@ public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndE
 		private final double startTime;
 		private final Id<Person> personId;
 		private final String stayTaskId;
-		private double EndTime;
+		private double endTime;
 
 		public StayTaskDataEntry(String stayTaskId, Id<Person> personId, double startTime, Id<Link> linkId) {
 			this.stayTaskId = stayTaskId;
@@ -34,7 +34,7 @@ public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndE
 		}
 
 		public void setEndTime(double endTime) {
-			EndTime = endTime;
+			this.endTime = endTime;
 		}
 
 		public double getStartTime() {
@@ -42,7 +42,7 @@ public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndE
 		}
 
 		public double getEndTime() {
-			return EndTime;
+			return endTime;
 		}
 
 		public Id<Person> getPersonId() {
