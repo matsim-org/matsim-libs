@@ -17,7 +17,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -52,11 +54,16 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
     }
 
     @Override
-    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+    public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+    	final Facility fromFacility = request.getFromFacility();
+    	final Facility toFacility = request.getToFacility();
+    	final double departureTime = request.getDepartureTime();
+    	final Person person = request.getPerson();
+    	
         List<? extends PlanElement> legs = this.raptor.calcRoute(fromFacility, toFacility, departureTime, person);
         return legs != null ?
                 fillWithActivities(legs) :
-                walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+                walkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
     }
 
     private List<? extends PlanElement> fillWithActivities(List<? extends PlanElement> segments) {

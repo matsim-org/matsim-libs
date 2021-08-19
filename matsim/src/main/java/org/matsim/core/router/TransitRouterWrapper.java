@@ -71,11 +71,12 @@ public class TransitRouterWrapper implements RoutingModule {
 	 * @return the list of legs returned by the transit router.
 	 */
 	@Override
-	public List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility,
-			final double departureTime,
-			final Person person) {
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
+		
 		List<? extends PlanElement> baseTrip = router.calcRoute(
 				fromFacility,
 				toFacility,
@@ -158,7 +159,7 @@ public class TransitRouterWrapper implements RoutingModule {
 		// historically just does not compute the distances.  kai, may'17
 		
 		Route route = RouteUtils.createGenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
-		final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(fromFacility, firstToFacility, departureTime, person);
+		final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, firstToFacility, departureTime, person));
 		route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
 		route.setTravelTime(travelTime);
 		return route;

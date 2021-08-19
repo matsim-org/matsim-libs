@@ -26,6 +26,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.scenario.MutableScenario;
@@ -518,7 +519,7 @@ public class SwissRailRaptorTest {
                     f.scenario.getNetwork(), // use a walk router in case no PT path is found
                     walkRoutingModule);
 
-            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0 * 3600 + 50 * 60, null);
+            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(DefaultRoutingRequest.of(f.fromFacility, f.toFacility, 7.0 * 3600 + 50 * 60, null));
             double tripDuration = calcTripDuration(planElements);
             Assert.assertEquals(9, planElements.size());
             Assert.assertEquals(100, ((Leg) planElements.get(0)).getTravelTime().seconds(), 0.0);    // 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
@@ -556,7 +557,7 @@ public class SwissRailRaptorTest {
                     f.scenario.getNetwork(), // use a walk router in case no PT path is found
                     walkRoutingModule);
 
-            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
+            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(DefaultRoutingRequest.of(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null));
             double tripDuration = calcTripDuration(planElements);
             Assert.assertEquals(9, planElements.size());
 			Assert.assertEquals(100, ((Leg)planElements.get(0)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
@@ -586,7 +587,7 @@ public class SwissRailRaptorTest {
                     walkRoutingModule);
 
             TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
-            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
+            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(DefaultRoutingRequest.of(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null));
             Assert.assertNull("The router should not find a route and return null, but did return something else.", planElements);
         }
     }

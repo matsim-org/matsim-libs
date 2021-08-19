@@ -120,13 +120,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	@Override
-	public synchronized List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility,
-			final double departureTime,
-			final Person person) {
+	public synchronized List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
+		
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
 
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
@@ -219,7 +220,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressTrip.add(egressLeg);
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLinkAndCoord(egressActLink,startCoord);
-			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
 			if(networkRoutedEgressTrip == null) return null;
 			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double egressTime = NetworkUtils.getLinkEgressTime(egressActLink,mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId().toString()));
@@ -286,7 +287,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 //			now += accessTime;
 		} else {
 			Facility toFacility = FacilitiesUtils.wrapLinkAndCoord(accessActLink,endCoord);
-			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
 			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
 			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double accessTime = NetworkUtils.getLinkAccessTime(accessActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));

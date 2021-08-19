@@ -27,7 +27,9 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -848,8 +850,7 @@ public class SwissRailRaptorIntermodalTest {
         		new RoutingModule() {
 
 					@Override
-					public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility,
-							double departureTime, Person person) {
+					public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 						return null;
 					}
         	
@@ -959,8 +960,10 @@ public class SwissRailRaptorIntermodalTest {
             new RoutingModule() {
 				
 				@Override
-				public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-						Person person) {
+				public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+					final Facility fromFacility = request.getFromFacility();
+					final Facility toFacility = request.getToFacility();
+					final double departureTime = request.getDepartureTime();
 					
 					Coord bikeCoord = CoordUtils.createCoord(9500, 10000);
 					
@@ -1078,8 +1081,10 @@ public class SwissRailRaptorIntermodalTest {
             new RoutingModule() {
 				
 				@Override
-				public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-						Person person) {
+				public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+					final Facility fromFacility = request.getFromFacility();
+					final Facility toFacility = request.getToFacility();
+					final double departureTime = request.getDepartureTime();
 					
 					Coord bikeCoord = CoordUtils.createCoord(9500, 10000);
 					
@@ -1140,7 +1145,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility fromFac = new FakeFacility(new Coord(9500, 10000), Id.create("from", Link.class));
         Facility toFac = new FakeFacility(new Coord(50000, 10500), Id.create("to", Link.class));
 
-        List<? extends PlanElement> legs = ssrrModule.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        List<? extends PlanElement> legs = ssrrModule.calcRoute(DefaultRoutingRequest.of(fromFac, toFac, 7*3600, f.dummyPerson));
         for (PlanElement leg : legs) {
             System.out.println(leg);
         }

@@ -171,14 +171,14 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		if (module != null) {
 			List<? extends PlanElement> trip =
-					module.calcRoute(
+					module.calcRoute(DefaultRoutingRequest.of(
 						fromFacility,
 						toFacility,
 						departureTime,
-						person);
+						person));
 
 			if ( trip == null ) {
-				trip = fallbackRoutingModule.calcRoute( fromFacility, toFacility, departureTime, person ) ;
+				trip = fallbackRoutingModule.calcRoute(DefaultRoutingRequest.of( fromFacility, toFacility, departureTime, person )) ;
 			}
 			for (Leg leg: TripStructureUtils.getLegs(trip)) {
 				TripStructureUtils.setRoutingMode(leg, mainMode);

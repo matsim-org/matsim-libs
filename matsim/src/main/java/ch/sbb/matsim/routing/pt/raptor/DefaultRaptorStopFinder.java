@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -187,12 +188,12 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
                 List<? extends PlanElement> routeParts;
                 if (direction == Direction.ACCESS) {
                     RoutingModule module = this.routingModules.get(mode);
-                    routeParts = module.calcRoute(facility, stopFacility, departureTime, person);
+                    routeParts = module.calcRoute(DefaultRoutingRequest.of(facility, stopFacility, departureTime, person));
                 } else { // it's Egress
                     // We don't know the departure time for the egress trip, so just use the original departureTime,
                     // although it is wrong and might result in a wrong traveltime and thus wrong route.
                     RoutingModule module = this.routingModules.get(mode);
-                    routeParts = module.calcRoute(stopFacility, facility, departureTime, person);
+                    routeParts = module.calcRoute(DefaultRoutingRequest.of(stopFacility, facility, departureTime, person));
                     if (routeParts == null) {
                         // the router for the access/egress mode could not find a route, skip that access/egress mode
                         continue;
