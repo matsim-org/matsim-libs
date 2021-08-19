@@ -41,6 +41,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -105,11 +106,10 @@ public class PlanRouterWithVehicleRessourcesTest {
 				TransportMode.car,
 				new RoutingModule() {
 					@Override
-					public List<? extends PlanElement> calcRoute(
-							final Facility fromFacility,
-							final Facility toFacility,
-							final double departureTime,
-							final Person p) {
+					public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+						final Facility fromFacility = request.getFromFacility();
+						final Facility toFacility = request.getToFacility();
+						
 						final List<PlanElement> legs = new ArrayList<PlanElement>();
 
 						for (int i=0; i < 5; i++) {

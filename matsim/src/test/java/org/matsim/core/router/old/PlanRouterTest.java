@@ -102,11 +102,16 @@ public class PlanRouterTest {
         final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
         final RoutingModule routingModule = new RoutingModule() {
               @Override
-              public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+              public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+            		final Facility fromFacility = request.getFromFacility();
+            		final Facility toFacility = request.getToFacility();
+            		final double departureTime = request.getDepartureTime();
+            		final Person person = request.getPerson();
+            		
                   List<? extends PlanElement> trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(),
                   		scenario.getNetwork(),
                   		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime)
-                  		).calcRoute(fromFacility, toFacility, departureTime, person);
+                  		).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
                   ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
                   return trip;
               }

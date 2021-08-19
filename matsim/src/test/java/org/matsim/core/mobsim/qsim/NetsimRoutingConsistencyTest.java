@@ -51,6 +51,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.NetworkRoutingModule;
@@ -178,7 +179,7 @@ public class NetsimRoutingConsistencyTest {
 					router);
 
 			Leg leg = (Leg) routingModule
-					.calcRoute(new LinkWrapperFacility(link12), new LinkWrapperFacility(link45), 0.0, person).get(0);
+					.calcRoute(DefaultRoutingRequest.withoutAttributes(new LinkWrapperFacility(link12), new LinkWrapperFacility(link45), 0.0, person)).get(0);
 
 			plan.addActivity(startActivity);
 			plan.addLeg(leg);
