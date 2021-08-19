@@ -210,7 +210,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * but it may be externalized in a "util" class...
 	 * @param config TODO
 	 */
-	public static double calcEndOfPlanElement(
+	public static double calcEndOfPlanElementDEPCRECATEDDEPRECATED(
 			final double now,
 			final PlanElement pe, Config config) {
 		Preconditions.checkArgument(Double.isFinite(now));//probably unnecessary after switching to OptionalTime

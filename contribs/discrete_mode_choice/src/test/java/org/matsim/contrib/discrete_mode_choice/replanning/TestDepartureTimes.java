@@ -42,9 +42,9 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
 import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
 import org.matsim.contribs.discrete_mode_choice.replanning.TripListConverter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.time_interpreter.EndTimeThenDurationInterpreter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 public class TestDepartureTimes {
 	@Test

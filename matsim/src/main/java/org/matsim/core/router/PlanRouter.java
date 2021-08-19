@@ -146,7 +146,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		}
 	}
 
-	public static double calcEndOfActivity(
+	public static double calcEndOfActivityDEPRECATEDDEPCRECATED(
 			final Activity activity,
 			final Plan plan,
 			final Config config ) {

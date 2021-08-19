@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanBuilder;
@@ -37,8 +38,6 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourFilter;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
@@ -46,6 +45,8 @@ import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.utils.time_interpreter.EndTimeThenDurationInterpreter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 public class SubtourModeChoiceReplacementTest {
 	@Test

@@ -41,6 +41,17 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
+	
+	/**
+	 * Defines how departure times are interpreted in rerouting applications.
+	 */
+	public enum RoutingDepartureTimeInterpration { 
+		/** When routing along a plan, the nominal end times of activities are using as depature times of the following trips */
+		nominal, 
+		/** When routing along a plan, travel times are accumulated and activity end times are shifted, if necessary */
+		cumulative 
+	}
+	
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
@@ -56,7 +67,10 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	//--
 	
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
+	private static final String ROUTING_DEPARTURE_TIME_INTERPRETATION="routingDepartureTimeInterpretation";
+	
 	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.tryEndTimeThenDuration ;
+	private RoutingDepartureTimeInterpration routingTimeDepatrureTimeInterpretation = RoutingDepartureTimeInterpration.nominal;
 
 	//--
 
@@ -87,6 +101,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		comments.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
 				+ PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
 		"(simpler) version of the TimeAllocationMutator.") ;
+		comments.put(ROUTING_DEPARTURE_TIME_INTERPRETATION, "Defines how departure times are interpreted in rerouting applications. If set to '" + RoutingDepartureTimeInterpration.nominal + "', " + 
+				"the departure time of a trip when routing along a plan will always be the nominal (plan-based) activity end time. If set to '" + RoutingDepartureTimeInterpration.cumulative + "', " + 
+				"routing along a plan will accumulate travel times and shift activity end times (and squeeze end-time based activities).");
 		
 		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
                 "activityStartTime. default=false. Use with Caution!");
@@ -203,7 +220,17 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		}
 		this.activityDurationInterpretation = actDurInterpret;
 	}
+	
+	@StringGetter(ROUTING_DEPARTURE_TIME_INTERPRETATION)
+	public PlansConfigGroup.RoutingDepartureTimeInterpration getRoutingDepartureTimeInterpration() {
+		return this.routingTimeDepatrureTimeInterpretation ;
+	}
 
+	@StringSetter(ROUTING_DEPARTURE_TIME_INTERPRETATION)
+	public void setRoutingDepartureTimeInterpration( final PlansConfigGroup.RoutingDepartureTimeInterpration value ) {
+		this.routingTimeDepatrureTimeInterpretation = value;
+	}
+	
 	// ---
 	
 	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes";

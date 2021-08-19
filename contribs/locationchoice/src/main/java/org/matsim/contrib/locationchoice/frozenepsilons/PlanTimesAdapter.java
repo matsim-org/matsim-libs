@@ -36,14 +36,17 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
 
 	private final Config config;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
-	/* package */ PlanTimesAdapter( final Scenario scenario ) {
+	/* package */ PlanTimesAdapter( final Scenario scenario, TimeInterpreter.Factory timeInterpreterFactory ) {
 		this.config = scenario.getConfig();
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	/* package */ double scorePlan (
@@ -58,6 +61,9 @@ class PlanTimesAdapter {
 		boolean firstAct = true ;
 		Activity rememberedActivity = null ;
 		double now = Double.NaN ;
+		
+		TimeInterpreter timeInterpreter = timeInterpreterFactory.createTimeInterpreter();
+		
 		for( PlanElement pe : planTmp.getPlanElements() ){
 			if ( pe instanceof Activity ) {
 				rememberedActivity = (Activity) pe;
@@ -68,14 +74,17 @@ class PlanTimesAdapter {
 				} else {
 					rememberedActivity.setStartTime( now );
 				}
-				now = PlanRouter.calcEndOfActivity( Objects.requireNonNull( rememberedActivity ), planTmp, config ) ;
+				timeInterpreter.addActivity(Objects.requireNonNull(rememberedActivity));
+				now = timeInterpreter.getCurrentTime();
 				rememberedActivity.setEndTime( now );
 				scoringFunction.handleActivity( rememberedActivity );
 				// ---
 				final Leg leg = (Leg) pe;
 				// the scoring needs dpTime and tTime filled out, even if qsim input does not require that:
 				leg.setDepartureTime( now ) ;
-				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg ).orElse(0) ;
+				timeInterpreter.addLeg(leg);
+				double arrivalTime = timeInterpreter.getCurrentTime();
+				double travelTime = arrivalTime - now;
 				leg.setTravelTime( travelTime);
 				scoringFunction.handleLeg( leg );
 				now += travelTime ;

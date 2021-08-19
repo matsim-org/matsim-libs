@@ -22,8 +22,8 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.contribs.discrete_mode_choice.replanning.TripListConverter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import com.google.inject.Provider;
 import com.google.inject.Provides;

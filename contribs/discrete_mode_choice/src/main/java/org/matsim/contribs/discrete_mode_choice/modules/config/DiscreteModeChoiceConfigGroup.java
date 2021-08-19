@@ -17,9 +17,9 @@ import org.matsim.contribs.discrete_mode_choice.modules.FilterModule;
 import org.matsim.contribs.discrete_mode_choice.modules.HomeFinderModule;
 import org.matsim.contribs.discrete_mode_choice.modules.ModeAvailabilityModule;
 import org.matsim.contribs.discrete_mode_choice.modules.ModelModule;
+import org.matsim.contribs.discrete_mode_choice.modules.ModelModule.ModelType;
 import org.matsim.contribs.discrete_mode_choice.modules.SelectorModule;
 import org.matsim.contribs.discrete_mode_choice.modules.TourFinderModule;
-import org.matsim.contribs.discrete_mode_choice.modules.ModelModule.ModelType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -33,7 +33,6 @@ import org.matsim.core.utils.collections.Tuple;
 public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private boolean performReroute = true;
 	private boolean enforceSinglePlan = false;
-	private boolean accumulateEstimationDelays = true;
 
 	private ModelModule.ModelType modelType = ModelModule.ModelType.Tour;
 	private DiscreteModeChoiceModel.FallbackBehaviour fallbackBehaviour = DiscreteModeChoiceModel.FallbackBehaviour.EXCEPTION;
@@ -58,15 +57,13 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String PERFORM_REROUTE = "performReroute";
 	private static final String PERFORM_REROUTE_CMT = "Defines whether the " + DiscreteModeChoiceModule.STRATEGY_NAME
-							   + " strategy should be followed by a rerouting of all trips. If the estimator returns alternatives with routes attached this is not necessary.";
+			+ " strategy should be followed by a rerouting of all trips. If the estimator returns alternatives with routes attached this is not necessary.";
 
 	public static final String ENFORCE_SINGLE_PLAN = "enforceSinglePlan";
 	private static final String ENFORCE_SINGLE_PLAN_CMT = "Defines whether to run a runtime check that verifies that everything is set up correctl for a 'mode-choice-in-the-loop' setup.";
 
 	public static final String FALLBACK_BEHAVIOUR = "fallbackBehaviour";
 	private static final String FALLBACK_BEHAVIOR_CMT = "Defines what happens if there is no feasible choice alternative for an agent: ";
-
-	public static final String ACCUMULATE_ESTIMATION_DELAYS = "accumulateEstimationDelays";
 
 	public static final String MODEL_TYPE = "modelType";
 	private static final String MODEL_TYPE_CMT = "Main model type: ";
@@ -78,7 +75,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private static final String TOUR_FINDER_CMT = "Defines which TourFinder component to use. Built-in choices: ";
 
 	public static final String HOME_FINDER = "homeFinder";
-	private static final String HOME_FINDER_CMT = "Defines how home activities are identified. Built-in choices: " ;
+	private static final String HOME_FINDER_CMT = "Defines how home activities are identified. Built-in choices: ";
 
 	public static final String SELECTOR = "selector";
 	private static final String SELECTOR_CMT = "Defines which Selector component to use. Built-in choices: ";
@@ -144,16 +141,6 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(ENFORCE_SINGLE_PLAN)
 	public boolean getEnforceSinglePlan() {
 		return enforceSinglePlan;
-	}
-
-	@StringSetter(ACCUMULATE_ESTIMATION_DELAYS)
-	public void setAccumulateEstimationDelays(boolean accumulateEstimationDelays) {
-		this.accumulateEstimationDelays = accumulateEstimationDelays;
-	}
-
-	@StringGetter(ACCUMULATE_ESTIMATION_DELAYS)
-	public boolean getAccumulateEstimationDelays() {
-		return accumulateEstimationDelays;
 	}
 
 	/**
@@ -253,14 +240,14 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param tourFilters  -- {@value #TOUR_FILTERS_CMT}
+	 * @param tourFilters -- {@value #TOUR_FILTERS_CMT}
 	 */
 	public void setTourFilters(Collection<String> tourFilters) {
 		this.tourFilters = new HashSet<>(tourFilters);
 	}
 
 	/**
-	 * @return  -- {@value #TOUR_FILTERS_CMT}
+	 * @return -- {@value #TOUR_FILTERS_CMT}
 	 */
 	public Collection<String> getTourFilters() {
 		return tourFilters;
@@ -275,7 +262,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return  -- {@value #TOUR_FILTERS_CMT}
+	 * @return -- {@value #TOUR_FILTERS_CMT}
 	 */
 	@StringGetter(TOUR_FILTERS)
 	public String getTourFiltersAsString() {
@@ -283,14 +270,14 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param tripFilters  -- {@value #TRIP_FILTERS_CMT}
+	 * @param tripFilters -- {@value #TRIP_FILTERS_CMT}
 	 */
 	public void setTripFilters(Collection<String> tripFilters) {
 		this.tripFilters = new HashSet<>(tripFilters);
 	}
 
 	/**
-	 * @return  -- {@value #TRIP_FILTERS_CMT}
+	 * @return -- {@value #TRIP_FILTERS_CMT}
 	 */
 	public Collection<String> getTripFilters() {
 		return tripFilters;
@@ -305,7 +292,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return  -- {@value #TRIP_FILTERS_CMT}
+	 * @return -- {@value #TRIP_FILTERS_CMT}
 	 */
 	@StringGetter(TRIP_FILTERS)
 	public String getTripFiltersAsString() {
@@ -321,7 +308,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return  -- {@value #TOUR_ESTIMATOR_CMT}
+	 * @return -- {@value #TOUR_ESTIMATOR_CMT}
 	 */
 	@StringGetter(TOUR_ESTIMATOR)
 	public String getTourEstimator() {
@@ -337,7 +324,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return  -- {@value #TRIP_ESTIMATOR_CMT}
+	 * @return -- {@value #TRIP_ESTIMATOR_CMT}
 	 */
 	@StringGetter(TRIP_ESTIMATOR)
 	public String getTripEstimator() {
@@ -376,14 +363,14 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param tripConstraints  -- {@value #TRIP_CONSTRAINTS_CMT}
+	 * @param tripConstraints -- {@value #TRIP_CONSTRAINTS_CMT}
 	 */
 	public void setTripConstraints(Collection<String> tripConstraints) {
 		this.tripConstraints = new HashSet<>(tripConstraints);
 	}
 
 	/**
-	 * @return  -- {@value #TRIP_CONSTRAINTS_CMT}
+	 * @return -- {@value #TRIP_CONSTRAINTS_CMT}
 	 */
 	public Collection<String> getTripConstraints() {
 		return tripConstraints;
@@ -399,7 +386,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return  -- {@value #TRIP_CONSTRAINTS_CMT}
+	 * @return -- {@value #TRIP_CONSTRAINTS_CMT}
 	 */
 	@StringGetter(TRIP_CONSTRAINTS)
 	public String getTripConstraintsAsString() {
@@ -407,14 +394,14 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param cachedModes  -- {@value #CACHED_MODES_CMT}
+	 * @param cachedModes -- {@value #CACHED_MODES_CMT}
 	 */
 	public void setCachedModes(Collection<String> cachedModes) {
 		this.cachedModes = new HashSet<>(cachedModes);
 	}
 
 	/**
-	 * @return  -- {@value #CACHED_MODES_CMT}
+	 * @return -- {@value #CACHED_MODES_CMT}
 	 */
 	public Collection<String> getCachedModes() {
 		return cachedModes;
@@ -429,7 +416,7 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return  -- {@value #CACHED_MODES_CMT}
+	 * @return -- {@value #CACHED_MODES_CMT}
 	 */
 	@StringGetter(CACHED_MODES)
 	public String getCachedModesAsString() {
@@ -617,21 +604,23 @@ public class DiscreteModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = new HashMap<>();
-		comments.put(MODEL_TYPE, MODEL_TYPE_CMT  + Arrays.asList(ModelType.values() ).stream().map(String::valueOf ).collect(Collectors.joining(", ")) );
-		comments.put(PERFORM_REROUTE, PERFORM_REROUTE_CMT );
-		comments.put(ENFORCE_SINGLE_PLAN, ENFORCE_SINGLE_PLAN_CMT );
-		comments.put(FALLBACK_BEHAVIOUR, FALLBACK_BEHAVIOR_CMT  + Arrays.asList(FallbackBehaviour.values() ).stream().map(String::valueOf ).collect(Collectors.joining(", " ) ) );
-		comments.put(MODE_AVAILABILITY, MODE_AVAILABILITY_CMT  + String.join( ", ", ModeAvailabilityModule.COMPONENTS ) );
-		comments.put(TOUR_FINDER, TOUR_FINDER_CMT  + String.join( ", ", TourFinderModule.COMPONENTS ) );
-		comments.put(HOME_FINDER, HOME_FINDER_CMT + String.join( ", ", HomeFinderModule.COMPONENTS ) );
-		comments.put(SELECTOR, SELECTOR_CMT  + String.join( ", ", SelectorModule.COMPONENTS ) );
-		comments.put(TOUR_CONSTRAINTS, TOUR_CONSTRAINTS_CMT + String.join( ", ", ConstraintModule.TOUR_COMPONENTS ) );
-		comments.put(TRIP_CONSTRAINTS, TRIP_CONSTRAINTS_CMT + String.join( ", ", ConstraintModule.TRIP_COMPONENTS ) );
-		comments.put(TOUR_ESTIMATOR, TOUR_ESTIMATOR_CMT  + String.join( ", ", EstimatorModule.TOUR_COMPONENTS ) );
-		comments.put(TRIP_ESTIMATOR, TRIP_ESTIMATOR_CMT + String.join( ", ", EstimatorModule.TRIP_COMPONENTS ) );
-		comments.put(TOUR_FILTERS, TOUR_FILTERS_CMT  + String.join( ", ", FilterModule.TOUR_COMPONENTS ) );
-		comments.put(TRIP_FILTERS, TRIP_FILTERS_CMT + String.join( ", ", FilterModule.TRIP_COMPONENTS ) );
-		comments.put(CACHED_MODES, CACHED_MODES_CMT );
+		comments.put(MODEL_TYPE, MODEL_TYPE_CMT
+				+ Arrays.asList(ModelType.values()).stream().map(String::valueOf).collect(Collectors.joining(", ")));
+		comments.put(PERFORM_REROUTE, PERFORM_REROUTE_CMT);
+		comments.put(ENFORCE_SINGLE_PLAN, ENFORCE_SINGLE_PLAN_CMT);
+		comments.put(FALLBACK_BEHAVIOUR, FALLBACK_BEHAVIOR_CMT + Arrays.asList(FallbackBehaviour.values()).stream()
+				.map(String::valueOf).collect(Collectors.joining(", ")));
+		comments.put(MODE_AVAILABILITY, MODE_AVAILABILITY_CMT + String.join(", ", ModeAvailabilityModule.COMPONENTS));
+		comments.put(TOUR_FINDER, TOUR_FINDER_CMT + String.join(", ", TourFinderModule.COMPONENTS));
+		comments.put(HOME_FINDER, HOME_FINDER_CMT + String.join(", ", HomeFinderModule.COMPONENTS));
+		comments.put(SELECTOR, SELECTOR_CMT + String.join(", ", SelectorModule.COMPONENTS));
+		comments.put(TOUR_CONSTRAINTS, TOUR_CONSTRAINTS_CMT + String.join(", ", ConstraintModule.TOUR_COMPONENTS));
+		comments.put(TRIP_CONSTRAINTS, TRIP_CONSTRAINTS_CMT + String.join(", ", ConstraintModule.TRIP_COMPONENTS));
+		comments.put(TOUR_ESTIMATOR, TOUR_ESTIMATOR_CMT + String.join(", ", EstimatorModule.TOUR_COMPONENTS));
+		comments.put(TRIP_ESTIMATOR, TRIP_ESTIMATOR_CMT + String.join(", ", EstimatorModule.TRIP_COMPONENTS));
+		comments.put(TOUR_FILTERS, TOUR_FILTERS_CMT + String.join(", ", FilterModule.TOUR_COMPONENTS));
+		comments.put(TRIP_FILTERS, TRIP_FILTERS_CMT + String.join(", ", FilterModule.TRIP_COMPONENTS));
+		comments.put(CACHED_MODES, CACHED_MODES_CMT);
 
 		return comments;
 	}

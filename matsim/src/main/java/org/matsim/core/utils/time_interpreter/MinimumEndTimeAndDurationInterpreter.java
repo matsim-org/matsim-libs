@@ -1,4 +1,4 @@
-package org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter;
+package org.matsim.core.utils.time_interpreter;
 
 import org.matsim.api.core.v01.population.Activity;
 

@@ -15,7 +15,7 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilityCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 /**
  * This class defines a trip-based discrete choice model.

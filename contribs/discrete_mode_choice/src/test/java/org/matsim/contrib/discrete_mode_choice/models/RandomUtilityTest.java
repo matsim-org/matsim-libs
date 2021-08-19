@@ -27,8 +27,8 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.time_interpreter.EndTimeThenDurationInterpreter;
 
 public class RandomUtilityTest {
 	@Test
