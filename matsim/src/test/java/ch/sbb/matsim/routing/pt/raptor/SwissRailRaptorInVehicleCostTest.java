@@ -154,23 +154,23 @@ public class SwissRailRaptorInVehicleCostTest {
 		Id<Person> person8 = Id.create(8, Person.class);
 		Id<Person> person9 = Id.create(9, Person.class);
 
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:51:00"), person1, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:52:00"), person2, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:53:00"), person3, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:54:00"), person4, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:55:00"), person5, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:56:00"), person6, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:57:00"), person7, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:58:00"), person8, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, f.stopA.getLinkId(), "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, f.stopA.getLinkId(), "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:59:00"), person9, f.stopAId, f.stopDId));
 
 		Id<Person> driver1 = Id.create(1001, Person.class);

@@ -53,6 +53,7 @@ import org.matsim.core.events.EventArray;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.ArrayMap;
 import org.matsim.core.utils.collections.IntArrayMap;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -484,7 +485,7 @@ class ScenarioImporter {
 				return;
 			}
 
-			events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
+			events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode(), TripStructureUtils.getRoutingMode(leg)));
 			if (route instanceof NetworkRoute) {
 				if (scenario.getConfig().hermes().getMainModes().contains(leg.getMode())) {
 					processPlanNetworkRoute(person, flatplan, events, leg, (NetworkRoute) route, agent);
@@ -748,10 +749,11 @@ class ScenarioImporter {
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
 		String legmode = TransportMode.pt;
+		String routingmode = TransportMode.pt;
 
 		// Prepare to leave
 		flatevents.add(new TransitDriverStartsEvent(0, driverid, v.getId(), tl.getId(), tr.getId(), depart.getId()));
-		flatevents.add(new PersonDepartureEvent(0, driverid, nr.getStartLinkId(), legmode));
+		flatevents.add(new PersonDepartureEvent(0, driverid, nr.getStartLinkId(), legmode, routingmode));
 		flatevents.add(new PersonEntersVehicleEvent(0, driverid, v.getId()));
 
 		flatevents.add(new VehicleEntersTrafficEvent(context.time, driverid, nr.getStartLinkId(), v.getId(), legmode, 1));
@@ -835,13 +837,14 @@ class ScenarioImporter {
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
 		String legmode = TransportMode.car;
+		String routingmode = TransportMode.car;
 
 		// Sleep until the time of departure
 		flatplan.add(Agent.prepareSleepUntilEntry(0, (int) Math.round(depart.getDepartureTime())));
 
 		// Prepare to leave
 		flatevents.add(new TransitDriverStartsEvent(0, driverid, v.getId(), tl.getId(), tr.getId(), depart.getId()));
-		flatevents.add(new PersonDepartureEvent(0, driverid, nr.getStartLinkId(), legmode));
+		flatevents.add(new PersonDepartureEvent(0, driverid, nr.getStartLinkId(), legmode, routingmode));
 		flatevents.add(new PersonEntersVehicleEvent(0, driverid, v.getId()));
 		flatevents.add(new VehicleEntersTrafficEvent(0, driverid, nr.getStartLinkId(), v.getId(), legmode, 1));
 
