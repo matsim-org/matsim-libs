@@ -2,6 +2,8 @@ package org.matsim.application.analysis.noise;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
@@ -15,6 +17,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import picocli.CommandLine;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(
         name = "noise-analysis",
@@ -47,12 +53,14 @@ public class NoiseAnalysis implements MATSimAppCommand {
     public Integer call() throws Exception {
         Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
         config.global().setCoordinateSystem(crs.getInputCRS());
-        if (runId != null) {
-            runId = runId + ".";
-            config.controler().setRunId(runId);
+        config.controler().setRunId(runId);
+        if (runId != "") {
+            config.network().setInputFile(runDirectory + "/" + runId + ".output_network.xml.gz");
+            config.plans().setInputFile(runDirectory + "/" + runId + ".output_plans.xml.gz");
+        } else {
+            config.network().setInputFile(runDirectory + "/" + runId + "output_network.xml.gz");
+            config.plans().setInputFile(runDirectory + "/" + runId + "output_plans.xml.gz");
         }
-        config.network().setInputFile(runDirectory + "/" + runId + "output_network.xml.gz");
-        config.plans().setInputFile(runDirectory + runId + "output_plans.xml.gz");
         config.controler().setOutputDirectory(runDirectory);
 
         // adjust the default noise parameters
@@ -60,7 +68,41 @@ public class NoiseAnalysis implements MATSimAppCommand {
         noiseParameters.setReceiverPointGap(250);
         noiseParameters.setConsideredActivitiesForReceiverPointGridArray(new String[]{"h", "w", "home", "work"});
         noiseParameters.setConsideredActivitiesForDamageCalculationArray(new String[]{"h", "w", "home", "work"});
-        CoordinateTransformation ct = shp.createInverseTransformation(crs.getInputCRS());
+        if (shp.getShapeFile() != null) {
+            CoordinateTransformation ct = shp.createInverseTransformation(crs.getInputCRS());
+            double maxX = Double.MIN_VALUE; // Initialization with the opposite min/max
+            double maxY = Double.MIN_VALUE;
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+            List<Coord> coords = Arrays.asList(shp.getGeometry().getCoordinates()).
+                    stream().map(c -> new Coord(c.x, c.y)).
+                    collect(Collectors.toList());
+            for (Coord coord : coords) {
+                ct.transform(coord);
+                double x = coord.getX();
+                double y = coord.getY();
+                if (x > maxX) {
+                    maxX = x;
+                }
+
+                if (x < minX) {
+                    minX = x;
+                }
+
+                if (y > maxY) {
+                    maxY = y;
+                }
+
+                if (y < minY) {
+                    minY = y;
+                }
+            }
+            noiseParameters.setReceiverPointsGridMinX(minX);
+            noiseParameters.setReceiverPointsGridMinY(minY);
+            noiseParameters.setReceiverPointsGridMaxX(maxX);
+            noiseParameters.setReceiverPointsGridMaxY(maxY);
+        }
+
         // ...
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
