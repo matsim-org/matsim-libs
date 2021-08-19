@@ -179,7 +179,7 @@ public class NetsimRoutingConsistencyTest {
 					router);
 
 			Leg leg = (Leg) routingModule
-					.calcRoute(DefaultRoutingRequest.of(new LinkWrapperFacility(link12), new LinkWrapperFacility(link45), 0.0, person)).get(0);
+					.calcRoute(DefaultRoutingRequest.withoutAttributes(new LinkWrapperFacility(link12), new LinkWrapperFacility(link45), 0.0, person)).get(0);
 
 			plan.addActivity(startActivity);
 			plan.addLeg(leg);

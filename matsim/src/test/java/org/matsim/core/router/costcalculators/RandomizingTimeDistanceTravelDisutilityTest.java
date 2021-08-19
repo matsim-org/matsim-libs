@@ -111,7 +111,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		            router);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
-		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, 7.0*3600, person)) ;
+		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 7.0*3600, person)) ;
 		Assert.assertEquals(1, result.size() );
 		Leg leg = (Leg) result.get(0) ;				
 		return (NetworkRoute) leg.getRoute();

@@ -106,7 +106,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
 
-		List<? extends PlanElement> basicRoute = delegate.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
+		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
 		Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
@@ -152,7 +152,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 						continue;
 					}
 					List<? extends PlanElement> routeSegment = delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, nexttoFacility,
-							lastArrivaltime, person));
+							lastArrivaltime, person, request.getAttributes()));
 					Leg lastLeg = (Leg)routeSegment.get(0);
 					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
@@ -165,7 +165,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
 				}
-				stagedRoute.addAll(delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, toFacility, lastArrivaltime, person)));
+				stagedRoute.addAll(delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, toFacility, lastArrivaltime, person, request.getAttributes())));
 
 				return stagedRoute;
 

@@ -111,7 +111,7 @@ public class PlanRouterTest {
                   List<? extends PlanElement> trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(),
                   		scenario.getNetwork(),
                   		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime)
-                  		).calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
+                  		).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
                   ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
                   return trip;
               }

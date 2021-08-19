@@ -25,6 +25,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -68,7 +69,7 @@ public class SwissRailRaptorCapacitiesTest {
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<? extends PlanElement> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route1 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assert.assertNotNull(route1);
 		System.out.println("uncongested route:");
 		for (PlanElement leg : route1) {
@@ -171,7 +172,7 @@ public class SwissRailRaptorCapacitiesTest {
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:25"), person9, vehicle3));
 		tracker.handleEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:30"), vehicle3, f.stopAId, 0));
 
-		List<? extends PlanElement> route2 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route2 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assert.assertNotNull(route2);
 		System.out.println("congested route:");
 		for (PlanElement leg : route2) {

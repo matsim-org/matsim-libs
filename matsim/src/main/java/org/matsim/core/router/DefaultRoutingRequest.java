@@ -5,22 +5,20 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class DefaultRoutingRequest implements RoutingRequest {
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes;
 
 	private final Facility fromFactility;
 	private final Facility toFacility;
 	private double departureTime;
 	private final Person person;
 
-	public DefaultRoutingRequest(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+	protected DefaultRoutingRequest(Facility fromFacility, Facility toFacility, double departureTime, Person person,
+			Attributes attributes) {
 		this.fromFactility = fromFacility;
 		this.toFacility = toFacility;
 		this.departureTime = departureTime;
 		this.person = person;
-	}
-
-	public DefaultRoutingRequest(Facility fromFacility, Facility toFacility, double departureTime) {
-		this(fromFacility, toFacility, departureTime, null);
+		this.attributes = attributes;
 	}
 
 	@Override
@@ -48,7 +46,13 @@ public class DefaultRoutingRequest implements RoutingRequest {
 		return person;
 	}
 
-	static public RoutingRequest of(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-		return new DefaultRoutingRequest(fromFacility, toFacility, departureTime, person);
+	static public RoutingRequest of(Facility fromFacility, Facility toFacility, double departureTime, Person person,
+			Attributes attributes) {
+		return new DefaultRoutingRequest(fromFacility, toFacility, departureTime, person, attributes);
+	}
+
+	static public RoutingRequest withoutAttributes(Facility fromFacility, Facility toFacility, double departureTime,
+			Person person) {
+		return new DefaultRoutingRequest(fromFacility, toFacility, departureTime, person, new Attributes());
 	}
 }

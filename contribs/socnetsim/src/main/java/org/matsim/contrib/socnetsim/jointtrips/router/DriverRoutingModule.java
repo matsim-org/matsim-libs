@@ -53,17 +53,10 @@ public class DriverRoutingModule implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final Facility fromFacility = request.getFromFacility();
-		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
-		final Person person = request.getPerson();
 		
 		List<? extends PlanElement> trip =
-			carRoutingModule.calcRoute(DefaultRoutingRequest.of(
-					fromFacility,
-					toFacility, 
-					departureTime,
-					person));
+			carRoutingModule.calcRoute(request);
 
 		if (trip.size() != 1) {
 			throw new RuntimeException( "unexpected trip size for trip "+trip+" for mode "+mode );

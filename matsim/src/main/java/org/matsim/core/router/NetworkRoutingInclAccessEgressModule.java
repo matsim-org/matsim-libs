@@ -54,6 +54,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -143,7 +144,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === access:
 		{
 			List<? extends PlanElement> accessTrip = computeAccessTripFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, populationFactory, mode,
-					scenario.getConfig());
+					scenario.getConfig(), request.getAttributes());
 			if(accessTrip == null ) return null; //access trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
 			for (PlanElement planElement : accessTrip) {
 				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
@@ -164,7 +165,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === egress:
 		{
 			List<PlanElement> egressTrip = computeEgressTripFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result.get(result.size() - 1), populationFactory, mode,
-					scenario.getConfig());
+					scenario.getConfig(), request.getAttributes());
 			if(egressTrip == null ) return null; //egress trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
 			result.addAll(egressTrip);
 		}
@@ -175,7 +176,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private List<PlanElement> computeEgressTripFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
 																final Link egressActLink, double departureTime, PlanElement previousPlanElement,
 																final PopulationFactory populationFactory, final String stageActivityType,
-																Config config) {
+																Config config, Attributes routingAttributes) {
 
 		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
@@ -220,7 +221,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressTrip.add(egressLeg);
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLinkAndCoord(egressActLink,startCoord);
-			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
+			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if(networkRoutedEgressTrip == null) return null;
 			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double egressTime = NetworkUtils.getLinkEgressTime(egressActLink,mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId().toString()));
@@ -246,7 +247,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private List<? extends PlanElement> computeAccessTripFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
 																  final Link accessActLink, double departureTime,
 																  final PopulationFactory populationFactory, final String stageActivityType,
-																  Config config) {
+																  Config config, Attributes routingAttributes) {
 		if (isNotNeedingBushwhackingLeg(fromFacility)) {
 			return Collections.emptyList();
 		}
@@ -287,7 +288,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 //			now += accessTime;
 		} else {
 			Facility toFacility = FacilitiesUtils.wrapLinkAndCoord(accessActLink,endCoord);
-			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
+			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person, routingAttributes));
 			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
 			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double accessTime = NetworkUtils.getLinkAccessTime(accessActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));

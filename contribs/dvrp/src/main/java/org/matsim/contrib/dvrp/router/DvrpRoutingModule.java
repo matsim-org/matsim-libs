@@ -104,7 +104,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		double now = departureTime;
 
 		// access (sub-)trip:
-		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, accessFacility, now, person));
+		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			for (PlanElement planElement : accessTrip) {
@@ -117,14 +117,14 @@ public class DvrpRoutingModule implements RoutingModule {
 		}
 
 		// dvrp proper leg:
-		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, now, person));
+		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
 			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
 		}
 
 		now++;
-		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(DefaultRoutingRequest.of(egressFacility, toFacility, now, person));
+		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
 			trip.add(createDrtStageActivity(egressFacility, now));

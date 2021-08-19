@@ -55,15 +55,10 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
 
     @Override
     public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-    	final Facility fromFacility = request.getFromFacility();
-    	final Facility toFacility = request.getToFacility();
-    	final double departureTime = request.getDepartureTime();
-    	final Person person = request.getPerson();
-    	
-        List<? extends PlanElement> legs = this.raptor.calcRoute(fromFacility, toFacility, departureTime, person);
+        List<? extends PlanElement> legs = this.raptor.calcRoute(request);
         return legs != null ?
                 fillWithActivities(legs) :
-                walkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, toFacility, departureTime, person));
+                walkRouter.calcRoute(request);
     }
 
     private List<? extends PlanElement> fillWithActivities(List<? extends PlanElement> segments) {
