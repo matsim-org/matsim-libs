@@ -13,38 +13,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StayTaskManager implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private final Map<Id<Person>, StayTaskDataEntry> startedSatyTasksMap = new HashMap<>();
+	private final Map<Id<Person>, StayTaskDataEntry> startedStayTasksMap = new HashMap<>();
 	private final List<StayTaskDataEntry> stayTaskDataEntriesList = new ArrayList<>();
 	private int counter = 0;
 
-	class StayTaskDataEntry {
-		private Id<Link> linkId;
-		private double StartTime;
-		private double EndTime;
+	static class StayTaskDataEntry {
+		private final Id<Link> linkId;
+		private final double startTime;
 		private final Id<Person> personId;
 		private final String stayTaskId;
+		private double EndTime;
 
-		public StayTaskDataEntry(String stayTaskId, Id<Person> personId) {
+		public StayTaskDataEntry(String stayTaskId, Id<Person> personId, double startTime, Id<Link> linkId) {
 			this.stayTaskId = stayTaskId;
 			this.personId = personId;
-		}
-
-		public void setStartTime(double startTime) {
-			StartTime = startTime;
+			this.startTime = startTime;
+			this.linkId = linkId;
 		}
 
 		public void setEndTime(double endTime) {
 			EndTime = endTime;
 		}
 
-		public void setLinkId(Id<Link> linkId) {
-			this.linkId = linkId;
-		}
-
 		public double getStartTime() {
-			return StartTime;
+			return startTime;
 		}
 
 		public double getEndTime() {
@@ -69,11 +63,9 @@ public class StayTaskManager implements ActivityStartEventHandler, ActivityEndEv
 	public void handleEvent(ActivityStartEvent event) {
 		if (event.getActType().equals("DrtStay")) {
 			Id<Person> personId = event.getPersonId();
-			StayTaskDataEntry stayTaskDataEntry = new StayTaskDataEntry("stayTask_" + Integer.toString(counter),
-					personId);
-			stayTaskDataEntry.setStartTime(event.getTime());
-			stayTaskDataEntry.setLinkId(event.getLinkId());
-			startedSatyTasksMap.put(personId, stayTaskDataEntry);
+			StayTaskDataEntry stayTaskDataEntry = new StayTaskDataEntry("stayTask_" + counter,
+					personId, event.getTime(), event.getLinkId());
+			startedStayTasksMap.put(personId, stayTaskDataEntry);
 			counter += 1;
 		}
 
@@ -83,10 +75,10 @@ public class StayTaskManager implements ActivityStartEventHandler, ActivityEndEv
 	public void handleEvent(ActivityEndEvent event) {
 		if (event.getActType().equals("DrtStay")) {
 			Id<Person> personId = event.getPersonId();
-			StayTaskDataEntry stayTaskDataEntry = startedSatyTasksMap.get(personId);
+			StayTaskDataEntry stayTaskDataEntry = startedStayTasksMap.get(personId);
 			stayTaskDataEntry.setEndTime(event.getTime());
 			stayTaskDataEntriesList.add(stayTaskDataEntry);
-			startedSatyTasksMap.remove(personId);
+			startedStayTasksMap.remove(personId);
 		}
 
 	}
@@ -95,15 +87,15 @@ public class StayTaskManager implements ActivityStartEventHandler, ActivityEndEv
 	public void reset(int iteration) {
 		counter = 0;
 		stayTaskDataEntriesList.clear();
-		startedSatyTasksMap.clear();
+		startedStayTasksMap.clear();
 	}
 
 	public List<StayTaskDataEntry> getStayTaskDataEntriesList() {
 		return stayTaskDataEntriesList;
 	}
 
-	public Map<Id<Person>, StayTaskDataEntry> getStartedSatyTasksMap() {
-		return startedSatyTasksMap;
+	public Map<Id<Person>, StayTaskDataEntry> getStartedStayTasksMap() {
+		return startedStayTasksMap;
 	}
 
 }
