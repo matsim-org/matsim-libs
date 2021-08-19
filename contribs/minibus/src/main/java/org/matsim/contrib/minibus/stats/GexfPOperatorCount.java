@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.genericUtils.gexf.*;
 import org.matsim.contrib.minibus.genericUtils.gexf.viz.PositionContent;
-import org.matsim.contrib.minibus.operator.Operator;
+import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;

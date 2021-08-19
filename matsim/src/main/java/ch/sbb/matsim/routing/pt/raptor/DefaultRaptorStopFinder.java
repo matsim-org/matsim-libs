@@ -197,12 +197,6 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
                         // the router for the access/egress mode could not find a route, skip that access/egress mode
                         continue;
                     }
-                    // clear the (wrong) departureTime so users don't get confused
-                    for (PlanElement pe : routeParts) {
-                        if (pe instanceof Leg) {
-                            ((Leg) pe).setDepartureTimeUndefined();
-                        }
-                    }
                 }
                 if (routeParts == null) {
                     // the router for the access/egress mode could not find a route, skip that access/egress mode
@@ -238,7 +232,17 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
                 RaptorIntermodalAccessEgress.RIntermodalAccessEgress accessEgress = this.intermodalAE.calcIntermodalAccessEgress(routeParts, parameters, person, direction);
                 InitialStop iStop = new InitialStop(stop, accessEgress.disutility, accessEgress.travelTime, accessEgress.routeParts);
                 initialStops.add(iStop);
-            }
+
+                if (direction == Direction.EGRESS) {
+									// clear the (wrong) departureTime so users don't get confused
+									// do it only after passing it to RIntermodalAccessEgress, in case this wants to make some use of it.
+									for (PlanElement pe : routeParts) {
+										if (pe instanceof Leg) {
+											((Leg) pe).setDepartureTimeUndefined();
+										}
+									}
+								}
+						}
         }
 	}
 

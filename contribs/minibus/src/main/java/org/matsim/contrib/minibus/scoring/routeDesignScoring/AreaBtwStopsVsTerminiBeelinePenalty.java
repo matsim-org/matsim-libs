@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;

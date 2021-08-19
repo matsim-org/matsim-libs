@@ -147,6 +147,16 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 			return this;
 		}
 
+		public Builder departureOffset(OptionalTime val) {
+			departureOffset = val;
+			return this;
+		}
+
+		public Builder arrivalOffset(OptionalTime val) {
+			arrivalOffset = val;
+			return this;
+		}
+
 		public Builder awaitDepartureTime(boolean val) {
 			awaitDepartureTime = val;
 			return this;

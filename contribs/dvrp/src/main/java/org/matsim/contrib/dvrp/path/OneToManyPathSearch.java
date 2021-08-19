@@ -50,7 +50,7 @@ public class OneToManyPathSearch {
 		public static final PathData INFEASIBLE = new PathData(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
 		private final Supplier<Path> pathSupplier;
-		private Path path; // inline?
+		private Path path;
 
 		private final double travelTime;
 

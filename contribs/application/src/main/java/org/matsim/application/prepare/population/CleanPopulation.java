@@ -3,9 +3,9 @@ package org.matsim.application.prepare.population;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import picocli.CommandLine;
@@ -21,6 +21,7 @@ import java.nio.file.Path;
 @CommandLine.Command(
 		name = "clean-population",
 		description = "Remove information from population, such as routes or unselected plans.",
+		mixinStandardHelpOptions = true,
 		showDefaultValues = true
 )
 public class CleanPopulation implements MATSimAppCommand {
@@ -39,6 +40,9 @@ public class CleanPopulation implements MATSimAppCommand {
 	@CommandLine.Option(names = "--remove-routes", description = "Remove route information", defaultValue = "false")
 	private boolean rmRoutes;
 
+	@CommandLine.Option(names = "--trips-to-legs", description = "Convert trips in older plan format to legs first (Removes routes implicitly).", defaultValue = "false")
+	private  boolean tripsToLegs;
+
 	@CommandLine.Option(names = "--output", description = "Output file name", required = true)
 	private Path output;
 
@@ -56,7 +60,8 @@ public class CleanPopulation implements MATSimAppCommand {
 			return 2;
 		}
 
-		Files.createDirectories(output.getParent());
+		if (output.getParent() != null)
+			Files.createDirectories(output.getParent());
 
 		// Using the analysis main mode identifier instead of the routing mode based one on purpose
 		// to be able to process older population files without any routing modes!
@@ -73,7 +78,8 @@ public class CleanPopulation implements MATSimAppCommand {
 			}
 
 			for (Plan plan : person.getPlans()) {
-				trips2Legs.run(plan);
+				if (tripsToLegs)
+					trips2Legs.run(plan);
 
 				for (PlanElement el : plan.getPlanElements()) {
 					if (rmRoutes) {

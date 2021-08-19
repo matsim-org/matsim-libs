@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+
+
+
+<!-- ====================================================================== -->
+
+	<person id="car_home_work_0">
+		<plan selected="yes">
+			<activity type="home" x="387084.0503649627" y="5819604.986261569" end_time="09:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" x="387634.93115218496" y="5819588.576455819" end_time="17:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="home" x="387084.0503649627" y="5819604.986261569" end_time="09:00:00" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="car_home_work_1">
+		<plan selected="yes">
+			<activity type="home" x="388317.6955012104" y="5819934.892938852" end_time="09:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" x="387284.0297647368" y="5820474.304101373" end_time="17:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="home" x="388317.6955012104" y="5819934.892938852" end_time="09:00:00" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="car_home_work_2">
+		<plan selected="yes">
+			<activity type="home" x="386759.233948669" y="5820780.225584746" end_time="09:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" x="387612.12104914157" y="5820444.066249309" end_time="17:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="home" x="386759.233948669" y="5820780.225584746" end_time="09:00:00" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="car_home_work_3">
+		<plan selected="yes">
+			<activity type="home" x="386475.1899705279" y="5820432.285657379" end_time="09:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" x="387357.9667112861" y="5819734.165478307" end_time="17:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="home" x="386475.1899705279" y="5820432.285657379" end_time="09:00:00" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="car_home_work_4">
+		<plan selected="yes">
+			<activity type="home" x="386613.64121036476" y="5819938.590256877" end_time="09:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" x="387599.0634287027" y="5819809.839025528" end_time="17:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="home" x="386613.64121036476" y="5819938.590256877" end_time="09:00:00" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</population>

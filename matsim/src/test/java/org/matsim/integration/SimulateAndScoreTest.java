@@ -254,7 +254,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
 		Route ptRoute = populationFactory.getRouteFactories().createRoute(Route.class, link1.getId(), link3.getId());
 		ptRoute.setTravelTime(3600);
-        ptRoute.setDistance(1000);
+		ptRoute.setDistance(1000);
 		leg.setRoute(ptRoute);
 		plan.addLeg(leg);
 
