@@ -32,6 +32,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
@@ -90,23 +91,30 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		final List<Trip> trips = TripStructureUtils.getTrips( plan );
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
+			timeTracker.addActivity(oldTrip.getOriginActivity());
+			
 			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
-			final List<? extends PlanElement> newTrip =
-					tripRouter.calcRoute(
-							routingMode,
-						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
-						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
-							timeInterpretation.calcEndOfActivity( oldTrip.getOriginActivity() , plan ),
-							plan.getPerson(), oldTrip.getOriginActivity().getAttributes() );
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute( //
+					routingMode, //
+					FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities), //
+					FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities), //
+					timeTracker.getTime().seconds(), //
+					plan.getPerson(), //
+					oldTrip.getOriginActivity().getAttributes() //
+			);
+			
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
 					plan, 
 					oldTrip.getOriginActivity(),
 					newTrip,
 					oldTrip.getDestinationActivity());
+			
+			timeTracker.addElements(newTrip);
 		}
 	}
 

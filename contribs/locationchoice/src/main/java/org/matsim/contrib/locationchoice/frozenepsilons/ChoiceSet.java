@@ -186,7 +186,7 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, timeInterpretation.calcEndOfActivity(previousActivity, planTmp), planTmp.getPerson(), null );
+				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, timeInterpretation.decideOnActivityEndTimeAlongPlan(previousActivity, planTmp).seconds(), planTmp.getPerson(), null );
 			}
 
 			// (2) backward tree
@@ -195,7 +195,7 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode,  timeInterpretation.calcEndOfActivity(activityToRelocate, planTmp), planTmp.getPerson(), null );
+				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode,  timeInterpretation.decideOnActivityEndTimeAlongPlan(activityToRelocate, planTmp).seconds(), planTmp.getPerson(), null );
 				// yy it is not clear to me how the dp time is interpreted for the backwards Dijkstra.  kai, mar'19
 			}
 			// ---
@@ -233,7 +233,7 @@ class ChoiceSet {
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario );
 							link = scenario.getNetwork().getLinks().get( linkId );
 
-							startTime = timeInterpretation.calcEndOfActivity( previousActivity, planTmp );
+							startTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( previousActivity, planTmp ).seconds();
 						}
 
 						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
@@ -249,7 +249,7 @@ class ChoiceSet {
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( Objects.requireNonNull( nextAct ), scenario );
 							link = scenario.getNetwork().getLinks().get( linkId );
 						}
-						double startTime = timeInterpretation.calcEndOfActivity( activityToRelocate, planTmp );
+						double startTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( activityToRelocate, planTmp ).seconds();
 
 						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
 						NetworkRoute linkNetworkRouteImpl = getNetworkRoute(activityToRelocate, link, result);

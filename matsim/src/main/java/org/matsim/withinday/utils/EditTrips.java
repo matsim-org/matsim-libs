@@ -589,7 +589,7 @@ public final class EditTrips {
 	 * Convenience method that estimates the trip departure time rather than explicitly requesting it.
 	 */
 	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
-		double departureTime = timeInterpretation.calcEndOfActivity( trip.getOriginActivity(), plan ) ;
+		double departureTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( trip.getOriginActivity(), plan ).seconds() ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
 

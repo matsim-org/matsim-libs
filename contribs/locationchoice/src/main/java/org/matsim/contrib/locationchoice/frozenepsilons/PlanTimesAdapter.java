@@ -69,7 +69,7 @@ class PlanTimesAdapter {
 				} else {
 					rememberedActivity.setStartTime( now );
 				}
-				now = timeInterpretation.calcEndOfActivity( Objects.requireNonNull( rememberedActivity ), planTmp ) ;
+				now = timeInterpretation.decideOnActivityEndTimeAlongPlan( Objects.requireNonNull( rememberedActivity ), planTmp ).seconds() ;
 				rememberedActivity.setEndTime( now );
 				scoringFunction.handleActivity( rememberedActivity );
 				// ---

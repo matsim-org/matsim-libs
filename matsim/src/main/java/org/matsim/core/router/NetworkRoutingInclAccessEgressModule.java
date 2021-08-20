@@ -150,9 +150,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			List<? extends PlanElement> accessTrip = computeAccessTripFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, populationFactory, mode,
 					scenario.getConfig(), request.getAttributes());
 			if(accessTrip == null ) return null; //access trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
-			for (PlanElement planElement : accessTrip) {
-				now = timeInterpretation.decideOnElementEndTime(planElement, now);
-			}
+			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 			result.addAll(accessTrip);
 		}
 

@@ -1,5 +1,7 @@
 package org.matsim.core.utils.timing;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -17,7 +19,8 @@ public class TimeInterpretation {
 	static public TimeInterpretation create(Config config) {
 		return new TimeInterpretation( //
 				config.plans().getActivityDurationInterpretation(), //
-				config.qsim().getStartTime().orElse(0.0) // Corresponds to QSim::initSimTimer
+				config.qsim().getStartTime().orElse(0.0) // Corresponds to QSim::initSimTimer if not set from
+															// configuration
 		);
 	}
 
@@ -26,7 +29,8 @@ public class TimeInterpretation {
 	}
 
 	static public TimeInterpretation create(ActivityDurationInterpretation interpretation) {
-		return new TimeInterpretation(interpretation, 0.0); // Corresponds to QSim::initSimTimer
+		return new TimeInterpretation(interpretation, 0.0); // Corresponds to QSim::initSimTimer if not set from
+															// configuration
 	}
 
 	private TimeInterpretation(ActivityDurationInterpretation activityDurationInterpretation,
@@ -36,36 +40,29 @@ public class TimeInterpretation {
 	}
 
 	/**
-	 * Returns the end time of an activity, given the whole plan. Note that there is
-	 * a shortcut: If activity end time is given, it will always be returned. This
-	 * is NOT always in line with activityDurationInterpretation! In general, this
-	 * function is here to preserve backwards compatibility. However, we should:
+	 * This function takes a plan and finds the end time of the activity along this
+	 * plan. Note that this requires tracking end times and travel times along all
+	 * plan elements. This is especially inefficient when already looping over an
+	 * agent plan. Whenever possible, make use of TimeTracker which provides a
+	 * simple step-by-step interface to track time along a plan.
 	 * 
-	 * <ul>
-	 * <li>Remove this function as it provides an illegal shortcut</li>
-	 * <li>Provide a class (similar as in DMC package) that allows to track times
-	 * along a plan, making use of TimeInterpretation</li>
-	 * <li>Use this tracking functionality (potentially also much more efficient)
-	 * wherever this function was used before</li>
-	 * </ul>
-	 */
-	public double calcEndOfActivity(Activity activity, Plan plan) {
+	 * TODO: Documentation TODO: Phase out shortcut.
+	 **/
+	public OptionalTime decideOnActivityEndTimeAlongPlan(Activity activity, Plan plan) {
+		// TODO: Can we phase out this shortcut? It interferes with
+		// activityDurationInterpretation!
 		if (activity.getEndTime().isDefined()) {
-			return activity.getEndTime().seconds();
+			return activity.getEndTime();
 		}
 
-		// Need to start counting from simulation start
-		double now = simulationStartTime;
+		int activityIndex = plan.getPlanElements().indexOf(activity);
 
-		for (PlanElement element : plan.getPlanElements()) {
-			now = decideOnElementEndTime(element, now);
-
-			if (element == activity) {
-				return now;
-			}
+		if (activityIndex == -1) {
+			throw new IllegalStateException(
+					"Activity " + activity + " not found in plan of agent " + plan.getPerson().getId());
 		}
 
-		throw new RuntimeException("Activity " + activity + " not found in plan of agent " + plan.getPerson().getId());
+		return decideOnElementsEndTime(plan.getPlanElements().subList(0, activityIndex + 1), simulationStartTime);
 	}
 
 	/**
@@ -123,17 +120,48 @@ public class TimeInterpretation {
 	}
 
 	/**
-	 * TODO: Transform this to OptionalTime ? TODO: Leg returns 0.0 as special case.
-	 * Should we return OptionalTime? Or simulationStartTime? How is it used?
+	 * Obtains the end time of an element which is either and activity or a leg,
+	 * according to the logic of decideOnActivityEndTime and decideOnLegtravelTime.
 	 */
-	public double decideOnElementEndTime(PlanElement element, double startTime) {
-		Preconditions.checkArgument(Double.isFinite(startTime));
-
+	public OptionalTime decideOnElementEndTime(PlanElement element, double startTime) {
 		if (element instanceof Activity) {
-			return decideOnActivityEndTime((Activity) element, startTime).seconds();
+			return decideOnActivityEndTime((Activity) element, startTime);
 		} else {
-			double travelTime = decideOnLegTravelTime((Leg) element).orElse(0);
-			return travelTime + startTime;
+			OptionalTime travelTime = decideOnLegTravelTime((Leg) element);
+
+			if (travelTime.isDefined()) {
+				return OptionalTime.defined(startTime + travelTime.seconds());
+			} else {
+				return OptionalTime.undefined();
+			}
 		}
+	}
+
+	/**
+	 * Traverses through a list of elements (activities and legs) and finds the end
+	 * time of the chain according to the logic of decideOnActivityEndTime and
+	 * decideOnLegtravelTime.
+	 */
+	public OptionalTime decideOnElementsEndTime(List<? extends PlanElement> elements, final double startTime) {
+		double now = startTime;
+
+		for (PlanElement element : elements) {
+			OptionalTime endTime = decideOnElementEndTime(element, now);
+
+			if (endTime.isDefined()) {
+				now = endTime.seconds();
+			} else {
+				return OptionalTime.undefined();
+			}
+		}
+
+		return OptionalTime.defined(now);
+	}
+
+	/**
+	 * Returns the simulation start time that is used for calculations.
+	 */
+	public double getSimulationStartTime() {
+		return simulationStartTime;
 	}
 }
