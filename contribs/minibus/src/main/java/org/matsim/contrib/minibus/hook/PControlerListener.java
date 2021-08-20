@@ -38,6 +38,7 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -64,6 +65,9 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final POperators operators ;
 
 	@Inject(optional=true) private PersonReRouteStuckFactory stuckFactory;
+	
+	@Inject
+	private TimeInterpretation timeInterpretation;
 
 	@Inject PControlerListener(Config config, POperators operators ){
 		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.GROUP_NAME, PConfigGroup.class);
@@ -102,7 +106,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return stuckFactory.getReRouteStuck(new PlanRouter(
 								controler.getTripRouterProvider().get(),
-								controler.getScenario().getActivityFacilities()
+								controler.getScenario().getActivityFacilities(),
+								timeInterpretation
 								), ((MutableScenario)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
 					}
 				});

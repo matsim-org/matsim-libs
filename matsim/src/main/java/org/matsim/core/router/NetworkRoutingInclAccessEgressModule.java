@@ -52,6 +52,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -83,6 +84,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
 	private static boolean hasWarnedAccessEgress = false;
 	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
+	private final TimeInterpretation timeInterpretation;
 
 	/**
 	 * If not null given, the main routing will be performed on an inverted network.
@@ -94,7 +96,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final String mode,
 			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork, @Nullable Network invertedNetwork,
 			final RoutingModule accessToNetworkRouter,
-			final RoutingModule egressFromNetworkRouter) {
+			final RoutingModule egressFromNetworkRouter,
+			final TimeInterpretation timeInterpretation) {
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork;
@@ -107,6 +110,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.accessToNetworkRouter = accessToNetworkRouter;
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
 		this.accessEgressType = config.plansCalcRoute().getAccessEgressType();
+		this.timeInterpretation = timeInterpretation;
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems");
@@ -146,9 +150,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			List<? extends PlanElement> accessTrip = computeAccessTripFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, populationFactory, mode,
 					scenario.getConfig(), request.getAttributes());
 			if(accessTrip == null ) return null; //access trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
-			for (PlanElement planElement : accessTrip) {
-				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
-			}
+			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 			result.addAll(accessTrip);
 		}
 

@@ -29,6 +29,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
 import javax.inject.Provider;
@@ -54,7 +55,7 @@ public class PRStrategyRemove implements PlanStrategy {
 		PRRemoveStrategyMod prRemoveMod = new PRRemoveStrategyMod(controler.getScenario());
 		planStrategyDelegate.addStrategyModule(prRemoveMod);
 		
-		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider) ;
+		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
 		
 	}

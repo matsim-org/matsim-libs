@@ -6,9 +6,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+
 import picocli.CommandLine;
 
 import java.nio.file.Files;
@@ -80,7 +83,8 @@ public class CloseTrajectories implements MATSimAppCommand {
 			if (time > threshold * 60)
 				continue;
 
-			double endTime = PopulationUtils.decideOnActivityEndTime(lastAct, lastAct.getStartTime().orElse(Double.NaN), PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration)
+			TimeInterpretation timeInterpretation = TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration);
+			double endTime = timeInterpretation.decideOnActivityEndTime(lastAct, lastAct.getStartTime().orElse(Double.NaN))
 					.orElseThrow(() -> new IllegalStateException("Could not determine end time"));
 
 			// don't insert when the last activity is too short

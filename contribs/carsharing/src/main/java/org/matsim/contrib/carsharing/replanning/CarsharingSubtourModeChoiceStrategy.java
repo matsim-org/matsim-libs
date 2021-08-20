@@ -15,6 +15,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
@@ -24,7 +25,7 @@ import org.matsim.core.router.TripRouter;
 public class CarsharingSubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 	@Inject
-	public CarsharingSubtourModeChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships) {
+	public CarsharingSubtourModeChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships, TimeInterpretation timeInterpretation) {
 		this.strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
@@ -33,7 +34,7 @@ public class CarsharingSubtourModeChoiceStrategy implements PlanStrategy {
 		SubtourModeChoice smc = new SubtourModeChoice(scenario.getConfig().global(), scenario.getConfig().subtourModeChoice(), cpmc);
 
 		addStrategyModule(smc);
-		addStrategyModule(new ReRoute(scenario, tripRouterProvider));
+		addStrategyModule(new ReRoute(scenario, tripRouterProvider, timeInterpretation));
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {

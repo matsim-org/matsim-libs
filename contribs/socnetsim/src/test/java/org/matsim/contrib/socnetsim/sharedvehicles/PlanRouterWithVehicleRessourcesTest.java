@@ -46,6 +46,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -72,6 +73,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 		firstAct.setEndTime( 223 );
 
 		final Leg leg = factory.createLeg( TransportMode.car );
+		leg.setTravelTime(0.0);
 		TripStructureUtils.setRoutingMode( leg, leg.getMode() );
 		plan.addLeg( leg );
 		final NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
@@ -84,7 +86,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
-				new PlanRouter( tripRouter ) );
+				new PlanRouter( tripRouter, TimeInterpretation.create(config) ) );
 
 		router.run( plan );
 
@@ -114,13 +116,16 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 						for (int i=0; i < 5; i++) {
 							final Leg l = factory.createLeg( TransportMode.car );	
+							l.setTravelTime(0.0);
 							l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(),
 									fromFacility.getLinkId()) );
 							legs.add( l );
 							legs.add( factory.createActivityFromLinkId( stage , fromFacility.getLinkId() ) );
+							((Activity) legs.get(legs.size() - 1)).setMaximumDuration(0.0);
 						}
 
 						final Leg l = factory.createLeg( TransportMode.car );	
+						l.setTravelTime(0.0);
 						l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(), toFacility.getLinkId()) );
 						legs.add( l );
 

@@ -57,6 +57,7 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -84,8 +85,9 @@ public final class EditTrips {
 	private Scenario scenario;
 	private TransitStopAgentTracker transitAgentTracker;
 	private EventsManager eventsManager;
+	private final TimeInterpretation timeInterpretation;
 
-	public EditTrips( TripRouter tripRouter, Scenario scenario, InternalInterface internalInterface ) {
+	public EditTrips( TripRouter tripRouter, Scenario scenario, InternalInterface internalInterface, TimeInterpretation timeInterpretation ) {
 //		For other log level, find log4j.xml and add something like
 //<logger name="org.matsim.withinday.utils.EditTrips">
 //	<level value="info"/>
@@ -107,6 +109,7 @@ public final class EditTrips {
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
 		this.internalInterface = internalInterface;
+		this.timeInterpretation = timeInterpretation;
 
 		if (transitAgentTracker == null) {
 			log.warn("no TransitStopAgentTracker found in qsim. Replanning of pt/transit legs will not work properly and will likely fail.");
@@ -499,7 +502,7 @@ public final class EditTrips {
 			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
 			// located half way between origin and destination of the teleport leg.
 
-			double travelTime = PopulationUtils.decideOnTravelTimeForLeg(currentLeg).seconds();
+			double travelTime = timeInterpretation.decideOnLegTravelTime(currentLeg).seconds();
 
 			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
@@ -586,7 +589,7 @@ public final class EditTrips {
 	 * Convenience method that estimates the trip departure time rather than explicitly requesting it.
 	 */
 	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
-		double departureTime = PlanRouter.calcEndOfActivity( trip.getOriginActivity(), plan, tripRouter.getConfig() ) ;
+		double departureTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( trip.getOriginActivity(), plan ).seconds() ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
 

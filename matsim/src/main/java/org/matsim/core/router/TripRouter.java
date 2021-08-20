@@ -203,29 +203,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 	// /////////////////////////////////////////////////////////////////////////
 	// public static convenience methods.
 	// /////////////////////////////////////////////////////////////////////////
-	/**
-	 * Helper method, that can be used to compute start time of legs.
-	 * (it is also used internally).
-	 * It is provided here, because such an operation is mainly useful for routing,
-	 * but it may be externalized in a "util" class...
-	 * @param config TODO
-	 */
-	public static double calcEndOfPlanElement(
-			final double now,
-			final PlanElement pe, Config config) {
-		Preconditions.checkArgument(Double.isFinite(now));//probably unnecessary after switching to OptionalTime
-
-		if (pe instanceof Activity) {
-			Activity act = (Activity) pe;
-			return PopulationUtils.decideOnActivityEndTime(act, now, config ).seconds() ;
-		}
-		else {
-			// take travel time from route if possible
-			// TODO throw exception if undefined? (currently 0 is returned)
-			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe ).orElse(0);
-			return now + ttime;
-		}
-	}
 
 	/**
 	 * Inserts a trip between two activities in the sequence of plan elements

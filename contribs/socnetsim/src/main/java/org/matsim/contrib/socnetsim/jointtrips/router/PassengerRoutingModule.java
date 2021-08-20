@@ -57,6 +57,7 @@ public class PassengerRoutingModule implements RoutingModule {
 		l.setDepartureTime( departureTime );
 		Route r = new PassengerRoute( fromFacility.getLinkId() , toFacility.getLinkId() );
 		l.setRoute( r );
+		l.setTravelTime(0.0);
 		return Collections.singletonList( l );
 	}
 
