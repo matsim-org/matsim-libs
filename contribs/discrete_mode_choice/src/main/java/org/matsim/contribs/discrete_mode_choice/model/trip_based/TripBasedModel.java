@@ -15,7 +15,8 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilityCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeTracker;
 
 /**
  * This class defines a trip-based discrete choice model.
@@ -32,18 +33,18 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 	private final TripConstraintFactory constraintFactory;
 	private final UtilitySelectorFactory selectorFactory;
 	private final FallbackBehaviour fallbackBehaviour;
-	private final TimeInterpreter.Factory timeInterpreterFactory;
+	private final TimeInterpretation timeInterpretation;
 
 	public TripBasedModel(TripEstimator estimator, TripFilter tripFilter, ModeAvailability modeAvailability,
 			TripConstraintFactory constraintFactory, UtilitySelectorFactory selectorFactory,
-			FallbackBehaviour fallbackBehaviour, TimeInterpreter.Factory timeInterpreterFactory) {
+			FallbackBehaviour fallbackBehaviour, TimeInterpretation timeInterpretation) {
 		this.estimator = estimator;
 		this.tripFilter = tripFilter;
 		this.modeAvailability = modeAvailability;
 		this.constraintFactory = constraintFactory;
 		this.selectorFactory = selectorFactory;
 		this.fallbackBehaviour = fallbackBehaviour;
-		this.timeInterpreterFactory = timeInterpreterFactory;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -56,11 +57,11 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 		List<String> tripCandidateModes = new ArrayList<>(trips.size());
 
 		int tripIndex = 0;
-		TimeInterpreter time = timeInterpreterFactory.createTimeInterpreter();
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
 		for (DiscreteModeChoiceTrip trip : trips) {
-			time.addActivity(trip.getOriginActivity());
-			trip.setDepartureTime(time.getCurrentTime());
+			timeTracker.addActivity(trip.getOriginActivity());
+			trip.setDepartureTime(timeTracker.getTime().seconds());
 
 			TripCandidate finalTripCandidate = null;
 
@@ -110,7 +111,7 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 			tripCandidates.add(finalTripCandidate);
 			tripCandidateModes.add(finalTripCandidate.getMode());
 
-			time.addTime(finalTripCandidate.getDuration());
+			timeTracker.addDuration(finalTripCandidate.getDuration());
 		}
 
 		return tripCandidates;
