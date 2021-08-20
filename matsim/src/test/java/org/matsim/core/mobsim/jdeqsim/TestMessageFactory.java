@@ -102,7 +102,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		Person person= PopulationUtils.getFactory().createPerson(Id.create("abc", Person.class));
 		
-		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.ignoreDelays);
 		Vehicle vehicle=new Vehicle(scheduler, person, timeInterpretation );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle, timeInterpretation).scheduler==scheduler);
@@ -127,7 +127,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		Person person= PopulationUtils.getFactory().createPerson(Id.create("abc", Person.class));
 		
-		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.ignoreDelays);
 		Vehicle vehicle=new Vehicle(scheduler, person, timeInterpretation );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle, timeInterpretation).scheduler==scheduler);
