@@ -43,6 +43,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityF
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import javax.inject.Provider;
 
@@ -124,7 +125,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)));
+				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new Attributes());
 
 		Leg l = (Leg) trip.get( 0 );
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
@@ -199,7 +200,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)));
+				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new Attributes());
 
 		Leg l = (Leg) trip.get( 0 );
 		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {

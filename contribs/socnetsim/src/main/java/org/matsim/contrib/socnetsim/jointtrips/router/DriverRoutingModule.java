@@ -29,7 +29,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 
 /**
@@ -50,17 +52,11 @@ public class DriverRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility, 
-			final double departureTime,
-			final Person person) {
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final double departureTime = request.getDepartureTime();
+		
 		List<? extends PlanElement> trip =
-			carRoutingModule.calcRoute(
-					fromFacility,
-					toFacility, 
-					departureTime,
-					person);
+			carRoutingModule.calcRoute(request);
 
 		if (trip.size() != 1) {
 			throw new RuntimeException( "unexpected trip size for trip "+trip+" for mode "+mode );

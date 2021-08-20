@@ -64,7 +64,7 @@ public abstract class AbstractTripRouterEstimator implements TripEstimator {
 		if (!isPrerouted(mode, trip)) {
 			// II) Perform the routing
 			List<? extends PlanElement> elements = tripRouter.calcRoute(mode, originFacility, destinationFacility,
-					trip.getDepartureTime(), person);
+					trip.getDepartureTime(), person, trip.getOriginActivity().getAttributes());
 
 			// III) Perform utility estimation
 			return estimateTripCandidate(person, mode, trip, previousTrips, elements);

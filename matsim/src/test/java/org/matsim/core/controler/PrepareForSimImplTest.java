@@ -48,6 +48,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -775,8 +776,7 @@ public class PrepareForSimImplTest {
 	
 	private class DummyRoutingModule implements RoutingModule {
 		@Override
-		public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-				Person person) {
+		public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 			return Collections.singletonList(PopulationUtils.createLeg("dummyMode"));
 		}
 	}
