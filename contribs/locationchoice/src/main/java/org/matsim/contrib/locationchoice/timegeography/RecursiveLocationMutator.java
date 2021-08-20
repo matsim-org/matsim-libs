@@ -202,7 +202,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		leg.setTravelTime(tripLeg.getTravelTime().seconds() );
 		leg.setDepartureTime(tripLeg.getDepartureTime().seconds() );
 
-		timeInterpretation.decideOnTravelTimeForLeg( tripLeg );
+		timeInterpretation.decideOnLegTravelTime( tripLeg );
 		return leg.getTravelTime().seconds();
 	}
 

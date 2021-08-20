@@ -107,7 +107,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			for (PlanElement planElement : accessTrip) {
-				now = timeInterpretation.calcEndOfPlanElement(now, planElement);
+				now = timeInterpretation.decideOnElementEndTime(planElement, now);
 			}
 
 			// interaction activity:
@@ -119,7 +119,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
-			now = timeInterpretation.calcEndOfPlanElement(now, planElement);
+			now = timeInterpretation.decideOnElementEndTime(planElement, now);
 		}
 
 		now++;

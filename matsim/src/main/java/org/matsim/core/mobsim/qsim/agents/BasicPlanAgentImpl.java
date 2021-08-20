@@ -179,7 +179,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	 */
 	private final void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getSimTimer().getTimeOfDay() ;
-		double departure = timeInterpretation.calculateDepartureTime(act, now);
+		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, now).orElse(Double.POSITIVE_INFINITY));
 	
 		if ( this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
@@ -255,7 +255,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	}
 	@Override
 	public final OptionalTime getExpectedTravelTime() {
-		return timeInterpretation.decideOnTravelTimeForLeg((Leg)this.getCurrentPlanElement());
+		return timeInterpretation.decideOnLegTravelTime((Leg)this.getCurrentPlanElement());
 	}
 
     @Override

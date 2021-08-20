@@ -76,7 +76,7 @@ class PlanTimesAdapter {
 				final Leg leg = (Leg) pe;
 				// the scoring needs dpTime and tTime filled out, even if qsim input does not require that:
 				leg.setDepartureTime( now ) ;
-				double travelTime = timeInterpretation.decideOnTravelTimeForLeg( leg ).orElse(0) ;
+				double travelTime = timeInterpretation.decideOnLegTravelTime( leg ).orElse(0) ;
 				leg.setTravelTime( travelTime);
 				scoringFunction.handleLeg( leg );
 				now += travelTime ;

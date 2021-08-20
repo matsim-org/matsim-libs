@@ -96,7 +96,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final OptionalTime legDur = timeInterpretation.decideOnTravelTimeForLeg(leg);
+				final OptionalTime legDur = timeInterpretation.decideOnLegTravelTime(leg);
 
 				if ( legDur.isDefined()) {
 					now -= legDur.seconds();
@@ -134,7 +134,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final OptionalTime legDur = timeInterpretation.decideOnTravelTimeForLeg(leg);
+				final OptionalTime legDur = timeInterpretation.decideOnLegTravelTime(leg);
 
 				if ( legDur.isDefined()) {
 					tt += legDur.seconds();

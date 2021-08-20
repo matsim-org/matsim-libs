@@ -74,7 +74,8 @@ public class EndLegMessage extends EventMessage {
 			Activity currentAct = (Activity) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
-			double departureTime = timeInterpretation.calculateDepartureTime(currentAct, getMessageArrivalTime()) ;
+			final double now = getMessageArrivalTime();
+			double departureTime = Math.max(now, timeInterpretation.decideOnActivityEndTime(currentAct, now).orElse(Double.POSITIVE_INFINITY));
 
 			/*
 			 * if the departureTime from the act is in the past (this means we

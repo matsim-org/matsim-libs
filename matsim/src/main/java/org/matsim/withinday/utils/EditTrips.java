@@ -502,7 +502,7 @@ public final class EditTrips {
 			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
 			// located half way between origin and destination of the teleport leg.
 
-			double travelTime = timeInterpretation.decideOnTravelTimeForLeg(currentLeg).seconds();
+			double travelTime = timeInterpretation.decideOnLegTravelTime(currentLeg).seconds();
 
 			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
