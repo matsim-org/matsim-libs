@@ -83,7 +83,7 @@ public class CloseTrajectories implements MATSimAppCommand {
 			if (time > threshold * 60)
 				continue;
 
-			TimeInterpretation timeInterpretation = TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration);
+			TimeInterpretation timeInterpretation = TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.ignoreDelays);
 			double endTime = timeInterpretation.decideOnActivityEndTime(lastAct, lastAct.getStartTime().orElse(Double.NaN))
 					.orElseThrow(() -> new IllegalStateException("Could not determine end time"));
 

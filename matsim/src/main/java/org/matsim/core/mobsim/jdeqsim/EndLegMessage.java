@@ -49,7 +49,7 @@ public class EndLegMessage extends EventMessage {
 		super(scheduler, vehicle);
 		this.priority = JDEQSimConfigGroup.PRIORITY_ARRIVAL_MESSAGE;
 		if ( vehicle == null ) {
-			this.timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
+			this.timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.ignoreDelays);
 			// need this for some test cases. kai, nov'13
 		} else {
 			this.timeInterpretation = timeInterpretation ;
