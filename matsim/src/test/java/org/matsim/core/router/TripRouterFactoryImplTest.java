@@ -42,6 +42,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -108,6 +109,7 @@ public class TripRouterFactoryImplTest {
 					@Override
 					public void install() {
 						install(new ScenarioByInstanceModule(scenario));
+						install(new TimeInterpretationModule());
 						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
@@ -183,6 +185,7 @@ public class TripRouterFactoryImplTest {
 			@Override
 			public void install() {
 				install(new ScenarioByInstanceModule(scenario));
+				install(new TimeInterpretationModule());
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 					@Override
 					public void install() {

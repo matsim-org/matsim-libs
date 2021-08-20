@@ -43,6 +43,8 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -66,12 +68,13 @@ public class PlanRouterTest {
             public void install() {
                 install(new TripRouterModule());
                 install(new ScenarioByInstanceModule(scenario));
+                install(new TimeInterpretationModule());
                 addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
             }
         });
         TripRouter tripRouter = injector.getInstance(TripRouter.class);
-        PlanRouter testee = new PlanRouter(tripRouter);
+        PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
         Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
         ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
@@ -133,7 +136,7 @@ public class PlanRouterTest {
         });
         TripRouter tripRouter = injector.getInstance(TripRouter.class);
 
-        PlanRouter testee = new PlanRouter(tripRouter);
+        PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
         testee.run(plan);
         if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
               Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());

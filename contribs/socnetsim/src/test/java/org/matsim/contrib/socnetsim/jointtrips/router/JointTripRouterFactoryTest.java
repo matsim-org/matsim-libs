@@ -59,6 +59,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
 import com.google.inject.Provider;
@@ -200,7 +201,7 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
+			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
@@ -237,7 +238,7 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
+			new JointPlanRouterFactory( (ActivityFacilities) null, TimeInterpretation.create(ConfigUtils.createConfig()) ).createPlanRoutingAlgorithm(
 					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();

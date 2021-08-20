@@ -48,6 +48,7 @@ import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 
 /**
@@ -65,7 +66,7 @@ public class JointPlanRouterTest {
 			new JointPlanRouter(
 					createTripRouter(
 						populationFactory, config),
-					null);
+					null, TimeInterpretation.create(config));
 
 		final Id<Link> linkId = Id.create( "some_link" , Link.class );
 		final Plan plan = populationFactory.createPlan();
@@ -120,7 +121,7 @@ public class JointPlanRouterTest {
 			new JointPlanRouter(
 					createTripRouter(
 						populationFactory, config),
-					null);
+					null, TimeInterpretation.create(config));
 
 		final Id<Link> linkId = Id.create( "some_link" , Link.class );
 		final Plan plan = populationFactory.createPlan();

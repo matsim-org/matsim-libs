@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +35,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 
 /**
@@ -52,19 +51,19 @@ public class DvrpRoutingModule implements RoutingModule {
 
 	private final AccessEgressFacilityFinder stopFinder;
 	private final String mode;
-	private final Scenario scenario;
 	private final RoutingModule mainRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
+	private final TimeInterpretation timeInterpretation;
 
 	public DvrpRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
-			AccessEgressFacilityFinder stopFinder, String mode, Scenario scenario) {
+			AccessEgressFacilityFinder stopFinder, String mode, TimeInterpretation timeInterpretation) {
 		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
 		this.mode = mode;
-		this.scenario = scenario;
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -108,7 +107,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			for (PlanElement planElement : accessTrip) {
-				now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+				now = timeInterpretation.calcEndOfPlanElement(now, planElement);
 			}
 
 			// interaction activity:
@@ -120,7 +119,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
-			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+			now = timeInterpretation.calcEndOfPlanElement(now, planElement);
 		}
 
 		now++;

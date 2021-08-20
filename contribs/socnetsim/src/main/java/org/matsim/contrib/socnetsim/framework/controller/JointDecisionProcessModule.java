@@ -42,6 +42,10 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -85,15 +89,21 @@ public class JointDecisionProcessModule extends AbstractModule {
 						return Collections.<ReplanningGroup>emptyList();
 					}
 				});
-
-		bind(PlanRoutingAlgorithmFactory.class).toInstance(
-				new PlanRoutingAlgorithmFactory() {
+		
+		bind(PlanRoutingAlgorithmFactory.class).toProvider(new Provider<PlanRoutingAlgorithmFactory>() {
+			@Inject TimeInterpretation timeInterpretation;
+			
+			@Override
+			public PlanRoutingAlgorithmFactory get() {
+				return new PlanRoutingAlgorithmFactory() {
 					@Override
 					public PlanAlgorithm createPlanRoutingAlgorithm(
 							final TripRouter tripRouter) {
-						return new PlanRouter(tripRouter);
+						return new PlanRouter(tripRouter, timeInterpretation);
 					}
-				});
+				};
+			}
+		});
 
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toInstance(new CompositePlanLinkIdentifier());
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance(new CompositePlanLinkIdentifier());

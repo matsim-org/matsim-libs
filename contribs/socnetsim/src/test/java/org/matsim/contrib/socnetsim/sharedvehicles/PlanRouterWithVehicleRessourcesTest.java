@@ -46,6 +46,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -84,7 +85,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
-				new PlanRouter( tripRouter ) );
+				new PlanRouter( tripRouter, TimeInterpretation.create(config) ) );
 
 		router.run( plan );
 

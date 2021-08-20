@@ -53,6 +53,7 @@ import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTrees;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -97,7 +98,7 @@ public class DrtRoutingModuleTest {
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
-				drtMode, scenario);
+				drtMode, TimeInterpretation.create(scenario.getConfig()));
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));

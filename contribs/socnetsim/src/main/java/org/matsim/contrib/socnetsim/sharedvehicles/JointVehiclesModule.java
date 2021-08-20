@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.controller.AbstractPrepareForSimListener;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -78,12 +78,13 @@ public class JointVehiclesModule extends AbstractModule {
 		bind( PlanRoutingAlgorithmFactory.class ).toProvider( 
 				new Provider<PlanRoutingAlgorithmFactory>() {
 					@Inject Scenario sc;
+					@Inject TimeInterpretation timeInterpretation;
 
 					@Override
 					public PlanRoutingAlgorithmFactory get() {
 						final PlanRoutingAlgorithmFactory jointRouterFactory =
 									new JointPlanRouterFactory(
-											sc.getActivityFacilities() );
+											sc.getActivityFacilities(), timeInterpretation );
 						return new PlanRouterWithVehicleRessourcesFactory(
 									jointRouterFactory );
 					}

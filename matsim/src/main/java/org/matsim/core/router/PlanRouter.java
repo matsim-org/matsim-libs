@@ -31,6 +31,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
@@ -49,6 +50,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
+	private final TimeInterpretation timeInterpretation;
 
 	/**
 	 * Initialises an instance.
@@ -59,17 +61,19 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 */
 	public PlanRouter(
 			final TripRouter tripRouter,
-			final ActivityFacilities facilities) {
+			final ActivityFacilities facilities,
+			final TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	/**
 	 * Short for initialising without facilities.
 	 */
 	public PlanRouter(
-			final TripRouter routingHandler) {
-		this( routingHandler , null );
+			final TripRouter routingHandler, final TimeInterpretation timeInterpretation) {
+		this( routingHandler , null, timeInterpretation );
 	}
 
 	/**
@@ -95,7 +99,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 							routingMode,
 						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
 						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
+							timeInterpretation.calcEndOfActivity( oldTrip.getOriginActivity() , plan ),
 							plan.getPerson(), oldTrip.getOriginActivity().getAttributes() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
@@ -144,31 +148,6 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			run( plan );
 		}
-	}
-
-	public static double calcEndOfActivity(
-			final Activity activity,
-			final Plan plan,
-			final Config config ) {
-		// yyyy similar method in PopulationUtils.  TripRouter.calcEndOfPlanElement in fact uses it.  However, this seems doubly inefficient; calling the
-		// method in PopulationUtils directly would probably be faster.  kai, jul'19
-
-		if (activity.getEndTime().isDefined())
-			return activity.getEndTime().seconds();
-
-		// no sufficient information in the activity...
-		// do it the long way.
-		// XXX This is inefficient! Using a cache for each plan may be an option
-		// (knowing that plan elements are iterated in proper sequence,
-		// no need to re-examine the parts of the plan already known)
-		double now = 0;
-
-		for (PlanElement pe : plan.getPlanElements()) {
-			now = TripRouter.calcEndOfPlanElement(now, pe, config);
-			if (pe == activity) return now;
-		}
-
-		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
 	}
 
 }
