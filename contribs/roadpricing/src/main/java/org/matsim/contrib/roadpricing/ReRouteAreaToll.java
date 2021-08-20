@@ -29,6 +29,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -38,13 +39,15 @@ import javax.inject.Provider;
 	private final Config config;
 	private RoadPricingScheme roadPricingScheme;
 	private Provider<TripRouter> tripRouterFactory;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 //	private final Provider<PlansCalcRouteWithTollOrNot> factory;
 
-	@Inject ReRouteAreaToll( Config config, RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory ) {
+	@Inject ReRouteAreaToll( Config config, RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory, TimeInterpreter.Factory timeInterpreterFactory ) {
 		this.config = config;
 //		this.factory = factory;
 		this.roadPricingScheme = roadPricingScheme;
 		this.tripRouterFactory = tripRouterFactory;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	@Override
@@ -53,7 +56,7 @@ import javax.inject.Provider;
 		builder.addStrategyModule(new AbstractMultithreadedModule(config.global()) {
 			@Override
 			public PlanAlgorithm getPlanAlgoInstance() {
-				return new PlansCalcRouteWithTollOrNot( roadPricingScheme, tripRouterFactory ) ;
+				return new PlansCalcRouteWithTollOrNot( roadPricingScheme, tripRouterFactory, timeInterpreterFactory ) ;
 			}
 		});
 		return builder.build();

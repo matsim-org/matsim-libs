@@ -15,6 +15,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import javax.inject.Provider;
 
@@ -22,7 +23,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	
-	public LocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
+	public LocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, TimeInterpreter.Factory timeInterpreterFactory) {
 		final DestinationChoiceConfigGroup destinationChoiceConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
 		if ( DestinationChoiceConfigGroup.Algotype.bestResponse== destinationChoiceConfigGroup.getAlgorithm() ) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoicePlanStrategy. " +
@@ -43,7 +44,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 				break;
 		}
 		delegate.addStrategyModule(new DestinationChoice( tripRouterProvider, scenario) );
-		delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
+		delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider, timeInterpreterFactory));
 	}
 	
 	@Override

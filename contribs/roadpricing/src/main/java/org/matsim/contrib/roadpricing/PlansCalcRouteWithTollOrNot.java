@@ -31,6 +31,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -42,9 +43,9 @@ import javax.inject.Provider;
 	private final PlanRouter planRouter ;
 
 	@Inject
-	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterProvider) {
+	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterProvider, TimeInterpreter.Factory timeInterpreterFactory) {
 		this.roadPricingScheme = roadPricingScheme;
-		this.planRouter = new PlanRouter( tripRouterProvider.get() ) ;
+		this.planRouter = new PlanRouter( tripRouterProvider.get(), timeInterpreterFactory ) ;
 	}
 
 	@Override

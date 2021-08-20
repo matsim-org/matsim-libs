@@ -82,6 +82,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
 import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
@@ -596,6 +597,8 @@ public class EditTripsTest {
 		@Inject
 		private Provider<TripRouter> tripRouterProvider;
 		private InternalInterface internalInterface;
+		@Inject 
+		private TimeInterpreter.Factory timeInterpreterFactory;
 
 		@Override
 		public void doSimStep(double now) {
@@ -636,7 +639,7 @@ public class EditTripsTest {
 
 				// ---
 
-				RunExamplePtDisturbances.replanPtPassengers(now, disturbedLineId, tripRouterProvider, scenario, internalInterface);
+				RunExamplePtDisturbances.replanPtPassengers(now, disturbedLineId, tripRouterProvider, scenario, internalInterface, timeInterpreterFactory);
 
 			}
 		}

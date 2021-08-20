@@ -11,10 +11,8 @@ public class TimeInterpreterModule extends AbstractModule {
 	@Override
 	public void install() {
 	}
-
-	@Provides
-	@Singleton
-	public TimeInterpreter.Factory provideTimeInterpreterFactory(Config config) {
+	
+	static public TimeInterpreter.Factory createFromConfig(Config config) {
 		double startTime = config.qsim().getStartTime().orElse(0.0);
 		boolean onlyAdvance = config.plans().getRoutingDepartureTimeInterpration()
 				.equals(RoutingDepartureTimeInterpration.cumulative);
@@ -29,5 +27,11 @@ public class TimeInterpreterModule extends AbstractModule {
 		default:
 			throw new IllegalStateException();
 		}
+	}
+
+	@Provides
+	@Singleton
+	public TimeInterpreter.Factory provideTimeInterpreterFactory(Config config) {
+		return createFromConfig(config);
 	}
 }

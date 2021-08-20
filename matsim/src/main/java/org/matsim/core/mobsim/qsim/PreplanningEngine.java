@@ -60,6 +60,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -86,6 +87,7 @@ public final class PreplanningEngine implements MobsimEngine {
 	private final Population population;
 	private final Network network;
 	private final Scenario scenario;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
 	// (we are in the mobsim, so we don't need to play around with IDs)
 	private final Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>(comparing(Identifiable::getId ));
@@ -102,12 +104,13 @@ public final class PreplanningEngine implements MobsimEngine {
 	private InternalInterface internalInterface;
 
 	@Inject
-	PreplanningEngine(TripRouter tripRouter, Scenario scenario) {
+	PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpreter.Factory timeInterpreterFactory) {
 		this.tripRouter = tripRouter;
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities();
 		this.network = scenario.getNetwork();
 		this.scenario = scenario;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	@Override
@@ -127,7 +130,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface);
+		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface, timeInterpreterFactory);
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), editTrips);
 		this.internalInterface = internalInterface;
 	}

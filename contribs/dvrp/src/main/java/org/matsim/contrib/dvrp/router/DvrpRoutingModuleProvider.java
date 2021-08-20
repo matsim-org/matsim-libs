@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
@@ -41,6 +42,9 @@ public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<D
 	@Inject
 	@Named(TransportMode.walk)
 	private RoutingModule walkRouter;
+	
+	@Inject
+	TimeInterpreter.Factory timeInterpreterFactory;
 
 	@Inject
 	private Scenario scenario;
@@ -59,6 +63,6 @@ public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<D
 		RoutingModule egressRouter = stageRouters.getOrDefault(Stage.EGRESS, walkRouter);
 
 		return new DvrpRoutingModule(mainRouter, accessRouter, egressRouter,
-				getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), scenario);
+				getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), scenario, timeInterpreterFactory);
 	}
 }

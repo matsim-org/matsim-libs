@@ -29,6 +29,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import javax.inject.Provider;
 
@@ -42,7 +43,7 @@ public class PRStrategyTime implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
 	
-	public PRStrategyTime(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
+	public PRStrategyTime(MatsimServices controler, Provider<TripRouter> tripRouterProvider, TimeInterpreter.Factory timeInterpreterFactory) {
 
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );
@@ -50,7 +51,7 @@ public class PRStrategyTime implements PlanStrategy {
 		PRTimeAllocationMutator prTimeModule = new PRTimeAllocationMutator(controler.getConfig());
 		planStrategyDelegate.addStrategyModule(prTimeModule);
 		
-		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider) ;
+		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, timeInterpreterFactory) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
 		
 	}

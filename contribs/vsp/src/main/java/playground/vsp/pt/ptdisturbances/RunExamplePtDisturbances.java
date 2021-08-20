@@ -64,6 +64,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
@@ -183,6 +184,7 @@ public class RunExamplePtDisturbances {
 		@Inject private Scenario scenario;
 		@Inject private EventsManager events;
 		@Inject private Provider<TripRouter> tripRouterProvider ;
+		@Inject private TimeInterpreter.Factory timeInterpreterFactory;
 		private InternalInterface internalInterface;
 
 		@Override public void doSimStep( double now ) {
@@ -222,7 +224,7 @@ public class RunExamplePtDisturbances {
 
 				// ---
 
-				replanPtPassengers(now, disturbedLineId, tripRouterProvider, scenario, internalInterface);
+				replanPtPassengers(now, disturbedLineId, tripRouterProvider, scenario, internalInterface, timeInterpreterFactory);
 
 			}
 		}
@@ -242,13 +244,13 @@ public class RunExamplePtDisturbances {
 
 	}
 	
-	static void replanPtPassengers(double now, final Id<TransitLine> disturbedLineId, Provider<TripRouter> tripRouterProvider, Scenario scenario, InternalInterface internalInterface) {
+	static void replanPtPassengers(double now, final Id<TransitLine> disturbedLineId, Provider<TripRouter> tripRouterProvider, Scenario scenario, InternalInterface internalInterface, TimeInterpreter.Factory timeInterpreterFactory) {
 		
 		final QSim qsim = internalInterface.getMobsim() ;
 
 		// force new transit router:
 		final TripRouter tripRouter = tripRouterProvider.get();
-		EditTrips editTrips = new EditTrips( tripRouter, scenario, internalInterface );;
+		EditTrips editTrips = new EditTrips( tripRouter, scenario, internalInterface, timeInterpreterFactory );;
 
 		// find the affected agents and replan affected trips:
 		

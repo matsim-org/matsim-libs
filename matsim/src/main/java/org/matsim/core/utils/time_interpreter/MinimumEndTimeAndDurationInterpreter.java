@@ -25,12 +25,22 @@ public class MinimumEndTimeAndDurationInterpreter extends AbstractTimeInterprete
 
 	@Override
 	public void addActivity(Activity activity) {
-		if (activity.getMaximumDuration().isUndefined() || activity.getEndTime().isUndefined()) {
+		if (activity.getMaximumDuration().isUndefined() && activity.getEndTime().isUndefined()) {
 			throw new IllegalStateException(
-					"Found an activity with undefined maximum duration or undefined activity end time. Both must be defined if minOfDurationAndEndTime is used!");
+					"Found an activity with undefined maximum duration and undefined activity end time. One must be defined if minOfDurationAndEndTime is used!");
 		}
 
-		advance(Math.min(currentTime + activity.getMaximumDuration().seconds(), activity.getEndTime().seconds()));
+		double endTime = Double.NaN;
+
+		if (activity.getMaximumDuration().isUndefined()) {
+			endTime = activity.getEndTime().seconds();
+		} else if (activity.getEndTime().isUndefined()) {
+			endTime = currentTime + activity.getMaximumDuration().seconds();
+		} else {
+			endTime = Math.min(activity.getEndTime().seconds(), currentTime + activity.getMaximumDuration().seconds());
+		}
+
+		advance(endTime);
 	}
 
 	@Override

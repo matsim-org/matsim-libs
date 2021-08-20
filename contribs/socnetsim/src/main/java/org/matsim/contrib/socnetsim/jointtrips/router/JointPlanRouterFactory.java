@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.jointtrips.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 
@@ -32,19 +33,21 @@ import com.google.inject.Inject;
  */
 public class JointPlanRouterFactory implements PlanRoutingAlgorithmFactory {
 	private final ActivityFacilities facilities;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
 	@Inject
-	public JointPlanRouterFactory(final Scenario sc) {
-		this( sc.getActivityFacilities() );
+	public JointPlanRouterFactory(final Scenario sc, TimeInterpreter.Factory timeInterpreterFactory) {
+		this( sc.getActivityFacilities(), timeInterpreterFactory );
 	}
 
-	public JointPlanRouterFactory(final ActivityFacilities facilities) {
+	public JointPlanRouterFactory(final ActivityFacilities facilities, TimeInterpreter.Factory timeInterpreterFactory) {
 		this.facilities = facilities;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	@Override
 	public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
-		return new JointPlanRouter( tripRouter , facilities );
+		return new JointPlanRouter( tripRouter , facilities, timeInterpreterFactory );
 	}
 }
 

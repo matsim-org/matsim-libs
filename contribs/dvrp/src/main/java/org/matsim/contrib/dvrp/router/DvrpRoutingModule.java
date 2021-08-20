@@ -37,6 +37,7 @@ import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.Facility;
 
 /**
@@ -56,15 +57,17 @@ public class DvrpRoutingModule implements RoutingModule {
 	private final RoutingModule mainRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
 	public DvrpRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
-			AccessEgressFacilityFinder stopFinder, String mode, Scenario scenario) {
+			AccessEgressFacilityFinder stopFinder, String mode, Scenario scenario, TimeInterpreter.Factory timeInterpreterFactory) {
 		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
 		this.mode = mode;
 		this.scenario = scenario;
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	@Override
@@ -101,33 +104,32 @@ public class DvrpRoutingModule implements RoutingModule {
 
 		List<PlanElement> trip = new ArrayList<>();
 
-		double now = departureTime;
+		TimeInterpreter timeInterpreter = timeInterpreterFactory.createTimeInterpreter();
+		timeInterpreter.setTime(departureTime);
 
 		// access (sub-)trip:
-		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
+		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, accessFacility, timeInterpreter.getCurrentTime(), person, request.getAttributes()));
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
-			for (PlanElement planElement : accessTrip) {
-				now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
-			}
+			timeInterpreter.addPlanElements(accessTrip);
 
 			// interaction activity:
-			trip.add(createDrtStageActivity(accessFacility, now));
-			now++;
+			trip.add(createDrtStageActivity(accessFacility, timeInterpreter.getCurrentTime()));
+			timeInterpreter.addPlanElement(trip.get(trip.size() - 1));
 		}
 
 		// dvrp proper leg:
-		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
+		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, timeInterpreter.getCurrentTime(), person, request.getAttributes()));
 		trip.addAll(drtLeg);
-		for (PlanElement planElement : drtLeg) {
-			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
-		}
+		timeInterpreter.addPlanElements(drtLeg);
 
-		now++;
-		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
+		//now++;
+		timeInterpreter.setTime(timeInterpreter.getCurrentTime() + 1); // "Simualating" now++ here
+		
+		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(DefaultRoutingRequest.of(egressFacility, toFacility, timeInterpreter.getCurrentTime(), person, request.getAttributes()));
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
-			trip.add(createDrtStageActivity(egressFacility, now));
+			trip.add(createDrtStageActivity(egressFacility, timeInterpreter.getCurrentTime()));
 
 			// egress (sub-)trip:
 			trip.addAll(egressTrip);

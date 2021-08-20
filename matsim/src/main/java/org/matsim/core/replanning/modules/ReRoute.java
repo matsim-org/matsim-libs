@@ -26,6 +26,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.ActivityFacilities;
 
 import javax.inject.Provider;
@@ -41,22 +42,25 @@ public class ReRoute extends AbstractMultithreadedModule {
 	private ActivityFacilities facilities;
 
 	private final Provider<TripRouter> tripRouterProvider;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
-	public ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+	public ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, TimeInterpreter.Factory timeInterpreterFactory) {
 		super(globalConfigGroup);
 		this.facilities = facilities;
 		this.tripRouterProvider = tripRouterProvider;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
-	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
-		this(scenario.getActivityFacilities(), tripRouterProvider, scenario.getConfig().global());
+	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider, TimeInterpreter.Factory timeInterpreterFactory) {
+		this(scenario.getActivityFacilities(), tripRouterProvider, scenario.getConfig().global(), timeInterpreterFactory);
 	}
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {
 			return new PlanRouter(
 					tripRouterProvider.get(),
-					facilities);
+					facilities,
+					timeInterpreterFactory);
 	}
 
 }

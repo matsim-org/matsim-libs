@@ -57,6 +57,7 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -84,8 +85,9 @@ public final class EditTrips {
 	private Scenario scenario;
 	private TransitStopAgentTracker transitAgentTracker;
 	private EventsManager eventsManager;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
-	public EditTrips( TripRouter tripRouter, Scenario scenario, InternalInterface internalInterface ) {
+	public EditTrips( TripRouter tripRouter, Scenario scenario, InternalInterface internalInterface, TimeInterpreter.Factory timeInterpreterFactory ) {
 //		For other log level, find log4j.xml and add something like
 //<logger name="org.matsim.withinday.utils.EditTrips">
 //	<level value="info"/>
@@ -107,6 +109,7 @@ public final class EditTrips {
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
 		this.internalInterface = internalInterface;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 
 		if (transitAgentTracker == null) {
 			log.warn("no TransitStopAgentTracker found in qsim. Replanning of pt/transit legs will not work properly and will likely fail.");
@@ -586,8 +589,17 @@ public final class EditTrips {
 	 * Convenience method that estimates the trip departure time rather than explicitly requesting it.
 	 */
 	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
-		double departureTime = PlanRouter.calcEndOfActivity( trip.getOriginActivity(), plan, tripRouter.getConfig() ) ;
-		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
+		TimeInterpreter timeInterpreter = timeInterpreterFactory.createTimeInterpreter();
+		
+		for (PlanElement element : plan.getPlanElements()) {
+			timeInterpreter.addPlanElement(element);
+			
+			if (element == trip.getOriginActivity()) {
+				break;
+			}
+		}
+		
+		return replanFutureTrip( trip, plan, mainMode, timeInterpreter.getCurrentTime() ) ;
 	}
 
 	public final List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,

@@ -16,6 +16,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 import com.google.inject.name.Named;
 
@@ -64,6 +65,9 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
 	@Inject
+	TimeInterpreter.Factory timeInterpreterFactory;
+	
+	@Inject
 	@Named(TransportMode.walk)
 	RoutingModule walkRouter;
 
@@ -88,7 +92,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						travelTime);
 		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
-					routeAlgo, scenario, filteredNetwork, walkRouter );
+					routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpreterFactory );
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo);

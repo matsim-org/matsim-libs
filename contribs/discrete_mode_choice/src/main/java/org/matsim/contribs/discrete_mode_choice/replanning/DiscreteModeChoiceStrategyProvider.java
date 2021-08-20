@@ -12,6 +12,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.ActivityFacilities;
 
 import com.google.inject.Provider;
@@ -38,12 +39,13 @@ public class DiscreteModeChoiceStrategyProvider implements Provider<PlanStrategy
 	private final Provider<TripListConverter> tripListConverterProvider;
 	private final DiscreteModeChoiceConfigGroup dmcConfig;
 	private final PopulationFactory populationFactory;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
 	@Inject
 	DiscreteModeChoiceStrategyProvider(GlobalConfigGroup globalConfigGroup, ActivityFacilities activityFacilities,
 			Provider<TripRouter> tripRouterProvider, Provider<DiscreteModeChoiceModel> modeChoiceModelProvider,
 			DiscreteModeChoiceConfigGroup dmcConfig, Population population,
-			Provider<TripListConverter> tripListConverterProvider) {
+			Provider<TripListConverter> tripListConverterProvider, TimeInterpreter.Factory timeInterpreterFactory) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
@@ -51,6 +53,7 @@ public class DiscreteModeChoiceStrategyProvider implements Provider<PlanStrategy
 		this.tripListConverterProvider = tripListConverterProvider;
 		this.dmcConfig = dmcConfig;
 		this.populationFactory = population.getFactory();
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	@Override
@@ -60,7 +63,7 @@ public class DiscreteModeChoiceStrategyProvider implements Provider<PlanStrategy
 				tripListConverterProvider, populationFactory));
 
 		if (dmcConfig.getPerformReroute()) {
-			builder.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
+			builder.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup, timeInterpreterFactory));
 		} else {
 			builder.addStrategyModule(new CheckConsistentRoutingReplanningModule(globalConfigGroup));
 		}

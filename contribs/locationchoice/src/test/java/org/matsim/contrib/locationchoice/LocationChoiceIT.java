@@ -54,6 +54,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -61,6 +62,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import com.google.inject.Inject;
 
 import javax.inject.Provider;
 
@@ -102,9 +105,11 @@ public class LocationChoiceIT extends MatsimTestCase {
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Inject TimeInterpreter.Factory timeInterpreterFactory;
+					
 					@Override
 					public PlanStrategy get() {
-						return new LocationChoicePlanStrategy(scenario, tripRouterProvider);
+						return new LocationChoicePlanStrategy(scenario, tripRouterProvider, timeInterpreterFactory);
 					}
 				});
 			}

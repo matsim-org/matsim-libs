@@ -37,6 +37,7 @@ import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 
 public class LinkToLinkRouting
         implements Provider<RoutingModule> {
@@ -72,6 +73,9 @@ public class LinkToLinkRouting
     @Inject
     @Named(TransportMode.walk)
     private RoutingModule walkRouter;
+    
+    @Inject
+    TimeInterpreter.Factory timeInterpreterFactory;
 
     public LinkToLinkRouting(String mode) {
         this.mode = mode;
@@ -116,10 +120,10 @@ public class LinkToLinkRouting
         if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
             if (mode.equals(TransportMode.walk)) {
                 return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, null,null);
+                        filteredNetwork, invertedNetwork, null,null, timeInterpreterFactory);
             } else {
                 return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, walkRouter, walkRouter);
+                        filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpreterFactory);
             }
 
         } else {

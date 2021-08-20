@@ -31,6 +31,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.utils.EditTrips;
@@ -45,10 +46,12 @@ import org.matsim.withinday.utils.EditTrips;
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
+	private final TimeInterpreter.Factory timeInterpreterFactory;
 
-	NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter) {
+	NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, TimeInterpreter.Factory timeInterpreterFactory) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.timeInterpreterFactory = timeInterpreterFactory;
 	}
 
 	@Override
@@ -69,7 +72,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		String routingMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
 		OptionalTime departureTime = TripStructureUtils.getDepartureTime(trip);
 		// To replan pt legs, we would need internalInterface of type InternalInterface.class
-		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, routingMode, departureTime.seconds() );
+		new EditTrips( this.tripRouter, scenario, null, timeInterpreterFactory ).replanFutureTrip(trip, executedPlan, routingMode, departureTime.seconds() );
 		
 		return true;
 	}

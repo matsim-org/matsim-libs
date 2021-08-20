@@ -59,6 +59,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.time_interpreter.TimeInterpreter;
+import org.matsim.core.utils.time_interpreter.TimeInterpreterModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -401,7 +403,7 @@ public class TollTravelCostCalculatorTest {
 			final Scenario scenario,
 			final LeastCostPathCalculatorFactory routerFactory,
 			final TravelTime travelTime,
-			final TravelDisutility travelDisutility ) {
+			final TravelDisutility travelDisutility) {
 		assertNotNull(routerFactory);
 
 		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
@@ -410,7 +412,7 @@ public class TollTravelCostCalculatorTest {
 		builder.setTravelTime(travelTime);
 		final Provider<TripRouter> factory = builder.build( scenario );
 		final TripRouter tripRouter = factory.get( );
-		final PersonAlgorithm router = new PlanRouter( tripRouter );
+		final PersonAlgorithm router = new PlanRouter( tripRouter, TimeInterpreterModule.createFromConfig(scenario.getConfig()) );
 
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run( p );
