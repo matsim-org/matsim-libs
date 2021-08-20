@@ -8,35 +8,63 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.base.Preconditions;
 
 public class TimeInterpretation {
 	private final ActivityDurationInterpretation activityDurationInterpretation;
+
 	private final double simulationStartTime;
+	private final boolean onlyAdvance;
 
 	static public TimeInterpretation create(Config config) {
 		return new TimeInterpretation( //
 				config.plans().getActivityDurationInterpretation(), //
-				config.qsim().getStartTime().orElse(0.0) // Corresponds to QSim::initSimTimer if not set from
-															// configuration
-		);
+				config.plans().getTripDurationHandling(), //
+				config.qsim().getStartTime().orElse(0.0));
+		// Value of 0.0 corresponds to QSim::initSimTimer if not set from configuration
 	}
 
-	static public TimeInterpretation create(ActivityDurationInterpretation interpretation, double simulationStartTime) {
-		return new TimeInterpretation(interpretation, simulationStartTime);
+	static public TimeInterpretation create(ActivityDurationInterpretation interpretation,
+			TripDurationHandling tripDurationHandling, double simulationStartTime) {
+		return new TimeInterpretation(interpretation, tripDurationHandling, simulationStartTime);
 	}
 
-	static public TimeInterpretation create(ActivityDurationInterpretation interpretation) {
-		return new TimeInterpretation(interpretation, 0.0); // Corresponds to QSim::initSimTimer if not set from
-															// configuration
+	static public TimeInterpretation create(ActivityDurationInterpretation interpretation,
+			TripDurationHandling tripDurationHandling) {
+		return new TimeInterpretation(interpretation, tripDurationHandling, 0.0);
+		// Value of 0.0 corresponds to QSim::initSimTimer if not set from configuration
 	}
 
 	private TimeInterpretation(ActivityDurationInterpretation activityDurationInterpretation,
-			double simulationStartTime) {
+			TripDurationHandling tripDurationHandling, double simulationStartTime) {
 		this.activityDurationInterpretation = activityDurationInterpretation;
 		this.simulationStartTime = simulationStartTime;
+
+		boolean onlyAdvance = false;
+
+		switch (tripDurationHandling) {
+		case ignoreDelays:
+			onlyAdvance = false;
+			break;
+		case shiftActivityEndTimes:
+			onlyAdvance = true;
+			break;
+		default:
+			throw new IllegalStateException();
+		}
+
+		this.onlyAdvance = onlyAdvance;
+	}
+
+	private OptionalTime checkAdvance(OptionalTime time, double startTime) {
+		if (time.isDefined() && onlyAdvance) {
+			return OptionalTime.defined(Math.max(startTime, time.seconds()));
+		}
+
+		return time;
 	}
 
 	/**
@@ -74,7 +102,7 @@ public class TimeInterpretation {
 
 		case tryEndTimeThenDuration:
 			if (activity.getEndTime().isDefined()) {
-				return activity.getEndTime();
+				return checkAdvance(activity.getEndTime(), startTime);
 			} else if (activity.getMaximumDuration().isDefined()) {
 				return OptionalTime.defined(startTime + activity.getMaximumDuration().seconds());
 			} else {
@@ -85,14 +113,14 @@ public class TimeInterpretation {
 			if (activity.getEndTime().isUndefined() && activity.getMaximumDuration().isUndefined()) {
 				return OptionalTime.undefined();
 			} else if (activity.getMaximumDuration().isUndefined()) {
-				return activity.getEndTime();
+				return checkAdvance(activity.getEndTime(), startTime);
 			} else if (activity.getEndTime().isUndefined()) {
 				double durationBasedEndTime = startTime + activity.getMaximumDuration().seconds();
 				return OptionalTime.defined(durationBasedEndTime);
 			} else {
 				double durationBasedEndTime = startTime + activity.getMaximumDuration().seconds();
-				return activity.getEndTime().seconds() <= durationBasedEndTime ? activity.getEndTime()
-						: OptionalTime.defined(durationBasedEndTime);
+				return checkAdvance(activity.getEndTime().seconds() <= durationBasedEndTime ? activity.getEndTime()
+						: OptionalTime.defined(durationBasedEndTime), startTime);
 			}
 
 		default:
