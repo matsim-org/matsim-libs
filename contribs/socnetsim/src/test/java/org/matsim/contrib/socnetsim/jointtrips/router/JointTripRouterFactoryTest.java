@@ -60,6 +60,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.facilities.ActivityFacilities;
 
 import com.google.inject.Provider;
@@ -191,6 +192,7 @@ public class JointTripRouterFactoryTest {
 						install(new TripRouterModule());
 						install(new TravelTimeCalculatorModule());
 						install(new TravelDisutilityModule());
+						install(new TimeInterpretationModule());
 						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
 					}
 				}), new JointTripRouterModule()));
