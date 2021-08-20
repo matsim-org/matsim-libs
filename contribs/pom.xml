@@ -95,6 +95,7 @@
 		<module>locationchoice</module>
 		<module>matrixbasedptrouter</module>
 		<module>minibus</module>
+		<module>mosaic</module>
 		<module>multimodal</module>
 		<module>noise</module>
 		<module>osm</module>
