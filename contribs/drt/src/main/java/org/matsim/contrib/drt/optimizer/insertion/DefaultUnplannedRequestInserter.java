@@ -66,10 +66,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
-			ForkJoinPool forkJoinPool) {
+			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
-				new DrtRequestInsertionRetryQueue(drtCfg.getDrtRequestInsertionRetryParams().
-						orElse(new DrtRequestInsertionRetryParams())), forkJoinPool, insertionSearch);
+				insertionRetryQueue, forkJoinPool, insertionSearch);
 	}
 
 	@VisibleForTesting
