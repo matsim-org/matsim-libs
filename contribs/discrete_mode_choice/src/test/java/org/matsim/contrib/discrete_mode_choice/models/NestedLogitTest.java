@@ -27,8 +27,10 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripBasedModel;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraintFactory;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class NestedLogitTest {
 	@Test
@@ -59,7 +61,9 @@ public class NestedLogitTest {
 				destinationActivity, null, Collections.emptyList(), 0, 0, 0));
 
 		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
-				selectorFactory, fallbackBehaviour, new EndTimeThenDurationInterpreter.Factory(0.0, true));
+				selectorFactory, fallbackBehaviour,
+				TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
+						TripDurationHandling.shiftActivityEndTimes));
 		Map<String, Integer> choices = new HashMap<>();
 		Random random = new Random(0);
 
