@@ -98,7 +98,7 @@ public class DrtRoutingModuleTest {
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
-				drtMode, scenario, TimeInterpreterModule.createFromConfig(scenario.getConfig()));
+				drtMode, TimeInterpreterModule.createFromConfig(scenario.getConfig()));
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));

@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +35,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.time_interpreter.TimeInterpreter;
 import org.matsim.facilities.Facility;
 
@@ -53,18 +51,16 @@ public class DvrpRoutingModule implements RoutingModule {
 
 	private final AccessEgressFacilityFinder stopFinder;
 	private final String mode;
-	private final Scenario scenario;
 	private final RoutingModule mainRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 	private final TimeInterpreter.Factory timeInterpreterFactory;
 
 	public DvrpRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
-			AccessEgressFacilityFinder stopFinder, String mode, Scenario scenario, TimeInterpreter.Factory timeInterpreterFactory) {
+			AccessEgressFacilityFinder stopFinder, String mode, TimeInterpreter.Factory timeInterpreterFactory) {
 		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
 		this.mode = mode;
-		this.scenario = scenario;
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
 		this.timeInterpreterFactory = timeInterpreterFactory;
@@ -115,7 +111,12 @@ public class DvrpRoutingModule implements RoutingModule {
 
 			// interaction activity:
 			trip.add(createDrtStageActivity(accessFacility, timeInterpreter.getCurrentTime()));
-			timeInterpreter.addPlanElement(trip.get(trip.size() - 1));
+			
+			// Attention: Generally, MATSim counts zero-duration activities are "zero" when routing along a plan.
+			// DRT (rightfully, I think) assumes still one second for executing the activity (sebhoerl, aug'21)
+			
+			// timeInterpreter.addPlanElement(trip.get(trip.size() - 1));
+			timeInterpreter.setTime(timeInterpreter.getCurrentTime() + 1);
 		}
 
 		// dvrp proper leg:
@@ -124,7 +125,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		timeInterpreter.addPlanElements(drtLeg);
 
 		//now++;
-		timeInterpreter.setTime(timeInterpreter.getCurrentTime() + 1); // "Simualating" now++ here
+		timeInterpreter.setTime(timeInterpreter.getCurrentTime() + 1); // "Simualating" now++ here, See above
 		
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(DefaultRoutingRequest.of(egressFacility, toFacility, timeInterpreter.getCurrentTime(), person, request.getAttributes()));
 		if (!egressTrip.isEmpty()) {
