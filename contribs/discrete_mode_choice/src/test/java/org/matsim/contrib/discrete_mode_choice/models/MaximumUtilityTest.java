@@ -23,8 +23,10 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraintF
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.MaximumSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class MaximumUtilityTest {
 	@Test
@@ -46,7 +48,9 @@ public class MaximumUtilityTest {
 				.singletonList(new DiscreteModeChoiceTrip(originActivity, destinationActivity, null, null, 0, 0, 0));
 
 		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
-				selectorFactory, fallbackBehaviour, new EndTimeThenDurationInterpreter.Factory(0.0, true));
+				selectorFactory, fallbackBehaviour,
+				TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
+						TripDurationHandling.shiftActivityEndTimes));
 
 		List<TripCandidate> result;
 

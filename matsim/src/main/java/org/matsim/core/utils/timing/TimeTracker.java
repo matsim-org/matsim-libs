@@ -27,6 +27,15 @@ public class TimeTracker {
 		currentTime = OptionalTime.defined(time);
 		return currentTime;
 	}
+	
+	public OptionalTime addDuration(double duration) {
+		if (currentTime.isUndefined()) {
+			throw new IllegalStateException("Cannot add element as current time is undefined");
+		}
+		
+		currentTime = OptionalTime.defined(currentTime.seconds() + duration);
+		return currentTime;
+	}
 
 	public OptionalTime getTime() {
 		return currentTime;
