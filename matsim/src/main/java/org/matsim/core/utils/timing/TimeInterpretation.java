@@ -49,12 +49,6 @@ public class TimeInterpretation {
 	 * TODO: Documentation TODO: Phase out shortcut.
 	 **/
 	public OptionalTime decideOnActivityEndTimeAlongPlan(Activity activity, Plan plan) {
-		// TODO: Can we phase out this shortcut? It interferes with
-		// activityDurationInterpretation!
-		if (activity.getEndTime().isDefined()) {
-			return activity.getEndTime();
-		}
-
 		int activityIndex = plan.getPlanElements().indexOf(activity);
 
 		if (activityIndex == -1) {

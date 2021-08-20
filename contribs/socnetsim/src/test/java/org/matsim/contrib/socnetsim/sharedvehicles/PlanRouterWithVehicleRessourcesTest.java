@@ -73,6 +73,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 		firstAct.setEndTime( 223 );
 
 		final Leg leg = factory.createLeg( TransportMode.car );
+		leg.setTravelTime(0.0);
 		TripStructureUtils.setRoutingMode( leg, leg.getMode() );
 		plan.addLeg( leg );
 		final NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
@@ -115,13 +116,16 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 						for (int i=0; i < 5; i++) {
 							final Leg l = factory.createLeg( TransportMode.car );	
+							l.setTravelTime(0.0);
 							l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(),
 									fromFacility.getLinkId()) );
 							legs.add( l );
 							legs.add( factory.createActivityFromLinkId( stage , fromFacility.getLinkId() ) );
+							((Activity) legs.get(legs.size() - 1)).setMaximumDuration(0.0);
 						}
 
 						final Leg l = factory.createLeg( TransportMode.car );	
+						l.setTravelTime(0.0);
 						l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(), toFacility.getLinkId()) );
 						legs.add( l );
 
