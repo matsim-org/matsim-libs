@@ -34,6 +34,7 @@ public class SpeedyMultiSourceALT {
 	private final int[] comingFrom;
 	private final int[] usedLink;
 	private final SpeedyGraph.LinkIterator outLI;
+	private final SpeedyGraph.LinkIterator inLI;
 	private final DAryMinHeap pq;
 
 	public SpeedyMultiSourceALT(SpeedyALTData astarData, TravelTime tt, TravelDisutility td) {
@@ -47,6 +48,7 @@ public class SpeedyMultiSourceALT {
 		this.usedLink = new int[this.graph.nodeCount];
 		this.pq = new DAryMinHeap(this.graph.nodeCount, 6);
 		this.outLI = this.graph.getOutLinkIterator();
+		this.inLI = this.graph.getInLinkIterator();
 		Arrays.fill(this.iterationIds, this.currentIteration);
 	}
 
@@ -82,7 +84,8 @@ public class SpeedyMultiSourceALT {
 		}
 	}
 
-	public Path calcLeastCostPath(List<StartNode> startNodes, Node endNode, Person person, Vehicle vehicle) {
+	public Path calcLeastCostPath(List<StartNode> startNodes, Node endNode, Person person, Vehicle vehicle,
+			boolean backward) {
 		this.currentIteration++;
 		if (this.currentIteration == Integer.MAX_VALUE) {
 			// reset iteration as we overflow
@@ -99,7 +102,7 @@ public class SpeedyMultiSourceALT {
 			int startNodeIndex = startNode.node.getId().index();
 			// TODO add support for dead ends
 			//  int startDeadend = this.astarData.getNodeDeadend(startNodeIndex);
-			double estimation = estimateMinTravelcostToDestination(startNodeIndex, endNodeIndex);
+			double estimation = estimateMinTravelcostToDestination(startNodeIndex, endNodeIndex, backward);
 
 			this.comingFrom[startNodeIndex] = -1;
 			setData(startNodeIndex, startNode.cost, startNode.time, 0);
@@ -125,14 +128,15 @@ public class SpeedyMultiSourceALT {
 			double currCost = getCost(nodeIdx);
 			double currDistance = getDistance(nodeIdx);
 
-			this.outLI.reset(nodeIdx);
-			while (this.outLI.next()) {
-				int linkIdx = this.outLI.getLinkIndex();
+			var li = backward ? this.inLI : this.outLI;
+			li.reset(nodeIdx);
+			while (li.next()) {
+				int linkIdx = li.getLinkIndex();
 				Link link = this.graph.getLink(linkIdx);
-				int toNode = this.outLI.getToNodeIndex();
+				int toNode = backward ? li.getFromNodeIndex() : li.getToNodeIndex();
 
 				double travelTime = this.tt.getLinkTravelTime(link, currTime, person, vehicle);
-				double newTime = currTime + travelTime;
+				double newTime = backward ? currTime - travelTime : currTime + travelTime;
 				double travelCost = this.td.getLinkTravelDisutility(link, currTime, person, vehicle);
 				double newCost = currCost + travelCost;
 
@@ -140,14 +144,14 @@ public class SpeedyMultiSourceALT {
 					// this node was already visited in this route-query
 					double oldCost = getCost(toNode);
 					if (newCost < oldCost) {
-						double estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex);
+						double estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex, backward);
 						this.pq.decreaseKey(toNode, newCost + estimation);
 						setData(toNode, newCost, newTime, currDistance + link.getLength());
 						this.comingFrom[toNode] = nodeIdx;
 						this.usedLink[toNode] = linkIdx;
 					}
 				} else {
-					double estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex);
+					double estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex, backward);
 					setData(toNode, newCost, newTime, currDistance + link.getLength());
 					this.pq.insert(toNode, newCost + estimation);
 					this.comingFrom[toNode] = nodeIdx;
@@ -157,7 +161,7 @@ public class SpeedyMultiSourceALT {
 		}
 
 		if (foundEndNode) {
-			return constructPath(endNodeIndex);
+			return constructPath(endNodeIndex, backward);
 		}
 		LOG.warn("No route was found from nodes [" + startNodes.stream()
 				.map(n -> n.node.getId() + "")
@@ -171,7 +175,7 @@ public class SpeedyMultiSourceALT {
 		return null;
 	}
 
-	private double estimateMinTravelcostToDestination(int nodeIdx, int destinationIdx) {
+	private double estimateMinTravelcostToDestination(int nodeIdx, int destinationIdx, boolean backward) {
 		/* The ALT algorithm uses two lower bounds for each Landmark:
 		 * given: source node S, target node T, landmark L
 		 * then, due to the triangle inequality:
@@ -183,7 +187,9 @@ public class SpeedyMultiSourceALT {
 		 */
 		double best = 0;
 		for (int i = 0, n = this.astarData.getLandmarksCount(); i < n; i++) {
-			double estimate = estimateMinTravelcostToDestinationForLandmark(nodeIdx, destinationIdx, i);
+			double estimate = backward ?
+					estimateMinTravelcostToDestinationForLandmarkbackward(nodeIdx, destinationIdx, i) :
+					estimateMinTravelcostToDestinationForLandmark(nodeIdx, destinationIdx, i);
 			if (estimate > best) {
 				best = estimate;
 			}
@@ -201,10 +207,21 @@ public class SpeedyMultiSourceALT {
 		return Math.max(sltl, ltls);
 	}
 
-	private Path constructPath(int endNodeIndex) {
+	private double estimateMinTravelcostToDestinationForLandmarkbackward(int nodeIdx, int destinationIdx,
+			int landmarkIdx) {
+		double sl = this.astarData.getTravelCostFromLandmark(nodeIdx, landmarkIdx);
+		double ls = this.astarData.getTravelCostToLandmark(nodeIdx, landmarkIdx);
+		double tl = this.astarData.getTravelCostFromLandmark(destinationIdx, landmarkIdx);
+		double lt = this.astarData.getTravelCostToLandmark(destinationIdx, landmarkIdx);
+		double sltl = sl - tl;
+		double ltls = lt - ls;
+		return Math.max(sltl, ltls);
+	}
+
+	private Path constructPath(int endNodeIndex, boolean backward) {
 		double travelCost = getCost(endNodeIndex);
-		double arrivalTime = getTimeRaw(endNodeIndex);
-		if (Double.isInfinite(arrivalTime)) {
+		double endTime = getTimeRaw(endNodeIndex);
+		if (Double.isInfinite(endTime)) {
 			throw new RuntimeException("Undefined time on end node");
 		}
 
@@ -226,13 +243,17 @@ public class SpeedyMultiSourceALT {
 			nodeIndex = this.comingFrom[nodeIndex];
 		}
 
-		Collections.reverse(nodes);
-		Collections.reverse(links);
+		double startTime;
+		if (backward) {
+			startTime = getTimeRaw(nodes.get(nodes.size() - 1).getId().index());
+		} else {
+			Collections.reverse(nodes);
+			Collections.reverse(links);
+			startTime = getTimeRaw(nodes.get(0).getId().index());
+		}
 
-		double startTime = getTimeRaw(nodes.get(0).getId().index());
-		double travelTime = arrivalTime - startTime;
+		double travelTime = backward ? startTime - endTime : endTime - startTime;
 
 		return new Path(nodes, links, travelTime, travelCost);
 	}
-
 }

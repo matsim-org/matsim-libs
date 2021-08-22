@@ -40,7 +40,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class SpeedyMultiSourceALTTest {
+public class SpeedyMultiSourceALTForwardTest {
 	private final Network network = NetworkUtils.createNetwork();
 
 	// single-direction links (from left to right, e.g. A->B, but not B->A)
@@ -78,9 +78,9 @@ public class SpeedyMultiSourceALTTest {
 			travelDisutility);
 
 	@Test
-	public void testOneSource() {
+	public void testOneSource_forward() {
 		var startNode = new StartNode(nodeB, 9999, 7777);
-		var path = multiSourceALT.calcLeastCostPath(List.of(startNode), nodeA, null, null);
+		var path = multiSourceALT.calcLeastCostPath(List.of(startNode), nodeA, null, null, false);
 		assertThat(path.nodes).containsExactly(nodeB, nodeD, nodeE, nodeA);
 		assertThat(path.links).containsExactly(linkBD, linkDE, linkEA);
 		assertThat(path.travelTime).isEqualTo(10 + 10 + 10);
@@ -88,10 +88,10 @@ public class SpeedyMultiSourceALTTest {
 	}
 
 	@Test
-	public void testManySources_sameStartCost() {
+	public void testManySources_forward_sameStartCost() {
 		var startNodeB = new StartNode(nodeB, 9999, 7777);
 		var startNodeC = new StartNode(nodeC, 9999, 7777);
-		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null);
+		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null, false);
 		assertThat(path.nodes).containsExactly(nodeC, nodeE, nodeA);
 		assertThat(path.links).containsExactly(linkCE, linkEA);
 		assertThat(path.travelTime).isEqualTo(10 + 10);
@@ -99,10 +99,10 @@ public class SpeedyMultiSourceALTTest {
 	}
 
 	@Test
-	public void testManySources_selectFartherNodeWithLowerCost() {
+	public void testManySources_forward_selectFartherNodeWithLowerCost() {
 		var startNodeB = new StartNode(nodeB, 100, 7777);
 		var startNodeC = new StartNode(nodeC, 111, 1111);
-		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null);
+		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null, false);
 		assertThat(path.nodes).containsExactly(nodeB, nodeD, nodeE, nodeA);
 		assertThat(path.links).containsExactly(linkBD, linkDE, linkEA);
 		assertThat(path.travelTime).isEqualTo(10 + 10 + 10);
@@ -110,10 +110,10 @@ public class SpeedyMultiSourceALTTest {
 	}
 
 	@Test
-	public void testManySources_selectNearestNodeWithHigherCost() {
+	public void testManySources_forward_selectNearestNodeWithHigherCost() {
 		var startNodeB = new StartNode(nodeB, 100, 7777);
 		var startNodeC = new StartNode(nodeC, 109, 1111);
-		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null);
+		var path = multiSourceALT.calcLeastCostPath(List.of(startNodeB, startNodeC), nodeA, null, null, false);
 		assertThat(path.nodes).containsExactly(nodeC, nodeE, nodeA);
 		assertThat(path.links).containsExactly(linkCE, linkEA);
 		assertThat(path.travelTime).isEqualTo(10 + 10);
