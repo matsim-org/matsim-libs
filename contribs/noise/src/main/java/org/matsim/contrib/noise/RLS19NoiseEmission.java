@@ -115,8 +115,6 @@ class RLS19NoiseEmission implements NoiseEmission {
         double pLkw1 = ((double) nLkw1) / m;
         double pLkw2 = ((double) nLkw2) / m;
 
-
-
         double singlePkwEmission
                 = calculateSingleVehicleEmission(noiseLink, pkw, vPkw);
         double singleLkw1Emission
@@ -165,13 +163,14 @@ class RLS19NoiseEmission implements NoiseEmission {
             Coord from = matsimLink.getFromNode().getCoord();
             Coord to = matsimLink.getToNode().getCoord();
 
-            DirectPosition positionFrom = new DirectPosition2D(crs, from.getX(), from.getY());
-            DirectPosition positionTo = new DirectPosition2D(crs, to.getX(), to.getY());
+            //MATSim coord's x/y are inversed to geotools/jts
+            DirectPosition positionFrom = new DirectPosition2D(crs, from.getY(), from.getX());
+            DirectPosition positionTo = new DirectPosition2D(crs, to.getY(), to.getX());
 
             float elevationFrom = demContext.getElevation(positionFrom);
             float elevationTo = demContext.getElevation(positionTo);
 
-            g = (elevationTo - elevationFrom) / matsimLink.getLength();
+            g = ((elevationTo - elevationFrom) / matsimLink.getLength()) * 100;
         } else {
             final Object gradient = matsimLink.getAttributes().getAttribute(GRADIENT);
             if(gradient != null) {

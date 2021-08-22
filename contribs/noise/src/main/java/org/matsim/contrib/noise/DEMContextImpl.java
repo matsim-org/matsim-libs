@@ -32,7 +32,6 @@ public class DEMContextImpl implements DEMContext {
         }
     }
 
-
     @Override
     public float getElevation(DirectPosition position) {
         float[] sample =  (float[])coverage.evaluate(position);
