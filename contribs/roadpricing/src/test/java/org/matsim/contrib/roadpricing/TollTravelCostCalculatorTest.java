@@ -59,6 +59,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -410,7 +411,7 @@ public class TollTravelCostCalculatorTest {
 		builder.setTravelTime(travelTime);
 		final Provider<TripRouter> factory = builder.build( scenario );
 		final TripRouter tripRouter = factory.get( );
-		final PersonAlgorithm router = new PlanRouter( tripRouter );
+		final PersonAlgorithm router = new PlanRouter( tripRouter, TimeInterpretation.create(scenario.getConfig()) );
 
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run( p );

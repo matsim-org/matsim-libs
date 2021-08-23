@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -51,12 +52,12 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 
 	private final TransitSchedule transitSchedule;
 
-	public static PTransitAgent createTransitAgent(Person p, Netsim simulation) {
-        return new PTransitAgent(p, simulation);
+	public static PTransitAgent createTransitAgent(Person p, Netsim simulation, TimeInterpretation timeInterpretation) {
+        return new PTransitAgent(p, simulation, timeInterpretation);
 	}
 
-	private PTransitAgent(final Person p, final Netsim simulation) {
-		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
+	private PTransitAgent(final Person p, final Netsim simulation, TimeInterpretation timeInterpretation) {
+		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation, timeInterpretation);
         this.transitSchedule = simulation.getScenario().getTransitSchedule();
 	}
 

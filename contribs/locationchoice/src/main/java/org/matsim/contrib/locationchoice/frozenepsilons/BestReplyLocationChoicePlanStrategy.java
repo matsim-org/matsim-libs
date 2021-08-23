@@ -38,6 +38,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -52,6 +53,7 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 	@Inject private ScoringFunctionFactory scoringFunctionFactory;
 	@Inject private Map<String, TravelTime> travelTimes;
 	@Inject private Map<String, TravelDisutilityFactory> travelDisutilities;
+	@Inject private TimeInterpretation timeInterpretation;
 
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
@@ -89,8 +91,8 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( config.planCalcScore() ) );
 				break;
 		}
-		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities) );
-		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
+		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities, timeInterpretation) );
+		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider, timeInterpretation));
 		
 		delegate.init(replanningContext);
 	}

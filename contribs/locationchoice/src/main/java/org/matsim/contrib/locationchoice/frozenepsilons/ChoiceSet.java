@@ -45,11 +45,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.MultiNodeDijkstra;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
@@ -64,6 +64,7 @@ class ChoiceSet {
 	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<>();
 	private final ActivityFacilities facilities;
 	private final Scenario scenario;
+	private final TimeInterpretation timeInterpretation;
 
 	private MultiNodeDijkstra forwardMultiNodeDijkstra;
 	private BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
@@ -83,10 +84,11 @@ class ChoiceSet {
 		return stb.toString() ;
 	}
 
-	ChoiceSet( FrozenTastesConfigGroup.ApproximationLevel approximationLevel, Scenario scenario ) {
+	ChoiceSet( FrozenTastesConfigGroup.ApproximationLevel approximationLevel, Scenario scenario, TimeInterpretation timeInterpretation ) {
 		this.approximationLevel = approximationLevel;
 		this.facilities = scenario.getActivityFacilities();
 		this.scenario = scenario;
+		this.timeInterpretation = timeInterpretation;
 
 		this.dccg = (FrozenTastesConfigGroup) this.scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 
@@ -184,7 +186,7 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, PlanRouter.calcEndOfActivity(previousActivity, planTmp, scenario.getConfig()), planTmp.getPerson(), null );
+				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, timeInterpretation.decideOnActivityEndTimeAlongPlan(previousActivity, planTmp).seconds(), planTmp.getPerson(), null );
 			}
 
 			// (2) backward tree
@@ -193,7 +195,7 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode,  PlanRouter.calcEndOfActivity(activityToRelocate, planTmp, scenario.getConfig()), planTmp.getPerson(), null );
+				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode,  timeInterpretation.decideOnActivityEndTimeAlongPlan(activityToRelocate, planTmp).seconds(), planTmp.getPerson(), null );
 				// yy it is not clear to me how the dp time is interpreted for the backwards Dijkstra.  kai, mar'19
 			}
 			// ---
@@ -231,7 +233,7 @@ class ChoiceSet {
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario );
 							link = scenario.getNetwork().getLinks().get( linkId );
 
-							startTime = PlanRouter.calcEndOfActivity( previousActivity, planTmp, scenario.getConfig() );
+							startTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( previousActivity, planTmp ).seconds();
 						}
 
 						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
@@ -247,7 +249,7 @@ class ChoiceSet {
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( Objects.requireNonNull( nextAct ), scenario );
 							link = scenario.getNetwork().getLinks().get( linkId );
 						}
-						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
+						double startTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( activityToRelocate, planTmp ).seconds();
 
 						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
 						NetworkRoute linkNetworkRouteImpl = getNetworkRoute(activityToRelocate, link, result);
@@ -259,7 +261,7 @@ class ChoiceSet {
 				default:
 					throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 			}
-			PlanTimesAdapter adapter = new PlanTimesAdapter( this.scenario );
+			PlanTimesAdapter adapter = new PlanTimesAdapter( timeInterpretation );
 			final double score = adapter.scorePlan( planTmp, scoringFunction, planTmp.getPerson() );
 
 			if (score > largestValue) {

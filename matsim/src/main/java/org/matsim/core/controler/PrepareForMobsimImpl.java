@@ -35,6 +35,7 @@ import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
 import javax.inject.Inject;
@@ -56,16 +57,18 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	private final Population population;
 	private final ActivityFacilities activityFacilities;
 	private final Provider<TripRouter> tripRouterProvider;
+	private final TimeInterpretation timeInterpretation;
 	
 	@Inject
 	PrepareForMobsimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
-				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
 		this.population = population;
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
+		this.timeInterpretation = timeInterpretation;
 	}
 	
 	
@@ -95,7 +98,7 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario, 
 								carOnlyNetwork );
 					}
 					// yyyyyy This prepared network is only used for computing the distance.  So the full network would

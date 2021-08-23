@@ -57,6 +57,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -110,6 +111,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 				install(new TripRouterModule());
 				install(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());
+				install(new TimeInterpretationModule());
 				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
 				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
 			}

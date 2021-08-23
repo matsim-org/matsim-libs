@@ -33,6 +33,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
@@ -55,6 +56,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	@Inject PopulationFactory populationFactory;
 	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	@Inject Scenario scenario ;
+	@Inject TimeInterpretation timeInterpretation;
 	@Inject
 	@Named(TransportMode.walk)
 	private RoutingModule walkRouter;
@@ -131,9 +133,9 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 			 */
 			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
 			if (mode.equals(TransportMode.walk)) {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null);
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation);
 			} else {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter) ;
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation) ;
 			}
 			
 		} else {
