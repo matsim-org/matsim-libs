@@ -2,7 +2,6 @@ package org.matsim.application.analysis.noise;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.MATSimAppCommand;

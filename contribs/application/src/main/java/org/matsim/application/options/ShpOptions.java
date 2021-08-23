@@ -24,9 +24,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import javax.annotation.Nullable;
 import picocli.CommandLine;
-
-import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
