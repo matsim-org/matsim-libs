@@ -42,8 +42,12 @@ import com.google.common.collect.ImmutableList;
  */
 public class DefaultMainLegRouter implements RoutingModule {
 	public interface RouteCreator {
-		Route createRoute(double departureTime, Link accessActLink, Link egressActLink,
-				Person person, Attributes tripAttributes, RouteFactories routeFactories);
+		/**
+		 * Creates a route based on basic trip characteristics (departure time, origin
+		 * and destination location) and potential person- or trip-based requirements.
+		 */
+		Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
+				Attributes tripAttributes, RouteFactories routeFactories);
 	}
 
 	private final String mode;
