@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Helps to work on plans with complex trips.
@@ -376,12 +377,20 @@ public final class TripStructureUtils {
 		public List<Leg> getLegsOnly() {
 			return legs;
 		}
+		
+		/**
+		 * Attributes of preceding activity are passed as trip attributes until more explicit encoding is found.
+		 */
+		public Attributes getTripAttributes() {
+			return originActivity.getAttributes();
+		}
 
 		@Override
 		public String toString() {
 			return "{Trip: origin="+originActivity+"; "+
 					       "trip="+trip+"; "+
-					       "destination="+destinationActivity+"}";
+					       "destination="+destinationActivity + "; " +
+					       getTripAttributes().toString() + "}";
 		}
 
 		@Override
