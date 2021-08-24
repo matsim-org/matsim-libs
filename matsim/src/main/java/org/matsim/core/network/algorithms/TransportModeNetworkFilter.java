@@ -128,7 +128,7 @@ public final class TransportModeNetworkFilter {
 						for (Link link : event.getLinks()) {
 							Link subNetworkLink = subNetwork.getLinks().get(link.getId());
 							
-							if (subNetwork != null) {
+							if (subNetworkLink != null) {
 								subNetworkEvent.addLink(subNetworkLink);
 							}
 						}
