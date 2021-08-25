@@ -43,6 +43,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.mockito.Mockito;
 
 /**
@@ -62,7 +63,7 @@ public class RoutingTimeStructureTest {
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
 		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(fromFacility, toFacility))
+		when(stopFinder.findFacilities(fromFacility, toFacility, new Attributes()))
 				.thenReturn(Optional.of(Pair.of(accessFacility, egressFacility)));
 
 		RoutingModule accessRouter = mock(RoutingModule.class);
@@ -122,7 +123,7 @@ public class RoutingTimeStructureTest {
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
 		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(fromFacility, toFacility))
+		when(stopFinder.findFacilities(fromFacility, toFacility, new Attributes()))
 				.thenReturn(Optional.of(Pair.of(accessFacility, egressFacility)));
 
 		RoutingModule accessRouter = mock(RoutingModule.class);
