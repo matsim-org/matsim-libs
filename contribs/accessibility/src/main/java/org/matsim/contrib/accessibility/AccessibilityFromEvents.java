@@ -17,6 +17,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 import java.util.*;
 
@@ -72,6 +73,7 @@ public final class AccessibilityFromEvents{
 			@Override public void install(){
 				install( new ScenarioByInstanceModule( scenario ) ) ;
 				install( new TripRouterModule() ) ;
+				install( new TimeInterpretationModule() );
 				for( String mode : getConfig().plansCalcRoute().getNetworkModes() ){
 					addTravelTimeBinding( mode ).toInstance( map.get(mode) );
 				}

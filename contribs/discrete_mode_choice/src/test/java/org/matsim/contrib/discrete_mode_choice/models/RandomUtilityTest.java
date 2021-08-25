@@ -27,8 +27,10 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class RandomUtilityTest {
 	@Test
@@ -37,7 +39,8 @@ public class RandomUtilityTest {
 		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
 		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
 		FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
-		TripEstimator estimator = new UniformTripEstimator(new EndTimeThenDurationInterpreter.Factory(0.0, true));
+		TripEstimator estimator = new UniformTripEstimator(TimeInterpretation.create(
+				ActivityDurationInterpretation.tryEndTimeThenDuration, TripDurationHandling.shiftActivityEndTimes));
 		UtilitySelectorFactory selectorFactory = new RandomSelector.Factory();
 
 		Activity originActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
@@ -50,7 +53,9 @@ public class RandomUtilityTest {
 				destinationActivity, null, Collections.emptyList(), 0, 0, 0));
 
 		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
-				selectorFactory, fallbackBehaviour, new EndTimeThenDurationInterpreter.Factory(0.0, true));
+				selectorFactory, fallbackBehaviour,
+				TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
+						TripDurationHandling.shiftActivityEndTimes));
 
 		Map<String, Integer> choices = new HashMap<>();
 		Random random = new Random(0);

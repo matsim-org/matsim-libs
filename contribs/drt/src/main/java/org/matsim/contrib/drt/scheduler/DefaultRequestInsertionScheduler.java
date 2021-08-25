@@ -288,8 +288,9 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			}
 			if (taskIdx + 1 == schedule.getTaskCount()) {
 				// no stay task at the end if the pickup follows the existing stay task
-				schedule.addTask(taskFactory.createStayTask(vehicleEntry.vehicle, dropoffStopTask.getEndTime(),
-						vehicleEntry.vehicle.getServiceEndTime(), dropoffStopTask.getLink()));
+				double endTime = Math.max(dropoffStopTask.getEndTime(), vehicleEntry.vehicle.getServiceEndTime());
+				schedule.addTask(taskFactory.createStayTask(vehicleEntry.vehicle, dropoffStopTask.getEndTime(), endTime,
+						dropoffStopTask.getLink()));
 			} else {
 				throw new RuntimeException();
 			}

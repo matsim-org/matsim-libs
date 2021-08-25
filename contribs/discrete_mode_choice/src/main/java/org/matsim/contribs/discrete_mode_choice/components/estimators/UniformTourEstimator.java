@@ -10,7 +10,8 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.DefaultTripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeTracker;
 
 /**
  * This estimator simply return a zero utility for every tour candidate that it
@@ -19,10 +20,10 @@ import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.Time
  * @author sebhoerl
  */
 public class UniformTourEstimator implements TourEstimator {
-	private final TimeInterpreter.Factory timeInterpreterFactory;
+	private final TimeInterpretation timeInterpretation;
 
-	public UniformTourEstimator(TimeInterpreter.Factory timeInterpreterFactory) {
-		this.timeInterpreterFactory = timeInterpreterFactory;
+	public UniformTourEstimator(TimeInterpretation timeInterpretation) {
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -30,20 +31,20 @@ public class UniformTourEstimator implements TourEstimator {
 			List<TourCandidate> previousTours) {
 		List<TripCandidate> tripCandidates = new ArrayList<>(modes.size());
 
-		TimeInterpreter time = timeInterpreterFactory.createTimeInterpreter();
-		time.setTime(trips.get(0).getDepartureTime());
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+		timeTracker.setTime(trips.get(0).getDepartureTime());
 
 		for (int index = 0; index < modes.size(); index++) {
 			DiscreteModeChoiceTrip trip = trips.get(index);
 
 			if (index > 0) { // We're already at the end of the first origin activity
-				time.addActivity(trip.getOriginActivity());
-				trip.setDepartureTime(time.getCurrentTime());
+				timeTracker.addActivity(trip.getOriginActivity());
+				trip.setDepartureTime(timeTracker.getTime().seconds());
 			}
 
-			time.addPlanElements(trip.getInitialElements());
+			timeTracker.addElements(trip.getInitialElements());
 
-			double duration = time.getCurrentTime() - trip.getDepartureTime();
+			double duration = timeTracker.getTime().seconds() - trip.getDepartureTime();
 			tripCandidates.add(new DefaultTripCandidate(1.0, modes.get(index), duration));
 		}
 

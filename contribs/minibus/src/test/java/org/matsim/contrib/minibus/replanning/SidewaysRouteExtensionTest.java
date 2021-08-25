@@ -23,8 +23,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.minibus.PConstants;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
 import org.matsim.testcases.MatsimTestUtils;
 

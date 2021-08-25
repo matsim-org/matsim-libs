@@ -10,7 +10,8 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeTracker;
 
 /**
  * This class is a TourEstimator which is based on a TripEstimator. Every trip
@@ -20,12 +21,12 @@ import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.Time
  * @author sebhoerl
  */
 public class CumulativeTourEstimator implements TourEstimator {
-	private final TimeInterpreter.Factory timeInterpreterFactory;
+	private final TimeInterpretation timeInterpretation;
 	private final TripEstimator delegate;
 
-	public CumulativeTourEstimator(TripEstimator delegate, TimeInterpreter.Factory timeInterpreterFactory) {
+	public CumulativeTourEstimator(TripEstimator delegate, TimeInterpretation timeInterpretation) {
 		this.delegate = delegate;
-		this.timeInterpreterFactory = timeInterpreterFactory;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -34,21 +35,21 @@ public class CumulativeTourEstimator implements TourEstimator {
 		List<TripCandidate> tripCandidates = new LinkedList<>();
 		double utility = 0.0;
 
-		TimeInterpreter time = timeInterpreterFactory.createTimeInterpreter();
-		time.setTime(trips.get(0).getDepartureTime());
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+		timeTracker.setTime(trips.get(0).getDepartureTime());
 
 		for (int i = 0; i < modes.size(); i++) {
 			String mode = modes.get(i);
 			DiscreteModeChoiceTrip trip = trips.get(i);
 
 			if (i > 0) { // We're already at the end of the first origin activity
-				time.addActivity(trip.getOriginActivity());
-				trip.setDepartureTime(time.getCurrentTime());
+				timeTracker.addActivity(trip.getOriginActivity());
+				trip.setDepartureTime(timeTracker.getTime().seconds());
 			}
 
 			TripCandidate tripCandidate = delegate.estimateTrip(person, mode, trip, tripCandidates);
 			utility += tripCandidate.getUtility();
-			time.addTime(tripCandidate.getDuration());
+			timeTracker.addDuration(tripCandidate.getDuration());
 
 			tripCandidates.add(tripCandidate);
 		}

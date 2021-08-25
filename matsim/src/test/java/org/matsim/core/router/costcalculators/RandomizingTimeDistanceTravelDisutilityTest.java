@@ -43,6 +43,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.NetworkRoutingModule;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -110,7 +111,7 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		            router);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
-		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person) ;
+		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 7.0*3600, person)) ;
 		Assert.assertEquals(1, result.size() );
 		Leg leg = (Leg) result.get(0) ;				
 		return (NetworkRoute) leg.getRoute();

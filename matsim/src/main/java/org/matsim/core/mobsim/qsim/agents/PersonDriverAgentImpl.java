@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -53,9 +54,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	private BasicPlanAgentImpl basicAgentDelegate ;
 	private PlanBasedDriverAgentImpl driverAgentDelegate ;
 
-	public PersonDriverAgentImpl(final Plan plan1, final Netsim simulation) {
+	public PersonDriverAgentImpl(final Plan plan1, final Netsim simulation, final TimeInterpretation timeInterpretation) {
 		basicAgentDelegate = new BasicPlanAgentImpl(plan1, simulation.getScenario(), simulation.getEventsManager(), 
-				simulation.getSimTimer() ) ;
+				simulation.getSimTimer(), timeInterpretation ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate) ;
 		
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.

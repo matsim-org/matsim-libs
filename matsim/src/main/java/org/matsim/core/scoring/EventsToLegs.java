@@ -38,6 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -183,6 +184,7 @@ public final class EventsToLegs
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		Leg leg = PopulationUtils.createLeg(event.getLegMode());
+		TripStructureUtils.setRoutingMode(leg, event.getRoutingMode());
 		leg.setDepartureTime(event.getTime());
 		legs.put(event.getPersonId(), leg);
 

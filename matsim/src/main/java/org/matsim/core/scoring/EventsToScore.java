@@ -70,7 +70,7 @@ public final class EventsToScore {
 	public static EventsToScore createWithScoreUpdating(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
-				new ExperiencedPlansModule(),
+				new StandaloneExperiencedPlansModule(false),
 				new AbstractModule() {
 					@Override
 					public void install() {
@@ -90,7 +90,7 @@ public final class EventsToScore {
 	public static EventsToScore createWithoutScoreUpdating(Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
-				new ExperiencedPlansModule(),
+				new StandaloneExperiencedPlansModule(false),
 				new AbstractModule() {
 					@Override
 					public void install() {
