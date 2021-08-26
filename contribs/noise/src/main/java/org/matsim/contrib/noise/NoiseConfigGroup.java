@@ -31,11 +31,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -87,6 +84,8 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String NOISE_BARRIERS_SOURCE_CRS = "source coordinate reference system of noise barriers geojson file";
 	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
 	private static final String NOISE_COMPUTATION_METHOD = "noiseComputationMethod";
+	private static final String USE_DEM = "useDGM";
+	private static final String DEM_FILE = "DGMFile";
 
 	public NoiseConfigGroup() {
 		super(GROUP_NAME);
@@ -143,6 +142,9 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private boolean considerNoiseBarriers = false;
     private String noiseBarriersFilePath = null;
     private String noiseBarriersSourceCrs = null;
+
+    private boolean useDEM = false;
+    private String demFile = null;
 
     public enum NoiseComputationMethod {
         RLS90,RLS19
@@ -203,7 +205,10 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
         comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
         comments.put(NOISE_BARRIERS_SOURCE_CRS, "Source coordinate reference system of noise barriers geojson file.");
 
-        comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
+		comments.put(USE_DEM, "Set to 'true' if a DEM (digital elevation model) should be used for road gradients. Otherwise set to 'false'.");
+		comments.put(DEM_FILE, "Path to the geoTiff file of the DEM.");
+
+		comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
 
         comments.put(NOISE_COMPUTATION_METHOD, "Specifies the computation method of different guidelines: " + Arrays.toString(NoiseComputationMethod.values()));
 
@@ -753,6 +758,26 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     public void setNoiseBarriersFilePath(String noiseBarriersFilePath) {
         this.noiseBarriersFilePath = noiseBarriersFilePath;
     }
+
+	@StringGetter(USE_DEM)
+	public boolean isUseDEM() {
+		return this.useDEM;
+	}
+
+	@StringSetter(USE_DEM)
+	public void setUseDEM(boolean useDEM) {
+		this.useDEM = useDEM;
+	}
+
+	@StringGetter(DEM_FILE)
+	public String getDEMFile() {
+		return this.demFile;
+	}
+
+	@StringSetter(DEM_FILE)
+	public void setDEMFilePath(String demFilePath) {
+		this.demFile = demFilePath;
+	}
 
     @StringGetter(NOISE_BARRIERS_SOURCE_CRS)
     public String getNoiseBarriersSourceCRS() {
