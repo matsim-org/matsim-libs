@@ -104,7 +104,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 					FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities), //
 					timeTracker.getTime().seconds(), //
 					plan.getPerson(), //
-					oldTrip.getOriginActivity().getAttributes() //
+					oldTrip.getTripAttributes() //
 			);
 			
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
