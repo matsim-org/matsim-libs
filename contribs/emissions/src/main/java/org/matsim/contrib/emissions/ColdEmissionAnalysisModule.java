@@ -164,19 +164,7 @@ final class ColdEmissionAnalysisModule {
 			changeVehCategory(key, HbefaVehicleCategory.COACH, HbefaVehicleCategory.PASSENGER_CAR);
 		}
 		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)){
-			for ( Pollutant coldPollutant : coldPollutants) {
-				coldEmissionsOfEvent.put( coldPollutant, 0.0 );
-				// yyyyyy todo replace by something more meaningful. kai, jan'20
-			}
-			if(vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.MOTORCYCLE +
-					//	". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-						"Currently, this code is setting the emissions of such vehicles to zero - as it was in the last years" +
-					"Might be necessary to find a better solution for this.  kturner, may'20" );
-				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
+			changeVehCategory(key, HbefaVehicleCategory.MOTORCYCLE, HbefaVehicleCategory.PASSENGER_CAR);
 			return coldEmissionsOfEvent;
 		}
 
