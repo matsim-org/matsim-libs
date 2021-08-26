@@ -215,13 +215,20 @@ final class ColdEmissionAnalysisModule {
 	 * @param originVehCat
 	 * @param targetvehCat
 	 */
+	//TODO Mabe make the behaviour settable by an enum? -> keep some kind of backwards capability or just return a 0.0 as it is for motorcycle?
 	private void changeVehCategory(HbefaColdEmissionFactorKey key, HbefaVehicleCategory originVehCat, HbefaVehicleCategory targetvehCat) {
-		key.setVehicleCategory(targetvehCat);
+//		key.setVehicleCategory(targetvehCat);
+//		if (vehInfoWarnHDVCnt < maxWarnCnt) {
+//			vehInfoWarnHDVCnt++;
+//			logger.warn("HBEFA does not provide cold start emission factors for " +
+//					originVehCat +
+//					". Setting vehicle category to " + targetvehCat + "...");
+//			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//		}
 		if (vehInfoWarnHDVCnt < maxWarnCnt) {
 			vehInfoWarnHDVCnt++;
-			logger.warn("HBEFA does not provide cold start emission factors for " +
-					originVehCat +
-					". Setting vehicle category to " + targetvehCat + "...");
+			logger.warn("Automagic changing of VehCategory is disabled. Please make sure that your table contains the " +
+					"necessary values for " + originVehCat.name());
 			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 		}
 	}
