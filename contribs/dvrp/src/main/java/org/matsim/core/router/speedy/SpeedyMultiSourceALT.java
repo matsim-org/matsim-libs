@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class SpeedyMultiSourceALT {
 		}
 	}
 
-	public Path calcLeastCostPath(List<StartNode> startNodes, Node endNode, Person person, Vehicle vehicle,
+	public Path calcLeastCostPath(Collection<StartNode> startNodes, Node endNode, Person person, Vehicle vehicle,
 			boolean backward) {
 		this.currentIteration++;
 		if (this.currentIteration == Integer.MAX_VALUE) {
