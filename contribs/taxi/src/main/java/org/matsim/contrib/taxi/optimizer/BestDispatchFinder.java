@@ -94,7 +94,7 @@ public class BestDispatchFinder {
 
 				InitialNode existingInitialNode = initialNodes.get(vehNode.getId());
 				if (existingInitialNode == null || existingInitialNode.initialCost > delay) {
-					InitialNode newInitialNode = new InitialNode(vehNode, delay, delay);
+					InitialNode newInitialNode = new InitialNode(vehNode, delay, departure.time + 1);
 					initialNodes.put(vehNode.getId(), newInitialNode);
 					nodeToVehicle.put(vehNode.getId(), veh);
 				}
@@ -147,7 +147,7 @@ public class BestDispatchFinder {
 				double delayAtLastLink = link.getLength() / link.getFreespeed(departure.time);
 
 				// works most fair (FIFO) if unplannedRequests (=destinations) are sorted by T0 (ascending)
-				InitialNode newInitialNode = new InitialNode(link.getFromNode(), delayAtLastLink, delayAtLastLink);
+				InitialNode newInitialNode = new InitialNode(link.getFromNode(), delayAtLastLink, departure.time + delayAtLastLink);
 				initialNodes.put(locNodeId, newInitialNode);
 				nodeToDestination.put(locNodeId, loc);
 			}
