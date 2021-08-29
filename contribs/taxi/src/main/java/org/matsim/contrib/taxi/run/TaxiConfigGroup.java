@@ -183,10 +183,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (config.qsim().getNumberOfThreads() > 1) {
-			log.warn("EXPERIMENTAL FEATURE: Running taxi with a multi-threaded QSim");
-		}
-
 		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
 				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
 
