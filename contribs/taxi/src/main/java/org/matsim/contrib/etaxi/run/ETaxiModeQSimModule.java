@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import java.util.function.Supplier;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -118,9 +120,10 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				Network network = getModalInstance(Network.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility,
-						travelTime);
-				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
+				var speedyALTFactory = new SpeedyALTFactory();
+				Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(network,
+						travelDisutility, travelTime);
+				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
 			}
 		}).asEagerSingleton();
 

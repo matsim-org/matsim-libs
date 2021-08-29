@@ -23,6 +23,7 @@ import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -60,12 +61,13 @@ public class TaxiScheduler {
 	private final TaxiScheduleInquiry taxiScheduleInquiry;
 
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, LeastCostPathCalculator router) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			Supplier<LeastCostPathCalculator> routerSupplier) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.taxiScheduleInquiry = taxiScheduleInquiry;
 		this.travelTime = travelTime;
-		this.router = router;
+		this.router = routerSupplier.get();
 
 		initFleet();
 	}
