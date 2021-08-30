@@ -39,6 +39,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class RecursiveLocationMutator extends AbstractLocationMutator{
 
@@ -189,7 +190,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 			  FacilitiesUtils.toFacility( fromAct, null ),
 			  FacilitiesUtils.toFacility( toAct, null ),
 				fromAct.getEndTime().seconds(),
-				person, fromAct.getAttributes() );
+				person, new Attributes() );
 
 		if ( trip.size() != 1 ) {
 			throw new IllegalStateException( "This method can only be used with "+

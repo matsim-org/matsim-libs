@@ -271,10 +271,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		if (config.qsim().getNumberOfThreads() > 1) {
-			log.warn("EXPERIMENTAL FEATURE: Running DRT with a multi-threaded QSim");
-		}
-
 		Verify.verify(getMaxWaitTime() >= getStopDuration(),
 				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
 

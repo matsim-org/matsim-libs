@@ -32,6 +32,7 @@ import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -41,7 +42,12 @@ import com.google.common.collect.ImmutableList;
  */
 public class DefaultMainLegRouter implements RoutingModule {
 	public interface RouteCreator {
-		Route createRoute(double departureTime, Link accessActLink, Link egressActLink, RouteFactories routeFactories);
+		/**
+		 * Creates a route based on basic trip characteristics (departure time, origin
+		 * and destination location) and potential person- or trip-based requirements.
+		 */
+		Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
+				Attributes tripAttributes, RouteFactories routeFactories);
 	}
 
 	private final String mode;
@@ -68,7 +74,7 @@ public class DefaultMainLegRouter implements RoutingModule {
 		Link egressActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(toFacility.getLinkId()),
 				"link: %s does not exist in the network of mode: %s", toFacility.getLinkId(), mode);
 		Route route = routeCreator.createRoute(departureTime, accessActLink, egressActLink,
-				populationFactory.getRouteFactories());
+				request.getPerson(), request.getAttributes(), populationFactory.getRouteFactories());
 
 		Leg leg = populationFactory.createLeg(mode);
 		leg.setDepartureTime(departureTime);
