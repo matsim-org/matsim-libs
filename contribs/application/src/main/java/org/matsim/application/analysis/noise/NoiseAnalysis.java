@@ -37,6 +37,10 @@ public class NoiseAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--runId", description = "Pattern to match runId.", defaultValue = "")
     private String runId;
 
+    @CommandLine.Option(names = "--receiver-point-gap", description = "The gap between analysis points in meter",
+            defaultValue = "250")
+    private double receiverPointGap;
+
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
 
@@ -64,7 +68,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 
         // adjust the default noise parameters
         NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
-        noiseParameters.setReceiverPointGap(250);
+        noiseParameters.setReceiverPointGap(receiverPointGap);
         noiseParameters.setConsideredActivitiesForReceiverPointGridArray(new String[]{"h", "w", "home", "work"});
         noiseParameters.setConsideredActivitiesForDamageCalculationArray(new String[]{"h", "w", "home", "work"});
         if (shp.getShapeFile() != null) {
