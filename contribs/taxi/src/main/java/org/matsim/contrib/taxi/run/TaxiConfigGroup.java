@@ -128,6 +128,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 	static final String NUMBER_OF_THREADS_EXP =
 			"Number of threads used for parallel computation of paths (occupied drive tasks)."
+					+ " 4-6 threads is usually enough. It's recommended to specify a higher number than that if possible"
+					+ " - of course, threads will probably be not 100% busy."
 					+ " Default value is the number of cores available to JVM";
 
 	@NotBlank

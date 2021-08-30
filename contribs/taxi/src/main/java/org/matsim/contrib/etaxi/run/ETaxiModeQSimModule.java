@@ -105,7 +105,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
 						getter.getModal(Network.class), getMode()))).asEagerSingleton();
 
-		bindModal(ETaxiScheduler.class).toProvider(new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
+		addModalComponent(ETaxiScheduler.class, new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 			@Inject
 			private MobsimTimer timer;
 
@@ -125,7 +125,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 						travelDisutility, travelTime);
 				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
 			}
-		}).asEagerSingleton();
+		});
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
