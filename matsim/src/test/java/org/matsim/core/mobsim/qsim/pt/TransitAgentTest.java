@@ -45,6 +45,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -103,7 +104,7 @@ public class TransitAgentTest extends TestCase {
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 
@@ -149,7 +150,7 @@ public class TransitAgentTest extends TestCase {
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
 				.useDefaults() //
 				.build(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 

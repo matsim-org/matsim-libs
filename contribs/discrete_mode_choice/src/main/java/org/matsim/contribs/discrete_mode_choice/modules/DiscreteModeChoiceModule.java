@@ -4,7 +4,6 @@ import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoic
 import org.matsim.contribs.discrete_mode_choice.modules.utils.ModeChoiceInTheLoopChecker;
 import org.matsim.contribs.discrete_mode_choice.replanning.DiscreteModeChoiceStrategyProvider;
 import org.matsim.contribs.discrete_mode_choice.replanning.NonSelectedPlanSelector;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreterModule;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
@@ -34,6 +33,5 @@ public class DiscreteModeChoiceModule extends AbstractModule {
 		}
 
 		install(new ModelModule());
-		install(new TimeInterpreterModule());
 	}
 }

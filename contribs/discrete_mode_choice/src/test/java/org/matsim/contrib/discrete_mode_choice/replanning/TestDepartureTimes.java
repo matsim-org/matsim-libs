@@ -42,9 +42,10 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
 import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
 import org.matsim.contribs.discrete_mode_choice.replanning.TripListConverter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class TestDepartureTimes {
 	@Test
@@ -190,16 +191,17 @@ public class TestDepartureTimes {
 		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
 		UtilitySelectorFactory selectorFactory = new RandomSelector.Factory();
 		FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
-		TimeInterpreter.Factory timeInterpreterFactory = new EndTimeThenDurationInterpreter.Factory(0.0, true);
 
 		return new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory, selectorFactory,
-				fallbackBehaviour, timeInterpreterFactory);
+				fallbackBehaviour, TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
+						TripDurationHandling.shiftActivityEndTimes));
 	}
 
 	static private TourBasedModel createTourBasedModel() {
-		TimeInterpreter.Factory timeInterpreterFactory = new EndTimeThenDurationInterpreter.Factory(0.0, true);
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(
+				ActivityDurationInterpretation.tryEndTimeThenDuration, TripDurationHandling.shiftActivityEndTimes);
 
-		TourEstimator estimator = new CumulativeTourEstimator(new TestTripEstimator(), timeInterpreterFactory);
+		TourEstimator estimator = new CumulativeTourEstimator(new TestTripEstimator(), timeInterpretation);
 		TourFilter tourFilter = new CompositeTourFilter(Collections.emptySet());
 		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car"));
 		TourConstraintFactory constraintFactory = new CompositeTourConstraintFactory();
@@ -209,7 +211,7 @@ public class TestDepartureTimes {
 		ModeChainGeneratorFactory modeChainGeneratorFactory = new DefaultModeChainGenerator.Factory();
 
 		return new TourBasedModel(estimator, modeAvailability, constraintFactory, tourFinder, tourFilter,
-				selectorFactory, modeChainGeneratorFactory, fallbackBehaviour, timeInterpreterFactory);
+				selectorFactory, modeChainGeneratorFactory, fallbackBehaviour, timeInterpretation);
 	}
 
 	static private class TestTripEstimator implements TripEstimator {

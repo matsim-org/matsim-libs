@@ -31,6 +31,7 @@ import org.matsim.facilities.*;
 import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -139,7 +140,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
         double expSum = 0.;
 
-        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null);
+        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null, new Attributes());
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
             //compute direct walk costs

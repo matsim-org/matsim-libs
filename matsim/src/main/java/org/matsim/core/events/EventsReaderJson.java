@@ -247,12 +247,14 @@ public final class EventsReaderJson {
 					mode));
 		} else if (PersonDepartureEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = o.path(PersonDepartureEvent.ATTRIBUTE_LEGMODE).asText(null);
-			String mode = legMode == null ? null : legMode.intern();
+			String canonicalLegMode = legMode == null ? null : legMode.intern();
+			String routingMode = o.path(PersonDepartureEvent.ATTRIBUTE_ROUTING_MODE).asText(null);
+			String canonicalRoutingMode = routingMode == null ? null : routingMode.intern();
 			this.events.processEvent(new PersonDepartureEvent(
 					time,
 					Id.create(o.get(PersonDepartureEvent.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(PersonDepartureEvent.ATTRIBUTE_LINK).asText(), Link.class),
-					mode));
+					canonicalLegMode, canonicalRoutingMode));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = o.path(PersonStuckEvent.ATTRIBUTE_LEGMODE).asText(null);
 			String mode = legMode == null ? null : legMode.intern();

@@ -76,12 +76,12 @@ public class TaxiFareHandlerTest {
 
 		Id<Person> p1 = Id.createPersonId("p1");
 		Id<Vehicle> t1 = Id.createVehicleId("v1");
-		events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("12"), mode));
+		events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("12"), mode, mode));
 		events.processEvent(new PersonEntersVehicleEvent(60.0, p1, t1));
 		events.processEvent(new LinkEnterEvent(61, t1, Id.createLinkId("23")));
 		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), mode));
 
-		events.processEvent(new PersonDepartureEvent(180.0, p1, Id.createLinkId("12"), mode));
+		events.processEvent(new PersonDepartureEvent(180.0, p1, Id.createLinkId("12"), mode, mode));
 		events.processEvent(new PersonEntersVehicleEvent(240.0, p1, t1));
 		events.processEvent(new LinkEnterEvent(241, t1, Id.createLinkId("23")));
 		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), mode));
@@ -91,7 +91,7 @@ public class TaxiFareHandlerTest {
 		Assert.assertEquals(-6.2, fare.getValue(), 0);
 
 		// test minFarePerTrip
-		events.processEvent(new PersonDepartureEvent(360.0, p1, Id.createLinkId("23"), mode));
+		events.processEvent(new PersonDepartureEvent(360.0, p1, Id.createLinkId("23"), mode, mode));
 		events.processEvent(new PersonEntersVehicleEvent(400.0, p1, t1));
 		events.processEvent(new LinkEnterEvent(401, t1, Id.createLinkId("34")));
 		events.processEvent(new PersonArrivalEvent(410.0, p1, Id.createLinkId("34"), mode));
