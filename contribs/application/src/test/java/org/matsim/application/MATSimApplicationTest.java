@@ -82,6 +82,12 @@ public class MATSimApplicationTest {
 
 		assertThat(controler.getConfig().controler().getRunId())
 				.isEqualTo("run-10pct");
+
+		controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig());
+
+		assertThat(controler.getConfig().controler().getRunId())
+				.isEqualTo("run-25pct");
+
 	}
 
 	@Test
@@ -172,7 +178,7 @@ public class MATSimApplicationTest {
 		@Override
 		protected Config prepareConfig(Config config) {
 
-			config.controler().setRunId(sample.adjustName("run-1pct"));
+			config.controler().setRunId(sample.adjustName("run-25pct"));
 
 			return config;
 		}
