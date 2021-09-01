@@ -53,8 +53,6 @@ public class PositionEmissionsModule extends AbstractModule {
 	@Override
 	public void install() {
 
-	    log.info("////////////////////////////////////////////////////////////////// this version has the transit vehicles /////////////////////////////////////////////////");
-
 		checkConsistency(config);
 		bind(EmissionCalculator.class);
 		bind(EmissionModule.class);
