@@ -37,8 +37,9 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
+import org.matsim.contrib.common.util.DistanceUtils;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
@@ -51,7 +52,6 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
-import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -117,7 +117,7 @@ public class DrtSpeedUpTest {
 			1);
 
 	private final FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-	private final DrtRequestAnalyzer requestAnalyzer = mock(DrtRequestAnalyzer.class);
+	private final DrtEventSequenceCollector requestAnalyzer = mock(DrtEventSequenceCollector.class);
 
 	@Test
 	public void test_useOnlyInitialEstimates_noRegression() {
@@ -276,7 +276,8 @@ public class DrtSpeedUpTest {
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
 		var dropoffEvent = new PassengerDroppedOffEvent(submittedTime + waitTime + rideTime, MODE, requestId, null,
 				null);
-		var drtFare = new PersonMoneyEvent(submittedTime, null, 5.5, DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, MODE, requestId.toString());
+		var drtFare = new PersonMoneyEvent(submittedTime, null, 5.5, DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE,
+				MODE, requestId.toString());
 		return new PerformedRequestEventSequence(submittedEvent, mock(PassengerRequestScheduledEvent.class),
 				pickupEvent, dropoffEvent, drtFare);
 	}
