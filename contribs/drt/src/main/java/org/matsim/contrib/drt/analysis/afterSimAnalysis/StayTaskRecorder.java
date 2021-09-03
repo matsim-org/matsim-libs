@@ -15,19 +15,22 @@ import java.util.Map;
 
 public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private final Map<Id<Person>, StayTaskDataEntry> startedStayTasksMap = new HashMap<>();
-	private final List<StayTaskDataEntry> stayTaskDataEntriesList = new ArrayList<>();
-	private int counter = 0;
+	private final Map<Id<Person>, OutsideNetworkTaskDataEntry> startedStayTasksMap = new HashMap<>();
+	private final Map<Id<Person>, OutsideNetworkTaskDataEntry> startedStopTasksMap = new HashMap<>();
+	private final List<OutsideNetworkTaskDataEntry> stayTaskDataEntries = new ArrayList<>();
+	private final List<OutsideNetworkTaskDataEntry> stopTaskDataEntries = new ArrayList<>();
+	private int stayTaskCounter = 0;
+	private int stopTaskCounter = 0;
 
-	static class StayTaskDataEntry {
+	static class OutsideNetworkTaskDataEntry {
 		private final Id<Link> linkId;
 		private final double startTime;
 		private final Id<Person> personId;
-		private final String stayTaskId;
+		private final String taskId;
 		private double endTime;
 
-		public StayTaskDataEntry(String stayTaskId, Id<Person> personId, double startTime, Id<Link> linkId) {
-			this.stayTaskId = stayTaskId;
+		public OutsideNetworkTaskDataEntry(String taskId, Id<Person> personId, double startTime, Id<Link> linkId) {
+			this.taskId = taskId;
 			this.personId = personId;
 			this.startTime = startTime;
 			this.linkId = linkId;
@@ -49,8 +52,8 @@ public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndE
 			return personId;
 		}
 
-		public String getStayTaskId() {
-			return stayTaskId;
+		public String getTaskId() {
+			return taskId;
 		}
 
 		public Id<Link> getLinkId() {
@@ -63,10 +66,18 @@ public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndE
 	public void handleEvent(ActivityStartEvent event) {
 		if (event.getActType().equals("DrtStay")) {
 			Id<Person> personId = event.getPersonId();
-			StayTaskDataEntry stayTaskDataEntry = new StayTaskDataEntry("stayTask_" + counter,
+			OutsideNetworkTaskDataEntry stayTaskDataEntry = new OutsideNetworkTaskDataEntry("stayTask_" + stayTaskCounter,
 					personId, event.getTime(), event.getLinkId());
 			startedStayTasksMap.put(personId, stayTaskDataEntry);
-			counter += 1;
+			stayTaskCounter += 1;
+		}
+
+		if (event.getActType().equals("DrtBusStop")){
+			Id<Person> personId = event.getPersonId();
+			OutsideNetworkTaskDataEntry stopTaskDataEntry = new OutsideNetworkTaskDataEntry("stopTask_" + stopTaskCounter,
+					personId, event.getTime(), event.getLinkId());
+			startedStopTasksMap.put(personId, stopTaskDataEntry);
+			stopTaskCounter += 1;
 		}
 
 	}
@@ -75,27 +86,42 @@ public class StayTaskRecorder implements ActivityStartEventHandler, ActivityEndE
 	public void handleEvent(ActivityEndEvent event) {
 		if (event.getActType().equals("DrtStay")) {
 			Id<Person> personId = event.getPersonId();
-			StayTaskDataEntry stayTaskDataEntry = startedStayTasksMap.get(personId);
+			OutsideNetworkTaskDataEntry stayTaskDataEntry = startedStayTasksMap.get(personId);
 			stayTaskDataEntry.setEndTime(event.getTime());
-			stayTaskDataEntriesList.add(stayTaskDataEntry);
+			stayTaskDataEntries.add(stayTaskDataEntry);
 			startedStayTasksMap.remove(personId);
+		}
+
+		if (event.getActType().equals("DrtBusStop")) {
+			Id<Person> personId = event.getPersonId();
+			OutsideNetworkTaskDataEntry stopTaskDataEntry = startedStopTasksMap.get(personId);
+			stopTaskDataEntry.setEndTime(event.getTime());
+			stopTaskDataEntries.add(stopTaskDataEntry);
+			startedStopTasksMap.remove(personId);
 		}
 
 	}
 
 	@Override
 	public void reset(int iteration) {
-		counter = 0;
-		stayTaskDataEntriesList.clear();
+		stayTaskCounter = 0;
+		stayTaskDataEntries.clear();
+		stopTaskDataEntries.clear();
 		startedStayTasksMap.clear();
+		startedStopTasksMap.clear();
 	}
 
-	public List<StayTaskDataEntry> getStayTaskDataEntriesList() {
-		return stayTaskDataEntriesList;
+	public List<OutsideNetworkTaskDataEntry> getStayTaskDataEntries() {
+		return stayTaskDataEntries;
 	}
 
-	public Map<Id<Person>, StayTaskDataEntry> getStartedStayTasksMap() {
+	public List<OutsideNetworkTaskDataEntry> getStopTaskDataEntries(){
+		return stopTaskDataEntries;
+	}
+
+	public Map<Id<Person>, OutsideNetworkTaskDataEntry> getStartedStayTasksMap() {
 		return startedStayTasksMap;
 	}
+	public Map<Id<Person>, OutsideNetworkTaskDataEntry> getStartedStopTasksMap() { return startedStopTasksMap; }
 
 }
