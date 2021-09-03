@@ -62,9 +62,9 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtVehicleDistanceStats.class));
 
-		bindModal(DrtRequestAnalyzer.class).toProvider(
-				modalProvider(getter -> new DrtRequestAnalyzer(drtCfg.getMode()))).asEagerSingleton();
-		addEventHandlerBinding().to(modalKey(DrtRequestAnalyzer.class));
+		bindModal(DrtEventSequenceCollector.class).toProvider(
+				modalProvider(getter -> new DrtEventSequenceCollector(drtCfg.getMode()))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtEventSequenceCollector.class));
 
 		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
@@ -80,6 +80,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
 						getter.getModal(FleetSpecification.class), getter.getModal(DrtVehicleDistanceStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class),
-						getter.getModal(DrtRequestAnalyzer.class), getter.getModal(DrtVehicleOccupancyProfileCalculator.class)))).asEagerSingleton();
+						getter.getModal(DrtEventSequenceCollector.class),
+						getter.getModal(DrtVehicleOccupancyProfileCalculator.class)))).asEagerSingleton();
 	}
 }
