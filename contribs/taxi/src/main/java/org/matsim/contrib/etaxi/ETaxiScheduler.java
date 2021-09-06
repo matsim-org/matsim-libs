@@ -19,7 +19,12 @@
 
 package org.matsim.contrib.etaxi;
 
-import com.google.inject.name.Named;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.EMPTY_DRIVE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -41,17 +46,15 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.EMPTY_DRIVE;
+import com.google.inject.name.Named;
 
 public class ETaxiScheduler extends TaxiScheduler {
 	public static final TaxiTaskType DRIVE_TO_CHARGER = new TaxiTaskType("DRIVE_TO_CHARGER", EMPTY_DRIVE);
 
 	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, LeastCostPathCalculator router) {
-		super(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			Supplier<LeastCostPathCalculator> routerCreator) {
+		super(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
 	}
 
 	// FIXME underestimated due to the ongoing AUX/drive consumption

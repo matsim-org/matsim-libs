@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.util.function.Supplier;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -98,7 +100,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			}
 		});
 
-		bindModal(TaxiScheduler.class).toProvider(new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
+		addModalComponent(TaxiScheduler.class, new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 			@Inject
 			private MobsimTimer timer;
 
@@ -113,11 +115,12 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				Network network = getModalInstance(Network.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility,
-						travelTime);
-				return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
+				var speedyALTFactory = new SpeedyALTFactory();
+				Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(network,
+						travelDisutility, travelTime);
+				return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
 			}
-		}).asEagerSingleton();
+		});
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),

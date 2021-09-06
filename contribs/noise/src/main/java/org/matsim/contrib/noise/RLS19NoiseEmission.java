@@ -2,10 +2,17 @@ package org.matsim.contrib.noise;
 
 import com.google.common.collect.Range;
 import com.google.inject.Inject;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.matsim.contrib.noise.RLS19VehicleType.*;
 
@@ -19,12 +26,21 @@ class RLS19NoiseEmission implements NoiseEmission {
     private final NoiseConfigGroup noiseParams;
     private final Network network;
     private final RoadSurfaceContext surfaceContext;
+    private final DEMContext demContext;
+    private CoordinateReferenceSystem crs;
 
     @Inject
-    RLS19NoiseEmission(Scenario scenario, RoadSurfaceContext surfaceContext) {
-        noiseParams = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
+    RLS19NoiseEmission(Scenario scenario, RoadSurfaceContext surfaceContext, DEMContext demContext) {
+        Config config = scenario.getConfig();
+        try {
+            crs = CRS.decode(config.global().getCoordinateSystem());
+        } catch (FactoryException e) {
+            e.printStackTrace();
+        }
+        noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
         network = scenario.getNetwork();
         this.surfaceContext = surfaceContext;
+        this.demContext = demContext;
     }
 
     /**
@@ -99,8 +115,6 @@ class RLS19NoiseEmission implements NoiseEmission {
         double pLkw1 = ((double) nLkw1) / m;
         double pLkw2 = ((double) nLkw2) / m;
 
-
-
         double singlePkwEmission
                 = calculateSingleVehicleEmission(noiseLink, pkw, vPkw);
         double singleLkw1Emission
@@ -130,10 +144,8 @@ class RLS19NoiseEmission implements NoiseEmission {
         double baseValue = calculateBaseVehicleTypeEmission(vehicleType, v);
         double surfaceCorrection = calculateSurfaceCorrection(vehicleType, link, v);
         double gradientCorrection = calculateGradientCorrection(link, v, vehicleType);
-        double reflectionCorrection = calculateReflectionCorrection();
 
-        double emission = baseValue + surfaceCorrection + gradientCorrection + reflectionCorrection;
-        return emission;
+        return baseValue + surfaceCorrection + gradientCorrection;
     }
 
 
@@ -146,10 +158,26 @@ class RLS19NoiseEmission implements NoiseEmission {
      */
     double calculateGradientCorrection(NoiseLink link, double v, RLS19VehicleType vehicleType) {
         double g = 0;
-        final Object gradient = network.getLinks().get(link.getId()).getAttributes().getAttribute(GRADIENT);
-        if(gradient != null) {
-            g = (Double) gradient;
+        Link matsimLink = network.getLinks().get(link.getId());
+        if(noiseParams.isUseDEM()) {
+            Coord from = matsimLink.getFromNode().getCoord();
+            Coord to = matsimLink.getToNode().getCoord();
+
+            //MATSim coord's x/y are inversed to geotools/jts
+            DirectPosition positionFrom = new DirectPosition2D(crs, from.getY(), from.getX());
+            DirectPosition positionTo = new DirectPosition2D(crs, to.getY(), to.getX());
+
+            float elevationFrom = demContext.getElevation(positionFrom);
+            float elevationTo = demContext.getElevation(positionTo);
+
+            g = ((elevationTo - elevationFrom) / matsimLink.getLength()) * 100;
+        } else {
+            final Object gradient = matsimLink.getAttributes().getAttribute(GRADIENT);
+            if(gradient != null) {
+                g = (Double) gradient;
+            }
         }
+
         double correction = 0;
         switch (vehicleType) {
             case pkw:
@@ -194,12 +222,6 @@ class RLS19NoiseEmission implements NoiseEmission {
                 + 10 * Math.log10(1 + Math.pow(v / vehicleType.getEmissionParameterB(), vehicleType.getEmissionParameterC()));
         return emission;
     }
-
-    //TODO
-    private double calculateReflectionCorrection() {
-        return 0;
-    }
-
 
     private double calculateSurfaceCorrection(RLS19VehicleType type, NoiseLink link, double velocity) {
         return surfaceContext.calculateSurfaceCorrection(type, link, velocity);
