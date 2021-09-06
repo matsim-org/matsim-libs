@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,11 +84,11 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private void doSnapshot(final double time, VisMobsim visMobsim) {
 		if (!this.snapshotWriters.isEmpty()) {
 
-			// why not do it parallel
-			var positions = visMobsim.getVisNetwork().getVisLinks().values().parallelStream()
+			// apparently not paralizable
+			var positions = visMobsim.getVisNetwork().getVisLinks().values().stream()
 					.filter(visLink -> isGenerateSnapshot(visLink.getLink()))
-					.flatMap(visLink -> visLink.getVisData().addAgentSnapshotInfo(new HashSet<>()).stream())
-					.collect(Collectors.toSet());
+					.flatMap(visLink -> visLink.getVisData().addAgentSnapshotInfo(new ArrayList<>()).stream())
+					.collect(Collectors.toList());
 
 			// We do not put non-network agents in movies.
 			// Otherwise, we would add snapshots from visMobsim.getNonNetworkAgentSnapshots() here.
