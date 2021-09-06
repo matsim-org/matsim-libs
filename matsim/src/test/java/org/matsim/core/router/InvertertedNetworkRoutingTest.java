@@ -103,7 +103,7 @@ public class InvertertedNetworkRoutingTest {
 	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility fromFacility,
             final Facility toFacility, final Person person)
 	{
-        Leg leg = (Leg)router.calcRoute(fromFacility, toFacility, 0.0, person).get(0);
+        Leg leg = (Leg)router.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 0.0, person)).get(0);
         return (NetworkRoute) leg.getRoute();
 	}
 	

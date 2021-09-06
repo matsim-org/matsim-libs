@@ -71,8 +71,12 @@ public final class NetworkRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime,
-			final Person person) {		
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
+		
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 
 		Gbl.assertNotNull(fromFacility);

@@ -98,7 +98,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 								toFacility( trip.getOriginActivity() ),
 								toFacility( trip.getDestinationActivity() ),
 								calcEndOfActivity( trip.getOriginActivity() , plan ),
-								plan.getPerson() );
+								plan.getPerson(), trip.getOriginActivity().getAttributes() );
 
 					TripRouter.insertTrip(
 							plan, 

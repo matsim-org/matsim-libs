@@ -20,6 +20,8 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -31,10 +33,13 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SnapshotWriterManager implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener, MobsimInitializedListener {
+
+	private static Logger log = LogManager.getLogger(SnapshotWriterManager.class);
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
 	private final QSimConfigGroup.FilterSnapshots filterSnapshots;
@@ -46,6 +51,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private double snapshotTime = 0.0;
 
 	public SnapshotWriterManager(int snapshotPeriod, QSimConfigGroup.FilterSnapshots filterSnapshots) {
+		log.info("\n\n\n\n\n\n---------------------------------------- This is the version with non parallel position generation --------------------------------------------\n\n\n\n\n");
 		this.snapshotPeriod = snapshotPeriod;
 		this.filterSnapshots = filterSnapshots;
 	}
@@ -84,11 +90,11 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private void doSnapshot(final double time, VisMobsim visMobsim) {
 		if (!this.snapshotWriters.isEmpty()) {
 
-			// apparently not paralizable
+			// this has to be single threaded somehow
 			var positions = visMobsim.getVisNetwork().getVisLinks().values().stream()
 					.filter(visLink -> isGenerateSnapshot(visLink.getLink()))
-					.flatMap(visLink -> visLink.getVisData().addAgentSnapshotInfo(new ArrayList<>()).stream())
-					.collect(Collectors.toList());
+					.flatMap(visLink -> visLink.getVisData().addAgentSnapshotInfo(new HashSet<>()).stream())
+					.collect(Collectors.toSet());
 
 			// We do not put non-network agents in movies.
 			// Otherwise, we would add snapshots from visMobsim.getNonNetworkAgentSnapshots() here.

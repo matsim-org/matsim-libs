@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * Represents a vehicle.
@@ -46,12 +46,12 @@ public class Vehicle extends SimUnit {
 	private Id<Link> currentLinkId = null;
 	private int linkIndex;
 	private Id<Link>[] currentLinkRoute = null;
-	private final PlansConfigGroup.ActivityDurationInterpretation activityEndTimeInterpretation;
+	private final TimeInterpretation timeInterpretation;
 
-	public Vehicle(Scheduler scheduler, Person ownerPerson, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
+	public Vehicle(Scheduler scheduler, Person ownerPerson, TimeInterpretation timeInterpretation) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
-		this.activityEndTimeInterpretation = activityDurationInterpretation;
+		this.timeInterpretation = timeInterpretation;
 		initialize();
 	}
 
@@ -279,7 +279,7 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void scheduleEndLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this, timeInterpretation), road, scheduleTime);
 	}
 
 	public void scheduleStartingLegMessage(double scheduleTime, Road road) {
@@ -291,9 +291,4 @@ public class Vehicle extends SimUnit {
 		sendMessage(dpMessage, road, scheduleTime);
 		return dpMessage;
 	}
-
-	public PlansConfigGroup.ActivityDurationInterpretation getActivityEndTimeInterpretation() {
-		return this.activityEndTimeInterpretation ;
-	}
-
 }

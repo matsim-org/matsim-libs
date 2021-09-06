@@ -21,7 +21,7 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.TripRouter;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -45,14 +45,16 @@ public class GroupOptimizingTourVehicleAllocationFactory extends AbstractConfigu
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
 	public GroupOptimizingTourVehicleAllocationFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier ) {
+			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier, TimeInterpretation timeInterpretation ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class GroupOptimizingTourVehicleAllocationFactory extends AbstractConfigu
 						(VehicleRessources) sc.getScenarioElement(
 							VehicleRessources.ELEMENT_NAME ),
 						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
-						true));
+						true, timeInterpretation));
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(

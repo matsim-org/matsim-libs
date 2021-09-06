@@ -25,6 +25,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -68,7 +69,7 @@ public class SwissRailRaptorCapacitiesTest {
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<? extends PlanElement> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route1 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assert.assertNotNull(route1);
 		System.out.println("uncongested route:");
 		for (PlanElement leg : route1) {
@@ -113,23 +114,23 @@ public class SwissRailRaptorCapacitiesTest {
 		Id<Person> person9 = Id.create(9, Person.class);
 
 		Id<Link> linkId = Id.create(1, Link.class);
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:51:00"), person1, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:52:00"), person2, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:53:00"), person3, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:54:00"), person4, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:55:00"), person5, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:56:00"), person6, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:57:00"), person7, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:58:00"), person8, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:59:00"), person9, f.stopAId, f.stopDId));
 
 		Id<Person> driver1 = Id.create(1001, Person.class);
@@ -171,7 +172,7 @@ public class SwissRailRaptorCapacitiesTest {
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:25"), person9, vehicle3));
 		tracker.handleEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:30"), vehicle3, f.stopAId, 0));
 
-		List<? extends PlanElement> route2 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route2 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assert.assertNotNull(route2);
 		System.out.println("congested route:");
 		for (PlanElement leg : route2) {

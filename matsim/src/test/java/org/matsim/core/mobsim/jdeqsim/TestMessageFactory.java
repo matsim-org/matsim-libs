@@ -23,8 +23,10 @@
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestMessageFactory extends MatsimTestCase{
@@ -33,7 +35,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	public void testMessageFactory1(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
-		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null));
+		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
 		MessageFactory.disposeEnterRoadMessage(new EnterRoadMessage(null,null));
 		MessageFactory.disposeStartingLegMessage(new StartingLegMessage(null,null));
 		MessageFactory.disposeLeaveRoadMessage(new LeaveRoadMessage(null,null));
@@ -52,7 +54,7 @@ public class TestMessageFactory extends MatsimTestCase{
 	public void testMessageFactory2(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
-		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null));
+		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
 		MessageFactory.disposeEnterRoadMessage(new EnterRoadMessage(null,null));
 		MessageFactory.disposeStartingLegMessage(new StartingLegMessage(null,null));
 		MessageFactory.disposeLeaveRoadMessage(new LeaveRoadMessage(null,null));
@@ -71,14 +73,14 @@ public class TestMessageFactory extends MatsimTestCase{
 	public void testMessageFactory3(){
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
-		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null));
+		MessageFactory.disposeEndLegMessage(new EndLegMessage(null,null, TimeInterpretation.create(ConfigUtils.createConfig())));
 		MessageFactory.disposeEnterRoadMessage(new EnterRoadMessage(null,null));
 		MessageFactory.disposeStartingLegMessage(new StartingLegMessage(null,null));
 		MessageFactory.disposeLeaveRoadMessage(new LeaveRoadMessage(null,null));
 		MessageFactory.disposeEndRoadMessage(new EndRoadMessage(null,null));
 		MessageFactory.disposeDeadlockPreventionMessage(new DeadlockPreventionMessage(null,null));
 		
-		MessageFactory.getEndLegMessage(null, null);
+		MessageFactory.getEndLegMessage(null, null, TimeInterpretation.create(ConfigUtils.createConfig()));
 		MessageFactory.getEnterRoadMessage(null, null);
 		MessageFactory.getStartingLegMessage(null, null);
 		MessageFactory.getLeaveRoadMessage(null, null);
@@ -99,16 +101,18 @@ public class TestMessageFactory extends MatsimTestCase{
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		Person person= PopulationUtils.getFactory().createPerson(Id.create("abc", Person.class));
-		Vehicle vehicle=new Vehicle(scheduler, person, PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
-		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.ignoreDelays);
+		Vehicle vehicle=new Vehicle(scheduler, person, timeInterpretation );
+		
+		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle, timeInterpretation).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getEnterRoadMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getStartingLegMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getLeaveRoadMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getEndRoadMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getDeadlockPreventionMessage(scheduler, vehicle).scheduler==scheduler);
 		
-		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).vehicle==vehicle);
+		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle, timeInterpretation).vehicle==vehicle);
 		assertEquals(true,MessageFactory.getEnterRoadMessage(scheduler, vehicle).vehicle==vehicle);
 		assertEquals(true,MessageFactory.getStartingLegMessage(scheduler, vehicle).vehicle==vehicle);
 		assertEquals(true,MessageFactory.getLeaveRoadMessage(scheduler, vehicle).vehicle==vehicle);
@@ -122,16 +126,18 @@ public class TestMessageFactory extends MatsimTestCase{
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		Person person= PopulationUtils.getFactory().createPerson(Id.create("abc", Person.class));
-		Vehicle vehicle=new Vehicle(scheduler, person, PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
-		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.ignoreDelays);
+		Vehicle vehicle=new Vehicle(scheduler, person, timeInterpretation );
+		
+		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle, timeInterpretation).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getEnterRoadMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getStartingLegMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getLeaveRoadMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getEndRoadMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getDeadlockPreventionMessage(scheduler, vehicle).scheduler==scheduler);
 		
-		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).vehicle==vehicle);
+		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle, timeInterpretation).vehicle==vehicle);
 		assertEquals(true,MessageFactory.getEnterRoadMessage(scheduler, vehicle).vehicle==vehicle);
 		assertEquals(true,MessageFactory.getStartingLegMessage(scheduler, vehicle).vehicle==vehicle);
 		assertEquals(true,MessageFactory.getLeaveRoadMessage(scheduler, vehicle).vehicle==vehicle);

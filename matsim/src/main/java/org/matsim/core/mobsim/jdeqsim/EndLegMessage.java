@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * The micro-simulation internal handler for ending a leg.
@@ -41,17 +41,18 @@ import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
  * @author rashid_waraich
  */
 public class EndLegMessage extends EventMessage {
-	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation ;
-	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle) {
+	private final TimeInterpretation timeInterpretation;
+	
+	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle, final TimeInterpretation timeInterpretation) {
 		// need the time interpretation info here.  Attaching it to the message feels weird.  The scheduler seems a pure simulation object.
 		// Consequence: attach it to Vehicle
 		super(scheduler, vehicle);
 		this.priority = JDEQSimConfigGroup.PRIORITY_ARRIVAL_MESSAGE;
 		if ( vehicle == null ) {
-			this.activityDurationInterpretation = PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ;
+			this.timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.ignoreDelays);
 			// need this for some test cases. kai, nov'13
 		} else {
-			this.activityDurationInterpretation = vehicle.getActivityEndTimeInterpretation() ;
+			this.timeInterpretation = timeInterpretation ;
 		}
 	}
 
@@ -73,7 +74,8 @@ public class EndLegMessage extends EventMessage {
 			Activity currentAct = (Activity) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
-			double departureTime = ActivityDurationUtils.calculateDepartureTime(currentAct, getMessageArrivalTime(), activityDurationInterpretation) ;
+			final double now = getMessageArrivalTime();
+			double departureTime = Math.max(now, timeInterpretation.decideOnActivityEndTime(currentAct, now).orElse(Double.POSITIVE_INFINITY));
 
 			/*
 			 * if the departureTime from the act is in the past (this means we

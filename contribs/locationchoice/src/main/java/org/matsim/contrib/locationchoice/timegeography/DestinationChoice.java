@@ -36,6 +36,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -55,8 +56,9 @@ class DestinationChoice extends AbstractMultithreadedModule {
 
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
+	private final TimeInterpretation timeInterpretation;
 
-	public DestinationChoice(Provider<TripRouter> tripRouterProvider, Scenario scenario) {
+	public DestinationChoice(Provider<TripRouter> tripRouterProvider, Scenario scenario, TimeInterpretation timeInterpretation) {
 		super(scenario.getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		if ( DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice" )).getAlgorithm() ) ) {
@@ -64,6 +66,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13");
 		}
 		this.scenario = scenario;
+		this.timeInterpretation  = timeInterpretation;
 		initLocal();
 	}
 
@@ -123,7 +126,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 			break ;
 		case localSearchRecursive:
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.tripRouterProvider.get(),
-					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+					this.timeInterpretation, this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchSingleAct:
 			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 

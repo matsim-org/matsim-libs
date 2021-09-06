@@ -71,7 +71,7 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 						  FacilitiesUtils.toFacility( origin, null ),
 						  FacilitiesUtils.toFacility( dest, null ),
 							now,
-							plan.getPerson());
+							plan.getPerson(), origin.getAttributes());
 
 				if (trip.size() != 1) {
 					throw new RuntimeException( "unexpected trip length "+trip.size()+" for "+trip+" for mode "+l.getMode());

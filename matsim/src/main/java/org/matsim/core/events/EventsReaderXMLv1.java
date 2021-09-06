@@ -193,8 +193,10 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new PersonArrivalEvent(time, Id.create(atts.getValue(PersonArrivalEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonArrivalEvent.ATTRIBUTE_LINK), Link.class), mode));
 		} else if (PersonDepartureEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE);
-			String mode = legMode == null ? null : legMode.intern();
-			this.events.processEvent(new PersonDepartureEvent(time, Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK), Link.class), mode));
+			String canonicalLegMode = legMode == null ? null : legMode.intern();
+			String routingMode = atts.getValue(PersonDepartureEvent.ATTRIBUTE_ROUTING_MODE);
+			String canonicalRoutingMode = routingMode == null ? null : routingMode.intern();
+			this.events.processEvent(new PersonDepartureEvent(time, Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK), Link.class), canonicalLegMode, canonicalRoutingMode));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
