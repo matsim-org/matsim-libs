@@ -36,6 +36,7 @@
         <guice.version>5.0.1</guice.version>
         <guava.version>30.0-jre</guava.version>
         <jackson.version>2.10.3</jackson.version>
+        <log4j.version>2.13.3</log4j.version>
     </properties>
 
     <scm>

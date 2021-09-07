@@ -1,0 +1,21 @@
+{
+    "simulation": {
+        "id": "Example",
+        "duration": "24h",
+        "projection": {
+            "centerCoordinates": {
+                "latitude": 52.23,
+                "longitude": 11.82
+            },
+            "cartesianOffset": {
+                "x": -691174.08,
+                "y": -5789894.65
+            }
+        }
+    },
+    "federates": {
+        "application": true,
+        "output": false,
+        "matsim": true
+    }
+}

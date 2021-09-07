@@ -41,7 +41,9 @@ import org.matsim.core.utils.io.CollectLogMessagesAppender;
  * Don't forget to call closeOutputDirLogging before quitting the JVM.
  * Call catchLogEntries() before either of the initLogging methods to memorize log entries between that call and the init
  * call and put them into the log file. Useful if creating the log directory only happens after some set-up which
- * allready produces log messages.
+ * already produces log messages.
+ * This class only works when log4j is used as underlying logging framework.
+ *
  * 
  * @author dgrether, michaz
  *
@@ -53,7 +55,9 @@ public final class OutputDirectoryLogging {
 
 	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
 
-	private static Logger log = Logger.getLogger(OutputDirectoryLogging.class);
+	private static final Logger log = Logger.getLogger(OutputDirectoryLogging.class);
+
+	private static final boolean IS_LOG4J = LogManager.getContext(false) instanceof LoggerContext;
 
 	/**
 	 * This variable is used to store the log4j output before it can be written
@@ -73,7 +77,7 @@ public final class OutputDirectoryLogging {
 
 		collectLogMessagesAppender = new CollectLogMessagesAppender();
 		collectLogMessagesAppender.start();
-		{
+		if (IS_LOG4J){
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.getConfiguration().getRootLogger().addAppender(collectLogMessagesAppender, Level.ALL, null);
 			ctx.updateLoggers();
@@ -84,8 +88,8 @@ public final class OutputDirectoryLogging {
 	 * Initializes log4j to write log output to files in output directory.
 	 * @param outputDirectoryHierarchy
 	 */
-	public final static void initLogging(OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		if (collectLogMessagesAppender != null) {
+	public static void initLogging(OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		if (collectLogMessagesAppender != null && IS_LOG4J) {
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
 			ctx.updateLoggers();
@@ -112,7 +116,7 @@ public final class OutputDirectoryLogging {
 	 * @author dgrether
 	 */
 	public static void initLoggingWithOutputDirectory(final String outputDirectory) throws IOException {
-		if (collectLogMessagesAppender != null) {
+		if (collectLogMessagesAppender != null && IS_LOG4J) {
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
 			ctx.updateLoggers();
@@ -124,6 +128,11 @@ public final class OutputDirectoryLogging {
 
 	private static void initLogging(String outputFilename, String warnLogfileName) throws IOException {
 		// code inspired from http://logging.apache.org/log4j/2.x/manual/customconfig.html#AddingToCurrent
+
+		if (!IS_LOG4J) {
+			log.warn("Logging to directory not set, because log4j is currently not set as logging framework.");
+			return;
+		}
 
 		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		final Configuration config = ctx.getConfiguration();
@@ -165,6 +174,10 @@ public final class OutputDirectoryLogging {
 	 * @see OutputDirectoryLogging#initLoggingWithOutputDirectory(String)
 	 */
 	public static void closeOutputDirLogging() {
+
+		if (!IS_LOG4J)
+			return;
+
 		//might also be sent to the warn logstream but then you end up with a warning even if everything is alright
 		String endLoggingInfo = "closing the logfile, i.e. messages sent to the logger after this message are not written to the logfile.";
 		log.info(endLoggingInfo);

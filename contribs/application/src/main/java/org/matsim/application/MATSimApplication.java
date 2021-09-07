@@ -455,16 +455,26 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		return execute(clazz, null, args);
 	}
 
+	/**
+	 * Prepare and return the controller without running the scenario.
+	 * @see #prepare(Class, Config, String...)
+	 */
+	public static Controler prepare(Class<? extends MATSimApplication> clazz, String... args) {
+		return prepare(clazz, null, args);
+	}
 
 	/**
 	 * Prepare and return controller without running the scenario.
 	 * This allows to configure the controller after setup has been run.
 	 */
-	public static Controler prepare(Class<? extends MATSimApplication> clazz, Config config, String... args) {
+	public static Controler prepare(Class<? extends MATSimApplication> clazz, @Nullable Config config, String... args) {
 
 		MATSimApplication app;
 		try {
-			app = clazz.getDeclaredConstructor(Config.class).newInstance(config);
+			if (config != null)
+				app = clazz.getDeclaredConstructor(Config.class).newInstance(config);
+			else
+				app = clazz.getDeclaredConstructor().newInstance();
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException("Could not instantiate the application class", e);
 		}
@@ -479,6 +489,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		if (!unmatched.isEmpty()) {
 			throw new RuntimeException("Unknown arguments: " + unmatched);
 		}
+
+		if (config == null)
+			config = app.loadConfig(Objects.requireNonNull(app.scenario, "No default scenario location given").getAbsoluteFile().toString());
 
 		Config tmp = app.prepareConfig(config);
 		config = tmp != null ? tmp : config;

@@ -35,6 +35,18 @@
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>application</artifactId>
 			<version>14.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-to-slf4j</artifactId>
+			<version>${log4j.version}</version>
 		</dependency>
 
 		<dependency>
@@ -47,6 +59,19 @@
 			<groupId>org.eclipse.mosaic</groupId>
 			<artifactId>mosaic-application</artifactId>
 			<version>${mosaic.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.mosaic</groupId>
+			<artifactId>mosaic-starter</artifactId>
+			<version>${mosaic.version}</version>
+		</dependency>
+
+		<!-- Needed for multithreading -->
+		<dependency>
+			<groupId>org.agrona</groupId>
+			<artifactId>agrona</artifactId>
+			<version>1.12.0</version>
 		</dependency>
 
 
