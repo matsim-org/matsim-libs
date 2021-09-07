@@ -11,7 +11,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.drt.analysis.afterSimAnalysis.StayTaskRecorder.OutsideNetworkTaskDataEntry;
+import org.matsim.contrib.drt.analysis.afterSimAnalysis.StoppingTaskRecorder.DrtStoppingTaskDataEntry;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,8 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class DrtIdleVehicleWriter {
-	private static final Logger log = LogManager.getLogger(DrtIdleVehicleWriter.class);
+public class DrtVehicleStoppingTaskWriter {
+	private static final Logger log = LogManager.getLogger(DrtVehicleStoppingTaskWriter.class);
 	private final double endTime = 30 * 3600;
 
 	private final String eventsFile;
@@ -31,7 +31,7 @@ public class DrtIdleVehicleWriter {
 	private final String stayTasksOutputPath;
 	private final String stopTasksOutputPath;
 
-	public DrtIdleVehicleWriter(Path directory) {
+	public DrtVehicleStoppingTaskWriter(Path directory) {
 		Path eventsPath = glob(directory, "*output_events*", true).orElseThrow(() -> new IllegalStateException("No events file found."));
 		Path networkPath = glob(directory, "*output_network*", true).orElseThrow(() -> new IllegalStateException("No network file found."));
 		this.eventsFile = eventsPath.toString();
@@ -42,38 +42,38 @@ public class DrtIdleVehicleWriter {
 
 	public static void main(String[] args) throws IOException {
 		// Input in argument: directory of the simulation output
-		DrtIdleVehicleWriter drtIdleVehicleWriter = new DrtIdleVehicleWriter(Path.of(args[0]));
-		drtIdleVehicleWriter.run();
+		DrtVehicleStoppingTaskWriter drtVehicleStoppingTaskWriter = new DrtVehicleStoppingTaskWriter(Path.of(args[0]));
+		drtVehicleStoppingTaskWriter.run();
 	}
 
 	public void run() throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Network network = scenario.getNetwork();
-		StayTaskRecorder stayTaskRecorder = new StayTaskRecorder();
+		StoppingTaskRecorder stoppingTaskRecorder = new StoppingTaskRecorder();
 
 		EventsManager eventManager = EventsUtils.createEventsManager();
-		eventManager.addHandler(stayTaskRecorder);
+		eventManager.addHandler(stoppingTaskRecorder);
 		eventManager.initProcessing();
 
 		MatsimEventsReader matsimEventsReader = DrtEventsReaders.createEventsReader(eventManager);
 		matsimEventsReader.readFile(eventsFile);
 		eventManager.finishProcessing();
 
-		List<OutsideNetworkTaskDataEntry> stayTaskDataEntries = stayTaskRecorder.getStayTaskDataEntries();
+		List<DrtStoppingTaskDataEntry> stayTaskDataEntries = stoppingTaskRecorder.getStayTaskDataEntries();
 		// Adding in the final stay tasks (which ends after the dvrpTaskEnded event)
-		Collection<OutsideNetworkTaskDataEntry> finalStayTasksEntries = stayTaskRecorder.getStartedStayTasksMap().values();
-		for (OutsideNetworkTaskDataEntry outsideNetworkTaskDataEntry : finalStayTasksEntries) {
-			outsideNetworkTaskDataEntry.setEndTime(endTime);
-			stayTaskDataEntries.add(outsideNetworkTaskDataEntry);
+		Collection<DrtStoppingTaskDataEntry> finalStayTasksEntries = stoppingTaskRecorder.getStartedStayTasksMap().values();
+		for (DrtStoppingTaskDataEntry drtStoppingTaskDataEntry : finalStayTasksEntries) {
+			drtStoppingTaskDataEntry.setEndTime(endTime);
+			stayTaskDataEntries.add(drtStoppingTaskDataEntry);
 		}
 		System.out.println("There are " + stayTaskDataEntries.size() + " stay tasks in total");
-		System.out.println("There are " + stayTaskRecorder.getStopTaskDataEntries().size() + " stop tasks in total");
+		System.out.println("There are " + stoppingTaskRecorder.getStopTaskDataEntries().size() + " stop tasks in total");
 		writeResultIntoCSVFile(stayTaskDataEntries, network, stayTasksOutputPath);
-		writeResultIntoCSVFile(stayTaskRecorder.getStopTaskDataEntries(), network, stopTasksOutputPath);
+		writeResultIntoCSVFile(stoppingTaskRecorder.getStopTaskDataEntries(), network, stopTasksOutputPath);
 	}
 
-	private void writeResultIntoCSVFile(List<OutsideNetworkTaskDataEntry> stayTaskDataEntries, Network network, String outputFile)
+	private void writeResultIntoCSVFile(List<DrtStoppingTaskDataEntry> stayTaskDataEntries, Network network, String outputFile)
 			throws IOException {
 		System.out.println("Writing CSV File now");
 		FileWriter csvWriter = new FileWriter(outputFile);
@@ -91,20 +91,20 @@ public class DrtIdleVehicleWriter {
 		csvWriter.append("Driver Id");
 		csvWriter.append("\n");
 
-		for (OutsideNetworkTaskDataEntry outsideNetworkTaskDataEntry : stayTaskDataEntries) {
-			double X = network.getLinks().get(outsideNetworkTaskDataEntry.getLinkId()).getToNode().getCoord().getX();
-			double Y = network.getLinks().get(outsideNetworkTaskDataEntry.getLinkId()).getToNode().getCoord().getY();
-			csvWriter.append(outsideNetworkTaskDataEntry.getTaskId());
+		for (DrtStoppingTaskDataEntry drtStoppingTaskDataEntry : stayTaskDataEntries) {
+			double X = network.getLinks().get(drtStoppingTaskDataEntry.getLinkId()).getToNode().getCoord().getX();
+			double Y = network.getLinks().get(drtStoppingTaskDataEntry.getLinkId()).getToNode().getCoord().getY();
+			csvWriter.append(drtStoppingTaskDataEntry.getTaskId());
 			csvWriter.append(",");
 			csvWriter.append(Double.toString(X));
 			csvWriter.append(",");
 			csvWriter.append(Double.toString(Y));
 			csvWriter.append(",");
-			csvWriter.append(Double.toString(outsideNetworkTaskDataEntry.getStartTime()));
+			csvWriter.append(Double.toString(drtStoppingTaskDataEntry.getStartTime()));
 			csvWriter.append(",");
-			csvWriter.append(Double.toString(outsideNetworkTaskDataEntry.getEndTime()));
+			csvWriter.append(Double.toString(drtStoppingTaskDataEntry.getEndTime()));
 			csvWriter.append(",");
-			csvWriter.append(outsideNetworkTaskDataEntry.getPersonId().toString());
+			csvWriter.append(drtStoppingTaskDataEntry.getPersonId().toString());
 			csvWriter.append("\n");
 		}
 		csvWriter.flush();
