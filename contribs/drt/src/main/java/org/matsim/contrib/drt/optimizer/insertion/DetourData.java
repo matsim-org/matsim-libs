@@ -39,7 +39,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * On the other hand, detour data (D) could itself provide time-dependent information.
  */
 public class DetourData<D> {
-	static DetourData<Double> create(DetourTimeEstimator detourTimeEstimator, DrtRequest drtRequest) {
+	public static DetourData<Double> create(DetourTimeEstimator detourTimeEstimator, DrtRequest drtRequest) {
 		//TODO add departure/arrival times to improve estimation
 		Function<Link, Double> timesToPickup = link -> detourTimeEstimator.estimateTime(link, drtRequest.getFromLink());
 		Function<Link, Double> timesFromPickup = link -> detourTimeEstimator.estimateTime(drtRequest.getFromLink(),
