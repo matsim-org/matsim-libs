@@ -5,12 +5,13 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.util.DrtEventsReaders;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.drt.analysis.afterSimAnalysis.StayTaskRecorder.StayTaskDataEntry;
+import org.matsim.contrib.drt.analysis.afterSimAnalysis.StoppingTaskRecorder.DrtStoppingTaskDataEntry;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,60 +22,63 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class DrtIdleVehicleWriter {
-	private static final Logger log = LogManager.getLogger(DrtIdleVehicleWriter.class);
-	private final int eventsQueueSize = 1048576 * 32;
+public class DrtVehicleStoppingTaskWriter {
+	private static final Logger log = LogManager.getLogger(DrtVehicleStoppingTaskWriter.class);
 	private final double endTime = 30 * 3600;
 
 	private final String eventsFile;
 	private final String networkFile;
-	private final String outputPath;
+	private final String stayTasksOutputPath;
+	private final String stopTasksOutputPath;
 
-	public DrtIdleVehicleWriter(Path directory) {
+	public DrtVehicleStoppingTaskWriter(Path directory) {
 		Path eventsPath = glob(directory, "*output_events*", true).orElseThrow(() -> new IllegalStateException("No events file found."));
 		Path networkPath = glob(directory, "*output_network*", true).orElseThrow(() -> new IllegalStateException("No network file found."));
 		this.eventsFile = eventsPath.toString();
 		this.networkFile = networkPath.toString();
-		this.outputPath = directory + "/idle-vehicle-XY-plot.csv";
+		this.stayTasksOutputPath = directory + "/stay-tasks-XY-plot.csv";
+		this.stopTasksOutputPath = directory + "/stop-tasks-XY-plot.csv";
 	}
 
 	public static void main(String[] args) throws IOException {
 		// Input in argument: directory of the simulation output
-		DrtIdleVehicleWriter drtIdleVehicleWriter = new DrtIdleVehicleWriter(Path.of(args[0]));
-		drtIdleVehicleWriter.run();
+		DrtVehicleStoppingTaskWriter drtVehicleStoppingTaskWriter = new DrtVehicleStoppingTaskWriter(Path.of(args[0]));
+		drtVehicleStoppingTaskWriter.run();
 	}
 
 	public void run() throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Network network = scenario.getNetwork();
-		StayTaskRecorder stayTaskRecorder = new StayTaskRecorder();
+		StoppingTaskRecorder stoppingTaskRecorder = new StoppingTaskRecorder();
 
-		ParallelEventsManager eventManager = new ParallelEventsManager(false, eventsQueueSize);
-
-		eventManager.addHandler(stayTaskRecorder);
+		EventsManager eventManager = EventsUtils.createEventsManager();
+		eventManager.addHandler(stoppingTaskRecorder);
 		eventManager.initProcessing();
 
 		MatsimEventsReader matsimEventsReader = DrtEventsReaders.createEventsReader(eventManager);
 		matsimEventsReader.readFile(eventsFile);
+		eventManager.finishProcessing();
 
-		List<StayTaskRecorder.StayTaskDataEntry> stayTaskDataEntries = stayTaskRecorder.getStayTaskDataEntriesList();
+		List<DrtStoppingTaskDataEntry> stayTaskDataEntries = stoppingTaskRecorder.getStayTaskDataEntries();
 		// Adding in the final stay tasks (which ends after the dvrpTaskEnded event)
-		Collection<StayTaskRecorder.StayTaskDataEntry> finalStayTasksEntries = stayTaskRecorder.getStartedStayTasksMap().values();
-		for (StayTaskRecorder.StayTaskDataEntry stayTaskDataEntry : finalStayTasksEntries) {
-			stayTaskDataEntry.setEndTime(endTime);
-			stayTaskDataEntries.add(stayTaskDataEntry);
+		Collection<DrtStoppingTaskDataEntry> finalStayTasksEntries = stoppingTaskRecorder.getStartedStayTasksMap().values();
+		for (DrtStoppingTaskDataEntry drtStoppingTaskDataEntry : finalStayTasksEntries) {
+			drtStoppingTaskDataEntry.setEndTime(endTime);
+			stayTaskDataEntries.add(drtStoppingTaskDataEntry);
 		}
-		System.out.println("there are " + stayTaskDataEntries.size() + " stay tasks in total");
-		writeResultIntoCSVFile(stayTaskDataEntries, network, outputPath);
+		System.out.println("There are " + stayTaskDataEntries.size() + " stay tasks in total");
+		System.out.println("There are " + stoppingTaskRecorder.getStopTaskDataEntries().size() + " stop tasks in total");
+		writeResultIntoCSVFile(stayTaskDataEntries, network, stayTasksOutputPath);
+		writeResultIntoCSVFile(stoppingTaskRecorder.getStopTaskDataEntries(), network, stopTasksOutputPath);
 	}
 
-	private void writeResultIntoCSVFile(List<StayTaskDataEntry> stayTaskDataEntries, Network network, String outputFile)
+	private void writeResultIntoCSVFile(List<DrtStoppingTaskDataEntry> stayTaskDataEntries, Network network, String outputFile)
 			throws IOException {
 		System.out.println("Writing CSV File now");
 		FileWriter csvWriter = new FileWriter(outputFile);
 
-		csvWriter.append("Stay Task ID");
+		csvWriter.append("Task ID");
 		csvWriter.append(",");
 		csvWriter.append("X");
 		csvWriter.append(",");
@@ -87,20 +91,20 @@ public class DrtIdleVehicleWriter {
 		csvWriter.append("Driver Id");
 		csvWriter.append("\n");
 
-		for (StayTaskDataEntry stayTaskDataEntry : stayTaskDataEntries) {
-			double X = network.getLinks().get(stayTaskDataEntry.getLinkId()).getToNode().getCoord().getX();
-			double Y = network.getLinks().get(stayTaskDataEntry.getLinkId()).getToNode().getCoord().getY();
-			csvWriter.append(stayTaskDataEntry.getStayTaskId());
+		for (DrtStoppingTaskDataEntry drtStoppingTaskDataEntry : stayTaskDataEntries) {
+			double X = network.getLinks().get(drtStoppingTaskDataEntry.getLinkId()).getToNode().getCoord().getX();
+			double Y = network.getLinks().get(drtStoppingTaskDataEntry.getLinkId()).getToNode().getCoord().getY();
+			csvWriter.append(drtStoppingTaskDataEntry.getTaskId());
 			csvWriter.append(",");
 			csvWriter.append(Double.toString(X));
 			csvWriter.append(",");
 			csvWriter.append(Double.toString(Y));
 			csvWriter.append(",");
-			csvWriter.append(Double.toString(stayTaskDataEntry.getStartTime()));
+			csvWriter.append(Double.toString(drtStoppingTaskDataEntry.getStartTime()));
 			csvWriter.append(",");
-			csvWriter.append(Double.toString(stayTaskDataEntry.getEndTime()));
+			csvWriter.append(Double.toString(drtStoppingTaskDataEntry.getEndTime()));
 			csvWriter.append(",");
-			csvWriter.append(stayTaskDataEntry.getPersonId().toString());
+			csvWriter.append(drtStoppingTaskDataEntry.getPersonId().toString());
 			csvWriter.append("\n");
 		}
 		csvWriter.flush();

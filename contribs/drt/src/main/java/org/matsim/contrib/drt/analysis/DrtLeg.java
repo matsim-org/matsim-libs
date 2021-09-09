@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import static org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
+import static org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
 
 import java.util.function.Function;
 
