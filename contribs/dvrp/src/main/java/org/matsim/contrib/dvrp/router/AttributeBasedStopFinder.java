@@ -1,6 +1,7 @@
-package org.matsim.contrib.drt.routing;
+package org.matsim.contrib.dvrp.router;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -20,6 +22,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.base.Verify;
@@ -34,19 +37,19 @@ import com.google.common.base.Verify;
  * the preceding activity).
  *
  */
-public class DrtAttributeBasedStopFinder implements AccessEgressFacilityFinder {
-	private final static Logger logger = Logger.getLogger(DrtAttributeBasedStopFinder.class);
+public class AttributeBasedStopFinder implements AccessEgressFacilityFinder {
+	private final static Logger logger = Logger.getLogger(AttributeBasedStopFinder.class);
 
 	public final static String FACILITY_STOP_NETWORKS_ATTRIBUTE = "stopNetworks";
 	public final static String TRIP_STOP_NETWORK_ATTRIBUTE = "stopNetwork";
 	public final static String DEFAULT_STOP_NETWORK = "DEFAULT";
 
 	private final Network network;
-	private final Map<String, QuadTree<? extends DrtStopFacility>> quadtrees;
+	private final Map<String, QuadTree<? extends Facility>> quadtrees;
 	private final double maxDistance;
 
-	private DrtAttributeBasedStopFinder(double maxDistance, Network network,
-			Map<String, QuadTree<? extends DrtStopFacility>> quadtrees) {
+	private AttributeBasedStopFinder(double maxDistance, Network network,
+			Map<String, QuadTree<? extends Facility>> quadtrees) {
 		this.network = network;
 		this.quadtrees = quadtrees;
 		this.maxDistance = maxDistance;
@@ -90,15 +93,32 @@ public class DrtAttributeBasedStopFinder implements AccessEgressFacilityFinder {
 		return coord;
 	}
 
-	static public DrtAttributeBasedStopFinder create(double maxDistance, Network network, DrtStopNetwork stopNetwork) {
-		Set<String> availableNames = new HashSet<>();
-		stopNetwork.getDrtStops().values().forEach(f -> availableNames.addAll(parseStopNetworks(f)));
+	static public <T extends Facility & Attributable> AttributeBasedStopFinder create(double maxDistance,
+			Network network, Collection<T> facilities) {
+		Map<Facility, Set<String>> facilityMap = new HashMap<>();
+		facilities.forEach(f -> facilityMap.put(f, parseStopNetworks(f)));
+		return create(maxDistance, network, facilityMap);
+	}
 
-		Map<String, QuadTree<? extends DrtStopFacility>> quadtrees = new HashMap<>();
+	static public AttributeBasedStopFinder create(double maxDistance, Network network, Collection<Facility> facilities,
+			Function<Facility, Set<String>> mapper) {
+		Map<Facility, Set<String>> facilityMap = new HashMap<>();
+		facilities.forEach(f -> facilityMap.put(f, mapper.apply(f)));
+		return create(maxDistance, network, facilityMap);
+	}
+
+	static public AttributeBasedStopFinder create(double maxDistance, Network network,
+			Map<Facility, Set<String>> facilities) {
+		Set<String> availableNames = new HashSet<>();
+		facilities.values().forEach(availableNames::addAll);
+
+		Map<String, QuadTree<? extends Facility>> quadtrees = new HashMap<>();
 
 		for (String networkName : availableNames) {
-			List<? extends DrtStopFacility> networkFacilities = stopNetwork.getDrtStops().values().stream()
-					.filter(f -> parseStopNetworks(f).contains(networkName)).collect(Collectors.toList());
+			List<? extends Facility> networkFacilities = facilities.entrySet().stream() //
+					.filter(e -> e.getValue().contains(networkName)) //
+					.map(e -> e.getKey()) //
+					.collect(Collectors.toList());
 
 			quadtrees.put(networkName, QuadTrees.createQuadTree(networkFacilities));
 
@@ -106,8 +126,10 @@ public class DrtAttributeBasedStopFinder implements AccessEgressFacilityFinder {
 					String.format("Found %d facilities for stop network %s", networkFacilities.size(), networkName));
 		}
 
-		List<? extends DrtStopFacility> defaultFacilities = stopNetwork.getDrtStops().values().stream()
-				.filter(f -> parseStopNetworks(f).isEmpty()).collect(Collectors.toList());
+		List<? extends Facility> defaultFacilities = facilities.entrySet().stream() //
+				.filter(e -> e.getValue().isEmpty()) //
+				.map(e -> e.getKey()) //
+				.collect(Collectors.toList());
 
 		if (defaultFacilities.size() > 0) {
 			quadtrees.put(DEFAULT_STOP_NETWORK, QuadTrees.createQuadTree(defaultFacilities));
@@ -116,10 +138,10 @@ public class DrtAttributeBasedStopFinder implements AccessEgressFacilityFinder {
 		logger.info(String.format("Found %d facilities for %s stop network", defaultFacilities.size(),
 				DEFAULT_STOP_NETWORK));
 
-		return new DrtAttributeBasedStopFinder(maxDistance, network, quadtrees);
+		return new AttributeBasedStopFinder(maxDistance, network, quadtrees);
 	}
 
-	private static Set<String> parseStopNetworks(DrtStopFacility facility) {
+	private static Set<String> parseStopNetworks(Attributable facility) {
 		String attributeValue = (String) facility.getAttributes().getAttribute(FACILITY_STOP_NETWORKS_ATTRIBUTE);
 
 		if (attributeValue != null) {
