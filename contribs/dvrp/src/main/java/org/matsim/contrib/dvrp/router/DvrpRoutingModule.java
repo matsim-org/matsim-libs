@@ -37,6 +37,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author jbischoff
@@ -47,6 +48,11 @@ public class DvrpRoutingModule implements RoutingModule {
 
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
+
+		default Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,
+																  Attributes attributes) {
+			return findFacilities(fromFacility, toFacility);
+		}
 	}
 
 	private final AccessEgressFacilityFinder stopFinder;
@@ -72,7 +78,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
@@ -107,7 +113,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
-			
+
 			// interaction activity:
 			trip.add(createDrtStageActivity(accessFacility, now));
 			now++;

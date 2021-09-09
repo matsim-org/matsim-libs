@@ -57,7 +57,7 @@ public class BestInsertionFinder<D> {
 	private final Comparator<InsertionWithCost<D>> comparator = createInsertionWithCostComparator();
 	private final InsertionCostCalculator<D> costCalculator;
 
-	BestInsertionFinder(InsertionCostCalculator<D> costCalculator) {
+	public BestInsertionFinder(InsertionCostCalculator<D> costCalculator) {
 		this.costCalculator = costCalculator;
 	}
 
