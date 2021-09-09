@@ -34,36 +34,36 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 public class CostCalculationStrategyTest {
 	@Test
 	public void RejectSoftConstraintViolations_tooLittleSlackTime() {
-		assertRejectSoftConstraintViolations(9999, 9999, 10, new InsertionCostCalculator.DetourTimeInfo(0, 0, 5, 5.01),
+		assertRejectSoftConstraintViolations(9999, 9999, 10, new InsertionCostCalculatorImpl.DetourTimeInfo(0, 0, 5, 5.01),
 				INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	public void RejectSoftConstraintViolations_negativeSlackTime_butNoTimeLoss() {
-		assertRejectSoftConstraintViolations(9999, 9999, -10, new InsertionCostCalculator.DetourTimeInfo(0, 0, 0, 0),
+		assertRejectSoftConstraintViolations(9999, 9999, -10, new InsertionCostCalculatorImpl.DetourTimeInfo(0, 0, 0, 0),
 				0);
 	}
 
 	@Test
 	public void RejectSoftConstraintViolations_tooLongWaitTime() {
-		assertRejectSoftConstraintViolations(10, 9999, 9999, new InsertionCostCalculator.DetourTimeInfo(11, 22, 0, 0),
+		assertRejectSoftConstraintViolations(10, 9999, 9999, new InsertionCostCalculatorImpl.DetourTimeInfo(11, 22, 0, 0),
 				INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	public void RejectSoftConstraintViolations_tooLongTravelTime() {
-		assertRejectSoftConstraintViolations(9999, 10, 9999, new InsertionCostCalculator.DetourTimeInfo(0, 11, 0, 0),
+		assertRejectSoftConstraintViolations(9999, 10, 9999, new InsertionCostCalculatorImpl.DetourTimeInfo(0, 11, 0, 0),
 				INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	public void RejectSoftConstraintViolations_allConstraintSatisfied() {
 		assertRejectSoftConstraintViolations(9999, 9999, 9999,
-				new InsertionCostCalculator.DetourTimeInfo(11, 22, 33, 44), 33 + 44);
+				new InsertionCostCalculatorImpl.DetourTimeInfo(11, 22, 33, 44), 33 + 44);
 	}
 
 	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
-			double vehicleSlackTime, InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+                                                      double vehicleSlackTime, InsertionCostCalculatorImpl.DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
@@ -75,35 +75,35 @@ public class CostCalculationStrategyTest {
 	@Test
 	public void DiscourageSoftConstraintViolations_tooLittleSlackTime() {
 		assertDiscourageSoftConstraintViolations(9999, 9999, 10,
-				new InsertionCostCalculator.DetourTimeInfo(0, 0, 5, 5.01), INFEASIBLE_SOLUTION_COST);
+				new InsertionCostCalculatorImpl.DetourTimeInfo(0, 0, 5, 5.01), INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	public void DiscourageSoftConstraintViolations_negativeSlackTime_butNoTimeLoss() {
 		assertDiscourageSoftConstraintViolations(9999, 9999, -10,
-				new InsertionCostCalculator.DetourTimeInfo(0, 0, 0, 0), 0);
+				new InsertionCostCalculatorImpl.DetourTimeInfo(0, 0, 0, 0), 0);
 	}
 
 	@Test
 	public void DiscourageSoftConstraintViolations_tooLongWaitTime() {
 		assertDiscourageSoftConstraintViolations(10, 9999, 9999,
-				new InsertionCostCalculator.DetourTimeInfo(11, 22, 0, 0), MAX_WAIT_TIME_VIOLATION_PENALTY);
+				new InsertionCostCalculatorImpl.DetourTimeInfo(11, 22, 0, 0), MAX_WAIT_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
 	public void DiscourageSoftConstraintViolations_tooLongTravelTime() {
 		assertDiscourageSoftConstraintViolations(9999, 10, 9999,
-				new InsertionCostCalculator.DetourTimeInfo(0, 11, 0, 0), MAX_TRAVEL_TIME_VIOLATION_PENALTY);
+				new InsertionCostCalculatorImpl.DetourTimeInfo(0, 11, 0, 0), MAX_TRAVEL_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
 	public void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
 		assertDiscourageSoftConstraintViolations(9999, 9999, 9999,
-				new InsertionCostCalculator.DetourTimeInfo(11, 22, 33, 44), 33 + 44);
+				new InsertionCostCalculatorImpl.DetourTimeInfo(11, 22, 33, 44), 33 + 44);
 	}
 
 	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
-			double vehicleSlackTime, InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+                                                          double vehicleSlackTime, InsertionCostCalculatorImpl.DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)

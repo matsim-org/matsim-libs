@@ -22,6 +22,8 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.*;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculatorImpl.calcVehicleSlackTime;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculatorImpl.checkTimeConstraintsForScheduledRequests;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,10 +77,10 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private <D> void assertCalculate(double now, InsertionWithDetourData<D> insertion,
-			InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+                                     InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
 		@SuppressWarnings("unchecked")
 		var detourTimeCalculator = (InsertionDetourTimeCalculator<D>)mock(InsertionDetourTimeCalculator.class);
-		var insertionCostCalculator = new InsertionCostCalculator<>(() -> now,
+		var insertionCostCalculator = new InsertionCostCalculatorImpl<>(() -> now,
 				new CostCalculationStrategy.RejectSoftConstraintViolations(), detourTimeCalculator);
 		when(detourTimeCalculator.calculateDetourTimeInfo(insertion)).thenReturn(detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertion)).isEqualTo(expectedCost);
