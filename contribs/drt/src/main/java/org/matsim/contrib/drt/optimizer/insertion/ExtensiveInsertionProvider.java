@@ -60,7 +60,7 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 			CostCalculationStrategy costCalculationStrategy, DetourTimeEstimator admissibleDetourTimeEstimator,
 			ForkJoinPool forkJoinPool) {
 		this((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(),
-				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
+				new InsertionCostCalculatorImpl<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
 						admissibleDetourTimeEstimator), admissibleDetourTimeEstimator, new InsertionGenerator(),
 				forkJoinPool);
 	}

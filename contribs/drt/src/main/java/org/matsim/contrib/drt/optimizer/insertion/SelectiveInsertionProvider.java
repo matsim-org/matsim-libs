@@ -59,7 +59,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 			CostCalculationStrategy costCalculationStrategy, DetourTimeEstimator restrictiveDetourTimeEstimator,
 			ForkJoinPool forkJoinPool) {
 		this(restrictiveDetourTimeEstimator, new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
+				new InsertionCostCalculatorImpl<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
 						restrictiveDetourTimeEstimator)), new InsertionGenerator(), forkJoinPool);
 	}
 
