@@ -32,9 +32,9 @@ import org.matsim.contrib.common.collections.PartialSort;
  *
  * @author michalm
  */
-class KNearestInsertionsAtEndFilter {
-	static List<InsertionGenerator.Insertion> filterInsertionsAtEnd(int k, double admissibleBeelineSpeedFactor,
-			List<InsertionWithDetourData<Double>> insertions) {
+public class KNearestInsertionsAtEndFilter {
+	public static List<InsertionGenerator.Insertion> filterInsertionsAtEnd(int k, double admissibleBeelineSpeedFactor,
+																		   List<InsertionWithDetourData<Double>> insertions) {
 		var nearestInsertionsAtEnd = new PartialSort<InsertionWithCost<Double>>(k,
 				BestInsertionFinder.createInsertionWithCostComparator());
 		var filteredInsertions = new ArrayList<InsertionGenerator.Insertion>(insertions.size());

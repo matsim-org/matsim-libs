@@ -12,7 +12,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.Detour
 /**
  * @author Michal Maciejewski (michalm)
  */
-class InsertionDetourTimeCalculator<D> {
+public class InsertionDetourTimeCalculator<D> {
 	private final double stopDuration;
 	private final ToDoubleFunction<D> detourTime;
 
@@ -22,14 +22,14 @@ class InsertionDetourTimeCalculator<D> {
 	@Nullable
 	private final DetourTimeEstimator replacedDriveTimeEstimator;
 
-	InsertionDetourTimeCalculator(double stopDuration, ToDoubleFunction<D> detourTime,
+	public InsertionDetourTimeCalculator(double stopDuration, ToDoubleFunction<D> detourTime,
 			@Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
 		this.stopDuration = stopDuration;
 		this.detourTime = detourTime;
 		this.replacedDriveTimeEstimator = replacedDriveTimeEstimator;
 	}
 
-	DetourTimeInfo calculateDetourTimeInfo(InsertionWithDetourData<D> insertion) {
+	public DetourTimeInfo calculateDetourTimeInfo(InsertionWithDetourData<D> insertion) {
 		InsertionGenerator.InsertionPoint pickup = insertion.getPickup();
 		InsertionGenerator.InsertionPoint dropoff = insertion.getDropoff();
 		if (pickup.index == dropoff.index) {
