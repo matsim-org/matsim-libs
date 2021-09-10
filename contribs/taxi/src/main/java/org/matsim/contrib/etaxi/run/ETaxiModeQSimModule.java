@@ -113,6 +113,9 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
 
+			@Inject
+			private EventsManager events;
+
 			@Override
 			public ETaxiScheduler get() {
 				Fleet fleet = getModalInstance(Fleet.class);
@@ -123,7 +126,8 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				var speedyALTFactory = new SpeedyALTFactory();
 				Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(network,
 						travelDisutility, travelTime);
-				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
+				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator, events,
+						timer);
 			}
 		});
 
@@ -147,9 +151,16 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(
-				getter -> new TaxiRequestCreator(getMode(), getter.getModal(SubmittedTaxiRequestsCollector.class))))
-				.asEagerSingleton();
+		bindModal(PassengerRequestCreator.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
+			@Inject
+			private EventsManager events;
+
+			@Override
+			public TaxiRequestCreator get() {
+				return new TaxiRequestCreator(getMode(), getModalInstance(SubmittedTaxiRequestsCollector.class),
+						events);
+			}
+		}).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
