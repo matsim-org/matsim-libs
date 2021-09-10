@@ -108,6 +108,9 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
 
+			@Inject
+			private EventsManager events;
+
 			@Override
 			public TaxiScheduler get() {
 				Fleet fleet = getModalInstance(Fleet.class);
@@ -118,7 +121,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				var speedyALTFactory = new SpeedyALTFactory();
 				Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(network,
 						travelDisutility, travelTime);
-				return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
+				return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator, events, timer);
 			}
 		});
 

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -56,6 +57,8 @@ import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -70,6 +73,8 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 	private final TaxiScheduleInquiry taxiScheduleInquiry;
+	private final EventsManager eventsManager;
+	private final MobsimTimer mobsimTimer;
 
 	// Pre-computing paths (occupied drive tasks) when they are not needed immediately (destinationKnown is false):
 	// In some configurations, the taxi optimiser may not know the destination until the passenger is picked up.
@@ -81,11 +86,13 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			Supplier<LeastCostPathCalculator> routerCreator) {
+			Supplier<LeastCostPathCalculator> routerCreator, EventsManager eventsManager, MobsimTimer mobsimTimer) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.taxiScheduleInquiry = taxiScheduleInquiry;
 		this.travelTime = travelTime;
+		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
 
 		router = routerCreator.get();
 
@@ -125,17 +132,24 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 		Link reqFromLink = request.getFromLink();
 		Link reqToLink = request.getToLink();
+		final double dropoffStartTime;
 		if (taxiCfg.isDestinationKnown()) {
 			// TODO use an estimate to set up the occupied drive task and then start computing the actual path in the background
 			VrpPathWithTravelData path = calcPath(reqFromLink, reqToLink, pickupEndTime);
 			appendOccupiedDriveAndDropoff(schedule, request, path);
 			appendTasksAfterDropoff(vehicle);
+			dropoffStartTime = path.getArrivalTime();
 		} else {
 			// pre-compute path for occupied drive; the occupied drive and subsequent tasks will be added after the pickup
 			var pathFuture = executorService.submitCallable(
 					router -> VrpPaths.calcAndCreatePath(reqFromLink, reqToLink, pickupEndTime, router, travelTime));
 			pathFutures.put(request.getId(), pathFuture);
+			dropoffStartTime = Double.NaN; // destination is unknown and so the arrival time
 		}
+
+		eventsManager.processEvent(
+				new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), request.getMode(), request.getId(),
+						request.getPassengerId(), vehicle.getId(), pickupEndTime, dropoffStartTime));
 	}
 
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {
