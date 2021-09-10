@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.taxi.analysis;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -98,7 +99,7 @@ public class TaxiEventSequenceCollector
 	}
 
 	public Map<Id<Request>, RequestEventSequence> getRequestSequences() {
-		return requestSequences;
+		return Collections.unmodifiableMap(requestSequences);
 	}
 
 	@Override
