@@ -37,6 +37,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author jbischoff
@@ -46,7 +47,8 @@ public class DvrpRoutingModule implements RoutingModule {
 	private static final Logger logger = Logger.getLogger(DvrpRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
-		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
+		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, 
+				Attributes tripAttributes);
 	}
 
 	private final AccessEgressFacilityFinder stopFinder;
@@ -75,7 +77,8 @@ public class DvrpRoutingModule implements RoutingModule {
 		
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
-				Objects.requireNonNull(toFacility, "toFacility is null"));
+				Objects.requireNonNull(toFacility, "toFacility is null"),
+				request.getAttributes());
 		if (stops.isEmpty()) {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
