@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.analysis;
 import static org.matsim.contrib.drt.fare.DrtFareHandler.PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Creates PerformedRequestEventSequence (for scheduled requests) and RejectedRequestEventSequence (for rejected requests).
  * Almost all data for request/leg analysis is there (except info on actual paths), so should be quite reusable.
@@ -70,21 +73,21 @@ public class DrtEventSequenceCollector
 		@Nullable
 		private PassengerDroppedOffEvent droppedOff;
 		@Nullable
-		private PersonMoneyEvent drtFare;
+		private List<PersonMoneyEvent> drtFares;
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled) {
-			this(submitted, scheduled, null, null, null);
+			this(submitted, scheduled, null, null, List.of());
 		}
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
-				PassengerDroppedOffEvent droppedOff, PersonMoneyEvent drtFare) {
+				PassengerDroppedOffEvent droppedOff, List<PersonMoneyEvent> drtFares) {
 			this.submitted = Objects.requireNonNull(submitted);
 			this.scheduled = Objects.requireNonNull(scheduled);
 			this.pickedUp = pickedUp;
 			this.droppedOff = droppedOff;
-			this.drtFare = drtFare;
+			this.drtFares = new ArrayList<>(drtFares);
 		}
 
 		public DrtRequestSubmittedEvent getSubmitted() {
@@ -103,8 +106,8 @@ public class DrtEventSequenceCollector
 			return Optional.ofNullable(droppedOff);
 		}
 
-		public Optional<PersonMoneyEvent> getDrtFare() {
-			return Optional.ofNullable(drtFare);
+		public List<PersonMoneyEvent> getDrtFares() {
+			return Collections.unmodifiableList(drtFares);
 		}
 
 		public boolean isCompleted() {
@@ -204,25 +207,20 @@ public class DrtEventSequenceCollector
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-		if (event.getTransactionPartner() != null
-				&& event.getTransactionPartner().equals(mode)
-				&& event.getPurpose() != null
-				&& event.getPurpose().equals(DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE)) {
-			if (event.getReference() == null) {
-				log.error("Found a PersonMoneyEvent with purpose "
-						+ event.getPurpose()
-						+ " and transactionPartner "
-						+ event.getTransactionPartner()
-						+ " but without field reference (null). This field should be the drt request id or "
-						+ PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE
-						+ " or similar. Terminating.");
-				throw new RuntimeException();
-			}
+		if (mode.equals(event.getTransactionPartner()) && DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE.equals(
+				event.getPurpose())) {
+			Preconditions.checkNotNull(event.getReference(),
+					"Found a PersonMoneyEvent with purpose (%s) and transactionPartner (%s)"
+							+ " but without field reference (null)."
+							+ " This field should be the drt request id or "
+							+ PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE
+							+ " or similar. Terminating.", event.getPurpose(), event.getTransactionPartner());
+
 			drtFarePersonMoneyEvents.add(event);
 			PerformedRequestEventSequence sequence = performedRequestSequences.get(
 					Id.create(event.getReference(), Request.class));
 			if (sequence != null) {
-				sequence.drtFare = event;
+				sequence.drtFares.add(event);
 			}
 		}
 	}

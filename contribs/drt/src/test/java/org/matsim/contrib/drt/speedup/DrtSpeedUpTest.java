@@ -279,7 +279,7 @@ public class DrtSpeedUpTest {
 		var drtFare = new PersonMoneyEvent(submittedTime, null, 5.5, DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE,
 				MODE, requestId.toString());
 		return new PerformedRequestEventSequence(submittedEvent, mock(PassengerRequestScheduledEvent.class),
-				pickupEvent, dropoffEvent, drtFare);
+				pickupEvent, dropoffEvent, List.of(drtFare));
 	}
 
 	DvrpVehicleSpecification vehicleSpecification(String id) {

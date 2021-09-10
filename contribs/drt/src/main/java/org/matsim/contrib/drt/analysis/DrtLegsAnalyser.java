@@ -37,11 +37,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -49,7 +49,7 @@ import org.matsim.vehicles.Vehicle;
 public class DrtLegsAnalyser {
 
 	public static Map<Double, List<DrtLeg>> splitLegsIntoBins(Collection<DrtLeg> legs, int startTime, int endTime,
-															  int binSize_s) {
+			int binSize_s) {
 		LinkedList<DrtLeg> allLegs = new LinkedList<>(legs);
 		DrtLeg currentLeg = allLegs.pollFirst();
 		if (currentLeg.departureTime > endTime) {
@@ -72,7 +72,7 @@ public class DrtLegsAnalyser {
 	}
 
 	public static void analyzeBoardingsAndDeboardings(List<DrtLeg> legs, String delimiter, double startTime,
-													  double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
@@ -122,14 +122,13 @@ public class DrtLegsAnalyser {
 	}
 
 	public static String summarizeLegs(List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances,
-									   List<PersonMoneyEvent> drtFarePersonMoneyEvents, String delimiter) {
+			List<PersonMoneyEvent> drtFarePersonMoneyEvents, String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
 		DescriptiveStatistics traveltimes = new DescriptiveStatistics();
-		DescriptiveStatistics fares = new DescriptiveStatistics();
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -162,8 +161,8 @@ public class DrtLegsAnalyser {
 				format.format(traveltimes.getMean()) + "",//
 				// all fares referencing this drt operator. Including daily fares independent from the legs.
 				// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
-				format.format(- drtFarePersonMoneyEvents.stream().mapToDouble(PersonMoneyEvent::getAmount).sum() /
-						(waitStats.getValues().length == 0 ? 1 : waitStats.getValues().length)));
+				format.format(-drtFarePersonMoneyEvents.stream().mapToDouble(PersonMoneyEvent::getAmount).sum()
+						/ (waitStats.getValues().length == 0 ? 1 : waitStats.getValues().length)));
 	}
 
 	public static double getDirectDistanceMean(List<DrtLeg> legs) {
@@ -181,7 +180,7 @@ public class DrtLegsAnalyser {
 	}
 
 	public static void analyseDetours(Network network, List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances,
-									  DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
+			DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
 		if (legs == null)
 			return;
 
