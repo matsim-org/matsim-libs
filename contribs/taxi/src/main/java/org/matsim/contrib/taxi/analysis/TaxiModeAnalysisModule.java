@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,29 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+/**
+ *
+ */
+package org.matsim.contrib.taxi.analysis;
 
-import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Inject;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * @author michalm (Michal Maciejewski)
  */
-public class MultiModeTaxiModule extends AbstractModule {
+public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
+	private final TaxiConfigGroup taxiCfg;
 
-	@Inject
-	private MultiModeTaxiConfigGroup multiModeTaxiCfg;
+	public TaxiModeAnalysisModule(TaxiConfigGroup taxiCfg) {
+		super(taxiCfg.getMode());
+		this.taxiCfg = taxiCfg;
+	}
 
 	@Override
 	public void install() {
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
-			install(new TaxiModeModule(taxiCfg));
-			installQSimModule(new TaxiModeQSimModule(taxiCfg));
-			install(new TaxiModeAnalysisModule(taxiCfg));
-		}
+		bindModal(TaxiEventSequenceCollector.class).toProvider(
+				modalProvider(getter -> new TaxiEventSequenceCollector(taxiCfg.getMode()))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(TaxiEventSequenceCollector.class));
 	}
 }
