@@ -45,7 +45,7 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(TaxiEventSequenceCollector.class));
 
 		bindModal(ExecutedScheduleCollector.class).toProvider(
-				modalProvider(getter -> ExecutedScheduleCollector.createWithDefaultTaskCreator(taxiCfg.getMode())));
+				modalProvider(getter -> new ExecutedScheduleCollector(taxiCfg.getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 	}
 }
