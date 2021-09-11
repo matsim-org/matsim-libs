@@ -23,6 +23,7 @@
  */
 package org.matsim.contrib.taxi.analysis;
 
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 
@@ -42,5 +43,9 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 		bindModal(TaxiEventSequenceCollector.class).toProvider(
 				modalProvider(getter -> new TaxiEventSequenceCollector(taxiCfg.getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(TaxiEventSequenceCollector.class));
+
+		bindModal(ExecutedScheduleCollector.class).toProvider(
+				modalProvider(getter -> ExecutedScheduleCollector.createWithDefaultTaskCreator(taxiCfg.getMode())));
+		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 	}
 }
