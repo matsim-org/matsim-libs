@@ -25,15 +25,15 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
@@ -129,11 +129,16 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
-				.mode(mode)
-				.objectClass(Fleet.class)
-				.listenerCreator(getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
-				.build());
+		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(ETaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+								getter.get(ChargingEventSequenceCollector.class),
+								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(ETaxiBenchmarkStats.class));
+			}
+		});
 
 		return controler;
 	}
