@@ -23,10 +23,13 @@ import java.net.URL;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
@@ -39,6 +42,7 @@ import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -114,11 +118,16 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(TaxiBenchmarkStats.class)
-				.mode(mode)
-				.objectClass(Fleet.class)
-				.listenerCreator(getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
-				.build());
+		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(TaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+								getter.getModal(ExecutedScheduleCollector.class),
+								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+			}
+		});
 
 		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
 				.mode(mode)
