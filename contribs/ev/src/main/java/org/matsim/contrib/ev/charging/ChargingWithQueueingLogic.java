@@ -104,6 +104,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	private void queueVehicle(ElectricVehicle ev, double now) {
 		queuedVehicles.add(ev);
+		eventsManager.processEvent(new QueuedAtChargerEvent(now, charger.getId(), ev.getId()));
 		listeners.get(ev.getId()).notifyVehicleQueued(ev, now);
 	}
 
