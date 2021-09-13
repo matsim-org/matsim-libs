@@ -43,6 +43,8 @@ import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
@@ -53,8 +55,8 @@ public class ETaxiScheduler extends TaxiScheduler {
 
 	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			Supplier<LeastCostPathCalculator> routerCreator) {
-		super(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator);
+			Supplier<LeastCostPathCalculator> routerCreator, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		super(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator, eventsManager, mobsimTimer);
 	}
 
 	// FIXME underestimated due to the ongoing AUX/drive consumption

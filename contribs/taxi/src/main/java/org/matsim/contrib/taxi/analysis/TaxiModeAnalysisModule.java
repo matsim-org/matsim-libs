@@ -18,32 +18,34 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.util;
+/**
+ *
+ */
+package org.matsim.contrib.taxi.analysis;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 
 /**
- * Utility functions to help calculation of wait/travel time violations.
- *
- * @author Michal Maciejewski (michalm)
+ * @author michalm (Michal Maciejewski)
  */
-public class DrtRequestTimeConstraintViolations {
-	/**
-	 * @return wait time constraint violation at the moment of request insertion
-	 */
-	public static double getInitialWaitTimeViolation(DrtRequest request, PassengerRequestScheduledEvent event) {
-		return getTimeConstraintViolation(event.getPickupTime(), request.getLatestStartTime());
+public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
+	private final TaxiConfigGroup taxiCfg;
+
+	public TaxiModeAnalysisModule(TaxiConfigGroup taxiCfg) {
+		super(taxiCfg.getMode());
+		this.taxiCfg = taxiCfg;
 	}
 
-	/**
-	 * @return travel time constraint violation at the moment of request insertion
-	 */
-	public static double getInitialTravelTimeViolation(DrtRequest request, PassengerRequestScheduledEvent event) {
-		return getTimeConstraintViolation(event.getDropoffTime(), request.getLatestArrivalTime());
-	}
+	@Override
+	public void install() {
+		bindModal(TaxiEventSequenceCollector.class).toProvider(
+				modalProvider(getter -> new TaxiEventSequenceCollector(taxiCfg.getMode()))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(TaxiEventSequenceCollector.class));
 
-	private static double getTimeConstraintViolation(double time, double maxTime) {
-		return Math.max(0, time - maxTime);
+		bindModal(ExecutedScheduleCollector.class).toProvider(
+				modalProvider(getter -> ExecutedScheduleCollector.createWithDefaultTaskCreator(taxiCfg.getMode())));
+		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 	}
 }

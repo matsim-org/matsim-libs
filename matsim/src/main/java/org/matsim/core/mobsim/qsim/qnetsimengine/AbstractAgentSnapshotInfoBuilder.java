@@ -52,13 +52,15 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private static int wrnCnt = 0;
 
 	private final Scenario scenario;
-	private final PositionInfo.LinkBasedBuilder builder;
+	private final SnapshotLinkWidthCalculator linkWidthCalculator;
 
 	AbstractAgentSnapshotInfoBuilder(Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator) {
 		this.scenario = sc;
+		this.linkWidthCalculator = linkWidthCalculator;
+	}
 
-		// use same builder for all positions to avoid uncessary objects being created.
-		this.builder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
+	private PositionInfo.LinkBasedBuilder newBuilder() {
+		return new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
 	}
 
 	private static double computeHolePositionAndReturnDistance(double freespeedTraveltime, Hole hole, double now, double curvedLength) {
@@ -77,6 +79,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 												Collection<? extends MobsimAgent> agentsInActivities, int cnt2) {
+		var builder = newBuilder();
 		builder.setVehicleId(null); // we don't have a vehicle in this case.
 		for (MobsimAgent agent : agentsInActivities) {
 
@@ -111,6 +114,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		// The reason for this, in return, is that positionVehiclesAlongLine(...) is a service method for queue models only.  kai, apr'16
 
 		MobsimDriverAgent driverAgent = veh.getDriver();
+		var builder = newBuilder();
 
 		var position = builder
 				.setPersonId(driverAgent.getId())
@@ -242,6 +246,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			double spacing, double prevVehicleDistance, double remainingTravelTime);
 
 	private int positionStack(final Collection<AgentSnapshotInfo> positions, final Collection<QVehicle> vehicles, final int startCount) {
+		var builder = newBuilder();
 
 		var counter = startCount;
 		for (var vehicle : vehicles) {
@@ -268,6 +273,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private void positionPassengers(Collection<AgentSnapshotInfo> positions,
 									Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
 									double lengthOfCurve, int lane, double speedValueBetweenZeroAndOne) {
+		var builder = newBuilder();
 
 		int cnt = passengers.size();
 		int laneInt = 2 * (cnt + 1) + lane;
@@ -296,6 +302,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 								 double curvedLength, Coord upstreamCoord, Coord downstreamCoord) {
 		int lane = 20;
 		double speedValue = 1.;
+		var builder = newBuilder();
 
 		var position = builder
 				.setPersonId(Id.createPersonId("hole"))
