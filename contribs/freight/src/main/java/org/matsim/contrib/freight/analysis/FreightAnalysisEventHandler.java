@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C) 2021 by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.analysis;
 
 import org.apache.log4j.Logger;
@@ -33,6 +54,8 @@ import java.util.HashSet;
 /*
 * EventHandler for analysis of matsim-freight runs. Tracks freight vehicles, carriers, shipments and services and is able to export results to TSV files.
 * Only uses information that is certain by default. Without LSP Events this means that the connection between Carrier-related Objects (Carriers, Shipments, Services) often cannot be made, but this Handles tries to make an educated guess which you can optionally include in the export. Guessed info will be preceeded by "?" in export.
+*
+* @author Jakob Harnisch (MATSim advanced class 2020/21)
 * */
 
 public class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
