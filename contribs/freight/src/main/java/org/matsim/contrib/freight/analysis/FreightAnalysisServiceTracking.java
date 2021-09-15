@@ -33,7 +33,7 @@ import java.util.HashMap;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
-public class FreightAnalysisServiceTracking {
+class FreightAnalysisServiceTracking {
 
 	private HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers;
 

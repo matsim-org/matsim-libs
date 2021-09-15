@@ -37,8 +37,7 @@ import java.util.HashSet;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
-public class FreightAnalysisVehicleTracking {
-
+class FreightAnalysisVehicleTracking {
 
 	private HashMap<Id<Vehicle>, VehicleTracker> trackers = new HashMap<>();
 	private HashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new HashMap<>();

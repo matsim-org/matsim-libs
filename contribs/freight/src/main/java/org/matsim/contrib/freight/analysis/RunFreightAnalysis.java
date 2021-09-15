@@ -38,7 +38,7 @@ import java.io.File;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
-public class RunFreightAnalysis {
+class RunFreightAnalysis {
     public static void main(String[] args) {
         RunFreightAnalysis rfa = new RunFreightAnalysis();
         // path to your output files:

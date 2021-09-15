@@ -36,7 +36,7 @@ import java.util.HashSet;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
-public class FreightAnalysisShipmentTracking {
+class FreightAnalysisShipmentTracking {
 
 	private HashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new HashMap();
     public void addTracker(CarrierShipment shipment){

@@ -58,7 +58,7 @@ import java.util.HashSet;
 * @author Jakob Harnisch (MATSim advanced class 2020/21)
 * */
 
-public class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
+class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
 	private final static Logger log = Logger.getLogger(FreightAnalysisEventHandler.class);
 	private final Vehicles vehicles;
 	private Network network;
