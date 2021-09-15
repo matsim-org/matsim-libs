@@ -161,7 +161,7 @@ public class AssignerRequirementsTest {
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setStartTimeWindow(startTimeWindow);
-        	builder.setServiceTime(capacityDemand * 60);
+        	builder.setDeliveryServiceTime(capacityDemand * 60 );
         	boolean blue = rand.nextBoolean();
         	if (blue == true) {
         		builder.addRequirement(new BlueRequirement());

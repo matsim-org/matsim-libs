@@ -125,7 +125,7 @@ import lsp.resources.LSPResource;
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setStartTimeWindow(startTimeWindow);
-	        	builder.setServiceTime(capacityDemand * 60);
+	        	builder.setDeliveryServiceTime( capacityDemand * 60);
 	        	shipmentList.add(builder.build());
 		 } 	
 	    return shipmentList;
@@ -156,12 +156,12 @@ import lsp.resources.LSPResource;
         //print the schedules for the assigned LSPShipments
         for(LSPShipment shipment : shipments) {
         	System.out.println("Shipment: " + shipment.getId());
-        	ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+        	ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new ShipmentPlanElementComparator());
         	
-			for(ShipmentPlanElement element : shipment.getSchedule().getPlanElements().values()) {
+			for(ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
         		System.out.println("Solution Id: " + element.getSolutionElement().getLogisticsSolution().getId() 
         		+ " SolutionElement Id: " + element.getSolutionElement().getId()
         		+ " Resource Id: " + element.getResourceId()

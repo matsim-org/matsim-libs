@@ -128,7 +128,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setStartTimeWindow(startTimeWindow);
-        	builder.setServiceTime(capacityDemand * 60);
+        	builder.setDeliveryServiceTime(capacityDemand * 60 );
         	LSPShipment shipment = builder.build();
         	collectionLSP.assignShipmentToLSP(shipment);
         }
@@ -140,19 +140,19 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 	public void testCollectionLSPScheduling() {
 		
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			
 			System.out.println();
-			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
+			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() +"  "+ scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
 			}
 			System.out.println();	
 		}
 				
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
-			assertTrue(shipment.getSchedule().getPlanElements().size() == 3);
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 3);
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
@@ -185,10 +185,10 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
-			assertTrue(endHandler.getCarrierService().getLocationLinkId() == shipment.getFromLinkId());
-			assertTrue(endHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(endHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
-			assertTrue(endHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getStartTimeWindow());
+			assertTrue(endHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
+			assertTrue(endHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
+			assertTrue(endHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertTrue(endHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
 			assertTrue(endHandler.getElement() == planElements.get(2).getSolutionElement());
 			assertTrue(endHandler.getElement() == collectionLSP.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
 			assertTrue(endHandler.getLspShipment() == shipment);
@@ -197,10 +197,10 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		
 			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
-			assertTrue(serviceHandler.getCarrierService().getLocationLinkId() == shipment.getFromLinkId());
-			assertTrue(serviceHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(serviceHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
-			assertTrue(serviceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getStartTimeWindow());
+			assertTrue(serviceHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
+			assertTrue(serviceHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
+			assertTrue(serviceHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertTrue(serviceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
 			assertTrue(serviceHandler.getElement() == planElements.get(1).getSolutionElement());
 			assertTrue(serviceHandler.getElement() == collectionLSP.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
 			assertTrue(serviceHandler.getLspShipment() == shipment);

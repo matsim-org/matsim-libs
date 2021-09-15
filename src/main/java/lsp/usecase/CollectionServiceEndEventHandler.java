@@ -50,7 +50,7 @@ class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentLoad);
+		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
 	private void logTransport(LSPServiceEndEvent event){
@@ -63,7 +63,7 @@ class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 		LoggedShipmentTransport transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().getPlanElements().put(transportId, transport);
+		lspShipment.getLog().addPlanElement(transportId, transport);
 	}
 
 

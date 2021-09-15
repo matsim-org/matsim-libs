@@ -152,7 +152,7 @@ public class CollectionLSPMobsimTest {
 				builder.setEndTimeWindow( endTimeWindow );
 				TimeWindow startTimeWindow = TimeWindow.newInstance( 0, (24 * 3600) );
 				builder.setStartTimeWindow( startTimeWindow );
-				builder.setServiceTime( capacityDemand * 60 );
+				builder.setDeliveryServiceTime( capacityDemand * 60 );
 				LSPShipment shipment = builder.build();
 				collectionLSP.assignShipmentToLSP( shipment );
 			}
@@ -184,7 +184,7 @@ public class CollectionLSPMobsimTest {
 
 			log.warn("");
 			log.warn("shipment schedule plan elements:" );
-			for( ShipmentPlanElement planElement : shipment.getSchedule().getPlanElements().values() ){
+			for( ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values() ){
 				log.warn( planElement );
 			}
 			log.warn("");
@@ -194,8 +194,8 @@ public class CollectionLSPMobsimTest {
 			}
 			log.warn("");
 
-			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == shipment.getLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new ShipmentPlanElementComparator());

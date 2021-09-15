@@ -58,7 +58,7 @@ import lsp.resources.LSPResource;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().getPlanElements().put(unloadId, unload);
+		lspShipment.getLog().addPlanElement(unloadId, unload);
 	}
 
 	private void logTransport(LSPTourEndEvent event, Tour tour){

@@ -1,8 +1,6 @@
 package example.lsp.initialPlans;
 
-import example.lsp.simulationTrackers.SimulationTrackersUtils;
 import lsp.*;
-import lsp.functions.LSPInfo;
 import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -18,11 +16,15 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**	The LSP have to possibilities to send the goods from the first depot to the recipients:
@@ -89,7 +91,7 @@ import java.util.*;
 				Id<VehicleType> mainRunVehicleTypeId = Id.create( "MainRunCarrierVehicleType", VehicleType.class );
 
 				VehicleType mainRunVehicleType = CarrierVehicleType.Builder.newInstance( mainRunVehicleTypeId ).setCapacity( 30 ).setCostPerDistanceUnit( 0.0002 )
-											   .setCostPerTimeUnit( 0.38 ).setFixCost( 120 ).setMaxVelocity( 50 / 3.6 ).build();
+						.setCostPerTimeUnit( 0.38 ).setFixCost( 120 ).setMaxVelocity( 50 / 3.6 ).build();
 
 				Id<Link> fromLinkId = Id.createLinkId( "(4 2) (4 3)" );
 				Id<Vehicle> mainRunVehicleId = Id.createVehicleId( "MainRunVehicle" );
@@ -149,7 +151,7 @@ import java.util.*;
 			//The Carrier for distribution from reloading Point is created
 			Id<Carrier> distributionCarrierId = Id.create( "DistributionCarrier", Carrier.class );
 			VehicleType distributionVehicleType = CarrierVehicleType.Builder.newInstance( Id.create( "DistributionCarrierVehicleType", VehicleType.class ) ).setCapacity( 10 )
-											.setCostPerDistanceUnit( 0.0004 ).setCostPerTimeUnit( 0.38 ).setFixCost( 49 ).setMaxVelocity( 50 / 3.6 ).build();
+					.setCostPerDistanceUnit( 0.0004 ).setCostPerTimeUnit( 0.38 ).setFixCost( 49 ).setMaxVelocity( 50 / 3.6 ).build();
 
 			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance( Id.createVehicleId( "DistributionVehicle" ), Id.createLinkId( "(14 2) (14 3)" ) );
 			distributionCarrierVehicle.setType( distributionVehicleType );
@@ -160,8 +162,8 @@ import java.util.*;
 
 			//The distribution adapter i.e. the Resource is created
 			distributionResource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-			Id.create("DistributionCarrierAdapter", LSPResource.class ), network ).setCarrier( distributionCarrier ).setLocationLinkId( Id.createLinkId( "(14 2) (14 3)" ) )
-											    .setDistributionScheduler( UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
+					Id.create("DistributionCarrierAdapter", LSPResource.class ), network ).setCarrier( distributionCarrier ).setLocationLinkId( Id.createLinkId( "(14 2) (14 3)" ) )
+					.setDistributionScheduler( UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
 			// (The scheduler is where jsprit comes into play.)
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
@@ -176,20 +178,20 @@ import java.util.*;
 		Id<Carrier> directDistributionCarrierId = Id.create("DirectDistributionCarrier", Carrier.class);
 		VehicleType directDistributionVehicleType = CarrierVehicleType.Builder.newInstance(
 				Id.create("DirectDistributionCarrierVehicleType", VehicleType.class ) ).setCapacity(10 ).setCostPerDistanceUnit(0.0004 )
-										      .setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50/3.6 ).build();
+				.setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50/3.6 ).build();
 
 		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), Id.createLinkId("(4 2) (4 3)" ) );
 		directDistributionCarrierVehicle.setType( directDistributionVehicleType );
 
 		CarrierCapabilities directDistributionCarrierCapabilities = CarrierCapabilities.Builder.newInstance().addType(directDistributionVehicleType )
-												       .addVehicle(directDistributionCarrierVehicle ).setFleetSize(FleetSize.INFINITE ).build();
+				.addVehicle(directDistributionCarrierVehicle ).setFleetSize(FleetSize.INFINITE ).build();
 		Carrier directDistributionCarrier = CarrierUtils.createCarrier( directDistributionCarrierId );
 		directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 		//The distribution adapter i.e. the Resource is created
 		LSPResource directDistributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
 				Id.create("DirectDistributionCarrierAdapter", LSPResource.class ), network ).setCarrier(directDistributionCarrier ).setLocationLinkId( Id.createLinkId("(4 2) (4 3)" ) )
-												      .setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
 		// (The scheduler is where jsprit comes into play.)
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
@@ -219,64 +221,74 @@ import java.util.*;
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
 
-		if ( solutionType==SolutionType.original ){
-			// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
+		switch (solutionType) {
+			case original: {
+				// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
 
-			log.info( "" );
-			log.info( "set up logistic Solution - original solution is created" );
+				log.info("");
+				log.info("set up logistic Solution - original solution is created");
 
-			LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
-					Id.create( "SolutionWithReloadingId", LogisticsSolution.class ) ).addSolutionElement( depotElement ).addSolutionElement( mainRunElement ).addSolutionElement( secondReloadElement ).addSolutionElement( distributionElement ).build();
+				//Das ist wichtig, damit er die die Kette zur Verfügung hat.
+				depotElement.setNextElement(mainRunElement);
+				mainRunElement.setNextElement(secondReloadElement);
+				secondReloadElement.setNextElement(distributionElement);
+
+				LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
+						Id.create("SolutionWithReloadingId", LogisticsSolution.class)).addSolutionElement(depotElement).addSolutionElement(mainRunElement).addSolutionElement(secondReloadElement).addSolutionElement(distributionElement).build();
 
 
-			log.info( "" );
-			log.info( "The initial plan of the lsp is generated and the assigner and the solution from above are added" );
+				log.info("");
+				log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
-			LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner( UsecaseUtils.createDeterministicShipmentAssigner() ).addSolution( completeSolutionWithReloading );
+				LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createDeterministicShipmentAssigner()).addSolution(completeSolutionWithReloading);
 
-			log.info( "" );
-			log.info( "The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder" );
+				log.info("");
+				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
 
-			List<LSPResource> resourcesList = new ArrayList<>( Arrays.asList( depotResource, mainRunResource, secondReloadingPointResource, distributionResource ));
+				List<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(depotResource, mainRunResource, secondReloadingPointResource, distributionResource));
 
-			SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler( resourcesList );
+				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-			return LSPUtils.LSPBuilder.getInstance().setInitialPlan( completePlan ).setId( Id.create( "CollectionLSP", LSP.class ) ).setSolutionScheduler( simpleScheduler ).build();
+				return LSPUtils.LSPBuilder.getInstance().setInitialPlan(completePlan).setId(Id.create("CollectionLSP", LSP.class)).setSolutionScheduler(simpleScheduler).build();
 
-		} else {
-			// ### This is the new solution with with directDistribution from the Depot.
+			}
+			case direct: {
+				// ### This is the new solution with with directDistribution from the Depot.
 
-			log.info( "" );
-			log.info( "The order of the logisticsSolutionElements is now specified" );
-			depotElement.setNextElement( directDistributionElement );
-			directDistributionElement.setPreviousElement( depotElement );
+				log.info("");
+				log.info("The order of the logisticsSolutionElements is now specified");
+				depotElement.setNextElement(directDistributionElement);
+				directDistributionElement.setPreviousElement(depotElement);
 
-			//TODO WIP: KostenInfo an das Element dran hängen.
-//		LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
-//		SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
-//		directDistributionElement.getInfos().add(costInfo);
+				//TODO WIP: KostenInfo an das Element dran hängen.
+				//		LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
+				//		SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
+				//		directDistributionElement.getInfos().add(costInfo);
 
-			log.info( "" );
-			log.info( "set up logistic Solution - direct distribution from the depot is created" );
+				log.info("");
+				log.info("set up logistic Solution - direct distribution from the depot is created");
 
-			LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
-					Id.create( "SolutionDirectId", LogisticsSolution.class ) ).addSolutionElement( depotElement ).addSolutionElement( directDistributionElement ).build();
+				LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
+						Id.create("SolutionDirectId", LogisticsSolution.class)).addSolutionElement(depotElement).addSolutionElement(directDistributionElement).build();
 
-			log.info( "" );
-			log.info( "The initial plan of the lsp is generated and the assigner and the solution from above are added" );
+				log.info("");
+				log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
-			LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner( UsecaseUtils.createDeterministicShipmentAssigner() ).addSolution( completeSolutionDirect );
+				LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createDeterministicShipmentAssigner()).addSolution(completeSolutionDirect);
 
-			log.info( "" );
-			log.info( "The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder" );
+				log.info("");
+				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
 
-			ArrayList<LSPResource> resourcesList = new ArrayList<>( Arrays.asList( depotResource, directDistributionAdapter ));
-			// TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
+				ArrayList<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(depotResource, directDistributionAdapter));
+				// TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
 
-//			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
-			SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+				//			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
+				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-			return LSPUtils.LSPBuilder.getInstance().setInitialPlan( completePlan ).setId( Id.create( "MyLSP", LSP.class ) ).setSolutionScheduler( simpleScheduler ).build();
+				return LSPUtils.LSPBuilder.getInstance().setInitialPlan(completePlan).setId(Id.create("MyLSP", LSP.class)).setSolutionScheduler(simpleScheduler).build();
+			}
+			default:
+				throw new IllegalStateException("Unexpected value: " + solutionType);
 		}
 
 	}
@@ -295,11 +307,11 @@ import java.util.*;
 				Collections.shuffle(linkList, rand);
 				Link pendingToLink = linkList.get(0);
 				if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
-						    pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
-						    pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
-						    pendingToLink.getToNode().getCoord().getX() <= 18000 &&
-						    pendingToLink.getToNode().getCoord().getY() <= 4000  &&
-						    pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
+						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
+						pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+						pendingToLink.getToNode().getCoord().getY() <= 4000  &&
+						pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
 					builder.setToLinkId(pendingToLink.getId());
 					break;
 				}
@@ -312,7 +324,7 @@ import java.util.*;
 			builder.setEndTimeWindow(endTimeWindow);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setServiceTime(capacityDemand * 60);
+			builder.setDeliveryServiceTime(capacityDemand * 60 );
 			LSPShipment shipment = builder.build();
 			shipmentList.add(shipment);
 		}
@@ -326,9 +338,10 @@ import java.util.*;
 			log.warn(arg);
 		}
 
-		CommandLine cmd = new CommandLine.Builder( args )
-						  .allowAnyOption( true )
-						  .build();
+		//Set up required MATSim classes
+		Config config;
+		config = ConfigUtils.loadConfig( args );
+		CommandLine cmd = ConfigUtils.getCommandLine(args);
 
 		ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf( cmd.getOption( "solutionType" ).get() ) ;
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
@@ -336,9 +349,6 @@ import java.util.*;
 		log.info("Starting ...");
 		log.info("Set up required MATSim classes");
 
-		//Set up required MATSim classes
-		Config config = new Config();
-		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
@@ -362,14 +372,23 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getSchedule().getPlanElements().values());
-			elementList.sort(new ShipmentPlanElementComparator());
-			System.out.println("Shipment: " + shipment.getId());
-			for(ShipmentPlanElement element : elementList) {
-				System.out.println(element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/schedules.txt" ) ){
+			for( LSPShipment shipment : lsp.getShipments() ){
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
+				elementList.sort( new ShipmentPlanElementComparator() );
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println( str1 );
+				writer.write( str1 + "\n");
+				for( ShipmentPlanElement element : elementList ){
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println( str2 );
+					writer.write(str2);
+				}
+				System.out.println();
+				writer.write("\n");
 			}
-			System.out.println();
+		} catch( IOException e ){
+			e.printStackTrace();
 		}
 
 		log.info("Done.");

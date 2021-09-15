@@ -1,19 +1,20 @@
 package lsp.shipment;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
 public interface ShipmentPlan {
 
-	public LSPShipment getShipment();
+	LSPShipment getShipment();
 
-	public HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> getPlanElements();
+	Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
 
-	public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element);
+	void addPlanElement( Id<ShipmentPlanElement> id, ShipmentPlanElement element );
 	
-	public ShipmentPlanElement getMostRecentEntry();
+	ShipmentPlanElement getMostRecentEntry();
 	
-	public void clear();
+	void clear();
 	
 }

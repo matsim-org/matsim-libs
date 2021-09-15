@@ -13,34 +13,36 @@ import lsp.functions.LSPInfo;
 
 public interface LSPShipment {
 
-	public Id<LSPShipment> getId();
+	Id<LSPShipment> getId(); // same as in CarrierShipment
 	
-	public Id<Link> getFromLinkId();
+	Id<Link> getFrom(); // same as in CarrierShipment
 	
-	public Id<Link> getToLinkId();
+	Id<Link> getTo(); // same as in CarrierShipment
 	
-	public TimeWindow getStartTimeWindow();
+	TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
 	
-	public TimeWindow getEndTimeWindow();
+	TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
+
+	int getSize(); // same as in CarrierShipment
+
+	double getDeliveryServiceTime(); // same as in CarrierShipment
+
+	double getPickupServiceTime(); // same as in CarrierShipment
+
+	ShipmentPlan getShipmentPlan();
 	
-	public ShipmentPlan getSchedule();
+	ShipmentPlan getLog();
 	
-	public ShipmentPlan getLog();
+	Collection<EventHandler> getEventHandlers();
 	
-	public int getCapacityDemand();
+	Collection<Requirement> getRequirements();
 	
-	public double getServiceDuration();
+//	Collection<UtilityFunction> getUtilityFunctions();
 	
-	public Collection<EventHandler> getEventHandlers();
+	Collection<LSPInfo> getInfos();
 	
-	public Collection<Requirement> getRequirements();
+	Id<LogisticsSolution> getSolutionId();
 	
-//	public Collection<UtilityFunction> getUtilityFunctions();
-	
-	public Collection<LSPInfo> getInfos();
-	
-	public Id<LogisticsSolution> getSolutionId();
-	
-//	public void setSolutionId(Id<LogisticsSolution> Id);
+//	void setSolutionId(Id<LogisticsSolution> Id);
 	
 }

@@ -48,7 +48,7 @@ import lsp.resources.LSPResource;
 	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement){
 		ReloadingPointEventHandlerPair pair = new ReloadingPointEventHandlerPair(shipment, solutionElement);
 		
-		for(ShipmentPlanElement planElement: shipment.getSchedule().getPlanElements().values()){
+		for(ShipmentPlanElement planElement: shipment.getShipmentPlan().getPlanElements().values()){
 			if(planElement instanceof ScheduledShipmentTransport){
 				ScheduledShipmentTransport transport = (ScheduledShipmentTransport) planElement;
 				if(transport.getSolutionElement().getNextElement() == solutionElement){
@@ -102,14 +102,14 @@ import lsp.resources.LSPResource;
 		builder.setResourceId(resourceId);
 		double startTime = event.getTime() + getUnloadEndTime(event.getTour());
 		builder.setStartTime(startTime);
-		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getCapacityDemand();
+		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
 		ShipmentPlanElement loggedShipmentHandle = builder.build();
 		String idString = loggedShipmentHandle.getResourceId() + "" + loggedShipmentHandle.getSolutionElement().getId() + "" + loggedShipmentHandle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentHandle);
+			lspShipment.getLog().addPlanElement(loadId, loggedShipmentHandle);
 		}	
 	}
 	
@@ -133,14 +133,14 @@ import lsp.resources.LSPResource;
 		builder.setResourceId(resourceId);
 		double startTime = event.getTime();
 		builder.setStartTime(startTime);
-		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getCapacityDemand();
+		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
 		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().getPlanElements().put(loadId, handle);
+			lspShipment.getLog().addPlanElement(loadId, handle);
 		}	
 	}
 

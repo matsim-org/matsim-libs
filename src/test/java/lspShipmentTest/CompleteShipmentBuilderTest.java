@@ -75,7 +75,7 @@ public class CompleteShipmentBuilderTest {
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setStartTimeWindow(startTimeWindow);
-        	builder.setServiceTime(capacityDemand * 60);
+        	builder.setDeliveryServiceTime(capacityDemand * 60 );
         	shipments.add(builder.build());
         }
 	}
@@ -86,13 +86,13 @@ public class CompleteShipmentBuilderTest {
 		assertTrue(shipments.size() == 10);
 		for(LSPShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
-			assertNotNull(shipment.getCapacityDemand());
-			assertNotNull(shipment.getEndTimeWindow());
-			assertNotNull(shipment.getFromLinkId());
-			assertNotNull(shipment.getServiceDuration() );
-			assertNotNull(shipment.getToLinkId());
-			assertNotNull(shipment.getStartTimeWindow());
-			assertNotNull(shipment.getSchedule());
+			assertNotNull(shipment.getSize() );
+			assertNotNull(shipment.getDeliveryTimeWindow() );
+			assertNotNull(shipment.getFrom() );
+			assertNotNull(shipment.getDeliveryServiceTime() );
+			assertNotNull(shipment.getTo() );
+			assertNotNull(shipment.getPickupTimeWindow() );
+			assertNotNull(shipment.getShipmentPlan());
 			assertNotNull(shipment.getLog());
 			assertNotNull(shipment.getEventHandlers());
 			
@@ -100,15 +100,15 @@ public class CompleteShipmentBuilderTest {
 			assertEquals(shipment.getLog().getShipment(), shipment);
 			assertTrue(shipment.getLog().getPlanElements().isEmpty());
 			
-			assertEquals(shipment.getSchedule().getShipment(), shipment);
-			assertTrue(shipment.getSchedule().getPlanElements().isEmpty());
-			Link link = network.getLinks().get(shipment.getToLinkId());
+			assertEquals(shipment.getShipmentPlan().getShipment(), shipment);
+			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());
+			Link link = network.getLinks().get(shipment.getTo() );
 			assertTrue(link.getFromNode().getCoord().getX() <= 18000);
 			assertTrue(link.getFromNode().getCoord().getX() >= 14000);
 			assertTrue(link.getToNode().getCoord().getX() <= 18000);
 			assertTrue(link.getToNode().getCoord().getX() >= 14000);
 			
-			link = network.getLinks().get(shipment.getFromLinkId());
+			link = network.getLinks().get(shipment.getFrom() );
 			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
 			assertTrue(link.getFromNode().getCoord().getY() <= 4000);
 		}

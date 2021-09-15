@@ -69,9 +69,9 @@ import org.matsim.vehicles.VehicleType;
 
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
-			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCapacity().getOther().intValue() ){
+			if((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getCapacityDemand();
+				load = load + tuple.getShipment().getSize();
 			}
 			else{
 				load=0;
@@ -79,7 +79,7 @@ import org.matsim.vehicles.VehicleType;
 				scheduledTours.addAll(plan.getScheduledTours());
 				shipmentsInCurrentTour.clear();
 				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getCapacityDemand();
+				load = load + tuple.getShipment().getSize();
 			}
 			
 		}
@@ -107,7 +107,7 @@ import org.matsim.vehicles.VehicleType;
 		double latestTupleTime = 0;
 
 		for ( ShipmentWithTime tuple : tuples){
-			totalLoadingTime = totalLoadingTime + tuple.getShipment().getServiceDuration();
+			totalLoadingTime = totalLoadingTime + tuple.getShipment().getDeliveryServiceTime();
 			if(tuple.getTime() > latestTupleTime){
 				latestTupleTime = tuple.getTime();
 			}
@@ -133,8 +133,8 @@ import org.matsim.vehicles.VehicleType;
 	private CarrierService convertToCarrierService( ShipmentWithTime tuple ){
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, adapter.getEndLinkId());
-		builder.setCapacityDemand(tuple.getShipment().getCapacityDemand());
-		builder.setServiceDuration(tuple.getShipment().getServiceDuration() );
+		builder.setCapacityDemand(tuple.getShipment().getSize() );
+		builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime() );
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
@@ -197,7 +197,7 @@ import org.matsim.vehicles.VehicleType;
 		ShipmentPlanElement  load = builder.build();
 		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, load);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
 	}
 
 	private void addShipmentTransportElement( ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity ){
@@ -220,7 +220,7 @@ import org.matsim.vehicles.VehicleType;
 		ShipmentPlanElement  transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, transport);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, transport);
 	}
 
 	private void addShipmentUnloadElement( ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity ){
@@ -248,7 +248,7 @@ import org.matsim.vehicles.VehicleType;
 		ShipmentPlanElement  unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, unload);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
 	}
 	
 	private void addMainRunStartEventHandler( CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource ){

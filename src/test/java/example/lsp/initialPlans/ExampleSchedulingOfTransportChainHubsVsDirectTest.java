@@ -28,26 +28,16 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 					,"--solutionType=original"
 			} );
 
-//			{
-//				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-//				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-//				EventsUtils.compareEventsFiles( expected, actual );
-//			}
-//			{
-//				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-//				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
-//				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-//				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
-//				PopulationUtils.comparePopulations( expected, actual ) ;
-//			}
-
 		} catch ( Exception ee ) {
 			log.fatal(ee) ;
 			fail() ;
 		}
+
+		//Compare written out schedule.
+		MatsimTestUtils.compareFilesLineByLine(utils.getInputDirectory() + "schedules.txt" , utils.getOutputDirectory() + "schedules.txt" );
 	}
 	@Test
-	public void testMain2(){
+	public void testMain2_direct(){
 
 		try{
 			ExampleSchedulingOfTransportChainHubsVsDirect.main( new String []{
@@ -57,23 +47,12 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 					,"--solutionType=direct"
 			} );
 
-//			{
-//				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-//				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-//				EventsUtils.compareEventsFiles( expected, actual );
-//			}
-//			{
-//				final Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-//				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
-//				final Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-//				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
-//				PopulationUtils.comparePopulations( expected, actual ) ;
-//			}
-
-
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail() ;
 		}
+
+		//Compare written out schedule.
+		MatsimTestUtils.compareFilesLineByLine(utils.getInputDirectory() + "schedules.txt" , utils.getOutputDirectory() + "schedules.txt" );
 	}
 }
