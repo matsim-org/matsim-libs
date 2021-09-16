@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 import org.matsim.contrib.dvrp.analysis.ExecutedTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -41,7 +43,8 @@ public class DurationStats {
 		public final double endTime;
 
 		public State(V value, double beginTime, double endTime) {
-			this.value = value;
+			Preconditions.checkArgument(beginTime <= endTime);
+			this.value = Preconditions.checkNotNull(value);
 			this.beginTime = beginTime;
 			this.endTime = endTime;
 		}
