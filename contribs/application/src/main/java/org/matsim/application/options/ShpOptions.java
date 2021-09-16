@@ -28,6 +28,8 @@ import javax.annotation.Nullable;
 import picocli.CommandLine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -87,6 +89,16 @@ public final class ShpOptions {
 	public List<SimpleFeature> readFeatures() {
 		if (shp == null)
 			throw new IllegalStateException("Shape file path not specified");
+		if (shp.getFileName().toString().startsWith("http")) {
+			URL shapeFileAsURL = null;
+			try {
+				shapeFileAsURL = new URL(shp.getFileName().toString());
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+			return (List<SimpleFeature>) ShapeFileReader.getAllFeatures(shapeFileAsURL);
+		}
+
 		if (!Files.exists(shp))
 			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
