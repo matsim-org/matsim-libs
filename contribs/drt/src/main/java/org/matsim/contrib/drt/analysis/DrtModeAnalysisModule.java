@@ -29,6 +29,7 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -57,6 +58,10 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		bindModal(ExecutedScheduleCollector.class).toProvider(
+				modalProvider(getter -> new ExecutedScheduleCollector(getMode()))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
+
 		bindModal(DrtVehicleDistanceStats.class).toProvider(modalProvider(
 				getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg,
 						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
