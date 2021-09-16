@@ -1,12 +1,12 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.util.stats.TaxiStats;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
-import org.matsim.contrib.common.csv.CSVLineBuilder;
-import org.matsim.contrib.common.csv.CompactCSVWriter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -16,7 +16,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiBenchmarkStats
 		implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
-	public static final String[] HEADER = { "n", "m", //
+	public static final String[] HEADER = { //
 			"PassWaitTime_avg", //
 			"PassWaitTime_95%ile", //
 			"PassWaitTime_max", //
@@ -60,20 +60,16 @@ public class TaxiBenchmarkStats
 		writeFile("benchmark_stats.txt", HEADER);
 	}
 
-	protected void writeFile(String file, String[] header) {
+	private void writeFile(String file, String[] header) {
 		try (CompactCSVWriter writer = new CompactCSVWriter(
 				IOUtils.getBufferedWriter(controlerIO.getOutputFilename(file)))) {
 			writer.writeNext(header);
-			writer.writeNext(createAndInitLineBuilder());
+			writer.writeNext(new CSVLineBuilder()//
+					.addf("%.1f", passengerWaitTime.getMean())
+					.addf("%.0f", pc95PassengerWaitTime.getMean())
+					.addf("%.0f", maxPassengerWaitTime.getMean())
+					.addf("%.3f", emptyDriveRatio.getMean())
+					.addf("%.3f", stayRatio.getMean()));
 		}
-	}
-
-	protected CSVLineBuilder createAndInitLineBuilder() {
-		return new CSVLineBuilder()//
-				.addf("%.1f", passengerWaitTime.getMean())
-				.addf("%.0f", pc95PassengerWaitTime.getMean())
-				.addf("%.0f", maxPassengerWaitTime.getMean())
-				.addf("%.3f", emptyDriveRatio.getMean())
-				.addf("%.3f", stayRatio.getMean());
 	}
 }

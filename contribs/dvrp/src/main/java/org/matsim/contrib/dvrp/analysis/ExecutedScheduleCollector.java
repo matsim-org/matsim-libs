@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -55,22 +54,13 @@ public class ExecutedScheduleCollector implements TaskStartedEventHandler, TaskE
 		}
 	}
 
-	public static ExecutedScheduleCollector createWithDefaultTaskCreator(String mode) {
-		return new ExecutedScheduleCollector(mode,
-				(taskStarted, taskEnded) -> new ExecutedTask(taskStarted.getTaskType(), taskStarted.getTime(),
-						taskEnded.getTime(), taskStarted.getLinkId(), taskEnded.getLinkId()));
-	}
-
 	private final String mode;
-	private final BiFunction<TaskStartedEvent, TaskEndedEvent, ExecutedTask> executedTaskCreator;
 
 	private final Map<Id<DvrpVehicle>, TaskStartedEvent> taskStartedEvents = new HashMap<>();
 	private final Map<Id<DvrpVehicle>, ExecutedSchedule> executedSchedules = new HashMap<>();
 
-	public ExecutedScheduleCollector(String mode,
-			BiFunction<TaskStartedEvent, TaskEndedEvent, ExecutedTask> executedTaskCreator) {
+	public ExecutedScheduleCollector(String mode) {
 		this.mode = mode;
-		this.executedTaskCreator = executedTaskCreator;
 	}
 
 	public Collection<ExecutedSchedule> getExecutedSchedules() {
@@ -78,7 +68,7 @@ public class ExecutedScheduleCollector implements TaskStartedEventHandler, TaskE
 	}
 
 	@Override
-	public void handleEvent(TaskStartedEvent startEvent) {
+	public final void handleEvent(TaskStartedEvent startEvent) {
 		if (!startEvent.getDvrpMode().equals(mode)) {
 			return;
 		}
@@ -89,7 +79,7 @@ public class ExecutedScheduleCollector implements TaskStartedEventHandler, TaskE
 	}
 
 	@Override
-	public void handleEvent(TaskEndedEvent endEvent) {
+	public final void handleEvent(TaskEndedEvent endEvent) {
 		if (!endEvent.getDvrpMode().equals(mode)) {
 			return;
 		}
@@ -100,7 +90,19 @@ public class ExecutedScheduleCollector implements TaskStartedEventHandler, TaskE
 				"Start event (%s) and end event (%s) refer to tasks of different types", startEvent, endEvent);
 
 		executedSchedules.computeIfAbsent(endEvent.getDvrpVehicleId(), ExecutedSchedule::new) //
-				.executedTasks.add(executedTaskCreator.apply(startEvent, endEvent));
+				.executedTasks.add(createTask(startEvent, endEvent));
+	}
+
+	/**
+	 * This method is meant for overriding in order to enrich created ExecutedTasks with some additional info.
+	 * <p>
+	 * In order to do so, we often need to listen to other events. Given Matsim's default implementation of
+	 * parallel event handling, there is no guarantee that two distinct event handler objects are processing events
+	 * in the same thread, therefore overriding is simpler than delegation.
+	 */
+	protected ExecutedTask createTask(TaskStartedEvent taskStarted, TaskEndedEvent taskEnded) {
+		return new ExecutedTask(taskStarted.getTaskType(), taskStarted.getTime(), taskEnded.getTime(),
+				taskStarted.getLinkId(), taskEnded.getLinkId());
 	}
 
 	@Override

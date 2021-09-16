@@ -36,9 +36,10 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
-import org.matsim.contrib.ev.temperature.TemperatureService;
+import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
@@ -112,6 +113,12 @@ public class RunETaxiBenchmark {
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
+
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(TaxiBenchmarkStats.class)
+				.mode(mode)
+				.objectClass(Fleet.class)
+				.listenerCreator(getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
+				.build());
 
 		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
 				.mode(mode)
