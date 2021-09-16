@@ -107,6 +107,7 @@ public class ExecutedScheduleCollector implements TaskStartedEventHandler, TaskE
 
 	@Override
 	public void reset(int iteration) {
+		taskStartedEvents.clear();
 		executedSchedules.clear();
 	}
 }

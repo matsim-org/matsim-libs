@@ -31,21 +31,18 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
  * @author michalm (Michal Maciejewski)
  */
 public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
-	private final TaxiConfigGroup taxiCfg;
-
 	public TaxiModeAnalysisModule(TaxiConfigGroup taxiCfg) {
 		super(taxiCfg.getMode());
-		this.taxiCfg = taxiCfg;
 	}
 
 	@Override
 	public void install() {
 		bindModal(TaxiEventSequenceCollector.class).toProvider(
-				modalProvider(getter -> new TaxiEventSequenceCollector(taxiCfg.getMode()))).asEagerSingleton();
+				modalProvider(getter -> new TaxiEventSequenceCollector(getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(TaxiEventSequenceCollector.class));
 
 		bindModal(ExecutedScheduleCollector.class).toProvider(
-				modalProvider(getter -> new ExecutedScheduleCollector(taxiCfg.getMode()))).asEagerSingleton();
+				modalProvider(getter -> new ExecutedScheduleCollector(getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 	}
 }
