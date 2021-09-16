@@ -16,8 +16,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class ETaxiBenchmarkStats
 		implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
-	public static final String[] HEADER = { "n", "m", //
-			"QueuedTimeRatio_fleetAvg" };
+	public static final String[] HEADER = { "QueuedTimeRatio_fleetAvg" };
 
 	private final OutputDirectoryHierarchy controlerIO;
 
@@ -49,8 +48,7 @@ public class ETaxiBenchmarkStats
 		try (CompactCSVWriter writer = new CompactCSVWriter(
 				IOUtils.getBufferedWriter(controlerIO.getOutputFilename(file)))) {
 			writer.writeNext(header);
-			writer.writeNext(new CSVLineBuilder()//
-					.addf("%.3f", queuedTimeRatio.getMean()));
+			writer.writeNext(new CSVLineBuilder().addf("%.3f", queuedTimeRatio.getMean()));
 		}
 	}
 }

@@ -16,7 +16,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiBenchmarkStats
 		implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
-	public static final String[] HEADER = { "n", "m", //
+	public static final String[] HEADER = { //
 			"PassWaitTime_avg", //
 			"PassWaitTime_95%ile", //
 			"PassWaitTime_max", //
