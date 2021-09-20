@@ -26,8 +26,6 @@ import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -77,14 +75,14 @@ public class RunFreightExample {
 		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
-		//Solving the VRP (generate carrier's tour plans)
+		// Solving the VRP (generate carrier's tour plans)
 		FreightUtils.runJsprit( scenario );
 
-		// output after jsprit run (not necessary)
+		// Output after jsprit run (not necessary)
 		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
-		//MATSim configuration:
+		// ## MATSim configuration:  ##
 		final Controler controler = new Controler( scenario ) ;
 		Freight.configure( controler );
 
@@ -96,7 +94,7 @@ public class RunFreightExample {
 //		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.kinematicWaves );
 //		controler.addOverridingModule( new OTFVisLiveModule() );
 
-//		start of the MATSim-Run:
+		// ## Start of the MATSim-Run: ##
 		controler.run();
 	}
 
