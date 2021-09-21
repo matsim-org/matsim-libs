@@ -33,10 +33,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.OptionalDouble;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author tschlenther
@@ -64,7 +61,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 	private final TransitConfigGroup transitConfigGroup;
 	private final Map<Id<Person>, ScoringParameters> params = new IdMap<>(Person.class);
 	private final double globalAvgIncome;
-	private Map<String, Map<String, ActivityUtilityParameters>> activityParamsPerSubpopulation = new HashMap<>();
+	private final Map<String, Map<String, ActivityUtilityParameters>> activityParamsPerSubpopulation = new HashMap<>();
 
 	@Inject
 	IncomeDependentUtilityOfMoneyPersonScoringParameters(Population population, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
@@ -80,11 +77,11 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 				"Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMOney in their subpopulation's scoring params..");
 		OptionalDouble averageIncome =  population.getPersons().values().stream()
 				.filter(person -> person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME) != null) //consider only agents that have a specific income provided
-				.mapToDouble(person -> (double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME))
+				.mapToDouble(person -> Double.parseDouble((String) Objects.requireNonNull(person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME))))
 				.filter(dd -> dd > 0)
 				.average();
 
-		if(! averageIncome.isPresent()){
+		if(averageIncome.isEmpty()){
 			throw new RuntimeException("you are using " + this.getClass() + " but there is not a single income attribute in the population! " +
 					"If you are not aiming for person-specific marginalUtilityOfMOney, better use other PersonScoringParams, e.g. SUbpopulationPersonScoringParams, which have higher performance." +
 					"Otherwise, please provide income attributes in the population...");
@@ -136,7 +133,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 
 			if (person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME) != null){
 				//here is where we put person-specific stuff
-				double personalIncome = (double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
+				double personalIncome = Double.parseDouble((String) Objects.requireNonNull(person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME)));
 				if(personalIncome > 0){
 					builder.setMarginalUtilityOfMoney(subpopulationScoringParams.getMarginalUtilityOfMoney()  * globalAvgIncome / personalIncome);
 				} else {
