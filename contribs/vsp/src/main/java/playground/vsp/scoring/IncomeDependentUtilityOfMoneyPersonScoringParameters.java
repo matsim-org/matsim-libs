@@ -77,7 +77,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 				"Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
 				"Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMOney in their subpopulation's scoring params..");
 		OptionalDouble averageIncome =  population.getPersons().values().stream()
-				.filter(person -> person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME) != null) //consider only agents that have a specific income provided
+				.filter(person -> PersonUtils.getIncome(person) != null) //consider only agents that have a specific income provided
 				.mapToDouble(PersonUtils::getIncome)
 				.filter(dd -> dd > 0)
 				.average();
@@ -132,7 +132,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
 			}
 
-			if (person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME) != null){
+			if (PersonUtils.getIncome(person) != null){
 				//here is where we put person-specific stuff
 				double personalIncome = PersonUtils.getIncome(person);
 				if(personalIncome > 0){
