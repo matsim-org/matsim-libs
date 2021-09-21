@@ -36,7 +36,8 @@ public final class PersonUtils {
 	private static final String CAR_AVAIL = "carAvail";
 	private static final String EMPLOYED = "employed";
 	private static final String AGE = "age";
-	private static final String TRAVELCARDS = "travelcards";
+	private static final String TRAVEL_CARDS = "travelcards";
+	private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
 	private final static Logger log = Logger.getLogger(Person.class);
 
 	@Deprecated // use methods of interface Person
@@ -77,7 +78,13 @@ public final class PersonUtils {
 	 */
 	public static String getLicense(Person person) {
 		return (String) person.getAttributes().getAttribute(HAS_LICENSE);
+	}
 
+	/**
+	 * convenience method for often used demographic attribute
+	 */
+	public static double getIncome(Person person) {
+		return (double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
 	}
 
 	/**
@@ -151,10 +158,18 @@ public final class PersonUtils {
 		}
 	}
 
+	/**
+	 * convenience method for often used demographic attribute
+	 */
+	public static void setIncome(Person person, final double income) {
+			person.getCustomAttributes().put(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+			person.getAttributes().putAttribute( PERSONAL_INCOME_ATTRIBUTE_NAME, income );
+	}
+
 	@Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16
 	public static void addTravelcard(Person person, final String type) {
 		if (getTravelcards(person) == null) {
-			person.getCustomAttributes().put(TRAVELCARDS, new TreeSet<String>());
+			person.getCustomAttributes().put(TRAVEL_CARDS, new TreeSet<String>());
 		}
 		if (getTravelcards(person).contains(type)) {
 			log.info(person + "[type=" + type + " already exists]");
@@ -166,7 +181,7 @@ public final class PersonUtils {
 	@SuppressWarnings("unchecked")
 	@Deprecated // use PersonAttributes
 	public static TreeSet<String> getTravelcards(Person person) {
-		return (TreeSet<String>) person.getCustomAttributes().get(TRAVELCARDS);
+		return (TreeSet<String>) person.getCustomAttributes().get(TRAVEL_CARDS);
 	}
 
 	public static boolean isSelected(Plan plan) {
