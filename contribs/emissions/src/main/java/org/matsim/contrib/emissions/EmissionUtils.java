@@ -72,16 +72,13 @@ public final class EmissionUtils {
 
 	public static Map<Pollutant, Double> sumUpEmissions(Map<Pollutant, Double> warmEmissions, Map<Pollutant, Double> coldEmissions) {
 
-		Map<Pollutant, Double> pollutant2sumOfEmissions =
-				Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
-						.collect(Collectors.toMap(
-								Entry::getKey, // The key
-								Entry::getValue, // The value
-								Double::sum
-								)
-						);
-
-		return pollutant2sumOfEmissions;
+		return Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
+				.collect(Collectors.toMap(
+						Entry::getKey, // The key
+						Entry::getValue, // The value
+						Double::sum
+						)
+				);
 	}
 
 	public static <T> Map<Id<T>, Map<Pollutant, Double>> sumUpEmissionsPerId(
@@ -93,7 +90,7 @@ public final class EmissionUtils {
 		if (coldEmissions == null)
 			return warmEmissions;
 
-		Map<Id<T>, Map<Pollutant, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
+		return warmEmissions.entrySet().stream().map(entry -> {
 			Id<T> id = entry.getKey();
 			Map<Pollutant, Double> warmEm = entry.getValue();
 			Map<Pollutant, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
@@ -101,8 +98,6 @@ public final class EmissionUtils {
 			Map<Pollutant, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
 			return new Tuple<>(id, totalPollutantCounts);
 		}).collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
-
-		return totalEmissions;
 	}
 
 	public static Map<Id<Person>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
@@ -128,8 +123,7 @@ public final class EmissionUtils {
 	}
 
 	private static Set<String> getAllPollutants(Map<Id<Person>, SortedMap<String, Double>> totalEmissions) {
-		Set<String> pollutants = totalEmissions.values().stream().flatMap(m -> m.keySet().stream()).collect(Collectors.toSet());
-		return pollutants;
+		return totalEmissions.values().stream().flatMap(m -> m.keySet().stream()).collect(Collectors.toSet());
 	}
 
 	public static Map<Id<Link>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
@@ -202,7 +196,11 @@ public final class EmissionUtils {
 		Gbl.assertNotNull(vehicleType);
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
 //		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
-		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
+		try {
+			Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
+		} catch (Exception e) {
+			logger.info("oh no!");
+		}
 		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -299,7 +297,7 @@ public final class EmissionUtils {
 				}
 
 				// delete at old location:
-				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() + substring + EmissionSpecificationMarker.END_EMISSIONS.toString();
+				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS + substring + EmissionSpecificationMarker.END_EMISSIONS;
 				String result2 = vehicleType.getDescription().replace( oldString, "" );
 				vehicleType.setDescription( result2 ) ;
 
@@ -318,15 +316,13 @@ public final class EmissionUtils {
 	private static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
 		EngineInformation engineInfo = vehicleType.getEngineInformation();
-		StringBuilder strb = new StringBuilder();
-		strb.append(VehicleUtils.getHbefaVehicleCategory(engineInfo));
-		strb.append(";");
-		strb.append(VehicleUtils.getHbefaTechnology(engineInfo));
-		strb.append(";");
-		strb.append(VehicleUtils.getHbefaSizeClass(engineInfo));
-		strb.append(";");
-		strb.append(VehicleUtils.getHbefaEmissionsConcept(engineInfo));
-		return strb.toString();
+		return VehicleUtils.getHbefaVehicleCategory(engineInfo) +
+				";" +
+				VehicleUtils.getHbefaTechnology(engineInfo) +
+				";" +
+				VehicleUtils.getHbefaSizeClass(engineInfo) +
+				";" +
+				VehicleUtils.getHbefaEmissionsConcept(engineInfo);
 	}
 
 	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
