@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SnapshotWriterManager implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener, MobsimInitializedListener {
@@ -118,7 +119,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 			case no:
 				return true;
 			case withLinkAttributes:
-				return link.getAttributes().getAttribute(SnapshotWritersModule.GENERATE_SNAPSHOT_FOR_LINK_KEY) != null;
+				return Objects.equals(link.getAttributes().getAttribute(SnapshotWritersModule.GENERATE_SNAPSHOT_FOR_LINK_KEY), true);
 			default:
 				throw new RuntimeException("Unexpected filter snapshot setting: " + filterSnapshots + " Possible are: [no, withLinkAttributes]. This can be changed in config.qsim.filterSnapshots");
 		}
