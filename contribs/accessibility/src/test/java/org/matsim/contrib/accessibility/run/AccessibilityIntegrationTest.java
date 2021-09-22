@@ -124,8 +124,8 @@ public class AccessibilityIntegrationTest {
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		// acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		// acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
 		acg.setUseParallelization(false);
@@ -436,6 +436,7 @@ public class AccessibilityIntegrationTest {
 		for( Link link : scenario.getNetwork().getLinks().values() ){
 			Set<String> modes = new HashSet<>( link.getAllowedModes() ) ;
 			modes.add( TransportMode.walk ) ;
+			modes.add( TransportMode.bike ) ;
 			link.setAllowedModes( modes );
 		}
 
@@ -453,6 +454,13 @@ public class AccessibilityIntegrationTest {
 
 	private static Scenario createTestScenarioUsingOpportunityWeights(final Config config) {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		for( Link link : scenario.getNetwork().getLinks().values() ){
+			Set<String> modes = new HashSet<>( link.getAllowedModes() ) ;
+			modes.add( TransportMode.walk ) ;
+			modes.add( TransportMode.bike ) ;
+			link.setAllowedModes( modes );
+		}
 
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link; with a weight
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
