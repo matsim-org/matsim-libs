@@ -39,9 +39,9 @@ public class AgentId2DepartureDelayAtStopMapTest {
         
 //        create Events
         
-        PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
+        PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt, TransportMode.pt);
 		handler.handleEvent(event3);
-		PersonDepartureEvent event4 = new PersonDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt);
+		PersonDepartureEvent event4 = new PersonDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt, TransportMode.pt);
 		handler.handleEvent(event4);
         
         PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(2.9*3600, persId1, vehId1);

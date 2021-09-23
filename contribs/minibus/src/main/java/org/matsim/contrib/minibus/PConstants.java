@@ -20,7 +20,7 @@
 package org.matsim.contrib.minibus;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 
 /**
  * @author aneumann

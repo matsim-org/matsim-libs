@@ -10,8 +10,9 @@ import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.DefaultRoutedTripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -27,14 +28,14 @@ import org.matsim.facilities.Facility;
 public abstract class AbstractTripRouterEstimator implements TripEstimator {
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
-	private final TimeInterpreter.Factory timeInterpreterFactory;
+	private final TimeInterpretation timeInterpretation;
 	private final Collection<String> preroutedModes;
 
 	public AbstractTripRouterEstimator(TripRouter tripRouter, ActivityFacilities facilities,
-			TimeInterpreter.Factory timeInterpreterFactory, Collection<String> preroutedModes) {
+			TimeInterpretation timeInterpretation, Collection<String> preroutedModes) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
-		this.timeInterpreterFactory = timeInterpreterFactory;
+		this.timeInterpretation = timeInterpretation;
 		this.preroutedModes = preroutedModes;
 	}
 
@@ -64,7 +65,7 @@ public abstract class AbstractTripRouterEstimator implements TripEstimator {
 		if (!isPrerouted(mode, trip)) {
 			// II) Perform the routing
 			List<? extends PlanElement> elements = tripRouter.calcRoute(mode, originFacility, destinationFacility,
-					trip.getDepartureTime(), person);
+					trip.getDepartureTime(), person, trip.getTripAttributes());
 
 			// III) Perform utility estimation
 			return estimateTripCandidate(person, mode, trip, previousTrips, elements);
@@ -90,13 +91,13 @@ public abstract class AbstractTripRouterEstimator implements TripEstimator {
 	protected TripCandidate estimateTripCandidate(Person person, String mode, DiscreteModeChoiceTrip trip,
 			List<TripCandidate> previousTrips, List<? extends PlanElement> routedTrip) {
 
-		TimeInterpreter time = timeInterpreterFactory.createTimeInterpreter();
-		time.setTime(trip.getDepartureTime());
-		time.addPlanElements(routedTrip);
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+		timeTracker.setTime(trip.getDepartureTime());
+		timeTracker.addElements(routedTrip);
 
 		double utility = estimateTrip(person, mode, trip, previousTrips, routedTrip);
 
-		double duration = time.getCurrentTime() - trip.getDepartureTime();
+		double duration = timeTracker.getTime().seconds() - trip.getDepartureTime();
 		return new DefaultRoutedTripCandidate(utility, mode, routedTrip, duration);
 	}
 }

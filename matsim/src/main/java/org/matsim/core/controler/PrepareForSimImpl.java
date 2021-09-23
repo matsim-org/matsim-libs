@@ -49,6 +49,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
@@ -81,6 +82,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
 	private final PlansConfigGroup plansConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
@@ -91,7 +93,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
 				PlansConfigGroup plansConfigGroup, 
-				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
+				MainModeIdentifier backwardCompatibilityMainModeIdentifier,
+				TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -102,6 +105,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.plansConfigGroup = plansConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -172,7 +176,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
+				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario, 
 						carOnlyNetwork)
 		);
 		

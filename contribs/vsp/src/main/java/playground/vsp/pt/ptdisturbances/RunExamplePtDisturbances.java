@@ -64,6 +64,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
@@ -248,7 +249,7 @@ public class RunExamplePtDisturbances {
 
 		// force new transit router:
 		final TripRouter tripRouter = tripRouterProvider.get();
-		EditTrips editTrips = new EditTrips( tripRouter, scenario, internalInterface );;
+		EditTrips editTrips = new EditTrips( tripRouter, scenario, internalInterface, TimeInterpretation.create(scenario.getConfig()) );;
 
 		// find the affected agents and replan affected trips:
 		

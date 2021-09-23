@@ -21,9 +21,11 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.MoreObjects;
 
@@ -66,6 +68,11 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	@Override
 	public Id<DvrpVehicle> getId() {
 		return id;
+	}
+
+	@Override
+	public Optional<Vehicle> getMatsimVehicle() {
+		return Optional.empty();
 	}
 
 	@Override

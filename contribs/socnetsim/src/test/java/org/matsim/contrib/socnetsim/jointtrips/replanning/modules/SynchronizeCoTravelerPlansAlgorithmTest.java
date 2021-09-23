@@ -42,6 +42,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
@@ -321,7 +322,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	public void testDepartureTimes() throws Exception {
-		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm();
+		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm(TimeInterpretation.create(ConfigUtils.createConfig()));
 		for ( Fixture fixture : fixtures ) {
 			testee.run( fixture.jointPlan );
 

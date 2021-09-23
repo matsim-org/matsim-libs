@@ -44,6 +44,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
@@ -68,13 +69,14 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final TripRouter tripRouter;
 	private final FrozenTastesConfigGroup dccg;
 	private final Scenario scenario;
+	private final TimeInterpretation timeInterpretation;
 
 	public BestReplyLocationChoicePlanAlgorithm(
 		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
 		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
 		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
-		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
+		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks, TimeInterpretation timeInterpretation ) {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -85,6 +87,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
+		this.timeInterpretation = timeInterpretation;
 
 		this.quadTreesOfType = quad_trees;
 		this.tripRouter = tripRouter;
@@ -157,7 +160,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			final FrozenTastesConfigGroup.ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario );
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario, timeInterpretation );
 
 		final String convertedType = actToMove.getType();
 		Gbl.assertNotNull(convertedType);

@@ -23,6 +23,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+
+import java.sql.Time;
 
 import javax.inject.Inject;
 
@@ -34,16 +37,18 @@ import javax.inject.Inject;
 public final class DefaultAgentFactory implements AgentFactory {
 
 	private final Netsim simulation;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
-	public DefaultAgentFactory(final Netsim simulation) {
+	public DefaultAgentFactory(final Netsim simulation, TimeInterpretation timeInterpretation) {
 		this.simulation = simulation;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
 
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation); 
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation, this.timeInterpretation); 
 		// ( BasicPlanAgentImpl (inside PersonDriverAgentImpl) makes the plan unmodifiable. )
 		
 		return agent;

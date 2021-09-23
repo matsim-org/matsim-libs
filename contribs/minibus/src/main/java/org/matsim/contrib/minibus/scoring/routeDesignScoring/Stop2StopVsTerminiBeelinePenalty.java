@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;

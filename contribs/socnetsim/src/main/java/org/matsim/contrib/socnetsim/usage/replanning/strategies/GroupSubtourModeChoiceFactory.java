@@ -34,6 +34,7 @@ import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * @author thibautd
@@ -44,16 +45,16 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private javax.inject.Provider<TripRouter> tripRouterProvider;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
 	public GroupSubtourModeChoiceFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory, Provider<TripRouter> tripRouterFactory,
-										 @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider) {
+										 @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
-		this.tripRouterProvider = tripRouterProvider;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -93,7 +94,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					sc.getConfig(),
-					tripRouterFactory) );
+					tripRouterFactory, timeInterpretation) );
 		
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
