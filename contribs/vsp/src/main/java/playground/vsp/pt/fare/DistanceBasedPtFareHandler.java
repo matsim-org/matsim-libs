@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.PtConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        if (event.getActType().equals("pt interaction")) {
+        if (event.getActType().equals(PtConstants.PT_INTERACTION)) {
             personDepartureCoordMap.computeIfAbsent(event.getPersonId(), c -> event.getCoord()); // The departure place is fixed to the place of first pt interaction an agent has in the whole leg
             personArrivalCoordMap.put(event.getPersonId(), event.getCoord()); // The arrival stop will keep updating until the agent start a real activity (i.e. finish the leg)
         }
