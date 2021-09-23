@@ -33,7 +33,7 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        if (event.getActType().equals(PtConstants.PT_INTERACTION)) {
+        if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
             personDepartureCoordMap.computeIfAbsent(event.getPersonId(), c -> event.getCoord()); // The departure place is fixed to the place of first pt interaction an agent has in the whole leg
             personArrivalCoordMap.put(event.getPersonId(), event.getCoord()); // The arrival stop will keep updating until the agent start a real activity (i.e. finish the leg)
         }
