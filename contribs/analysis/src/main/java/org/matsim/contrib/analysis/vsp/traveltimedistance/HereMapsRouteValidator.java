@@ -81,12 +81,17 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 	 */
 	@Override
 	public Tuple<Double, Double> getTravelTime(CarTrip trip) {
+		String filename = outputPath + "/" + trip.getPersonId() + "_" + trip.getDepartureTime() + ".json.gz";
+		return getTravelTime(trip.getDepartureLocation(), trip.getArrivalLocation(), trip.getDepartureTime(), filename);
+	}
 
+	public Tuple<Double, Double> getTravelTime(Coord fromCoord, Coord toCoord, double departureTime, String detailedRecordFileName){
 		long travelTime = 0;
 		long distance = 0;
-		Coord from = transformation.transform(trip.getDepartureLocation());
-		Coord to = transformation.transform(trip.getArrivalLocation());
-		String filename = outputPath + "/" + trip.getPersonId() + "_" + trip.getDepartureTime() + ".json.gz";
+
+		Coord from = transformation.transform(fromCoord);
+		Coord to = transformation.transform(toCoord);
+
 		Locale locale = new Locale("en", "UK");
 		String pattern = "###.#####";
 
@@ -95,7 +100,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
 		String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAcessKey + "&transportmode=car&origin="
 				+ df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
-				+ df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(trip.getDepartureTime())
+				+ df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(departureTime)
 				+ "&return=summary";
 
 		try {
@@ -115,7 +120,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 				distance = (long) summary.get("length");
 
 				if (writeDetailedFiles) {
-					BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+					BufferedWriter bw = IOUtils.getBufferedWriter(detailedRecordFileName);
 					bw.write(jsonObject.toString());
 					bw.flush();
 					bw.close();
@@ -125,7 +130,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 		} catch (IOException e) {
 		} catch (ParseException e) {
 		}
-
 		return new Tuple<Double, Double>((double) travelTime, (double) distance);
 	}
 
