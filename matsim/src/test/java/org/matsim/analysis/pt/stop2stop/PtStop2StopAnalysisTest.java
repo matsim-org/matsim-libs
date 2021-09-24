@@ -19,7 +19,6 @@
 
 package org.matsim.analysis.pt.stop2stop;
 
-import gnu.trove.impl.sync.TSynchronizedShortObjectMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -41,34 +40,17 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 
-import javax.measure.spi.SystemOfUnits;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author dtamleh
+ */
+
 public class PtStop2StopAnalysisTest {
 
     /**
-     * TODO:
-     * 1 test one line, one route, one departure, 3 stops (almost done)
-     *
-     * another test: complex: multiple lines (of different modes), events in chronological order but lines/routes/departures mixed up for at least 2 routes (not necessarily everything mixed up),
-     * at least one line with multiple routes,
-     * at least one route with multiple departures,
-     * at least one route serving the same stop multiple times (identify using stopSequence),
-     * at least one passenger using multiple lines one after the other,
-     * at least one route with multiple links between two stops
-     *
-     * -> test stichprobenartig, nicht unbedingt an allen Halten fuer alle Linien,
-     * am besten (nicht unbedingt fuer alle Linien, aber für mindestens eine) 0. Haltestelle, eine mittlere Haltestelle und die letzte Haltestelle
-     * jede Linie / Route / usw. min. 2-3 Haltestellen
-     *
-     * vielleicht im simpleTest nur eine TransitLine, eine TransitRoute, eine Departure aber mit allen gemeinheiten (gleicher stop mehrfach bedient, passagier steigt ein, wieder aus, wieder ein und nochmal wieder aus)
-     *
-     * Dann diesen Test kopieren und die weiteren Lines/Routes/departures als Stoerfeuer zwischen die Events werfen und die gleichen Asserts nur fuer die eine besondere Linie am Ende + Asserts fuer eine oder zwei Haltestellen der train Line (-> andere vehicle capacity)
-     *
-     * helpful give expressive variable names
-     *
      * Test method for {@link PtStop2StopAnalysis}.
      */
     @Test
@@ -107,12 +89,9 @@ public class PtStop2StopAnalysisTest {
         scenario.getTransitVehicles().addVehicle(veh_bus_line1_route1_dep2);
         scenario.getTransitVehicles().addVehicle(veh_train1);
         Id<Person> driverId_bus1 = Id.createPersonId("driver_bus1");
-        Id<Person> driverId_bus2 = Id.createPersonId("driver_bus2");
-        Id<Person> driverId_train1 = Id.createPersonId("driver_train1");
         Id<TransitLine> transitLineId_bus1 = Id.create("bus_1", TransitLine.class);
         Id<TransitRoute> transitRouteId_bus1_route1 = Id.create("bus1_route1", TransitRoute.class);
         Id<Departure> departureId_bus1_route1_dep1 = Id.create("bus1_route1_dep1", Departure.class);
-        // ...
 
         Id<TransitStopFacility> transitStopFacilityId1 = Id.create("stop1", TransitStopFacility.class);
         Id<TransitStopFacility> transitStopFacilityId2 = Id.create("stop2", TransitStopFacility.class);
@@ -133,7 +112,6 @@ public class PtStop2StopAnalysisTest {
         ParallelEventsManager events = new ParallelEventsManager(false);
         events.addHandler(ptStop2StopAnalysis);
 
-// for each Departure one TransitDriverStartsEvent
         events.initProcessing();
         events.processEvent(new TransitDriverStartsEvent(1.0, driverId_bus1, veh_bus1.getId(),
                 transitLineId_bus1, transitRouteId_bus1_route1, departureId_bus1_route1_dep1));
@@ -149,9 +127,7 @@ public class PtStop2StopAnalysisTest {
         events.processEvent(new VehicleArrivesAtFacilityEvent(6.0, veh_bus1.getId(), transitStopFacilityId2, -1.0));
         events.processEvent(new PersonLeavesVehicleEvent(7.0, passenger1, veh_bus1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(7.0, passenger3, veh_bus1.getId()));
-//        events.processEvent(new PersonEntersVehicleEvent(9.0, passenger3, veh_bus1.getId()));
         events.processEvent(new VehicleDepartsAtFacilityEvent(8.0, veh_bus1.getId(), transitStopFacilityId2, 1.0));
-//        events.processEvent(new PersonEntersVehicleEvent(7.0, passenger3, veh_bus1.getId()));
         events.processEvent(new LinkLeaveEvent(9.0, veh_bus1.getId(), linkId2));
         events.processEvent(new LinkEnterEvent(10.0, veh_bus1.getId(), linkId3));
         events.processEvent(new VehicleArrivesAtFacilityEvent(11.0, veh_bus1.getId(), transitStopFacilityId3, -1.0));
@@ -163,12 +139,6 @@ public class PtStop2StopAnalysisTest {
         events.processEvent(new PersonArrivalEvent(15.0, driverId_bus1, linkId3, networkMode_bus));
         events.finishProcessing();
 
-
-
-        // das oben als einfachen test, dann weiteren Test mit mehreren Linien, TranistRoutes und Departures darunter separat als weiteren Test
-
-        // fuer weitere Busse, zeitlich durchmischt. Mal ein Event fuer bus 1, dann eins fuer bus 2, dann wieder ein event an bus 1.
-        // Events immer chronologisch, auch die Reihenfolge der Event Typen muss gleich bleiben, z.B. TransitDriverStartsEvent, dann PersonDepartureEvent, dann PersonEntersVehicleEvent, dann VehicleEntersTrafficEvent
 
 
 
@@ -205,8 +175,6 @@ public class PtStop2StopAnalysisTest {
 //        Assert.assertEquals("Wrong amount of passenger alighting", 1.0, line1_route1_dep1_stop3.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
 //        Assert.assertEquals("Wrong amount of passenger at Arrival", 1.0, line1_route1_dep1_stop3.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
 
-        //   Assert.assertEquals("Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_route1_dep1 + ", " + departureId_bus1_route1_dep1 + ", " + transitStopFacilityId1 + ", 0",1, line1_route1_dep1_stop1.size());
-     //   Assert.assertEquals("There is no previous stop", "stop2", line1_route1_dep1_stop3.get(2).stopPreviousId);
 
     }
 
@@ -253,42 +221,27 @@ public class PtStop2StopAnalysisTest {
 
         Vehicle veh_bus1_dep1 = vehicleFactory.createVehicle(Id.create("pt_bus_1", Vehicle.class), busVehicleType);
         Vehicle veh_bus1_dep2 = vehicleFactory.createVehicle(Id.create("pt_bus_2", Vehicle.class), busVehicleType);
-/*        Vehicle veh_bus1_line1_route2_dep1 = vehicleFactory.createVehicle(Id.create("pt_bus_4321", Vehicle.class), busVehicleType);
-        Vehicle veh_bus2_line2_route1_dep1 = vehicleFactory.createVehicle(Id.create("pt_bus_156734", Vehicle.class), busVehicleType);
-        Vehicle veh_bus3_line3_route1_dep1 = vehicleFactory.createVehicle(Id.create("pt_bus_1894", Vehicle.class), busVehicleType);*/
         Vehicle veh_train1_dep1 = vehicleFactory.createVehicle(Id.create("pt_train_1", Vehicle.class), trainVehicleType);
         scenario.getTransitVehicles().addVehicle(veh_bus1_dep1);
         scenario.getTransitVehicles().addVehicle(veh_bus1_dep2);
         scenario.getTransitVehicles().addVehicle(veh_train1_dep1);
-//        scenario.getTransitVehicles().addVehicle(veh_bus2_line2_route1_dep1);
-//        scenario.getTransitVehicles().addVehicle(veh_bus3_line3_route1_dep1);
-        scenario.getTransitVehicles().addVehicle(veh_train1_dep1);
         Id<Person> driverId_bus1 = Id.createPersonId("driver_bus1");
         Id<Person> driverId_bus2 = Id.createPersonId("driver_bus2");
-        Id<Person> driverId_3 = Id.createPersonId("driver_3");
-        Id<Person> driverId_4 = Id.createPersonId("driver_4");
         Id<Person> driverId_train1 = Id.createPersonId("driver_train1");
 
         Id<TransitLine> transitLineId_bus1 = Id.create("bus_1", TransitLine.class);
         Id<TransitLine> transitLineId_train1 = Id.create("train_1", TransitLine.class);
-        Id<TransitLine> transitLineId_bus2 = Id.create("bus_2", TransitLine.class);
-        Id<TransitLine> transitLineId_bus3 = Id.create("bus_3", TransitLine.class);
 
         Id<TransitRoute> transitRouteId_bus1_route1 = Id.create("bus1_route1", TransitRoute.class);
         Id<TransitRoute> transitRouteId_train1_route1 = Id.create("train1_route1", TransitRoute.class);
         Id<TransitRoute> transitRouteId_bus1_route2 = Id.create("bus1_route2", TransitRoute.class);
-        Id<TransitRoute> transitRouteId_bus2_route1 = Id.create("bus2_route1", TransitRoute.class);
-        Id<TransitRoute> transitRouteId_bus3_route1 = Id.create("bus3_route1", TransitRoute.class);
 
         Id<Departure> departureId_bus1_dep1 = Id.create("bus1_dep1", Departure.class);
         Id<Departure> departureId_bus1_dep2 = Id.create("bus1_dep2", Departure.class);
         Id<Departure> departureId_train1_dep1 = Id.create("train1_dep1", Departure.class);
-        Id<Departure> departureId_bus2_route1_dep1 = Id.create("bus2_route1_dep1", Departure.class);
-        Id<Departure> departureId_bus3_route1_dep1 = Id.create("bus3_route1_dep1", Departure.class);
 
         Id<TransitStopFacility> transitStopFacilityId1 = Id.create("stop1", TransitStopFacility.class);
         Id<TransitStopFacility> transitStopFacilityId2 = Id.create("stop2", TransitStopFacility.class);
-        Id<TransitStopFacility> transitStopFacilityId3 = Id.create("stop3", TransitStopFacility.class);
         Id<TransitStopFacility> transitStopFacilityId4 = Id.create("stop4", TransitStopFacility.class);
         Id<TransitStopFacility> transitStopFacilityId6 = Id.create("stop6", TransitStopFacility.class);
 
@@ -300,9 +253,6 @@ public class PtStop2StopAnalysisTest {
         Id<Link> linkId5 = Id.createLinkId("link5");
         Id<Link> linkId6 = Id.createLinkId("link6");
         Id<Link> linkId7 = Id.createLinkId("link7");
-//        Id<Link> linkId8 = Id.createLinkId("link8");
-//        Id<Link> linkId9 = Id.createLinkId("link9");
-
 
 
         Id<Person> passenger1B = Id.createPersonId("passenger1B");
@@ -312,7 +262,6 @@ public class PtStop2StopAnalysisTest {
         Id<Person> passenger5B = Id.createPersonId("passenger5B");
         Id<Person> passenger6B = Id.createPersonId("passenger6B");
         Id<Person> passenger7B = Id.createPersonId("passenger7B");
-        Id<Person> passenger8B = Id.createPersonId("passenger8B");
 
         Id<Person> passenger1T = Id.createPersonId("passenger1T");
         Id<Person> passenger2T = Id.createPersonId("passenger2T");
@@ -320,10 +269,7 @@ public class PtStop2StopAnalysisTest {
         Id<Person> passenger4T = Id.createPersonId("passenger4T");
         Id<Person> passenger5T = Id.createPersonId("passenger5T");
         Id<Person> passenger6T = Id.createPersonId("passenger6T");
-        Id<Person> passenger7T = Id.createPersonId("passenger7T");
         Id<Person> passenger8T = Id.createPersonId("passenger8T");
-        Id<Person> passenger9T = Id.createPersonId("passenger9T");
-        Id<Person> passenger10T = Id.createPersonId("passenger10T");
 
         String networkMode_bus = TransportMode.car;
         String networkMode_train = TransportMode.train;
@@ -420,6 +366,22 @@ public class PtStop2StopAnalysisTest {
         events.processEvent(new VehicleLeavesTrafficEvent(15.0, driverId_bus1, linkId4, veh_bus1_dep1.getId(), networkMode_bus, 1.0));
         events.processEvent(new PersonLeavesVehicleEvent(15.0, driverId_bus1, veh_bus1_dep1.getId()));
         events.processEvent(new PersonArrivalEvent(15.0, driverId_bus1, linkId4, networkMode_bus));
+//      ( BUS1 :stopSequence == 3 )
+        events.processEvent(new TransitDriverStartsEvent(21.0, driverId_bus1, veh_bus1_dep1.getId(),
+                transitLineId_bus1, transitRouteId_bus1_route2, departureId_bus1_dep1));
+        events.processEvent(new PersonDepartureEvent(21.0, driverId_bus1, linkId4, networkMode_bus));
+        events.processEvent(new PersonEntersVehicleEvent(22.0, driverId_bus1, veh_bus1_dep1.getId()));
+        events.processEvent(new VehicleEntersTrafficEvent(22.0, driverId_bus1, linkId4, veh_bus1_dep1.getId(), networkMode_bus, 1.0));
+        events.processEvent(new VehicleArrivesAtFacilityEvent(23.0, veh_bus1_dep1.getId(), transitStopFacilityId4, 0.0));
+        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger1B, veh_bus1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger2B, veh_bus1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger3B, veh_bus1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger4B, veh_bus1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger5B, veh_bus1_dep1.getId()));
+        events.processEvent(new VehicleDepartsAtFacilityEvent(25.0, veh_bus1_dep1.getId(), transitStopFacilityId4, 0.0));
+        events.processEvent(new LinkLeaveEvent(26.0, veh_bus1_dep1.getId(), linkId4));
+        events.processEvent(new LinkEnterEvent(26.0, veh_bus1_dep1.getId(), linkId3));
+        events.processEvent(new LinkLeaveEvent(27.0, veh_bus1_dep1.getId(), linkId3));
 
 //      TRAIN1 - 3,4,5,6 :stopSequence == 2
         events.processEvent(new LinkEnterEvent(14.0, veh_train1_dep1.getId(), linkId2));
@@ -446,22 +408,7 @@ public class PtStop2StopAnalysisTest {
         events.processEvent(new PersonLeavesVehicleEvent(23.0, driverId_bus2, veh_bus1_dep2.getId()));
         events.processEvent(new PersonArrivalEvent(23.0, driverId_bus2, linkId4, networkMode_bus));
 
-//      BUS1 :stopSequence == 3
-        events.processEvent(new TransitDriverStartsEvent(21.0, driverId_bus1, veh_bus1_dep1.getId(),
-                transitLineId_bus1, transitRouteId_bus1_route1, departureId_bus1_dep1));
-        events.processEvent(new PersonDepartureEvent(21.0, driverId_bus1, linkId4, networkMode_bus));
-        events.processEvent(new PersonEntersVehicleEvent(22.0, driverId_bus1, veh_bus1_dep1.getId()));
-        events.processEvent(new VehicleEntersTrafficEvent(22.0, driverId_bus1, linkId4, veh_bus1_dep1.getId(), networkMode_bus, 1.0));
-        events.processEvent(new VehicleArrivesAtFacilityEvent(23.0, veh_bus1_dep1.getId(), transitStopFacilityId4, 0.0));
-        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger1B, veh_bus1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger2B, veh_bus1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger3B, veh_bus1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger4B, veh_bus1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(24.0, passenger5B, veh_bus1_dep1.getId()));
-        events.processEvent(new VehicleDepartsAtFacilityEvent(25.0, veh_bus1_dep1.getId(), transitStopFacilityId4, 0.0));
-        events.processEvent(new LinkLeaveEvent(26.0, veh_bus1_dep1.getId(), linkId4));
-        events.processEvent(new LinkEnterEvent(26.0, veh_bus1_dep1.getId(), linkId3));
-        events.processEvent(new LinkLeaveEvent(27.0, veh_bus1_dep1.getId(), linkId3));
+
 
 
 
@@ -480,14 +427,14 @@ public class PtStop2StopAnalysisTest {
 //      TRAIN1 - 3,4,5 :stopSequence == 4
         events.processEvent(new LinkEnterEvent(24.0, veh_train1_dep1.getId(), linkId2));
         events.processEvent(new VehicleArrivesAtFacilityEvent(25.0, veh_train1_dep1.getId(), transitStopFacilityId2, 0.0));
-        events.processEvent(new PersonLeavesVehicleEvent(25.0, passenger5T, veh_train1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(25.0, passenger2T, veh_train1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(25.0, passenger1T, veh_train1_dep1.getId()));
-        events.processEvent(new PersonEntersVehicleEvent(26.0, passenger8T, veh_train1_dep1.getId()));
-        events.processEvent(new VehicleDepartsAtFacilityEvent(26.0, veh_train1_dep1.getId(), transitStopFacilityId2, 0.0));
-        events.processEvent(new LinkLeaveEvent(27.0, veh_train1_dep1.getId(), linkId2));
-        events.processEvent(new LinkEnterEvent(27.0, veh_train1_dep1.getId(), linkId5));
-        events.processEvent(new LinkLeaveEvent(28.0, veh_train1_dep1.getId(), linkId5));
+        events.processEvent(new PersonLeavesVehicleEvent(28.0, passenger5T, veh_train1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(28.0, passenger2T, veh_train1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(28.0, passenger1T, veh_train1_dep1.getId()));
+        events.processEvent(new PersonEntersVehicleEvent(28.0, passenger8T, veh_train1_dep1.getId()));
+        events.processEvent(new VehicleDepartsAtFacilityEvent(29.0, veh_train1_dep1.getId(), transitStopFacilityId2, 0.0));
+        events.processEvent(new LinkLeaveEvent(29.0, veh_train1_dep1.getId(), linkId2));
+        events.processEvent(new LinkEnterEvent(29.0, veh_train1_dep1.getId(), linkId5));
+        events.processEvent(new LinkLeaveEvent(29.0, veh_train1_dep1.getId(), linkId5));
 
         // BUS1 1,2,3,4,5 :stopSequence == 4
         events.processEvent(new LinkEnterEvent(27.0, veh_bus1_dep1.getId(), linkId2));
@@ -502,7 +449,7 @@ public class PtStop2StopAnalysisTest {
 
 
         //      TRAIN1 - 1,2,3,4,8 :stopSequence == 5
-        events.processEvent(new LinkEnterEvent(28.0, veh_train1_dep1.getId(), linkId6));
+        events.processEvent(new LinkEnterEvent(29.0, veh_train1_dep1.getId(), linkId6));
         events.processEvent(new VehicleArrivesAtFacilityEvent(29.0, veh_train1_dep1.getId(), transitStopFacilityId6, 0.0));
         events.processEvent(new PersonLeavesVehicleEvent(30.0, passenger1T, veh_train1_dep1.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(30.0, passenger2T, veh_train1_dep1.getId()));
@@ -531,14 +478,6 @@ public class PtStop2StopAnalysisTest {
         events.finishProcessing();
 
 
-
-        // das oben als einfachen test, dann weiteren Test mit mehreren Linien, TranistRoutes und Departures darunter separat als weiteren Test
-
-        // fuer weitere Busse, zeitlich durchmischt. Mal ein Event fuer bus 1, dann eins fuer bus 2, dann wieder ein event an bus 1.
-        // Events immer chronologisch, auch die Reihenfolge der Event Typen muss gleich bleiben, z.B. TransitDriverStartsEvent, dann PersonDepartureEvent, dann PersonEntersVehicleEvent, dann VehicleEntersTrafficEvent
-
-
-
         // Tests
         List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop1 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId1) && entry.stopSequence == 0).collect(Collectors.toList());
         Assert.assertEquals("Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId1 + ", 0",1, bus1_dep1_stop1.size());
@@ -556,28 +495,38 @@ public class PtStop2StopAnalysisTest {
         linkList.add(linkId1);
         Assert.assertEquals("Wrong links", linkList, bus1_dep1_stop1.get(0).linkIdsSincePreviousStop);
 
-        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId1) && entry.stopSequence == 3).collect(Collectors.toList());
-        Assert.assertEquals("Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId1 + ", 0",1, bus1_dep1_stop1.size());
-        Assert.assertNull("There should be no previous stop, but there was", bus1_dep1_stop4.get(0).stopPreviousId);
-        Assert.assertEquals("Wrong arrivalTimeScheduled", 1.0, bus1_dep1_stop4.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON);
-        Assert.assertEquals("Wrong arrivalDelay", 0.0, bus1_dep1_stop4.get(0).arrivalDelay, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(25.0, bus1_dep1_stop4.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(0.0, bus1_dep1_stop4.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(0.0, bus1_dep1_stop4.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
+        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop3 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId4) && entry.stopSequence == 2).collect(Collectors.toList());
+        System.out.println(bus1_dep1_stop3.isEmpty());
+        Assert.assertEquals("Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId4 + ", 0",1, bus1_dep1_stop3.size());
+        Assert.assertEquals("Wrong arrivalDelay", 0.0, bus1_dep1_stop3.get(0).arrivalDelay, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(15.0, bus1_dep1_stop3.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(0.0, bus1_dep1_stop3.get(0).departureDelay, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(3.0, bus1_dep1_stop3.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
         Assert.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(0.0, bus1_dep1_stop4.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(5.0, bus1_dep1_stop4.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(3.0, bus1_dep1_stop3.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(0.0, bus1_dep1_stop3.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
 
-        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop5 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route1) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId1) && entry.stopSequence == 4).collect(Collectors.toList());
-        Assert.assertEquals("Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route1 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId1 + ", 0",1, bus1_dep1_stop1.size());
-        Assert.assertEquals("Wrong arrivalTimeScheduled", 1.0, bus1_dep1_stop5.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON);
-        Assert.assertEquals("Wrong arrivalDelay", 0.0, bus1_dep1_stop5.get(0).arrivalDelay, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(32.0, bus1_dep1_stop5.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(0.0, bus1_dep1_stop5.get(0).departureDelay, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(5.0, bus1_dep1_stop5.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
+        List<PtStop2StopAnalysis.Stop2StopEntry> bus1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_bus1) && entry.transitRouteId.equals(transitRouteId_bus1_route2) && entry.departureId.equals(departureId_bus1_dep1) && entry.stopId.equals(transitStopFacilityId2) && entry.stopSequence == 1).collect(Collectors.toList());
+        Assert.assertEquals("Either no entry or more than entry for " + transitLineId_bus1 + ", " + transitRouteId_bus1_route2 + ", " + departureId_bus1_dep1 + ", " + departureId_bus1_dep1 + ", " + transitStopFacilityId2 + ", 0",1, bus1_dep1_stop4.size());
+        Assert.assertEquals("Wrong arrivalTimeScheduled", 28.0, bus1_dep1_stop4.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON);
+        Assert.assertEquals("Wrong arrivalDelay", 0.0, bus1_dep1_stop4.get(0).arrivalDelay, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(29.0, bus1_dep1_stop4.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(0.0, bus1_dep1_stop4.get(0).departureDelay, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(5.0, bus1_dep1_stop4.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
         Assert.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(5.0, bus1_dep1_stop5.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
-        Assert.assertEquals(0.0, bus1_dep1_stop5.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(2.0, bus1_dep1_stop4.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(2.0, bus1_dep1_stop4.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
+
+        List<PtStop2StopAnalysis.Stop2StopEntry> train1_dep1_stop4 = ptStop2StopAnalysis.getStop2StopEntriesByDeparture().stream().filter(entry -> entry.transitLineId.equals(transitLineId_train1) && entry.transitRouteId.equals(transitRouteId_train1_route1) && entry.departureId.equals(departureId_train1_dep1) && entry.stopId.equals(transitStopFacilityId6) && entry.stopSequence == 3).collect(Collectors.toList());
+        Assert.assertEquals("Either no entry or more than entry for " + transitLineId_train1 + ", " + transitRouteId_train1_route1 + ", " + departureId_train1_dep1 + ", "  + transitStopFacilityId6 + ", 0",1, train1_dep1_stop4.size());
+        Assert.assertEquals("Wrong arrivalTimeScheduled", 19.0, train1_dep1_stop4.get(0).arrivalTimeScheduled, MatsimTestUtils.EPSILON);
+        Assert.assertEquals("Wrong arrivalDelay", 0.0, train1_dep1_stop4.get(0).arrivalDelay, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(21.0, train1_dep1_stop4.get(0).departureTimeScheduled, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(0.0, train1_dep1_stop4.get(0).departureDelay, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(6.0, train1_dep1_stop4.get(0).passengersAtArrival, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(veh_bus1_dep1.getType().getCapacity().getSeats() + veh_bus1_dep1.getType().getCapacity().getStandingRoom(), bus1_dep1_stop1.get(0).totalVehicleCapacity, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(4.0, train1_dep1_stop4.get(0).passengersAlighting, MatsimTestUtils.EPSILON);
+        Assert.assertEquals(1.0, train1_dep1_stop4.get(0).passengersBoarding, MatsimTestUtils.EPSILON);
 
     }
 }
