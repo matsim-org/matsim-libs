@@ -22,7 +22,10 @@
  */
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
+
+import java.util.Deque;
 
 /**
  * @author  jbischoff
@@ -39,4 +42,6 @@ public interface TravelTimeDistanceValidator {
 	 * @return a tuple of validated TravelTime and Distance
 	 */
 	Tuple<Double,Double> getTravelTime(CarTrip trip);
+
+	Tuple<Double, Double> getTravelTime(Coord fromCorrd, Coord toCoord, double departureTime, String tripId);
 }

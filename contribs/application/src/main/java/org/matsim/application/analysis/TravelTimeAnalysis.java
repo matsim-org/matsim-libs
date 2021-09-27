@@ -1,15 +1,9 @@
 package org.matsim.application.analysis;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -19,31 +13,20 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
+import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunnerPreAnalysis;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine;
 
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.ApplicationUtils.loadScenario;
@@ -65,7 +48,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--run-id", defaultValue = "*", description = "Pattern used to match runId", required = true)
     private String runId;
 
-    @CommandLine.Option(names = "--output", defaultValue = "travelTimeResults", description = "Name of output folder", required = true)
+    @CommandLine.Option(names = "--output", defaultValue = "travelTimeValidation", description = "Name of output folder", required = true)
     private String output;
 
     @CommandLine.Option(names = "--api", description = "Online API used. Choose from [here, google-map (todo)]", defaultValue = "here", required = true)
@@ -113,7 +96,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         }
 
         String outputFolder = runDirectory.resolve(output).toString();
-        if (type.equals("post-analysis")){
+        if (type.equals("post-analysis")) {
             Path events = globFile(runDirectory, runId + ".*events.*");
             Scenario scenario = loadScenario(runId, runDirectory, crs);
             Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
@@ -150,104 +133,32 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             }
 
             TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, validator, trips, timeWindow, tripFilter);
-
             runner.run();
 
             return 0;
 
-        } else if (type.equals("pre-analysis")){
+        } else if (type.equals("pre-analysis")) {
             Path networkPath = globFile(runDirectory, ".*network.*");
             if (!Files.exists(networkPath)) {
                 log.error("Network file does not exist. Please make sure the network file is in the run directory");
                 return 2;
             }
             Network network = NetworkUtils.readNetwork(networkPath.toString());
-            List<Link> links = network.getLinks().values().stream().
-                    filter(l -> l.getAllowedModes().contains(TransportMode.car)).
-                    collect(Collectors.toList());
-            int numOfLinks = links.size();
-
-            // Create router
-            FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
-            LeastCostPathCalculatorFactory fastAStarLandmarksFactory = new SpeedyALTFactory();
-            OnlyTimeDependentTravelDisutilityFactory disutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();
-            TravelDisutility travelDisutility = disutilityFactory.createTravelDisutility(travelTime);
-            LeastCostPathCalculator router = fastAStarLandmarksFactory.createPathCalculator(network, travelDisutility,
-                    travelTime);
-
-            // Read shapefile if presents
-            List<Link> linksInsideShp = new ArrayList<>();
-            List<Link> outsideLinks = new ArrayList<>();
-            if (shp.getShapeFile() != null) {
-                Geometry geometry = shp.getGeometry();
-                for (Link link : links) {
-                    if (MGC.coord2Point(link.getToNode().getCoord()).within(geometry)) {
-                        linksInsideShp.add(link);
-                    }
-                }
-                outsideLinks.addAll(links);
-                outsideLinks.removeAll(linksInsideShp);
-            }
-
-            // Choose random trips to validate
-            CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputFolder + "/results.csv"), CSVFormat.DEFAULT);
-            csvWriter.printRecord("trip_number", "trip_category", "from_x", "from_y", "to_x", "to_y", "simulated_travel_time", "validated_travel_time");
-            int counter = 0;
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
-            HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder.toString(), appCode, "2021-01-01", transformation);
+            HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation);
             validator.setWriteDetailedFiles(writeDetails);
 
-            Link fromLink;
-            Link toLink;
-            String tripType;
-            while (counter < trips) {
-                if (!linksInsideShp.isEmpty()) {
-                    int numOfLinksInsideShp = linksInsideShp.size();
-                    int numOfOutsideLinks = outsideLinks.size();
-
-                    if (counter < 0.6 * trips) {
-                        fromLink = linksInsideShp.get(rnd.nextInt(numOfLinksInsideShp));
-                        toLink = linksInsideShp.get(rnd.nextInt(numOfLinksInsideShp));
-                        tripType = "inside";
-                    } else if (counter < 0.9 * trips) {
-                        fromLink = linksInsideShp.get(rnd.nextInt(numOfLinksInsideShp));
-                        toLink = outsideLinks.get(rnd.nextInt(numOfOutsideLinks));
-                        tripType = "cross-border";
-                    } else {
-                        fromLink = outsideLinks.get(rnd.nextInt(numOfOutsideLinks));
-                        toLink = outsideLinks.get(rnd.nextInt(numOfOutsideLinks));
-                        tripType = "outside";
-                    }
-                } else {
-                    fromLink = links.get(rnd.nextInt(numOfLinks));
-                    toLink = links.get(rnd.nextInt(numOfLinks));
-                    tripType = "unknown";
-                }
-
-                if (!fromLink.getToNode().getId().equals(toLink.getToNode().getId())) {
-                    String detailedFile = outputFolder + "/detailed-record/trip" + counter + ".json.gz";
-                    Coord fromCorrd = fromLink.getToNode().getCoord();
-                    Coord toCoord = toLink.getToNode().getCoord();
-                    double validatedTravelTime = validator.getTravelTime
-                            (fromCorrd, toCoord, 1, detailedFile).getFirst();
-                    if (validatedTravelTime < 60){
-                        continue;
-                    }
-                    double simulatedTravelTime = router.calcLeastCostPath
-                            (fromLink.getToNode(), toLink.getToNode(), 0, null, null).travelTime;
-                    csvWriter.printRecord(Integer.toString(counter), tripType, Double.toString(fromCorrd.getX()),
-                            Double.toString(fromCorrd.getY()), Double.toString(toCoord.getX()),
-                            Double.toString(toCoord.getY()), Double.toString(simulatedTravelTime),
-                            Double.toString(validatedTravelTime));
-                    counter++;
-                }
+            TravelTimeValidationRunnerPreAnalysis preAnalysisRunner = new TravelTimeValidationRunnerPreAnalysis(network, trips, outputFolder, validator, null);
+            if (shp.getShapeFile() != null) {
+                preAnalysisRunner.setKeyAreaGeometry(shp.getGeometry());
             }
-            csvWriter.close();
+            preAnalysisRunner.run();
+
             return 0;
         }
 
         log.error("Please enter the correct analysis type: [pre-analysis, post-analysis]");
-        return  2;
+        return 2;
     }
 
 
