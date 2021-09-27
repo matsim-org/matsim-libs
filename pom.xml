@@ -11,22 +11,26 @@
 	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
 
 	<properties>
-<!--		<matsim.version>13.0-SNAPSHOT</matsim.version>-->
+<!--		<matsim.version>14.0-SNAPSHOT</matsim.version>-->
 <!--		<matsim.version>13.0-2021w07-SNAPSHOT</matsim.version>-->
 		<matsim.version>14.0-PR1512</matsim.version>
 	</properties>
 
 	<repositories>
 		<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
-		<repository>
-			<id>matsim</id>
-			<url>https://dl.bintray.com/matsim/matsim</url>
-		</repository>
+<!--		<repository>-->
+<!--			<id>matsim</id>-->
+<!--			<url>https://dl.bintray.com/matsim/matsim</url>-->
+<!--		</repository>-->
 <!--		<repository>-->
 <!--			&lt;!&ndash; Required for MATSim snaphots &ndash;&gt;-->
 <!--			<id>ojo-snapshots</id>-->
 <!--			<url>http://oss.jfrog.org/libs-snapshot</url>-->
 <!--		</repository>-->
+		<repository>
+			<id>matsim</id>
+			<url>repo.matsim.org/repository/matsim</url>
+		</repository>
 		<repository>
 			<!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
