@@ -9,13 +9,6 @@ on:
       - 'master' # no need to run after merging to master
     pull_request:
 
-#Copy from Open Berlin: Trigger only for defined branches
-#on:
-#  push:
-#    branches: [ 5.5.x ]
-#  pull_request:
-#    branches: [ 5.5.x ]
-
 jobs:
   build:
 
@@ -31,10 +24,8 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
-#    - name: Build with Maven
-#      run: mvn -B package --file pom.xml
+
     - name: Build module (with dependencies)
-     # run: mvn install --batch-mode --also-make -DskipTests -Dsource.skip
       run: mvn -B package --file pom.xml -DskipTests -Dsource.skip
 
     - name: Test module
