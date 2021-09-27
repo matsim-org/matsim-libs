@@ -35,7 +35,7 @@ jobs:
 #      run: mvn -B package --file pom.xml
     - name: Build module (with dependencies)
      # run: mvn install --batch-mode --also-make -DskipTests -Dsource.skip
-    - run: mvn -B package --file pom.xml -DskipTests -Dsource.skip
+      run: mvn -B package --file pom.xml -DskipTests -Dsource.skip
 
     - name: Test module
       run: mvn verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip
