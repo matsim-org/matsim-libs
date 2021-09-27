@@ -138,7 +138,11 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             return 0;
 
         } else if (type.equals("pre-analysis")) {
-            Path networkPath = globFile(runDirectory, ".*network.*");
+            Path networkPath = globFile(runDirectory, "*network*");
+            if (!networkPath.endsWith(".xml") && !networkPath.endsWith(".xml.gz")) {
+                log.error("There are other non-xml file with the name network in the folder. Please consider change the run directory and only keep the correct network xml file in the run directory");
+                return 2;
+            }
             if (!Files.exists(networkPath)) {
                 log.error("Network file does not exist. Please make sure the network file is in the run directory");
                 return 2;
