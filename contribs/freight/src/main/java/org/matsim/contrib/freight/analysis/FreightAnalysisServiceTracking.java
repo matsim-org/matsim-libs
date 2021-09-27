@@ -35,14 +35,8 @@ import java.util.HashMap;
 
 class FreightAnalysisServiceTracking {
 
-	private HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers;
+	private HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new HashMap<>();
 
-	{
-		carrierServiceTrackers = new HashMap<>();
-	}
-
-
-	public HashMap<Id<CarrierService>, ServiceTracker> getTrackers(Id<Carrier> carrierId) { return carrierServiceTrackers.get(carrierId).serviceTrackers;}
 	public HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> getCarrierServiceTrackers(){return carrierServiceTrackers;}
 
 	public void addTracker(CarrierService service, Id<Carrier> id) {
@@ -115,7 +109,7 @@ class FreightAnalysisServiceTracking {
 	public void estimateArrivalTimes(Carriers carriers) {
 		for (Carrier carrier: carriers.getCarriers().values()){
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
-				Double calculatedArrivalTime = 0.0;
+				double calculatedArrivalTime = 0.0;
 				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 					if (tourElement instanceof Tour.Leg) {
 						calculatedArrivalTime = ((Tour.Leg) tourElement).getExpectedDepartureTime() + ((Tour.Leg) tourElement).getExpectedTransportTime();

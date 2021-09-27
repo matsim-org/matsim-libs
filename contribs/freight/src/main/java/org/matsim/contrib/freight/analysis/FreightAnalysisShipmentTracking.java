@@ -38,7 +38,7 @@ import java.util.HashSet;
 
 class FreightAnalysisShipmentTracking {
 
-	private HashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new HashMap();
+	private HashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new HashMap<>();
     public void addTracker(CarrierShipment shipment){
         shipments.put(shipment.getId(),new ShipmentTracker(shipment) );
     }
@@ -98,7 +98,7 @@ class FreightAnalysisShipmentTracking {
 class ShipmentTracker {
 	public Id<Person> driverIdGuess;
 	public double deliveryTimeGuess;
-	public HashSet<String> possibleDrivers = new HashSet<String>();
+	public HashSet<String> possibleDrivers = new HashSet<>();
 	Id<Link> from;
 	Id<Link> to;
 	public Double pickUpTime = 0.;
@@ -116,13 +116,8 @@ class ShipmentTracker {
 		this.shipment=shipment;
 	}
 
-	public ShipmentTracker(CarrierShipment shipment, Id<Carrier> carrierId) {
+	public ShipmentTracker(Id<Carrier> carrierId, CarrierShipment shipment) {
 		this(shipment);
 		this.carrierId = carrierId;
-	}
-
-	public ShipmentTracker(CarrierShipment shipment, Id<Carrier> carrierId, Id<Person> driverId) {
-		this(shipment, carrierId);
-		this.driverId = driverId;
 	}
 }

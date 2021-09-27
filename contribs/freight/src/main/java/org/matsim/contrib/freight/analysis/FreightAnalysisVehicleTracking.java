@@ -164,7 +164,7 @@ class VehicleTracker {
 	Double emptyTime = 0.0;
 	Double emptyDistance = 0.0;
 	Id<Carrier> carrierId;
-	Double cost = 0.0;
+	Double cost;
 	Id<Person> currentDriverId;
 	Double usageStartTime = 0.0;
 
