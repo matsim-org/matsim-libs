@@ -3,7 +3,11 @@
 
 name: Java CI with Maven
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'master' # no need to run after merging to master
+    pull_request:
 
 #Copy from Open Berlin: Trigger only for defined branches
 #on:
