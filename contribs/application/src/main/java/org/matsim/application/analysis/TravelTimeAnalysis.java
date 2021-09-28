@@ -129,9 +129,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
             TravelTimeDistanceValidator validator;
-            if (api.equals(TravelTimeDistanceValidators.HERE)) {
+            if (api == TravelTimeDistanceValidators.HERE) {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
-            } else if (api.equals(TravelTimeDistanceValidators.GOOGLE_MAP)) {
+            } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
@@ -163,9 +163,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
             TravelTimeDistanceValidator validator;
-            if (api.equals(TravelTimeDistanceValidators.HERE)) {
+            if (api == TravelTimeDistanceValidators.HERE) {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation, writeDetails);
-            } else if (api.equals(TravelTimeDistanceValidators.GOOGLE_MAP)) {
+            } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");

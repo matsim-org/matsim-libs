@@ -30,9 +30,9 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
     final CoordinateTransformation ct;
     boolean writeDetailedFiles;
 
-    public GoogleMapRouteValidator(String outputFolder, String apiAcessKey, String date, CoordinateTransformation ct, boolean writeDetailedFiles) {
+    public GoogleMapRouteValidator(String outputFolder, String apiAccessKey, String date, CoordinateTransformation ct, boolean writeDetailedFiles) {
         this.outputFolder = outputFolder;
-        this.apiAccessKey = apiAcessKey;
+        this.apiAccessKey = apiAccessKey;
         this.date = date;
         this.ct = ct;
         this.writeDetailedFiles = writeDetailedFiles;
@@ -91,7 +91,7 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
                 }
             }
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            log.error("The contents on the URL cannot be read properly. Please check your API or check the contents on URL manually", e);
         }
         return new Tuple<Double, Double>((double) travelTime, (double) distance);
     }
