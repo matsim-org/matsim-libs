@@ -131,10 +131,9 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
             in.close();
         } catch (MalformedURLException e) {
-            log.error("URL is not working. Please check your API key");
-            e.printStackTrace();
+            log.error("URL is not working. Please check your API key", e);
         } catch (IOException | ParseException e) {
-            log.error("Cannot read the content on the URL properly. Please manually check the URL");
+            log.error("Cannot read the content on the URL properly. Please manually check the URL", e);
         }
         return new Tuple<Double, Double>((double) travelTime, (double) distance);
     }

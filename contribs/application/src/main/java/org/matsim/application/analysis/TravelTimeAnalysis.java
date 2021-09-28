@@ -84,7 +84,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         HERE, GOOGLE_MAP
     }
 
-    enum AnalysisTypes{
+    enum AnalysisTypes {
         PRE_ANALYSIS, POST_ANALYSIS
     }
 
@@ -101,7 +101,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         }
 
         String outputFolder = runDirectory.resolve(output).toString();
-        if (type.equals(AnalysisTypes.POST_ANALYSIS)) {
+        if (type == AnalysisTypes.POST_ANALYSIS) {
             Path events = globFile(runDirectory, runId + ".*events.*");
             Scenario scenario = loadScenario(runId, runDirectory, crs);
             Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
@@ -141,7 +141,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
             return 0;
 
-        } else if (type.equals(AnalysisTypes.PRE_ANALYSIS)) {
+        } else if (type == AnalysisTypes.PRE_ANALYSIS) {
             Path networkPath = globFile(runDirectory, "*network*");
             if (!networkPath.toString().endsWith(".xml") && !networkPath.toString().endsWith(".xml.gz")) {
                 log.error("There are other non-xml file with the name network in the folder. Please consider change the run directory and only keep the correct network xml file in the run directory");
