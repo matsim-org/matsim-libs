@@ -128,10 +128,16 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
-            HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation);
-            validator.setWriteDetailedFiles(writeDetails);
+            TravelTimeDistanceValidator validator;
+            if (api == TravelTimeDistanceValidators.HERE) {
+                validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
+                validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else {
+                throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
+            }
+            Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 24);
 
-            Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 30);
             if (timeFrom != null && timeTo != null) {
                 timeWindow = new Tuple<>(timeFrom, timeTo);
             }
@@ -143,6 +149,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
         } else if (type == AnalysisTypes.PRE_ANALYSIS) {
             Path networkPath = globFile(runDirectory, "*network*");
+            log.info("Network file to be read: " + networkPath);
             if (!networkPath.toString().endsWith(".xml") && !networkPath.toString().endsWith(".xml.gz")) {
                 log.error("There are other non-xml file with the name network in the folder. Please consider change the run directory and only keep the correct network xml file in the run directory");
                 return 2;
@@ -153,8 +160,14 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             }
             Network network = NetworkUtils.readNetwork(networkPath.toString());
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
-            HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation);
-            validator.setWriteDetailedFiles(writeDetails);
+            TravelTimeDistanceValidator validator;
+            if (api == TravelTimeDistanceValidators.HERE) {
+                validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation, writeDetails);
+            } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
+                validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else {
+                throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
+            }
 
             TravelTimeValidationRunnerPreAnalysis preAnalysisRunner = new TravelTimeValidationRunnerPreAnalysis(network, trips, outputFolder, validator, null);
             if (shp.getShapeFile() != null) {

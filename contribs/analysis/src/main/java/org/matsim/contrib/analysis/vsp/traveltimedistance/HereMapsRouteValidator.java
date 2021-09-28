@@ -61,11 +61,13 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
      * @param transformation A coordinate transformation to WGS 84
      */
     public HereMapsRouteValidator(String outputFolder, String apiAccessKey, String date,
-                                  CoordinateTransformation transformation) {
+                                  CoordinateTransformation transformation, boolean writeDetailedFiles) {
         this.outputPath = outputFolder;
         this.apiAccessKey = apiAccessKey;
         this.date = date;
         this.transformation = transformation;
+        this.writeDetailedFiles = writeDetailedFiles;
+
         File outDir = new File(outputFolder);
         if (!outDir.exists()) {
             outDir.mkdirs();
