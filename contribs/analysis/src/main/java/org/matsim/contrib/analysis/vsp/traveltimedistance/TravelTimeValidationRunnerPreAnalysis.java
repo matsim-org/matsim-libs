@@ -145,7 +145,6 @@ public class TravelTimeValidationRunnerPreAnalysis {
                         Double.toString(fromCorrd.getY()), Double.toString(toCoord.getX()),
                         Double.toString(toCoord.getY()), Double.toString(simulatedTravelTime),
                         Double.toString(validatedTravelTime));
-                counter++;
             }
         }
         csvWriter.close();
