@@ -46,7 +46,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
-    final String apiAcessKey;
+    final String apiAccessKey;
     final String outputPath;
     final String date;
     final CoordinateTransformation transformation;
@@ -59,11 +59,12 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
      * @param transformation A coordinate transformation to WGS 84
      */
     public HereMapsRouteValidator(String outputFolder, String apiAccessKey, String date,
-                                  CoordinateTransformation transformation) {
+                                  CoordinateTransformation transformation, boolean writeDetailedFiles) {
         this.outputPath = outputFolder;
-        this.apiAcessKey = apiAccessKey;
+        this.apiAccessKey = apiAccessKey;
         this.date = date;
         this.transformation = transformation;
+        this.writeDetailedFiles = writeDetailedFiles;
         File outDir = new File(outputFolder);
         if (!outDir.exists()) {
             outDir.mkdirs();
@@ -97,7 +98,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
         DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(locale);
         df.applyPattern(pattern);
 
-        String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAcessKey + "&transportmode=car&origin="
+        String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAccessKey + "&transportmode=car&origin="
                 + df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
                 + df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(departureTime)
                 + "&return=summary";

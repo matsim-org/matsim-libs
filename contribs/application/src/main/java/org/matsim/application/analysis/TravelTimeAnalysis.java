@@ -10,10 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
-import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
-import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
-import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunnerPreAnalysis;
+import org.matsim.contrib.analysis.vsp.traveltimedistance.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.utils.collections.Tuple;
@@ -123,11 +120,16 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
+            TravelTimeDistanceValidator validator;
+            if (api.equals("here")){
+                validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else if (api.equals("google-map")){
+                validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else {
+                throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
+            }
 
-            HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation);
-            validator.setWriteDetailedFiles(writeDetails);
-
-            Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 30);
+            Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 24);
             if (timeFrom != null && timeTo != null) {
                 timeWindow = new Tuple<>(timeFrom, timeTo);
             }
@@ -139,7 +141,8 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
         } else if (type.equals("pre-analysis")) {
             Path networkPath = globFile(runDirectory, "*network*");
-            if (!networkPath.endsWith(".xml") && !networkPath.endsWith(".xml.gz")) {
+            log.info("Network file to be read: " + networkPath);
+            if (!networkPath.toString().endsWith(".xml") && !networkPath.toString().endsWith(".xml.gz")) {
                 log.error("There are other non-xml file with the name network in the folder. Please consider change the run directory and only keep the correct network xml file in the run directory");
                 return 2;
             }
@@ -149,8 +152,15 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             }
             Network network = NetworkUtils.readNetwork(networkPath.toString());
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
-            HereMapsRouteValidator validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation);
-            validator.setWriteDetailedFiles(writeDetails);
+
+            TravelTimeDistanceValidator validator;
+            if (api.equals("here")){
+                validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation, writeDetails);
+            } else if (api.equals("google-map")){
+                validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else {
+                throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
+            }
 
             TravelTimeValidationRunnerPreAnalysis preAnalysisRunner = new TravelTimeValidationRunnerPreAnalysis(network, trips, outputFolder, validator, null);
             if (shp.getShapeFile() != null) {

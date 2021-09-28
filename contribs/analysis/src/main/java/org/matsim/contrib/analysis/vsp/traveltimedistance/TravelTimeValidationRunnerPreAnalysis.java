@@ -108,6 +108,7 @@ public class TravelTimeValidationRunnerPreAnalysis {
                 Coord toCoord = toLink.getToNode().getCoord();
                 double validatedTravelTime = validator.getTravelTime
                         (fromCorrd, toCoord, 1, detailedFile).getFirst();
+                counter++;
                 if (validatedTravelTime < 60) {
                     continue;
                 }
@@ -117,7 +118,6 @@ public class TravelTimeValidationRunnerPreAnalysis {
                         Double.toString(fromCorrd.getY()), Double.toString(toCoord.getX()),
                         Double.toString(toCoord.getY()), Double.toString(simulatedTravelTime),
                         Double.toString(validatedTravelTime));
-                counter++;
             }
         }
         csvWriter.close();
