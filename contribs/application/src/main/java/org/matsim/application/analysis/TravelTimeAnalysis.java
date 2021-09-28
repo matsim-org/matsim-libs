@@ -150,7 +150,6 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         } else if (type == AnalysisTypes.PRE_ANALYSIS) {
             Path networkPath = globFile(runDirectory, "*network*");
             log.info("Network file to be read: " + networkPath);
-
             if (!networkPath.toString().endsWith(".xml") && !networkPath.toString().endsWith(".xml.gz")) {
                 log.error("There are other non-xml file with the name network in the folder. Please consider change the run directory and only keep the correct network xml file in the run directory");
                 return 2;
@@ -161,7 +160,6 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             }
             Network network = NetworkUtils.readNetwork(networkPath.toString());
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
-
             TravelTimeDistanceValidator validator;
             if (api == TravelTimeDistanceValidators.HERE) {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation, writeDetails);

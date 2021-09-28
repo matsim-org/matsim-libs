@@ -67,6 +67,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
         this.date = date;
         this.transformation = transformation;
         this.writeDetailedFiles = writeDetailedFiles;
+
         File outDir = new File(outputFolder);
         if (!outDir.exists()) {
             outDir.mkdirs();
