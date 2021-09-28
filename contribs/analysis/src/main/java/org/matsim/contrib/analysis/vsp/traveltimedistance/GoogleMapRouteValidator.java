@@ -30,6 +30,13 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
     final CoordinateTransformation ct;
     boolean writeDetailedFiles;
 
+    /**
+     * Travel time and distance validator based on Google Map API.
+     *
+     * @param apiAccessKey You can apply for free API key on the Google Map API website.
+     * @param date         Google Map API only accept date in the future. If a past date is used, today in the next week will be used as the date by default.
+     * @param ct           The target CRS of the Coordinate Transformation should be WGS84.
+     */
     public GoogleMapRouteValidator(String outputFolder, String apiAccessKey, String date, CoordinateTransformation ct, boolean writeDetailedFiles) {
         this.outputFolder = outputFolder;
         this.apiAccessKey = apiAccessKey;
@@ -42,7 +49,6 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
             outDir.mkdirs();
         }
     }
-
 
     @Override
     public Tuple<Double, Double> getTravelTime(CarTrip trip) {
@@ -72,22 +78,23 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
                 "&key=" + apiAccessKey;
 
         try {
-            System.out.println(urlString);
+            log.info(urlString);
             URL url = new URL(urlString);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            JSONParser jp = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jp.parse(in);
-            JSONArray rows = (JSONArray) jsonObject.get("rows");
-            if (!rows.isEmpty()) {
-                JSONArray elements = (JSONArray) ((JSONObject) rows.get(0)).get("elements");
-                JSONObject results = (JSONObject) elements.get(0);
-                if (results.containsKey("distance")) {
-                    JSONObject distanceResults = (JSONObject) results.get("distance");
-                    distance = (long) distanceResults.get("value");
-                }
-                if (results.containsKey("duration_in_traffic")) {
-                    JSONObject timeResults = (JSONObject) results.get("duration_in_traffic");
-                    travelTime = (long) timeResults.get("value");
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                JSONParser jp = new JSONParser();
+                JSONObject jsonObject = (JSONObject) jp.parse(in);
+                JSONArray rows = (JSONArray) jsonObject.get("rows");
+                if (!rows.isEmpty()) {
+                    JSONArray elements = (JSONArray) ((JSONObject) rows.get(0)).get("elements");
+                    JSONObject results = (JSONObject) elements.get(0);
+                    if (results.containsKey("distance")) {
+                        JSONObject distanceResults = (JSONObject) results.get("distance");
+                        distance = (long) distanceResults.get("value");
+                    }
+                    if (results.containsKey("duration_in_traffic")) {
+                        JSONObject timeResults = (JSONObject) results.get("duration_in_traffic");
+                        travelTime = (long) timeResults.get("value");
+                    }
                 }
             }
         } catch (IOException | ParseException e) {
@@ -111,7 +118,6 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
             log.warn("Changing validation date to today in the next week (i.e. today + 7 days)" +
                     "Please make sure today is the weekday you want to validate against (e.g. working days instead of weekend)!");
             validationDate = nextWeek; // Google Map API only accept date and time in the future.
-
         }
         long numOfDays = ChronoUnit.DAYS.between(googleDate0, validationDate);
         return numOfDays * 86400 + departureTime;
