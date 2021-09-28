@@ -29,6 +29,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -45,7 +47,7 @@ import org.matsim.core.utils.misc.Time;
  * and obey here's usage policy
  */
 public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
-
+    private static final Logger log = LogManager.getLogger(HereMapsRouteValidator.class);
     final String apiAccessKey;
     final String outputPath;
     final String date;
@@ -103,14 +105,15 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
                 + df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(departureTime)
                 + "&return=summary";
 
+        log.info(urlString);
+
         try {
-            System.out.println(urlString);
             URL url = new URL(urlString);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             JSONParser jp = new JSONParser();
-
             JSONObject jsonObject = (JSONObject) jp.parse(in);
             JSONArray routes = (JSONArray) jsonObject.get("routes");
+
             if (!routes.isEmpty()) {
                 JSONObject route = (JSONObject) routes.get(0);
                 JSONArray sections = (JSONArray) route.get("sections");
@@ -118,7 +121,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
                 JSONObject summary = (JSONObject) section.get("summary");
                 travelTime = (long) summary.get("duration");
                 distance = (long) summary.get("length");
-
                 if (writeDetailedFiles) {
                     String filename = outputPath + "/" + tripId + ".json.gz";
                     BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -127,9 +129,13 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
                     bw.close();
                 }
             }
+
+            in.close();
         } catch (MalformedURLException e) {
-        } catch (IOException e) {
-        } catch (ParseException e) {
+            log.error("URL is not working. Please check your API key");
+            e.printStackTrace();
+        } catch (IOException | ParseException e) {
+            log.error("Cannot read the content on the URL properly. Please manually check the URL");
         }
         return new Tuple<Double, Double>((double) travelTime, (double) distance);
     }

@@ -39,8 +39,8 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Parameters(arity = "1", paramLabel = "INPUT", description = "Input run directory")
     private Path runDirectory;
 
-    @CommandLine.Option(names = "--analysis-type", defaultValue = "post-analysis", description = "type of the analysis. Choose from [pre-analysis, post-analysis]", required = true)
-    private String type;
+    @CommandLine.Option(names = "--analysis-type", defaultValue = "POST_ANALYSIS", description = "type of the analysis. Choose from [PRE_ANALYSIS, POST_ANALYSIS]", required = true)
+    private AnalysisTypes type;
 
     @CommandLine.Option(names = "--run-id", defaultValue = "*", description = "Pattern used to match runId", required = true)
     private String runId;
@@ -48,8 +48,8 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--output", defaultValue = "travelTimeValidation", description = "Name of output folder", required = true)
     private String output;
 
-    @CommandLine.Option(names = "--api", description = "Online API used. Choose from [here, google-map (todo)]", defaultValue = "here", required = true)
-    private String api;
+    @CommandLine.Option(names = "--api", description = "Online API used. Choose from [HERE, GOOGLE_MAP]", defaultValue = "HERE", required = true)
+    private TravelTimeDistanceValidators api;
 
     @CommandLine.Option(names = "--api-key", description = "API key. You can apply for free API key on their website", required = true)
     private String appCode;
@@ -80,6 +80,14 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
     private final Random rnd = new Random(1234);
 
+    enum TravelTimeDistanceValidators {
+        HERE, GOOGLE_MAP
+    }
+
+    enum AnalysisTypes {
+        PRE_ANALYSIS, POST_ANALYSIS
+    }
+
     public static void main(String[] args) {
         System.exit(new CommandLine(new TravelTimeAnalysis()).execute(args));
     }
@@ -93,7 +101,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         }
 
         String outputFolder = runDirectory.resolve(output).toString();
-        if (type.equals("post-analysis")) {
+        if (type.equals(AnalysisTypes.POST_ANALYSIS)) {
             Path events = globFile(runDirectory, runId + ".*events.*");
             Scenario scenario = loadScenario(runId, runDirectory, crs);
             Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
@@ -121,15 +129,15 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
             TravelTimeDistanceValidator validator;
-            if (api.equals("here")){
+            if (api.equals(TravelTimeDistanceValidators.HERE)) {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
-            } else if (api.equals("google-map")){
+            } else if (api.equals(TravelTimeDistanceValidators.GOOGLE_MAP)) {
                 validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }
-
             Tuple<Double, Double> timeWindow = new Tuple<>((double) 0, (double) 3600 * 24);
+
             if (timeFrom != null && timeTo != null) {
                 timeWindow = new Tuple<>(timeFrom, timeTo);
             }
@@ -139,9 +147,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
             return 0;
 
-        } else if (type.equals("pre-analysis")) {
+        } else if (type.equals(AnalysisTypes.PRE_ANALYSIS)) {
             Path networkPath = globFile(runDirectory, "*network*");
             log.info("Network file to be read: " + networkPath);
+
             if (!networkPath.toString().endsWith(".xml") && !networkPath.toString().endsWith(".xml.gz")) {
                 log.error("There are other non-xml file with the name network in the folder. Please consider change the run directory and only keep the correct network xml file in the run directory");
                 return 2;
@@ -154,9 +163,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
             TravelTimeDistanceValidator validator;
-            if (api.equals("here")){
+            if (api.equals(TravelTimeDistanceValidators.HERE)) {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation, writeDetails);
-            } else if (api.equals("google-map")){
+            } else if (api.equals(TravelTimeDistanceValidators.GOOGLE_MAP)) {
                 validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");

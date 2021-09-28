@@ -29,6 +29,10 @@ public class TravelTimeValidationRunnerPreAnalysis {
     private final TravelTimeDistanceValidator validator;
     private final String outputFolder;
 
+    private double insideTripProportion = 0.6;  // Proportion of trips will be chosen within the key area (when key area shape file is provided)
+    private double crossBorderTripProportion = 0.3; // Proportion of trips will be chosen that cross the broader of the key area (when key area shape file is provided)
+    // The rest will be outside trips. Therefore, insideTripProportion+crossBorderTripProportion should be less than or equal to 1
+
     private final Random rnd = new Random(1234);
 
     public TravelTimeValidationRunnerPreAnalysis(Network network, int trips, String outputFolder, TravelTimeDistanceValidator validator, Geometry keyAreaGeometry) {
@@ -41,6 +45,14 @@ public class TravelTimeValidationRunnerPreAnalysis {
 
     public void setKeyAreaGeometry(Geometry keyAreaGeometry) {
         this.keyAreaGeometry = keyAreaGeometry;
+    }
+
+    public void setInsideTripProportion(double insideTripProportion) {
+        this.insideTripProportion = insideTripProportion;
+    }
+
+    public void setCrossBorderTripProportion(double crossBorderTripProportion){
+        this.crossBorderTripProportion = crossBorderTripProportion;
     }
 
     public void run() throws IOException {
@@ -83,11 +95,11 @@ public class TravelTimeValidationRunnerPreAnalysis {
                 int numOfLinksInsideShp = linksInsideShp.size();
                 int numOfOutsideLinks = outsideLinks.size();
 
-                if (counter < 0.6 * trips) {
+                if (counter < insideTripProportion * trips) {
                     fromLink = linksInsideShp.get(rnd.nextInt(numOfLinksInsideShp));
                     toLink = linksInsideShp.get(rnd.nextInt(numOfLinksInsideShp));
                     tripType = "inside";
-                } else if (counter < 0.9 * trips) {
+                } else if (counter < (insideTripProportion + crossBorderTripProportion) * trips) {
                     fromLink = linksInsideShp.get(rnd.nextInt(numOfLinksInsideShp));
                     toLink = outsideLinks.get(rnd.nextInt(numOfOutsideLinks));
                     tripType = "cross-border";
