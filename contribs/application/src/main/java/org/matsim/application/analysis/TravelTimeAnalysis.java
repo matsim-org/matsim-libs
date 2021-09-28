@@ -101,7 +101,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
         }
 
         String outputFolder = runDirectory.resolve(output).toString();
-        if (type.equals(AnalysisTypes.POST_ANALYSIS)) {
+        if (type == AnalysisTypes.POST_ANALYSIS) {
             Path events = globFile(runDirectory, runId + ".*events.*");
             Scenario scenario = loadScenario(runId, runDirectory, crs);
             Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();
@@ -147,7 +147,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
             return 0;
 
-        } else if (type.equals(AnalysisTypes.PRE_ANALYSIS)) {
+        } else if (type == AnalysisTypes.PRE_ANALYSIS) {
             Path networkPath = globFile(runDirectory, "*network*");
             log.info("Network file to be read: " + networkPath);
 

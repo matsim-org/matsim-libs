@@ -29,9 +29,14 @@ public class TravelTimeValidationRunnerPreAnalysis {
     private final TravelTimeDistanceValidator validator;
     private final String outputFolder;
 
-    private double insideTripProportion = 0.6;  // Proportion of trips will be chosen within the key area (when key area shape file is provided)
-    private double crossBorderTripProportion = 0.3; // Proportion of trips will be chosen that cross the broader of the key area (when key area shape file is provided)
-    // The rest will be outside trips. Therefore, insideTripProportion+crossBorderTripProportion should be less than or equal to 1
+    /**
+     * Proportion of trips will be chosen within the key area (when key area shape file is provided).
+     * */
+    private double insideTripProportion = 0.6;
+    /**
+     * Proportion of trips will be chosen that cross the border of the key area (when key area shape file is provided)
+     * */
+    private double crossBorderTripProportion = 0.3;
 
     private final Random rnd = new Random(1234);
 
@@ -47,10 +52,20 @@ public class TravelTimeValidationRunnerPreAnalysis {
         this.keyAreaGeometry = keyAreaGeometry;
     }
 
+    /**
+     * Set the proportion of the inside trips to analyze.
+     * Note that insideTripProportion + crossBorderTripProportion should be less than or equal to 1
+     * The rest proportion will be outside trips
+     * */
     public void setInsideTripProportion(double insideTripProportion) {
         this.insideTripProportion = insideTripProportion;
     }
 
+    /**
+     * Set the proportion of the cross border trips to analyze.
+     * Note that insideTripProportion + crossBorderTripProportion should be less than or equal to 1
+     * The rest proportion will be outside trips
+     * */
     public void setCrossBorderTripProportion(double crossBorderTripProportion){
         this.crossBorderTripProportion = crossBorderTripProportion;
     }
