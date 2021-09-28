@@ -28,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import java.util.Deque;
 
 /**
- * @author  jbischoff
+ * @author  jbischoff, Chengqi Lu
  * An Interface for Traveltime Validation
  */
 
@@ -43,5 +43,13 @@ public interface TravelTimeDistanceValidator {
 	 */
 	Tuple<Double,Double> getTravelTime(CarTrip trip);
 
+	/**
+	 * A more general form for the trip validation
+	 * @param fromCorrd coordinate of departure location
+	 * @param toCoord coordinate of departure location
+	 * @param departureTime departure time in seconds during the day
+	 * @param tripId id for the trip for detailed record
+	 * @return a tuple of validated TravelTime and Distance
+	 */
 	Tuple<Double, Double> getTravelTime(Coord fromCorrd, Coord toCoord, double departureTime, String tripId);
 }
