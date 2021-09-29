@@ -45,7 +45,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
-import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -65,7 +65,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final MatsimServices matsimServices;
 	private final Network network;
 	private final DrtEventSequenceCollector drtEventSequenceCollector;
-	private final DrtVehicleOccupancyProfileCalculator drtVehicleOccupancyProfileCalculator;
+	private final VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator;
 	private final DrtConfigGroup drtCfg;
 	private final QSimConfigGroup qSimCfg;
 	private boolean headerWritten = false;
@@ -78,12 +78,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
 			DrtVehicleDistanceStats drtVehicleStats, MatsimServices matsimServices, Network network,
 			DrtEventSequenceCollector drtEventSequenceCollector,
-			DrtVehicleOccupancyProfileCalculator drtVehicleOccupancyProfileCalculator) {
+			VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator) {
 		this.drtVehicleStats = drtVehicleStats;
 		this.matsimServices = matsimServices;
 		this.network = network;
 		this.drtEventSequenceCollector = drtEventSequenceCollector;
-		this.drtVehicleOccupancyProfileCalculator = drtVehicleOccupancyProfileCalculator;
+		this.vehicleOccupancyProfileCalculator = vehicleOccupancyProfileCalculator;
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = Optional.ofNullable(config.controler().getRunId()).orElse(notAvailableString);
@@ -140,7 +140,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		double l_d = DrtLegsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size()
 				* directDistanceMean);
 
-		var stayTaskProfile = drtVehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles()
+		var stayTaskProfile = vehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles()
 				.getOrDefault(new DrtTaskType(DrtTaskBaseType.STAY), new double[0]);
 		var minStayTaskVehicleCountOverDay = Arrays.stream(stayTaskProfile).min();
 

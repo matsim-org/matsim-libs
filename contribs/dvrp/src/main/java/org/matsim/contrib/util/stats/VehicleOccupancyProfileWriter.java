@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,10 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.drt.util.stats;
+ * *********************************************************************** *
+ */
+package org.matsim.contrib.util.stats;
 
-import java.awt.Color;
 import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,8 +37,6 @@ import org.matsim.contrib.common.csv.CSVLineBuilder;
 import org.matsim.contrib.common.csv.CompactCSVWriter;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.common.util.ChartSaveUtils;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.controler.MatsimServices;
@@ -54,31 +53,24 @@ import one.util.streamex.EntryStream;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
-	private static final String OUTPUT_FILE = "drt_occupancy_time_profiles";
+public class VehicleOccupancyProfileWriter implements IterationEndsListener {
+	private static final String OUTPUT_FILE = "occupancy_time_profiles";
 
 	private final MatsimServices matsimServices;
 	private final String mode;
-	private final DrtVehicleOccupancyProfileCalculator calculator;
+	private final VehicleOccupancyProfileCalculator calculator;
 
-	private final Comparator<Task.TaskType> nonPassengerTaskTypeComparator = Comparator.comparing(type -> {
-		//we want the following order on the plot: STAY, RELOCATE, other
-		if (type.equals(DrtStayTask.TYPE)) {
-			return "C";
-		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
-			return "B";
-		} else {
-			return "A" + type.name();
-		}
-	});
+	private final Comparator<Task.TaskType> nonPassengerTaskTypeComparator;
+	private final Map<Task.TaskType, Paint> taskTypePaints;
 
-	private final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(DrtStayTask.TYPE, Color.LIGHT_GRAY);
-
-	public DrtVehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
-			DrtVehicleOccupancyProfileCalculator calculator) {
+	public VehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
+			VehicleOccupancyProfileCalculator calculator, Comparator<Task.TaskType> nonPassengerTaskTypeComparator,
+			Map<Task.TaskType, Paint> taskTypePaints) {
 		this.matsimServices = matsimServices;
 		this.mode = mode;
 		this.calculator = calculator;
+		this.nonPassengerTaskTypeComparator = nonPassengerTaskTypeComparator;
+		this.taskTypePaints = taskTypePaints;
 	}
 
 	@Override

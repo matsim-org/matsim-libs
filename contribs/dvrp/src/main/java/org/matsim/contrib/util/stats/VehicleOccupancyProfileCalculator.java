@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,8 +15,9 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.drt.util.stats;
+ * *********************************************************************** *
+ */
+package org.matsim.contrib.util.stats;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -55,7 +57,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class DrtVehicleOccupancyProfileCalculator
+public class VehicleOccupancyProfileCalculator
 		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
 		TaskEndedEventHandler, AfterMobsimListener {
 
@@ -65,7 +67,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		private double beginTime;
 	}
 
-	private final static Logger log = Logger.getLogger(DrtVehicleOccupancyProfileCalculator.class);
+	private final static Logger log = Logger.getLogger(VehicleOccupancyProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
@@ -82,7 +84,7 @@ public class DrtVehicleOccupancyProfileCalculator
 	private boolean wasConsolidatedInThisIteration = false;
 	private boolean mobsimHasFinished = false;
 
-	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
+	public VehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
 			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
 		this.dvrpMode = dvrpMode;
 		this.passengerServingTaskTypes = passengerServingTaskTypes;
