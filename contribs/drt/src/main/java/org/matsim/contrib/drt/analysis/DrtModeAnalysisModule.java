@@ -44,16 +44,12 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private final ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes;
+	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE,
+			DrtStopTask.TYPE);
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
-		this(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE, DrtStopTask.TYPE));
-	}
-
-	public DrtModeAnalysisModule(DrtConfigGroup drtCfg, ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.nonPassengerServingTaskTypes = nonPassengerServingTaskTypes;
 	}
 
 	@Override
@@ -73,7 +69,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
-						300, getter.get(QSimConfigGroup.class), nonPassengerServingTaskTypes))).asEagerSingleton();
+						300, getter.get(QSimConfigGroup.class), passengerServingTaskTypes))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 		addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
