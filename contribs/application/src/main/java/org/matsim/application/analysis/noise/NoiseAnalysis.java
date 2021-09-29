@@ -60,7 +60,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
         Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
         config.global().setCoordinateSystem(crs.getInputCRS());
         config.controler().setRunId(runId);
-        if (runId.equals("")) {
+        if (!runId.equals("")) {
             config.network().setInputFile(runDirectory + "/" + runId + ".output_network.xml.gz");
             config.plans().setInputFile(runDirectory + "/" + runId + ".output_plans.xml.gz");
         } else {
