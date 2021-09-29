@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,16 +15,15 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.drt.util.stats;
+ * *********************************************************************** *
+ */
+package org.matsim.contrib.util.stats;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
@@ -35,8 +35,6 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -59,7 +57,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class DrtVehicleOccupancyProfileCalculator
+public class VehicleOccupancyProfileCalculator
 		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
 		TaskEndedEventHandler, AfterMobsimListener {
 
@@ -69,7 +67,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		private double beginTime;
 	}
 
-	private final static Logger log = Logger.getLogger(DrtVehicleOccupancyProfileCalculator.class);
+	private final static Logger log = Logger.getLogger(VehicleOccupancyProfileCalculator.class);
 	private final TimeDiscretizer timeDiscretizer;
 
 	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
@@ -86,7 +84,7 @@ public class DrtVehicleOccupancyProfileCalculator
 	private boolean wasConsolidatedInThisIteration = false;
 	private boolean mobsimHasFinished = false;
 
-	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
+	public VehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
 			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
 		this.dvrpMode = dvrpMode;
 		this.passengerServingTaskTypes = passengerServingTaskTypes;
@@ -112,7 +110,8 @@ public class DrtVehicleOccupancyProfileCalculator
 	private void consolidate() {
 		if (!mobsimHasFinished) {
 			log.error("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
-			throw new RuntimeException("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
+			throw new RuntimeException(
+					"Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
 		}
 		if (!wasConsolidatedInThisIteration) {
 			// consolidate
@@ -147,14 +146,6 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	public TimeDiscretizer getTimeDiscretizer() {
 		return timeDiscretizer;
-	}
-
-	public OptionalDouble getMinStayTaskVehiclesOverDay() {
-		double[] stayTask = getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
-		if (stayTask == null) {
-			return OptionalDouble.empty();
-		}
-		return Arrays.stream(stayTask).min();
 	}
 
 	private void increment(VehicleState state, double endTime) {
