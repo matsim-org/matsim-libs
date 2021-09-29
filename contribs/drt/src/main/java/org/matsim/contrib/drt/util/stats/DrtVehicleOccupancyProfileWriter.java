@@ -18,6 +18,7 @@
 package org.matsim.contrib.drt.util.stats;
 
 import java.awt.Color;
+import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -60,6 +61,19 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	private final String mode;
 	private final DrtVehicleOccupancyProfileCalculator calculator;
 
+	private final Comparator<Task.TaskType> nonPassengerTaskTypeComparator = Comparator.comparing(type -> {
+		//we want the following order on the plot: STAY, RELOCATE, other
+		if (type.equals(DrtStayTask.TYPE)) {
+			return "C";
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
+			return "B";
+		} else {
+			return "A" + type.name();
+		}
+	});
+
+	private final Map<Task.TaskType, Paint> taskTypePaints = ImmutableMap.of(DrtStayTask.TYPE, Color.LIGHT_GRAY);
+
 	public DrtVehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
 			DrtVehicleOccupancyProfileCalculator calculator) {
 		this.matsimServices = matsimServices;
@@ -75,7 +89,7 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		var nonPassengerTaskProfiles = calculator.getNonPassengerServingTaskProfiles()
 				.entrySet()
 				.stream()
-				.sorted(Comparator.comparing(this::mapTaskTypeNameForSorting))
+				.sorted(Entry.comparingByKey(nonPassengerTaskTypeComparator))
 				.map(e -> Pair.of(e.getKey().name(), e.getValue()));
 
 		// occupancy profiles (for tasks related to passengers)
@@ -99,18 +113,6 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 			DefaultTableXYDataset xyDataset = createXYDataset(timeDiscretizer, profiles);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
-		}
-	}
-
-	private String mapTaskTypeNameForSorting(Entry<Task.TaskType, double[]> typeProfileEntry) {
-		//we want the following order on the plot: STAY, RELOCATE, other
-		Task.TaskType type = typeProfileEntry.getKey();
-		if (type.equals(DrtStayTask.TYPE)) {
-			return "C";
-		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
-			return "B";
-		} else {
-			return "A" + type.name();
 		}
 	}
 
@@ -143,11 +145,12 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	}
 
 	private void makeStayTaskSeriesGrey(XYPlot plot) {
+		var seriesPaints = EntryStream.of(taskTypePaints).mapKeys(Task.TaskType::name).toMap();
 		XYDataset dataset = plot.getDataset(0);
 		for (int i = 0; i < dataset.getSeriesCount(); i++) {
-			if (dataset.getSeriesKey(i).equals(DrtStayTask.TYPE.name())) {
-				plot.getRenderer().setSeriesPaint(i, Color.LIGHT_GRAY);
-				return;
+			Paint paint = seriesPaints.get((String)dataset.getSeriesKey(i));
+			if (paint != null) {
+				plot.getRenderer().setSeriesPaint(i, paint);
 			}
 		}
 	}
