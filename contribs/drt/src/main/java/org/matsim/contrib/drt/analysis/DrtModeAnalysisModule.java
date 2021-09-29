@@ -44,16 +44,12 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes;
+	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE,
+			DrtStopTask.TYPE);
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
-		this(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE, DrtStopTask.TYPE));
-	}
-
-	public DrtModeAnalysisModule(DrtConfigGroup drtCfg, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.passengerServingTaskTypes = passengerServingTaskTypes;
 	}
 
 	@Override
