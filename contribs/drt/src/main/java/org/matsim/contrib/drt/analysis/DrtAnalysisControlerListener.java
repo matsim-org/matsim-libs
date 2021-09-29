@@ -32,7 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,6 +43,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.core.config.Config;
@@ -138,13 +139,17 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				+ format.format(rejectionRate), event.getIteration());
 		double l_d = DrtLegsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size()
 				* directDistanceMean);
-		OptionalDouble minStayTaskVehiclesOverDay = drtVehicleOccupancyProfileCalculator.getMinStayTaskVehiclesOverDay();
+
+		var stayTaskProfile = drtVehicleOccupancyProfileCalculator.getNonPassengerServingTaskProfiles()
+				.getOrDefault(new DrtTaskType(DrtTaskBaseType.STAY), new double[0]);
+		var minStayTaskVehicleCountOverDay = Arrays.stream(stayTaskProfile).min();
+
 		String vehStats = DrtLegsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), ";")
 				+ ";"
 				+ format.format(l_d)
 				+ ";"
-				+ (minStayTaskVehiclesOverDay.isPresent() ?
-				format.format(minStayTaskVehiclesOverDay.getAsDouble()) :
+				+ (minStayTaskVehicleCountOverDay.isPresent() ?
+				format.format(minStayTaskVehicleCountOverDay.getAsDouble()) :
 				notAvailableString);
 		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), ";",
 				maxcap);

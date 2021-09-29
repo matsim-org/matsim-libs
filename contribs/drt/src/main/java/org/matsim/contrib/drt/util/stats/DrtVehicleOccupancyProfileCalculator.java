@@ -19,11 +19,9 @@ package org.matsim.contrib.drt.util.stats;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
@@ -35,8 +33,6 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -112,7 +108,8 @@ public class DrtVehicleOccupancyProfileCalculator
 	private void consolidate() {
 		if (!mobsimHasFinished) {
 			log.error("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
-			throw new RuntimeException("Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
+			throw new RuntimeException(
+					"Should not consolidate data deleting all vehicleStats before the mobsim ends. Terminating.");
 		}
 		if (!wasConsolidatedInThisIteration) {
 			// consolidate
@@ -147,14 +144,6 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	public TimeDiscretizer getTimeDiscretizer() {
 		return timeDiscretizer;
-	}
-
-	public OptionalDouble getMinStayTaskVehiclesOverDay() {
-		double[] stayTask = getNonPassengerServingTaskProfiles().get(new DrtTaskType(DrtTaskBaseType.STAY));
-		if (stayTask == null) {
-			return OptionalDouble.empty();
-		}
-		return Arrays.stream(stayTask).min();
 	}
 
 	private void increment(VehicleState state, double endTime) {
