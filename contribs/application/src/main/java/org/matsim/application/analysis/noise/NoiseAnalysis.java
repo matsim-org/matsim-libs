@@ -41,6 +41,9 @@ public class NoiseAnalysis implements MATSimAppCommand {
             defaultValue = "250")
     private double receiverPointGap;
 
+    @CommandLine.Option(names = "--noise-barrier", description = "Path to the noise barrier File", defaultValue = "")
+    private String noiseBarrierFile;
+
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
 
@@ -57,7 +60,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
         Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
         config.global().setCoordinateSystem(crs.getInputCRS());
         config.controler().setRunId(runId);
-        if (runId != "") {
+        if (!runId.equals("")) {
             config.network().setInputFile(runDirectory + "/" + runId + ".output_network.xml.gz");
             config.plans().setInputFile(runDirectory + "/" + runId + ".output_plans.xml.gz");
         } else {
@@ -106,8 +109,15 @@ public class NoiseAnalysis implements MATSimAppCommand {
             noiseParameters.setReceiverPointsGridMaxY(maxY);
         }
 
-        // ...
+        noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
 
+        if (!noiseBarrierFile.equals("")){
+            noiseParameters.setNoiseBarriersSourceCRS(crs.getInputCRS());
+            noiseParameters.setConsiderNoiseBarriers(true);
+            noiseParameters.setNoiseBarriersFilePath(noiseBarrierFile);
+        }
+
+        // ...
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         String outputDirectory = runDirectory + "/analysis/";
