@@ -78,7 +78,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,
+				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg.getMode(),
 						getter.getModal(DrtVehicleOccupancyProfileCalculator.class))));
 
 		addControlerListenerBinding().toProvider(modalProvider(

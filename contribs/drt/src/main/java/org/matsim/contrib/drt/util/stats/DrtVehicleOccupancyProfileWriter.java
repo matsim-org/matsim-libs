@@ -31,15 +31,14 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.common.util.ChartSaveUtils;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
-import org.matsim.contrib.common.csv.CSVLineBuilder;
-import org.matsim.contrib.common.csv.CompactCSVWriter;
-import org.matsim.contrib.common.util.ChartSaveUtils;
-import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -58,13 +57,13 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	private static final String OUTPUT_FILE = "drt_occupancy_time_profiles";
 
 	private final MatsimServices matsimServices;
-	private final DrtConfigGroup drtCfg;
+	private final String mode;
 	private final DrtVehicleOccupancyProfileCalculator calculator;
 
-	public DrtVehicleOccupancyProfileWriter(MatsimServices matsimServices, DrtConfigGroup drtCfg,
+	public DrtVehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
 			DrtVehicleOccupancyProfileCalculator calculator) {
 		this.matsimServices = matsimServices;
-		this.drtCfg = drtCfg;
+		this.mode = mode;
 		this.calculator = calculator;
 	}
 
@@ -72,13 +71,18 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
 
-		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getNonPassengerServingTaskProfiles()
-						.entrySet()
-						.stream()
-						.sorted(Comparator.comparing(this::mapTaskTypeNameForSorting))
-						.map(e -> Pair.of(e.getKey().name(), e.getValue())),
-				EntryStream.of(calculator.getVehicleOccupancyProfiles())
-						.map(e -> Pair.of(e.getKey() + " pax", e.getValue())))
+		// stream tasks which are not related to passenger (unoccupied vehicle)
+		var nonPassengerTaskProfiles = calculator.getNonPassengerServingTaskProfiles()
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparing(this::mapTaskTypeNameForSorting))
+				.map(e -> Pair.of(e.getKey().name(), e.getValue()));
+
+		// occupancy profiles (for tasks related to passengers)
+		var occupancyProfiles = EntryStream.of(calculator.getVehicleOccupancyProfiles())
+				.map(e -> Pair.of(e.getKey() + " pax", e.getValue()));
+
+		ImmutableMap<String, double[]> profiles = Stream.concat(nonPassengerTaskProfiles, occupancyProfiles)
 				.collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
 
 		String file = filename(OUTPUT_FILE);
@@ -130,8 +134,8 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	private void generateImage(DefaultTableXYDataset xyDataset, TimeProfileCharts.ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(xyDataset, chartType);
 		String runID = matsimServices.getConfig().controler().getRunId();
-		if( runID != null){
-			chart.setTitle( runID + " " + chart.getTitle().getText());
+		if (runID != null) {
+			chart.setTitle(runID + " " + chart.getTitle().getText());
 		}
 		makeStayTaskSeriesGrey(chart.getXYPlot());
 		String imageFile = filename(OUTPUT_FILE + "_" + chartType.name());
@@ -150,6 +154,6 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 
 	private String filename(String prefix) {
 		return matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + drtCfg.getMode());
+				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
 	}
 }
