@@ -42,7 +42,7 @@ class LinkPaxVolumesWriter {
         this.linkPaxVolumesAnalysis = linkPaxVolumesAnalysis;
         this.network = network;
         this.columnSeparator = sep;
-        this.numberOfHours = linkPaxVolumesAnalysis.getMaxTime() / 3600;
+        this.numberOfHours = linkPaxVolumesAnalysis.getNumberOfHours();
     }
 
     void writeLinkVehicleAndPaxVolumesAllPerDayCsv(String fileName) {

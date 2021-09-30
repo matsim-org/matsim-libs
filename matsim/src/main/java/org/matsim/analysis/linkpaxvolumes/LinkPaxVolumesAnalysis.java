@@ -503,8 +503,8 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 		return this.linkVehicleVolumes.keySet();
 	}
 
-	int getMaxTime() {
-		return maxTime;
+	int getNumberOfHours() {
+		return maxSlotIndex * timeBinSize / 3600;
 	}
 
 	@Override
