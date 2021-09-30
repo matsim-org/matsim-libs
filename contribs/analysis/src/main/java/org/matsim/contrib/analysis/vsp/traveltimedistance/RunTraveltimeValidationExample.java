@@ -91,9 +91,8 @@ public class RunTraveltimeValidationExample {
 
 
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);
-		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, apiKey, date, transformation);
-        //Setting this to true will write out the raw JSON files for each calculated route
-        validator.setWriteDetailedFiles(false);
+		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, apiKey, date, transformation, false);
+        //Setting "writeDetailedFiles" to true will write out the raw JSON files for each calculated route
 		TravelTimeValidationRunner runner;
 		if (tripsToValidate != null){
             runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events, outputfolder, validator, tripsToValidate);

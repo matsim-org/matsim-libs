@@ -17,7 +17,11 @@ class AccidentCostComputationBVWP {
 	/**
 	 * 
 	 * Provides the accident costs in EUR based on a simplified version of Fig. 13 in the German 'BVWP Methodenhandbuch 2030'
-	 * 
+	 *
+	 * BE AWARE THAT THIS DOES NOT DIFFERENTIATE RAILWAYS AND ROADWAYS AT THE MOMENT!
+	 * //TODO incorporate the global average cost rate for railways from the BVWP Methodenhandbuch! But we need a good guess for the distinction of railways and roads (in the pt network) before that!
+	 * tschlenther, sep '21
+	 *
 	 * @param demand
 	 * @param link
 	 * @param roadType
