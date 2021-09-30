@@ -70,17 +70,17 @@ public final class LinkPaxVolumesControlerListener implements IterationEndsListe
 
 			if (linkPaxVolumesAnalysis.observeNetworkModes) {
 				String outputPerNetworkModePerHour = controlerIO.getOutputFilename("linkPaxVolumesPerNetworkModePerHour.csv.gz");
-				linkPaxVolumesWriter.writeLinkVehicleAndPaxVolumesAllPerDayCsv(outputPerNetworkModePerHour);
+				linkPaxVolumesWriter.writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(outputPerNetworkModePerHour);
 			}
 
 			if (linkPaxVolumesAnalysis.observePassengerModes) {
 				String outputPerPassengerModePerHour = controlerIO.getOutputFilename("linkPaxVolumesPerPassengerModePerHour.csv.gz");
-				linkPaxVolumesWriter.writeLinkVehicleAndPaxVolumesAllPerDayCsv(outputPerPassengerModePerHour);
+				linkPaxVolumesWriter.writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(outputPerPassengerModePerHour);
 			}
 
 			if (linkPaxVolumesAnalysis.observeVehicleTypes) {
 				String outputPerVehicleTypePerHour = controlerIO.getOutputFilename("linkPaxVolumesPerVehicleTypePerHour.csv.gz");
-				linkPaxVolumesWriter.writeLinkVehicleAndPaxVolumesAllPerDayCsv(outputPerVehicleTypePerHour);
+				linkPaxVolumesWriter.writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(outputPerVehicleTypePerHour);
 			}
 
 			VehicleStatsPerVehicleType vehicleStatsPerVehicleType = new VehicleStatsPerVehicleType(linkPaxVolumesAnalysis, scenario.getNetwork(), sep);
