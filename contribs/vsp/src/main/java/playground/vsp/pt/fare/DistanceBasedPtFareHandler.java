@@ -20,15 +20,23 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
     @Inject
     private EventsManager events;
 
-    private final double baseFare;
-    private final double distanceFare;
+    private final double minFare;
+    private final double shortTripIntercept;
+    private final double shortTripSlope;
+    private final double longTripIntercept;
+    private final double longTripSlope;
+    private final double longTripThreshold;
 
     private final Map<Id<Person>, Coord> personDepartureCoordMap = new HashMap<>();
     private final Map<Id<Person>, Coord> personArrivalCoordMap = new HashMap<>();
 
     public DistanceBasedPtFareHandler(DistanceBasedPtFareParams params) {
-        this.baseFare = params.getBaseFare();
-        this.distanceFare = params.getDistanceFare();
+        this.minFare = params.getMinFare();
+        this.shortTripIntercept = params.getShortTripIntercept();
+        this.shortTripSlope = params.getShortTripSlope();
+        this.longTripIntercept = params.getLongTripIntercept();
+        this.longTripSlope = params.getLongTripSlope();
+        this.longTripThreshold = params.getLongTripThreshold();
     }
 
     @Override
@@ -43,8 +51,13 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
             if (personDepartureCoordMap.containsKey(personId)) {
                 double distance = CoordUtils.calcEuclideanDistance
                         (personDepartureCoordMap.get(personId), personArrivalCoordMap.get(personId));
-                double fare = baseFare + distance * distanceFare;
 
+                double fare = 0;
+                if (distance <= longTripThreshold) {
+                    fare = Math.max(minFare, shortTripIntercept + shortTripSlope * distance);
+                } else {
+                    fare = Math.max(minFare, longTripIntercept + longTripSlope * distance);
+                }
                 // charge fare to the person
                 events.processEvent(
                         new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare,
