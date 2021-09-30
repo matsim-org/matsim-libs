@@ -44,7 +44,6 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
@@ -156,14 +155,11 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 			@Override
 			public TaxiRequestCreator get() {
-				return new TaxiRequestCreator(getMode(), getModalInstance(SubmittedTaxiRequestsCollector.class),
-						events);
+				return new TaxiRequestCreator(getMode(), events);
 			}
 		}).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
-
-		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
 
 		addModalQSimComponentBinding().toProvider(modalProvider(
 				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(TaxiEventSequenceCollector.class),
