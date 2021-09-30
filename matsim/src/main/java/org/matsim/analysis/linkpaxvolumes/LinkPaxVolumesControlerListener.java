@@ -84,7 +84,7 @@ public final class LinkPaxVolumesControlerListener implements IterationEndsListe
 			}
 
 			VehicleStatsPerVehicleType vehicleStatsPerVehicleType = new VehicleStatsPerVehicleType(linkPaxVolumesAnalysis, scenario.getNetwork(), sep);
-			String outputVehicleTypeStats = controlerIO.getOutputFilename("vehicleTypeStats.csv.gz");
+			String outputVehicleTypeStats = controlerIO.getOutputFilename("vehicleType_stats.csv.gz");
 			vehicleStatsPerVehicleType.writeOperatingStatsPerVehicleType(outputVehicleTypeStats);
 		}
 	}

@@ -61,7 +61,7 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 	private final IdMap<Vehicle, VehicleData> vehiclesData;
 	private final Vehicles vehicles;
 	private final Vehicles transitVehicles;
-	private final Id<VehicleType> nullVehicleType = Id.create("nukllVehicleType", VehicleType.class);
+	private final Id<VehicleType> nullVehicleType = Id.create("nullVehicleType", VehicleType.class);
 	
 	// for multi-modal / multi vehicle type support
 	final boolean observeNetworkModes;
@@ -138,19 +138,16 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 			Vehicle vehicle = vehicles.getVehicles().get(event.getVehicleId());
 			if (vehicle == null) {
 				// TODO: Why can the transit vehicles not be found in the general scenario.getVehicles() ?
-//				vehicle = transitVehicles.getVehicles().get(event.getVehicleId());
+				vehicle = transitVehicles.getVehicles().get(event.getVehicleId());
 			}
 			vehicleData = new VehicleData(event.getVehicleId(),
 					vehicle == null ? nullVehicleType : vehicle.getType().getId(),
-					event.getPersonId(),
-					person2passengerMode.get(event.getPersonId()));
+					event.getPersonId());
 			this.vehiclesData.put(event.getVehicleId(), vehicleData);
 		}
-		vehicleData.currentPax++;
-		if (! vehicleData.passengerMode.equals(person2passengerMode.get(event.getPersonId()))) {
-			throw new RuntimeException("Different passenger modes for passengers of vehicle " +
-					event.getVehicleId() + ". Not implemented in this analysis. Terminating.");
-		}
+		String passengerMode = person2passengerMode.get(event.getPersonId());
+		Map<String, Integer> passengersByMode = this.vehiclesData.get(event.getVehicleId()).passengerMode2currentPax;
+		passengersByMode.put(passengerMode, passengersByMode.getOrDefault(passengerMode, 0) + 1);
 	}
 
 	@Override
@@ -178,13 +175,17 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 		vehicleVolumesAll[timeslot]++;
 
 		VehicleData vehicleData = this.vehiclesData.get(event.getVehicleId());
+		int currentPaxAllPassengerModes = 0;
+		for (int i : vehicleData.passengerMode2currentPax.values()) {
+			currentPaxAllPassengerModes += i;
+		}
 
 		int[] passengerVolumesAll = this.linkPaxVolumes.get(event.getLinkId());
 		if (passengerVolumesAll == null) {
 			passengerVolumesAll = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
 			this.linkPaxVolumes.put(event.getLinkId(), passengerVolumesAll);
 		}
-		passengerVolumesAll[timeslot] += vehicleData.currentPax;
+		passengerVolumesAll[timeslot] += currentPaxAllPassengerModes;
 		
 		if (this.observeNetworkModes) {
 			String mode = vehicleData.networkMode;
@@ -205,29 +206,32 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 				passengerVolumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
 				modePassengerVolumes.put(mode, passengerVolumes);
 			}
-			passengerVolumes[timeslot] += vehicleData.currentPax;
+			passengerVolumes[timeslot] += currentPaxAllPassengerModes;
 		}
 
 		if (this.observePassengerModes) {
-			String mode = vehicleData.passengerMode;
+			// There is no clear way how to count a vehicle which is used by passengers of different passenger modes
+			// Here we simply count multiple times the same vehicle (once per passenger mode)
+			for (Map.Entry<String, Integer> passengerMode2modePax: vehicleData.passengerMode2currentPax.entrySet()) {
 
-			Map<String, int[]> modeVehicleVolumes = this.linkVehicleVolumesPerPassengerMode.
-					computeIfAbsent(event.getLinkId(), k -> new HashMap<>());
-			int[] vehicleVolumes = modeVehicleVolumes.get(mode);
-			if (vehicleVolumes == null) {
-				vehicleVolumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
-				modeVehicleVolumes.put(mode, vehicleVolumes);
-			}
-			vehicleVolumes[timeslot]++;
+				Map<String, int[]> modeVehicleVolumes = this.linkVehicleVolumesPerPassengerMode.
+						computeIfAbsent(event.getLinkId(), k -> new HashMap<>());
+				int[] vehicleVolumes = modeVehicleVolumes.get(passengerMode2modePax.getKey());
+				if (vehicleVolumes == null) {
+					vehicleVolumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
+					modeVehicleVolumes.put(passengerMode2modePax.getKey(), vehicleVolumes);
+				}
+				vehicleVolumes[timeslot]++;
 
-			Map<String, int[]> modePassengerVolumes = this.linkPaxVolumesPerPassengerMode.
-					computeIfAbsent(event.getLinkId(), k -> new HashMap<>());
-			int[] passengerVolumes = modePassengerVolumes.get(mode);
-			if (passengerVolumes == null) {
-				passengerVolumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
-				modePassengerVolumes.put(mode, passengerVolumes);
+				Map<String, int[]> modePassengerVolumes = this.linkPaxVolumesPerPassengerMode.
+						computeIfAbsent(event.getLinkId(), k -> new HashMap<>());
+				int[] passengerVolumes = modePassengerVolumes.get(passengerMode2modePax.getKey());
+				if (passengerVolumes == null) {
+					passengerVolumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
+					modePassengerVolumes.put(passengerMode2modePax.getKey(), passengerVolumes);
+				}
+				passengerVolumes[timeslot] += passengerMode2modePax.getValue();
 			}
-			passengerVolumes[timeslot] += vehicleData.currentPax;
 		}
 
 		if (this.observeVehicleTypes) {
@@ -249,17 +253,27 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 				passengerVolumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
 				modePassengerVolumes.put(vehicleType, passengerVolumes);
 			}
-			passengerVolumes[timeslot] += vehicleData.currentPax;
+			passengerVolumes[timeslot] += currentPaxAllPassengerModes;
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		String passengerMode = person2passengerMode.get(event.getPersonId());
+		Map<String, Integer> passengersByMode = this.vehiclesData.get(event.getVehicleId()).passengerMode2currentPax;
+		passengersByMode.put(passengerMode, passengersByMode.get(passengerMode) - 1);
 		if (vehiclesAboutToLeave.contains(event.getVehicleId())) {
-			this.vehiclesData.remove(event.getVehicleId());
-			vehiclesAboutToLeave.remove(event.getVehicleId());
-		} else {
-			this.vehiclesData.get(event.getVehicleId()).currentPax--;
+			// drt vehicles have a VehicleLeavesTrafficEvent at each stop, then alights the driver and after that
+			// the remaining passengers
+			// -> only remove vehicle when empty
+			int totalPax = 0;
+			for (int i: passengersByMode.values()) {
+				totalPax += i;
+			}
+			if (totalPax == 0) {
+				this.vehiclesData.remove(event.getVehicleId());
+				vehiclesAboutToLeave.remove(event.getVehicleId());
+			}
 		}
 	}
 
@@ -526,16 +540,13 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 		private final Id<VehicleType> vehicleTypeId;
 		private final Id<Person> driverId;
 		private String networkMode;
-		private String passengerMode;
-		private int currentPax = 0;
+		private Map<String, Integer> passengerMode2currentPax = new HashMap<>();
 		private double enteredNetworkTime;
 
-		public VehicleData(Id<Vehicle> vehicleId, Id<VehicleType> vehicleTypeId, Id<Person> driverId,
-						   String passengerMode) {
+		public VehicleData(Id<Vehicle> vehicleId, Id<VehicleType> vehicleTypeId, Id<Person> driverId) {
 			this.vehicleId = vehicleId;
 			this.vehicleTypeId = vehicleTypeId;
 			this.driverId = driverId;
-			this.passengerMode = passengerMode;
 		}
 	}
 }

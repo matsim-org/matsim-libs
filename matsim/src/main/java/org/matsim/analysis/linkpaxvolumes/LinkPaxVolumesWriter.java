@@ -96,6 +96,10 @@ class LinkPaxVolumesWriter {
         }
     }
 
+    /*
+     * Please note that the same vehicle is counted for each passenger mode it is serving here. E.g. a pt vehicle
+     * will be counted with the driver's passenger mode and with the passenger's passenger mode, i.e. multiple times.
+     */
     void writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
