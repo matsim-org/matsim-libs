@@ -27,11 +27,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
-import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
+import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfiles;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -43,20 +44,20 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private final ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes;
+	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE,
+			DrtStopTask.TYPE);
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
-		this(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE, DrtStopTask.TYPE));
-	}
-
-	public DrtModeAnalysisModule(DrtConfigGroup drtCfg, ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.nonPassengerServingTaskTypes = nonPassengerServingTaskTypes;
 	}
 
 	@Override
 	public void install() {
+		bindModal(ExecutedScheduleCollector.class).toProvider(
+				modalProvider(getter -> new ExecutedScheduleCollector(getMode()))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
+
 		bindModal(DrtVehicleDistanceStats.class).toProvider(modalProvider(
 				getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg,
 						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
@@ -66,21 +67,21 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				modalProvider(getter -> new DrtEventSequenceCollector(drtCfg.getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtEventSequenceCollector.class));
 
-		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
-				getter -> new DrtVehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
-						300, getter.get(QSimConfigGroup.class), nonPassengerServingTaskTypes))).asEagerSingleton();
-		addEventHandlerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
-		addControlerListenerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
+		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
+				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
+						300, getter.get(QSimConfigGroup.class), passengerServingTaskTypes))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
+		addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,
-						getter.getModal(DrtVehicleOccupancyProfileCalculator.class))));
+				getter -> DrtVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
+						drtCfg.getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
 						getter.getModal(FleetSpecification.class), getter.getModal(DrtVehicleDistanceStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class),
 						getter.getModal(DrtEventSequenceCollector.class),
-						getter.getModal(DrtVehicleOccupancyProfileCalculator.class)))).asEagerSingleton();
+						getter.getModal(VehicleOccupancyProfileCalculator.class)))).asEagerSingleton();
 	}
 }

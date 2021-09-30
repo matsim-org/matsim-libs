@@ -1,9 +1,10 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ * LinkPaxVolumesAnalysisModule.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,15 +16,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.analysis.linkpaxvolumes;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
-@Deprecated //prefer using events to monitor the state of mobsim from outside (i.e. controller scope)
-public interface QSimScopeObjectListener<T> {
-	void objectCreated(T object);
+import com.google.inject.Singleton;
+import org.matsim.core.controler.AbstractModule;
+
+
+public final class LinkPaxVolumesAnalysisModule extends AbstractModule {
+    @Override
+    public void install() {
+        bind(LinkPaxVolumesControlerListener.class).in(Singleton.class);
+        addControlerListenerBinding().to(LinkPaxVolumesControlerListener.class);
+    }
 }

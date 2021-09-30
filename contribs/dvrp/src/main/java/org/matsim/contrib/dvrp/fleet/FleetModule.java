@@ -23,10 +23,10 @@ package org.matsim.contrib.dvrp.fleet;
 import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vehicles.Vehicles;
@@ -88,12 +88,10 @@ public class FleetModule extends AbstractDvrpModeModule {
 		});
 
 		if (updateVehicleStartLinkToLastLink) {
-			install(QSimScopeObjectListenerModule.builder(VehicleStartLinkToLastLinkUpdater.class)
-					.mode(getMode())
-					.objectClass(Fleet.class)
-					.listenerCreator(
-							getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class)))
-					.build());
+			bindModal(VehicleStartLinkToLastLinkUpdater.class).toProvider(modalProvider(
+					getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class),
+							getter.getModal(ExecutedScheduleCollector.class)))).asEagerSingleton();
+			addControlerListenerBinding().to(modalKey(VehicleStartLinkToLastLinkUpdater.class));
 		}
 
 		bindModal(FleetControlerListener.class).toProvider(modalProvider(

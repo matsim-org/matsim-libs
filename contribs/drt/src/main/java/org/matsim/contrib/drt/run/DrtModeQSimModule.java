@@ -75,12 +75,10 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
 			@Inject
 			private EventsManager events;
-			@Inject
-			private MobsimTimer timer;
 
 			@Override
 			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events, timer);
+				return new DrtRequestCreator(getMode(), events);
 			}
 		}).asEagerSingleton();
 	}

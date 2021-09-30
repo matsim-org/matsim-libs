@@ -30,14 +30,17 @@ public class ChargingEndEvent extends Event {
 	public static final String EVENT_TYPE = "charging_end";
 	public static final String ATTRIBUTE_CHARGER = "charger";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_CHARGE = "charge";
 
 	private final Id<Charger> chargerId;
 	private final Id<ElectricVehicle> vehicleId;
+	private final double charge;
 
-	public ChargingEndEvent(double time, Id<Charger> chargerId, Id<ElectricVehicle> vehicleId) {
+	public ChargingEndEvent(double time, Id<Charger> chargerId, Id<ElectricVehicle> vehicleId, double charge) {
 		super(time);
 		this.chargerId = chargerId;
 		this.vehicleId = vehicleId;
+		this.charge = charge;
 	}
 
 	public Id<Charger> getChargerId() {
@@ -53,11 +56,16 @@ public class ChargingEndEvent extends Event {
 		return EVENT_TYPE;
 	}
 
+	public double getCharge() {
+		return charge;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
+		attr.put(ATTRIBUTE_CHARGE, charge + "");
 		return attr;
 	}
 }
