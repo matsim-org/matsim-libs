@@ -105,7 +105,7 @@ class LinkPaxVolumesWriter {
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<String> passengerModesSorted = new TreeSet(linkPaxVolumesAnalysis.getPassengerModes());
 
-        String[] header = {"link", "passengerMode", "hour", "vehicles", "passengersInclDriver"};
+        String[] header = {"link", "passengerMode", "hour", "vehicles", "passengersPossiblyInclDriver"};
 
         try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(fileName),
                 CSVFormat.DEFAULT.withDelimiter(columnSeparator.charAt(0)).withHeader(header))
