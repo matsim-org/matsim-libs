@@ -46,10 +46,8 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -157,18 +155,11 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
-		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
+		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();//
 
 		addModalQSimComponentBinding().toProvider(modalProvider(
 				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(TaxiEventSequenceCollector.class),
 						taxiCfg)));
-
-		if (taxiCfg.getTimeProfiles()) {
-			addModalQSimComponentBinding().toProvider(modalProvider(
-					getter -> new TaxiStatusTimeProfileCollectorProvider(getter.getModal(Fleet.class),
-							getter.get(MatsimServices.class), getter.getModal(SubmittedTaxiRequestsCollector.class),
-							taxiCfg).get()));
-		}
 
 		bindModal(VrpOptimizer.class).to(modalKey(TaxiOptimizer.class));
 	}
