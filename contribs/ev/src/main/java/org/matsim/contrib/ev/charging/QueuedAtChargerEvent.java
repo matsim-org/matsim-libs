@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.passenger;
+package org.matsim.contrib.ev.charging;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
-//TODO remove this class once taxi stats are refactored
-public class SubmittedTaxiRequestsCollector {
-	private final Map<Id<Request>, TaxiRequest> requests = new ConcurrentHashMap<>();
+public class QueuedAtChargerEvent extends Event {
+	public static final String EVENT_TYPE = "queued_at_charger";
+	public static final String ATTRIBUTE_CHARGER = "charger";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
-	public Map<Id<Request>, ? extends TaxiRequest> getRequests() {
-		return Collections.unmodifiableMap(requests);
+	private final Id<Charger> chargerId;
+	private final Id<ElectricVehicle> vehicleId;
+
+	public QueuedAtChargerEvent(double time, Id<Charger> chargerId, Id<ElectricVehicle> vehicleId) {
+		super(time);
+		this.chargerId = chargerId;
+		this.vehicleId = vehicleId;
 	}
 
-	void addRequest(TaxiRequest request) {
-		requests.put(request.getId(), request);
+	public Id<Charger> getChargerId() {
+		return chargerId;
+	}
+
+	public Id<ElectricVehicle> getVehicleId() {
+		return vehicleId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
+		return attr;
 	}
 }

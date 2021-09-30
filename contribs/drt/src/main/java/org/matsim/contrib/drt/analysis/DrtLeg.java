@@ -19,12 +19,13 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import static org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
+import static org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
 
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -66,6 +67,6 @@ final class DrtLeg {
 		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
 		this.arrivalTime = sequence.getDroppedOff().get().getTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
-		this.fare = sequence.getDrtFare().isPresent() ? -sequence.getDrtFare().get().getAmount() : 0.0;
+		this.fare = sequence.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
 	}
 }

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
@@ -166,7 +166,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(DrtSpeedUp.class).toProvider(modalProvider(
 					getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controler(),
 							getter.get(Network.class), getter.getModal(FleetSpecification.class),
-							getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
+							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
 	}

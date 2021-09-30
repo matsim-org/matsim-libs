@@ -34,6 +34,11 @@ public final class SampleOptions {
 	private int sample;
 
 	/**
+	 * Whether sample size was set explicitly.
+	 */
+	private boolean set;
+
+	/**
 	 * Create Sample options with the available sample size.
 	 * First sample size is the default option.
 	 *
@@ -77,6 +82,7 @@ public final class SampleOptions {
 	}
 
 	private void setSize(int sample) {
+		this.set = true;
 		this.sample = sample;
 	}
 
@@ -88,9 +94,18 @@ public final class SampleOptions {
 	}
 
 	/**
-	 * Adjust file name for selected sample size.
+	 * Check whether the sample size was set explicitly.
+	 */
+	public boolean isSet() {
+		return set;
+	}
+
+	/**
+	 * Adjust file name for selected sample size if it was set explicitly.
 	 */
 	public String adjustName(String name) {
+		if (!set) return name;
+
 		String postfix = getSize() + "pct";
 
 		return PATTERN.matcher(name).replaceAll(postfix);
