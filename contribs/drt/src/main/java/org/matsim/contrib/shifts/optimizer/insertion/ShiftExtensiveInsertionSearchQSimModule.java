@@ -1,8 +1,5 @@
 package org.matsim.contrib.shifts.optimizer.insertion;
 
-import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
@@ -19,6 +16,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
 
 public class ShiftExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModule {
     private final DrtConfigGroup drtCfg;
@@ -37,8 +38,8 @@ public class ShiftExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSi
             var provider = ShiftExtensiveInsertionProviders.create(drtCfg, timer, costCalculator,
                     getter.getModal(DvrpTravelTimeMatrix.class),
                     getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-            return ShiftDrtInsertionSearches.createShiftDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class), costCalculator,
-                    drtCfg, timer);
+			return ShiftDrtInsertionSearches.createShiftDrtInsertionSearch(provider,
+					getter.getModal(DetourPathCalculator.class), costCalculator, drtCfg, timer);
         })).asEagerSingleton();
 
         addModalComponent(MultiInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {

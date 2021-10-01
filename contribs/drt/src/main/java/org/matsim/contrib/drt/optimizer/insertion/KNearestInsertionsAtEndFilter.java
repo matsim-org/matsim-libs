@@ -21,9 +21,9 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
+import org.matsim.contrib.common.collections.PartialSort;
 
 /**
  * "Insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride
@@ -32,8 +32,8 @@ import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionW
  *
  * @author michalm
  */
-public class KNearestInsertionsAtEndFilter {
-	public static List<InsertionGenerator.Insertion> filterInsertionsAtEnd(int k, double admissibleBeelineSpeedFactor,
+class KNearestInsertionsAtEndFilter {
+	static List<InsertionGenerator.Insertion> filterInsertionsAtEnd(int k, double admissibleBeelineSpeedFactor,
 			List<InsertionWithDetourData<Double>> insertions) {
 		var nearestInsertionsAtEnd = new PartialSort<InsertionWithCost<Double>>(k,
 				BestInsertionFinder.createInsertionWithCostComparator());
