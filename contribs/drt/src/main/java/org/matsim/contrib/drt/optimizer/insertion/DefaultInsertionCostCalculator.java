@@ -44,8 +44,8 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 
 	public DefaultInsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer,
-									   CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
-									   @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
+			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
+			@Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
 		this(timer::getTimeOfDay, costCalculationStrategy,
 				new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
 						replacedDriveTimeEstimator));
@@ -53,7 +53,7 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 
 	@VisibleForTesting
 	DefaultInsertionCostCalculator(DoubleSupplier timeOfDay, CostCalculationStrategy costCalculationStrategy,
-								InsertionDetourTimeCalculator<D> detourTimeCalculator) {
+			InsertionDetourTimeCalculator<D> detourTimeCalculator) {
 		this.timeOfDay = timeOfDay;
 		this.costCalculationStrategy = costCalculationStrategy;
 		this.detourTimeCalculator = detourTimeCalculator;
