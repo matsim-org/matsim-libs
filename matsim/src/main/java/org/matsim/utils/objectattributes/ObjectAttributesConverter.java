@@ -100,11 +100,17 @@ public class ObjectAttributesConverter {
 		//we pass in a lot of maps here that we can and (maybe) do not want to write
 		{
 			if(converter instanceof StringStringMapConverter){
-				Map.Entry firstEntry = ((Map<Object, Object>) o).entrySet().iterator().next();
-				if(! (firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String) ) return null;
+				Map<Object, Object> map = ((Map<Object, Object>) o);
+				if (! map.isEmpty()){
+					Map.Entry firstEntry = map.entrySet().iterator().next();
+					if(! (firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String) ) return null;
+				}
 			}
 			if(converter instanceof StringCollectionConverter){
-				if(! ( ((Collection) o).iterator().next() instanceof String) ) return null;
+				Collection collection = ((Collection) o);
+				if(! collection.isEmpty()){
+					if(! ( collection.iterator().next() instanceof String) ) return null;
+				}
 			}
 		}
 

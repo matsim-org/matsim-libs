@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
@@ -10,9 +10,6 @@
   <name>locationchoice</name>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
@@ -27,18 +24,12 @@
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>otfvis</artifactId>
-            <version>13.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.matsim</groupId>
-            <artifactId>matsim-examples</artifactId>
-            <version>13.0-SNAPSHOT</version>
-            <scope>test</scope>
+            <version>14.0-SNAPSHOT</version>
         </dependency>
 	    <dependency>
 		    <groupId>org.matsim.contrib</groupId>
 		    <artifactId>analysis</artifactId>
-		    <version>13.0-SNAPSHOT</version>
+		    <version>14.0-SNAPSHOT</version>
 		    <scope>test</scope>
 	    </dependency>
     </dependencies>

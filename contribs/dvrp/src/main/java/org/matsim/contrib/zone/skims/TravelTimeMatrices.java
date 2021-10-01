@@ -18,8 +18,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import ch.sbb.matsim.routing.graph.Graph;
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.LeastCostPathTree;
 
 /**
  * Based on NetworkSkimMatrices from sbb-matsim-extensions
@@ -30,7 +30,7 @@ public final class TravelTimeMatrices {
 
 	public static Matrix calculateTravelTimeMatrix(Network routingNetwork, Map<Zone, Node> centralNodes,
 			double departureTime, TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
-		Graph graph = new Graph(routingNetwork);
+		SpeedyGraph graph = new SpeedyGraph(routingNetwork);
 		ExecutorServiceWithResource<LeastCostPathTree> executorService = new ExecutorServiceWithResource<>(
 				IntStream.range(0, numberOfThreads)
 						.mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility))

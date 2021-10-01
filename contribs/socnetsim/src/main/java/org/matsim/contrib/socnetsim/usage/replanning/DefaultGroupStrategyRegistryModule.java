@@ -37,7 +37,7 @@ import java.util.Map;
  * @author thibautd
  */
 public class DefaultGroupStrategyRegistryModule extends AbstractModule {
-	private static Logger log = Logger.getLogger( DefaultGroupStrategyRegistryModule.class );
+	private static final  Logger log = Logger.getLogger( DefaultGroupStrategyRegistryModule.class );
 
 	@Override
     public void install() {

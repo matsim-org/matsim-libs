@@ -43,10 +43,11 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import ch.sbb.matsim.routing.graph.Graph;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author michalm
@@ -64,7 +65,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 	public MultiInsertionDetourPathCalculator(Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
-		Graph graph = new Graph(network);
+		SpeedyGraph graph = new SpeedyGraph(network);
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
 
@@ -73,6 +74,16 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
 		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+	}
+
+	@VisibleForTesting
+	MultiInsertionDetourPathCalculator(OneToManyPathSearch toPickupPathSearch, OneToManyPathSearch fromPickupPathSearch,
+			OneToManyPathSearch toDropoffPathSearch, OneToManyPathSearch fromDropoffPathSearch, int numberOfThreads) {
+		this.toPickupPathSearch = toPickupPathSearch;
+		this.fromPickupPathSearch = fromPickupPathSearch;
+		this.toDropoffPathSearch = toDropoffPathSearch;
+		this.fromDropoffPathSearch = fromDropoffPathSearch;
+		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
 	@Override

@@ -22,7 +22,7 @@ package org.matsim.contrib.edrt.schedule;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.ev.dvrp.ETask;
+import org.matsim.contrib.evrp.ETask;
 
 /**
  * @author michalm

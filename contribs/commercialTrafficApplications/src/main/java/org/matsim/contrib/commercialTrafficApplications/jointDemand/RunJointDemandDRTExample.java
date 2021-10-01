@@ -23,10 +23,13 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
 
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -45,13 +48,40 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
-class RunJointDemandDRTExample {
-    public static void main(String[] args) {
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
-        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml");
+class RunJointDemandDRTExample {
+
+    private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
+    private static final Logger log = Logger.getLogger(RunJointDemandDRTExample.class);
+
+    public static void main(String[] args) throws IOException {
+        final URL configUrl;
+        if (args.length > 0) {
+            log.info("Starting simulation run with the following arguments:");
+            configUrl = new URL(args[0]);
+            log.info("config URL: " + configUrl);
+        } else {
+            File localConfigFile = new File(EXAMPLE_CONFIG);
+            if (localConfigFile.exists()) {
+                log.info("Starting simulation run with the local example config file");
+                configUrl = localConfigFile.toURI().toURL();
+            } else {
+                log.info("Starting simulation run with the example config file from GitHub repository");
+                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/commercialTrafficApplications/"
+                        + EXAMPLE_CONFIG);
+            }
+        }
+        new RunJointDemandDRTExample().run(configUrl);
+    }
+
+    public void run(URL configURL){
+        Config config = loadConfig(configURL);
         prepareConfig(config);
-		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
-				config.plansCalcRoute());
+        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
+                config.plansCalcRoute());
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
         ScenarioUtils.loadScenario(scenario);
@@ -60,9 +90,7 @@ class RunJointDemandDRTExample {
         //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
 
         Controler controler = new Controler(scenario);
-
-        controler.addOverridingModule(
-                new JointDemandModule() );
+        controler.addOverridingModule(new JointDemandModule());
 
         controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
         controler.run();
@@ -92,7 +120,6 @@ class RunJointDemandDRTExample {
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
         config.planCalcScore().addActivityParams(work);
-        config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
         config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandUsingDRTExample");
         config.controler()
@@ -115,12 +142,13 @@ class RunJointDemandDRTExample {
         drtCfg.setStopDuration(60);
         drtCfg.setVehiclesFile("jointDemand_vehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);
+        drtCfg.addDrtInsertionSearchParams(new ExtensiveInsertionSearchParams() {});
 
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setCarriersFile("jointDemand_carriers_drt.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
     }
 }

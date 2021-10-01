@@ -151,7 +151,7 @@ public class CreateAutomatedFDTest {
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
-	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 
 	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
@@ -320,13 +320,13 @@ public class CreateAutomatedFDTest {
 		}
 	}
 	
-	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
+	class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
-		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
-		private static final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
-		private static final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
-		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
-		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+		private final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
+		private final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
+		private final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
+		private final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
 
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;

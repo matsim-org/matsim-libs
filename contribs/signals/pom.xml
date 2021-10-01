@@ -2,29 +2,32 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
   <artifactId>signals</artifactId>
-  <name>signals</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <name>signals</name>  
+  <repositories>
+    <repository>
+      <id>topobyte</id>
+      <url>https://mvn.topobyte.de</url>
+    </repository>
+    <repository>
+      <id>slimjars</id>
+      <url>https://mvn.slimjars.com</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.matsim</groupId>
       <artifactId>matsim-examples</artifactId>
-      <version>13.0-SNAPSHOT</version>
+      <version>14.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
       <artifactId>otfvis</artifactId>
-      <version>13.0-SNAPSHOT</version>
+      <version>14.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -33,5 +36,15 @@
  		<version>3.15.0</version>
  		<scope>test</scope>
  	</dependency>
+    <dependency>
+      <groupId>de.topobyte</groupId>
+      <artifactId>osm4j-pbf</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>de.topobyte</groupId>
+      <artifactId>osm4j-xml</artifactId>
+      <version>1.2.0</version>
+    </dependency>
   </dependencies>
 </project>

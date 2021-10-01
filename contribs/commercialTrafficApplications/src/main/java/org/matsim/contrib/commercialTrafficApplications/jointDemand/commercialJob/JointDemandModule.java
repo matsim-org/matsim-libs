@@ -53,9 +53,9 @@ public class JointDemandModule extends AbstractModule {
 
         bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
+        bind(CommercialJobGenerator.class).to(DefaultCommercialJobGenerator.class).in(Singleton.class);
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-//        addControlerListenerBinding().to(ScoreCommercialJobs.class);
 
         //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {

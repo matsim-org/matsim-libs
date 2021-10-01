@@ -268,6 +268,7 @@ public final class EmissionUtils {
 
 				break;
 			case fromVehicleTypeDescription:
+				// (v1 but hbefa vehicle description is in vehicle type description (Amit's version))
 
 				if ( VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() ) != null ) {
 					// information has already been moved to correct location

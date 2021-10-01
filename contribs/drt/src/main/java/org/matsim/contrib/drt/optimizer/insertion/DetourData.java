@@ -25,6 +25,7 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * Contains detour data for all potential insertions (i.e. pickup and dropoff indices)
@@ -38,6 +39,17 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
  * On the other hand, detour data (D) could itself provide time-dependent information.
  */
 public class DetourData<D> {
+	static DetourData<Double> create(DetourTimeEstimator detourTimeEstimator, DrtRequest drtRequest) {
+		//TODO add departure/arrival times to improve estimation
+		Function<Link, Double> timesToPickup = link -> detourTimeEstimator.estimateTime(link, drtRequest.getFromLink());
+		Function<Link, Double> timesFromPickup = link -> detourTimeEstimator.estimateTime(drtRequest.getFromLink(),
+				link);
+		Function<Link, Double> timesToDropoff = link -> detourTimeEstimator.estimateTime(link, drtRequest.getToLink());
+		Function<Link, Double> timesFromDropoff = link -> detourTimeEstimator.estimateTime(drtRequest.getToLink(),
+				link);
+		return new DetourData<>(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff, 0.);
+	}
+
 	private final Function<Link, D> detourToPickup;
 	private final Function<Link, D> detourFromPickup;
 	private final Function<Link, D> detourToDropoff;

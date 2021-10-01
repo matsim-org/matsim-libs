@@ -20,20 +20,22 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
+import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.fare.TaxiFareHandler;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 
 /**
  * @author michalm
@@ -53,7 +55,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		install(new DvrpModeRoutingNetworkModule(getMode(), taxiCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new DvrpModeRoutingModule(getMode(), new FastAStarLandmarksFactory(getConfig().global())));
+		install(new DvrpModeRoutingModule(getMode(), new SpeedyALTFactory()));
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
@@ -61,11 +63,10 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		taxiCfg.getTaxiFareParams()
 				.ifPresent(params -> addEventHandlerBinding().toInstance(new TaxiFareHandler(getMode(), params)));
 
-		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
-				.mode(getMode())
-				.objectClass(Fleet.class)
-				.listenerCreator(getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
-						getter.get(IterationCounter.class)))
-				.build());
+		bindModal(TaxiStatsDumper.class).toProvider(ModalProviders.createProvider(getMode(),
+				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
+						getter.get(IterationCounter.class), getter.getModal(ExecutedScheduleCollector.class),
+						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+		addControlerListenerBinding().to(modalKey(TaxiStatsDumper.class));
 	}
 }

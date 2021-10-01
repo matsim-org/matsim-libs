@@ -58,7 +58,7 @@ class Realm {
     // queue of sorted events by time
     private EventArray sorted_events;
     // MATSim event manager.
-    private final ParallelEventsManager eventsManager;
+    private final EventsManager eventsManager;
     // Current timestamp
     private int secs;
     Logger log = Logger.getLogger(Realm.class);
@@ -73,7 +73,7 @@ class Realm {
         this.route_stops_by_route_no = scenario.route_stops_by_route_no;
         this.line_of_route = scenario.line_of_route;
         this.sorted_events = new EventArray();
-        this.eventsManager = (ParallelEventsManager)eventsManager;
+        this.eventsManager = eventsManager;
 
 	// the last position is to store events that will not happen...
         for (int i = 0; i <= HermesConfigGroup.SIM_STEPS + 1; i++) {

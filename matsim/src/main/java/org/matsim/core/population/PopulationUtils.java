@@ -447,58 +447,6 @@ public final class PopulationUtils {
 		map.putAll(treeMap);
 	}
 
-	/**
-	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
-	 */
-	@Deprecated // was renamed
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
-		return decideOnActivityEndTime( act, now, config ).seconds() ;
-	}
-
-	/**
-	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
-	 */
-	public static OptionalTime decideOnActivityEndTime( Activity act, double now, Config config ) {
-		return decideOnActivityEndTime(act,now, config.plans().getActivityDurationInterpretation());
-	}
-
-	public static OptionalTime decideOnActivityEndTime( Activity act, double now,
-			PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation ) {
-
-		switch (activityDurationInterpretation) {
-			case endTimeOnly:
-				return act.getEndTime();
-
-			case tryEndTimeThenDuration:
-				if (act.getEndTime().isDefined()) {
-					return act.getEndTime();
-				} else if (act.getMaximumDuration().isDefined()) {
-					return OptionalTime.defined(now + act.getMaximumDuration().seconds());
-				} else {
-					return OptionalTime.undefined();
-				}
-
-			case minOfDurationAndEndTime:
-				if (act.getEndTime().isUndefined() && act.getMaximumDuration().isUndefined()) {
-					return OptionalTime.undefined();
-				} else if (act.getMaximumDuration().isUndefined()) {
-					return act.getEndTime();
-				} else if (act.getEndTime().isUndefined()) {
-					double durationBasedEndTime = now + act.getMaximumDuration().seconds();
-					return OptionalTime.defined(durationBasedEndTime);
-				} else {
-					double durationBasedEndTime = now + act.getMaximumDuration().seconds();
-					return act.getEndTime().seconds() <= durationBasedEndTime ?
-							act.getEndTime() :
-							OptionalTime.defined(durationBasedEndTime);
-				}
-
-			default:
-				throw new IllegalArgumentException(
-						"Unsupported 'activityDurationInterpretation' enum type: " + activityDurationInterpretation);
-		}
-	}
-
 	private static int missingFacilityCnt = 0 ;
 
 	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
@@ -1135,9 +1083,7 @@ public final class PopulationUtils {
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
 		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
-	public static OptionalTime decideOnTravelTimeForLeg( Leg leg ) {
-		return leg.getRoute() != null ? leg.getRoute().getTravelTime().or(leg::getTravelTime) : leg.getTravelTime();
-	}
+
 	public static void sampleDown( Population pop, double sample ) {
 		final Random rnd = MatsimRandom.getLocalInstance();;
 		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;

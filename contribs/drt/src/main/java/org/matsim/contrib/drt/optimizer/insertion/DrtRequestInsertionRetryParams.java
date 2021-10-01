@@ -58,8 +58,9 @@ public class DrtRequestInsertionRetryParams extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(RETRY_INTERVAL)
-	public void setRetryInterval(int retryInterval) {
+	public DrtRequestInsertionRetryParams setRetryInterval(int retryInterval) {
 		this.retryInterval = retryInterval;
+		return this;
 	}
 
 	@StringGetter(MAX_REQUEST_AGE)
@@ -68,8 +69,9 @@ public class DrtRequestInsertionRetryParams extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(MAX_REQUEST_AGE)
-	public void setMaxRequestAge(double maxRequestAge) {
+	public DrtRequestInsertionRetryParams setMaxRequestAge(double maxRequestAge) {
 		this.maxRequestAge = maxRequestAge;
+		return this;
 	}
 
 	@Override

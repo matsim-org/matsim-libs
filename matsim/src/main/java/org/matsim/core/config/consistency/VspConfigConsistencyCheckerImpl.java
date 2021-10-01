@@ -24,9 +24,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
@@ -37,6 +40,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.pt.PtConstants;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,7 +48,7 @@ import java.util.Set;
  *
  */
 public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
-	private static Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class) ;
+	private static final  Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class);
 	
 	public VspConfigConsistencyCheckerImpl() {
 		// empty.  only here to find out where it is called.
@@ -85,24 +89,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		
 		// === controler:
-		
-		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
-		if ( !formats.contains(EventsFileFormat.xml) ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
-		}
 
-		switch ( config.controler().getRoutingAlgorithmType() ) {
-			case Dijkstra:
-			case AStarLandmarks:
-			case FastDijkstra:
-				log.log( lvl, "you are not using FastAStarLandmarks as routing algorithm.  vsp default is to use FastAStarLandmarks.") ;
-				System.out.flush();
-				break;
-			case FastAStarLandmarks:
-				break;
-		}
+		problem = checkControlerConfigGroup( config, lvl, problem );
 
 		// === location choice:
 		
@@ -191,7 +179,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( config.planCalcScore().getMarginalUtlOfWaiting_utils_hr() != 0. ) {
 			problem = true ;
 			System.out.flush() ;
-			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
+			log.log(lvl, "found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
 		
 		// added oct'17:
@@ -203,6 +191,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "<module name=\"planCalcScore\">");
 			log.log( lvl, "	<param name=\"fractionOfIterationsToStartScoreMSA\" value=\"0.8\" />");
 			log.log( lvl, "</module>");
+		}
+
+		// added apr'21:
+		for( Map.Entry<String, PlanCalcScoreConfigGroup.ScoringParameterSet> entry : config.planCalcScore().getScoringParametersPerSubpopulation().entrySet() ){
+			for( ActivityParams activityParam : entry.getValue().getActivityParams() ){
+				if( activityParam.getMinimalDuration().isDefined() ){
+					log.log( lvl, "Vsp default is to not define minimal duration.  Activity type=" + activityParam.getActivityType() + "; subpopulation=" + entry.getKey() );
+				}
+			}
 		}
 
 		// === plans:
@@ -372,6 +369,28 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			throw new RuntimeException( str ) ;
 		}
 		
+	}
+	private static boolean checkControlerConfigGroup( Config config, Level lvl, boolean problem ){
+		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
+		if ( !formats.contains( EventsFileFormat.xml ) ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
+		}
+
+		// may'21
+		switch ( config.controler().getRoutingAlgorithmType() ) {
+			case Dijkstra:
+			case AStarLandmarks:
+			case FastDijkstra:
+			case FastAStarLandmarks:
+				log.log( lvl, "you are not using SpeedyALT as routing algorithm.  vsp default (since may'21) is to use SpeedeALT.") ;
+				System.out.flush();
+				break;
+			case SpeedyALT:
+				break;
+		}
+		return problem;
 	}
 
 }

@@ -42,14 +42,16 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
-import org.matsim.contrib.util.StraightLineKnnFinder;
+import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
@@ -98,10 +100,13 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility,
-			final double departureTime, final Person person) {
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
 
-		List<? extends PlanElement> basicRoute = delegate.calcRoute(fromFacility, toFacility, departureTime, person);
+		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
 		Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
@@ -146,8 +151,8 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					if (nexttoFacility.getLinkId().equals(lastFrom.getLinkId())) {
 						continue;
 					}
-					List<? extends PlanElement> routeSegment = delegate.calcRoute(lastFrom, nexttoFacility,
-							lastArrivaltime, person);
+					List<? extends PlanElement> routeSegment = delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, nexttoFacility,
+							lastArrivaltime, person, request.getAttributes()));
 					Leg lastLeg = (Leg)routeSegment.get(0);
 					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
@@ -160,7 +165,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
 				}
-				stagedRoute.addAll(delegate.calcRoute(lastFrom, toFacility, lastArrivaltime, person));
+				stagedRoute.addAll(delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, toFacility, lastArrivaltime, person, request.getAttributes())));
 
 				return stagedRoute;
 

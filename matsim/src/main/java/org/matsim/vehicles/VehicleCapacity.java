@@ -32,7 +32,7 @@ public final class VehicleCapacity implements Attributable {
 	// always seem to lead to awkward code.  If parallel computing pieces need immutable data structures, they first need to copy them from the in-memory
 	// data base.  kai, sep'19
 
-	private Integer seats = 1; // one seat for the driver
+	private Integer seats = 0;
 	private Integer standingRoom = 0 ;
 	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ;
 	private Double weightInTons = Double.POSITIVE_INFINITY ;

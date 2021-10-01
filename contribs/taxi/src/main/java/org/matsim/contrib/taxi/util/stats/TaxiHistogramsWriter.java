@@ -21,8 +21,9 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.List;
 
-import org.matsim.contrib.util.*;
-import org.matsim.contrib.util.histogram.*;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.common.histogram.*;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiHistogramsWriter {

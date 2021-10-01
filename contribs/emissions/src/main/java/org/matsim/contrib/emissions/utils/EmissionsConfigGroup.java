@@ -80,11 +80,11 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private boolean handleHighAverageSpeeds = false;
 	// yyyy should become an enum.  kai, jan'20
 
-	@Deprecated // See elsewhere in this class.  kai, oct'18
+//	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
-	@Deprecated // See elsewhere in this class.  kai, oct'18
+//	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
-	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
+//	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
 	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
 	// in the vehicles file.  kai, dec'19
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility

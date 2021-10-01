@@ -30,7 +30,7 @@ import javax.inject.Inject;
 
 class LegTimesControlerListener implements AfterMobsimListener {
 
-	private static Logger log = Logger.getLogger(LegTimesControlerListener.class);
+	private static final  Logger log = Logger.getLogger(LegTimesControlerListener.class);
 	
 	private CalcLegTimes legTimes;
 	

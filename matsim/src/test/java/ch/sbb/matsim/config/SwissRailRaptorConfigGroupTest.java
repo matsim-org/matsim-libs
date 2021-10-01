@@ -147,6 +147,7 @@ public class SwissRailRaptorConfigGroupTest {
             paramset1.setMaxRadius(2000);
             paramset1.setInitialSearchRadius(1500);
             paramset1.setSearchExtensionRadius(1000);
+            paramset1.setShareTripSearchRadius(0.01);
             paramset1.setPersonFilterAttribute(null);
             paramset1.setStopFilterAttribute("bikeAndRail");
             paramset1.setStopFilterValue("true");
@@ -179,6 +180,7 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertEquals(2000, paramSet1.getMaxRadius(), 0.0);
         Assert.assertEquals(1500, paramSet1.getInitialSearchRadius(), 0.0);
         Assert.assertEquals(1000, paramSet1.getSearchExtensionRadius(), 0.0);
+        Assert.assertEquals(0.01, paramSet1.getShareTripSearchRadius(), 0.0);
         Assert.assertNull(paramSet1.getPersonFilterAttribute());
         Assert.assertNull(paramSet1.getPersonFilterValue());
         Assert.assertNull(paramSet1.getLinkIdAttribute());
@@ -190,6 +192,7 @@ public class SwissRailRaptorConfigGroupTest {
         Assert.assertEquals(5000, paramSet2.getMaxRadius(), 0.0);
         Assert.assertEquals(3000, paramSet2.getInitialSearchRadius(), 0.0);
         Assert.assertEquals(2000, paramSet2.getSearchExtensionRadius(), 0.0);
+        Assert.assertEquals(Double.POSITIVE_INFINITY, paramSet2.getShareTripSearchRadius(), 0.0);
         Assert.assertEquals("sff_user", paramSet2.getPersonFilterAttribute());
         Assert.assertEquals("true", paramSet2.getPersonFilterValue());
         Assert.assertEquals("linkId_sff", paramSet2.getLinkIdAttribute());

@@ -12,8 +12,7 @@ import java.util.*;
 
 public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 
-	private static Logger log = Logger.getLogger(CarrierPlanXmlReaderV2WithDtdTest.class);
-	Carrier testCarrier;
+	private Carrier testCarrier;
 	
 	@Override
 	public void setUp() throws Exception{

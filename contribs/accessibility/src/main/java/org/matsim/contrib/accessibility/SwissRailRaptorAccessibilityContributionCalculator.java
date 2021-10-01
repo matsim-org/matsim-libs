@@ -31,6 +31,7 @@ import org.matsim.facilities.*;
 import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,15 +67,11 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
 			this.raptorData = SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
 
-		DefaultRaptorParametersForPerson parametersForPerson = new DefaultRaptorParametersForPerson(scenario.getConfig());
-		DefaultRaptorStopFinder defaultRaptorStopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-		LeastCostRaptorRouteSelector routeSelector = new LeastCostRaptorRouteSelector();
-
-		this.raptor = new SwissRailRaptor(raptorData, parametersForPerson, routeSelector, defaultRaptorStopFinder, new DefaultRaptorInVehicleCostCalculator());
+		this.raptor = new SwissRailRaptor.Builder(raptorData, scenario.getConfig()).build();
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.scenario = scenario;
 
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		this.betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 
 		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
@@ -143,7 +140,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
         double expSum = 0.;
 
-        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null);
+        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null, new Attributes());
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
             //compute direct walk costs

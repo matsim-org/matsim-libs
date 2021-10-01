@@ -45,6 +45,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -105,7 +106,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),
-					new DefaultAgentFactory( qSim ),
+					new DefaultAgentFactory( qSim, qSim.getChildInjector().getInstance(TimeInterpretation.class) ),
 					qSim );
 
 		boolean gotException = false;
@@ -186,7 +187,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),
-					new DefaultAgentFactory( qSim ),
+					new DefaultAgentFactory( qSim, qSim.getChildInjector().getInstance(TimeInterpretation.class) ),
 					qSim );
 
 		boolean gotException = false;

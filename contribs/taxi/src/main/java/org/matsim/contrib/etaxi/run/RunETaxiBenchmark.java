@@ -23,25 +23,27 @@ import java.net.URL;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
-import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
-import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
-import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
+import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
+import org.matsim.contrib.evrp.OperatingVehicleProvider;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
+import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
@@ -51,8 +53,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.common.collect.ImmutableSet;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -83,18 +84,15 @@ public class RunETaxiBenchmark {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
+		DvrpBenchmarks.adjustConfig(config);
 
-		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
-		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		DvrpBenchmarks.initController(controler);
 
 		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
-		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
-		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeETaxiModule());
-		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule());
-
 		controler.addOverridingModule(new EvModule());
 
 		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
@@ -120,11 +118,27 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
-				.mode(mode)
-				.objectClass(Fleet.class)
-				.listenerCreator(getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
-				.build());
+		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(TaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+								getter.getModal(ExecutedScheduleCollector.class),
+								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+			}
+		});
+
+		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(ETaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+								getter.get(ChargingEventSequenceCollector.class),
+								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(ETaxiBenchmarkStats.class));
+			}
+		});
 
 		return controler;
 	}

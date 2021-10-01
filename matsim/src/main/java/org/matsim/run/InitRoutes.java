@@ -44,6 +44,8 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 /**
  * Assigns for each leg of each plan of each person an initial (freespeed) route.
@@ -143,6 +145,7 @@ public class InitRoutes {
 				@Override
 				public void install() {
 				install(new ScenarioByInstanceModule(scenario));
+				install(new TimeInterpretationModule());
 				addTravelTimeBinding("car").toInstance(timeCostCalc);
 				addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 					@Override
@@ -154,7 +157,7 @@ public class InitRoutes {
 			}));
 			}
 		});
-		reader.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null));
+		reader.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null, injector.getInstance(TimeInterpretation.class)));
 		reader.addAlgorithm(plansWriter);
 		reader.readFile(this.config.plans().getInputFile());
 		PopulationUtils.printPlansCount(reader) ;

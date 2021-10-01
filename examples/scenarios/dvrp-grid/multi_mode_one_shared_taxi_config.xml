@@ -18,6 +18,11 @@
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_A.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+			<parameterset type="drtfare" >
+				<param name="basefare" value="1.0" />
+				<param name="dailySubscriptionFee" value="5.0" />
+				<param name="distanceFare_m" value="0.001" />
+			</parameterset>
 		</parameterset>
 
 		<parameterset type="drt">
@@ -30,6 +35,11 @@
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_B.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+			<parameterset type="drtfare" >
+				<param name="basefare" value="2.0" />
+				<param name="dailySubscriptionFee" value="0.0" />
+				<param name="distanceFare_m" value="0.001" />
+			</parameterset>
 		</parameterset>
 
 		<parameterset type="drt">
@@ -42,6 +52,11 @@
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_C.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+			<parameterset type="drtfare" >
+				<param name="basefare" value="0.0" />
+				<param name="dailySubscriptionFee" value="10.0" />
+				<param name="distanceFare_m" value="0.002" />
+			</parameterset>
 		</parameterset>
 	</module>
 

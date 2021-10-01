@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
@@ -51,18 +52,20 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     private SteppableScheduler scheduler;
     private int numberOfAgents = 0;
     private AgentCounter agentCounter;
+    private final TimeInterpretation timeInterpretation;
 
-    public JDEQSimEngine(JDEQSimConfigGroup config, Scenario scenario, EventsManager eventsManager, AgentCounter agentCounter, SteppableScheduler scheduler) {
+    public JDEQSimEngine(JDEQSimConfigGroup config, Scenario scenario, EventsManager eventsManager, AgentCounter agentCounter, SteppableScheduler scheduler, TimeInterpretation timeInterpretation) {
         this.config = config;
         this.scheduler = scheduler;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
         this.agentCounter = agentCounter;
+        this.timeInterpretation = timeInterpretation;
     }
 
     @Override
     public void onPrepareSim() {
-        new JDEQSimulation(config, scenario, eventsManager); // Initialize JDEQSim static fields
+        new JDEQSimulation(config, scenario, eventsManager, timeInterpretation); // Initialize JDEQSim static fields
         t = new Timer();
         t.startTimer();
 
@@ -81,7 +84,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     public boolean handleActivity(MobsimAgent agent) {
         // We expect all the agents to appear here at the beginning of the simulation (starting their
         // overnight activity.) That's when we enter them into JDEQSim and never let them out.
-        new Vehicle(scheduler, ((HasPerson) agent).getPerson(), scenario.getConfig().plans().getActivityDurationInterpretation());
+        new Vehicle(scheduler, ((HasPerson) agent).getPerson(), timeInterpretation);
         numberOfAgents++;
         return true;
     }

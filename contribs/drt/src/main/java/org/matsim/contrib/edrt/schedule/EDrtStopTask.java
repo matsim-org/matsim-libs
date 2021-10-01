@@ -21,7 +21,7 @@ package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.ev.dvrp.ETask;
+import org.matsim.contrib.evrp.ETask;
 
 /**
  * @author michalm

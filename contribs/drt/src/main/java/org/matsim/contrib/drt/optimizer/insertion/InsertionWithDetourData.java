@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 
@@ -50,7 +50,7 @@ public class InsertionWithDetourData<D> {
 		return insertion;
 	}
 
-	public VehicleData.Entry getVehicleEntry() {
+	public VehicleEntry getVehicleEntry() {
 		return insertion.vehicleEntry;
 	}
 

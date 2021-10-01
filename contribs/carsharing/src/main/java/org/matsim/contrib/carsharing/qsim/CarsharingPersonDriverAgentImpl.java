@@ -25,6 +25,7 @@ import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -46,10 +47,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private final Scenario scenario;
 	private final Plan originalPlan;
 	private int carsharingTrips = 0;
-	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, CarsharingManagerInterface carsharingManager) {
+	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, CarsharingManagerInterface carsharingManager, TimeInterpretation timeInterpretation) {
 		this.scenario = simulation.getScenario() ;
 		this.carsharingManager = carsharingManager;
-		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
+		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation ) ;
 		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate, TransitConfigGroup.BoardingAcceptance.checkLineAndStop) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
 		this.originalPlan = this.scenario.getPopulation().getPersons().get(this.basicAgentDelegate.getId()).getSelectedPlan();

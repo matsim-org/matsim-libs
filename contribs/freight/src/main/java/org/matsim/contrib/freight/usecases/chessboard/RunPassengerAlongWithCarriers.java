@@ -91,7 +91,7 @@ final class RunPassengerAlongWithCarriers {
 			prepareConfig() ;
 		}
 		scenario = ScenarioUtils.loadScenario( config ) ;
-		FreightUtils.getOrCreateCarriers( scenario );
+		FreightUtils.addOrGetCarriers( scenario );
 		return scenario ;
 	}
 
@@ -111,7 +111,7 @@ final class RunPassengerAlongWithCarriers {
 		controler.addControlerListener((IterationEndsListener) event -> {
 			//write plans
 			String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
-			new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+			new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 
 			//write stats
 			freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

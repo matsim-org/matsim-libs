@@ -68,7 +68,7 @@ import com.google.inject.name.Names;
 public class DefaultPassengerEngineTest {
 	private final PassengerEngineTestFixture fixture = new PassengerEngineTestFixture();
 
-	private static final Id<DvrpVehicle> VEHICLE_ID = Id.create("taxi1", DvrpVehicle.class);
+	private final Id<DvrpVehicle> VEHICLE_ID = Id.create("taxi1", DvrpVehicle.class);
 	private final DvrpVehicle oneTaxi = new DvrpVehicleImpl(ImmutableDvrpVehicleSpecification.newBuilder()
 			.id(VEHICLE_ID)
 			.serviceBeginTime(0)
@@ -98,16 +98,16 @@ public class DefaultPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
-				new ActivityEndEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, PERSON_ID, VEHICLE_ID, 0,
+				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID, 0,
 						scheduledDropoffTime),
-				new PersonEntersVehicleEvent(pickupStartTime, PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
-				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, PERSON_ID, VEHICLE_ID),
-				new PassengerDroppedOffEvent(dropoffEndTime, MODE, requestId, PERSON_ID, VEHICLE_ID),
-				new PersonLeavesVehicleEvent(dropoffEndTime, PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
-				new PersonArrivalEvent(dropoffEndTime, PERSON_ID, fixture.linkBA.getId(), MODE),
-				new ActivityStartEvent(dropoffEndTime, PERSON_ID, fixture.linkBA.getId(), null, END_ACTIVITY));
+				new PersonEntersVehicleEvent(pickupStartTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
+				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID),
+				new PassengerDroppedOffEvent(dropoffEndTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID),
+				new PersonLeavesVehicleEvent(dropoffEndTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
+				new PersonArrivalEvent(dropoffEndTime, fixture.PERSON_ID, fixture.linkBA.getId(), MODE),
+				new ActivityStartEvent(dropoffEndTime, fixture.PERSON_ID, fixture.linkBA.getId(), null, END_ACTIVITY));
 	}
 
 	@Test
@@ -119,10 +119,10 @@ public class DefaultPassengerEngineTest {
 		createQSim(requestValidator, OneTaxiOptimizer.class).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, PERSON_ID, "invalid"),
-				new PersonStuckEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE));
+		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "invalid"),
+				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	@Test
@@ -134,10 +134,10 @@ public class DefaultPassengerEngineTest {
 		createQSim(requestValidator, RejectingOneTaxiOptimizer.class).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, PERSON_ID, "rejecting_all_requests"),
-				new PersonStuckEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE));
+		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "rejecting_all_requests"),
+				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	private static class RejectingOneTaxiOptimizer implements VrpOptimizer {

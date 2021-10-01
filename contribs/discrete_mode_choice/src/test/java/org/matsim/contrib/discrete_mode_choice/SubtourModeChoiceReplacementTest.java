@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanBuilder;
@@ -37,15 +38,16 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourFilter;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class SubtourModeChoiceReplacementTest {
 	@Test
@@ -319,9 +321,10 @@ public class SubtourModeChoiceReplacementTest {
 
 	private Set<List<String>> computeDMC(PlanBuilder planBuilder, List<String> modes, List<String> constrainedModes,
 			boolean considerCarAvailability, boolean allowSingleLegs, int samples) throws NoFeasibleChoiceException {
-		TimeInterpreter.Factory timeInterpreterFactory = new EndTimeThenDurationInterpreter.Factory(0.0, true);
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(
+				ActivityDurationInterpretation.tryEndTimeThenDuration, TripDurationHandling.shiftActivityEndTimes);
 
-		TourEstimator estimator = new UniformTourEstimator(timeInterpreterFactory);
+		TourEstimator estimator = new UniformTourEstimator(timeInterpretation);
 		ModeAvailability modeAvailability = considerCarAvailability ? new CarModeAvailability(modes)
 				: new DefaultModeAvailability(modes);
 		TourFinder tourFinder = new PlanTourFinder();
@@ -343,7 +346,7 @@ public class SubtourModeChoiceReplacementTest {
 		TourFilter tourFilter = new CompositeTourFilter(Collections.emptySet());
 
 		DiscreteModeChoiceModel model = new TourBasedModel(estimator, modeAvailability, constraintFactory, tourFinder,
-				tourFilter, selectorFactory, modeChainGeneratorFactory, fallbackBehaviour, timeInterpreterFactory);
+				tourFilter, selectorFactory, modeChainGeneratorFactory, fallbackBehaviour, timeInterpretation);
 
 		Plan plan = planBuilder.buildPlan();
 		List<DiscreteModeChoiceTrip> trips = planBuilder.buildDiscreteModeChoiceTrips();
@@ -363,8 +366,8 @@ public class SubtourModeChoiceReplacementTest {
 			boolean considerCarAvailability, boolean allowSingleLegs, int samples) {
 		double singleLegProbability = allowSingleLegs ? 0.5 : 0.0;
 
-		String[] availableModes = modes.toArray(new String[]{});
-		String[] chainBasedModes = constrainedModes.toArray(new String[]{});
+		String[] availableModes = modes.toArray(new String[] {});
+		String[] chainBasedModes = constrainedModes.toArray(new String[] {});
 		Config config = ConfigUtils.createConfig();
 		config.subtourModeChoice().setModes(availableModes);
 		config.subtourModeChoice().setConsiderCarAvailability(considerCarAvailability);

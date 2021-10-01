@@ -8,6 +8,6 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 public interface CompanyAgent {
 
 	CSVehicle vehicleRequest(Id<Person> personId, Link locationLink, Link destinationLink, String carsharingType,
-			String carType);
+			String carType, double searchDistance);
 
 }

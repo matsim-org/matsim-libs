@@ -46,7 +46,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class QueryAgentEvents extends AbstractQuery implements BasicEventHandler {
 
-	private static Logger logger = Logger.getLogger(QueryAgentEvents.class);
+	private static final  Logger logger = Logger.getLogger(QueryAgentEvents.class);
 
 	public static class Result implements OTFQueryResult {
 

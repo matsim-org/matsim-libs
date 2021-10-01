@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -38,18 +38,21 @@ public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultith
 	private final boolean allowNullRoutes;
 	private final Set<String> stageActs;
 	private final VehicleRessources vehicleRessources;
+	private final TimeInterpretation timeInterpretation;
 
 	public OptimizeVehicleAllocationAtTourLevelModule(
 			final int nThreads,
 			final Set<String> stageActivitiesForSubtourDetection,
 			final VehicleRessources vehicleRessources,
 			final Collection<String> modes,
-			final boolean allowNullRoutes) {
+			final boolean allowNullRoutes,
+			final TimeInterpretation timeInterpretation) {
 		super( nThreads );
 		this.vehicularModes = modes;
 		this.allowNullRoutes = allowNullRoutes;
 		this.stageActs = stageActivitiesForSubtourDetection;
 		this.vehicleRessources = vehicleRessources;
+		this.timeInterpretation = timeInterpretation;
 	}	
 
 	@Override
@@ -59,7 +62,8 @@ public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultith
 			MatsimRandom.getLocalInstance(),
 			vehicleRessources,
 			vehicularModes,
-			allowNullRoutes);
+			allowNullRoutes,
+			timeInterpretation);
 	}
 }
 

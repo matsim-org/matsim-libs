@@ -21,20 +21,20 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.util.CSVLineBuilder;
-import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
+public class TaxiStatsDumper implements ShutdownListener, AfterMobsimListener {
 	private static final String[] HEADER = { "iter", null, //
 			"PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
 			"EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
@@ -46,13 +46,17 @@ public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupLis
 	private final IterationCounter iterationCounter;
 	private final CompactCSVWriter multiDayWriter;
 
-	private Fleet fleet;
+	private final ExecutedScheduleCollector executedScheduleCollector;
+	private final TaxiEventSequenceCollector taxiEventSequenceCollector;
 
 	public TaxiStatsDumper(TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO,
-			IterationCounter iterationCounter) {
+			IterationCounter iterationCounter, ExecutedScheduleCollector executedScheduleCollector,
+			TaxiEventSequenceCollector taxiEventSequenceCollector) {
 		this.taxiCfg = taxiCfg;
 		this.controlerIO = controlerIO;
 		this.iterationCounter = iterationCounter;
+		this.executedScheduleCollector = executedScheduleCollector;
+		this.taxiEventSequenceCollector = taxiEventSequenceCollector;
 
 		multiDayWriter = new CompactCSVWriter(IOUtils.getBufferedWriter(
 				controlerIO.getOutputFilename("taxi_daily_stats_" + taxiCfg.getMode() + ".txt")));
@@ -60,13 +64,9 @@ public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupLis
 	}
 
 	@Override
-	public void objectCreated(Fleet fleet) {
-		this.fleet = fleet;
-	}
-
-	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		TaxiStatsCalculator calculator = new TaxiStatsCalculator(executedScheduleCollector.getExecutedSchedules(),
+				taxiEventSequenceCollector.getRequestSequences().values());
 
 		appendToMultiDayStats(calculator.getDailyStats(), iterationCounter.getIterationNumber());
 		if (taxiCfg.getDetailedStats()) {

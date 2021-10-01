@@ -70,7 +70,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 			fail("missing exception.");
 		}
 		catch (Exception e) {
-			log.info("catched expected exception.", e);
+			log.info("caught expected exception.", e);
 		}
 	}
 

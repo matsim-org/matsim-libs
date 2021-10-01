@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,9 +31,13 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
@@ -49,6 +51,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
+	private final TimeInterpretation timeInterpretation;
 
 	/**
 	 * Initialises an instance.
@@ -59,17 +62,19 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 */
 	public PlanRouter(
 			final TripRouter tripRouter,
-			final ActivityFacilities facilities) {
+			final ActivityFacilities facilities,
+			final TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.facilities = facilities;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	/**
 	 * Short for initialising without facilities.
 	 */
 	public PlanRouter(
-			final TripRouter routingHandler) {
-		this( routingHandler , null );
+			final TripRouter routingHandler, final TimeInterpretation timeInterpretation) {
+		this( routingHandler , null, timeInterpretation );
 	}
 
 	/**
@@ -86,23 +91,30 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		final List<Trip> trips = TripStructureUtils.getTrips( plan );
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
-			log.debug( "about to call TripRouter with routingMode=" + routingMode ) ;
-			final List<? extends PlanElement> newTrip =
-					tripRouter.calcRoute(
-							routingMode,
-						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
-						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
-							plan.getPerson() );
+			timeTracker.addActivity(oldTrip.getOriginActivity());
+			
+			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute( //
+					routingMode, //
+					FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities), //
+					FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities), //
+					timeTracker.getTime().seconds(), //
+					plan.getPerson(), //
+					oldTrip.getTripAttributes() //
+			);
+			
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
 					plan, 
 					oldTrip.getOriginActivity(),
 					newTrip,
 					oldTrip.getDestinationActivity());
+			
+			timeTracker.addElements(newTrip);
 		}
 	}
 
@@ -144,31 +156,6 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			run( plan );
 		}
-	}
-
-	public static double calcEndOfActivity(
-			final Activity activity,
-			final Plan plan,
-			final Config config ) {
-		// yyyy similar method in PopulationUtils.  TripRouter.calcEndOfPlanElement in fact uses it.  However, this seems doubly inefficient; calling the
-		// method in PopulationUtils directly would probably be faster.  kai, jul'19
-
-		if (activity.getEndTime().isDefined())
-			return activity.getEndTime().seconds();
-
-		// no sufficient information in the activity...
-		// do it the long way.
-		// XXX This is inefficient! Using a cache for each plan may be an option
-		// (knowing that plan elements are iterated in proper sequence,
-		// no need to re-examine the parts of the plan already known)
-		double now = 0;
-
-		for (PlanElement pe : plan.getPlanElements()) {
-			now = TripRouter.calcEndOfPlanElement(now, pe, config);
-			if (pe == activity) return now;
-		}
-
-		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
 	}
 
 }

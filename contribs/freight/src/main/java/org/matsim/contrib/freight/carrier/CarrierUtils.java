@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CarrierUtils{
 
-	private static Logger log = Logger.getLogger(CarrierUtils.class);
+	private static final  Logger log = Logger.getLogger(CarrierUtils.class);
 
 	public static Carrier createCarrier( Id<Carrier> id ){
 		return new CarrierImpl(id);
@@ -26,8 +26,9 @@ public class CarrierUtils{
 	}
 
 	public static CarrierVehicle getCarrierVehicle(Carrier carrier, Id<Vehicle> vehicleId){
-		if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-			return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+		CarrierVehicle veh = carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+		if(veh != null){
+			return veh;
 		}
 		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing in Carrier: " + carrier.getId()));
 		return null;
@@ -43,10 +44,11 @@ public class CarrierUtils{
 	}
 
 	public static CarrierService getService(Carrier carrier, Id<CarrierService> serviceId){
-		if(carrier.getServices().containsKey(serviceId)){
-			return carrier.getServices().get(serviceId);
+		CarrierService service = carrier.getServices().get(serviceId);
+		if(service != null){
+			return service;
 		}
-		log.error("Service with Id does not exists", new IllegalStateException("Serice with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Service with Id does not exists", new IllegalStateException("Service with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 
@@ -60,17 +62,18 @@ public class CarrierUtils{
 	}
 
 	public static CarrierShipment getShipment(Carrier carrier, Id<CarrierShipment> serviceId){
-		if(carrier.getShipments().containsKey(serviceId)){
-			return carrier.getShipments().get(serviceId);
+		CarrierShipment shipment = carrier.getShipments().get(serviceId);
+		if(shipment != null){
+			return shipment;
 		}
-		log.error("Shipment with Id does not exists", new IllegalStateException("Serice with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Shipment with Id does not exists", new IllegalStateException("Shipment with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 	
 	
 
 	public static CarrierPlan copyPlan( CarrierPlan plan2copy ) {
-		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
+		List<ScheduledTour> tours = new ArrayList<>();
 		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
 			double depTime = sTour.getDeparture();
 			CarrierVehicle vehicle = sTour.getVehicle();

@@ -32,11 +32,14 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates the number of people waiting at a transit stop facility as
@@ -46,11 +49,11 @@ import org.matsim.pt.PtConstants;
  */
 public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	private final Map<Id, Id> vehicleFacilityMap = new HashMap<Id, Id>();
-	private ConcurrentHashMap<Id, Double> passengerWaitingSince = new ConcurrentHashMap<Id, Double>();
-	private ConcurrentHashMap<Id, StopData> stopData = new ConcurrentHashMap<Id, StopData>();
+	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehicleFacilityMap = new HashMap<>();
+	private final ConcurrentHashMap<Id<Person>, Double> passengerWaitingSince = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Id<TransitStopFacility>, StopData> stopData = new ConcurrentHashMap<>();
 
-	public int getStopFacilityLoad(final Id stopFacilityId, final double time) {
+	public int getStopFacilityLoad(final Id<TransitStopFacility> stopFacilityId, final double time) {
 		StopData sData = getStopData(stopFacilityId, false);
 		if (sData == null) {
 			return 0;
@@ -58,7 +61,7 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 		return sData.getWaitingCount(time);
 	}
 
-	public Map<Double, Integer> getStopFacilityLoad(final Id stopFacilityId) {
+	public Map<Double, Integer> getStopFacilityLoad(final Id<TransitStopFacility> stopFacilityId) {
 		StopData sData = getStopData(stopFacilityId, false);
 		if (sData == null) {
 			return null;
@@ -75,10 +78,10 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
-		Id stopId = this.vehicleFacilityMap.get(event.getVehicleId());
+		Id<TransitStopFacility> stopId = this.vehicleFacilityMap.get(event.getVehicleId());
 		Double waitStartTime = this.passengerWaitingSince.get(event.getPersonId());
 		StopData sData = getStopData(stopId, true);
-		sData.addWaitingChange(waitStartTime.doubleValue(), +1);
+		sData.addWaitingChange(waitStartTime, +1);
 		sData.addWaitingChange(event.getTime(), -1);
 	}
 
@@ -98,7 +101,7 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 		this.passengerWaitingSince.clear();
 	}
 
-	private StopData getStopData(final Id stopId, final boolean createIfMissing) {
+	private StopData getStopData(final Id<TransitStopFacility> stopId, final boolean createIfMissing) {
 		StopData sData = this.stopData.get(stopId);
 		if (sData == null && createIfMissing) {
 			StopData newData = new StopData();
@@ -111,19 +114,14 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 	}
 
 	private static class StopData {
-		private final SortedMap<Double, Integer> nOfPassengersDeltaByTime = new TreeMap<Double, Integer>(); // Time, nOfDeltaPassengers
+		private final SortedMap<Double, Integer> nOfPassengersDeltaByTime = new TreeMap<>(); // Time, nOfDeltaPassengers
 		private volatile TreeMap<Double, Integer> nOfPassengersByTime = null;
 
 		public StopData() {
 		}
 
 		public void addWaitingChange(final double time, final int delta) {
-			Integer i = this.nOfPassengersDeltaByTime.get(time);
-			if (i == null) {
-				this.nOfPassengersDeltaByTime.put(time, delta);
-			} else {
-				this.nOfPassengersDeltaByTime.put(time, i.intValue() + delta);
-			}
+			this.nOfPassengersDeltaByTime.merge(time, delta, Integer::sum);
 			this.nOfPassengersByTime = null;
 		}
 
@@ -137,14 +135,14 @@ public class TransitStopLoadByTime implements ActivityEndEventHandler, PersonEnt
 			if (floor == null) {
 				return 0;
 			}
-			return floor.getValue().intValue();
+			return floor.getValue();
 		}
 
 		private NavigableMap<Double, Integer> calculateWaitingLoad() {
-			TreeMap<Double, Integer> map = new TreeMap<Double, Integer>();
+			TreeMap<Double, Integer> map = new TreeMap<>();
 			int count = 0;
 			for (Map.Entry<Double, Integer> e : this.nOfPassengersDeltaByTime.entrySet()) {
-				count += e.getValue().intValue();
+				count += e.getValue();
 				map.put(e.getKey(), count);
 			}
 			this.nOfPassengersByTime = map;

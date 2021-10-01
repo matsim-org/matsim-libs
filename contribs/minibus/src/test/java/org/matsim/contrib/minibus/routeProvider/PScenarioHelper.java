@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
-import org.matsim.contrib.minibus.operator.*;
+import org.matsim.contrib.minibus.hook.*;
 import org.matsim.contrib.minibus.replanning.CreateNewPlan;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.schedule.CreatePStops;
@@ -62,11 +62,11 @@ import org.matsim.vehicles.Vehicle;
  */
 public class PScenarioHelper {
 	
-	public static Operator createTestCooperative(String testOutPutDir){
+	public static Operator createTestCooperative( String testOutPutDir ){
 		Scenario sC = PScenarioHelper.createTestNetwork();
 		
 		PConfigGroup pC = new PConfigGroup();
-		Operator coop = new BasicOperator(Id.create(pC.getPIdentifier() + 1, Operator.class), pC, new PFranchise(pC.getUseFranchise(), pC.getGridSize()));
+		Operator coop = new BasicOperator(Id.create(pC.getPIdentifier() + 1, Operator.class ), pC, new PFranchise(pC.getUseFranchise(), pC.getGridSize()));
 		TransitSchedule sched = CreatePStops.createPStops(sC.getNetwork(), pC);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sched, null);
 		
@@ -419,7 +419,7 @@ class Route2111to2333 implements PStrategy{
 	}
 
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run( Operator cooperative ) {
 		Id<PPlan> routeId = Id.create(cooperative.getCurrentIteration(), PPlan.class);
 		
 		PPlan newPlan = new PPlan(routeId, this.getStrategyName(), PConstants.founderPlanId);

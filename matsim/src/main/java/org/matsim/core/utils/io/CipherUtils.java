@@ -37,7 +37,7 @@ import java.util.Arrays;
  */
 public class CipherUtils {
 
-    public static String ENVIRONMENT_VARIABLE = "MATSIM_DECRYPTION_PASSWORD";
+    public static final  String ENVIRONMENT_VARIABLE = "MATSIM_DECRYPTION_PASSWORD";
 
     private CipherUtils() {
     }

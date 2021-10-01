@@ -51,6 +51,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -107,12 +109,13 @@ public class MultiModalTripRouterTest {
 						install(new TripRouterModule());
 						install(new TravelTimeCalculatorModule());
 						install(new TravelDisutilityModule());
+						install(new TimeInterpretationModule());
 						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
 					}
 				}), multiModalModule));
 
 		TripRouter tripRouter = injector.getInstance(TripRouter.class);
-		PlanRouter planRouter = new PlanRouter(tripRouter);
+		PlanRouter planRouter = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));
 		
 		/*
 		 * Create travel time object

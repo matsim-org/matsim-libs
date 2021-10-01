@@ -6,6 +6,17 @@ import ch.sbb.matsim.routing.pt.raptor.RaptorRoute;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorCore.TravelInfo;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,14 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiPredicate;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Calculates zone-to-zone matrices containing a number of performance indicators related to public transport.
@@ -58,6 +61,7 @@ public class PTSkimMatrices {
         // prepare calculation
         Set<T> zoneIds = coordsPerZone.keySet();
         PtIndicators<T> pti = new PtIndicators<>(zoneIds);
+        Config config = ConfigUtils.createConfig();
 
         // do calculation
         ConcurrentLinkedQueue<T> originZones = new ConcurrentLinkedQueue<>(zoneIds);
@@ -65,7 +69,7 @@ public class PTSkimMatrices {
         Counter counter = new Counter("PT-FrequencyMatrix-" + Time.writeTime(minDepartureTime) + "-" + Time.writeTime(maxDepartureTime) + " zone ", " / " + coordsPerZone.size());
         Thread[] threads = new Thread[numberOfThreads];
         for (int i = 0; i < numberOfThreads; i++) {
-            SwissRailRaptor raptor = new SwissRailRaptor(raptorData, null, null, null, null);
+            SwissRailRaptor raptor = new SwissRailRaptor.Builder(raptorData, config).build();
             RowWorker<T> worker = new RowWorker<>(originZones, zoneIds, coordsPerZone, pti, raptor, parameters, minDepartureTime, maxDepartureTime, stepSize_seconds, counter, trainDetector);
             threads[i] = new Thread(worker, "PT-FrequencyMatrix-" + Time.writeTime(minDepartureTime) + "-" + Time.writeTime(maxDepartureTime) + "-" + i);
             threads[i].start();
@@ -96,6 +100,7 @@ public class PTSkimMatrices {
                 } else {
                     float avgFactor = 1.0f / count;
                     float adaptionTime = pti.adaptionTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
+                    pti.distanceMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.travelTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.accessTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.egressTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);

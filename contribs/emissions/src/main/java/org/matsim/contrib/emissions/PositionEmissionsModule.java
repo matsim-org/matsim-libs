@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -27,6 +28,7 @@ import org.matsim.vis.snapshotwriters.PositionEvent;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class PositionEmissionsModule extends AbstractModule {
 
@@ -43,8 +45,8 @@ public class PositionEmissionsModule extends AbstractModule {
         if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
             throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
         }
-        if (!config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue)) {
-            throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue");
+        if (!(config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue) || config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.kinematicWaves))) {
+            throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue or == kinematicWaves");
         }
     }
 
@@ -162,6 +164,9 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getState().equals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR))
                 return; // only calculate emissions for cars
 
+            if (!vehiclesInTraffic.containsKey(event.getVehicleId()))
+                return; // only collect positions if vehicle has entered traffic (if vehicle is wait2link its position is calculated but it hasn't entered traffic yet.
+
             if (trajectories.containsKey(event.getVehicleId())) {
                 computeWarmEmissionEvent(event);
 
@@ -185,7 +190,6 @@ public class PositionEmissionsModule extends AbstractModule {
                     startEngineTime, parkingDurations.get(vehicle.getId()), 1);
 
             var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
-            log.info("Cold emission event with number " + emisPosEv.getNumber());
             eventsManager.processEvent(emisPosEv);
         }
 
@@ -198,7 +202,6 @@ public class PositionEmissionsModule extends AbstractModule {
                 var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                         event.getTime(), parkingDurations.get(vehicle.getId()), 2);
                 var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
-                log.info("Cold emission event with number " + emisPosEv.getNumber());
                 eventsManager.processEvent(emisPosEv);
 
                 // this makes sure that this is only computed once
@@ -239,21 +242,30 @@ public class PositionEmissionsModule extends AbstractModule {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                     var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
                     eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
+
+                } else {
+                    log.warn("speed was too fast: " + speed + "m/s Current time: " + event.getTime() + " prev time: " + previousPosition.getTime() + " current linkId: " + event.getLinkId() + " prev linkId: " + previousPosition.getLinkId() + " agentId: " + event.getPersonId());
                 }
+            } else {
+                // if the vehicle hasn't moved, issue an event with 0 emissions. This way there is an event for every timestep
+                // we want that for the palm integration. The more appropriate fix would be to not issue an event here
+                // but generate the 0 emission positions in the necdf module in the palm project but this is much easier
+                // and will do for now
+                // janek july'21
+                var emissions = emissionCalculator.emissionModule.getWarmPollutants().stream()
+                        .collect(Collectors.toMap(key -> key, key -> 0.0));
+                eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
             }
         }
     }
 
     public static class PositionEmissionEvent extends Event {
 
-        public static final String EVENT_TYPE = "emissionPosition";
-
-        private static final AtomicInteger eventCounter = new AtomicInteger(); // this should be removed at some point
+        public static final String EVENT_TYPE = "positionEmission";
 
         private final PositionEvent position;
         private final Map<Pollutant, Double> emissions;
         private final String emissionType;
-        private final int id;
 
         public Map<Pollutant, Double> getEmissions() {
             return emissions;
@@ -264,16 +276,22 @@ public class PositionEmissionsModule extends AbstractModule {
             this.position = positionEvent;
             this.emissions = emissions;
             this.emissionType = emissionType;
-            id = eventCounter.incrementAndGet();
         }
 
         public Id<Link> getLinkId() {
             return position.getLinkId();
         }
 
+        public Id<Vehicle> getVehicleId() { return position.getVehicleId(); }
+
+        public Id<Person> getPersonId() { return position.getPersonId(); }
+
         public String getEmissionType() {
             return emissionType;
         }
+
+        public Coord getCoord() { return position.getCoord(); }
+
 
         @Override
         public Map<String, String> getAttributes() {
@@ -281,21 +299,17 @@ public class PositionEmissionsModule extends AbstractModule {
             // call super second, so that the event type get overridden
             var attr = position.getAttributes();
             attr.putAll(super.getAttributes());
+            attr.put("emissionType", emissionType);
 
             for (var pollutant : emissions.entrySet()) {
                 attr.put(pollutant.getKey().toString(), pollutant.getValue().toString());
             }
-            attr.put("#", Integer.toString(id));
             return attr;
         }
 
         @Override
         public String getEventType() {
             return EVENT_TYPE;
-        }
-
-        int getNumber() {
-            return id;
         }
     }
 }

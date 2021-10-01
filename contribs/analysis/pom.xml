@@ -3,24 +3,17 @@
     <parent>
         <groupId>org.matsim</groupId>
         <artifactId>contrib</artifactId>
-        <version>13.0-SNAPSHOT</version>
+        <version>14.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim.contrib</groupId>
     <artifactId>analysis</artifactId>
     <name>analysis</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>roadpricing</artifactId>
-            <version>13.0-SNAPSHOT</version>
+            <version>14.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgeo</groupId>
@@ -35,7 +28,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
         </dependency>
     </dependencies>
 </project>

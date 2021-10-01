@@ -59,17 +59,17 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class Fixture {
 
-	static final Id<Link> linkId1 = Id.create(1, Link.class);
-	static final Id<Link> linkId2 = Id.create(2, Link.class);
-	static final Id<Node> nodeId2 = Id.create(2, Node.class);
-	static final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
-	static final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
-	static final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
+	final Id<Link> linkId1 = Id.create(1, Link.class);
+	final Id<Link> linkId2 = Id.create(2, Link.class);
+	final Id<Node> nodeId2 = Id.create(2, Node.class);
+	final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
+	final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
+	final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
 	
 	// only available if 'TwoSignals'-Method is used
-	static final Id<SignalGroup> signalGroupId200 = Id.create(200, SignalGroup.class);
-	static final Id<Link> linkId6 = Id.create(6, Link.class);
-	static final Id<Node> nodeId6 = Id.create(6, Node.class);
+	final Id<SignalGroup> signalGroupId200 = Id.create(200, SignalGroup.class);
+	final Id<Link> linkId6 = Id.create(6, Link.class);
+	final Id<Node> nodeId6 = Id.create(6, Node.class);
 	
 
 	public Scenario createAndLoadTestScenarioOneSignal(Boolean useIntergreens){

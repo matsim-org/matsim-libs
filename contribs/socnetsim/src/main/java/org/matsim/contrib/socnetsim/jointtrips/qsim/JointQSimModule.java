@@ -12,6 +12,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -47,9 +48,9 @@ public class JointQSimModule extends AbstractQSimModule {
 	@Provides
 	@Singleton
 	PassengerUnboardingAgentFactory providePassengerUnboardingAgentFactory(Config config, QSim qsim,
-			QNetsimEngineI netsimEngine) {
+			QNetsimEngineI netsimEngine, TimeInterpretation timeInterpretation) {
 		return new PassengerUnboardingAgentFactory(
-				config.transit().isUseTransit() ? new TransitAgentFactory(qsim) : new DefaultAgentFactory(qsim),
+				config.transit().isUseTransit() ? new TransitAgentFactory(qsim, timeInterpretation) : new DefaultAgentFactory(qsim, timeInterpretation),
 				new NetsimWrappingQVehicleProvider(netsimEngine));
 	}
 	

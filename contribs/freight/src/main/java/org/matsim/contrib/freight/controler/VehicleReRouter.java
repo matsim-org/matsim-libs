@@ -105,7 +105,7 @@ class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
         
-        Boolean addDefaultCostCalculators = true;
+        boolean addDefaultCostCalculators = true;
          
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 

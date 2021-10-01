@@ -34,11 +34,11 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
-import org.matsim.contrib.ev.dvrp.ChargingActivity;
-import org.matsim.contrib.ev.dvrp.ChargingTask;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
-import org.matsim.contrib.ev.dvrp.tracker.OfflineETaskTracker;
-import org.matsim.contrib.ev.dvrp.tracker.OnlineEDriveTaskTracker;
+import org.matsim.contrib.evrp.ChargingActivity;
+import org.matsim.contrib.evrp.ChargingTask;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
+import org.matsim.contrib.evrp.tracker.OfflineETaskTracker;
+import org.matsim.contrib.evrp.tracker.OnlineEDriveTaskTracker;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**

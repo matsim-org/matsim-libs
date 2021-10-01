@@ -42,7 +42,9 @@ public final class NoiseComputationModule extends AbstractModule {
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
 		this.bind(NoiseContext.class).to(NoiseContextImpl.class).in( Singleton.class );
+		this.bind(BarrierContext.class).in(Singleton.class);
 		this.bind(ShieldingContext.class).in(Singleton.class);
+		this.bind(ReflectionContext.class).in(Singleton.class);
 
 		switch (noiseParameters.getNoiseComputationMethod()) {
 			case RLS90:
@@ -64,6 +66,7 @@ public final class NoiseComputationModule extends AbstractModule {
 				}
 				this.bind(RoadSurfaceContext.class).in(Singleton.class);
 				this.bind(IntersectionContext.class).in(Singleton.class);
+				this.bind(DEMContext.class).to(DEMContextImpl.class).in(Singleton.class);
 
 				break;
 			default:

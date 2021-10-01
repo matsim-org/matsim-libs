@@ -350,7 +350,8 @@ public class ModalDistanceAndCountsCadytsIT {
 			assertEquals(400, modalDistanceCount.get("bike_2050.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
 		} else if (this.modalDistanceWeight == 0 && this.countsWeight > 0) {
-			assertTrue(modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count corretion but there isn't
+			assertTrue("expected more than 500 car trips on the long route but the number of trips was " + modalDistanceCount.get("car_2250.0"),
+					modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count correction but there isn't
 		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
 			/* This assumes that counts have a higher impact than distance distributions 
 			 * (because counts request 1000 on car_2250 and the distance distribution requests 100 on car_2050 and car_2150 but 0 on car_2250).

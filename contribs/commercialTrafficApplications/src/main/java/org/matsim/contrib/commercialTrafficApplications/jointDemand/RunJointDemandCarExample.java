@@ -17,14 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
- * created by jbischoff, 03.05.2019
- */
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
+import org.matsim.contrib.ev.example.RunEvExample;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
@@ -35,14 +35,40 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
-import static org.matsim.core.config.ConfigUtils.createConfig;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 class RunJointDemandCarExample {
-    public static void main(String[] args) {
 
-        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml");
+    private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
+    private static final Logger log = Logger.getLogger(RunJointDemandCarExample.class);
+
+    public static void main(String[] args) throws IOException {
+        final URL configUrl;
+        if (args.length > 0) {
+            log.info("Starting simulation run with the following arguments:");
+            configUrl = new URL(args[0]);
+            log.info("config URL: " + configUrl);
+        } else {
+            File localConfigFile = new File(EXAMPLE_CONFIG);
+            if (localConfigFile.exists()) {
+                log.info("Starting simulation run with the local example config file");
+                configUrl = localConfigFile.toURI().toURL();
+            } else {
+                log.info("Starting simulation run with the example config file from GitHub repository");
+                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/commercialTrafficApplications/"
+                        + EXAMPLE_CONFIG);
+            }
+        }
+        new RunJointDemandCarExample().run(configUrl);
+    }
+
+    public void run(URL configUrl){
+        Config config = loadConfig(configUrl);
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
@@ -83,7 +109,6 @@ class RunJointDemandCarExample {
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
         config.planCalcScore().addActivityParams(work);
-        config.controler().setLastIteration(100);
         config.controler().setWriteEventsInterval(5);
         config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarExample");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

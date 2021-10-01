@@ -19,35 +19,8 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.run.gui;
+package org.matsim.run.gui;
 
-import org.matsim.core.utils.io.IOUtils;
-
-import javax.swing.AbstractAction;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.PlainView;
-import javax.swing.text.Segment;
-import javax.swing.text.StyledEditorKit;
-import javax.swing.text.Utilities;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -64,10 +37,38 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.PlainView;
+import javax.swing.text.Segment;
+import javax.swing.text.StyledEditorKit;
+import javax.swing.text.Utilities;
+import javax.swing.text.ViewFactory;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
+import org.matsim.core.utils.io.IOUtils;
+
 /**
  * @author mrieser
  */
-public class ConfigEditor extends JFrame {
+class ConfigEditor extends JDialog {
 
 	private static final boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
 
@@ -76,7 +77,8 @@ public class ConfigEditor extends JFrame {
 	private JTextPane xmlPane;
 	private ConfigChangeListener configChangeListener;
 
-	public ConfigEditor(File configFile, ConfigChangeListener configChangeListener) {
+	ConfigEditor(JFrame parent, File configFile, ConfigChangeListener configChangeListener) {
+		super(parent);
 		setTitle("Config Editor");
 		this.configChangeListener = configChangeListener;
 		this.configFile = configFile;
@@ -90,26 +92,22 @@ public class ConfigEditor extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(this.btnSave)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnSaveAs)
-					.addContainerGap(471, Short.MAX_VALUE))
-				.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 661, Short.MAX_VALUE)
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addContainerGap()
 						.addComponent(this.btnSave)
-						.addComponent(btnSaveAs))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE))
-		);
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnSaveAs)
+						.addContainerGap(471, Short.MAX_VALUE))
+				.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 661, Short.MAX_VALUE));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(this.btnSave)
+								.addComponent(btnSaveAs))
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)));
 
 		this.xmlPane = new JTextPane();
 		this.xmlPane.setContentType("text/xml");
@@ -146,16 +144,16 @@ public class ConfigEditor extends JFrame {
 		});
 	}
 
-	public void showEditor() {
+	void showEditor() {
 		setVisible(true);
 		this.xmlPane.requestFocus();
 	}
 
-	public void closeEditor() {
+	void closeEditor() {
 		setVisible(false);
 	}
 
-	public void saveAs() {
+	private void saveAs() {
 		SaveFileSaver chooser = new SaveFileSaver();
 		chooser.setSelectedFile(this.configFile);
 		int saveResult = chooser.showSaveDialog(null);
@@ -165,7 +163,7 @@ public class ConfigEditor extends JFrame {
 		}
 	}
 
-	public void save() {
+	private void save() {
 		String fullXml = this.xmlPane.getText();
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(this.configFile.getAbsolutePath())) {
 			writer.write(fullXml);
@@ -210,8 +208,12 @@ public class ConfigEditor extends JFrame {
 		});
 
 		// Create keyboard accelerators for undo/redo actions (Ctrl+Z/Ctrl+Y)
-		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), UNDO_ACTION);
-		textPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), REDO_ACTION);
+		textPane.getInputMap()
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+						IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), UNDO_ACTION);
+		textPane.getInputMap()
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
+						IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), REDO_ACTION);
 
 		return undoManager;
 	}
@@ -224,7 +226,9 @@ public class ConfigEditor extends JFrame {
 				save();
 			}
 		});
-		this.xmlPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), SAVE_ACTION);
+		this.xmlPane.getInputMap()
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+						IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), SAVE_ACTION);
 	}
 
 	private void addCloseFunctionality() {
@@ -235,7 +239,9 @@ public class ConfigEditor extends JFrame {
 				ConfigEditor.this.setVisible(false);
 			}
 		});
-		this.xmlPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_W, IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), CLOSE_ACTION);
+		this.xmlPane.getInputMap()
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+						IS_MAC ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK), CLOSE_ACTION);
 	}
 
 	private void loadConfig() {
@@ -253,23 +259,24 @@ public class ConfigEditor extends JFrame {
 		this.xmlPane.setCaretPosition(0);
 	}
 
-	public interface ConfigChangeListener {
+	interface ConfigChangeListener {
 		void configChanged(File newConfigFile);
 	}
 
-	/** XmlEditorKit based on https://boplicity.nl/knowledgebase/Java/Xml+syntax+highlighting+in+Swing+JTextPane.html
-	 *
+	/**
+	 * XmlEditorKit based on https://boplicity.nl/knowledgebase/Java/Xml+syntax+highlighting+in+Swing+JTextPane.html
+	 * <p>
 	 * Copyright 2006-2008 Kees de Kooter
 	 * Licensed under the Apache License, Version 2.0
 	 */
 
-	public static class XmlEditorKit extends StyledEditorKit {
+	private static class XmlEditorKit extends StyledEditorKit {
 
 		private static final long serialVersionUID = 2969169649596107757L;
 		private ViewFactory xmlViewFactory;
 
 		public XmlEditorKit() {
-			xmlViewFactory = new XmlViewFactory();
+			xmlViewFactory = XmlView::new;
 		}
 
 		@Override
@@ -283,30 +290,17 @@ public class ConfigEditor extends JFrame {
 		}
 	}
 
-	public static class XmlViewFactory implements ViewFactory {
-
-		/**
-		 * @see javax.swing.text.ViewFactory#create(javax.swing.text.Element)
-		 */
-		public View create(Element element) {
-
-			return new XmlView(element);
-		}
-
-	}
-
 	/**
 	 * Thanks: http://groups.google.com/group/de.comp.lang.java/msg/2bbeb016abad270
-	 *
+	 * <p>
 	 * IMPORTANT NOTE: regex should contain 1 group.
-	 *
+	 * <p>
 	 * Using PlainView here because we don't want line wrapping to occur.
 	 *
 	 * @author kees
 	 * date 13-jan-2006
-	 *
 	 */
-	public static class XmlView extends PlainView {
+	private static class XmlView extends PlainView {
 
 		private static HashMap<Pattern, Color> patternColors;
 		private static String TAG_PATTERN = "(</?[a-z\\-]*)\\s?>?";
@@ -322,14 +316,10 @@ public class ConfigEditor extends JFrame {
 			patternColors = new HashMap<>();
 			patternColors.put(Pattern.compile(TAG_CDATA_START), new Color(128, 128, 128));
 			patternColors.put(Pattern.compile(TAG_CDATA_END), new Color(128, 128, 128));
-			patternColors
-					.put(Pattern.compile(TAG_PATTERN), new Color(63, 127, 127));
-			patternColors.put(Pattern.compile(TAG_ATTRIBUTE_PATTERN), new Color(
-					127, 0, 127));
-			patternColors.put(Pattern.compile(TAG_END_PATTERN), new Color(63, 127,
-					127));
-			patternColors.put(Pattern.compile(TAG_ATTRIBUTE_VALUE), new Color(42,
-					0, 255));
+			patternColors.put(Pattern.compile(TAG_PATTERN), new Color(63, 127, 127));
+			patternColors.put(Pattern.compile(TAG_ATTRIBUTE_PATTERN), new Color(127, 0, 127));
+			patternColors.put(Pattern.compile(TAG_END_PATTERN), new Color(63, 127, 127));
+			patternColors.put(Pattern.compile(TAG_ATTRIBUTE_VALUE), new Color(42, 0, 255));
 			patternColors.put(Pattern.compile(TAG_COMMENT), new Color(63, 95, 191));
 		}
 
@@ -342,8 +332,7 @@ public class ConfigEditor extends JFrame {
 		}
 
 		@Override
-		protected int drawUnselectedText(Graphics graphics, int x, int y, int p0,
-																		 int p1) throws BadLocationException {
+		protected int drawUnselectedText(Graphics graphics, int x, int y, int p0, int p1) throws BadLocationException {
 
 			Document doc = getDocument();
 			String text = doc.getText(p0, p1 - p0);

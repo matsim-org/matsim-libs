@@ -56,7 +56,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author thibautd
  */
 public class InsertionRemovalIterativeActionTest {
-	private static int N_COUPLES = 100;
+	private final static int N_COUPLES = 100;
 	private Config config;
 	private TripRouter tripRouter;
 	private Random random;

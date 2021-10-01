@@ -17,10 +17,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.gbl.Gbl;
@@ -67,7 +64,7 @@ class CarrierAgent
 		private int activityCounter = 0;
 
 		private CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
-			log.warn("creating CarrierDriverAgent with driverId=" + driverId );
+			log.debug("creating CarrierDriverAgent with driverId=" + driverId );
 			this.driverId = driverId;
 			this.scheduledTour = tour;
 		}
@@ -146,7 +143,7 @@ class CarrierAgent
 
 			notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
 
-			log.warn("handling activity end event=" + event );
+			log.debug("handling activity end event=" + event );
 			if(FreightConstants.START.equals( event.getActType() ) ) {
 				activityCounter += 1;
 				return;
@@ -267,7 +264,9 @@ class CarrierAgent
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
 					Route route = tourLeg.getRoute();
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
-					Leg leg = PopulationUtils.createLeg(TransportMode.car);
+					//this returns TransportMode.car if the attribute is null
+					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
+					//TODO we might need to set the route to null if the the mode is a drt mode
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());

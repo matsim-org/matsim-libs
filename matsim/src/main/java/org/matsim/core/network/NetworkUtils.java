@@ -20,15 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,6 +38,7 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -440,7 +435,7 @@ public final class NetworkUtils {
         }
 
         if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
-            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
+            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?][node = " + nearestNode.getId() + "]" ) ;
         }
 
         // now find nearest link from the nearest node
@@ -614,9 +609,17 @@ public final class NetworkUtils {
 	}
 
 
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link ) {
 		return link.getLength() / link.getFreespeed() ;
 	}
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link, double time ) {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
@@ -647,7 +650,8 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
 //		}
-		return (String) link.getAttributes().getAttribute(ORIGID);
+		Object o = link.getAttributes().getAttribute(ORIGID);
+		return o == null ? null : o.toString();
 	}
 
 	public static void setOrigId( Link link, String id ) {
@@ -833,6 +837,22 @@ public final class NetworkUtils {
 		return network;
 	}
 
+	/**
+	 * reads network form file and applies a coordinate transformation.
+	 * @param filename network file name
+	 * @param transformation coordinate transformation as from @{{@link org.matsim.core.utils.geometry.transformations.TransformationFactory#getCoordinateTransformation(String, String)}}
+	 * @return network from file transformed onto target CRS
+	 */
+	public static Network readNetwork(String filename, CoordinateTransformation transformation) {
+		var network = readNetwork(filename);
+		network.getNodes().values().parallelStream()
+				.forEach(node -> {
+					var transformedCoord = transformation.transform(node.getCoord());
+					node.setCoord(transformedCoord);
+				});
+		return network;
+	}
+
 	public static boolean compare(Network expected, Network actual) {
 
 		// check that all element from expected result are in tested network
@@ -869,7 +889,7 @@ public final class NetworkUtils {
 
 		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
 				&& expected.getCapacity() == actual.getCapacity()
-				&& expected.getFlowCapacityPerSec() == actual.getFlowCapacityPerSec()
+				&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
 				&& expected.getFreespeed() == actual.getFreespeed()
 				&& expected.getLength() == actual.getLength()
 				&& expected.getNumberOfLanes() == actual.getNumberOfLanes();
@@ -887,6 +907,28 @@ public final class NetworkUtils {
 	 */
 	public static Coord findNearestPointOnLink(Coord coord, Link link) {
 		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+	}
 
+	public static final String ORIG_GEOM = "origgeom";
+	public static List<Node> getOriginalGeometry(Link link) {
+
+		// use a list since order is important
+		List<Node> result = new ArrayList<>();
+		result.add(link.getFromNode());
+		var attr = (String)link.getAttributes().getAttribute(ORIG_GEOM);
+
+		if (!StringUtils.isBlank(attr)) {
+			var data = attr.split(" ");
+			for (String date : data) {
+				var values = date.split(",");
+				if (values.length != 3) throw new RuntimeException("expected three values per node but found: " + date);
+				var coord = new Coord(Double.parseDouble(values[1]), Double.parseDouble(values[2]));
+				var node = new NodeImpl(Id.createNodeId(values[0]), coord);
+				result.add(node);
+			}
+		}
+
+		result.add(link.getToNode());
+		return result;
 	}
 }
