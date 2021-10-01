@@ -63,7 +63,7 @@ public class CostCalculationStrategyTest {
 	}
 
 	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
-                                                      double vehicleSlackTime, InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+			double vehicleSlackTime, InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
@@ -103,7 +103,7 @@ public class CostCalculationStrategyTest {
 	}
 
 	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
-                                                          double vehicleSlackTime, InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+			double vehicleSlackTime, InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
