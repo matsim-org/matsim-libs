@@ -12,7 +12,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.Detour
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class InsertionDetourTimeCalculator<D> {
+public final class InsertionDetourTimeCalculator<D> {
 	private final double stopDuration;
 	private final ToDoubleFunction<D> detourTime;
 
