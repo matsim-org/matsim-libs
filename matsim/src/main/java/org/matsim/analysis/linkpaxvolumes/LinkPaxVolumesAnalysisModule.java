@@ -1,11 +1,10 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtConstants.java
+ * LinkPaxVolumesAnalysisModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,29 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.pt;
+package org.matsim.analysis.linkpaxvolumes;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import com.google.inject.Singleton;
+import org.matsim.core.controler.AbstractModule;
 
-/**
- * An abstract class containing some constants used for public transportation.
- * 
- * @author mrieser
- */
-public abstract class PtConstants implements MatsimParameters {
 
-	/**
-	 * Type of an activity that somehow interacts with pt, e.g. to connect a walk leg
-	 * to a pt leg, or to connect two pt legs together where agents have to change lines.
-	 * 
-	 * @see Activity#setType(String)
-	 */
-	public final static String TRANSIT_ACTIVITY_TYPE = PlanCalcScoreConfigGroup.createStageActivityType(TransportMode.pt);
-	
-	// this is currently used for wait2link events where the mode is not clear (bus, rail...?!), theresa sep'2015
-	public final static String NETWORK_MODE = "pt unspecified";
-
+public final class LinkPaxVolumesAnalysisModule extends AbstractModule {
+    @Override
+    public void install() {
+        bind(LinkPaxVolumesControlerListener.class).in(Singleton.class);
+        addControlerListenerBinding().to(LinkPaxVolumesControlerListener.class);
+    }
 }
