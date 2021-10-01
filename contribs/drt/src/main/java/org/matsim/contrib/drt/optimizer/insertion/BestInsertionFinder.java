@@ -33,7 +33,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 /**
  * @author michalm
  */
-public final class BestInsertionFinder<D> {
+public class BestInsertionFinder<D> {
 	static class InsertionWithCost<D> {
 		final InsertionWithDetourData<D> insertionWithDetourData;
 		final double cost;
