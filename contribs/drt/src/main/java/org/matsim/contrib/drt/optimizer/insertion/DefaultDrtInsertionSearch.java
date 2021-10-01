@@ -47,7 +47,8 @@ public class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
 			CostCalculationStrategy costCalculationStrategy, DrtConfigGroup drtCfg, MobsimTimer timer) {
 		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null)));
+				new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime,
+						null)));
 	}
 
 	@VisibleForTesting
