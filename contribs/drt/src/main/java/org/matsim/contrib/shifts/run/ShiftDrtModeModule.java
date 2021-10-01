@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
@@ -20,7 +20,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFl
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
-import org.matsim.contrib.drt.router.StopNetworkFacilityFinder;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
@@ -113,7 +112,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				DrtStopNetwork stopNetwork = getter.getModal(DrtStopNetwork.class);
 				Network network = getter.get(Network.class);
 
-				return StopNetworkFacilityFinder.create(drtCfg.getMaxWalkDistance(), network, stopNetwork);
+				return AttributeBasedStopFinder.create(drtCfg.getMaxWalkDistance(), network, stopNetwork.getDrtStops().values());
 			})).asEagerSingleton();
         }
 
@@ -145,7 +144,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
             bindModal(DrtSpeedUp.class).toProvider(modalProvider(
                     getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controler(),
                             getter.get(Network.class), getter.getModal(FleetSpecification.class),
-                            getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
+                            getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
             addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
         });
 

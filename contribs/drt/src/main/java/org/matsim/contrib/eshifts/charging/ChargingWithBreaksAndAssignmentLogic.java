@@ -1,13 +1,25 @@
 package org.matsim.contrib.eshifts.charging;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.function.Function;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.charging.*;
+import org.matsim.contrib.ev.charging.ChargingEndEvent;
+import org.matsim.contrib.ev.charging.ChargingListener;
+import org.matsim.contrib.ev.charging.ChargingStartEvent;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.shifts.schedule.OperationalStop;
@@ -15,8 +27,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-import java.util.*;
-import java.util.function.Function;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author nkuehnel
@@ -105,13 +117,15 @@ public class ChargingWithBreaksAndAssignmentLogic implements ChargingWithAssignm
                 if (now >= currentTask.getEndTime() + evConfig.getChargeTimeStep() ||
 						chargingStrategy.isChargingCompleted(ev)) {
                     evIter.remove();
-                    eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+					eventsManager.processEvent(
+							new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
                     listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
                 }
             } else {
                 if (chargingStrategy.isChargingCompleted(ev)) {
                     evIter.remove();
-                    eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+					eventsManager.processEvent(
+							new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
                     listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
                 }
             }
@@ -143,7 +157,8 @@ public class ChargingWithBreaksAndAssignmentLogic implements ChargingWithAssignm
     @Override
     public void removeVehicle(ElectricVehicle ev, double now) {
         if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
-            eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+			eventsManager.processEvent(
+					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
             listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
             if (!queuedVehicles.isEmpty()) {
@@ -165,7 +180,8 @@ public class ChargingWithBreaksAndAssignmentLogic implements ChargingWithAssignm
         if (pluggedVehicles.put(ev.getId(), ev) != null) {
             throw new IllegalArgumentException();
         }
-        eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType()));
+		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType(),
+				ev.getBattery().getSoc()));
         listeners.get(ev.getId()).notifyChargingStarted(ev, now);
     }
 

@@ -37,13 +37,13 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public class InsertionCostCalculatorImpl<D> implements InsertionCostCalculator<D> {
+public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
 
 	private final DoubleSupplier timeOfDay;
 	private final CostCalculationStrategy costCalculationStrategy;
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 
-	public InsertionCostCalculatorImpl(DrtConfigGroup drtConfig, MobsimTimer timer,
+	public DefaultInsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer,
 									   CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
 									   @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
 		this(timer::getTimeOfDay, costCalculationStrategy,
@@ -52,7 +52,7 @@ public class InsertionCostCalculatorImpl<D> implements InsertionCostCalculator<D
 	}
 
 	@VisibleForTesting
-	InsertionCostCalculatorImpl(DoubleSupplier timeOfDay, CostCalculationStrategy costCalculationStrategy,
+	DefaultInsertionCostCalculator(DoubleSupplier timeOfDay, CostCalculationStrategy costCalculationStrategy,
 								InsertionDetourTimeCalculator<D> detourTimeCalculator) {
 		this.timeOfDay = timeOfDay;
 		this.costCalculationStrategy = costCalculationStrategy;

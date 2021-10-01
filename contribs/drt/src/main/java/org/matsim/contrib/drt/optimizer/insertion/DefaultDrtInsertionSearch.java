@@ -30,8 +30,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.common.annotations.VisibleForTesting;
-
 /**
  * @author michalm
  */
@@ -47,12 +45,12 @@ public class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
 			CostCalculationStrategy costCalculationStrategy, DrtConfigGroup drtCfg, MobsimTimer timer) {
 		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(
-				new InsertionCostCalculatorImpl<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null)));
+				new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime,
+						null)));
 	}
 
-	@VisibleForTesting
-	protected DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-										BestInsertionFinder<PathData> bestInsertionFinder) {
+	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
+			BestInsertionFinder<PathData> bestInsertionFinder) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.bestInsertionFinder = bestInsertionFinder;

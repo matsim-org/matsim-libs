@@ -45,7 +45,7 @@ public class BestInsertionFinderTest {
 
 	private final DrtRequest request = mock(DrtRequest.class);
 	@SuppressWarnings("unchecked")
-	private final InsertionCostCalculator<Double> insertionCostCalculator = mock(InsertionCostCalculatorImpl.class);
+	private final InsertionCostCalculator<Double> insertionCostCalculator = mock(InsertionCostCalculator.class);
 	private final BestInsertionFinder<Double> bestInsertionFinder = new BestInsertionFinder<>(insertionCostCalculator);
 
 	@Test

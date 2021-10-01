@@ -34,10 +34,10 @@ public class ShiftSelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSi
         }).toProvider(modalProvider(getter -> {
             var costCalculator = getter.getModal(CostCalculationStrategy.class);
             var timer = getter.get(MobsimTimer.class);
-            var provider = ShiftSelectiveInsertionProvider.create(drtCfg, timer, costCalculator,
+            var provider = ShiftSelectiveInsertionProviders.create(drtCfg, timer, costCalculator,
                     getter.getModal(DvrpTravelTimeMatrix.class),
                     getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-            return new ShiftDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class), costCalculator,
+            return ShiftDrtInsertionSearches.createShiftDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class), costCalculator,
                     drtCfg, timer);
         })).asEagerSingleton();
 

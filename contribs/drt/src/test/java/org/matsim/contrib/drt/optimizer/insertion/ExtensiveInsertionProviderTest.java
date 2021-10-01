@@ -75,7 +75,7 @@ public class ExtensiveInsertionProviderTest {
 
 		//mock admissibleCostCalculator
 		@SuppressWarnings("unchecked")
-		var admissibleCostCalculator = (InsertionCostCalculator<Double>)mock(InsertionCostCalculatorImpl.class);
+		var admissibleCostCalculator = (InsertionCostCalculator<Double>)mock(InsertionCostCalculator.class);
 		when(admissibleCostCalculator.calculate(eq(request),
 				argThat(argument -> argument.getInsertion() == feasibleInsertion))).thenReturn(1.);
 		when(admissibleCostCalculator.calculate(eq(request),
