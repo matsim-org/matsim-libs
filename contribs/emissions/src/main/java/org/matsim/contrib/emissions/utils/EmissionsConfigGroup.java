@@ -141,6 +141,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL_CMT = "Define on which level the entries in the provided hbefa tables are checked for consistency" + "\n\t\t" +
 			HbefaTableConsistencyCheckingLevel.allCombinations.name() + " : check if entries for all combinations of HbefaTrafficSituation, HbefaVehicleCategory, HbefaVehicleAttributes, HbefaComponent. " +
 																"are available in the table. It only checks for paramters that are available in the table (e.g. if there is no HGV in the table, it can also pass. \n\t\t" +
+			HbefaTableConsistencyCheckingLevel.perVehCat.name() + " : perform the checks for each VehicleCategory, e.g. HGV or passenger car,... , independently. \n\t\t " +
 			HbefaTableConsistencyCheckingLevel.consistent.name() + " : check if the entries for the two HbefaTrafficSituations 'StopAndGo' and 'FreeFlow' (nov 2020, maybe subject to change) are consistently available in the table. \n\t\t" + //TODO
 			HbefaTableConsistencyCheckingLevel.none.name() + " : There is no consistency check. This option is NOT recommended and only for backward capability to inputs from before spring 2020 . \n\t\t" +
 			"Default is " + HbefaTableConsistencyCheckingLevel.allCombinations.name();
