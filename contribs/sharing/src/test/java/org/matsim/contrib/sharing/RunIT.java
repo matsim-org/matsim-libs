@@ -1,5 +1,6 @@
 package org.matsim.contrib.sharing;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,9 +22,9 @@ import org.matsim.contrib.sharing.service.events.SharingFailedPickupEventHandler
 import org.matsim.contrib.sharing.service.events.SharingPickupEventHandler;
 import org.matsim.contrib.sharing.service.events.SharingVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -32,19 +33,18 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.examples.ExamplesUtils;
 
 public class RunIT {
 
 	@Test
-	public final void test() throws UncheckedIOException, ConfigurationException {
-		URL fixtureUrl = getClass().getClassLoader().getResource("siouxfalls");
-		CommandLine cmd = new CommandLine.Builder(new String[] { "--config-path", fixtureUrl.getFile() + "/config.xml", //
-				"--config:controler.lastIteration", "2" }) //
-						.requireOptions("config-path") //
-						.build();
+	public final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
+		URL vehiclesUrl = RunIT.class.getResource("shared_vehicles.xml");
 
-		Config config = ConfigUtils.loadConfig(cmd.getOptionStrict("config-path"));
-		cmd.applyConfiguration(config);
+		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
+		config.controler().setLastIteration(2);
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		// We need to add the sharing config group
 		SharingConfigGroup sharingConfig = new SharingConfigGroup();
@@ -63,7 +63,7 @@ public class RunIT {
 		serviceConfig.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfig.setServiceInputFile("shared_vehicles.xml");
+		serviceConfig.setServiceInputFile(vehiclesUrl.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfig.setMode("car");
@@ -86,7 +86,7 @@ public class RunIT {
 		serviceConfigBike.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfigBike.setServiceInputFile("shared_vehicles.xml");
+		serviceConfigBike.setServiceInputFile(vehiclesUrl.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfigBike.setMode("bike");
@@ -109,7 +109,7 @@ public class RunIT {
 		serviceConfigBikeFF.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfigBikeFF.setServiceInputFile("shared_vehicles.xml");
+		serviceConfigBikeFF.setServiceInputFile(vehiclesUrl.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfigBikeFF.setMode("bike");
@@ -154,22 +154,22 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assert.assertEquals(29324, (long) data.counts.get("car"));
-		Assert.assertEquals(26686, (long) data.counts.get("walk"));
-		Assert.assertEquals(88, (long) data.counts.get("bike"));
-		Assert.assertEquals(10581, (long) data.counts.get("pt"));
+		Assert.assertEquals(83271, (long) data.counts.get("car"));
+		Assert.assertEquals(31125, (long) data.counts.get("walk"));
+		Assert.assertEquals(86, (long) data.counts.get("bike"));
+		Assert.assertEquals(19086, (long) data.counts.get("pt"));
 
-		Assert.assertEquals(57, (long) data.pickupCounts.get("wheels"));
-		Assert.assertEquals(24, (long) data.pickupCounts.get("mobility"));
-		Assert.assertEquals(31, (long) data.pickupCounts.get("velib"));
+		Assert.assertEquals(62, (long) data.pickupCounts.get("wheels"));
+		Assert.assertEquals(2, (long) data.pickupCounts.get("mobility"));
+		Assert.assertEquals(24, (long) data.pickupCounts.get("velib"));
 
-		Assert.assertEquals(57, (long) data.dropoffCounts.get("wheels"));
-		Assert.assertEquals(24, (long) data.dropoffCounts.get("mobility"));
-		Assert.assertEquals(31, (long) data.dropoffCounts.get("velib"));
+		Assert.assertEquals(62, (long) data.dropoffCounts.get("wheels"));
+		Assert.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
+		Assert.assertEquals(24, (long) data.dropoffCounts.get("velib"));
 
-		Assert.assertEquals(2298, (long) data.failedPickupCounts.get("wheels"));
-		Assert.assertEquals(45, (long) data.failedPickupCounts.get("mobility"));
-		Assert.assertEquals(60, (long) data.failedPickupCounts.get("velib"));
+		Assert.assertEquals(1537, (long) data.failedPickupCounts.get("wheels"));
+		Assert.assertEquals(1, (long) data.failedPickupCounts.get("mobility"));
+		Assert.assertEquals(50, (long) data.failedPickupCounts.get("velib"));
 
 		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
 		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));
