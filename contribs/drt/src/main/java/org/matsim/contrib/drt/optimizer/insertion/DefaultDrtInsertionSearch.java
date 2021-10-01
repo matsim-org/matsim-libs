@@ -35,9 +35,18 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
+public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
 	public interface InsertionProvider {
 		List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries);
+	}
+
+	//using the default InsertionCostCalculator
+	public static DefaultDrtInsertionSearch createWithDefaultCostCalculator(InsertionProvider insertionProvider,
+			DetourPathCalculator detourPathCalculator, CostCalculationStrategy costCalculationStrategy,
+			DrtConfigGroup drtCfg, MobsimTimer timer) {
+		return new DefaultDrtInsertionSearch(insertionProvider, detourPathCalculator,
+				new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime,
+						null));
 	}
 
 	private final InsertionProvider insertionProvider;
@@ -45,10 +54,8 @@ public class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			CostCalculationStrategy costCalculationStrategy, DrtConfigGroup drtCfg, MobsimTimer timer) {
-		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(
-				new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime,
-						null)));
+			InsertionCostCalculator<PathData> insertionCostCalculator) {
+		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(insertionCostCalculator));
 	}
 
 	@VisibleForTesting
