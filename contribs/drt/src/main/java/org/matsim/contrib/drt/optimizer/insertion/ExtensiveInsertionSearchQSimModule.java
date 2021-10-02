@@ -57,8 +57,8 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			var provider = ExtensiveInsertionProvider.create(drtCfg, timer, costCalculator,
 					getter.getModal(DvrpTravelTimeMatrix.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class), costCalculator,
-					drtCfg, timer);
+			return DefaultDrtInsertionSearch.createWithDefaultCostCalculator(provider,
+					getter.getModal(DetourPathCalculator.class), costCalculator, drtCfg, timer);
 		})).asEagerSingleton();
 
 		addModalComponent(MultiInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
