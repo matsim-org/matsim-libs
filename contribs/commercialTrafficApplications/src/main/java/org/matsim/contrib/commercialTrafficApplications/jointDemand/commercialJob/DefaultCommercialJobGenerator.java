@@ -332,10 +332,9 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-		// Assignment between jobs and carriers has changed
+		// Assignment between jobs and operators has changed due to innovation.
 		// Recalculate jsprit tour planning, and build new fright agents
 		if (enableTourPlanning) {
-
 			removeFreightAgents(true);
 			carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
 
@@ -344,7 +343,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 			buildTours();
 			buildFreightAgents();
 
-			// Assignment between jobs and carriers can't be changed
+			// Assignment between jobs and operators can't be changed
 			// Rebuild existing freight agents
 		} else {
 			buildFreightAgents();
