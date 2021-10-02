@@ -24,12 +24,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
@@ -101,6 +103,10 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						}), getter.getModal(DrtRequestInsertionRetryQueue.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
+		bindModal(InsertionCostCalculatorFactory.class).toProvider(modalProvider(
+				getter -> DefaultInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
+						getter.getModal(CostCalculationStrategy.class))));
+
 		install(getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
@@ -132,10 +138,10 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-				getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class),
-						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
-						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
+						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+								getter.get(MobsimTimer.class),
+								getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
+								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(

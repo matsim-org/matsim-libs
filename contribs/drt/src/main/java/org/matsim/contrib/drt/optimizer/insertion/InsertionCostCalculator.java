@@ -19,12 +19,19 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import java.util.function.ToDoubleFunction;
+
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
 public interface InsertionCostCalculator<D> {
+
+	interface InsertionCostCalculatorFactory {
+		<D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
+				DetourTimeEstimator replacedDriveTimeEstimator);
+	}
 
 	double INFEASIBLE_SOLUTION_COST = Double.POSITIVE_INFINITY;
 
