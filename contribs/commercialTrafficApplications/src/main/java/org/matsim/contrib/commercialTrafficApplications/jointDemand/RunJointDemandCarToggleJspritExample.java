@@ -41,10 +41,10 @@ import java.net.URL;
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
-class RunJointDemandCarExample {
+class RunJointDemandCarToggleJspritExample {
 
     private static final  String EXAMPLE_CONFIG = "scenarios/grid/jointDemand_config.xml";
-    private static final Logger log = Logger.getLogger(RunJointDemandCarExample.class);
+    private static final Logger log = Logger.getLogger(RunJointDemandCarToggleJspritExample.class);
 
     public static void main(String[] args) throws IOException {
         final URL configUrl;
@@ -63,13 +63,14 @@ class RunJointDemandCarExample {
                         + EXAMPLE_CONFIG);
             }
         }
-        new RunJointDemandCarExample().run(configUrl);
+        new RunJointDemandCarToggleJspritExample().run(configUrl);
     }
 
     public void run(URL configUrl){
         Config config = loadConfig(configUrl);
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
+        jointDemandConfigGroup.setKeepUsedOperatorsInterval(2);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setTravelTimeSliceWidth(3600);
@@ -109,7 +110,7 @@ class RunJointDemandCarExample {
         work.setClosingTime(8 * 3600);
         config.planCalcScore().addActivityParams(work);
         config.controler().setWriteEventsInterval(5);
-        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarExample");
+        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarToggleJspritExample");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controler().setLastIteration(5);
     }

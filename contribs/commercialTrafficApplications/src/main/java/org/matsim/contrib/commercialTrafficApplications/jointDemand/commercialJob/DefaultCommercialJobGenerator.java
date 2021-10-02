@@ -20,7 +20,6 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJ
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
@@ -50,11 +49,14 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -66,39 +68,43 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.comme
  */
 class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
-
 	private final double firsttourTraveltimeBuffer;
-    private final int timeSliceWidth;
+	private final int timeSliceWidth;
+	private StrategyManager strategyManager;
+	private Scenario scenario;
+	private int keepUsedOperatorsInterval;
+	private Carriers carriers;
 
-    private Scenario scenario;
+	private final TravelTime carTT;
 
-    private Carriers carriers;
+	private Set<Id<Person>> freightDrivers = new HashSet<>();
+	private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
 
-    private final TravelTime carTT;
+	private final static Logger log = Logger.getLogger(DefaultCommercialJobGenerator.class);
 
-    private Set<Id<Person>> freightDrivers = new HashSet<>();
-    private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
+	private Set<String> drtModes = new HashSet<>();
+	private boolean enableTourPlanning = true;
 
-    private final static Logger log = Logger.getLogger(DefaultCommercialJobGenerator.class);
+	@Inject
+	/* package */ DefaultCommercialJobGenerator(StrategyManager strategyManager, Scenario scenario,
+			Map<String, TravelTime> travelTimes, Carriers carriers) {
+		JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
+		this.strategyManager = strategyManager;
+		this.carriers = carriers;
+		this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
+		this.keepUsedOperatorsInterval = cfg.getKeepUsedOperatorsInterval();
+		this.timeSliceWidth = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class)
+				.getTravelTimeSliceWidth();
+		this.scenario = scenario;
+		carTT = travelTimes.get(TransportMode.car);
+		getDrtModes(scenario.getConfig());
+	}
 
-    private Set<String> drtModes = new HashSet<>();
-
-    @Inject
-    /* package */ DefaultCommercialJobGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
-        JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
-        this.carriers = carriers;
-        this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
-        this.timeSliceWidth = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getTravelTimeSliceWidth();
-        this.scenario = scenario;
-        carTT = travelTimes.get(TransportMode.car);
-        getDrtModes(scenario.getConfig());
-    }
-
-    /**
+	/**
 	 * Converts Jsprit tours to MATSim freight agents and adjusts departure times of
 	 * leg and end times of activities
 	 */
-	public void createAndAddFreightAgents(Carriers carriers, Population population) {
+	private void buildFreightAgents() {
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			int nextId = 0;
@@ -111,20 +117,44 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 				// Transform Jsprit output to MATSim freight agents
 				Plan plainPlan = createPlainPlanFromTour(carrier, scheduledTour);
-				
-				// adjust Jsprit departure times and activity end times to avoid too early services
+
+				// adjust Jsprit departure times and activity end times to avoid too early
+				// services
 				manageJspritDepartureTimes(plainPlan);
-				
+
 				driverPerson.addPlan(plainPlan);
 				plainPlan.setPerson(driverPerson);
-				population.addPerson(driverPerson);
+				scenario.getPopulation().addPerson(driverPerson);
 				buildVehicleAndDriver(carrier, driverPerson, carrierVehicle);
 			}
+
+		}
+
+	}
+
+	/**
+	 * If tour planning is executed, carriers needs to be cleared.
+	 * 
+	 * @param cleanCarriers enable/disable cleaning of carriers
+	 */
+	private void removeFreightAgents(boolean cleanCarriers) {
+		freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
+		freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
+
+		if (cleanCarriers) {
+			CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet()
+					.forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
+			carriers.getCarriers().values().forEach(carrier -> {
+				carrier.getServices().clear();
+				carrier.getShipments().clear();
+				carrier.clearPlans();
+			});
 		}
 	}
-	
+
 	/**
 	 * Creates fright vehicles and drivers
+	 * 
 	 * @param carrier
 	 * @param driverPerson
 	 * @param carrierVehicle
@@ -142,13 +172,14 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 	/**
 	 * Jsprit creates tours that begin with the opening time of the carrier. As a
-	 * consequence, the tour vehicle arrives may arrive too early at the first customer.
-	 * Moreover, we need to enforce that a service does not end too early (before the of it's TimeWindow),
-	 * otherwise following services would start too early.
-	 * This method adjusts the (service) activity endTimes and leg departure times to avoid too early starts
-	 * of the services. The firsttourTraveltimeBuffer tries to ensure that the carrier
-	 * departures early enough (leg travel time x firsttourTraveltimeBuffer) to
-	 * reach his first destination (service).
+	 * consequence, the tour vehicle arrives may arrive too early at the first
+	 * customer. Moreover, we need to enforce that a service does not end too early
+	 * (before the of it's TimeWindow), otherwise following services would start too
+	 * early. This method adjusts the (service) activity endTimes and leg departure
+	 * times to avoid too early starts of the services. The
+	 * firsttourTraveltimeBuffer tries to ensure that the carrier departures early
+	 * enough (leg travel time x firsttourTraveltimeBuffer) to reach his first
+	 * destination (service).
 	 * 
 	 * @param plan
 	 */
@@ -159,25 +190,26 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 			PlanElement planElement = planElements.get(i);
 
 			if (planElement instanceof Activity) {
-				
+
 				Activity currentActivity = (Activity) planElement;
-				
+
 				// Handle all regular services
-				if(!currentActivity.getType().equals(FreightConstants.START))
-				{
+				if (!currentActivity.getType().equals(FreightConstants.START)) {
 
 					// ExpectedArrivalTime from jsprit needs to be recalculated
-					// Recalculation is based on next leg departure time and current act service time
-					Leg prevLeg = (Leg) planElements.get(i-1);
+					// Recalculation is based on next leg departure time and current act service
+					// time
+					Leg prevLeg = (Leg) planElements.get(i - 1);
 					Leg nextLeg = PopulationUtils.getNextLeg(plan, currentActivity);
-					
+
 					Activity prevAct = (Activity) planElements.get(i - 2);
 
 					if (!prevAct.getType().equals(FreightConstants.START)) {
 
-						//End of plan is reached
+						// End of plan is reached
 						if (nextLeg == null) {
-							// If next activity is the end activity, departure is allowed to start immediately
+							// If next activity is the end activity, departure is allowed to start
+							// immediately
 							prevAct.setEndTime(prevLeg.getDepartureTime().seconds());
 						} else {
 							// Update recent prevAct and prevLeg
@@ -195,27 +227,32 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 					}
 
-				} else if (currentActivity.getType().equals(FreightConstants.START))
-				{
-					
-					Double travelTimeToFirstJob = ((Leg) planElements.get(i+1)).getTravelTime().seconds();
-					Double departureTimeAtFirstJob = ((Leg) planElements.get(i+3)).getDepartureTime().seconds();
-					Double jobServiceDuration = (double) ((Activity) planElements.get(i+2)).getAttributes().getAttribute(SERVICE_DURATION_NAME);
-					Double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob * this.firsttourTraveltimeBuffer;
-					Double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;
-					
-					//Set optimal endTimes to avoid an too early arrival at first job
-					 ((Activity) planElements.get(i+2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expectedArrivalTimeAtFirstJob );
+				} else if (currentActivity.getType().equals(FreightConstants.START)) {
+
+					Double travelTimeToFirstJob = ((Leg) planElements.get(i + 1)).getTravelTime().seconds();
+					Double departureTimeAtFirstJob = ((Leg) planElements.get(i + 3)).getDepartureTime().seconds();
+					Double jobServiceDuration = (double) ((Activity) planElements.get(i + 2)).getAttributes()
+							.getAttribute(SERVICE_DURATION_NAME);
+					Double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration
+							- travelTimeToFirstJob * this.firsttourTraveltimeBuffer;
+					Double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob
+							- travelTimeToFirstJob * this.firsttourTraveltimeBuffer;
+
+					// Set optimal endTimes to avoid an too early arrival at first job
+					((Activity) planElements.get(i + 2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME,
+							expectedArrivalTimeAtFirstJob);
 					currentActivity.setEndTime(initialLegDepartureTime);
-					((Leg) planElements.get(i+1)).setDepartureTime(initialLegDepartureTime);
-					
+					((Leg) planElements.get(i + 1)).setDepartureTime(initialLegDepartureTime);
+
 				}
 			}
 		}
 	}
 
 	/**
-	 * Creates just a simple copy of the ScheduledTour (from JSprit) and forms a MATSim plan
+	 * Creates just a simple copy of the ScheduledTour (from JSprit) and forms a
+	 * MATSim plan
+	 * 
 	 * @param carrier
 	 * @param scheduledTour
 	 * @return
@@ -246,11 +283,12 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 				// Assign information from tourLeg to defaultLeg
 				defaultLeg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 				defaultLeg.setTravelTime(tourLeg.getExpectedTransportTime());
-				
+
 				if (drtModes.contains(carrierMode)) {
 					defaultLeg.setRoute(null); // DrtRoute gets calculated later on
 				} else {
-					double routeDistance = RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0, scenario.getNetwork());
+					double routeDistance = RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0,
+							scenario.getNetwork());
 					route.setDistance(routeDistance);
 					route.setTravelTime(tourLeg.getExpectedTransportTime());
 					defaultLeg.setRoute(route);
@@ -291,108 +329,159 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		return plan;
 	}
 
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-        CommercialTrafficChecker.run(scenario.getPopulation(), carriers);
-        generateIterationServices(carriers, scenario.getPopulation());
-        try {
+		// Assignment between jobs and carriers has changed
+		// Recalculate jsprit tour planning, and build new fright agents
+		if (enableTourPlanning) {
+
+			removeFreightAgents(true);
+			carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+
+			CommercialTrafficChecker.run(scenario.getPopulation(), carriers);
+			generateIterationServices(carriers, scenario.getPopulation());
 			buildTours();
-		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			buildFreightAgents();
+
+			// Assignment between jobs and carriers can't be changed
+			// Rebuild existing freight agents
+		} else {
+			buildFreightAgents();
 		}
-        createAndAddFreightAgents(this.carriers, this.scenario.getPopulation());
 
-        event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
-        String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
-        log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
-        CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers);
-        planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
-    }
+		event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
+		String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it."
+				+ event.getIteration() + "/";
+		log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
+		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers);
+		planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
+	}
 
-    private void getDrtModes(Config config){
-        MultiModeDrtConfigGroup drtCfgGroup = MultiModeDrtConfigGroup.get(config);
-        if (drtCfgGroup != null){
-            drtCfgGroup.getModalElements().forEach(cfg -> drtModes.add(cfg.getMode()));
-        }
-    }
+	private void getDrtModes(Config config) {
+		MultiModeDrtConfigGroup drtCfgGroup = MultiModeDrtConfigGroup.get(config);
+		if (drtCfgGroup != null) {
+			drtCfgGroup.getModalElements().forEach(cfg -> drtModes.add(cfg.getMode()));
+		}
+	}
 
 	/**
-	 * generates the services (out of the person population) and assigns them to the carriers
+	 * generates the services (out of the person population) and assigns them to the
+	 * carriers
 	 */
 	public void generateIterationServices(Carriers carriers, Population population) {
 
-        Map<Person,Set<Activity>> customer2ActsWithJobs = new HashMap();
+		Map<Person, Set<Activity>> customer2ActsWithJobs = new HashMap();
 
-        population.getPersons().values().forEach(p ->
-        {
-            Set<Activity> activitiesWithServices = JointDemandUtils.getCustomerActivitiesExpectingJobs(p.getSelectedPlan());
-            if(!activitiesWithServices.isEmpty()) customer2ActsWithJobs.put(p,activitiesWithServices);
-        });
-        for(Person customer : customer2ActsWithJobs.keySet()){
-            for (Activity activity : customer2ActsWithJobs.get(customer)) {
-                Map<String,Object> commercialJobAttributes = JointDemandUtils.getCommercialJobAttributes(activity);
-                for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
-                    List<String> commercialJobProperties = new ArrayList<>();
-                    commercialJobProperties.addAll((Collection<? extends String>) commercialJobAttributes.get(commercialJobAttributeKey));
-
-                    int jobIdx = Integer.parseInt(commercialJobAttributeKey.substring(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
-                    Id<CarrierService> serviceId = createCarrierServiceIdXForCustomer(customer,jobIdx);
-
-                    double earliestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_START_IDX));
-                    double latestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_END_IDX));
-
-                    CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, activity.getLinkId());
-                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX)));
-                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)));
-                    serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
-
-                    Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
-                    if (carriers.getCarriers().containsKey(carrierId)) {
-                        Carrier carrier = carriers.getCarriers().get(carrierId);
-                        CarrierService service = serviceBuilder.build();
-                        service.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer.getId().toString());
-                        carrier.getServices().put(serviceId, service);
-                    } else {
-                        throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString()
-                                + ". There is a wrong reference in activity attribute of person " + customer);
-                    }
-                }
-            }
-        }
-
-    }
-
-    private void buildTours() throws InterruptedException, ExecutionException {
-        TourPlanning.runTourPlanningForCarriersWithNetBasedCosts(carriers,scenario, timeSliceWidth,carTT );
-    }
-
-    private static Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x) {
-        return Id.create(customer.getId().toString() + "_" + x, CarrierService.class);
-    }
-
-
-    private Person createDriverPerson(Id<Person> driverId) {
-        return PopulationUtils.getFactory().createPerson(driverId);
-    }
-
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event) {
-        removeFreightAgents(scenario);
-        //clear carrier plans
-		carriers.getCarriers().values().forEach(carrier -> {
-			carrier.getServices().clear();
-			carrier.getShipments().clear();
-			carrier.clearPlans();
+		population.getPersons().values().forEach(p -> {
+			Set<Activity> activitiesWithServices = JointDemandUtils
+					.getCustomerActivitiesExpectingJobs(p.getSelectedPlan());
+			if (!activitiesWithServices.isEmpty())
+				customer2ActsWithJobs.put(p, activitiesWithServices);
 		});
-    }
+		for (Person customer : customer2ActsWithJobs.keySet()) {
+			for (Activity activity : customer2ActsWithJobs.get(customer)) {
+				Map<String, Object> commercialJobAttributes = JointDemandUtils.getCommercialJobAttributes(activity);
+				for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
+					List<String> commercialJobProperties = new ArrayList<>();
+					commercialJobProperties.addAll(
+							(Collection<? extends String>) commercialJobAttributes.get(commercialJobAttributeKey));
 
-    public void removeFreightAgents(Scenario scenario) {
-        freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
-        freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-    }
+					int jobIdx = Integer.parseInt(commercialJobAttributeKey
+							.substring(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
+					Id<CarrierService> serviceId = createCarrierServiceIdXForCustomer(customer, jobIdx);
+
+					double earliestStart = Double
+							.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_START_IDX));
+					double latestStart = Double
+							.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_END_IDX));
+
+					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId,
+							activity.getLinkId());
+					serviceBuilder.setCapacityDemand(
+							Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX)));
+					serviceBuilder.setServiceDuration(
+							Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)));
+					serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart, latestStart));
+
+					Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
+					if (carriers.getCarriers().containsKey(carrierId)) {
+						Carrier carrier = carriers.getCarriers().get(carrierId);
+						CarrierService service = serviceBuilder.build();
+						service.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer.getId().toString());
+						carrier.getServices().put(serviceId, service);
+					} else {
+						throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString()
+								+ ". There is a wrong reference in activity attribute of person " + customer);
+					}
+				}
+			}
+		}
+
+	}
+
+	private void buildTours() {
+		try {
+			TourPlanning.runTourPlanningForCarriersWithNetBasedCosts(carriers, scenario, timeSliceWidth, carTT);
+		} catch (ExecutionException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x) {
+		return Id.create(customer.getId().toString() + "_" + x, CarrierService.class);
+	}
+
+	private Person createDriverPerson(Id<Person> driverId) {
+		return PopulationUtils.getFactory().createPerson(driverId);
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+
+		removeFreightAgents(false);
+		// Toggles ChangeCommercialJobOperatorStrategy to enable or disable via weight
+		// zero
+		toggleChangeCommercialJobOperatorStrategy(event.getIteration());
+
+	}
+
+	private boolean isChangeCommercialJobOperatorStrategy(GenericPlanStrategy<Plan, Person> strategy) {
+		String name = strategy.toString();
+		
+		return name.endsWith(ChangeCommercialJobOperator.SELECTOR_NAME);
+	}
+
+	private void toggleChangeCommercialJobOperatorStrategy(int currentIteration) {
+
+		// 0 means always tour planning
+		if (this.keepUsedOperatorsInterval != 0) {
+						
+			this.enableTourPlanning = ((currentIteration + 1.0) % this.keepUsedOperatorsInterval == 0.0) ? true : false;
+			
+			if (enableTourPlanning) {
+				log.info("Toggle " + ChangeCommercialJobOperator.SELECTOR_NAME);
+			}
+			
+			Collection<StrategySettings> allStrategies = this.scenario.getConfig().strategy().getStrategySettings();
+
+			for (StrategySettings strategy : allStrategies) {
+				if (strategy.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME)) {
+					double initalWeight = strategy.getWeight();
+					
+					// Update weight 
+					double newWeight = enableTourPlanning ? initalWeight : 0.0;
+					for (GenericPlanStrategy<Plan, Person> currentStrategy : this.strategyManager.getStrategies(null)) {
+						String strategyName = currentStrategy.toString();
+						if (isChangeCommercialJobOperatorStrategy(currentStrategy)) {
+							log.info("Set weight for " + strategyName + " --> "+ newWeight);
+							this.strategyManager.changeWeightOfStrategy(currentStrategy, null, newWeight);
+						}
+					}
+				}
+			}
+		}
+
+	}
 
 }

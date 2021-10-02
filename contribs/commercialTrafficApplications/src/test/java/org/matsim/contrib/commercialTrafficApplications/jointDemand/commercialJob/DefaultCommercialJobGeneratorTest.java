@@ -10,6 +10,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
@@ -24,7 +25,7 @@ public class DefaultCommercialJobGeneratorTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-
+    //TODO: This test is not needed anymore! It gets not executed and DefaultCommercialJobGenerator requires injection
     @org.junit.Test
     @Ignore //set to ignore since this is tested in integration test anyways. Currently, this test here would fail anyways
     //since we use the injector in DefaultCommercialJobGenerator.notifyBeforeMobsim()
@@ -34,7 +35,7 @@ public class DefaultCommercialJobGeneratorTest {
         Map<String,TravelTime> travelTimes = new HashMap<>();
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
 
-        DefaultCommercialJobGenerator generator = new DefaultCommercialJobGenerator(scenario,travelTimes, carriers );
+        DefaultCommercialJobGenerator generator = new DefaultCommercialJobGenerator(new StrategyManager(),scenario,travelTimes, carriers );
         new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(utils.getOutputDirectory() + "vehicleTypes.xml");
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         int iteration = 0;
