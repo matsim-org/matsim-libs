@@ -1,6 +1,6 @@
 package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
-interface CommercialJobScoreCalculator {
+public interface CommercialJobScoreCalculator {
 
     /**
      * @param timeDifference

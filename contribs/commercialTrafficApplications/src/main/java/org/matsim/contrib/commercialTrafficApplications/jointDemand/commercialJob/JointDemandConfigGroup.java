@@ -64,7 +64,7 @@ public class JointDemandConfigGroup extends ReflectiveConfigGroup {
     /**
      * @return -- {@value #FIRSTLEGBUFFERDESC}
      */
-//    @StringGetter(FIRSTLEGBUFFER)
+public //    @StringGetter(FIRSTLEGBUFFER)
     double getFirstLegTraveltimeBufferFactor() {
         return firstLegTraveltimeBufferFactor;
     }

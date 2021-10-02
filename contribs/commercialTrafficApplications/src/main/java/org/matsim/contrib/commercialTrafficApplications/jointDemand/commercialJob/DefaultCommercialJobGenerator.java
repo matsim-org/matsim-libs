@@ -64,7 +64,7 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.comme
 /**
  * Generates carriers and tours depending on next iteration's freight demand
  */
-class DefaultCommercialJobGenerator implements CommercialJobGenerator {
+public class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 
 	private final double firsttourTraveltimeBuffer;

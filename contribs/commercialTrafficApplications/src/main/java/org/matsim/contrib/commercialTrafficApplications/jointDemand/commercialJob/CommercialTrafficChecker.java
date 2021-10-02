@@ -30,13 +30,12 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-class CommercialTrafficChecker {
+public class CommercialTrafficChecker {
     private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
 
-    static void run(Population population, Carriers carriers){
+    public static void run(Population population, Carriers carriers){
         boolean fail = checkPopulationAttributesConsistency(population);
         if(checkCarrierConsistency(carriers)) fail = true;
         if(fail) throw new RuntimeException("there is a problem with consistency for commercial traffic either in the plans or in the carriers. Please check the log for details.");

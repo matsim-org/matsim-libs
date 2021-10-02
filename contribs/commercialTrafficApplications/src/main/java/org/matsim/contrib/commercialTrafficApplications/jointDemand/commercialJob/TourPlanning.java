@@ -55,11 +55,11 @@ import java.util.stream.Collectors;
 
 //import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
-class TourPlanning {
+public class TourPlanning {
 
 	private static final Logger log = Logger.getLogger(TourPlanning.class);
 
-	static void runTourPlanningForCarriersWithNetBasedCosts(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
+	public static void runTourPlanningForCarriersWithNetBasedCosts(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
 															TravelTime travelTime) throws ExecutionException, InterruptedException {
 
 		Set<VehicleType> vehicleTypes = new HashSet<>();
@@ -78,7 +78,7 @@ class TourPlanning {
 		runTourPlanningForCarriers(carriers, scenario, netBasedCosts);
 	}
 
-	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, VehicleRoutingTransportCosts transportCosts) throws InterruptedException, ExecutionException {
+	public static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, VehicleRoutingTransportCosts transportCosts) throws InterruptedException, ExecutionException {
 
 		if(! (transportCosts instanceof NetworkBasedTransportCosts)) throw new IllegalArgumentException("currently, carrier plans can only be routed with " + NetworkBasedTransportCosts.class +
 				". Sorry! We aim to provide another solution. Please refer to tschlenther or kmt...");

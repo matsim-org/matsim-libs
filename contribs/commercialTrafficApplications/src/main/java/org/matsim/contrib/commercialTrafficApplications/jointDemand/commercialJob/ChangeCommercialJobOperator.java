@@ -45,7 +45,7 @@ public final class ChangeCommercialJobOperator extends AbstractMultithreadedModu
 
     private final Carriers carriers;
 
-	ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
+	public ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
         super(globalConfigGroup);
         this.carriers = carriers;
     }

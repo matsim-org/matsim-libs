@@ -39,7 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler {
 
     private final Population population;
 
@@ -68,7 +68,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
     }
 
 
-    void prepareTourArrivalsForDay() {
+    public void prepareTourArrivalsForDay() {
         freightAgent2Jobs.clear();
 
         Set<Plan> freightPlans = population.getPersons().values().stream()

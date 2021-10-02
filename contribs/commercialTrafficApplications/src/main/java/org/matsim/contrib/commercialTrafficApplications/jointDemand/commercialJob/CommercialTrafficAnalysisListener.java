@@ -42,7 +42,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 
-class CommercialTrafficAnalysisListener implements IterationEndsListener {
+public class CommercialTrafficAnalysisListener implements IterationEndsListener {
 
     @Inject
     private

@@ -42,7 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
     private final Map<Id<Vehicle>, Set<Id<Person>>> currentFreightVehicleForDelivery = new HashMap<>();
     private final Map<Id<Person>, Double> deliveryAgentDistances = new HashMap<>();
