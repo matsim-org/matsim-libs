@@ -28,11 +28,11 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -40,14 +40,14 @@ import com.google.common.annotations.VisibleForTesting;
  * @author michalm
  */
 public class SelectiveInsertionProvider implements InsertionProvider {
-	public static SelectiveInsertionProvider create(DrtConfigGroup drtCfg, MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
+	public static SelectiveInsertionProvider create(DrtConfigGroup drtCfg,
+			InsertionCostCalculatorFactory insertionCostCalculatorFactory, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
 			ForkJoinPool forkJoinPool) {
 		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
 				insertionParams.getRestrictiveBeelineSpeedFactor(), dvrpTravelTimeMatrix);
-		var restrictiveCostCalculator = new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy,
-				Double::doubleValue, restrictiveDetourTimeEstimator);
+		var restrictiveCostCalculator = insertionCostCalculatorFactory.create(Double::doubleValue,
+				restrictiveDetourTimeEstimator);
 		return new SelectiveInsertionProvider(restrictiveDetourTimeEstimator, forkJoinPool, restrictiveCostCalculator);
 	}
 

@@ -26,9 +26,7 @@ import java.util.Optional;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -38,15 +36,6 @@ import com.google.common.annotations.VisibleForTesting;
 public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
 	public interface InsertionProvider {
 		List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries);
-	}
-
-	//using the default InsertionCostCalculator
-	public static DefaultDrtInsertionSearch createWithDefaultCostCalculator(InsertionProvider insertionProvider,
-			DetourPathCalculator detourPathCalculator, CostCalculationStrategy costCalculationStrategy,
-			DrtConfigGroup drtCfg, MobsimTimer timer) {
-		return new DefaultDrtInsertionSearch(insertionProvider, detourPathCalculator,
-				new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime,
-						null));
 	}
 
 	private final InsertionProvider insertionProvider;
