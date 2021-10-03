@@ -3,6 +3,7 @@ package org.matsim.contrib.shifts.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -13,8 +14,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserte
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -45,8 +45,7 @@ import org.matsim.contrib.shifts.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.shifts.optimizer.ShiftDrtOptimizer;
 import org.matsim.contrib.shifts.optimizer.ShiftRequestInsertionScheduler;
 import org.matsim.contrib.shifts.optimizer.ShiftVehicleDataEntryFactory;
-import org.matsim.contrib.shifts.optimizer.insertion.ShiftExtensiveInsertionSearchQSimModule;
-import org.matsim.contrib.shifts.optimizer.insertion.ShiftSelectiveInsertionSearchQSimModule;
+import org.matsim.contrib.shifts.optimizer.insertion.ShiftInsertionCostCalculator;
 import org.matsim.contrib.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.shifts.schedule.ShiftDrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.shifts.schedule.ShiftDrtTaskFactory;
@@ -98,37 +97,34 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(DrtRequestInsertionRetryQueue.class).toInstance(new DrtRequestInsertionRetryQueue(
 				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
 
-		bindModal(OperationFacilityFinder.class).toProvider(
-				new ModalProviders.AbstractProvider<OperationFacilityFinder>(drtCfg.getMode()) {
-					@Inject
-					private Scenario scenario;
+		bindModal(OperationFacilityFinder.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
+			@Inject
+			private Scenario scenario;
 
-					@Override
-					public OperationFacilityFinder get() {
-						return new NearestOperationFacilityWithCapacityFinder(
-								OperationFacilitiesUtils.getFacilities(scenario));
-					}
-				}).asEagerSingleton();
+			@Override
+			public OperationFacilityFinder get() {
+				return new NearestOperationFacilityWithCapacityFinder(OperationFacilitiesUtils.getFacilities(scenario));
+			}
+		}).asEagerSingleton();
+
+		bindModal(DrtShiftDispatcher.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
+			@Inject
+			private MobsimTimer timer;
+			@Inject
+			private Scenario scenario;
+			@Inject
+			private EventsManager eventsManager;
+
+			@Override
+			public DrtShiftDispatcher get() {
+				return new DrtShiftDispatcherImpl(DrtShiftUtils.getShifts(scenario), getModalInstance(Fleet.class),
+						timer, getModalInstance(OperationFacilityFinder.class),
+						getModalInstance(ShiftTaskScheduler.class), getModalInstance(Network.class), eventsManager,
+						shiftConfigGroup);
+			}
+		}).asEagerSingleton();
 
 		addMobsimScopeEventHandlerBinding().to(modalKey(DrtShiftDispatcher.class));
-
-		bindModal(DrtShiftDispatcher.class).toProvider(
-				new ModalProviders.AbstractProvider<DrtShiftDispatcher>(drtCfg.getMode()) {
-					@Inject
-					private MobsimTimer timer;
-					@Inject
-					private Scenario scenario;
-					@Inject
-					private EventsManager eventsManager;
-
-					@Override
-					public DrtShiftDispatcher get() {
-						return new DrtShiftDispatcherImpl(DrtShiftUtils.getShifts(scenario),
-								getModalInstance(Fleet.class), timer, getModalInstance(OperationFacilityFinder.class),
-								getModalInstance(ShiftTaskScheduler.class), getModalInstance(Network.class),
-								eventsManager, shiftConfigGroup);
-					}
-				}).asEagerSingleton();
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
 				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
@@ -142,7 +138,11 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						}), getter.getModal(DrtRequestInsertionRetryQueue.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
-		install(getInsertionSearchQSimModule(drtCfg));
+		bindModal(InsertionCostCalculator.InsertionCostCalculatorFactory.class).toProvider(modalProvider(
+				getter -> ShiftInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
+						getter.getModal(CostCalculationStrategy.class))));
+
+		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(drtCfg));
 		bindModal(CostCalculationStrategy.class).to(drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
@@ -152,26 +152,24 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		final ShiftDrtTaskFactoryImpl taskFactory = new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl());
 
 		bindModal(DrtTaskFactory.class).toInstance(taskFactory);
-
 		bindModal(ShiftDrtTaskFactory.class).toInstance(taskFactory);
+		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
+			@Inject
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+			private TravelTime travelTime;
 
-		bindModal(EmptyVehicleRelocator.class).toProvider(
-				new ModalProviders.AbstractProvider<EmptyVehicleRelocator>(drtCfg.getMode()) {
-					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-					@Inject
-					private MobsimTimer timer;
+			@Inject
+			private MobsimTimer timer;
 
-					@Override
-					public EmptyVehicleRelocator get() {
-						Network network = getModalInstance(Network.class);
-						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						TravelDisutility travelDisutility = getModalInstance(
-								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
-					}
-				}).asEagerSingleton();
+			@Override
+			public EmptyVehicleRelocator get() {
+				Network network = getModalInstance(Network.class);
+				DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
+				TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
+			}
+		}).asEagerSingleton();
 
 		bindModal(EShiftTaskScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<EShiftTaskScheduler>(drtCfg.getMode()) {
@@ -210,19 +208,5 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						new DrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),
 								getter.get(DvrpConfigGroup.class))))).asEagerSingleton();
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
-	}
-
-	public static AbstractDvrpModeQSimModule getInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
-		switch (drtCfg.getDrtInsertionSearchParams().getName()) {
-			case ExtensiveInsertionSearchParams.SET_NAME:
-				return new ShiftExtensiveInsertionSearchQSimModule(drtCfg);
-
-			case SelectiveInsertionSearchParams.SET_NAME:
-				return new ShiftSelectiveInsertionSearchQSimModule(drtCfg);
-
-			default:
-				throw new RuntimeException(
-						"Unsupported DRT insertion search type: " + drtCfg.getDrtInsertionSearchParams().getName());
-		}
 	}
 }

@@ -23,6 +23,18 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 
 public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
 
+	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
+			CostCalculationStrategy costCalculationStrategy) {
+		return new InsertionCostCalculatorFactory() {
+			@Override
+			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
+					DetourTimeEstimator replacedDriveTimeEstimator) {
+				return new ShiftInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, detourTime,
+						replacedDriveTimeEstimator);
+			}
+		};
+	}
+
 	private final InsertionCostCalculator<D> defaultInsertionCostCalculator;
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 	private final MobsimTimer timer;
