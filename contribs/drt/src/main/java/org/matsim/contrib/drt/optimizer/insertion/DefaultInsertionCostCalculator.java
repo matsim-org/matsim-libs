@@ -39,6 +39,18 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
 
+	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
+			CostCalculationStrategy costCalculationStrategy) {
+		return new InsertionCostCalculatorFactory() {
+			@Override
+			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
+					DetourTimeEstimator replacedDriveTimeEstimator) {
+				return new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, detourTime,
+						replacedDriveTimeEstimator);
+			}
+		};
+	}
+
 	private final DoubleSupplier timeOfDay;
 	private final CostCalculationStrategy costCalculationStrategy;
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
