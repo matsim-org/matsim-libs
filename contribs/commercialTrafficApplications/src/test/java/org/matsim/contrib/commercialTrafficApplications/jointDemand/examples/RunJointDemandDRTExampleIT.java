@@ -1,10 +1,9 @@
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand.examples;
 
 import org.junit.Test;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.examples.RunJointDemandDRTExample;
 
 import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 public class RunJointDemandDRTExampleIT {
 
