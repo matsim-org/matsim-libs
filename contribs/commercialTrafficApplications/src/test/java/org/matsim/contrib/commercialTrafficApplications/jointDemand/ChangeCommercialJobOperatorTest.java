@@ -1,4 +1,4 @@
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandUtils;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.TestScenarioGeneration;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;

@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +27,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandUtils;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.utils.FreightUtils;

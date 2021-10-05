@@ -25,9 +25,9 @@ import static org.matsim.core.config.ConfigUtils.loadConfig;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
