@@ -14,10 +14,22 @@ public class    RunMATSimMosaicTest {
 	}
 
 	@Test
-	public void run() throws URISyntaxException {
+	public void runExample() throws URISyntaxException {
 
 		RunMATSimMosaic.main(new String[]{
-				"--config", resource("Example/scenario_config.json"),
+				"--config", resource("Example/example_config.json"),
+				"--runtime", resource("etc/runtime.json"),
+				"--logger", resource("etc/logback.xml")
+		});
+
+	}
+
+
+	@Test
+	public void runSignal() throws URISyntaxException {
+
+		RunMATSimMosaic.main(new String[]{
+				"--config", resource("SignalExample/signal_config.json"),
 				"--runtime", resource("etc/runtime.json"),
 				"--logger", resource("etc/logback.xml")
 		});

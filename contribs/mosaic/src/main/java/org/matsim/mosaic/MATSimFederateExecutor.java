@@ -4,6 +4,9 @@ import org.eclipse.mosaic.rti.api.FederateExecutor;
 import org.eclipse.mosaic.rti.api.InternalFederateException;
 import org.eclipse.mosaic.rti.config.CLocalHost;
 import org.matsim.application.MATSimApplication;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.builder.Signals;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.slf4j.Logger;
@@ -64,6 +67,17 @@ final class MATSimFederateExecutor implements FederateExecutor {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		controler.addOverridingModule(new MosaicModule(ambassador, controler.getConfig()));
+
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(),
+				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
+
+		if (signalsConfigGroup.isUseSignalSystems()) {
+
+			log.info("Enabling signal controlling");
+			new Signals.Configurator(controler).addSignalControllerFactory(MosaicSignalController.IDENTIFIER, MosaicSignalController.Factory.class);
+
+		}
+
 
 		runner = new Runner();
 		runner.start();
@@ -127,6 +141,10 @@ final class MATSimFederateExecutor implements FederateExecutor {
 	}
 
 	private final class Runner extends Thread {
+
+		public Runner() {
+			super("MATSim-Thread");
+		}
 
 		@Override
 		public void run() {

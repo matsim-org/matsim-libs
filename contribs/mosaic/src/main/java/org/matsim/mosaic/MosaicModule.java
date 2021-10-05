@@ -1,6 +1,5 @@
 package org.matsim.mosaic;
 
-import com.google.inject.Inject;
 import org.eclipse.mosaic.rti.api.RtiAmbassador;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -10,6 +9,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
 /**
@@ -19,9 +19,6 @@ public class MosaicModule extends AbstractModule {
 
 	private final MATSimAmbassador ambassador;
 	private final Config config;
-
-	@Inject
-	private MultiModeDrtConfigGroup multiModeDrtCfg;
 
 	public MosaicModule(MATSimAmbassador ambassador, Config config) {
 		this.ambassador = ambassador;
@@ -36,6 +33,8 @@ public class MosaicModule extends AbstractModule {
 
 		bind(MATSimAmbassador.class).toInstance(ambassador);
 		bind(RtiAmbassador.class).toInstance(ambassador.getRti());
+
+		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			install(new DrtModeModule(drtCfg));

@@ -56,6 +56,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>signals</artifactId>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.eclipse.mosaic</groupId>
 			<artifactId>mosaic-application</artifactId>
 			<version>${mosaic.version}</version>
@@ -67,7 +73,7 @@
 			<version>${mosaic.version}</version>
 		</dependency>
 
-		<!-- Needed for multithreading -->
+		<!-- Needed for multithreading utils -->
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>
