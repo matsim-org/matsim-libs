@@ -70,7 +70,7 @@ class RunJointDemandCarToggleJspritExample {
         Config config = loadConfig(configUrl);
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
-        jointDemandConfigGroup.setKeepUsedOperatorsInterval(2);
+        jointDemandConfigGroup.setChangeCommercialJobOperatorInterval(2);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setTravelTimeSliceWidth(3600);

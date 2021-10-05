@@ -18,8 +18,8 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;/*
-																					* created by jbischoff, 08.05.2019
-																					*/
+ * created by jbischoff, 08.05.2019
+ */
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -31,129 +31,136 @@ import java.util.Map;
 
 public class JointDemandConfigGroup extends ReflectiveConfigGroup {
 
-	@Positive
-	private double firstLegTraveltimeBufferFactor = 2.0;
-	public static final String FIRSTLEGBUFFER = "firstLegBufferFactor";
-	private static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
+    @Positive
+    private double firstLegTraveltimeBufferFactor = 2.0;
+    public static final String FIRSTLEGBUFFER = "firstLegBufferFactor";
+    private static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
 
-	public static final String MAXJOBSCORE = "maxJobScore";
+    public static final String MAXJOBSCORE = "maxJobScore";
 
-	@Positive
-	private double zeroUtilityDelay = 1800;
-	public static final String ZEROUTILDELAY = "zeroUtilityDelay";
-	private static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
-	public static final String MINJOBSCORE = "minJobScore";
-	private static final String MAXJOBSCOREDESC = "Score for performing job in time.";
-	private static final String MINJOBSCOREDESC = "Minimum score for delayed commercial jobs. "
-			+ "Note that if the customer is not served at all, that creates a score of zero. "
-			+ "So if this value is set to negative, that means an intensively delayed job is worse than no job.";
-	@Positive
-	private double maxJobScore = 6;
-	private double minJobScore = -6;
+    @Positive
+    private double zeroUtilityDelay = 1800;
+    public static final String ZEROUTILDELAY = "zeroUtilityDelay";
+    private static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
+    public static final String MINJOBSCORE = "minJobScore";
+    private static final String MAXJOBSCOREDESC = "Score for performing job in time.";
+    private static final String MINJOBSCOREDESC = "Minimum score for delayed commercial jobs. " +
+            "Note that if the customer is not served at all, that creates a score of zero. " +
+            "So if this value is set to negative, that means an intensively delayed job is worse than no job.";
+    @Positive
+    private double maxJobScore = 6;
+    private double minJobScore = -6;
 
-	public static final String KEEPUSEDOPERATORSINTERVAL = "keepUsedOperatorsInterval";
-	public static final String KEEPUSEDOPERATORSINTERVALDESC = ChangeCommercialJobOperator.SELECTOR_NAME
+	public static final String CHANGEOPERATORINTERVAL = "changeOperatorInterval";
+	public static final String CHANGEOPERATORINTERVALDESC = ChangeCommercialJobOperator.SELECTOR_NAME
 			+ " is actively used only every n-th iteration. Between this interval, assigned operator "
 			+ "per job is kept constant and jsprit tourplanning gets bypassed.";
 	@PositiveOrZero
-	private int keepUsedOperatorsInterval = 0;
+	private int changeOperatorInterval = 0;
 
-	public static final String GROUP_NAME = "commercialTraffic";
+    public static final String GROUP_NAME = "commercialTraffic";
 
-	public JointDemandConfigGroup() {
-		super(GROUP_NAME);
-	}
+    public JointDemandConfigGroup() {
+        super(GROUP_NAME);
+    }
 
-	public static JointDemandConfigGroup get(Config config) {
-		return (JointDemandConfigGroup) config.getModules().get(GROUP_NAME);
+    public static JointDemandConfigGroup get(Config config) {
+        return (JointDemandConfigGroup) config.getModules().get(GROUP_NAME);
+    }
+
+	/**
+	 * @return -- {@value #CHANGEOPERATORINTERVAL}
+	 */
+	public int getChangeCommercialJobOperatorInterval() {
+		return changeOperatorInterval;
 	}
 
 	/**
-	 * @return -- {@value #KEEPUSEDCARRIERINTERVAL}
+	 * @param changeOperatorInterval-- {@value #CHANGEOPERATORINTERVAL}
 	 */
-	public int getKeepUsedOperatorsInterval() {
-		return keepUsedOperatorsInterval;
+	public void setChangeCommercialJobOperatorInterval(int changeOperatorInterval) {
+		this.changeOperatorInterval = changeOperatorInterval;
 	}
 
-	/**
-	 * @param -- {@value #KEEPUSEDCARRIERINTERVAL}
-	 */
-	public void setKeepUsedOperatorsInterval(int interval) {
-		this.keepUsedOperatorsInterval = interval;
-	}
+    /**
+     * @return firstLegTraveltimeBufferFactor --{@value #FIRSTLEGBUFFERDESC}
+     */
+//    @StringGetter(FIRSTLEGBUFFER)
+    double getFirstLegTraveltimeBufferFactor() {
+        return firstLegTraveltimeBufferFactor;
+    }
 
-	/**
-	 * @return -- {@value #FIRSTLEGBUFFERDESC}
-	 */
-	double getFirstLegTraveltimeBufferFactor() {
-		return firstLegTraveltimeBufferFactor;
-	}
+    /**
+     * @param firstLegTraveltimeBufferFactor --{@value #FIRSTLEGBUFFERDESC}
+     */
+//    @StringSetter(FIRSTLEGBUFFER)
+    public void setFirstLegTraveltimeBufferFactor(double firstLegTraveltimeBufferFactor) {
+        this.firstLegTraveltimeBufferFactor = firstLegTraveltimeBufferFactor;
+    }
 
-	/**
-	 * @param -- {@value #FIRSTLEGBUFFERDESC}
-	 */
-	public void setFirstLegTraveltimeBufferFactor(double firstLegTraveltimeBufferFactor) {
-		this.firstLegTraveltimeBufferFactor = firstLegTraveltimeBufferFactor;
-	}
+    /**
+     * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
+     */
+//    @StringGetter(ZEROUTILDELAY)
+    public double getZeroUtilityDelay() {
+        return zeroUtilityDelay;
+    }
 
-	/**
-	 * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
-	 */
-	public double getZeroUtilityDelay() {
-		return zeroUtilityDelay;
-	}
+    /**
+     * @param zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
+     */
+//    @StringSetter(ZEROUTILDELAY)
+    public void setZeroUtilityDelay(double zeroUtilityDelay) {
+        this.zeroUtilityDelay = zeroUtilityDelay;
+    }
 
-	/**
-	 * @param zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
-	 */
-	public void setZeroUtilityDelay(double zeroUtilityDelay) {
-		this.zeroUtilityDelay = zeroUtilityDelay;
-	}
+    /**
+     * @return maxJobScore --{@value #MAXJOBSCOREDESC}
+     */
+//    @StringGetter(MAXJOBSCORE)
+    public double getMaxJobScore() {
+        return maxJobScore;
+    }
 
-	/**
-	 * @return maxJobScore --{@value #MAXJOBSCOREDESC}
-	 */
-	public double getMaxJobScore() {
-		return maxJobScore;
-	}
+    /**
+     * @param maxJobScore --{@value #MAXJOBSCOREDESC}
+     */
+//    @StringSetter(MAXJOBSCORE)
+    public void setMaxJobScore(double maxJobScore) {
+        this.maxJobScore = maxJobScore;
+    }
 
-	/**
-	 * @param maxJobScore --{@value #MAXJOBSCOREDESC}
-	 */
-	public void setMaxJobScore(double maxJobScore) {
-		this.maxJobScore = maxJobScore;
-	}
+    /**
+     * @return minJobScore --{@value #MINJOBSCOREDESC}
+     */
+//    @StringGetter(MINJOBSCORE)
+    public double getMinJobScore() {
+        return minJobScore;
+    }
 
-	/**
-	 * @return minJobScore --{@value #MINJOBSCOREDESC}
-	 */
-	public double getMinJobScore() {
-		return minJobScore;
-	}
+    /**
+     * @param minJobScore --{@value #MINJOBSCOREDESC}
+     */
+//    @StringSetter(MINJOBSCORE)
+    public void setMinJobScore(double minJobScore) {
+        this.minJobScore = minJobScore;
+    }
 
-	/**
-	 * @param minJobScore --{@value #MINJOBSCOREDESC}
-	 */
-	public void setMinJobScore(double minJobScore) {
-		this.minJobScore = minJobScore;
-	}
+    @Override
+    public Map<String, String> getComments() {
+        Map<String, String> map = super.getComments();
+        map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
+        map.put(MAXJOBSCORE, MAXJOBSCOREDESC);
+        map.put(MINJOBSCORE, MINJOBSCOREDESC);
+        map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
+        return map;
+    }
 
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
-		map.put(MAXJOBSCORE, MAXJOBSCOREDESC);
-		map.put(MINJOBSCORE, MINJOBSCOREDESC);
-		map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
-		map.put(KEEPUSEDOPERATORSINTERVAL, KEEPUSEDOPERATORSINTERVALDESC);
-		return map;
-	}
-
-	@Override
-	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
-		if (getMaxJobScore() < getMinJobScore()) {
-			throw new RuntimeException("Minimum Score for commercial jobs is higher than maximum score");
-		}
-	}
+    @Override
+    protected void checkConsistency(Config config) {
+        super.checkConsistency(config);
+        if (getMaxJobScore() < getMinJobScore()) {
+            throw new RuntimeException("Minimum Score for commercial jobs is higher than maximum score");
+        }
+    }
 }
