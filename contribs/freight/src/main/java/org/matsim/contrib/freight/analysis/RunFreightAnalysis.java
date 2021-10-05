@@ -38,21 +38,21 @@ import java.io.File;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  */
 
-class RunFreightAnalysis {
-    public static void main(String[] args) {
-        RunFreightAnalysis rfa = new RunFreightAnalysis();
-        // path to your output files:
-        // (For a quick start, run the "RunFAIT" test to generate sample output from the chessboard-example and then run the analysis on that:)
-        String basePath = "src/test/output/chessboard/matsim";
-        rfa.runAnalysis(basePath);
+public class RunFreightAnalysis {
+
+    private String inputPath;
+    private String outputPath;
+
+    public RunFreightAnalysis(String inputPath, String outputPath) {
+        this.inputPath = inputPath;
+        this.outputPath = outputPath;
     }
-    public RunFreightAnalysis() { }
-    
-    private void runAnalysis(String basePath){
-       File networkFile = new File(basePath + "/output_network.xml.gz");
-       File carrierFile = new File(basePath + "/output_carriers.xml");
-       File vehiclesFile = new File(basePath + "/output_allVehicles.xml.gz");
-       File eventsFile = new File(basePath + "/output_events.xml.gz");
+
+    private void runAnalysis(){
+       File networkFile = new File(inputPath + "/output_network.xml.gz");
+       File carrierFile = new File(inputPath + "/output_carriers.xml");
+       File vehiclesFile = new File(inputPath + "/output_allVehicles.xml.gz");
+       File eventsFile = new File(inputPath + "/output_events.xml.gz");
 
        Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
@@ -72,10 +72,10 @@ class RunFreightAnalysis {
        eventsReader.readFile(eventsFile.getAbsolutePath());
        eventsManager.finishProcessing();
 
-       freightEventHandler.exportVehicleInfo("freightOutput", true);
-       freightEventHandler.exportVehicleTripInfo("freightOutput", true);
-       freightEventHandler.exportVehicleTypeStats("freightOutput", true);
-       freightEventHandler.exportServiceInfo("freightOutput", true);
-       freightEventHandler.exportShipmentInfo("freightOutput", true);
+       freightEventHandler.exportVehicleInfo(outputPath, true);
+       freightEventHandler.exportVehicleTripInfo(outputPath, true);
+       freightEventHandler.exportVehicleTypeStats(outputPath, true);
+       freightEventHandler.exportServiceInfo(outputPath, true);
+       freightEventHandler.exportShipmentInfo(outputPath, true);
     }
 }
