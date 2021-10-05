@@ -46,6 +46,7 @@ public abstract class TransformationFactory {
 	public final static String HARTEBEESTHOEK94_LO29 = "SA_Lo29"; // South Africa adaption of Transverse Mercator. General for SA as a whole, and Gauteng
 	public final static String HARTEBEESTHOEK94_LO31 = "SA_Lo31"; // South Africa adaption of Transverse Mercator. eThekwini (Durban)
 	public final static String WGS84_UTM33N = "WGS84_UTM33N"; // Berlin
+	public final static String KROVAK = "EPSG5514_KROVAK"; // Czech
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
     public final static String WGS84_UTM31N = "WGS84_UTM31N"; // Barcelona/Spain
