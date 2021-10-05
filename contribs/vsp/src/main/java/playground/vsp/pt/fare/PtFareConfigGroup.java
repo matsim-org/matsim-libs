@@ -6,7 +6,8 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.Map;
 
 public class PtFareConfigGroup extends ReflectiveConfigGroup {
-    public static final String MODULE_NAME = "ptFares";
+    public static final String PT_FARE = "pt fare";
+    public static final String MODULE_NAME = "ptFare";
     public static final String PT_FARE_CALCULATION = "ptFareCalculation";
     public static final String APPLY_UPPER_BOUND = "applyUpperBound";
     public static final String UPPER_BOUND_FACTOR = "upperBoundFactor";

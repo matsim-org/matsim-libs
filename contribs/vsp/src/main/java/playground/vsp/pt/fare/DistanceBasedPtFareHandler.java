@@ -61,7 +61,7 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
                 // charge fare to the person
                 events.processEvent(
                         new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare,
-                                DistanceBasedPtFareParams.PT_DISTANCE_BASED_FARE, TransportMode.pt, event.getPersonId().toString()));
+                                PtFareConfigGroup.PT_FARE, DistanceBasedPtFareParams.PT_FARE_DISTANCE_BASED, event.getPersonId().toString()));
 
                 personDepartureCoordMap.remove(personId);
                 personArrivalCoordMap.remove(personId);
