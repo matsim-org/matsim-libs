@@ -1,7 +1,8 @@
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.DefaultCommercialServiceScore;
 
 public class DefaultCommercialServiceScoreTest {
 

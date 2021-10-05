@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;/*
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 17.06.2019
  */
 

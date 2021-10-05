@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -59,7 +59,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import static org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandUtils.*;
+import static org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandUtils.*;
 
 /**
  * Generates carriers and tours depending on next iteration's freight demand

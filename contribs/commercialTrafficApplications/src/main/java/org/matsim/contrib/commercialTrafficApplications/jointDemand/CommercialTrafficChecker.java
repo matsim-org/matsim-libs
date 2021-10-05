@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -30,7 +30,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 class CommercialTrafficChecker {
