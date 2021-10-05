@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
