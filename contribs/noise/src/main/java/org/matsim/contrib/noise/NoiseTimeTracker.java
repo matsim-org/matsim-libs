@@ -104,11 +104,13 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				potentialLinks.parallelStream().forEach(linkId -> {
 					if (!(relevantLinkIds.contains(linkId))) {
 						Link candidateLink = noiseContext.getScenario().getNetwork().getLinks().get(linkId);
-						double projectedDistance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
-						if (projectedDistance < noiseParams.getRelevantRadius()) {
-							relevantLinkIds.add(linkId);
-							double correction = immissionModule.calculateCorrection(projectedDistance, nrp, candidateLink);
-							nrp.setLinkId2Correction(linkId, correction);
+						if (candidateLink.getFromNode().getCoord() != candidateLink.getToNode().getCoord()){
+							double projectedDistance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+							if (projectedDistance < noiseParams.getRelevantRadius()) {
+								relevantLinkIds.add(linkId);
+								double correction = immissionModule.calculateCorrection(projectedDistance, nrp, candidateLink);
+								nrp.setLinkId2Correction(linkId, correction);
+							}
 						}
 					}
 				});
