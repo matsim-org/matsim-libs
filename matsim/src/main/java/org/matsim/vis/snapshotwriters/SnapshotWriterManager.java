@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class SnapshotWriterManager implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener, MobsimInitializedListener {
 
-	private static Logger log = LogManager.getLogger(SnapshotWriterManager.class);
+	private static final Logger log = LogManager.getLogger(SnapshotWriterManager.class);
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
 	private final QSimConfigGroup.FilterSnapshots filterSnapshots;
@@ -52,7 +52,6 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private double snapshotTime = 0.0;
 
 	public SnapshotWriterManager(int snapshotPeriod, QSimConfigGroup.FilterSnapshots filterSnapshots) {
-		log.info("\n\n\n\n\n\n---------------------------------------- This is the version with non parallel position generation --------------------------------------------\n\n\n\n\n");
 		this.snapshotPeriod = snapshotPeriod;
 		this.filterSnapshots = filterSnapshots;
 	}
@@ -91,7 +90,10 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private void doSnapshot(final double time, VisMobsim visMobsim) {
 		if (!this.snapshotWriters.isEmpty()) {
 
-			// this has to be single threaded somehow
+			// This could be parallel since mihal has fixed some concurrency issues in the SnapshotInfoBuilder
+			// I think mainly by using separate builders for each generated AgentPositionInfo.
+			// I don't have time to test this right now, but if this ever appears to be a bottle neck, this probably
+			// can be replaced by a parallel stream. janek: oct' 2021
 			var positions = visMobsim.getVisNetwork().getVisLinks().values().stream()
 					.filter(visLink -> isGenerateSnapshot(visLink.getLink()))
 					.flatMap(visLink -> visLink.getVisData().addAgentSnapshotInfo(new HashSet<>()).stream())
