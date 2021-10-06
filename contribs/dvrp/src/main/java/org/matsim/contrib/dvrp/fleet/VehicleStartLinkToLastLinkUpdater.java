@@ -20,54 +20,34 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 /**
- * 1. Collects information on fleet vehicles on MobsimBeforeCleanupEvent.
- * 2. Updates vehicle fleet specifications on IterationEndsEvent.
+ * Updates vehicle fleet specifications on IterationEndsEvent.
  *
  * @author Michal Maciejewski (michalm)
  */
-public class VehicleStartLinkToLastLinkUpdater
-		implements QSimScopeObjectListener<Fleet>, MobsimBeforeCleanupListener, IterationEndsListener {
+public class VehicleStartLinkToLastLinkUpdater implements IterationEndsListener {
 	private final FleetSpecification fleetSpecification;
-	private List<DvrpVehicleSpecification> updatedVehSpecifications;
-	private Fleet fleet;
+	private final ExecutedScheduleCollector executedScheduleCollector;
 
-	public VehicleStartLinkToLastLinkUpdater(FleetSpecification fleetSpecification) {
+	public VehicleStartLinkToLastLinkUpdater(FleetSpecification fleetSpecification,
+			ExecutedScheduleCollector executedScheduleCollector) {
 		this.fleetSpecification = fleetSpecification;
-	}
-
-	@Override
-	public void objectCreated(Fleet fleet) {
-		this.fleet = fleet;
-	}
-
-	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		updatedVehSpecifications = fleet.getVehicles()
-				.values()
-				.stream()
-				.map(v -> ImmutableDvrpVehicleSpecification.newBuilder()
-						.id(v.getId())
-						.startLinkId(Schedules.getLastLinkInSchedule(v).getId())
-						.capacity(v.getCapacity())
-						.serviceBeginTime(v.getServiceBeginTime())
-						.serviceEndTime(v.getServiceEndTime())
-						.build())
-				.collect(Collectors.toList());
+		this.executedScheduleCollector = executedScheduleCollector;
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		updatedVehSpecifications.forEach(fleetSpecification::replaceVehicleSpecification);
+		executedScheduleCollector.getExecutedSchedules().forEach(schedule -> {
+			var currentSpecification = fleetSpecification.getVehicleSpecifications().get(schedule.vehicleId);
+			var tasks = schedule.getExecutedTasks();
+			var updatedSpecification = ImmutableDvrpVehicleSpecification.newBuilder(currentSpecification)
+					.startLinkId(tasks.get(tasks.size() - 1).endLinkId) // update start link to last link
+					.build();
+			fleetSpecification.replaceVehicleSpecification(updatedSpecification);
+		});
 	}
 }

@@ -25,7 +25,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -55,16 +55,18 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
 	private final MainModeIdentifier mainModeIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 
 	@Inject
 	JointTripMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier, MainModeIdentifier mainModeIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier, MainModeIdentifier mainModeIdentifier, TimeInterpretation timeInterpretation ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
 		this.mainModeIdentifier = mainModeIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -109,7 +111,7 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					config,
-					tripRouterFactory) );
+					tripRouterFactory, timeInterpretation) );
 
 		final VehicleRessources vehicles = 
 					(VehicleRessources) sc.getScenarioElement(

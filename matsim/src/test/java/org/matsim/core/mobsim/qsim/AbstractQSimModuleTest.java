@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -122,8 +123,8 @@ public class AbstractQSimModuleTest {
 		private final AtomicLong value;
 
 		@Inject
-		public TestAgentFactory(Netsim simulation, AtomicLong value) {
-			delegate = new DefaultAgentFactory(simulation);
+		public TestAgentFactory(Netsim simulation, AtomicLong value, TimeInterpretation timeInterpretation) {
+			delegate = new DefaultAgentFactory(simulation, timeInterpretation);
 			this.value = value;
 		}
 

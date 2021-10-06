@@ -32,6 +32,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
 import playground.vsp.parkAndRide.PRConfigGroup;
@@ -65,7 +66,7 @@ public class PRStrategyAdd implements PlanStrategy {
 		PRAddStrategyMod prAddStrategyMod = new PRAddStrategyMod(controler, id2prFacility, prSettings.getGravity(), prSettings.getTypicalDuration());
 		planStrategyDelegate.addStrategyModule(prAddStrategyMod);
 		
-		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider) ;
+		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
 		
 	}

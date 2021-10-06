@@ -41,6 +41,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -121,7 +122,8 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 						new Random( 1234 ),
 						vehs,
 						Collections.singleton( MODE ),
-						false );
+						false,
+						TimeInterpretation.create(ConfigUtils.createConfig()));
 			algo.run( optimized );
 			final double optimizedOverlap = algo.calcOverlap( optimized );
 			final Counter counter = new Counter( "test plan # "+(i+1)+", test # " );

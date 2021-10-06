@@ -47,6 +47,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RoutingIT {
@@ -233,6 +235,7 @@ public class RoutingIT {
 					public void install() {
 						install(new ScenarioByInstanceModule(scenario));
 						addTravelTimeBinding("car").toInstance(calculator);
+						install(new TimeInterpretationModule());
 						addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 							@Override
 							public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
@@ -246,7 +249,7 @@ public class RoutingIT {
 		});
 
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
-		final PersonAlgorithm router = new PlanRouter(tripRouter);
+		final PersonAlgorithm router = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));
 		
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run(p);

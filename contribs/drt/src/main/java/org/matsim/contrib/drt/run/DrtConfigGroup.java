@@ -143,7 +143,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	static final String NUMBER_OF_THREADS_EXP =
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
-					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+					+ " using up to 4 threads."
+					+ " Default value is the number of cores available to JVM.";
 
 	public static final String STORE_UNSHARED_PATH = "storeUnsharedPath";
 	static final String STORE_UNSHARED_PATH_EXP = "Store planned unshared drt route as a link sequence";
@@ -269,10 +270,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
 					+ " Keep also in mind that not setting an end time may result in agents "
 					+ "attempting to travel without vehicles being available.");
-		}
-
-		if (config.qsim().getNumberOfThreads() > 1) {
-			log.warn("EXPERIMENTAL FEATURE: Running DRT with a multi-threaded QSim");
 		}
 
 		Verify.verify(getMaxWaitTime() >= getStopDuration(),

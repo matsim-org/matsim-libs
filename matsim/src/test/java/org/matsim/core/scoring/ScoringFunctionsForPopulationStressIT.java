@@ -226,7 +226,7 @@ public class ScoringFunctionsForPopulationStressIT {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator", null));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work", null));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work", null));
-			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
+			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car", "car"));
 			events.processEvent(new PersonArrivalEvent(i*200+190, personId, Id.createLinkId(0), "car"));
 		}
 		events.finishProcessing();
@@ -374,7 +374,7 @@ public class ScoringFunctionsForPopulationStressIT {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
-			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
+			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car", "car"));
 			events.processEvent(new PersonArrivalEvent(i*200+200, personId, Id.createLinkId(0), "car"));
 		}
 		events.finishProcessing();

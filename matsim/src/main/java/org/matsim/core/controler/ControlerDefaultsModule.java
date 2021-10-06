@@ -31,6 +31,7 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.counts.CountsModule;
 import org.matsim.guice.DependencyGraphModule;
 import org.matsim.pt.counts.PtCountsModule;
@@ -46,6 +47,7 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new CharyparNagelScoringFunctionModule());
         install(new TripRouterModule());
         install(new StrategyManagerModule());
+        install(new TimeInterpretationModule());
     
         // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
         install(new LinkStatsModule());

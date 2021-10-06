@@ -30,10 +30,10 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class DrtRequestInsertionRetryQueue {
+public class DrtRequestInsertionRetryQueue {
 	private final DrtRequestInsertionRetryParams params;
 
-	DrtRequestInsertionRetryQueue(DrtRequestInsertionRetryParams params) {
+	public DrtRequestInsertionRetryQueue(DrtRequestInsertionRetryParams params) {
 		this.params = params;
 	}
 
@@ -48,10 +48,14 @@ class DrtRequestInsertionRetryQueue {
 		return true;
 	}
 
+	public boolean hasRequestsToRetryNow(double now) {
+		double maxLastAttemptTimeForRetry = now - params.getRetryInterval();
+		return !requestQueue.isEmpty() && requestQueue.getFirst().lastAttemptTime <= maxLastAttemptTimeForRetry;
+	}
+
 	List<DrtRequest> getRequestsToRetryNow(double now) {
-		double maxAttemptTimeForRetry = now - params.getRetryInterval();
 		List<DrtRequest> requests = new ArrayList<>();
-		while (!requestQueue.isEmpty() && requestQueue.getFirst().lastAttemptTime <= maxAttemptTimeForRetry) {
+		while (hasRequestsToRetryNow(now)) {
 			var entry = requestQueue.removeFirst();
 			//no guarantee that this method is called every second, so we need to calculate time delta, instead of
 			//directly using the retry interval

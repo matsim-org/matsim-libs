@@ -9,6 +9,9 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+
+import org.matsim.core.utils.misc.OptionalTime;
 import picocli.CommandLine;
 
 import java.nio.file.Files;
@@ -32,11 +35,19 @@ public class CloseTrajectories implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", description = "Desired output path", required = true)
 	private Path output;
 
-	@CommandLine.Option(names = "--threshold", description = "Home activity is only inserted if travel time would be below threshold in minutes", defaultValue = "30")
+	@CommandLine.Option(names = "--threshold", description = "Home activity is only inserted if travel time would be below threshold in minutes.", defaultValue = "30")
 	private int threshold;
 
-	@CommandLine.Option(names = "--min-duration", description = "Minimum duration the last activity and home activity needs to have in minutes", defaultValue = "30")
+	@CommandLine.Option(names = "--min-duration", description = "Minimum duration the last activity and home activity needs to have in minutes. " +
+			"Can be 0 to disable or if this information is not available.", defaultValue = "30")
 	private int minDuration;
+
+	@CommandLine.Option(names = "--act-duration", description = "If the last activity has no duration, it will be assigned one.", defaultValue = "0")
+	private double actDuration;
+
+	@CommandLine.Option(names = "--end-time", description = "Set end-time for the inserted home activities." +
+			"Can be 0 to leave it undefined.", defaultValue = "0")
+	private double endTime;
 
 	@Override
 	public Integer call() throws Exception {
@@ -48,6 +59,7 @@ public class CloseTrajectories implements MATSimAppCommand {
 
 		Population population = PopulationUtils.readPopulation(input.toString());
 		PopulationFactory f = population.getFactory();
+		TimeInterpretation timeInterpretation = TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.ignoreDelays);
 
 		int added = 0;
 
@@ -60,8 +72,8 @@ public class CloseTrajectories implements MATSimAppCommand {
 
 			Optional<Activity> home = activities.stream().filter(act -> act.getType().startsWith("home")).findFirst();
 
-			// persons without home are not considered
-			if (home.isEmpty())
+			// persons without home or legs are not considered
+			if (home.isEmpty() || legs.isEmpty())
 				continue;
 
 			Coord homeCoord = home.get().getCoord();
@@ -80,17 +92,24 @@ public class CloseTrajectories implements MATSimAppCommand {
 			if (time > threshold * 60)
 				continue;
 
-			double endTime = PopulationUtils.decideOnActivityEndTime(lastAct, lastAct.getStartTime().orElse(Double.NaN), PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration)
-					.orElseThrow(() -> new IllegalStateException("Could not determine end time"));
+			if (minDuration > 0) {
 
-			// don't insert when the last activity is too short
-			if (endTime - lastAct.getStartTime().orElse(Double.NaN) < minDuration * 60)
-				continue;
+				OptionalTime optionalTime = timeInterpretation.decideOnActivityEndTime(lastAct, lastAct.getStartTime().orElse(Double.NaN));
 
-			// don't insert if home activity would be too short
-			// travel time is not considered here
-			if (86400 - endTime < minDuration * 60)
-				continue;
+				if (optionalTime.isUndefined())
+					continue;
+
+				double endTime = optionalTime.orElse(Double.NaN);
+
+				// don't insert when the last activity is too short
+				if (endTime - lastAct.getStartTime().orElse(Double.NaN) < minDuration * 60)
+					continue;
+
+				// don't insert if home activity would be too short
+				// travel time is not considered here
+				if (86400 - endTime < minDuration * 60)
+					continue;
+			}
 
 			Leg leg = f.createLeg(lastLeg.getMode());
 			for (Map.Entry<String, Object> e : lastLeg.getAttributes().getAsMap().entrySet()) {
@@ -98,6 +117,17 @@ public class CloseTrajectories implements MATSimAppCommand {
 			}
 
 			Activity homeAct = f.createActivityFromCoord("home", homeCoord);
+
+			if (lastAct.getEndTime().isUndefined() && actDuration > 0) {
+				lastAct.setEndTime(lastAct.getStartTime().seconds() + actDuration);
+			}
+
+			//if (lastAct.getStartTime().isDefined() && actDuration > 0) {
+			//	homeAct.setStartTime(lastAct.getStartTime().seconds() + time * 1.3 + actDuration);
+			//}
+
+			if (endTime > 0)
+				homeAct.setEndTime(endTime);
 
 			plan.addLeg(leg);
 			plan.addActivity(homeAct);
