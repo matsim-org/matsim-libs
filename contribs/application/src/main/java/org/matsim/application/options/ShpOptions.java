@@ -24,9 +24,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import picocli.CommandLine;
-
 import javax.annotation.Nullable;
+import picocli.CommandLine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
@@ -209,6 +208,12 @@ public final class ShpOptions {
 		return shpCrs;
 	}
 
+	/**
+	 * Create an inverse coordinate transformation from the shape file crs. Tries to autodetect the crs of the shape file.
+	 */
+	public CoordinateTransformation createInverseTransformation(String toCRS) {
+		return TransformationFactory.getCoordinateTransformation(detectCRS(), toCRS);
+	}
 
 	/**
 	 * Helper class to provide an index for a shapefile lookup.

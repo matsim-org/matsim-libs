@@ -34,12 +34,12 @@ public interface CostCalculationStrategy {
 	 * @return the cost of insertion, INFEASIBLE_SOLUTION_COST if insertion is not feasible
 	 */
 	double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-			InsertionCostCalculator.DetourTimeInfo detourTimeInfo);
+			InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo);
 
 	class RejectSoftConstraintViolations implements CostCalculationStrategy {
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				InsertionCostCalculator.DetourTimeInfo detourTimeInfo) {
+				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 			if ((totalTimeLoss > 0 && totalTimeLoss > vehicleSlackTime)
 					|| detourTimeInfo.departureTime > request.getLatestStartTime()
@@ -60,7 +60,7 @@ public interface CostCalculationStrategy {
 
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				InsertionCostCalculator.DetourTimeInfo detourTimeInfo) {
+				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 			if (totalTimeLoss > 0 && totalTimeLoss > vehicleSlackTime) {
 				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)

@@ -5,6 +5,7 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This class represents an agent's trip. It contains structural information
@@ -19,17 +20,19 @@ public final class DiscreteModeChoiceTrip {
 	private final String initialMode;
 	private OptionalTime departureTime = OptionalTime.undefined();
 	private final List<? extends PlanElement> initialElements;
+	private final Attributes tripAttributes;
 
 	private final int hashCode;
 	private final int index;
 
 	public DiscreteModeChoiceTrip(Activity originActivity, Activity destinationActivity, String initialMode,
-			List<? extends PlanElement> initialElements, int personHash, int tripHash, int index) {
+			List<? extends PlanElement> initialElements, int personHash, int tripHash, int index, Attributes tripAttributes) {
 		this.originActivity = originActivity;
 		this.destinationActivity = destinationActivity;
 		this.initialMode = initialMode;
 		this.initialElements = initialElements;
 		this.index = index;
+		this.tripAttributes = tripAttributes;
 
 		int hashCode = 12;
 		hashCode += 37 * (int) (personHash ^ (personHash >>> 32));
@@ -68,5 +71,9 @@ public final class DiscreteModeChoiceTrip {
 
 	public int getIndex() {
 		return index;
+	}
+	
+	public Attributes getTripAttributes() {
+		return tripAttributes;
 	}
 }

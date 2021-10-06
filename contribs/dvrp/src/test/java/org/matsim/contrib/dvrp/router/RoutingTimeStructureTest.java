@@ -23,6 +23,8 @@ package org.matsim.contrib.dvrp.router;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +64,7 @@ public class RoutingTimeStructureTest {
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
 		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(fromFacility, toFacility))
+		when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any()))
 				.thenReturn(Optional.of(Pair.of(accessFacility, egressFacility)));
 
 		RoutingModule accessRouter = mock(RoutingModule.class);
@@ -122,7 +124,7 @@ public class RoutingTimeStructureTest {
 		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
 		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(fromFacility, toFacility))
+		when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any()))
 				.thenReturn(Optional.of(Pair.of(accessFacility, egressFacility)));
 
 		RoutingModule accessRouter = mock(RoutingModule.class);

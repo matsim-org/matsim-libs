@@ -29,6 +29,7 @@ import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpreta
 import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class MultinomialLogitTest {
 	@Test
@@ -53,7 +54,7 @@ public class MultinomialLogitTest {
 				considerMinimumUtility);
 
 		List<DiscreteModeChoiceTrip> trips = Collections
-				.singletonList(new DiscreteModeChoiceTrip(originActivity, destinationActivity, null, null, 0, 0, 0));
+				.singletonList(new DiscreteModeChoiceTrip(originActivity, destinationActivity, null, null, 0, 0, 0, new Attributes()));
 
 		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
 				selectorFactory, fallbackBehaviour,
