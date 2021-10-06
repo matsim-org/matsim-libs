@@ -12,10 +12,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -25,6 +27,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.PositionEvent;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -330,6 +333,28 @@ public class PositionEmissionsModule extends AbstractModule {
 		@Override
 		public String getEventType() {
 			return EVENT_TYPE;
+		}
+
+		public static MatsimEventsReader.CustomEventMapper getEventMapper() {
+			return event -> {
+				var position = new PositionInfo.DirectBuilder()
+						.setAgentState(AgentSnapshotInfo.AgentState.valueOf(event.getAttributes().get("state")))
+						.setEasting(Double.parseDouble(event.getAttributes().get(Event.ATTRIBUTE_X)))
+						.setNorthing(Double.parseDouble(event.getAttributes().get(Event.ATTRIBUTE_Y)))
+						.setPersonId(Id.createPersonId(event.getAttributes().get(HasPersonId.ATTRIBUTE_PERSON)))
+						.setLinkId(Id.createLinkId(event.getAttributes().get("linkId")))
+						.setVehicleId(Id.createVehicleId(event.getAttributes().get("vehicleId")))
+						.build();
+
+				var positionEvent = new PositionEvent(event.getTime(), position);
+				var emissions = Arrays.stream(Pollutant.values())
+						.filter(pollutant -> event.getAttributes().containsKey(pollutant.toString()))
+						.map(pollutant -> Tuple.of(pollutant, Double.parseDouble(event.getAttributes().get(pollutant.toString()))))
+						.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+				var type = event.getAttributes().get("emissionType");
+
+				return new PositionEmissionEvent(positionEvent, emissions, type);
+			};
 		}
 	}
 }
