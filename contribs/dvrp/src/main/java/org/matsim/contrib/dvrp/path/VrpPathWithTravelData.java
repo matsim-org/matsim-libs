@@ -25,4 +25,6 @@ public interface VrpPathWithTravelData extends VrpPath {
 	double getTravelTime();
 
 	double getArrivalTime();
+
+	VrpPathWithTravelData withDepartureTime(double timeShift);
 }

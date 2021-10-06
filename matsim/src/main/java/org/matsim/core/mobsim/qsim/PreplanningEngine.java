@@ -349,7 +349,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			Facility toFacility = tripInfo.getPickupLocation();
 			double departureTime = tripInfo.getExpectedBoardingTime() - 900.; // always depart 15min before pickup
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
-					toFacility, departureTime, null, inputTrip.getOriginActivity().getAttributes());
+					toFacility, departureTime, null, inputTrip.getTripAttributes());
 			;
 			// not sure if this works for walk, but it should ...
 

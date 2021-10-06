@@ -43,6 +43,5 @@ public abstract class PtConstants implements MatsimParameters {
 	
 	// this is currently used for wait2link events where the mode is not clear (bus, rail...?!), theresa sep'2015
 	public final static String NETWORK_MODE = "pt unspecified";
-	
 
 }

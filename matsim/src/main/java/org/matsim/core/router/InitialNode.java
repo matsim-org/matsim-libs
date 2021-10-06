@@ -33,7 +33,9 @@ public class InitialNode {
 	//need a decision. Amit Sep'17
 	
 	public Node node;
+	// additional travel disutility related to visiting this node
 	public final double initialCost;
+	// additional travel time related to visiting this node
 	public final double initialTime;
 	
 	public InitialNode(final Node node, final double initialCost, final double initialTime) {

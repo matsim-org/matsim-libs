@@ -157,7 +157,7 @@ public final class EditTrips {
 			replanCurrentTripFromStageActivity(trip, tripElementsIndex, routingMode, now, agent);
 		} else {
 			// we are on a leg
-			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent, trip.getOriginActivity().getAttributes());
+			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent, trip.getTripAttributes());
 		}
 
 		if (eventsManager != null) {
@@ -517,7 +517,7 @@ public final class EditTrips {
 					departureTime = departureTimeAccordingToPlannedActivityEnd;
 				}
 			}
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, plan.getPerson(), previousActivity.getAttributes() );
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, plan.getPerson(), trip.getTripAttributes() );
 			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
 		} else {
 			/*
@@ -555,7 +555,7 @@ public final class EditTrips {
 		// (1) get new trip from current position to new activity:
 		Facility currentLocationFacility = FacilitiesUtils.toFacility(currentStageActivity, scenario.getActivityFacilities());
 		List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, trip.getDestinationActivity(), mainMode,
-				now, person, trip.getOriginActivity().getAttributes() );
+				now, person, trip.getTripAttributes() );
 
 		// (2) prune the new trip up to the current leg:
 		// do nothing ?!
@@ -690,7 +690,7 @@ public final class EditTrips {
 		Facility fromFacility = FacilitiesUtils.toFacility(trip.getOriginActivity(), scenario.getActivityFacilities());
 		Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());
 
-		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person, trip.getOriginActivity().getAttributes());
+		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person, trip.getTripAttributes());
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 

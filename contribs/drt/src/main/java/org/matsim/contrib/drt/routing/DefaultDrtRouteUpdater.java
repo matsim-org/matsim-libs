@@ -17,13 +17,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.routing;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
@@ -33,14 +36,16 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.inject.name.Named;
-
-import one.util.streamex.StreamEx;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -67,19 +72,28 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		Stream<Leg> drtLegs = StreamEx.of(population.getPersons().values())
-				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
-				.select(Leg.class)
-				.filterBy(Leg::getMode, drtCfg.getMode());
-		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
+		List<Future<?>> futures = new LinkedList<>();
+		
+		for (Person person : population.getPersons().values()) {
+			for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+				for (Leg leg : trip.getLegsOnly()) {
+					if (leg.getMode().equals(drtCfg.getMode())) {
+						futures.add(executorService.submitRunnable(router -> updateDrtRoute(router, person, trip.getTripAttributes(), leg)));
+					}
+				}
+			}
+		}
+		
+		futures.forEach(Futures::getUnchecked);
 	}
 
-	private void updateDrtRoute(DrtRouteCreator drtRouteCreator, Leg drtLeg) {
+	private void updateDrtRoute(DrtRouteCreator drtRouteCreator, Person person, Attributes tripAttributes, Leg drtLeg) {
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
 		RouteFactories routeFactories = population.getFactory().getRouteFactories();
 		drtLeg.setRoute(
-				drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, routeFactories));
+				drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, 
+						person, tripAttributes, routeFactories));
 	}
 
 	@Override

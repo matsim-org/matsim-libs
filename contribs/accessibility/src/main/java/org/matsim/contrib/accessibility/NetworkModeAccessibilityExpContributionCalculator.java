@@ -93,7 +93,9 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
         	modeSet.add(mode);
 		}
         filter.filter(subNetwork, modeSet);
-        if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+        if (subNetwork.getNodes().size() == 0) {
+        	throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
+        }
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 
         this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
@@ -161,6 +163,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 
 	@Override
 	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
+		LOG.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
 		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
 				new NetworkModeAccessibilityExpContributionCalculator(this.mode, this.travelTime, this.travelDisutilityFactory, this.scenario);
 		networkModeAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;
