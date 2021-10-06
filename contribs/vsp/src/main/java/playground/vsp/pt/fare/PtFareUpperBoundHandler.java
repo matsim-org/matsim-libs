@@ -10,6 +10,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.pt.PtConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,8 @@ import java.util.Map;
  * instead of single tickets.
  */
 public class PtFareUpperBoundHandler implements PersonMoneyEventHandler, AfterMobsimListener {
-    public static final String PT_REFUND = "pt_fare_refund";
+    public static final String PT_REFUND = "pt fare refund";
+
     private double mobsimEndTime = Double.NaN;
     private final double upperBoundFactor;
 
@@ -40,11 +42,10 @@ public class PtFareUpperBoundHandler implements PersonMoneyEventHandler, AfterMo
 
     @Override
     public void handleEvent(PersonMoneyEvent event) {
-        if (event.getPurpose().startsWith("pt_fare")) {
+        if (event.getPurpose().equals(PtFareConfigGroup.PT_FARE)) {
             Id<Person> personId = event.getPersonId();
-            ptFareRecords.computeIfAbsent(personId, l -> new ArrayList<>()).add(event.getAmount());
+            ptFareRecords.computeIfAbsent(personId, l -> new ArrayList<>()).add(event.getAmount() * -1);
         }
-
     }
 
     @Override
@@ -67,20 +68,17 @@ public class PtFareUpperBoundHandler implements PersonMoneyEventHandler, AfterMo
 
     private double calculateRefund(List<Double> fares) {
         double sum = 0;
-        double maxFare = -1 * Double.MAX_VALUE;
+        double maxFare = 0;
         for (double fare : fares) {
             sum += fare;
             if (fare > maxFare) {
                 maxFare = fare;
             }
         }
-
         double upperBound = maxFare * upperBoundFactor;
-
         if (sum > upperBound) {
             return sum - upperBound;
         }
-
         return 0;
     }
 
