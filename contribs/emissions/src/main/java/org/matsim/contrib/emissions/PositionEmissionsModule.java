@@ -1,5 +1,6 @@
 package org.matsim.contrib.emissions;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,7 +30,6 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 import org.matsim.vis.snapshotwriters.PositionInfo;
 
-import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,7 +107,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		@Inject
 		private Vehicles vehicles;
 
-		@Inject
+		@Inject(optional = true)
 		@Transit
 		private Vehicles transitVehicles;
 
