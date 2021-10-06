@@ -56,8 +56,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	@CommandLine.Option(names = "--network", description = "Base network that will be merged with pt network.", required = true)
 	private Path networkFile;
 
-	@CommandLine.Option(names = "--date", description = "The day for which the schedules will be extracted", required = true)
-	private LocalDate date;
+	@CommandLine.Option(names = "--date", arity = "1..*", description = "The day for which the schedules will be extracted, can also be multiple", required = true)
+	private List<LocalDate> date;
 
 	@CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
 	private File output;
@@ -104,12 +104,17 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			filter = filter.and((Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance());
 		}
 
+		int i = 0;
 		for (Path gtfsFile : gtfsFiles) {
+
+			LocalDate date = this.date.size() > 1 ? this.date.get(i) : this.date.get(0);
+
+			log.info("Converting {} at date {}", gtfsFile, date);
 
 			GtfsConverter converter = GtfsConverter.newBuilder()
 					.setScenario(scenario)
 					.setTransform(ct)
-					.setDate(date)
+					.setDate(date) // use first date for all sets
 					.setFeed(gtfsFile)
 					//.setIncludeAgency(agency -> agency.equals("rbg-70"))
 					.setIncludeStop(filter)
@@ -239,17 +244,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				gtfsTransitType = Integer.parseInt( (String) line.getAttributes().getAttribute("gtfs_route_type"));
 			} catch (NumberFormatException e) {
 				log.error("unknown transit mode! Line id was " + line.getId().toString() +
-						"; gtfs route type was " + (String) line.getAttributes().getAttribute("gtfs_route_type"));
+						"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
 				throw new RuntimeException("unknown transit mode");
-			}
-
-			int agencyId;
-			try {
-				agencyId = Integer.parseInt( (String) line.getAttributes().getAttribute("gtfs_agency_id"));
-			} catch (NumberFormatException e) {
-				log.error("invalid transit agency! Line id was " + line.getId().toString() +
-						"; gtfs agency was " + (String) line.getAttributes().getAttribute("gtfs_agency_id"));
-				throw new RuntimeException("invalid transit agency");
 			}
 
 			switch (gtfsTransitType) {
@@ -262,6 +258,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				// and arrivals are as punctual (not too early) as possible
 				case 2:
 				case 100:
+				case 101:
+				case 102:
+				case 103:
+				case 104:
+				case 105:
+				case 106:
+				case 107:
+				case 108:
 					lineVehicleType = reRbVehicleType;
 					stopFilter = "station_S/U/RE/RB";
 					break;
