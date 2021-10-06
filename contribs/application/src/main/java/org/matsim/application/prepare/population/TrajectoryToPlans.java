@@ -46,16 +46,16 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private Path population;
 
     @CommandLine.Mixin
-    private CrsOptions crs = new CrsOptions();
+    private final CrsOptions crs = new CrsOptions();
 
     @CommandLine.Option(names = "--attributes", description = "Input person attributes file")
     private Path attributes;
 
-    @CommandLine.Option(names = { "--activity-bin-size", "--abs"}, description = "Activity types are extended so that they belong to a typical duration. This parameter influences the number of typical duration classes. The default is 600s")
-    private int activityBinSize = 600;
+    @CommandLine.Option(names = {"--activity-bin-size", "--abs"}, description = "Activity types are extended so that they belong to a typical duration. This parameter influences the number of typical duration classes. The default is 600s")
+    private final int activityBinSize = 600;
 
-    @CommandLine.Option(names = { "--max-typical-duraction", "--mtd" }, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h)")
-    private int maxTypicalDuration = 86400;
+    @CommandLine.Option(names = {"--max-typical-duraction", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h)")
+    private final int maxTypicalDuration = 86400;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
     private Path output;
@@ -136,7 +136,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
      */
     private void splitActivityTypesBasedOnDuration(Population population) {
 
-        final int maxCategories = maxTypicalDuration / activityBinSize; // limit categories to 24h * 3600s / timeBinSize
+        final int maxCategories = maxTypicalDuration / activityBinSize;
 
         // Calculate activity durations for the next step
         for (Person p : population.getPersons().values()) {
