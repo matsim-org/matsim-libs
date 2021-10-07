@@ -321,7 +321,7 @@ public final class EmissionUtils {
 				VehicleUtils.getHbefaEmissionsConcept(engineInfo);
 	}
 
-	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+	public static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
 		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
@@ -339,6 +339,27 @@ public final class EmissionUtils {
 		}
 		return hbefaVehicleCategory;
 	}
+
+	public static String mapHbefaVehicleCategory2String(HbefaVehicleCategory category) {
+
+		switch (category) {
+			case COACH:
+				return "coach";
+			case HEAVY_GOODS_VEHICLE:
+					return "HGV";
+			case LIGHT_COMMERCIAL_VEHICLE:
+				return "LCV";
+			case MOTORCYCLE:
+				return "motorcycle";
+			case PASSENGER_CAR:
+				return "pass. car";
+			case URBAN_BUS:
+				return "urban bus";
+			default:
+				throw new RuntimeException("Could not transform category to string: " + category);
+		}
+	}
+
         static Pollutant getPollutant( String pollutantString ){
 		// for the time being, we just manually add alternative spellings here, and map them all to the established enums.  One option to make this
 		// configurable would be to add corresponding maps into the emissions config, in the sense of
