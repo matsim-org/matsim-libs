@@ -195,12 +195,8 @@ public final class EmissionUtils {
 
 		Gbl.assertNotNull(vehicleType);
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
-//		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
-		try {
-			Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
-		} catch (Exception e) {
-			logger.info("oh no!");
-		}
+		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
+
 		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
