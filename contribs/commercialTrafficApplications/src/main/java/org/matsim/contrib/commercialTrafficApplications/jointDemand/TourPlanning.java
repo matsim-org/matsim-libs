@@ -36,7 +36,7 @@ import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.TransportCosts;
+import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 
@@ -77,7 +77,7 @@ class TourPlanning {
 		runTourPlanningForCarriers(carriers, scenario, netBasedCosts);
 	}
 
-	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, TransportCosts transportCosts) throws InterruptedException, ExecutionException {
+	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, VRPTransportCosts transportCosts) throws InterruptedException, ExecutionException {
 
 		HashMap<Id<Carrier>, Integer> carrierServiceCounterMap = new HashMap<>();
 

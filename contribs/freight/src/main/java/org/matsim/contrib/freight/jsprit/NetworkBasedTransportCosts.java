@@ -72,7 +72,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author stefan schröder
  *
  */
-public class NetworkBasedTransportCosts implements TransportCosts {
+public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	public interface InternalLeastCostPathCalculatorListener {
 

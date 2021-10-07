@@ -31,7 +31,7 @@ public class NetworkRouter {
 	 * @param {@link CarrierPlan}
 	 * @param {@link NetworkBasedTransportCosts}
 	 */
-	public static void routePlan(CarrierPlan plan, TransportCosts freightTransportCosts){
+	public static void routePlan(CarrierPlan plan, VRPTransportCosts freightTransportCosts){
 		new TimeAndSpacePlanRouter(freightTransportCosts.getRouter(), freightTransportCosts.getNetwork(), freightTransportCosts.getTravelTime()).run(plan);
 	}
 
