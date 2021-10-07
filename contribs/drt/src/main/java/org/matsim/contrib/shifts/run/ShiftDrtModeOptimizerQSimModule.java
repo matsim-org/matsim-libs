@@ -81,7 +81,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 	protected void configureQSim() {
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new ShiftDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
-						getter.getModal(DrtShiftDispatcher.class), getter.getModal(EShiftTaskScheduler.class),
+						getter.getModal(DrtShiftDispatcher.class),
 						getter.getModal(ScheduleTimingUpdater.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
@@ -171,8 +171,8 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 			}
 		}).asEagerSingleton();
 
-		bindModal(EShiftTaskScheduler.class).toProvider(
-				new ModalProviders.AbstractProvider<EShiftTaskScheduler>(drtCfg.getMode()) {
+		bindModal(ShiftTaskScheduler.class).toProvider(
+				new ModalProviders.AbstractProvider<ShiftTaskScheduler>(drtCfg.getMode()) {
 					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
@@ -180,13 +180,13 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 					private MobsimTimer timer;
 
 					@Override
-					public EShiftTaskScheduler get() {
+					public ShiftTaskScheduler get() {
 						Network network = getModalInstance(Network.class);
 						ShiftDrtTaskFactory taskFactory = getModalInstance(ShiftDrtTaskFactory.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new EShiftTaskScheduler(network, travelTime, travelDisutility, timer, taskFactory,
-								shiftConfigGroup, null);
+						return new ShiftTaskScheduler(network, travelTime, travelDisutility, timer, taskFactory,
+								shiftConfigGroup);
 					}
 				}).asEagerSingleton();
 
