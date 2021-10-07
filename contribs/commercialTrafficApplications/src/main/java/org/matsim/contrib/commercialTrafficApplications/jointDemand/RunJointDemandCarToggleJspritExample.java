@@ -21,9 +21,6 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
