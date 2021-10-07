@@ -52,10 +52,10 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private Path attributes;
 
     @CommandLine.Option(names = {"--activity-bin-size", "--abs"}, description = "Activity types are extended so that they belong to a typical duration. This parameter influences the number of typical duration classes. The default is 600s")
-    private final int activityBinSize = 600;
+    private int activityBinSize = 600;
 
     @CommandLine.Option(names = {"--max-typical-duraction", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h)")
-    private final int maxTypicalDuration = 86400;
+    private int maxTypicalDuration = 86400;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
     private Path output;
