@@ -65,19 +65,19 @@ public class InsertionCostCalculatorTest {
 		var insertion = new InsertionWithDetourData<>(insertion(entry, 0, 1), null, null, null, null);
 
 		//feasible solution
-		assertCalculate(0, insertion, new InsertionCostCalculator.DetourTimeInfo(0, 0, 11, 22), 11 + 22);
+		assertCalculate(0, insertion, new InsertionDetourTimeCalculator.DetourTimeInfo(0, 0, 11, 22), 11 + 22);
 
 		//infeasible solution - time constraints at stop 0
-		assertCalculate(0, insertion, new InsertionCostCalculator.DetourTimeInfo(0, 0, 999, 999),
+		assertCalculate(0, insertion, new InsertionDetourTimeCalculator.DetourTimeInfo(0, 0, 999, 999),
 				INFEASIBLE_SOLUTION_COST);
 
 		//infeasible solution - too little vehicle time slack
-		assertCalculate(499, insertion, new InsertionCostCalculator.DetourTimeInfo(0, 0, 1, 1),
+		assertCalculate(499, insertion, new InsertionDetourTimeCalculator.DetourTimeInfo(0, 0, 1, 1),
 				INFEASIBLE_SOLUTION_COST);
 	}
 
 	private <D> void assertCalculate(double now, InsertionWithDetourData<D> insertion,
-			InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+			InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
 		@SuppressWarnings("unchecked")
 		var detourTimeCalculator = (InsertionDetourTimeCalculator<D>)mock(InsertionDetourTimeCalculator.class);
 		var insertionCostCalculator = new DefaultInsertionCostCalculator<>(() -> now,
