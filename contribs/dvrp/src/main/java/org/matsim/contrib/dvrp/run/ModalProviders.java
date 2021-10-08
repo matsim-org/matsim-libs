@@ -61,6 +61,7 @@ public class ModalProviders {
 	public static final class InstanceGetter {
 		private final String mode;
 		private final Injector injector;
+		private final ModalAnnotationCreator<DvrpMode> modalAnnotationCreator = DvrpModes::mode;
 
 		private InstanceGetter(String mode, Injector injector) {
 			this.mode = mode;
@@ -80,11 +81,11 @@ public class ModalProviders {
 		}
 
 		public <T> T getModal(Class<T> type) {
-			return injector.getInstance(DvrpModes.key(type, mode));
+			return injector.getInstance(modalAnnotationCreator.key(type, mode));
 		}
 
 		public <T> T getModal(TypeLiteral<T> typeLiteral) {
-			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
+			return injector.getInstance(modalAnnotationCreator.key(typeLiteral, mode));
 		}
 
 		public <T> T getNamed(Class<T> type, String name) {
@@ -98,6 +99,7 @@ public class ModalProviders {
 
 	public static abstract class AbstractProvider<T> implements Provider<T> {
 		private final String mode;
+		private final ModalAnnotationCreator<DvrpMode> modalAnnotationCreator = DvrpModes::mode;
 
 		@Inject
 		private Injector injector;
@@ -107,11 +109,11 @@ public class ModalProviders {
 		}
 
 		protected <I> I getModalInstance(Class<I> type) {
-			return injector.getInstance(DvrpModes.key(type, mode));
+			return injector.getInstance(modalAnnotationCreator.key(type, mode));
 		}
 
 		protected <I> I getModalInstance(TypeLiteral<I> typeLiteral) {
-			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
+			return injector.getInstance(modalAnnotationCreator.key(typeLiteral, mode));
 		}
 
 		protected String getMode() {

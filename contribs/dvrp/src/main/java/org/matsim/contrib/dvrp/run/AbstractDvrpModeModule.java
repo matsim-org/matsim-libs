@@ -35,6 +35,7 @@ import com.google.inject.multibindings.MapBinder;
  */
 public abstract class AbstractDvrpModeModule extends AbstractModule {
 	private final String mode;
+	private final ModalAnnotationCreator<DvrpMode> modalAnnotationCreator = DvrpModes::mode;
 
 	protected AbstractDvrpModeModule(String mode) {
 		this.mode = mode;
@@ -45,11 +46,11 @@ public abstract class AbstractDvrpModeModule extends AbstractModule {
 	}
 
 	protected <T> Key<T> modalKey(Class<T> type) {
-		return DvrpModes.key(type, mode);
+		return modalAnnotationCreator.key(type, mode);
 	}
 
 	protected <T> Key<T> modalKey(TypeLiteral<T> typeLiteral) {
-		return DvrpModes.key(typeLiteral, mode);
+		return modalAnnotationCreator.key(typeLiteral, mode);
 	}
 
 	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
@@ -61,7 +62,7 @@ public abstract class AbstractDvrpModeModule extends AbstractModule {
 	}
 
 	protected <K, V> MapBinder<K, V> modalMapBinder(Class<K> keyType, Class<V> valueType) {
-		return MapBinder.newMapBinder(binder(), keyType, valueType, DvrpModes.mode(getMode()));
+		return MapBinder.newMapBinder(binder(), keyType, valueType, modalAnnotationCreator.mode(getMode()));
 	}
 
 	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {

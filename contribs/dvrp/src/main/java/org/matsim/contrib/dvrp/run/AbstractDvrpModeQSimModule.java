@@ -37,6 +37,7 @@ import com.google.inject.binder.LinkedBindingBuilder;
  */
 public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
+	private final ModalAnnotationCreator<DvrpMode> modalAnnotationCreator = DvrpModes::mode;
 
 	protected AbstractDvrpModeQSimModule(String mode) {
 		this.mode = mode;
@@ -47,15 +48,15 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	}
 
 	protected final DvrpMode getDvrpMode() {
-		return DvrpModes.mode(mode);
+		return modalAnnotationCreator.mode(mode);
 	}
 
 	protected final <T> Key<T> modalKey(Class<T> type) {
-		return DvrpModes.key(type, mode);
+		return modalAnnotationCreator.key(type, mode);
 	}
 
 	protected final <T> Key<T> modalKey(TypeLiteral<T> typeLiteral) {
-		return DvrpModes.key(typeLiteral, mode);
+		return modalAnnotationCreator.key(typeLiteral, mode);
 	}
 
 	protected final <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
