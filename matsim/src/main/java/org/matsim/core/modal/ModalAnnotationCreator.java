@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,15 +18,24 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.core.modal;
 
-import org.matsim.core.modal.AbstractModalModule;
+import java.lang.annotation.Annotation;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractDvrpModeModule extends AbstractModalModule<DvrpMode> {
-	protected AbstractDvrpModeModule(String mode) {
-		super(mode, DvrpModes::mode);
+public interface ModalAnnotationCreator<M extends Annotation> {
+	M mode(String mode);
+
+	default <T> Key<T> key(Class<T> type, String mode) {
+		return Key.get(type, mode(mode));
+	}
+
+	default <T> Key<T> key(TypeLiteral<T> typeLiteral, String mode) {
+		return Key.get(typeLiteral, mode(mode));
 	}
 }

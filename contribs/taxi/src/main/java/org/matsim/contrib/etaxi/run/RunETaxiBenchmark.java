@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
@@ -121,7 +120,7 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
 			@Override
 			public void install() {
-				bindModal(TaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
 						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
 								getter.getModal(ExecutedScheduleCollector.class),
 								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
@@ -132,7 +131,7 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
 			@Override
 			public void install() {
-				bindModal(ETaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+				bindModal(ETaxiBenchmarkStats.class).toProvider(modalProvider(
 						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
 								getter.get(ChargingEventSequenceCollector.class),
 								getter.getModal(FleetSpecification.class)))).asEagerSingleton();

@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.sharing.io.DefaultSharingServiceSpecification;
 import org.matsim.contrib.sharing.io.SharingServiceReader;
 import org.matsim.contrib.sharing.io.SharingServiceSpecification;
@@ -24,21 +23,24 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.modal.AbstractModalModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Singleton;
 
-public class SharingServiceModule extends AbstractDvrpModeModule {
+public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 	private final SharingServiceConfigGroup serviceConfig;
 
 	public SharingServiceModule(SharingServiceConfigGroup serviceConfig) {
-		super(SharingUtils.getServiceMode(serviceConfig));
+		super(SharingUtils.getServiceMode(serviceConfig), SharingModes::mode);
 		this.serviceConfig = serviceConfig;
 	}
 
 	@Override
 	public void install() {
+		SharingModes.registerSharingMode(binder(), getMode());
+
 		installQSimModule(new SharingQSimServiceModule(serviceConfig));
 
 		bindModal(SharingServiceSpecification.class).toProvider(modalProvider(getter -> {

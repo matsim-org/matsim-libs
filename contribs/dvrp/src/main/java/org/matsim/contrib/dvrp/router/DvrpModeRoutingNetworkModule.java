@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import static org.matsim.contrib.dvrp.run.ModalProviders.createProvider;
-
 import java.util.Collections;
 import java.util.Set;
 
@@ -62,19 +60,19 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	public void install() {
 		if (useModeFilteredSubnetwork) {
 			checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
-			bindModal(Network.class).toProvider(createProvider(getMode(), getter -> {
+			bindModal(Network.class).toProvider(modalProvider(getter -> {
 				Network subnetwork = NetworkUtils.createNetwork();
 				new TransportModeNetworkFilter(
-						getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).
-						filter(subnetwork, Collections.singleton(getMode()));
+						getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).filter(
+						subnetwork, Collections.singleton(getMode()));
 				new NetworkCleaner().run(subnetwork);
 				return subnetwork;
 			})).asEagerSingleton();
 
 			//lazily initialised: optimisers may do not need it
-			bindModal(DvrpTravelTimeMatrix.class).toProvider(createProvider(getMode(),
-					getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class),
-							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads())))
+			bindModal(DvrpTravelTimeMatrix.class).toProvider(modalProvider(
+							getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class),
+									dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads())))
 					.in(Singleton.class);
 		} else {
 			bindModal(Network.class).to(
