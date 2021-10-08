@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.sharing.run;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,22 +31,23 @@ import com.google.inject.multibindings.Multibinder;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpModes {
-	public static DvrpMode mode(String mode) {
-		return new DvrpModeImpl(mode);
+public class SharingModes {
+
+	public static SharingMode mode(String mode) {
+		return new SharingModeImpl(mode);
 	}
 
-	public static void registerDvrpMode(Binder binder, String mode) {
-		Multibinder.newSetBinder(binder, DvrpMode.class).addBinding().toInstance(DvrpModes.mode(mode));
+	public static void registerSharingMode(Binder binder, String mode) {
+		Multibinder.newSetBinder(binder, SharingMode.class).addBinding().toInstance(SharingModes.mode(mode));
 	}
 
 	/**
 	 * This class is based on guava's NamedImpl.
 	 */
-	private static class DvrpModeImpl implements DvrpMode, Serializable {
+	private static class SharingModeImpl implements SharingMode, Serializable {
 		private final String value;
 
-		DvrpModeImpl(String value) {
+		SharingModeImpl(String value) {
 			this.value = checkNotNull(value, "value");
 		}
 
@@ -60,20 +61,20 @@ public class DvrpModes {
 		}
 
 		public boolean equals(Object o) {
-			if (!(o instanceof DvrpMode)) {
+			if (!(o instanceof SharingMode)) {
 				return false;
 			}
 
-			DvrpMode other = (DvrpMode)o;
+			SharingMode other = (SharingMode)o;
 			return value.equals(other.value());
 		}
 
 		public String toString() {
-			return "@" + DvrpMode.class.getName() + "(value=" + value + ")";
+			return "@" + SharingMode.class.getName() + "(value=" + value + ")";
 		}
 
 		public Class<? extends Annotation> annotationType() {
-			return DvrpMode.class;
+			return SharingMode.class;
 		}
 
 		private static final long serialVersionUID = 0;
