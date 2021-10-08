@@ -100,15 +100,16 @@ public class ModalProviders {
 		}
 	}
 
-	public static abstract class AbstractProvider<T> implements Provider<T> {
+	public static abstract class AbstractProvider<M extends Annotation, T> implements Provider<T> {
 		private final String mode;
-		private final ModalAnnotationCreator<DvrpMode> modalAnnotationCreator = DvrpModes::mode;
+		private final ModalAnnotationCreator<M> modalAnnotationCreator;
 
 		@Inject
 		private Injector injector;
 
-		protected AbstractProvider(String mode) {
+		protected AbstractProvider(String mode, ModalAnnotationCreator<M> modalAnnotationCreator) {
 			this.mode = mode;
+			this.modalAnnotationCreator = modalAnnotationCreator;
 		}
 
 		protected <I> I getModalInstance(Class<I> type) {
