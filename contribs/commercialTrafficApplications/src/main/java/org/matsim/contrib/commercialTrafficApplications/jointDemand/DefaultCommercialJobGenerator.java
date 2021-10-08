@@ -302,7 +302,8 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		// Assignment between jobs and operators has changed due to innovation.
 		// Recalculate jsprit tour planning, and build new fright agents
 		if (enableTourPlanning) {
-			removeFreightAgents(true);
+			removeFreightAgents();
+			cleanCarriers();
 			carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
 
 			CommercialTrafficChecker.run(scenario.getPopulation(), carriers);
@@ -391,37 +392,37 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-		removeFreightAgents(false);
+		removeFreightAgents();
         //clear carrier plans
 		toggleChangeCommercialJobOperatorStrategy(event.getIteration());
     }
 
-    public void removeFreightAgents(Scenario scenario) {
-        freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
-        freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-    }
 
 	/**
-	 * If tour planning is executed, carriers needs to be cleared.
-	 *
-	 * @param cleanCarriers enable/disable cleaning of carriers
+	 * Remove freight drivers and vehicles from scenario
 	 */
-	private void removeFreightAgents(boolean cleanCarriers) {
+	private void removeFreightAgents() {
 		freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
 		freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-
-		if (cleanCarriers) {
-			CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet()
-					.forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-			carriers.getCarriers().values().forEach(carrier -> {
-				carrier.getServices().clear();
-				carrier.getShipments().clear();
-				carrier.clearPlans();
-			});
-		}
 	}
 
+	/**
+	 * Clean services, shipments and plans of carriers
+	 */
+	private void cleanCarriers(){
+		CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet()
+				.forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
+		carriers.getCarriers().values().forEach(carrier -> {
+			carrier.getServices().clear();
+			carrier.getShipments().clear();
+			carrier.clearPlans();
+		});
+	}
+
+	/**
+	 * Enable or disable ChangeCommercialJobOperator strategy depending to current situation
+	 * @param currentIteration
+	 */
 	private void toggleChangeCommercialJobOperatorStrategy(int currentIteration) {
 
 		// 0 means always tour planning
