@@ -26,7 +26,7 @@ import java.util.Objects;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
 

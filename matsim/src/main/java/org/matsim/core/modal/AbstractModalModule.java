@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.core.modal;
 
 import java.lang.annotation.Annotation;
 import java.util.function.Function;

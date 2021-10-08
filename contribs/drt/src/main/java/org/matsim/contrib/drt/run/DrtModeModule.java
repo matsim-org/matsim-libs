@@ -60,7 +60,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

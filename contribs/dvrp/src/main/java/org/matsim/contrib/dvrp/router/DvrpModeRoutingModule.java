@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;

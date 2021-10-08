@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 
 import com.google.inject.Inject;

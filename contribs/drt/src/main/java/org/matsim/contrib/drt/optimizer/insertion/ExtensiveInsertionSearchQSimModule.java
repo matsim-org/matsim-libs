@@ -27,7 +27,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;

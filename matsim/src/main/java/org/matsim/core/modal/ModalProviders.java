@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.core.modal;
 
 import java.lang.annotation.Annotation;
 import java.util.function.Function;
@@ -35,18 +35,6 @@ import com.google.inject.name.Names;
  * @author Michal Maciejewski (michalm)
  */
 public class ModalProviders {
-	public static <T> Provider<T> createProvider(Function<Injector, T> delegate) {
-		return new Provider<>() {
-			@Inject
-			private Injector injector;
-
-			@Override
-			public T get() {
-				return delegate.apply(injector);
-			}
-		};
-	}
-
 	public static <M extends Annotation, T> Provider<T> createProvider(String mode,
 			ModalAnnotationCreator<M> modalAnnotationCreator, Function<InstanceGetter<M>, T> delegate) {
 		return new Provider<>() {

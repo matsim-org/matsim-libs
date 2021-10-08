@@ -49,7 +49,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;

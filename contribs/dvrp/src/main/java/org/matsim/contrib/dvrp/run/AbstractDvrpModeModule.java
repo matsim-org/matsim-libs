@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import org.matsim.core.modal.AbstractModalModule;
+
 /**
  * @author Michal Maciejewski (michalm)
  */

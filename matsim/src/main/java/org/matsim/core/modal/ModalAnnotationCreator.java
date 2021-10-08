@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.core.modal;
 
 import java.lang.annotation.Annotation;
 
