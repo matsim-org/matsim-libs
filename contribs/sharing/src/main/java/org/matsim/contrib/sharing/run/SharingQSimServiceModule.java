@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.sharing.io.SharingServiceSpecification;
 import org.matsim.contrib.sharing.logic.SharingEngine;
 import org.matsim.contrib.sharing.logic.SharingLogic;
@@ -13,16 +12,17 @@ import org.matsim.contrib.sharing.service.SharingService;
 import org.matsim.contrib.sharing.service.SharingUtils;
 import org.matsim.contrib.sharing.service.StationBasedService;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Singleton;
 
-public class SharingQSimServiceModule extends AbstractDvrpModeQSimModule {
+public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMode> {
 	private final SharingServiceConfigGroup serviceConfig;
 
 	protected SharingQSimServiceModule(SharingServiceConfigGroup serviceConfig) {
-		super(SharingUtils.getServiceMode(serviceConfig));
+		super(SharingUtils.getServiceMode(serviceConfig), SharingModes::mode);
 		this.serviceConfig = serviceConfig;
 	}
 
