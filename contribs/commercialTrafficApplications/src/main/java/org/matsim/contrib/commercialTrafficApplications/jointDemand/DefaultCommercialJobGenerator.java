@@ -50,11 +50,14 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -75,21 +78,23 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     private Carriers carriers;
 
     private final TravelTime carTT;
-
+	private boolean enableTourPlanning = true;
     private Set<Id<Person>> freightDrivers = new HashSet<>();
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
-
+	private StrategyManager strategyManager;
     private final static Logger log = Logger.getLogger(DefaultCommercialJobGenerator.class);
-
+	private int changeOperatorInterval;
     private Set<String> drtModes = new HashSet<>();
 
     @Inject
-    /* package */ DefaultCommercialJobGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
+    /* package */ DefaultCommercialJobGenerator(StrategyManager strategyManager,Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
         JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
         this.timeSliceWidth = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getTravelTimeSliceWidth();
         this.scenario = scenario;
+        this.strategyManager = strategyManager;
+        this.changeOperatorInterval = cfg.getChangeCommercialJobOperatorInterval();
         carTT = travelTimes.get(TransportMode.car);
         getDrtModes(scenario.getConfig());
     }
@@ -111,10 +116,10 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 				// Transform Jsprit output to MATSim freight agents
 				Plan plainPlan = createPlainPlanFromTour(carrier, scheduledTour);
-				
+
 				// adjust Jsprit departure times and activity end times to avoid too early services
 				manageJspritDepartureTimes(plainPlan);
-				
+
 				driverPerson.addPlan(plainPlan);
 				plainPlan.setPerson(driverPerson);
 				population.addPerson(driverPerson);
@@ -122,7 +127,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates fright vehicles and drivers
 	 * @param carrier
@@ -159,9 +164,9 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 			PlanElement planElement = planElements.get(i);
 
 			if (planElement instanceof Activity) {
-				
+
 				Activity currentActivity = (Activity) planElement;
-				
+
 				// Handle all regular services
 				if(!currentActivity.getType().equals(FreightConstants.START))
 				{
@@ -170,7 +175,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 					// Recalculation is based on next leg departure time and current act service time
 					Leg prevLeg = (Leg) planElements.get(i-1);
 					Leg nextLeg = PopulationUtils.getNextLeg(plan, currentActivity);
-					
+
 					Activity prevAct = (Activity) planElements.get(i - 2);
 
 					if (!prevAct.getType().equals(FreightConstants.START)) {
@@ -182,13 +187,13 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 						} else {
 							// Update recent prevAct and prevLeg
 							// Expected arrival time at current activity
-							Double expactedArrivalTime = nextLeg.getDepartureTime().seconds()
+							Double expectedArrivalTime = nextLeg.getDepartureTime().seconds()
 									- (double) currentActivity.getAttributes().getAttribute(SERVICE_DURATION_NAME);
 
 							// Set endTimes to avoid an too early departure after service
 							// The earliestPrevActEndTime will include a waiting time,
 							// for which the vehicle remains at previous activity
-							Double earliestPrevActEndTime = expactedArrivalTime - prevLeg.getTravelTime().seconds();
+							Double earliestPrevActEndTime = expectedArrivalTime - prevLeg.getTravelTime().seconds();
 							prevAct.setEndTime(earliestPrevActEndTime);
 							prevLeg.setDepartureTime(earliestPrevActEndTime);
 						}
@@ -197,18 +202,18 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
 				} else if (currentActivity.getType().equals(FreightConstants.START))
 				{
-					
+
 					Double travelTimeToFirstJob = ((Leg) planElements.get(i+1)).getTravelTime().seconds();
 					Double departureTimeAtFirstJob = ((Leg) planElements.get(i+3)).getDepartureTime().seconds();
 					Double jobServiceDuration = (double) ((Activity) planElements.get(i+2)).getAttributes().getAttribute(SERVICE_DURATION_NAME);
 					Double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob * this.firsttourTraveltimeBuffer;
 					Double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;
-					
+
 					//Set optimal endTimes to avoid an too early arrival at first job
 					 ((Activity) planElements.get(i+2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expectedArrivalTimeAtFirstJob );
 					currentActivity.setEndTime(initialLegDepartureTime);
 					((Leg) planElements.get(i+1)).setDepartureTime(initialLegDepartureTime);
-					
+
 				}
 			}
 		}
@@ -246,7 +251,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 				// Assign information from tourLeg to defaultLeg
 				defaultLeg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 				defaultLeg.setTravelTime(tourLeg.getExpectedTransportTime());
-				
+
 				if (drtModes.contains(carrierMode)) {
 					defaultLeg.setRoute(null); // DrtRoute gets calculated later on
 				} else {
@@ -291,17 +296,24 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		return plan;
 	}
 
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-        CommercialTrafficChecker.run(scenario.getPopulation(), carriers);
-        generateIterationServices(carriers, scenario.getPopulation());
-        try {
-			buildTours();
-		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// Assignment between jobs and operators has changed due to innovation.
+		// Recalculate jsprit tour planning, and build new fright agents
+		if (enableTourPlanning) {
+			removeFreightAgents();
+			cleanCarriers();
+			carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+
+			CommercialTrafficChecker.run(scenario.getPopulation(), carriers);
+			generateIterationServices(carriers, scenario.getPopulation());
+			try {
+				buildTours();
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
         createAndAddFreightAgents(this.carriers, this.scenario.getPopulation());
 
@@ -380,19 +392,72 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        removeFreightAgents(scenario);
+		removeFreightAgents();
         //clear carrier plans
+		toggleChangeCommercialJobOperatorStrategy(event.getIteration());
+    }
+
+
+	/**
+	 * Remove freight drivers and vehicles from scenario
+	 */
+	private void removeFreightAgents() {
+		freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
+		freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
+	}
+
+	/**
+	 * Clean services, shipments and plans of carriers
+	 */
+	private void cleanCarriers(){
+		CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet()
+				.forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
 		carriers.getCarriers().values().forEach(carrier -> {
 			carrier.getServices().clear();
 			carrier.getShipments().clear();
 			carrier.clearPlans();
 		});
-    }
+	}
 
-    public void removeFreightAgents(Scenario scenario) {
-        freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
-        freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-    }
+	/**
+	 * Enable or disable ChangeCommercialJobOperator strategy depending to current situation
+	 * @param currentIteration
+	 */
+	private void toggleChangeCommercialJobOperatorStrategy(int currentIteration) {
+
+		// 0 means always tour planning
+		if (this.changeOperatorInterval != 0) {
+
+			this.enableTourPlanning = ((currentIteration + 1.0) % this.changeOperatorInterval == 0.0) ? true : false;
+
+			if (enableTourPlanning) {
+				log.info("Toggle " + ChangeCommercialJobOperator.SELECTOR_NAME);
+			}
+
+			Collection<StrategySettings> allStrategies = this.scenario.getConfig().strategy().getStrategySettings();
+
+			for (StrategySettings strategy : allStrategies) {
+				if (strategy.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME)) {
+					double initalWeight = strategy.getWeight();
+
+					// Update weight
+					double newWeight = enableTourPlanning ? initalWeight : 0.0;
+					for (GenericPlanStrategy<Plan, Person> currentStrategy : this.strategyManager.getStrategies(null)) {
+						String strategyName = currentStrategy.toString();
+						if (isChangeCommercialJobOperatorStrategy(currentStrategy)) {
+							log.info("Set weight for " + strategyName + " --> " + newWeight);
+							this.strategyManager.changeWeightOfStrategy(currentStrategy, null, newWeight);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private boolean isChangeCommercialJobOperatorStrategy(GenericPlanStrategy<Plan, Person> strategy) {
+		String name = strategy.toString();
+		return name.endsWith(ChangeCommercialJobOperator.SELECTOR_NAME);
+	}
 
 }
