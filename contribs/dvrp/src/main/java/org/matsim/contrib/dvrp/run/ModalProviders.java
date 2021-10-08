@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -46,26 +47,28 @@ public class ModalProviders {
 		};
 	}
 
-	public static <T> Provider<T> createProvider(String mode, Function<InstanceGetter, T> delegate) {
+	public static <M extends Annotation, T> Provider<T> createProvider(String mode,
+			ModalAnnotationCreator<M> modalAnnotationCreator, Function<InstanceGetter<M>, T> delegate) {
 		return new Provider<>() {
 			@Inject
 			private Injector injector;
 
 			@Override
 			public T get() {
-				return delegate.apply(new InstanceGetter(mode, injector));
+				return delegate.apply(new InstanceGetter<>(mode, modalAnnotationCreator, injector));
 			}
 		};
 	}
 
-	public static final class InstanceGetter {
+	public static final class InstanceGetter<M extends Annotation> {
 		private final String mode;
 		private final Injector injector;
-		private final ModalAnnotationCreator<DvrpMode> modalAnnotationCreator = DvrpModes::mode;
+		private final ModalAnnotationCreator<M> modalAnnotationCreator;
 
-		private InstanceGetter(String mode, Injector injector) {
+		private InstanceGetter(String mode, ModalAnnotationCreator<M> modalAnnotationCreator, Injector injector) {
 			this.mode = mode;
 			this.injector = injector;
+			this.modalAnnotationCreator = modalAnnotationCreator;
 		}
 
 		public <T> T get(Class<T> type) {
