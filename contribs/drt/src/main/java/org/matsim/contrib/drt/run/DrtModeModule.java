@@ -58,8 +58,9 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFind
 import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -119,7 +120,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		//this is a customised version of DvrpModeRoutingModule.install()
 		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
-				DvrpRoutingModuleProvider.Stage.MAIN)
+						DvrpRoutingModuleProvider.Stage.MAIN)
 				.toProvider(new DvrpModeRoutingModule.DefaultMainLegRouterProvider(getMode()));// not singleton
 		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
 				new DrtRouteCreatorProvider(drtCfg));// not singleton
@@ -128,17 +129,17 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
 			bindModal(AccessEgressFacilityFinder.class).toProvider(
-					modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
+							modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 					.asEagerSingleton();
 		} else {
 			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-					getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
-							getter.get(Network.class),
-							QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
+							getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+									getter.get(Network.class),
+									QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
 					.asEagerSingleton();
 		}
 
-		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
+		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
@@ -171,7 +172,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		});
 	}
 
-	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DrtRouteCreator> {
+	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
@@ -181,7 +182,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private final DrtConfigGroup drtCfg;
 
 		private DrtRouteCreatorProvider(DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode());
+			super(drtCfg.getMode(), DvrpModes::mode);
 			this.drtCfg = drtCfg;
 			leastCostPathCalculatorFactory = new SpeedyALTFactory();
 		}
@@ -193,13 +194,13 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 	}
 
-	private static class DrtStopNetworkProvider extends ModalProviders.AbstractProvider<DrtStopNetwork> {
+	private static class DrtStopNetworkProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtStopNetwork> {
 
 		private final DrtConfigGroup drtCfg;
 		private final Config config;
 
 		private DrtStopNetworkProvider(Config config, DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode());
+			super(drtCfg.getMode(), DvrpModes::mode);
 			this.drtCfg = drtCfg;
 			this.config = config;
 		}

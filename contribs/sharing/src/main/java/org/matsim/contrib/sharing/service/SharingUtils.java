@@ -2,8 +2,8 @@ package org.matsim.contrib.sharing.service;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.sharing.run.SharingConfigGroup;
+import org.matsim.contrib.sharing.run.SharingModes;
 import org.matsim.contrib.sharing.run.SharingServiceConfigGroup;
 import org.matsim.contrib.sharing.service.events.SharingDropoffEvent;
 import org.matsim.contrib.sharing.service.events.SharingFailedDropoffEvent;
@@ -63,7 +63,7 @@ public class SharingUtils {
 	public static QSimComponentsConfigurator configureQSim(SharingConfigGroup sharingConfig) {
 		return components -> {
 			for (SharingServiceConfigGroup serviceConfig : sharingConfig.getServices()) {
-				components.addComponent(DvrpModes.mode(getServiceMode(serviceConfig)));
+				components.addComponent(SharingModes.mode(getServiceMode(serviceConfig)));
 			}
 		};
 	}
