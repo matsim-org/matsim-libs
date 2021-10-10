@@ -48,6 +48,7 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -85,9 +86,10 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     private final static Logger log = Logger.getLogger(DefaultCommercialJobGenerator.class);
 	private int changeOperatorInterval;
     private Set<String> drtModes = new HashSet<>();
+    private VRPTransportCosts vrpTransportCosts;
 
     @Inject
-    /* package */ DefaultCommercialJobGenerator(StrategyManager strategyManager,Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
+    /* package */ DefaultCommercialJobGenerator(StrategyManager strategyManager, Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, VRPTransportCosts vrpTransportCosts) {
         JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
@@ -95,6 +97,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
         this.scenario = scenario;
         this.strategyManager = strategyManager;
         this.changeOperatorInterval = cfg.getChangeCommercialJobOperatorInterval();
+        this.vrpTransportCosts = vrpTransportCosts;
         carTT = travelTimes.get(TransportMode.car);
         getDrtModes(scenario.getConfig());
     }
@@ -378,7 +381,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     }
 
     private void buildTours() throws InterruptedException, ExecutionException {
-        TourPlanning.runTourPlanningForCarriersWithNetBasedCosts(carriers,scenario, timeSliceWidth,carTT );
+        TourPlanning.runTourPlanningForCarriers(carriers,scenario,vrpTransportCosts);
     }
 
     private static Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x) {
