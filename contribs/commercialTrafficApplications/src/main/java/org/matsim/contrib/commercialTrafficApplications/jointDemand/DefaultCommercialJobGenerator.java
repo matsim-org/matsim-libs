@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -69,16 +68,10 @@ import static org.matsim.contrib.commercialTrafficApplications.jointDemand.Joint
  * Generates carriers and tours depending on next iteration's freight demand
  */
 class DefaultCommercialJobGenerator implements CommercialJobGenerator {
-
-
-	private final double firsttourTraveltimeBuffer;
-    private final int timeSliceWidth;
-
+	
+	private final double firstTourTraveltimeBuffer;
     private Scenario scenario;
-
     private Carriers carriers;
-
-    private final TravelTime carTT;
 	private boolean enableTourPlanning = true;
     private Set<Id<Person>> freightDrivers = new HashSet<>();
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
@@ -89,16 +82,14 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     private VRPTransportCosts vrpTransportCosts;
 
     @Inject
-    /* package */ DefaultCommercialJobGenerator(StrategyManager strategyManager, Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, VRPTransportCosts vrpTransportCosts) {
+    DefaultCommercialJobGenerator(StrategyManager strategyManager, Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, VRPTransportCosts vrpTransportCosts) {
         JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
-        this.firsttourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
-        this.timeSliceWidth = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getTravelTimeSliceWidth();
+        this.firstTourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
         this.scenario = scenario;
         this.strategyManager = strategyManager;
         this.changeOperatorInterval = cfg.getChangeCommercialJobOperatorInterval();
         this.vrpTransportCosts = vrpTransportCosts;
-        carTT = travelTimes.get(TransportMode.car);
         getDrtModes(scenario.getConfig());
     }
 
@@ -209,8 +200,8 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 					Double travelTimeToFirstJob = ((Leg) planElements.get(i+1)).getTravelTime().seconds();
 					Double departureTimeAtFirstJob = ((Leg) planElements.get(i+3)).getDepartureTime().seconds();
 					Double jobServiceDuration = (double) ((Activity) planElements.get(i+2)).getAttributes().getAttribute(SERVICE_DURATION_NAME);
-					Double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob * this.firsttourTraveltimeBuffer;
-					Double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;
+					Double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob * this.firstTourTraveltimeBuffer;
+					Double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firstTourTraveltimeBuffer;
 
 					//Set optimal endTimes to avoid an too early arrival at first job
 					 ((Activity) planElements.get(i+2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expectedArrivalTimeAtFirstJob );
