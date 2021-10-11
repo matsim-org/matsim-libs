@@ -21,25 +21,33 @@
 
 package org.matsim.contrib.freight.analysis;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+
+import static org.junit.Assert.assertTrue;
 
 public class RunFreightAnalysisTest {
 
 	@Rule
-	public static MatsimTestUtils testUtils = new MatsimTestUtils();
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Before
-	public void analysisRun(){
-		RunFreightAnalysis freightAnalysis = new RunFreightAnalysis(testUtils.getPackageInputDirectory(), testUtils.getOutputDirectory());
+	public void runAnalysis(){
+		final String packageInputDirectory = testUtils.getClassInputDirectory();
+		final String outputDirectory = testUtils.getOutputDirectory();
+		RunFreightAnalysis freightAnalysis = new RunFreightAnalysis(packageInputDirectory, outputDirectory);
+		freightAnalysis.runAnalysis();
 	}
 
 	@Test
-	public void compareOutput1() {
-		String filename = "";
-		testUtils.compareFilesLineByLine(testUtils.getOutputDirectory() + filename , testUtils.getInputDirectory() + filename);
-	}
+	public void compareResults() {
+		String filename = "carrierStats.tsv";
+
+		final String inputFilename = testUtils.getInputDirectory() + filename;
+		final String outputFilename = testUtils.getOutputDirectory() + filename;
+		MatsimTestUtils.compareFilesLineByLine(inputFilename, outputFilename);
+		
+		}
 }
