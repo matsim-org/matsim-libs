@@ -27,7 +27,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 import org.matsim.contrib.freight.events.LSPServiceStartEvent;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
@@ -35,9 +35,9 @@ import java.util.HashMap;
 
 class FreightAnalysisServiceTracking {
 
-	private HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new HashMap<>();
+	private LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new LinkedHashMap<>();
 
-	public HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> getCarrierServiceTrackers(){return carrierServiceTrackers;}
+	public LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> getCarrierServiceTrackers(){return carrierServiceTrackers;}
 
 	public void addTracker(CarrierService service, Id<Carrier> id) {
 		ServiceTracker st = new ServiceTracker(service);
@@ -145,7 +145,7 @@ class ServiceTracker {
 	}
 	static class CarrierServiceTracker{
 		Id<Carrier> carrierId;
-		HashMap<Id<CarrierService>, ServiceTracker> serviceTrackers= new HashMap<>();
+		LinkedHashMap<Id<CarrierService>, ServiceTracker> serviceTrackers= new LinkedHashMap<>();
 
 		public CarrierServiceTracker(Id<Carrier> id, CarrierService service) {
 			this.serviceTrackers.put(service.getId(), new ServiceTracker(service));

@@ -48,7 +48,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 
 /*
@@ -64,7 +64,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	private Network network;
 	private Carriers carriers;
 	private Integer iterationCount=0;
-	private HashMap<Id<Vehicle>, Double> vehiclesOnLink = new HashMap<>();
+	private LinkedHashMap<Id<Vehicle>, Double> vehiclesOnLink = new LinkedHashMap<>();
 	private FreightAnalysisVehicleTracking vehicleTracking = new FreightAnalysisVehicleTracking();
 	private FreightAnalysisShipmentTracking shipmentTracking = new FreightAnalysisShipmentTracking();
 	private FreightAnalysisServiceTracking serviceTracking = new FreightAnalysisServiceTracking();
@@ -196,13 +196,13 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		exportVehicleInfo(path, false);
 	}
 	public void exportVehicleInfo(String path, Boolean exportGuesses) {
-		path = getIterationDirectory(path);
+//		path = getIterationDirectory(path);
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(path + "/freightVehicleStats.tsv"));
-			HashMap<String, HashSet<String>> carrierVehicleStatistics = new HashMap<>();
+			LinkedHashMap<String, HashSet<String>> carrierVehicleStatistics = new LinkedHashMap<>();
 			out.write("vehicleId	vehicleType	carrierId	driverID	usageTime	roadTime	travelDistance	vehicleCost	tripCount");
 			out.newLine();
-			HashMap<Id<Vehicle>, VehicleTracker> trackers = vehicleTracking.getTrackers();
+			LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = vehicleTracking.getTrackers();
 			for (Id<Vehicle> vehId : trackers.keySet()) {
 				VehicleTracker tracker = trackers.get(vehId);
 				String lastDriverIdString = id2String(tracker.lastDriverId);
@@ -239,13 +239,13 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		exportVehicleTripInfo(path, false );
 	}
 	public void exportVehicleTripInfo(String path, Boolean exportGuesses) {
-		path = getIterationDirectory(path);
+//		path = getIterationDirectory(path);
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(path + "/freightVehicleTripStats.tsv"));
 			out.write("vehicleId	vehicleType	tripNumber	carrierId	driverId	tripRoadTime	tripDistance	tripVehicleCost");
 			out.newLine();
-			HashMap<Id<Vehicle>, VehicleTracker> trackers = vehicleTracking.getTrackers();
-			HashMap<String, HashSet<String>> carrierTripStatistics = new HashMap<>();
+			LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = vehicleTracking.getTrackers();
+			LinkedHashMap<String, HashSet<String>> carrierTripStatistics = new LinkedHashMap<>();
 			for (Id<Vehicle> vehId : trackers.keySet()) {
 				VehicleTracker tracker = trackers.get(vehId);
 				Integer i = 0;
@@ -288,13 +288,13 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		exportVehicleTypeStats(path, false);
 	}
 	public void exportVehicleTypeStats(String path, Boolean exportGuesses) {
-		path = getIterationDirectory(path);
+//		path = getIterationDirectory(path);
 		try {
 			BufferedWriter singleFile = new BufferedWriter(new FileWriter(path + "/carrierStats.tsv"));
 			singleFile.write("carrierId	vehicleType	vehicleCount	totalDistance	totalServiceTime	totalRoadTime	totalCost");
 			singleFile.newLine();
 			for (Carrier carrier : carriers.getCarriers().values()) {
-			HashMap<String, CarrierVehicleTypeStats> vehicleTypeStatsMap = new HashMap<>();
+			LinkedHashMap<String, CarrierVehicleTypeStats> vehicleTypeStatsMap = new LinkedHashMap<>();
 				BufferedWriter out = new BufferedWriter(new FileWriter(path + "/carrier_" + carrier.getId().toString() + "_VehicleTypeStats.tsv"));
 				for (VehicleTracker tracker : vehicleTracking.getTrackers().values()) {
 					// if desired get carrierIdString, in which case the vehicleType gets the "?" prefix to separate guessed vehicle connections from non-guessed ones, even if they are of the same vehicle type
@@ -336,12 +336,12 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		exportServiceInfo(path, false);
 	}
 	public void exportServiceInfo(String path, Boolean exportGuesses) {
-		path = getIterationDirectory(path);
+//		path = getIterationDirectory(path);
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(path + "/serviceStats.tsv"));
 			out.write("carrierId	serviceId	driverId	vehicleId	serviceETA	tourETA 	arrivalTime");
 			out.newLine();
-			HashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers= serviceTracking.getCarrierServiceTrackers();
+			LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers= serviceTracking.getCarrierServiceTrackers();
 			for(ServiceTracker.CarrierServiceTracker carrierServiceTracker:carrierServiceTrackers.values()){
 				String carrierIdString = id2String(carrierServiceTracker.carrierId);
 				BufferedWriter out_carrier = new BufferedWriter(new FileWriter(path+"/carrier_" + carrierIdString + "_ServiceStats.tsv"));
@@ -371,7 +371,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		exportShipmentInfo(path, false);
 	}
 	public void exportShipmentInfo(String path, Boolean exportGuesses) {
-		path = getIterationDirectory(path);
+//		path = getIterationDirectory(path);
 		try {
 			BufferedWriter singleFile = new BufferedWriter(new FileWriter(path + "/shipmentStats.tsv"));
 			singleFile.write("carrierId	shipmentId	driverId	vehicleId	pickupTime	deliveryTime	deliveryDuration	beelineDistance");
@@ -420,7 +420,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	// reset the EventHandler, would typically be done between iterations of a simulation
 	public void reset(){
 		iterationCount++;
-		this.vehiclesOnLink = new HashMap<>();
+		this.vehiclesOnLink = new LinkedHashMap<>();
 		this.vehicleTracking = new FreightAnalysisVehicleTracking();
 		this.shipmentTracking = new FreightAnalysisShipmentTracking();
 		this.serviceTracking = new FreightAnalysisServiceTracking();

@@ -30,8 +30,8 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 /**
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
@@ -39,9 +39,9 @@ import java.util.HashSet;
 
 class FreightAnalysisVehicleTracking {
 
-	private HashMap<Id<Vehicle>, VehicleTracker> trackers = new HashMap<>();
-	private HashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new HashMap<>();
-	private HashMap<Id<Vehicle>, Double> vehiclesOnLink = new HashMap<>();
+	private LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = new LinkedHashMap<>();
+	private LinkedHashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new LinkedHashMap<>();
+	private LinkedHashMap<Id<Vehicle>, Double> vehiclesOnLink = new LinkedHashMap<>();
 
 	public Id<Vehicle> getDriver2VehicleId(Id<Person> driverId) {
 		return driver2VehicleId.get(driverId);
@@ -86,7 +86,7 @@ class FreightAnalysisVehicleTracking {
 		}
 	}
 
-	public HashMap<Id<Vehicle>, VehicleTracker> getTrackers() {
+	public LinkedHashMap<Id<Vehicle>, VehicleTracker> getTrackers() {
 		return trackers;
 	}
 

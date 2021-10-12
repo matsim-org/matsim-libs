@@ -29,7 +29,7 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 
 /**
@@ -38,11 +38,11 @@ import java.util.HashSet;
 
 class FreightAnalysisShipmentTracking {
 
-	private HashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new HashMap<>();
+	private LinkedHashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new LinkedHashMap<>();
     public void addTracker(CarrierShipment shipment){
         shipments.put(shipment.getId(),new ShipmentTracker(shipment) );
     }
-	public HashMap<Id<CarrierShipment>, ShipmentTracker> getShipments() {
+	public LinkedHashMap<Id<CarrierShipment>, ShipmentTracker> getShipments() {
 		return shipments;
 	}
 
