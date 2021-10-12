@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFind
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.base.Verify;
 
@@ -49,7 +50,7 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
+	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
 		Facility accessFacility = findClosestStop(fromFacility);
 		if (accessFacility == null) {
 			return Optional.empty();

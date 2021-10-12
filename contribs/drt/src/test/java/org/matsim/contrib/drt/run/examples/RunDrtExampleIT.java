@@ -72,9 +72,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.01)
 				.rejections(5)
-				.waitAverage(700.11)
-				.inVehicleTravelTimeMean(381.06)
-				.totalTravelTimeMean(1081.17)
+				.waitAverage(806.34)
+				.inVehicleTravelTimeMean(369.91)
+				.totalTravelTimeMean(1176.25)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -159,12 +159,12 @@ public class RunDrtExampleIT {
 		double rejectionRate = Double.parseDouble(params.get("rejectionRate"));
 		double totalTravelTimeMean = Double.parseDouble(params.get("totalTravelTime_mean"));
 
-		var percentage = Percentage.withPercentage(1);
-		assertThat(expectedStats.rejectionRate).isCloseTo(rejectionRate, percentage);
-		assertThat(expectedStats.rejections).isCloseTo(rejections, percentage);
-		assertThat(expectedStats.waitAverage).isCloseTo(waitAverage, percentage);
-		assertThat(expectedStats.inVehicleTravelTimeMean).isCloseTo(inVehicleTravelTimeMean, percentage);
-		assertThat(expectedStats.totalTravelTimeMean).isCloseTo(totalTravelTimeMean, percentage);
+		var percentage = Percentage.withPercentage(0.00001);
+		assertThat(rejectionRate).isCloseTo(expectedStats.rejectionRate, percentage);
+		assertThat(rejections).isCloseTo(expectedStats.rejections, percentage);
+		assertThat(waitAverage).isCloseTo(expectedStats.waitAverage, percentage);
+		assertThat(inVehicleTravelTimeMean).isCloseTo(expectedStats.inVehicleTravelTimeMean, percentage);
+		assertThat(totalTravelTimeMean).isCloseTo(expectedStats.totalTravelTimeMean, percentage);
 	}
 
 	private static class Stats {

@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModeModule;
@@ -40,6 +41,7 @@ public final class MultiModeETaxiModule extends AbstractModule {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
 			installQSimModule(new ETaxiModeQSimModule(taxiCfg));
+			install(new TaxiModeAnalysisModule(taxiCfg));
 		}
 	}
 }

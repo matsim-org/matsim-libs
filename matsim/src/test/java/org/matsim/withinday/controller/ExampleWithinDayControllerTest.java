@@ -35,6 +35,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleWithinDayControllerTest {
@@ -64,7 +65,7 @@ public class ExampleWithinDayControllerTest {
 				.filter(Leg.class::isInstance)
 				.forEach(planElement -> ((Leg)planElement).setRoute(null));
 
-		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get());
+		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get(), TimeInterpretation.create(scenario.getConfig()));
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
 		scenario.getPopulation().getPersons().values().forEach(pp4s::run);
 		// yyyyyy According to specs, these 3 lines should not be necessary: Having no route should just trigger the re-routing. Commenting

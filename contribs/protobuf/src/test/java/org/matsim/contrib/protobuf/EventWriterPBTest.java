@@ -62,7 +62,7 @@ public class EventWriterPBTest {
                 .has(new Condition<>(m -> m.get("sample").equals("15"), "contains custom attribute"))
                 .has(new Condition<>(m -> !m.containsKey(Event.ATTRIBUTE_TIME) && !m.containsKey(Event.ATTRIBUTE_X), "does not contain common attributes"));
 
-        assertThat(EventWriterPB.convertEvent(new PersonDepartureEvent(15.0, Id.createPersonId(15), Id.createLinkId(20), "test")))
+        assertThat(EventWriterPB.convertEvent(new PersonDepartureEvent(15.0, Id.createPersonId(15), Id.createLinkId(20), "test", "test")))
                 .hasFieldOrPropertyWithValue("time", 15.0)
                 .extracting(ProtoEvents.Event::getPersonDeparture)
                 .hasFieldOrPropertyWithValue("legMode", "test")

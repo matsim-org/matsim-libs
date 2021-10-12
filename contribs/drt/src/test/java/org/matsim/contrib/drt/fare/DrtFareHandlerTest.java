@@ -43,7 +43,7 @@ public class DrtFareHandlerTest {
 	public void testDrtFareHandler() {
 		String mode = "mode_0";
 		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.setBasefare(1);
+		fareParams.setBaseFare(1);
 		fareParams.setMinFarePerTrip(1.5);
 		fareParams.setDailySubscriptionFee(1);
 		fareParams.setDistanceFare_m(1.0 / 1000.0);

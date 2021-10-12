@@ -20,7 +20,6 @@
 package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
@@ -39,13 +38,12 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class RouteDesignScoringManager {
 
-	public static enum RouteDesignScoreFunctionName {
+	public enum RouteDesignScoreFunctionName {
 		stop2StopVsBeelinePenalty, areaBtwStopsVsBeelinePenalty, areaBtwLinksVsBeelinePenalty,
 		stopServedMultipleTimesPenalty
 	}
 
-	private List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
-	private Map<RouteDesignScoreFunctionName, RouteDesignScoreParams> paramMap = new HashMap<>();
+	private final List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
 	private final static Logger log = Logger.getLogger(RouteDesignScoringManager.class);
 
 	public final double scoreRouteDesign(PPlan pPlan) {
@@ -74,7 +72,7 @@ public class RouteDesignScoringManager {
 	}
 
 	public final void init(final PConfigGroup pConfig, Network network) {
-		paramMap = pConfig.getRouteDesignScoreParams();
+		Map<RouteDesignScoreFunctionName, RouteDesignScoreParams> paramMap = pConfig.getRouteDesignScoreParams();
 
 		paramMap.forEach((name, params) -> {
 			switch (name) {

@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.minibus.operator.BasicOperator;
+import org.matsim.contrib.minibus.hook.BasicOperator;
 import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
@@ -48,8 +49,9 @@ public class JointPlanRouter implements PlanAlgorithm {
 	
 	public JointPlanRouter(
 			final TripRouter routingHandler,
-			final ActivityFacilities facilities ) {
-		delegate = new PlanRouter( routingHandler , facilities );
+			final ActivityFacilities facilities,
+			final TimeInterpretation timeInterpretation) {
+		delegate = new PlanRouter( routingHandler , facilities, timeInterpretation );
 	}
 
 	@Override

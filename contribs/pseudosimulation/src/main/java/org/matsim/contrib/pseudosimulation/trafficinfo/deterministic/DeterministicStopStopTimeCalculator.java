@@ -7,9 +7,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -35,7 +37,7 @@ public class DeterministicStopStopTimeCalculator implements StopStopTimeCalculat
 		TransitStopFacility originFacility = schedule.getFacilities().get(stopOId);
 		TransitStopFacility destinationFacility = schedule.getFacilities().get(stopDId);
 
-		List<? extends PlanElement> legs = transitRouter.calcRoute(originFacility, destinationFacility, time, null);
+		List<? extends PlanElement> legs = transitRouter.calcRoute(DefaultRoutingRequest.withoutAttributes(originFacility, destinationFacility, time, null));
 		return legs.stream().mapToDouble(l -> ((Leg)l).getTravelTime().seconds()).sum();
 	}
 

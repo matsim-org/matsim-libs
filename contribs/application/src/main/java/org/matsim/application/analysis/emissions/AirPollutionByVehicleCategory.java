@@ -20,16 +20,24 @@
 package org.matsim.application.analysis.emissions;
 
 import com.google.common.collect.Iterables;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.analysis.AnalysisSummary;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaRoadTypeSource;
@@ -49,14 +57,19 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import picocli.CommandLine;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 
+import static org.matsim.application.ApplicationUtils.globFile;
+
 
 @CommandLine.Command(
 		name = "air-pollution-by-vehicle",
-		description = "Run offline air pollution analysis assuming default vehicles"
+		description = "Run offline air pollution analysis assuming default vehicles",
+		mixinStandardHelpOptions = true,
+		showDefaultValues = true
 )
 public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 
@@ -73,6 +86,9 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--hbefa-cold", required = true)
 	private Path hbefaColdFile;
+
+	@CommandLine.Option(names = "--hbefa-lookup", description = "Emission detailedVsAverageLookupBehavior", defaultValue = "directlyTryAverageTable")
+	private DetailedVsAverageLookupBehavior lookupBehavior;
 
 	@CommandLine.Option(names = "-p", description = "Password for encrypted hbefa files", interactive = true, required = false)
 	private char[] password;
@@ -110,10 +126,10 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		}
 
 		Config config = ConfigUtils.createConfig();
-		config.vehicles().setVehiclesFile(AnalysisSummary.globFile(runDirectory, runId, "vehicles"));
-		config.network().setInputFile(AnalysisSummary.globFile(runDirectory, runId, "network"));
-		config.transit().setTransitScheduleFile(AnalysisSummary.globFile(runDirectory, runId, "transitSchedule"));
-		config.transit().setVehiclesFile(AnalysisSummary.globFile(runDirectory, runId, "transitVehicles"));
+		config.vehicles().setVehiclesFile(globFile(runDirectory, runId, "vehicles"));
+		config.network().setInputFile(globFile(runDirectory, runId, "network"));
+		config.transit().setTransitScheduleFile(globFile(runDirectory, runId, "transitSchedule"));
+		config.transit().setVehiclesFile(globFile(runDirectory, runId, "transitVehicles"));
 		config.global().setCoordinateSystem(crs.getInputCRS());
 		config.plans().setInputFile(null);
 		config.parallelEventHandling().setNumberOfThreads(null);
@@ -121,13 +137,13 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		config.global().setNumberOfThreads(1);
 
 		EmissionsConfigGroup eConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
-		eConfig.setDetailedVsAverageLookupBehavior(DetailedVsAverageLookupBehavior.directlyTryAverageTable);
+		eConfig.setDetailedVsAverageLookupBehavior(lookupBehavior);
 		eConfig.setAverageColdEmissionFactorsFile(this.hbefaColdFile.toString());
 		eConfig.setAverageWarmEmissionFactorsFile(this.hbefaWarmFile.toString());
 		eConfig.setHbefaRoadTypeSource(HbefaRoadTypeSource.fromLinkAttributes);
 		eConfig.setNonScenarioVehicles(NonScenarioVehicles.ignore);
 
-		final String eventsFile = AnalysisSummary.globFile(runDirectory, runId, "events");
+		final String eventsFile = globFile(runDirectory, runId, "events");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -177,7 +193,11 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
 		EventWriterXML emissionEventWriter = new EventWriterXML(output.toString());
+
+		Handler aggrHandler = new Handler();
+
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+		emissionModule.getEmissionEventsManager().addHandler(aggrHandler);
 
 		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
@@ -185,6 +205,14 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		eventsManager.finishProcessing();
 
 		emissionEventWriter.closeFile();
+
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(Path.of(output.toString()
+				.replace(".xml", ".footprint.csv").replace(".gz", ""))), CSVFormat.DEFAULT)) {
+			printer.printRecord("pollutant", "g");
+			for (Object2DoubleMap.Entry<Pollutant> e : aggrHandler.pollution.object2DoubleEntrySet()) {
+				printer.printRecord(e.getKey(), e.getDoubleValue());
+			}
+		}
 
 		log.info("Done");
 
@@ -198,7 +226,7 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		// network
 		for (Link link : network.getLinks().values()) {
 
-			double freespeed = Double.NaN;
+			double freespeed;
 
 			if (link.getFreespeed() <= 13.888889) {
 				freespeed = link.getFreespeed() * speedFactor;
@@ -245,6 +273,28 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 			}
 		}
 
+	}
+
+
+	private static class Handler implements ColdEmissionEventHandler, WarmEmissionEventHandler {
+
+		private final Object2DoubleMap<Pollutant> pollution = new Object2DoubleOpenHashMap<>();
+
+		@Override
+		public void handleEvent(ColdEmissionEvent event) {
+
+			for (Map.Entry<Pollutant, Double> pollutant : event.getColdEmissions().entrySet()) {
+				pollution.mergeDouble(pollutant.getKey(), pollutant.getValue(), Double::sum);
+			}
+		}
+
+		@Override
+		public void handleEvent(WarmEmissionEvent event) {
+
+			for (Map.Entry<Pollutant, Double> pollutant : event.getWarmEmissions().entrySet()) {
+				pollution.mergeDouble(pollutant.getKey(), pollutant.getValue(), Double::sum);
+			}
+		}
 	}
 
 }

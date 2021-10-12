@@ -88,7 +88,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Double averageAverageFactor = .1;
 	private static final Double averagePetrolFactor = .01;
 
-	private static final double heavyGoodsFactor = -1.; //should not be used since HGV is not in HBEFA 3 or 4.1. KMT May 2020
+	private static final double heavyGoodsFactor = -1.;
 
 	
 	@Test
@@ -105,7 +105,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
 		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, detailedPetrolFactor);
+		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, heavyGoodsFactor);
 
 		logger.info("Running testcase: " + testCase6 + " " +testCase6.toString());
 		Id<Link> linkId = Id.create( "linkId" + testCase6, Link.class );

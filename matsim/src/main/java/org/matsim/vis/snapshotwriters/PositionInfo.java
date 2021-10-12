@@ -113,6 +113,8 @@ public class PositionInfo implements AgentSnapshotInfo {
         private double colorValue;
         private int userDefined;
         private AgentState agentState;
+        private Id<Link> linkId;
+        private Id<Vehicle> vehicleId;
 
         public DirectBuilder() {
         }
@@ -147,8 +149,18 @@ public class PositionInfo implements AgentSnapshotInfo {
             return this;
         }
 
+        public DirectBuilder setLinkId(Id<Link> id) {
+            this.linkId = id;
+            return this;
+        }
+
+        public DirectBuilder setVehicleId(Id<Vehicle> id) {
+            this.vehicleId = id;
+            return this;
+        }
+
         public AgentSnapshotInfo build() {
-            return new PositionInfo(personId, null, null, easting, northing, colorValue, agentState, null, userDefined);
+            return new PositionInfo(personId, linkId, vehicleId, easting, northing, colorValue, agentState, null, userDefined);
         }
     }
 

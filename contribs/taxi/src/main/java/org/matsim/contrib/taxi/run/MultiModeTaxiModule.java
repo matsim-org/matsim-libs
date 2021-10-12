@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
@@ -37,6 +38,7 @@ public class MultiModeTaxiModule extends AbstractModule {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
 			installQSimModule(new TaxiModeQSimModule(taxiCfg));
+			install(new TaxiModeAnalysisModule(taxiCfg));
 		}
 	}
 }

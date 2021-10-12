@@ -20,9 +20,10 @@
 
 package org.matsim.vis.snapshotwriters;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ExternalMobimConfigGroup;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -32,31 +33,27 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SnapshotWriterManager implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener, MobsimInitializedListener {
-	
-	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
-	
-	/** time since last snapshot */
+
+	private static final Logger log = LogManager.getLogger(SnapshotWriterManager.class);
+
+	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
+	private final QSimConfigGroup.FilterSnapshots filterSnapshots;
+	private final int snapshotPeriod;
+
+	/**
+	 * time since last snapshot
+	 */
 	private double snapshotTime = 0.0;
 
-	final private int snapshotPeriod;
-
-	public SnapshotWriterManager(Config config) {
-		snapshotPeriod = findSnapshotPeriod(config);
-	}
-
-	// yuck
-	private int findSnapshotPeriod(Config config) {
-		if (config.qsim() != null) {
-			return (int) config.qsim().getSnapshotPeriod();
-//		} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
-//			return (int) ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod();
-		} else {
-			return 1;
-		}
+	public SnapshotWriterManager(int snapshotPeriod, QSimConfigGroup.FilterSnapshots filterSnapshots) {
+		this.snapshotPeriod = snapshotPeriod;
+		this.filterSnapshots = filterSnapshots;
 	}
 
 	@Override
@@ -92,14 +89,19 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	
 	private void doSnapshot(final double time, VisMobsim visMobsim) {
 		if (!this.snapshotWriters.isEmpty()) {
-			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			for (VisLink link : visMobsim.getVisNetwork().getVisLinks().values()) {
-				link.getVisData().addAgentSnapshotInfo(positions);
-			}
-			
+
+			// This could be parallel since mihal has fixed some concurrency issues in the SnapshotInfoBuilder
+			// I think mainly by using separate builders for each generated AgentPositionInfo.
+			// I don't have time to test this right now, but if this ever appears to be a bottle neck, this probably
+			// can be replaced by a parallel stream. janek: oct' 2021
+			var positions = visMobsim.getVisNetwork().getVisLinks().values().stream()
+					.filter(visLink -> isGenerateSnapshot(visLink.getLink()))
+					.flatMap(visLink -> visLink.getVisData().addAgentSnapshotInfo(new HashSet<>()).stream())
+					.collect(Collectors.toSet());
+
 			// We do not put non-network agents in movies.
 			// Otherwise, we would add snapshots from visMobsim.getNonNetworkAgentSnapshots() here.
-			
+
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (AgentSnapshotInfo position : positions) {
@@ -114,4 +116,14 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 		this.snapshotWriters.add(snapshotWriter);
 	}
 
+	private boolean isGenerateSnapshot(Link link) {
+		switch (filterSnapshots) {
+			case no:
+				return true;
+			case withLinkAttributes:
+				return Objects.equals(link.getAttributes().getAttribute(SnapshotWritersModule.GENERATE_SNAPSHOT_FOR_LINK_KEY), true);
+			default:
+				throw new RuntimeException("Unexpected filter snapshot setting: " + filterSnapshots + " Possible are: [no, withLinkAttributes]. This can be changed in config.qsim.filterSnapshots");
+		}
+	}
 }

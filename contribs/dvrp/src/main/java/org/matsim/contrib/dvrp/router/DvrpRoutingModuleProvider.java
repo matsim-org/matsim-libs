@@ -23,10 +23,12 @@ package org.matsim.contrib.dvrp.router;
 import java.util.Map;
 import java.util.Objects;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
@@ -35,7 +37,7 @@ import com.google.inject.name.Named;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpRoutingModule> {
+public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpMode, DvrpRoutingModule> {
 	public enum Stage {ACCESS, MAIN, EGRESS}
 
 	@Inject
@@ -43,10 +45,10 @@ public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<D
 	private RoutingModule walkRouter;
 
 	@Inject
-	private Scenario scenario;
+	private TimeInterpretation timeInterpretation;
 
 	public DvrpRoutingModuleProvider(String mode) {
-		super(mode);
+		super(mode, DvrpModes::mode);
 	}
 
 	@Override
@@ -59,6 +61,6 @@ public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<D
 		RoutingModule egressRouter = stageRouters.getOrDefault(Stage.EGRESS, walkRouter);
 
 		return new DvrpRoutingModule(mainRouter, accessRouter, egressRouter,
-				getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), scenario);
+				getModalInstance(DvrpRoutingModule.AccessEgressFacilityFinder.class), getMode(), timeInterpretation);
 	}
 }

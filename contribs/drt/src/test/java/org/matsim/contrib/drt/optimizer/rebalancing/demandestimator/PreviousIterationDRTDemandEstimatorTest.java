@@ -167,7 +167,7 @@ public class PreviousIterationDRTDemandEstimatorTest {
 	}
 
 	private PersonDepartureEvent departureEvent(double time, Link link, String mode) {
-		return new PersonDepartureEvent(time, null, link.getId(), mode);
+		return new PersonDepartureEvent(time, null, link.getId(), mode, mode);
 	}
 
 	private void assertDemand(PreviousIterationDRTDemandEstimator estimator, double fromTime, DrtZone zone,
