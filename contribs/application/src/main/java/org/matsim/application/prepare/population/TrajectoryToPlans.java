@@ -178,9 +178,8 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             if (firstBaseActivity.equals(lastBaseActivity)) {
                 double mergedDuration = Double.parseDouble(firstActivity.getType().split("_")[1]) + Double.parseDouble(lastActivity.getType().split("_")[1]);
 
-
-                firstActivity.setType(firstBaseActivity + "_" + mergedDuration);
-                lastActivity.setType(lastBaseActivity + "_" + mergedDuration);
+                firstActivity.setType(String.format("%s_%.1f", firstBaseActivity, mergedDuration));
+                lastActivity.setType(String.format("%s_%.1f", lastBaseActivity, mergedDuration));
             }
         }  // skipping plans with just one activity
 
