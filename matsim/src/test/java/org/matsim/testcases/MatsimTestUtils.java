@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -76,8 +77,8 @@ public final class MatsimTestUtils extends TestWatcher {
 				}
 				assertEquals( "Lines have different content: ", lineInput.trim(), lineOutput.trim() );
 			}
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
