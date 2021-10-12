@@ -24,11 +24,7 @@ package org.matsim.contrib.freight.analysis;
 import org.junit.*;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
-
-import static org.junit.Assert.assertTrue;
-
-public class RunFreightAnalysisTest {
+public class RunFreightAnalysisIT {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
