@@ -43,11 +43,26 @@ public class RunFreightAnalysisTest {
 
 	@Test
 	public void compareResults() {
-		String filename = "carrierStats.tsv";
+		//some generale stats
+		checkFile("carrierStats.tsv");
+		checkFile("freightVehicleStats.tsv");
+		checkFile("freightVehicleTripStats.tsv");
+		checkFile("serviceStats.tsv");
+		checkFile("shipmentStats.tsv");
 
+		//Carrier specific stats
+		checkFile("carrier_carrier1_ServiceStats.tsv");
+		checkFile("carrier_carrier1_ShipmentStats.tsv");
+		checkFile("carrier_carrier1_VehicleTypeStats.tsv");
+		checkFile("carrier_?carrier1_tripStats.tsv");
+		checkFile("carrier_?carrier1_vehicleStats.tsv");
+
+		//Todo: Where comes the "?" from? KMT oct'21
+	}
+
+	private void checkFile(String filename) {
 		final String inputFilename = testUtils.getInputDirectory() + filename;
 		final String outputFilename = testUtils.getOutputDirectory() + filename;
 		MatsimTestUtils.compareFilesLineByLine(inputFilename, outputFilename);
-		
-		}
+	}
 }
