@@ -21,6 +21,7 @@
 
 package org.matsim.contrib.freight.analysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -39,9 +40,11 @@ import java.util.LinkedHashMap;
 
 class FreightAnalysisVehicleTracking {
 
-	private LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = new LinkedHashMap<>();
-	private LinkedHashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new LinkedHashMap<>();
-	private LinkedHashMap<Id<Vehicle>, Double> vehiclesOnLink = new LinkedHashMap<>();
+	private static final  Logger log = Logger.getLogger(FreightAnalysisVehicleTracking.class);
+
+	private final LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = new LinkedHashMap<>();
+	private final LinkedHashMap<Id<Person>, Id<Vehicle>> driver2VehicleId = new LinkedHashMap<>();
+	private final LinkedHashMap<Id<Vehicle>, Double> vehiclesOnLink = new LinkedHashMap<>();
 
 	public Id<Vehicle> getDriver2VehicleId(Id<Person> driverId) {
 		return driver2VehicleId.get(driverId);
@@ -95,7 +98,7 @@ class FreightAnalysisVehicleTracking {
 		if (trackers.containsKey(vehicleId)) {
 			if (trackers.get(vehicleId).currentDriverId != personId) { // In Case the Person wasn't using the vehicle before, a new tour of the vehicle is started.
 				if (null != trackers.get(vehicleId).currentDriverId) {
-					//TODO: Warning that driver changed unexpectedly as this wrongs the service duration because the end of the previous service is obviously not known.
+					log.warn("Warning that driver changed unexpectedly as this wrongs the service duration because the end of the previous service is obviously not known.");
 				}
 				trackers.get(vehicleId).currentDriverId = personId;
 				trackers.get(vehicleId).usageStartTime = time;

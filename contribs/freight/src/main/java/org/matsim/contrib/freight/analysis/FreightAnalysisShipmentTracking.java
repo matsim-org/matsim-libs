@@ -38,7 +38,8 @@ import java.util.LinkedHashSet;
 
 class FreightAnalysisShipmentTracking {
 
-	private LinkedHashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new LinkedHashMap<>();
+	private final LinkedHashMap<Id<CarrierShipment>, ShipmentTracker> shipments = new LinkedHashMap<>();
+
     public void addTracker(CarrierShipment shipment){
         shipments.put(shipment.getId(),new ShipmentTracker(shipment) );
     }
@@ -116,8 +117,8 @@ class ShipmentTracker {
 		this.shipment=shipment;
 	}
 
-	public ShipmentTracker(Id<Carrier> carrierId, CarrierShipment shipment) {
-		this(shipment);
-		this.carrierId = carrierId;
-	}
+//	public ShipmentTracker(Id<Carrier> carrierId, CarrierShipment shipment) {
+//		this(shipment);
+//		this.carrierId = carrierId;
+//	}
 }

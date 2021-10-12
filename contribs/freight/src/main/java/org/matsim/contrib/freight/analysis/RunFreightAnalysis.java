@@ -40,8 +40,8 @@ import java.io.File;
 
 public class RunFreightAnalysis {
 
-    private String inputPath;
-    private String outputPath;
+    private final String inputPath;
+    private final String outputPath;
 
     public RunFreightAnalysis(String inputPath, String outputPath) {
         this.inputPath = inputPath;

@@ -40,14 +40,13 @@ import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandle
 import org.matsim.contrib.freight.events.eventhandler.ShipmentDeliveredEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.ShipmentPickedUpEventHandler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
@@ -61,10 +60,9 @@ import java.util.LinkedHashSet;
 class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
 	private final static Logger log = Logger.getLogger(FreightAnalysisEventHandler.class);
 	private final Vehicles vehicles;
-	private Network network;
-	private Carriers carriers;
+	private final Network network;
+	private final Carriers carriers;
 	private Integer iterationCount=0;
-	private LinkedHashMap<Id<Vehicle>, Double> vehiclesOnLink = new LinkedHashMap<>();
 	private FreightAnalysisVehicleTracking vehicleTracking = new FreightAnalysisVehicleTracking();
 	private FreightAnalysisShipmentTracking shipmentTracking = new FreightAnalysisShipmentTracking();
 	private FreightAnalysisServiceTracking serviceTracking = new FreightAnalysisServiceTracking();
@@ -192,9 +190,10 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
     // ##################################################
 
 	// Export vehicle Statistics to single TSV
-	public void exportVehicleInfo(String path){
-		exportVehicleInfo(path, false);
-	}
+//	public void exportVehicleInfo(String path){
+//		exportVehicleInfo(path, false);
+//	}
+
 	public void exportVehicleInfo(String path, Boolean exportGuesses) {
 //		path = getIterationDirectory(path);
 		try {
@@ -230,14 +229,15 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 			out.close();
 			System.out.println("File created successfully");
 		} catch (IOException e) {
-			// TODO
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	// Export Vehicle Statistics per Trip to TSV
-	public void exportVehicleTripInfo(String path){
-		exportVehicleTripInfo(path, false );
-	}
+//	public void exportVehicleTripInfo(String path){
+//		exportVehicleTripInfo(path, false );
+//	}
+
 	public void exportVehicleTripInfo(String path, Boolean exportGuesses) {
 //		path = getIterationDirectory(path);
 		try {
@@ -248,16 +248,16 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 			LinkedHashMap<String, LinkedHashSet<String>> carrierTripStatistics = new LinkedHashMap<>();
 			for (Id<Vehicle> vehId : trackers.keySet()) {
 				VehicleTracker tracker = trackers.get(vehId);
-				Integer i = 0;
+				int i = 0;
 				for (VehicleTracker.VehicleTrip trip : tracker.tripHistory) {
 					// if info is not certain, export the guess if that is wanted.
 					String driverIdString = trip.driverId == null ? "" : trip.driverId.toString();
-					String carrierIdString = (tracker.carrierId == null && exportGuesses) ? "?" + id2String(tracker.carrierIdGuess) : id2String(tracker.carrierId);
+					String carrierIdString = ((tracker.carrierId == null) && exportGuesses) ? ("?" + id2String(tracker.carrierIdGuess)) : id2String(tracker.carrierId);
 					// trip statistics are collected per carrier...
 					if (!carrierTripStatistics.containsKey(carrierIdString)) {
 						carrierTripStatistics.put(carrierIdString, new LinkedHashSet<>());
 					}
-					String vehicleTripInfoString = vehId.toString() + "	" + tracker.vehicleType.getId().toString() + "	" + i.toString() + "	" + carrierIdString + "	" + driverIdString + "	" + trip.travelTime + "	" + trip.travelDistance + "	" + trip.cost;
+					String vehicleTripInfoString = vehId.toString() + "	" + tracker.vehicleType.getId().toString() + "	" + i + "	" + carrierIdString + "	" + driverIdString + "	" + trip.travelTime + "	" + trip.travelDistance + "	" + trip.cost;
 					carrierTripStatistics.get(carrierIdString).add(vehicleTripInfoString);
 					i++;
 				}
@@ -278,15 +278,15 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 			out.close();
 			System.out.println("File created successfully");
 		} catch (IOException e) {
-			 // TODO
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	// Export Vehicle Statistics grouped by VehicleType to individual TSV files per carrier
-	public void exportVehicleTypeStats(String path){
-		//there are no guesses to be exported as of now, still having this method to keep the export calls consistent
-		exportVehicleTypeStats(path, false);
-	}
+//	public void exportVehicleTypeStats(String path){
+//		//there are no guesses to be exported as of now, still having this method to keep the export calls consistent
+//		exportVehicleTypeStats(path, false);
+//	}
 	public void exportVehicleTypeStats(String path, Boolean exportGuesses) {
 //		path = getIterationDirectory(path);
 		try {
@@ -332,9 +332,10 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 
 	// Export Statistics of performed services
-	public void exportServiceInfo(String path){
-		exportServiceInfo(path, false);
-	}
+//	public void exportServiceInfo(String path){
+//		exportServiceInfo(path, false);
+//	}
+//
 	public void exportServiceInfo(String path, Boolean exportGuesses) {
 //		path = getIterationDirectory(path);
 		try {
@@ -367,9 +368,10 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	}
 
 	//Export Info about Shipments to individual and per-carrier TSV
-	public void exportShipmentInfo(String path){
-		exportShipmentInfo(path, false);
-	}
+//	public void exportShipmentInfo(String path){
+//		exportShipmentInfo(path, false);
+//	}
+
 	public void exportShipmentInfo(String path, Boolean exportGuesses) {
 //		path = getIterationDirectory(path);
 		try {
@@ -408,19 +410,19 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 	}
 
-	private String getIterationDirectory(String parentDirectory) {
-		String path = parentDirectory + "/freight-analysis-it_" + iterationCount.toString(); // create one subfolder per iteration
-		try {
-			Files.createDirectories(Paths.get(path));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return(path);
-	}
+//	private String getIterationDirectory(String parentDirectory) {
+//		String path = parentDirectory + "/freight-analysis-it_" + iterationCount.toString(); // create one subfolder per iteration
+//		try {
+//			Files.createDirectories(Paths.get(path));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return(path);
+//	}
+
 	// reset the EventHandler, would typically be done between iterations of a simulation
 	public void reset(){
 		iterationCount++;
-		this.vehiclesOnLink = new LinkedHashMap<>();
 		this.vehicleTracking = new FreightAnalysisVehicleTracking();
 		this.shipmentTracking = new FreightAnalysisShipmentTracking();
 		this.serviceTracking = new FreightAnalysisServiceTracking();
@@ -431,7 +433,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		return id==null?" ":id.toString(); // return space because instead of empty string because TSV files get confused otherwise
 	}
 
-	private class CarrierVehicleTypeStats {
+	private static class CarrierVehicleTypeStats {
 		Integer vehicleCount=0;
 		Double totalDistance=0.0;
 		Double totalRoadTime=0.0;

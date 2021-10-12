@@ -35,7 +35,7 @@ import java.util.LinkedHashMap;
 
 class FreightAnalysisServiceTracking {
 
-	private LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new LinkedHashMap<>();
+	private final LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> carrierServiceTrackers = new LinkedHashMap<>();
 
 	public LinkedHashMap<Id<Carrier>, ServiceTracker.CarrierServiceTracker> getCarrierServiceTrackers(){return carrierServiceTrackers;}
 
