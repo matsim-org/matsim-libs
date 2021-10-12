@@ -30,7 +30,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 
 /**
@@ -152,8 +152,8 @@ class FreightAnalysisVehicleTracking {
 class VehicleTracker {
 	public double lastExit;
 	public Id<Person> lastDriverId = Id.createPersonId(-1);
-	public HashSet<Id<Person>> driverHistory=new HashSet<>();
-	public HashSet<VehicleTrip> tripHistory= new HashSet<>();
+	public LinkedHashSet<Id<Person>> driverHistory=new LinkedHashSet<>();
+	public LinkedHashSet<VehicleTrip> tripHistory= new LinkedHashSet<>();
 	public double currentTripDuration;
 	public double currentTripDistance;
 	public Id<Carrier> carrierIdGuess;

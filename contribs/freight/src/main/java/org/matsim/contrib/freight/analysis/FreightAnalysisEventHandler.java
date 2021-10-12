@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 /*
 * EventHandler for analysis of matsim-freight runs. Tracks freight vehicles, carriers, shipments and services and is able to export results to TSV files.
@@ -199,7 +199,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 //		path = getIterationDirectory(path);
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(path + "/freightVehicleStats.tsv"));
-			LinkedHashMap<String, HashSet<String>> carrierVehicleStatistics = new LinkedHashMap<>();
+			LinkedHashMap<String, LinkedHashSet<String>> carrierVehicleStatistics = new LinkedHashMap<>();
 			out.write("vehicleId	vehicleType	carrierId	driverID	usageTime	roadTime	travelDistance	vehicleCost	tripCount");
 			out.newLine();
 			LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = vehicleTracking.getTrackers();
@@ -210,7 +210,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 				String carrierIdString = (tracker.carrierId == null && exportGuesses) ? "?" + id2String(tracker.carrierIdGuess) : id2String(tracker.carrierId);
 				// vehicle statistics are collected per carrier...
 				if (!carrierVehicleStatistics.containsKey(carrierIdString)) {
-					carrierVehicleStatistics.put(carrierIdString, new HashSet<>());
+					carrierVehicleStatistics.put(carrierIdString, new LinkedHashSet<>());
 				}
 				String vehicleInfoString = vehId.toString() + "	" + tracker.vehicleType.getId().toString() + "	" + carrierIdString + "	" + lastDriverIdString + "	" + tracker.usageTime.toString() + "	" + tracker.roadTime.toString() + "	" + tracker.travelDistance.toString() + "	" + tracker.cost.toString() + "	" + tracker.tripHistory.size();
 				carrierVehicleStatistics.get(carrierIdString).add(vehicleInfoString);
@@ -245,7 +245,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 			out.write("vehicleId	vehicleType	tripNumber	carrierId	driverId	tripRoadTime	tripDistance	tripVehicleCost");
 			out.newLine();
 			LinkedHashMap<Id<Vehicle>, VehicleTracker> trackers = vehicleTracking.getTrackers();
-			LinkedHashMap<String, HashSet<String>> carrierTripStatistics = new LinkedHashMap<>();
+			LinkedHashMap<String, LinkedHashSet<String>> carrierTripStatistics = new LinkedHashMap<>();
 			for (Id<Vehicle> vehId : trackers.keySet()) {
 				VehicleTracker tracker = trackers.get(vehId);
 				Integer i = 0;
@@ -255,7 +255,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 					String carrierIdString = (tracker.carrierId == null && exportGuesses) ? "?" + id2String(tracker.carrierIdGuess) : id2String(tracker.carrierId);
 					// trip statistics are collected per carrier...
 					if (!carrierTripStatistics.containsKey(carrierIdString)) {
-						carrierTripStatistics.put(carrierIdString, new HashSet<>());
+						carrierTripStatistics.put(carrierIdString, new LinkedHashSet<>());
 					}
 					String vehicleTripInfoString = vehId.toString() + "	" + tracker.vehicleType.getId().toString() + "	" + i.toString() + "	" + carrierIdString + "	" + driverIdString + "	" + trip.travelTime + "	" + trip.travelDistance + "	" + trip.cost;
 					carrierTripStatistics.get(carrierIdString).add(vehicleTripInfoString);

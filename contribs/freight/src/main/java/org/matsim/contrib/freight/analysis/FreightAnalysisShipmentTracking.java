@@ -30,7 +30,7 @@ import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 
 import java.util.LinkedHashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 /**
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
@@ -98,7 +98,7 @@ class FreightAnalysisShipmentTracking {
 class ShipmentTracker {
 	public Id<Person> driverIdGuess;
 	public double deliveryTimeGuess;
-	public HashSet<String> possibleDrivers = new HashSet<>();
+	public LinkedHashSet<String> possibleDrivers = new LinkedHashSet<>();
 	Id<Link> from;
 	Id<Link> to;
 	public Double pickUpTime = 0.;
