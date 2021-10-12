@@ -320,9 +320,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				// increase speed if current freespeed is lower.
 				List<TransitRouteStop> routeStops = route.getStops();
 				if (routeStops.size() < 2) {
-					log.error("TransitRoute with less than 2 stops found: line " + line.getId().toString() +
-							", route " + route.getId().toString());
-					throw new RuntimeException("");
+					log.warn("TransitRoute with less than 2 stops found: line {}, route {}", line.getId(), route.getId());
+					continue;
 				}
 
 				double lastDepartureOffset = route.getStops().get(0).getDepartureOffset().seconds();
