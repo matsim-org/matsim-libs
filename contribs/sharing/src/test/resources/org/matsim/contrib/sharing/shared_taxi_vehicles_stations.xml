@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service SYSTEM "../dtd/sharing_service_v1.dtd">
+<service>
+	<stations>
+		<station id="1" link="55_2" capacity="4" />
+		<station id="2" link="7_2" capacity="4" />
+	</stations>
+	<vehicles>
+		<vehicle id="1" startLink="55_2" startStation="1" />
+		<vehicle id="2" startLink="7_2" startStation="2" />
+	</vehicles>
+</service>
