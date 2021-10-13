@@ -1,0 +1,16 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT service (stations*,vehicles)>
+
+<!ELEMENT stations (station)*>
+<!ELEMENT vehicles (vehicle)*>
+
+<!ELEMENT station EMPTY>
+<!ATTLIST station	id				CDATA	#REQUIRED
+					link  			CDATA	#REQUIRED
+					capacity		CDATA	#REQUIRED>
+
+<!ELEMENT vehicle EMPTY>
+<!ATTLIST vehicle	id				CDATA	#REQUIRED
+					startLink		CDATA	#IMPLIED
+					startStation	CDATA	#IMPLIED>

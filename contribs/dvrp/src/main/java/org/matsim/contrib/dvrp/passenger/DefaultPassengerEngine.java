@@ -34,7 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -169,7 +170,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
-		return new ModalProviders.AbstractProvider<>(mode) {
+		return new ModalProviders.AbstractProvider<>(mode, DvrpModes::mode) {
 			@Inject
 			private EventsManager eventsManager;
 

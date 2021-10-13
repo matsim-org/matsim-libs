@@ -28,10 +28,12 @@ import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -46,7 +48,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -100,11 +103,11 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		// XXX if overridden to something else, make sure that the depots are equipped with chargers
 		//  otherwise vehicles will not re-charge
 		bindModal(DepotFinder.class).toProvider(
-				modalProvider(getter -> new NearestChargerAsDepot(getter.getModal(ChargingInfrastructure.class))))
+						modalProvider(getter -> new NearestChargerAsDepot(getter.getModal(ChargingInfrastructure.class))))
 				.asEagerSingleton();
 
 		bindModal(EmptyVehicleChargingScheduler.class).toProvider(
-				new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
+				new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
 					@Inject
 					private MobsimTimer timer;
 
@@ -131,6 +134,10 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						}), getter.getModal(DrtRequestInsertionRetryQueue.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
+		bindModal(InsertionCostCalculator.InsertionCostCalculatorFactory.class).toProvider(modalProvider(
+				getter -> DefaultInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
+						getter.getModal(CostCalculationStrategy.class))));
+
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(
@@ -142,31 +149,32 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
 
-		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
+		bindModal(EmptyVehicleRelocator.class).toProvider(
+				new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
 
-			@Inject
-			private MobsimTimer timer;
+					@Inject
+					private MobsimTimer timer;
 
-			@Override
-			public EmptyVehicleRelocator get() {
-				Network network = getModalInstance(Network.class);
-				DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
-			}
-		}).asEagerSingleton();
+					@Override
+					public EmptyVehicleRelocator get() {
+						Network network = getModalInstance(Network.class);
+						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
+					}
+				}).asEagerSingleton();
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-				getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class),
-						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
-						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
+						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+								getter.get(MobsimTimer.class),
+								getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
+								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
