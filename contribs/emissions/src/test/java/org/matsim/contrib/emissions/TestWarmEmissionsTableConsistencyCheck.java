@@ -156,6 +156,4 @@ public class TestWarmEmissionsTableConsistencyCheck {
 
 		return VehicleUtils.createVehicle(Id.createVehicleId("dieselTruckFullSpecified"), vehicleType);
 	}
-
-
 }

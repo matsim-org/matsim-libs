@@ -287,7 +287,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			efkey.setVehicleAttributes(hbefaVehicleAttributes);
 		}
 
-
 		double averageSpeed_kmh = (linkLength_m / 1000) / (travelTime_sec / 3600);
 
 		// hedge against odd average speeds:
@@ -566,9 +565,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				throw new IllegalStateException("Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior());
 		}
 
-		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
-				"the config OR " +
-				"you should use another fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+		throw new RuntimeException("Was not able to lookup emissions factor. " +
+				"Maybe you wanted to look up detailed values and did not specify this in the config OR " +
+				"you should use another fallback setting when using detailed calculation " +
+				"OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
 	}
 
 

@@ -104,8 +104,6 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	//This is the first quick fix for the issue https://github.com/matsim-org/matsim-libs/issues/1226.
 	// Maybe other (smarter) strategies will be added later. kturner nov'20
 	public enum HbefaTableConsistencyCheckingLevel { allCombinations, perVehCat, consistent, none}
-
-
 	private static final String HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL = "hbefaTableConsistencyCheckingLevel";
 	private HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel = HbefaTableConsistencyCheckingLevel.allCombinations;
 
