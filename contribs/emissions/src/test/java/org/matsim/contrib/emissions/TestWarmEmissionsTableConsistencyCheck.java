@@ -44,31 +44,38 @@ import java.util.Map;
 /**
  *  @author kturner
  *
- *  test the different levels of fallback behaviour -> lookup for detailed or less detailed or avarage values or abort,
- *  depending on @link{DetailedVsAverageLookupBehavior}.
- *  Note this test only focus on one type of emissions and one computation method.
- *  It will NOT test the variety of computational methods. For this, please look to the other tests.
- *
+ *  Test the different levels of consistency checks for the provided emission tables
  */
 public class TestWarmEmissionsTableConsistencyCheck {
 
 	private final Link link = generateLink();
 	private final Vehicle vehicleFull = generateFullSpecifiedVehicle();
-	private final Vehicle vehicleFallbackToTechnologyAverage = generateVehicleForFallbackToTechnologyAverage();
-	private final Vehicle vehicleFallbackToAverageTable = generateVehicleForFallbackToAverageTable();
 
-//TODO @Jonas: Please check, if the values are the same as before due to chances in the table for this test here (new table).
+//TODO Use a second table were all combination should also pass... & introduce another block of tests.
 
-// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------	
+// ---------- Table with pass. car & HGV -------------
+
 	/**
-	 * vehicles information is complete
-	 *
-	 * LookupBehavior: allCombinations
-	 *
-	 * -> will crash because too restrictive check
+	 * HbefaTableConsistencyCheckingLevel: allCombinations
+	 * -> should fail, because  all combination does not work for tables with pass. cas and HGV due to different technologies definition.
+	 */
+	@Test(expected=RuntimeException.class)
+	public void testConsistency_AllCombinations() {
+		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.allCombinations);
+
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
+
+		double expectedValue = 1.7685253144E9; // = 200m * 151.7492371 g/km
+		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
+	}
+
+	/**
+	 * HbefaTableConsistencyCheckingLevel: perVehCat
+	 * -> should pass.
 	 */
 	@Test
-	public void testWarmDetailedValueOnlyDetailed() {
+	public void testConsistency_PerVehCat() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.perVehCat);
 
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
@@ -78,171 +85,51 @@ public class TestWarmEmissionsTableConsistencyCheck {
 		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
 	}
 
-	//TODO: @Jonas: Please update for the new purpose of this test.
+	/**
+	 * HbefaTableConsistencyCheckingLevel: consistend
+	 * -> should pass.
+	 */
+	@Test
+	public void testConsistency_Consistent() {
+		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
 
-//	/**
-//	 *
-//	 * vehicles information is complete but fully specified entry is NOT available in detailed table
-//	 * LookupBehavior: onlyTryDetailedElseAbort
-//	 *
-//	 * -> should abort --> RuntimeException
-//	 */
-//	@Test(expected=RuntimeException.class)
-//	public void testWarm_DetailedElseAbort_ShouldAbort1() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
-//	}
-//
-//	/**
-//	 * vehicles information is complete but fully specified entry is NOT available in detailed table
-//	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-//	 *
-//	 * LookupBehavior: onlyTryDetailedElseAbort
-//	 *
-//	 * -> should abort --> RuntimeException
-//	 */
-//	@Test(expected=RuntimeException.class)
-//	public void testWarm_DetailedElseAbort_ShouldAbort2() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
-//	}
-//
-//
-//// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------
-//	/**
-//	 * vehicles information is complete
-//	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-//	 *
-//	 * -> do NOT fall back to technology average
-//	 * ---> should calculate value from detailed value
-//	 */
-//	@Test
-//	public void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
-//
-//		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-//		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
-//	}
-//
-//
-//	/**
-//	 * vehicles information is complete but fully specified entry is NOT available in detailed table
-//	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-//	 *
-//	 * -> do fall back to technology average
-//	 * ---> should calculate value from technology average
-//	 */
-//	@Test
-//	public void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
-//
-//		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
-//		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
-//	}
-//
-//	/**
-//	 * vehicles information is complete but fully specified entry is NOT available in detailed table
-//	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-//	 *
-//	 * LookupBehavior: onlyTryDetailedElseAbort
-//	 *
-//	 * -> should abort --> RuntimeException
-//	 */
-//	@Test(expected=RuntimeException.class)
-//	public void testWarm_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
-//	}
-//
-//// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------
-//	/**
-//	 * vehicles information is complete
-//	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-//	 *
-//	 * -> do NOT fall back to technology average or average table
-//	 * ---> should calculate value from detailed value
-//	 */
-//	@Test
-//	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
-//
-//		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-//		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
-//	}
-//
-//
-//	/**
-//	 * vehicles information is complete but fully specified entry is NOT available in detailed table
-//	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-//	 *
-//	 * -> do fall back to technology average; do NOT fall back to average table
-//	 * ---> should calculate value from technology average
-//	 */
-//	@Test
-//	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
-//
-//		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
-//		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
-//	}
-//
-//	/**
-//	 * vehicles information is complete but fully specified entry is NOT available in detailed table
-//	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-//	 *
-//	 * LookupBehavior: tryDetailedThenTechnologyAverageThenAverageTable
-//	 *
-//	 * -> do fall back to average table
-//	 * ---> should calculate value from average table
-//	 */
-//	@Test
-//	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
-//		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-//
-//		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-//		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
-//
-//		double expectedValue = 31.1947174; // = 200m * 155.973587 g/km
-//		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
-//	}
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
+		double expectedValue = 1.7685253144E9; // = 200m * 151.7492371 g/km
+		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
+	}
 
+	/**
+	 * HbefaTableConsistencyCheckingLevel: none
+	 * -> should pass.
+	 */
+	@Test
+	public void testConsistency_None() {
+		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
 
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
+
+		double expectedValue = 1.7685253144E9; // = 200m * 151.7492371 g/km
+		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
+	}
 
 // ---------- setup and helper methods -------------	
 
 	/**
 	 * load and prepare the scenario, create the emissionsModule
 	 *
-	 * @param consistencyCheckingLevel the EmissionsConfigGroup.DetailedVsAverageLookupBehavior
+	 * @param consistencyCheckingLevel the EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel
 	 * @return EmissionsModule
 	 */
 	private EmissionModule setUpScenario(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel consistencyCheckingLevel) {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" );
 		Config config = ConfigUtils.createConfig();
-//		Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort); //TODO: maybe change later
+		emissionsConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 		emissionsConfig.setHbefaTableConsistencyCheckingLevel(consistencyCheckingLevel);
-		emissionsConfig.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
+		emissionsConfig.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);			//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
 		emissionsConfig.setDetailedColdEmissionFactorsFile(IOUtils.extendUrl( scenarioUrl, "sample_41_EFA_ColdStart_SubSegm_2020detailed.txt").toString());
 		emissionsConfig.setDetailedWarmEmissionFactorsFile(IOUtils.extendUrl( scenarioUrl,"sample_41_EFA_HOT_SubSegm_2020detailed_2Pollutants_Car_LCV_HGV.csv").toString());
 
@@ -260,49 +147,15 @@ public class TestWarmEmissionsTableConsistencyCheck {
 	}
 
 	private Vehicle generateFullSpecifiedVehicle() {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselTruckFullSpecified", VehicleType.class));
 		EngineInformation engineInformation = vehicleType.getEngineInformation();
 		VehicleUtils.setHbefaVehicleCategory(engineInformation, "HEAVY_GOODS_VEHICLE");
 		VehicleUtils.setHbefaTechnology(engineInformation,"diesel");
 		VehicleUtils.setHbefaEmissionsConcept(engineInformation, "HGV D Euro-I");
 		VehicleUtils.setHbefaSizeClass(engineInformation, "RT >7.5-12t");
 
-		return VehicleUtils.createVehicle(Id.createVehicleId("dieselCarFullSpecified"), vehicleType);
+		return VehicleUtils.createVehicle(Id.createVehicleId("dieselTruckFullSpecified"), vehicleType);
 	}
-
-	/**
-	 * create a vehicle with all information, which is not full represented in emissions table.
-	 *
-	 * @return vehicle
-	 */
-	private Vehicle generateVehicleForFallbackToTechnologyAverage() {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
-		EngineInformation engineInformation = vehicleType.getEngineInformation();
-		VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
-		VehicleUtils.setHbefaTechnology(engineInformation,"diesel");
-		VehicleUtils.setHbefaEmissionsConcept(engineInformation, "PC-D-Euro-3_NotInTable");  //<--- this value is not in table
-		VehicleUtils.setHbefaSizeClass(engineInformation, ">1,4L");
-
-		return VehicleUtils.createVehicle(Id.createVehicleId("dieselCarFallbackToTechnology"), vehicleType);
-	}
-
-	/**
-	 * create a vehicle with all information, which is not represented in detailed emissions table.
-	 *
-	 * @return vehicle
-	 */
-	private Vehicle generateVehicleForFallbackToAverageTable() {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
-		EngineInformation engineInformation = vehicleType.getEngineInformation();
-		VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
-		VehicleUtils.setHbefaTechnology(engineInformation,"diesel_NotInTable");	//<--- this value is not in table
-		VehicleUtils.setHbefaEmissionsConcept(engineInformation, "PC-D-Euro-3");
-		VehicleUtils.setHbefaSizeClass(engineInformation, ">1,4L");
-
-		return VehicleUtils.createVehicle(Id.createVehicleId("dieselCarFallbackToAverage"), vehicleType);
-	}
-
-
 
 
 }
