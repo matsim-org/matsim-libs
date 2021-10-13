@@ -46,8 +46,8 @@ import java.util.Map;
  *
  *  test the different levels of fallback behaviour -> lookup for detailed or less detailed or avarage values or abort,
  *  depending on @link{DetailedVsAverageLookupBehavior}.
- *  Note this test only focus on one type of emissions and one commutation method.
- *  It will NOT test the variety of commutational methods. For this please look to the other tests.
+ *  Note this test only focus on one type of emissions and one computation method.
+ *  It will NOT test the variety of computational methods. For this, please look to the other tests.
  *
  */
 public class TestWarmEmissionsTableConsistencyCheck {
@@ -77,9 +77,6 @@ public class TestWarmEmissionsTableConsistencyCheck {
 		double expectedValue = 1.7685253144E9; // = 200m * 151.7492371 g/km
 		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
 	}
-
-	
-
 
 	//TODO: @Jonas: Please update for the new purpose of this test.
 

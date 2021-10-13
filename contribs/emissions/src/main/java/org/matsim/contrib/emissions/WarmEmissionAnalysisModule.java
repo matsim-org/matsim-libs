@@ -155,18 +155,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 							HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(hbefaWarmEmissionFactorKey);
 							if (result == null) {
 								throw new RuntimeException("emissions factor for key=" + hbefaWarmEmissionFactorKey + " is missing." +
-										"  There used to be some " +
-										"fallback, but it was " +
-										"inconsistent and confusing, so " +
-										"we are now just aborting.");
+										" There used to be some fallback, but it was " +
+										"inconsistent and confusing, so we are now just aborting.");
 							}
 						}
-
-
-						}
-
+					}
 					break;
-
 				case consistent:
 					// yy The above consistency check might actually be too restrictive.  The code only needs that both freeflow and stopgo traffic
 					// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
@@ -573,7 +567,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
-                                                           "the config OR " +
+				"the config OR " +
 				"you should use another fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
 	}
 
