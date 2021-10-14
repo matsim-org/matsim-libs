@@ -233,6 +233,18 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setEgressTime(ferryVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
 			scenario.getTransitVehicles().addVehicleType( ferryVehicleType );
 		}
+
+		VehicleType ptVehicleType = vehicleFactory.createVehicleType( Id.create( "Pt_veh_type", VehicleType.class ) );
+		{
+			VehicleCapacity capacity = ptVehicleType.getCapacity() ;
+			capacity.setSeats( 100 );
+			capacity.setStandingRoom( 100 );
+			VehicleUtils.setDoorOperationMode(ptVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
+			VehicleUtils.setAccessTime(ptVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
+			VehicleUtils.setEgressTime(ptVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
+			scenario.getTransitVehicles().addVehicleType( ptVehicleType );
+		}
+
 		// set link speeds and create vehicles according to pt mode
 		for (TransitLine line: scenario.getTransitSchedule().getTransitLines().values()) {
 			VehicleType lineVehicleType;
@@ -309,9 +321,10 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					lineVehicleType = ferryVehicleType;
 					break;
 				default:
-					log.error("unknown transit mode! Line id was " + line.getId().toString() +
+					log.warn("unknown transit mode! Line id was " + line.getId().toString() +
 							"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
-					throw new RuntimeException("unknown transit mode");
+
+					lineVehicleType = ptVehicleType;
 			}
 
 			for (TransitRoute route: line.getRoutes().values()) {
