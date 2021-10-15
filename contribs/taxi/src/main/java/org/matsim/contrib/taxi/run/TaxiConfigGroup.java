@@ -26,9 +26,9 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
