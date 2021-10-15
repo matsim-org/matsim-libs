@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;

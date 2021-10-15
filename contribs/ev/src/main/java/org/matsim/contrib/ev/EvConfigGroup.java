@@ -22,8 +22,8 @@ package org.matsim.contrib.ev;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.Map;
 
 public final class EvConfigGroup extends ReflectiveConfigGroup {

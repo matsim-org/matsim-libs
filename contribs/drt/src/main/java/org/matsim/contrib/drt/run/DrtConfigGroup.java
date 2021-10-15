@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;

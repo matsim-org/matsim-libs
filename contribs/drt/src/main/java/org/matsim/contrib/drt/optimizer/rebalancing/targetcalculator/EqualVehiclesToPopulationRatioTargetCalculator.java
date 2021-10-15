@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;

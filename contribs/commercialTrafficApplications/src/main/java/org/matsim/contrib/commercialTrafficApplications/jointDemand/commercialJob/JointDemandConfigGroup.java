@@ -24,7 +24,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 import java.util.Map;
 
 public class JointDemandConfigGroup extends ReflectiveConfigGroup {

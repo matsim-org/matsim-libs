@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
