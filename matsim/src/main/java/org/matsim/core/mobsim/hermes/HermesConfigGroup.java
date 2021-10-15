@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.Map;
 import java.util.Set;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
