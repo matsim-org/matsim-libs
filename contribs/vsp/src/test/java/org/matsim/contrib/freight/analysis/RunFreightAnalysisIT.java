@@ -50,8 +50,8 @@ public class RunFreightAnalysisIT {
 		checkFile("carrier_carrier1_ServiceStats.tsv");
 		checkFile("carrier_carrier1_ShipmentStats.tsv");
 		checkFile("carrier_carrier1_VehicleTypeStats.tsv");
-		checkFile("carrier_?carrier1_tripStats.tsv");  //Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
-		checkFile("carrier_?carrier1_vehicleStats.tsv"); //Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
+		checkFile("carrier_##carrier1_tripStats.tsv");  //Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
+		checkFile("carrier_##carrier1_vehicleStats.tsv"); //Note: The "?" is here, because the carrierId was guessed depending on the vehicleId.
 	}
 
 	private void checkFile(String filename) {
