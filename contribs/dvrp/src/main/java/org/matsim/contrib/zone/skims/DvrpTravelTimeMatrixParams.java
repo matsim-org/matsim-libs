@@ -22,7 +22,7 @@ package org.matsim.contrib.zone.skims;
 
 import java.util.Map;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
