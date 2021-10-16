@@ -122,6 +122,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					.build();
 
 			converter.convert();
+			i++;
 		}
 
 		if (copyLateEarlyDepartures) {
