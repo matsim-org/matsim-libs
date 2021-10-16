@@ -52,6 +52,8 @@ class RunDrtExample{
 			config = ConfigUtils.loadConfig( args );
 		} else {
 			configFile = "scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
+			// (we need a config file so that we have a relative path to other input files)
+
 			config = ConfigUtils.loadConfig( configFile );
 			config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");
 			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
@@ -74,7 +76,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -83,7 +85,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -92,33 +94,29 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 		}
+		{
+			// clear strategy settings from config file:
+			config.strategy().clearStrategySettings();
 
-		// clear strategy settings from config file:
-		config.strategy().clearStrategySettings();
+			// configure mode choice so that travellers start using drt:
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.ChangeSingleTripMode ).setWeight( 0.1 ) );
+			config.changeMode().setModes( new String[]{TransportMode.car, DRT_A, DRT_B, DRT_C} );
 
-		// configure mode choice so that travellers start using drt:
-		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultStrategy.SubtourModeChoice ).setWeight( 0.1 ) );
-		config.subtourModeChoice().setModes( new String [] {TransportMode.car, DRT_A, DRT_B, DRT_C} );
-
-		// have a "normal" plans choice strategy:
-		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
-
-		// add params so that scoring works:
-		config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
-		config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
-		config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
-
-//		config.planCalcScore().addModeParams( new ModeParams( "drt_A_walk" ) );
-//		config.planCalcScore().addModeParams( new ModeParams( "drt_B_walk" ) );
-//		config.planCalcScore().addModeParams( new ModeParams( "drt_C_walk" ) );
-		// now seems to work without these.  kai, dec'20
-
+			// have a "normal" plans choice strategy:
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
+		}
+		{
+			// add params so that scoring works:
+			config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
+			config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
+			config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
+		}
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		ScenarioUtils.loadScenario( scenario );
@@ -135,7 +133,7 @@ class RunDrtExample{
 		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
 		otfVisConfigGroup.setLinkWidth( 5 );
 		otfVisConfigGroup.setDrawNonMovingItems( true );
-		controler.addOverridingModule( new OTFVisLiveModule() );
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 	}
