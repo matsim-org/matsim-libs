@@ -28,7 +28,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -55,6 +56,7 @@ import org.matsim.contrib.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.shifts.shift.DrtShiftUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -98,7 +100,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 		bindModal(DrtRequestInsertionRetryQueue.class).toInstance(new DrtRequestInsertionRetryQueue(
 				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
 
-		bindModal(OperationFacilityFinder.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
+		bindModal(OperationFacilityFinder.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
 			@Inject
 			private Scenario scenario;
 
@@ -108,7 +110,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 			}
 		}).asEagerSingleton();
 
-		bindModal(DrtShiftDispatcher.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
+		bindModal(DrtShiftDispatcher.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
 			@Inject
 			private MobsimTimer timer;
 			@Inject
@@ -158,7 +160,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 		bindModal(DrtTaskFactory.class).toInstance(taskFactory);
 		bindModal(ShiftDrtTaskFactory.class).toInstance(taskFactory);
 		bindModal(EmptyVehicleRelocator.class).toProvider(
-				new ModalProviders.AbstractProvider<EmptyVehicleRelocator>(drtCfg.getMode()) {
+				new ModalProviders.AbstractProvider<DvrpMode, EmptyVehicleRelocator>(drtCfg.getMode(), DvrpModes::mode ) {
 					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
@@ -176,7 +178,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				}).asEagerSingleton();
 
 		bindModal(EShiftTaskScheduler.class).toProvider(
-				new ModalProviders.AbstractProvider<EShiftTaskScheduler>(drtCfg.getMode()) {
+				new ModalProviders.AbstractProvider<DvrpMode, EShiftTaskScheduler>(drtCfg.getMode(), DvrpModes::mode) {
 					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;

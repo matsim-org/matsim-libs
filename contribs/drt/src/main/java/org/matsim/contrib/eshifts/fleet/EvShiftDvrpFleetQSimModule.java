@@ -7,9 +7,10 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.eshifts.fleet.EvShiftDvrpVehicle;
+
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.core.modal.ModalProviders;
 
 public class EvShiftDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 
@@ -19,7 +20,7 @@ public class EvShiftDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	public void configureQSim() {
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
+		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Inject
 			private ElectricFleet evFleet;
 

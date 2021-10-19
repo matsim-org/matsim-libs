@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-import static org.matsim.contrib.eshifts.scheduler.EShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
+import static org.matsim.contrib.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
 
 /**
  * @author nkuehnel

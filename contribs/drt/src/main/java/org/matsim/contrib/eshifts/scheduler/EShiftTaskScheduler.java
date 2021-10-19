@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+import static org.matsim.contrib.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE;
+import static org.matsim.contrib.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
 
 /**
  * @author nkuehnel
@@ -52,9 +54,6 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 public class EShiftTaskScheduler {
 
     private final static Logger logger = Logger.getLogger(EShiftTaskScheduler.class);
-
-    public static final DrtTaskType RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE = new DrtTaskType("RELOCATE_SHIFT_BREAK", DRIVE);
-    public static final DrtTaskType RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE = new DrtTaskType("RELOCATE_SHIFT_CHANGEOVER", DRIVE);
 
     private final TravelTime travelTime;
     private final MobsimTimer timer;
