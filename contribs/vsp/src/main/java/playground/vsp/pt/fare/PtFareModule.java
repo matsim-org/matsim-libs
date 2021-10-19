@@ -6,20 +6,18 @@ public class PtFareModule extends AbstractModule {
 
     @Override
     public void install() {
-        PtFareConfigGroup configGroup = new PtFareConfigGroup();
-
-        if (configGroup.getPtFareCalculation().equals(DistanceBasedPtFareParams.SET_NAME)) {
-            DistanceBasedPtFareParams params = new DistanceBasedPtFareParams();
-            addEventHandlerBinding().toInstance(new DistanceBasedPtFareHandler(params));
+        PtFareConfigGroup ptFareConfigGroup = new PtFareConfigGroup();
+        if (ptFareConfigGroup.getPtFareCalculation().equals(DistanceBasedPtFareParams.SET_NAME)) {
+            DistanceBasedPtFareParams distanceBasedPtFareParams = new DistanceBasedPtFareParams();
+            addEventHandlerBinding().toInstance(new DistanceBasedPtFareHandler(distanceBasedPtFareParams));
         } else {
             throw new RuntimeException("Please choose from the following fare Calculation method: [" + DistanceBasedPtFareParams.SET_NAME + "]");
         }
 
-        if (configGroup.getApplyUpperBound()) {
-            PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(configGroup.getUpperBoundFactor());
+        if (ptFareConfigGroup.getApplyUpperBound()) {
+            PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getUpperBoundFactor());
             addEventHandlerBinding().toInstance(ptFareUpperBoundHandler);
             addControlerListenerBinding().toInstance(ptFareUpperBoundHandler);
         }
-
     }
 }

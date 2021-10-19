@@ -21,8 +21,8 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 

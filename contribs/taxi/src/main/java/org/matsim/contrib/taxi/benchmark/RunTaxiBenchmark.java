@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
@@ -74,7 +73,7 @@ public class RunTaxiBenchmark {
 		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
 			@Override
 			public void install() {
-				bindModal(TaxiBenchmarkStats.class).toProvider(ModalProviders.createProvider(mode,
+				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
 						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
 								getter.getModal(ExecutedScheduleCollector.class),
 								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();

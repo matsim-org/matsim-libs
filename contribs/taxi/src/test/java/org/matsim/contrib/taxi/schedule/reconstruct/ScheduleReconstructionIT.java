@@ -36,7 +36,8 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -90,7 +91,7 @@ public class ScheduleReconstructionIT {
 			@Override
 			public void install() {
 				bindModal(ScheduleReconstructor.class).toProvider(
-						new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
+						new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
 							@Inject
 							private EventsManager eventsManager;
 

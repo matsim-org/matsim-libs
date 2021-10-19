@@ -51,7 +51,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -117,23 +118,24 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
-		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
+		bindModal(EmptyVehicleRelocator.class).toProvider(
+				new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
 
-			@Inject
-			private MobsimTimer timer;
+					@Inject
+					private MobsimTimer timer;
 
-			@Override
-			public EmptyVehicleRelocator get() {
-				Network network = getModalInstance(Network.class);
-				DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
-			}
-		}).asEagerSingleton();
+					@Override
+					public EmptyVehicleRelocator get() {
+						Network network = getModalInstance(Network.class);
+						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
+					}
+				}).asEagerSingleton();
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 

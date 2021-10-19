@@ -1,8 +1,10 @@
 package playground.vsp.pt.fare;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.pt.PtConstants;
 
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.util.Map;
 
 /**
@@ -12,7 +14,7 @@ import java.util.Map;
  * The values are based on the standard unit of meter (m) and Euro (EUR)
  */
 public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
-    public static final String PT_DISTANCE_BASED_FARE = "ptDistanceBasedFare";
+    public static final String PT_FARE_DISTANCE_BASED = "distance based pt fare";
 
     public static final String SET_NAME = "distanceBasedPtFare";
     public static final String MIN_FARE = "minFare";
