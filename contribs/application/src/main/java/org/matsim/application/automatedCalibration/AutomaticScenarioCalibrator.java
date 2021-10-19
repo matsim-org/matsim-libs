@@ -53,7 +53,7 @@ public abstract class AutomaticScenarioCalibrator {
     private double maxAbsError = 1.0;
     private boolean complete = false;
     private long startTime;
-    private final Config config;
+    protected final Config config;
     private final ParameterTuner parameterTuner;
     private final String relevantPersonsFile;
 
@@ -68,9 +68,9 @@ public abstract class AutomaticScenarioCalibrator {
         readReferenceData(referenceDataFile);
     }
 
-    private void calibrate() throws IOException {
+    public void calibrate() throws IOException {
         startTime = System.currentTimeMillis();
-        config.controler().setOutputDirectory("./auto-calibration/run-0");
+        config.controler().setOutputDirectory("./output/auto-calibration/run-0");
         // Auto tuning loop
         while (true) {
             runSimulation();

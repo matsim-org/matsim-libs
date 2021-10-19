@@ -6,6 +6,12 @@ import org.matsim.core.config.Config;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This simple tuner will tune the ASC and marginal traveling utility by analyzing the difference between actual
+ * mode share and reference mode share. One mode will be tuned each time. The distance group with the largest error
+ * (non-absolute value!) and smallest error (non-absolute value!) will form an equation set. Solving for the equation
+ * set, we will get the new parameters for the given mode.
+ */
 public class SimpleParameterTuner implements ParameterTuner {
     private final Map<String, Double> speedMap = new HashMap<>();
     private final double targetError;
