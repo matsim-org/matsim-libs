@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.PositiveOrZero;
 
 /**
  * @author Michal Maciejewski (michalm)

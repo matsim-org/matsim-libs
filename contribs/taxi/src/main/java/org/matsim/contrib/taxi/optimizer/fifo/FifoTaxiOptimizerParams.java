@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 
