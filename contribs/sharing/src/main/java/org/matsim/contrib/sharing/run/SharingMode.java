@@ -18,50 +18,22 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.sharing.run;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import com.google.inject.BindingAnnotation;
 
 /**
- * This class is based on guava's NamedImpl.
- *
  * @author Michal Maciejewski (michalm)
  */
-class DvrpModeImpl implements DvrpMode, Serializable {
-	private final String value;
-
-	DvrpModeImpl(String value) {
-		this.value = checkNotNull(value, "value");
-	}
-
-	public String value() {
-		return this.value;
-	}
-
-	public int hashCode() {
-		// This is specified in java.lang.Annotation.
-		return (127 * "value".hashCode()) ^ value.hashCode();
-	}
-
-	public boolean equals(Object o) {
-		if (!(o instanceof DvrpMode)) {
-			return false;
-		}
-
-		DvrpMode other = (DvrpMode)o;
-		return value.equals(other.value());
-	}
-
-	public String toString() {
-		return "@" + DvrpMode.class.getName() + "(value=" + value + ")";
-	}
-
-	public Class<? extends Annotation> annotationType() {
-		return DvrpMode.class;
-	}
-
-	private static final long serialVersionUID = 0;
+@BindingAnnotation
+@Target({ FIELD, PARAMETER, METHOD })
+@Retention(RUNTIME)
+public @interface SharingMode {
+	String value();
 }

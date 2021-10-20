@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,8 +18,9 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.core.modal;
 
+import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -34,37 +35,28 @@ import com.google.inject.name.Names;
  * @author Michal Maciejewski (michalm)
  */
 public class ModalProviders {
-	public static <T> Provider<T> createProvider(Function<Injector, T> delegate) {
+	public static <M extends Annotation, T> Provider<T> createProvider(String mode,
+			ModalAnnotationCreator<M> modalAnnotationCreator, Function<InstanceGetter<M>, T> delegate) {
 		return new Provider<>() {
 			@Inject
 			private Injector injector;
 
 			@Override
 			public T get() {
-				return delegate.apply(injector);
+				return delegate.apply(new InstanceGetter<>(mode, modalAnnotationCreator, injector));
 			}
 		};
 	}
 
-	public static <T> Provider<T> createProvider(String mode, Function<InstanceGetter, T> delegate) {
-		return new Provider<>() {
-			@Inject
-			private Injector injector;
-
-			@Override
-			public T get() {
-				return delegate.apply(new InstanceGetter(mode, injector));
-			}
-		};
-	}
-
-	public static final class InstanceGetter {
+	public static final class InstanceGetter<M extends Annotation> {
 		private final String mode;
 		private final Injector injector;
+		private final ModalAnnotationCreator<M> modalAnnotationCreator;
 
-		private InstanceGetter(String mode, Injector injector) {
+		private InstanceGetter(String mode, ModalAnnotationCreator<M> modalAnnotationCreator, Injector injector) {
 			this.mode = mode;
 			this.injector = injector;
+			this.modalAnnotationCreator = modalAnnotationCreator;
 		}
 
 		public <T> T get(Class<T> type) {
@@ -80,11 +72,11 @@ public class ModalProviders {
 		}
 
 		public <T> T getModal(Class<T> type) {
-			return injector.getInstance(DvrpModes.key(type, mode));
+			return injector.getInstance(modalAnnotationCreator.key(type, mode));
 		}
 
 		public <T> T getModal(TypeLiteral<T> typeLiteral) {
-			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
+			return injector.getInstance(modalAnnotationCreator.key(typeLiteral, mode));
 		}
 
 		public <T> T getNamed(Class<T> type, String name) {
@@ -96,22 +88,24 @@ public class ModalProviders {
 		}
 	}
 
-	public static abstract class AbstractProvider<T> implements Provider<T> {
+	public static abstract class AbstractProvider<M extends Annotation, T> implements Provider<T> {
 		private final String mode;
+		private final ModalAnnotationCreator<M> modalAnnotationCreator;
 
 		@Inject
 		private Injector injector;
 
-		protected AbstractProvider(String mode) {
+		protected AbstractProvider(String mode, ModalAnnotationCreator<M> modalAnnotationCreator) {
 			this.mode = mode;
+			this.modalAnnotationCreator = modalAnnotationCreator;
 		}
 
 		protected <I> I getModalInstance(Class<I> type) {
-			return injector.getInstance(DvrpModes.key(type, mode));
+			return injector.getInstance(modalAnnotationCreator.key(type, mode));
 		}
 
 		protected <I> I getModalInstance(TypeLiteral<I> typeLiteral) {
-			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
+			return injector.getInstance(modalAnnotationCreator.key(typeLiteral, mode));
 		}
 
 		protected String getMode() {

@@ -26,7 +26,8 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.Insert
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -61,19 +62,20 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 					insertionCostCalculator);
 		})).asEagerSingleton();
 
-		addModalComponent(MultiInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
+		addModalComponent(MultiInsertionDetourPathCalculator.class,
+				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
 
-			@Override
-			public MultiInsertionDetourPathCalculator get() {
-				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
-			}
-		});
+					@Override
+					public MultiInsertionDetourPathCalculator get() {
+						Network network = getModalInstance(Network.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
+					}
+				});
 		bindModal(DetourPathCalculator.class).to(modalKey(MultiInsertionDetourPathCalculator.class));
 	}
 }

@@ -71,6 +71,10 @@ import org.matsim.core.utils.io.IOUtils;
 	}
 
 	private static class ExternalExecutor extends Thread {
+
+		// Environmental variables passed to process
+		final String[] envp = {"MATSIM_GUI=true"};
+
 		final String[] cmdArgs;
 		final JTextArea stdOut;
 		final JTextArea errOut;
@@ -96,9 +100,9 @@ import org.matsim.core.utils.io.IOUtils;
 		public void run()  {
 			try {
 				if (this.workingDirectory == null) {
-					this.p = Runtime.getRuntime().exec(this.cmdArgs);
+					this.p = Runtime.getRuntime().exec(this.cmdArgs, this.envp);
 				} else {
-					this.p = Runtime.getRuntime().exec(this.cmdArgs, null, new File(this.workingDirectory));
+					this.p = Runtime.getRuntime().exec(this.cmdArgs, this.envp, new File(this.workingDirectory));
 				}
 				
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));
