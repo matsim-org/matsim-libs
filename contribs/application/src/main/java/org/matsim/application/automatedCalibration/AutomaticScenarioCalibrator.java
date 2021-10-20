@@ -5,7 +5,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,20 +42,22 @@ public abstract class AutomaticScenarioCalibrator {
      * The auto-tuning process will stop when all the error (normalized to total number of trips) are within the allowed range
      */
     private final double targetError;
-    private final String configFile;
+    protected final String configFile;
 
     private static final Logger log = LogManager.getLogger(AutomaticScenarioCalibrator.class);
     private final Map<String, Map<Double, Double>> errorMap = new HashMap<>();
     private final Map<String, Map<Double, Double>> referenceMap = new HashMap<>();
-    private int counter = 0;
+    protected int counter = 0;
     private int nonImprovingRuns = 0;
     private double maxAbsError = 1.0;
+    private double currentMaxAbsError = 0.0;
+    private double currentSumAbsError = 0.0;
     private boolean complete = false;
     private long startTime;
     protected final Config config;
     private final ParameterTuner parameterTuner;
     private final String relevantPersonsFile;
-    private final String outputFolder;
+    protected final String outputFolder;
 
     public AutomaticScenarioCalibrator(String configFile, String output, String referenceDataFile, double targetError, long maxRunningTime, int patience, String relevantPersonsFile) throws IOException {
         this.targetError = targetError;
@@ -67,6 +68,7 @@ public abstract class AutomaticScenarioCalibrator {
         this.parameterTuner = new SimpleParameterTuner(targetError);
         this.relevantPersonsFile = relevantPersonsFile;
         readReferenceData(referenceDataFile);
+        initializeErrorMap();
         if (output == null || output.equals("")) {
             output = "./output/auto-calibration";
         }
@@ -80,20 +82,41 @@ public abstract class AutomaticScenarioCalibrator {
         while (true) {
             runSimulation();
             analyzeResults();
+            writeRecord();
             checkIfComplete();
             if (complete) {
                 break;
             }
             counter++;
             modifyConfig();
-            writeRecord(config.controler().getOutputDirectory());
         }
     }
 
-    private void writeRecord(String outputDirectory) throws IOException {
-        CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputDirectory + "/record.csv"), CSVFormat.DEFAULT);
+    /**
+     * This function is to be implemented in the different scenario. Important: Please do not build the scenario (and
+     * the controller) with the original config! Create (load) a new config in each simulation run instead!
+     */
+    public abstract void runSimulation();
+
+    private void analyzeResults() throws IOException {
+        // Get output plan  //TODO may be improved?
+        String runId = config.controler().getRunId();
+        String outputPlansFileName = "/output_plans.xml.gz";
+        if (runId != null && !runId.equals("")) {
+            outputPlansFileName = "/" + runId + ".output_plans.xml.gz";
+        }
+        Population outputPlans = PopulationUtils.readPopulation(config.controler().getOutputDirectory() + outputPlansFileName);
+        // Analyze mode share of the output plan
+        Map<String, Map<Double, Double>> modeShare = analyzeModeShare(outputPlans);
+        // update error map
+        updateErrorMap(modeShare);
+    }
+
+    private void writeRecord() throws IOException {
+        CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputFolder + "/record.csv", true), CSVFormat.DEFAULT);
         csvWriter.printRecord("mode", "asc", "marginal");
-        csvWriter.printRecord("Tuning run" + counter, "max abs error = ", "mean abs error = "); // TODO add statistics info
+        csvWriter.printRecord("Tuning run " + counter, "Max abs error = " + currentMaxAbsError,
+                "Sum abs error = " + currentSumAbsError);
         csvWriter.printRecord(TransportMode.car,
                 config.planCalcScore().getModes().get(TransportMode.car).getConstant(),
                 config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
@@ -109,10 +132,38 @@ public abstract class AutomaticScenarioCalibrator {
         csvWriter.printRecord(TransportMode.walk,
                 config.planCalcScore().getModes().get(TransportMode.walk).getConstant(),
                 config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling());
+        csvWriter.close();
     }
 
-    public abstract void runSimulation();
+    private void checkIfComplete() {
+        // Case 1: Everything is within range
+        if (maxAbsError < targetError) {
+            complete = true;
+            log.info("Auto-tuning process ends successfully with all error within range!");
+        }
 
+        // Case 2: No improvements after certain number of runs
+        if (nonImprovingRuns >= patience) {
+            complete = true;
+            log.warn("Auto-tuning terminates because the results have not improved for " + patience + " cycles!");
+        }
+
+        // Case 3: Overtime
+        long runningTime = (System.currentTimeMillis() - startTime) / 1000;
+        if (runningTime > maxRunningTime) {
+            complete = true;
+            log.warn("Auto-tuning terminates because the maximum time allowed is exceeded!");
+        }
+    }
+
+    private void modifyConfig() {
+        // Tune parameter
+        parameterTuner.tune(config, errorMap);
+        // update output folder for next run
+        config.controler().setOutputDirectory(outputFolder + "/run-" + counter);
+    }
+
+    // Initializations
     private void readReferenceData(String referenceDataFile) throws IOException {
         // For a sample reference data, please see the svn //TODO
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(referenceDataFile)),
@@ -132,31 +183,26 @@ public abstract class AutomaticScenarioCalibrator {
         }
     }
 
-    private void modifyConfig() {
-        // update input and output
-        config.controler().setOutputDirectory(outputFolder + "/run-" + counter);
-        // Tune parameter
-        parameterTuner.tune(config, errorMap);
-        // overwrite the old config file (the design here may be improved in the future)
-        ConfigUtils.writeConfig(config, configFile);
-    }
-
-    private void analyzeResults() throws IOException {
-        // Get output plan  //TODO may be improved?
-        String runId = config.controler().getRunId();
-        String outputPlansFileName = "/output_plans.xml.gz";
-        if (runId != null && !runId.equals("")) {
-            outputPlansFileName = "/" + runId + ".output_plans.xml.gz";
-        }
-        Population outputPlans = PopulationUtils.readPopulation(config.controler().getOutputDirectory() + outputPlansFileName);
-        // Analyze mode share of the output plan
-        Map<String, Map<Double, Double>> modeShare = analyzeModeShare(outputPlans);
-        // update error map
-        updateErrorMap(modeShare);
-    }
-
-    protected Map<String, Map<Double, Double>> analyzeModeShare(Population outputPlans) throws IOException {
+    private Map<String, Map<Double, MutableDouble>> initializeModeCount() {
         Map<String, Map<Double, MutableDouble>> modeCount = new HashMap<>();
+        modeCount.put(TransportMode.car, new HashMap<>());
+        modeCount.put(TransportMode.ride, new HashMap<>());
+        modeCount.put(TransportMode.pt, new HashMap<>());
+        modeCount.put(TransportMode.bike, new HashMap<>());
+        modeCount.put(TransportMode.walk, new HashMap<>());
+        return modeCount;
+    }
+
+    private void initializeErrorMap() {
+        errorMap.put(TransportMode.car, new HashMap<>());
+        errorMap.put(TransportMode.ride, new HashMap<>());
+        errorMap.put(TransportMode.pt, new HashMap<>());
+        errorMap.put(TransportMode.bike, new HashMap<>());
+        errorMap.put(TransportMode.walk, new HashMap<>());
+    }
+
+    private Map<String, Map<Double, Double>> analyzeModeShare(Population outputPlans) throws IOException {
+        Map<String, Map<Double, MutableDouble>> modeCount = initializeModeCount();
         Map<String, Map<Double, Double>> modeShare = new HashMap<>();
         int totalTrips = 0;
         MainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
@@ -202,59 +248,40 @@ public abstract class AutomaticScenarioCalibrator {
      */
     private void addLegToModeCount(String mode, double euclideanDistance, Map<String, Map<Double, MutableDouble>> modeCount) {
         if (euclideanDistance < 1) {
-            modeCount.get(mode).get(0.5).increment();
+            modeCount.get(mode).computeIfAbsent(0.5, c -> new MutableDouble()).increment();
         } else if (euclideanDistance < 2) {
-            modeCount.get(mode).get(1.5).increment();
+            modeCount.get(mode).computeIfAbsent(1.5, c -> new MutableDouble()).increment();
         } else if (euclideanDistance < 5) {
-            modeCount.get(mode).get(3.5).increment();
+            modeCount.get(mode).computeIfAbsent(3.5, c -> new MutableDouble()).increment();
         } else if (euclideanDistance < 10) {
-            modeCount.get(mode).get(7.5).increment();
+            modeCount.get(mode).computeIfAbsent(7.5, c -> new MutableDouble()).increment();
         } else if (euclideanDistance < 20) {
-            modeCount.get(mode).get(15.0).increment();
+            modeCount.get(mode).computeIfAbsent(15.0, c -> new MutableDouble()).increment();
         } else {
-            modeCount.get(mode).get(35.0).increment();
-        }
-    }
-
-    private void checkIfComplete() {
-        // Case 1: Everything is within range
-        if (maxAbsError < targetError) {
-            complete = true;
-            log.info("Auto-tuning process ends successfully with all error within range!");
-        }
-
-        // Case 2: No improvements after certain number of runs
-        if (nonImprovingRuns >= patience) {
-            complete = true;
-            log.warn("Auto-tuning terminates because the results have not improved for " + patience + " cycles!");
-        }
-
-        // Case 3: Overtime
-        long runningTime = (System.currentTimeMillis() - startTime) / 1000;
-        if (runningTime > maxRunningTime) {
-            complete = true;
-            log.warn("Auto-tuning terminates because the maximum time allowed is exceeded!");
+            modeCount.get(mode).computeIfAbsent(35.0, c -> new MutableDouble()).increment();
         }
     }
 
     private void updateErrorMap(Map<String, Map<Double, Double>> modeShare) {
-        double maxAbsErrorForThisRun = 0.0;
+        currentMaxAbsError = 0.0;
+        currentSumAbsError = 0.0;
         for (String mode : referenceMap.keySet()) {
             for (double distance : referenceMap.get(mode).keySet()) {
                 double error = modeShare.getOrDefault(mode, new HashMap<>()).getOrDefault(distance, 0.0) - referenceMap.get(mode).get(distance);
                 errorMap.get(mode).put(distance, error);
-                if (Math.abs(error) > maxAbsErrorForThisRun) {
-                    maxAbsErrorForThisRun = Math.abs(error);
+                currentSumAbsError += Math.abs(error);
+                if (Math.abs(error) > currentMaxAbsError) {
+                    currentMaxAbsError = Math.abs(error);
                 }
             }
         }
-        if (maxAbsErrorForThisRun >= maxAbsError) {
+        if (currentMaxAbsError >= maxAbsError) {
             // No improvements for this run
             nonImprovingRuns++;
         } else {
             // Results have been improved
             nonImprovingRuns = 0;
-            maxAbsError = maxAbsErrorForThisRun;
+            maxAbsError = currentMaxAbsError;
         }
     }
 }
