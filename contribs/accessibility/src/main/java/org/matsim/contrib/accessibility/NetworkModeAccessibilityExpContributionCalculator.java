@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -39,6 +40,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 
 	private final TravelDisutility travelDisutility;
 	private final PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private final NetworkConfigGroup networkConfigGroup;
 
 	private Network subNetwork;
 
@@ -66,6 +68,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
+		networkConfigGroup = scenario.getConfig().network();
 
 		RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
 //		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, scheme);
@@ -84,7 +87,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 		LOG.warn("Initializing calculator for mode " + mode + "...");
 		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
-        subNetwork = NetworkUtils.createNetwork();
+        subNetwork = NetworkUtils.createNetwork(networkConfigGroup);
         Set<String> modeSet = new HashSet<>();
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
         if (mode.equals(Modes4Accessibility.freespeed.name())) {

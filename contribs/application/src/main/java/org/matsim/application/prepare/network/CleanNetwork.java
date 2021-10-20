@@ -28,7 +28,7 @@ public class CleanNetwork implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		Network network = NetworkUtils.readNetwork(input.toString());
+		Network network = NetworkUtils.readTimeInvariantNetwork(input.toString());
 
 		var cleaner = new MultimodalNetworkCleaner(network);
 

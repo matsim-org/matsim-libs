@@ -64,6 +64,10 @@ public final class NetworkUtils {
 		return new NetworkImpl(linkFactory);
 	}
 	
+	public static Network createTimeInvariantNetwork() {
+		return new NetworkImpl(new LinkFactoryImpl());
+	}
+	
 	/**
 	 * This function is deprecated as it creates by default a non-time-varying
 	 * network. This poses problems where, for instance, you have a time-varying
@@ -72,6 +76,9 @@ public final class NetworkUtils {
 	 * because the present method was used to create the new network to which the
 	 * filtered links were added. Hence, make use of createNetwork(Config) or
 	 * createNetwork(NetworkConfigGroup) to avoid these errors.
+	 * 
+	 * If you're sure that your network will remain time invariant, use
+	 * NetworkUtils.createTimeInvariantNetwork().
 	 * 
 	 * @return
 	 */
@@ -833,20 +840,30 @@ public final class NetworkUtils {
 	}
 
 
-	public static Network readNetwork(String string) {
-		Network network = createNetwork();
+	public static Network readNetwork(String string, Config config) {
+		return readNetwork(string, config.network());
+	}
+
+	public static Network readNetwork(String string, NetworkConfigGroup networkConfigGroup) {
+		Network network = createNetwork(networkConfigGroup);
 		new MatsimNetworkReader(network).readFile(string);
 		return network;
 	}
-
+	
+	public static Network readTimeInvariantNetwork(String string) {
+		Network network = createTimeInvariantNetwork();
+		new MatsimNetworkReader(network).readFile(string);
+		return network;
+	}
+	
 	/**
 	 * reads network form file and applies a coordinate transformation.
 	 * @param filename network file name
 	 * @param transformation coordinate transformation as from @{{@link org.matsim.core.utils.geometry.transformations.TransformationFactory#getCoordinateTransformation(String, String)}}
 	 * @return network from file transformed onto target CRS
 	 */
-	public static Network readNetwork(String filename, CoordinateTransformation transformation) {
-		var network = readNetwork(filename);
+	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup, CoordinateTransformation transformation) {
+		var network = readNetwork(filename, networkConfigGroup);
 		network.getNodes().values().parallelStream()
 				.forEach(node -> {
 					var transformedCoord = transformation.transform(node.getCoord());
@@ -883,8 +900,18 @@ public final class NetworkUtils {
 		return true;
 	}
 
-	public static NetworkCollector getCollector() {
-		return new NetworkCollector();
+	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
+		return new NetworkCollector(networkConfigGroup);
+	}
+
+	public static NetworkCollector getCollector(Config config) {
+		return new NetworkCollector(config.network());
+	}
+	
+	public static NetworkCollector getTimeInvariantCollector() {
+		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
+		networkConfigGroup.setTimeVariantNetwork(false);
+		return new NetworkCollector(networkConfigGroup);
 	}
 
 	private static boolean testLinksAreEqual(Link expected, Link actual) {

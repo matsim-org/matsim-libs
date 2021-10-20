@@ -80,7 +80,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 			Set<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
-			filteredNetwork = NetworkUtils.createNetwork();
+			filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
 			filter.filter(filteredNetwork, modes);
 		}
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL);

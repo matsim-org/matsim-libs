@@ -49,7 +49,7 @@ import org.matsim.core.router.speedy.LeastCostPathTree;
  * @author Michal Maciejewski (michalm)
  */
 public class OneToManyPathCalculatorTest {
-	private final Network network = NetworkUtils.createNetwork();
+	private final Network network = NetworkUtils.createTimeInvariantNetwork();
 
 	private final Node nodeA = createAndAddNode("A", new Coord(0, 0));
 	private final Node nodeB = createAndAddNode("B", new Coord(150, 0));
