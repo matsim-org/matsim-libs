@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -53,6 +54,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	@Inject SingleModeNetworksCache singleModeNetworksCache;
 	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	@Inject Network network;
+	@Inject NetworkConfigGroup networkConfigGroup;
 	@Inject PopulationFactory populationFactory;
 	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	@Inject Scenario scenario ;
@@ -103,7 +105,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 				Set<String> modes = new HashSet<>();
 				modes.add(mode);
-				filteredNetwork = NetworkUtils.createNetwork();
+				filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
 				filter.filter(filteredNetwork, modes);
 				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
 			}
