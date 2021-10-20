@@ -207,7 +207,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                             newPlan.addLeg(leg1);
 
                             Activity shortDistanceRangeActivity = population.getFactory().createActivityFromCoord(
-                                    "other_3600.0", getShortDistanceCoordinate(trip.getOriginActivity().getCoord(), range));
+                                    "other_3600", getShortDistanceCoordinate(trip.getOriginActivity().getCoord(), range));
                             shortDistanceRangeActivity.setMaximumDuration(duration);
                             shortDistanceRangeActivity.setStartTime(newEndTime + walkTime / 2);
                             shortDistanceRangeActivity.setEndTime(newEndTime + walkTime / 2 + duration);
