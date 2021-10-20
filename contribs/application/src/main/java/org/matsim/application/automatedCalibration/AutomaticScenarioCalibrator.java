@@ -56,8 +56,9 @@ public abstract class AutomaticScenarioCalibrator {
     protected final Config config;
     private final ParameterTuner parameterTuner;
     private final String relevantPersonsFile;
+    private final String outputFolder;
 
-    public AutomaticScenarioCalibrator(String configFile, String referenceDataFile, double targetError, long maxRunningTime, int patience, String relevantPersonsFile) throws IOException {
+    public AutomaticScenarioCalibrator(String configFile, String output, String referenceDataFile, double targetError, long maxRunningTime, int patience, String relevantPersonsFile) throws IOException {
         this.targetError = targetError;
         this.maxRunningTime = maxRunningTime;
         this.patience = patience;
@@ -66,11 +67,15 @@ public abstract class AutomaticScenarioCalibrator {
         this.parameterTuner = new SimpleParameterTuner(targetError);
         this.relevantPersonsFile = relevantPersonsFile;
         readReferenceData(referenceDataFile);
+        if (output == null || output.equals("")) {
+            output = "./output/auto-calibration";
+        }
+        this.outputFolder = output;
     }
 
     public void calibrate() throws IOException {
         startTime = System.currentTimeMillis();
-        config.controler().setOutputDirectory("./output/auto-calibration/run-0");
+        config.controler().setOutputDirectory(outputFolder + "/run-0");
         // Auto tuning loop
         while (true) {
             runSimulation();
@@ -88,7 +93,7 @@ public abstract class AutomaticScenarioCalibrator {
     private void writeRecord(String outputDirectory) throws IOException {
         CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputDirectory + "/record.csv"), CSVFormat.DEFAULT);
         csvWriter.printRecord("mode", "asc", "marginal");
-        csvWriter.printRecord("Tuning run" + counter, "", "");
+        csvWriter.printRecord("Tuning run" + counter, "max abs error = ", "mean abs error = "); // TODO add statistics info
         csvWriter.printRecord(TransportMode.car,
                 config.planCalcScore().getModes().get(TransportMode.car).getConstant(),
                 config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
@@ -129,7 +134,7 @@ public abstract class AutomaticScenarioCalibrator {
 
     private void modifyConfig() {
         // update input and output
-        config.controler().setOutputDirectory("./auto-calibration/run-" + counter);
+        config.controler().setOutputDirectory(outputFolder + "/run-" + counter);
         // Tune parameter
         parameterTuner.tune(config, errorMap);
         // overwrite the old config file (the design here may be improved in the future)
@@ -137,8 +142,13 @@ public abstract class AutomaticScenarioCalibrator {
     }
 
     private void analyzeResults() throws IOException {
-        // Get output plan
-        Population outputPlans = PopulationUtils.readPopulation(config.controler().getOutputDirectory() + "/outputplans.xml.gz"); //TODO
+        // Get output plan  //TODO may be improved?
+        String runId = config.controler().getRunId();
+        String outputPlansFileName = "/output_plans.xml.gz";
+        if (runId != null && !runId.equals("")) {
+            outputPlansFileName = "/" + runId + ".output_plans.xml.gz";
+        }
+        Population outputPlans = PopulationUtils.readPopulation(config.controler().getOutputDirectory() + outputPlansFileName);
         // Analyze mode share of the output plan
         Map<String, Map<Double, Double>> modeShare = analyzeModeShare(outputPlans);
         // update error map
