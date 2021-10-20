@@ -232,6 +232,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
             if (edge.name != null)
                 link.getAttributes().putAttribute("name", edge.name);
 
+            link.getAttributes().putAttribute("type", edge.type);
+
             link.setNumberOfLanes(edge.lanes.size());
             Set<String> modes = Sets.newHashSet(TransportMode.car, TransportMode.ride);
 
