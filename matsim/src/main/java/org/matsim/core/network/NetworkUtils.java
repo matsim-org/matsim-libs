@@ -49,21 +49,37 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = Logger.getLogger(NetworkUtils.class);
+	
 	public static Network createNetwork(Config config) {
 		return createNetwork(config.network());
 	}
 
-
 	public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
-		Network network = new NetworkImpl();
-
+		LinkFactory linkFactory = new LinkFactoryImpl();
+		
 		if (networkConfigGroup.isTimeVariantNetwork()) {
-			network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+			linkFactory = new VariableIntervalTimeVariantLinkFactory();
 		}
-
-		return network;
+		
+		return new NetworkImpl(linkFactory);
 	}
-
+	
+	/**
+	 * This function is deprecated as it creates by default a non-time-varying
+	 * network. This poses problems where, for instance, you have a time-varying
+	 * network and want to use a TransportModeNetworkFilter to extract a specific
+	 * model network. Before, the time-varying information would have been lost,
+	 * because the present method was used to create the new network to which the
+	 * filtered links were added. Hence, make use of createNetwork(Config) or
+	 * createNetwork(NetworkConfigGroup) to avoid these errors.
+	 * 
+	 * @return
+	 */
+	@Deprecated
+	public static Network createNetwork() {
+		log.warn("Using NetworkUtils.createNetwork() is deprecated. Use createNetwork(Config).");
+		return new NetworkImpl(new LinkFactoryImpl());
+	}
 
 	/**
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
@@ -671,12 +687,6 @@ public final class NetworkUtils {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 
-
-	public static Network createNetwork() {
-		return new NetworkImpl();
-	}
-
-
 	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
 			final double capacity, final double numLanes) {
 		return createAndAddLink(network, id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null ) ;
@@ -767,14 +777,6 @@ public final class NetworkUtils {
 		} else {
 			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork" ) ;
 		}
-	}
-
-	@Deprecated // use network.getFactory() instead
-	public static LinkFactoryImpl createLinkFactory() {
-		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
-		// the different factory types need to be visible, or at least configurable, during initialization: User needs to be able to select which factory to
-		// insert into NetworkFactory.  kai, may'17
-		return new LinkFactoryImpl();
 	}
 
 	public static final String ORIGID = "origid";

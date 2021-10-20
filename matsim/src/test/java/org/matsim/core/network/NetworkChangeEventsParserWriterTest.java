@@ -50,10 +50,7 @@ public class NetworkChangeEventsParserWriterTest {
 	public void testChangeEventsParserWriter() {
 		String input = utils.getInputDirectory() + "testNetworkChangeEvents.xml";
 		String output  = utils.getOutputDirectory() + "outputTestNetworkChangeEvents.xml";
-		final Network network = NetworkUtils.createNetwork();
-		NetworkFactory nf = network.getFactory();
-		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-		((NetworkImpl)network).setFactory(nf);
+		final Network network = new NetworkImpl(new VariableIntervalTimeVariantLinkFactory());
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
