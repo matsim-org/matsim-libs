@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -51,6 +52,9 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	@Inject
 	private GlobalConfigGroup globalConfigGroup;
 
+	@Inject
+	private QSimConfigGroup qSimConfigGroup;
+
 	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork) {
 		super(mode);
 		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
@@ -71,9 +75,9 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 
 			//lazily initialised: optimisers may do not need it
 			bindModal(DvrpTravelTimeMatrix.class).toProvider(modalProvider(
-							getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class),
-									dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads())))
-					.in(Singleton.class);
+					getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class),
+							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads(),
+							qSimConfigGroup.getTimeStepSize()))).in(Singleton.class);
 		} else {
 			bindModal(Network.class).to(
 					Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
