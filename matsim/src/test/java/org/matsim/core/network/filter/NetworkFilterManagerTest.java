@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -88,7 +89,7 @@ public class NetworkFilterManagerTest {
 
 	@Test
 	public void filterTest() {
-		NetworkFilterManager networkFilterManager = new NetworkFilterManager(filterNetwork);
+		NetworkFilterManager networkFilterManager = new NetworkFilterManager(filterNetwork, new NetworkConfigGroup());
 		networkFilterManager.addNodeFilter(new NetworkNodeFilter() {
 			@Override
 			public boolean judgeNode(Node n) {

@@ -121,7 +121,7 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
 
 
     public Network assignLinkTurnAttributes(Path input, String networkCrs){
-        Network network = NetworkUtils.readNetwork(input.toString());
+        Network network = NetworkUtils.readTimeInvariantNetwork(input.toString());
         return assignLinkTurnAttributes(network, networkCrs);
     }
 

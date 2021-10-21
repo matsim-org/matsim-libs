@@ -98,7 +98,7 @@ public class SupersonicOsmNetworkReader {
         parser.parse(inputFile);
 
         // set up state for convertion of parsed osm data
-        this.network = NetworkUtils.createNetwork();
+        this.network = NetworkUtils.createTimeInvariantNetwork();
         this.ways = parser.getWays();
         this.nodes = parser.getNodes();
 

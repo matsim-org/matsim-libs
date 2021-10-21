@@ -394,7 +394,7 @@ public class MatsimTransformerTest {
 	@Test
 	public void createVehicleRoutingProblemBuilderWithServices_isMadeCorrectly() {
 		Carrier carrier = createCarrierWithServices();
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml");
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 		VehicleRoutingProblem vrp = vrpBuilder.build();
@@ -447,7 +447,7 @@ public class MatsimTransformerTest {
 //	@Ignore		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
 	public void createVehicleRoutingProblemBuilderWithShipments_isMadeCorrectly() {
 		Carrier carrier = createCarrierWithShipments();
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml");
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 		VehicleRoutingProblem vrp = vrpBuilder.build();

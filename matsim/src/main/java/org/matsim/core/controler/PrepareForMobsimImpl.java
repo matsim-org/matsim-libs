@@ -85,7 +85,7 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			carOnlyNetwork = NetworkUtils.createNetwork();
+			carOnlyNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
 			filter.filter(carOnlyNetwork, modes);
