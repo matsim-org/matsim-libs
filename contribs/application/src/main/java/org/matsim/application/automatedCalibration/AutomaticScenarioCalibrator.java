@@ -246,16 +246,16 @@ public abstract class AutomaticScenarioCalibrator {
      * Designed for the distance grouping: 0-1, 1-2, 2-5, 5-10, 10-20, 20+
      * For other distance groupings, please override this function
      */
-    private void addLegToModeCount(String mode, double euclideanDistance, Map<String, Map<Double, MutableDouble>> modeCount) {
-        if (euclideanDistance < 1) {
+    private void addLegToModeCount(String mode, double distance, Map<String, Map<Double, MutableDouble>> modeCount) {
+        if (distance < 1000) {
             modeCount.get(mode).computeIfAbsent(0.5, c -> new MutableDouble()).increment();
-        } else if (euclideanDistance < 2) {
+        } else if (distance < 2000) {
             modeCount.get(mode).computeIfAbsent(1.5, c -> new MutableDouble()).increment();
-        } else if (euclideanDistance < 5) {
+        } else if (distance < 5000) {
             modeCount.get(mode).computeIfAbsent(3.5, c -> new MutableDouble()).increment();
-        } else if (euclideanDistance < 10) {
+        } else if (distance < 10000) {
             modeCount.get(mode).computeIfAbsent(7.5, c -> new MutableDouble()).increment();
-        } else if (euclideanDistance < 20) {
+        } else if (distance < 20000) {
             modeCount.get(mode).computeIfAbsent(15.0, c -> new MutableDouble()).increment();
         } else {
             modeCount.get(mode).computeIfAbsent(35.0, c -> new MutableDouble()).increment();
