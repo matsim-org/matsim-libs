@@ -360,11 +360,11 @@ public class CalculateSkimMatrices {
         TravelDisutility td = new OnlyTimeDependentTravelDisutility(tt);
 
         log.info("extracting car-only network");
-        final Network carNetwork = NetworkUtils.createNetwork();
+        final Network carNetwork = NetworkUtils.createNetwork(config);
         new TransportModeNetworkFilter(scenario.getNetwork()).filter(carNetwork, Collections.singleton(TransportMode.car));
 
         log.info("filter car-only network for assigning links to locations");
-        final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate);
+        final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate, config);
 
         log.info("calc CAR matrix for " + Time.writeTime(times[0]));
         NetworkIndicators<String> netIndicators = NetworkSkimMatrices.calculateSkimMatrices(
@@ -388,8 +388,8 @@ public class CalculateSkimMatrices {
         return netIndicators;
     }
 
-    private Network extractXy2LinksNetwork(Network network, Predicate<Link> xy2linksPredicate) {
-        Network xy2lNetwork = NetworkUtils.createNetwork();
+    private Network extractXy2LinksNetwork(Network network, Predicate<Link> xy2linksPredicate, Config config) {
+        Network xy2lNetwork = NetworkUtils.createNetwork(config);
         NetworkFactory nf = xy2lNetwork.getFactory();
         for (Link link : network.getLinks().values()) {
             if (xy2linksPredicate.test(link)) {

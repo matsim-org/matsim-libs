@@ -118,7 +118,7 @@ public class FreightUtilsIT {
 		new CarrierVehicleTypeLoader(carriersWithServicesAndShpiments).loadVehicleTypes(vehicleTypes) ;
 
 		//load Network and build netbasedCosts for jsprit
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;

@@ -52,7 +52,7 @@ public class RunIntersectionSimplifier {
 		String input = args[0];
 		String output = args[1];
 		
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readFile(input);
 		
 		IntersectionSimplifier ns = new IntersectionSimplifier(30.0, 2);

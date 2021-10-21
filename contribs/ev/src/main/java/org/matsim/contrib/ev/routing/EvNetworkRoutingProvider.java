@@ -108,7 +108,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 				Set<String> modes = new HashSet<>();
 				modes.add(mode);
-				filteredNetwork = NetworkUtils.createNetwork();
+				filteredNetwork = NetworkUtils.createNetwork(config);
 				filter.filter(filteredNetwork, modes);
 				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
 			}

@@ -85,7 +85,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		final Node fromNode = node1;
@@ -117,7 +117,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withBadLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		final Node fromNode = node1;
@@ -738,7 +738,7 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_OneLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
@@ -805,7 +805,7 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_TwoLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
@@ -874,7 +874,7 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_MoreLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
