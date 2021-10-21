@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.ClusterActivity;
@@ -70,7 +71,7 @@ public class IntersectionSimplifier {
 
 		LOG.info("Simplifying the intersections...");
 		reportNetworkStatistics(network);
-		Network newNetwork = NetworkUtils.createNetwork();
+		Network newNetwork = NetworkUtils.createTimeInvariantNetwork();
 
 		/* Get all the network's node coordinates that must be clustered. */
 		List<Node> nodes = new ArrayList<>();

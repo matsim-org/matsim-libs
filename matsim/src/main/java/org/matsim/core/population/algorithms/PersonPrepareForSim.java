@@ -89,7 +89,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		if (NetworkUtils.isMultimodal( carOnlyNetwork )) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( carOnlyNetwork );
-			net = NetworkUtils.createNetwork();
+			net = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);

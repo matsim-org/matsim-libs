@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -59,6 +60,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 	private TripRouter tripRouter ;
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private NetworkConfigGroup networkConfigGroup;
 	private Scenario scenario;
 
     Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
@@ -82,6 +84,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 	    this.mode = mode;
 		this.tripRouter = tripRouter;
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
+		this.networkConfigGroup = scenario.getConfig().network();
 		this.scenario = scenario;
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
@@ -97,7 +100,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
     @Override
     public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 		LOG.warn("Initializing calculator for mode " + mode + "...");
-		subNetwork = AccessibilityUtils.createModeSpecificSubNetwork(scenario.getNetwork(), mode);
+		subNetwork = AccessibilityUtils.createModeSpecificSubNetwork(scenario.getNetwork(), mode, networkConfigGroup);
 
 		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
         this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, subNetwork, scenario.getConfig());

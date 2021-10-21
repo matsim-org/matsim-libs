@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -58,7 +59,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 		pC.addParam("minCapacityForStops", "0");
 		pC.addParam("speedLimitForStops", "1000");
 		
-		TransitSchedule transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(net, pC);
+		TransitSchedule transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(net, pC, new NetworkConfigGroup());
 		
 		int numberOfParaStops = 0;
 		for (TransitStopFacility stopFacility : transitSchedule.getFacilities().values()) {
@@ -87,7 +88,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 		pC.addParam("minCapacityForStops", "800");
 		pC.addParam("speedLimitForStops", "20");
 		
-		transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(net, pC, realTransitSchedule);
+		transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(net, pC, realTransitSchedule, new NetworkConfigGroup());
 		
 		numberOfParaStops = 0;
 		for (TransitStopFacility stopFacility : transitSchedule.getFacilities().values()) {
@@ -113,7 +114,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 		pC.addParam("stopLocationSelector", "outsideJunctionAreas");
 		pC.addParam("stopLocationSelectorParameter", "30.0,2,500");
 		
-		TransitSchedule transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pC);
+		TransitSchedule transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pC, new NetworkConfigGroup());
 		
 		int numberOfParaStops = 0;
 		for (TransitStopFacility stopFacility : transitSchedule.getFacilities().values()) {
@@ -190,7 +191,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 		/* Check whether CalcTopoTypes is considered (type 8 : intersections only) */
 		pC.addParam("TopoTypesForStops", "8");
 		
-		transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pC);
+		transitSchedule = CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pC, new NetworkConfigGroup());
 		Assert.assertNull("Should NOT find paratransit stop at link with wrong topo type (not an intersection) '30_31'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_31", TransitStopFacility.class)));
 	}
 
@@ -221,7 +222,7 @@ public class CreatePStopsOnJunctionApproachesAndBetweenJunctionsTest {
 	 *                                                        26
 	 */
 	private Network buildComplexIntersection() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 
 		/* Left cluster */
 		Node n01 = NetworkUtils.createAndAddNode(network, Id.createNodeId( 1), CoordUtils.createCoord(  0.0,  85.0));

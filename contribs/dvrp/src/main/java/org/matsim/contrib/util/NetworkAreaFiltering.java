@@ -28,6 +28,7 @@ import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.zone.ZonalSystems;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.filter.NetworkFilterManager;
 
@@ -40,7 +41,7 @@ public class NetworkAreaFiltering {
 		Set<Node> nodesWithinArea = new HashSet<>(
 				ZonalSystems.selectNodesWithinArea(network.getNodes().values(), areaGeometries));
 
-		NetworkFilterManager networkFilterManager = new NetworkFilterManager(network);
+		NetworkFilterManager networkFilterManager = new NetworkFilterManager(network, new NetworkConfigGroup());
 		networkFilterManager.addLinkFilter(
 				l -> nodesWithinArea.contains(l.getFromNode()) || nodesWithinArea.contains(l.getToNode()));
 		Network filteredNetwork = networkFilterManager.applyFilters();

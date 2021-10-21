@@ -24,7 +24,7 @@ public class OSM2MATSim {
 
 	public static void main(final String[] args) {
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,

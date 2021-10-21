@@ -126,7 +126,7 @@ public class FreightUtilsTest {
 		new CarrierVehicleTypeLoader(carriersWithServicesAndShpiments).loadVehicleTypes(vehicleTypes) ;
 
 		//load Network and build netbasedCosts for jsprit
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
@@ -324,7 +324,7 @@ public class FreightUtilsTest {
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
 		CarrierUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 
 		MatsimJspritFactory.createRoutingProblemBuilder(carrierMixedWServicesAndShipments, network);

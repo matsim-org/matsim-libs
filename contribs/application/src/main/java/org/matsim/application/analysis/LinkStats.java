@@ -55,7 +55,7 @@ public class LinkStats implements MATSimAppCommand {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		Network network = NetworkUtils.readNetwork(this.network.toString());
+		Network network = NetworkUtils.readTimeInvariantNetwork(this.network.toString());
 
 		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(network);
 		builder.setTimeslice(timeSlice);
