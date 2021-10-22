@@ -231,7 +231,7 @@ import org.matsim.vehicles.Vehicle;
 		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
-		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes);
+		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes, person2.getId(), vehicle2.getId() );
 		
 		if (foundToNode == null) return null;
 		else {
@@ -293,7 +293,8 @@ import org.matsim.vehicles.Vehicle;
 	 * Returns the last node of the path. By default this is the to-node.
 	 * The MultiNodeDijkstra returns the cheapest of all given to-nodes.
 	 */
-	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
+	/*package*/ Node searchLogic( final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes,
+				      Id<Person> personId, Id<Vehicle> vehicleId ) {
 		
 		boolean stillSearching = true;
 		
@@ -301,7 +302,8 @@ import org.matsim.vehicles.Vehicle;
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". Some possible reasons:");
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId()
+							 + "; personId=" + personId + "; vehicleID=" + vehicleId + ". Some possible reasons:");
 				log.warn("  * Network is not connected.  Run NetworkCleaner().") ;
 				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
 				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
