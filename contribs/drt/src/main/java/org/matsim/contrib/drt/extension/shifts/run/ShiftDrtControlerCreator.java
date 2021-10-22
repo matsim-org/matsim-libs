@@ -2,9 +2,6 @@ package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -56,10 +53,7 @@ public class ShiftDrtControlerCreator {
 		ScenarioUtils.loadScenario(scenario);
 
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		if(shiftDrtConfigGroup.getOperationFacilityInputFile() != null) {
-			final OperationFacilities operationFacilities = OperationFacilitiesUtils.getOrCreateShifts(scenario);
-			new OperationFacilitiesReader(operationFacilities).readFile(shiftDrtConfigGroup.getOperationFacilityInputFile());
-		}
+
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());

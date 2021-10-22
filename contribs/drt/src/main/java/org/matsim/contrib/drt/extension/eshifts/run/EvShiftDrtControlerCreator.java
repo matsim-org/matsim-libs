@@ -4,9 +4,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.eshifts.charging.ShiftOperatingVehicleProvider;
 import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpFleetQSimModule;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
 import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtQSimModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -41,10 +38,6 @@ public class EvShiftDrtControlerCreator {
 		ScenarioUtils.loadScenario(scenario);
 
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		final OperationFacilities operationFacilities = OperationFacilitiesUtils.getOrCreateShifts(scenario);
-		if(shiftDrtConfigGroup.getOperationFacilityInputFile() != null) {
-			new OperationFacilitiesReader(operationFacilities).readFile(shiftDrtConfigGroup.getOperationFacilityInputFile());
-		}
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeShiftEDrtModule());

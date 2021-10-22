@@ -3,11 +3,9 @@ package org.matsim.contrib.drt.extension.shifts.analysis;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -25,9 +23,8 @@ public class IndividualCapacityTimeProfileCollectorProvider implements Provider<
     private final OperationFacilities facilities;
     private final MatsimServices matsimServices;
 
-    @Inject
-    public IndividualCapacityTimeProfileCollectorProvider(Scenario scenario, MatsimServices matsimServices) {
-        this.facilities = OperationFacilitiesUtils.getFacilities(scenario);
+    public IndividualCapacityTimeProfileCollectorProvider(OperationFacilities operationFacilities, MatsimServices matsimServices) {
+        this.facilities = operationFacilities;
         this.matsimServices = matsimServices;
     }
 

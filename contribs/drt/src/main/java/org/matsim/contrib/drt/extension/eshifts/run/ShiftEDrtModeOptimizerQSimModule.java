@@ -15,7 +15,7 @@ import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.NearestOperationFacilityWithCapacityFinder;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftDrtOptimizer;
 import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftRequestInsertionScheduler;
@@ -95,7 +95,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 
 			@Override
 			public OperationFacilityFinder get() {
-				return new NearestOperationFacilityWithCapacityFinder(OperationFacilitiesUtils.getFacilities(scenario));
+				return new NearestOperationFacilityWithCapacityFinder(getModalInstance(OperationFacilities.class));
 			}
 		}).asEagerSingleton();
 
@@ -190,7 +190,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						getter.get(MobsimTimer.class),
 						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
 						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class),
-						OperationFacilitiesUtils.getFacilities(getter.get(Scenario.class))))).asEagerSingleton();
+						getter.getModal(OperationFacilities.class)))).asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),

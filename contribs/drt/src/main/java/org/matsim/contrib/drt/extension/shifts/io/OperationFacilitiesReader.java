@@ -4,11 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.*;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityImpl;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityType;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -33,9 +30,9 @@ public class OperationFacilitiesReader extends MatsimXmlParser {
     public static final String TYPE = "type";
 
 
-    private final OperationFacilities operationFacilities;
+    private final OperationFacilitiesSpecification operationFacilities;
 
-    public OperationFacilitiesReader(final OperationFacilities operationFacilities) {
+    public OperationFacilitiesReader(final OperationFacilitiesSpecification operationFacilities) {
         log.info("Using " + this.getClass().getName());
         this.operationFacilities = operationFacilities;
         this.setValidating(false);
@@ -51,8 +48,14 @@ public class OperationFacilitiesReader extends MatsimXmlParser {
                 int capacity = Integer.parseInt(atts.getValue(CAPACITY));
                 Id<Charger> chargerId = Id.create(atts.getValue(CHARGER_ID), Charger.class);;
                 OperationFacilityType type = OperationFacilityType.valueOf(atts.getValue(TYPE));
-                OperationFacility facility = new OperationFacilityImpl(id, linkId, coord, capacity, chargerId, type);
-                this.operationFacilities.addOperationFacility(facility);
+				OperationFacilitySpecificationImpl operationFacilitySpecification = OperationFacilitySpecificationImpl.newBuilder()
+						.id(id)
+						.capacity(capacity)
+						.chargerId(chargerId)
+						.coord(coord)
+						.linkId(linkId)
+						.type(type).build();
+				this.operationFacilities.addOperationFacilitySpecification(operationFacilitySpecification);
                 break;
             case ROOT:
                 break;

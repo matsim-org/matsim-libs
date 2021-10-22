@@ -4,6 +4,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.shifts.analysis.*;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.io.DrtShiftsReader;
+import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecificationImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -26,11 +29,19 @@ public class ShiftsModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		if(shiftConfig.getShiftInputFile() != null) {
+		if (shiftConfig.getShiftInputFile() != null) {
 			bindModal(DrtShiftsSpecification.class).toProvider(() -> {
 				DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
 				new DrtShiftsReader(drtShiftsSpecification).readFile(shiftConfig.getShiftInputFile());
 				return drtShiftsSpecification;
+			}).asEagerSingleton();
+		}
+
+		if (shiftConfig.getOperationFacilityInputFile() != null) {
+			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
+				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
+				new OperationFacilitiesReader(operationFacilitiesSpecification).readFile(shiftConfig.getOperationFacilityInputFile());
+				return operationFacilitiesSpecification;
 			}).asEagerSingleton();
 		}
 
