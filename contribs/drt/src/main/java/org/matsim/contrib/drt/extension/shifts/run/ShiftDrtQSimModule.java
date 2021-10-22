@@ -1,15 +1,28 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityImpl;
 import org.matsim.contrib.drt.extension.shifts.shift.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.modal.ModalProviders;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 /**
  * @author nkuehnel / MOIA
@@ -56,5 +69,15 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 				return () -> operationFacilities;
 			}
 		}).asEagerSingleton();
+
+		addModalQSimComponentBinding().toProvider(modalProvider((Function<ModalProviders.InstanceGetter<DvrpMode>, QSimComponent>) dvrpModeInstanceGetter -> {
+			List<OperationFacility> facilitiesList = new ArrayList<>(dvrpModeInstanceGetter.getModal(OperationFacilities.class).getDrtOperationFacilities().values());
+			ImmutableList<String> header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());
+			TimeProfileCollector.ProfileCalculator profileCalculator = TimeProfiles.createProfileCalculator(header, () -> facilitiesList.stream()
+					.collect(toImmutableMap(f -> f.getId() + "",
+							f -> (double) f.getRegisteredVehicles().size())));
+			return new TimeProfileCollector(profileCalculator, 300, "individual_operation_facility_capacity_time_profiles" + "_" + getMode(),
+					dvrpModeInstanceGetter.get(MatsimServices.class));
+		}));
 	}
 }

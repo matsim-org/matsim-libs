@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -11,16 +10,11 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class ShiftDrtControlerCreator {
 	/**
@@ -52,9 +46,6 @@ public class ShiftDrtControlerCreator {
 		Scenario scenario = createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
-		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-
-
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new MultiModeShiftDrtModule());
@@ -64,9 +55,6 @@ public class ShiftDrtControlerCreator {
 			controler.addOverridingQSimModule(new ShiftDvrpFleetQsimModule(drtCfg.getMode()));
 			controler.addOverridingQSimModule(new ShiftDrtQSimModule(drtCfg.getMode()));
 		}
-
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of("SHIFT_COMPONENT"),
-				multiModeDrtConfig.modes().collect(toList())));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
