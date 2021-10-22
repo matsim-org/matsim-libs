@@ -132,6 +132,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 logger.warn("Too late to start shift " + next.shift.getId());
                 next.vehicle.getShifts().remove(next.shift);
                 iterator.remove();
+				continue;
             }
 
             if (shiftStarts(next)) {

@@ -41,6 +41,8 @@ public class EvShiftDrtControlerCreator {
 		controler.addOverridingModule(new MultiModeShiftEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingQSimModule(new EvShiftDvrpFleetQSimModule(drtCfg.getMode()));
@@ -53,6 +55,9 @@ public class EvShiftDrtControlerCreator {
 				this.bind(AuxDischargingHandler.VehicleProvider.class).to(ShiftOperatingVehicleProvider.class);
 			}
 		});
+
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
+				multiModeDrtConfig.modes().collect(toList())));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

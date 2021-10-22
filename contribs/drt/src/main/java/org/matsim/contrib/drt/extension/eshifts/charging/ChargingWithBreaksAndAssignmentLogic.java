@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ChargingWithBreaksAndAssignmentLogic implements ChargingWithAssignmentLogic {
 
