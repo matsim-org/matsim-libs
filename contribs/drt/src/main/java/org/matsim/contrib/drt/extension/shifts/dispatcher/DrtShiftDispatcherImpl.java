@@ -39,14 +39,9 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
-
-    @Override
-    public void cleanupAfterMobsim(int iteration) {
-        shifts.getShifts().values().forEach(DrtShift::reset);
-    }
 
     private final static Logger logger = Logger.getLogger(DrtShiftDispatcherImpl.class);
 

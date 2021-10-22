@@ -18,7 +18,7 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
@@ -45,7 +45,7 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-											   ShiftBreak shiftBreak, OperationFacility facility) {
+                                               DrtShiftBreak shiftBreak, OperationFacility facility) {
         return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, 0, null, facility);
     }
 
@@ -69,7 +69,7 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
     }
 
     public EDrtShiftBreakTaskImpl createChargingShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                                                                            ShiftBreak shiftBreak, Charger charger, double totalEnergy, OperationFacility facility) {
+                                                               DrtShiftBreak shiftBreak, Charger charger, double totalEnergy, OperationFacility facility) {
         ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
         return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, totalEnergy, chargingTask, facility);
     }

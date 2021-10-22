@@ -11,8 +11,7 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 /**
  * @author nkuehnel, fzwick
  */
-public interface DrtShiftDispatcher extends MobsimScopeEventHandler {
-	//no need to extend MobsimScopeEventHandler
+public interface DrtShiftDispatcher {
 
 	final class ShiftEntry {
 		public final DrtShift shift;

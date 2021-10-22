@@ -6,7 +6,7 @@ import org.matsim.contrib.evrp.ETask;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTaskImpl;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 /**
  * @author nkuehnel
@@ -16,7 +16,7 @@ public class EDrtShiftBreakTaskImpl extends ShiftBreakTaskImpl implements ShiftB
     private final double consumedEnergy;
     private final ChargingTask chargingTask;
 
-    public EDrtShiftBreakTaskImpl(double beginTime, double endTime, Link link, ShiftBreak shiftBreak,
+    public EDrtShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak,
                                   double consumedEnergy, ChargingTask chargingTask, OperationFacility facility) {
         super(beginTime, endTime, link, shiftBreak, facility);
         this.consumedEnergy = consumedEnergy;
