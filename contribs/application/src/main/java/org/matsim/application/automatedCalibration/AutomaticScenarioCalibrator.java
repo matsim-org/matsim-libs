@@ -56,7 +56,7 @@ public abstract class AutomaticScenarioCalibrator {
     private long startTime;
     protected final Config config;
     private final ParameterTuner parameterTuner;
-    private final String relevantPersonsFile;
+    private final List<Id<Person>> relevantPersons = new ArrayList<>();
     protected final String outputFolder;
 
     public AutomaticScenarioCalibrator(String configFile, String output, String referenceDataFile, double targetError, long maxRunningTime, int patience, String relevantPersonsFile) throws IOException {
@@ -66,13 +66,14 @@ public abstract class AutomaticScenarioCalibrator {
         this.configFile = configFile;
         this.config = ConfigUtils.loadConfig(configFile);
         this.parameterTuner = new SimpleParameterTuner(targetError);
-        this.relevantPersonsFile = relevantPersonsFile;
-        readReferenceData(referenceDataFile);
-        initializeErrorMap();
         if (output == null || output.equals("")) {
             output = "./output/auto-calibration";
         }
         this.outputFolder = output;
+
+        readRelevantPersonsFile(relevantPersonsFile);
+        readReferenceData(referenceDataFile);
+        initializeErrorMap();
     }
 
     public void calibrate() throws IOException {
@@ -164,6 +165,19 @@ public abstract class AutomaticScenarioCalibrator {
     }
 
     // Initializations
+    private void readRelevantPersonsFile(String relevantPersonsFile) throws IOException {
+        if (relevantPersonsFile != null && !relevantPersonsFile.equals("")) {
+            // read persons live in the area
+            try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(relevantPersonsFile)),
+                    CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
+                for (CSVRecord record : parser) {
+                    relevantPersons.add(Id.createPersonId(record.get(0)));
+                }
+            }
+        }
+    }
+
+
     private void readReferenceData(String referenceDataFile) throws IOException {
         // For a sample reference data, please see the svn //TODO
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(referenceDataFile)),
@@ -201,23 +215,11 @@ public abstract class AutomaticScenarioCalibrator {
         errorMap.put(TransportMode.walk, new HashMap<>());
     }
 
-    private Map<String, Map<Double, Double>> analyzeModeShare(Population outputPlans) throws IOException {
+    private Map<String, Map<Double, Double>> analyzeModeShare(Population outputPlans) {
         Map<String, Map<Double, MutableDouble>> modeCount = initializeModeCount();
         Map<String, Map<Double, Double>> modeShare = new HashMap<>();
         int totalTrips = 0;
         MainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
-
-        // Get relevant persons
-        List<Id<Person>> relevantPersons = new ArrayList<>();
-        if (relevantPersonsFile != null && !relevantPersonsFile.equals("")) {
-            // read persons live in the area
-            try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(relevantPersonsFile)),
-                    CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
-                for (CSVRecord record : parser) {
-                    relevantPersons.add(Id.createPersonId(record.get(0)));
-                }
-            }
-        }
 
         for (Person person : outputPlans.getPersons().values()) {
             if (relevantPersons.contains(person.getId()) || relevantPersons.isEmpty()) {
@@ -267,7 +269,7 @@ public abstract class AutomaticScenarioCalibrator {
         currentSumAbsError = 0.0;
         for (String mode : referenceMap.keySet()) {
             for (double distance : referenceMap.get(mode).keySet()) {
-                double error = modeShare.getOrDefault(mode, new HashMap<>()).getOrDefault(distance, 0.0) - referenceMap.get(mode).get(distance);
+                double error = modeShare.get(mode).getOrDefault(distance, 0.0) - referenceMap.get(mode).get(distance);
                 errorMap.get(mode).put(distance, error);
                 currentSumAbsError += Math.abs(error);
                 if (Math.abs(error) > currentMaxAbsError) {
