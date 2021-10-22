@@ -1,24 +1,22 @@
 package org.matsim.contrib.drt.extension.eshifts.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.extension.eshifts.charging.ShiftOperatingVehicleProvider;
+import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpFleetQSimModule;
+import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
+import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtQSimModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.drt.extension.eshifts.charging.ShiftOperatingVehicleProvider;
-import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpFleetQSimModule;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.io.DrtShiftsReader;
-import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftUtils;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -48,11 +46,6 @@ public class EvShiftDrtControlerCreator {
 			new OperationFacilitiesReader(operationFacilities).readFile(shiftDrtConfigGroup.getOperationFacilityInputFile());
 		}
 
-		final DrtShifts shifts = DrtShiftUtils.getOrCreateShifts(scenario);
-		if(shiftDrtConfigGroup.getShiftInputFile() != null) {
-			new DrtShiftsReader(shifts).readFile(shiftDrtConfigGroup.getShiftInputFile());
-		}
-
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeShiftEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
@@ -60,6 +53,7 @@ public class EvShiftDrtControlerCreator {
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingQSimModule(new EvShiftDvrpFleetQSimModule(drtCfg.getMode()));
+			controler.addOverridingQSimModule(new ShiftDrtQSimModule(drtCfg.getMode()));
 		}
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {

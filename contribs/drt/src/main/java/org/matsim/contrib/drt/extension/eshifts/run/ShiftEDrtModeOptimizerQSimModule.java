@@ -1,20 +1,32 @@
 package org.matsim.contrib.drt.extension.eshifts.run;
 
+import com.google.inject.Inject;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.extension.edrt.optimizer.depot.NearestChargerAsDepot;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
+import org.matsim.contrib.drt.extension.eshifts.dispatcher.EDrtShiftDispatcherImpl;
+import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
+import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtActionCreator;
+import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
+import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
+import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.NearestOperationFacilityWithCapacityFinder;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityFinder;
+import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftDrtOptimizer;
+import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftRequestInsertionScheduler;
+import org.matsim.contrib.drt.extension.shifts.optimizer.insertion.ShiftInsertionCostCalculator;
+import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtStayTaskEndTimeCalculator;
+import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
+import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftDrtScheduleInquiry;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
+import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
@@ -33,37 +45,14 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.drt.extension.edrt.optimizer.depot.NearestChargerAsDepot;
-import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
-import org.matsim.contrib.drt.extension.eshifts.dispatcher.EDrtShiftDispatcherImpl;
-import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
-import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtActionCreator;
-import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
-import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.NearestOperationFacilityWithCapacityFinder;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesUtils;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityFinder;
-import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftDrtOptimizer;
-import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftRequestInsertionScheduler;
-import org.matsim.contrib.drt.extension.shifts.optimizer.insertion.ShiftInsertionCostCalculator;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtStayTaskEndTimeCalculator;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
-import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftDrtScheduleInquiry;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
@@ -122,14 +111,12 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 			public DrtShiftDispatcher get() {
 				var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
 
-				return new EDrtShiftDispatcherImpl(DrtShiftUtils.getShifts(scenario), getModalInstance(Fleet.class),
+				return new EDrtShiftDispatcherImpl(getModalInstance(DrtShifts.class), getModalInstance(Fleet.class),
 						timer, getModalInstance(OperationFacilityFinder.class),
 						getModalInstance(EShiftTaskScheduler.class), getModalInstance(Network.class),
 						chargingInfrastructure, eventsManager, shiftConfigGroup);
 			}
 		}).asEagerSingleton();
-
-		addMobsimScopeEventHandlerBinding().to(modalKey(DrtShiftDispatcher.class));
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
 				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));

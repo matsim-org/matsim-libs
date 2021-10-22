@@ -1,12 +1,11 @@
 package org.matsim.contrib.drt.extension.shifts.analysis;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.shifts.events.*;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftUtils;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreakSpecification;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftSpecification;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftsSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -19,23 +18,26 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author nkuehnel / MOIA
+ */
 public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
 		DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
-    private final DrtShifts shifts;
+    private final DrtShiftsSpecification shifts;
     private final Map<Id<DrtShift>, Double> shift2StartTime = new HashMap<>();
     private final Map<Id<DrtShift>, Double> shift2BreakStartTime = new HashMap<>();
 
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualDuration = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakDuration = new HashMap<>();
 
-    @Inject
-    ShiftDurationXY(Scenario scenario, EventsManager eventsManager) {
-        this(DrtShiftUtils.getShifts(scenario));
+
+    public ShiftDurationXY(DrtShiftsSpecification drtShiftsSpecification, EventsManager eventsManager) {
+        this(drtShiftsSpecification);
         eventsManager.addHandler(this);
     }
 
-    public ShiftDurationXY(DrtShifts shifts) {
+    public ShiftDurationXY(DrtShiftsSpecification shifts) {
         super();
         this.shifts = shifts;
         reset(0);
@@ -57,7 +59,7 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     public void handleEvent(final DrtShiftEndedEvent event) {
         final Double start = shift2StartTime.get(event.getShiftId());
         double duration = event.getTime() - start;
-        final DrtShift drtShift = shifts.getShifts().get(event.getShiftId());
+        final DrtShiftSpecification drtShift = shifts.getShiftSpecifications().get(event.getShiftId());
         double plannedDuration = drtShift.getEndTime() - drtShift.getStartTime();
         shift2plannedVsActualDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
     }
@@ -66,7 +68,7 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     public void handleEvent(DrtShiftBreakEndedEvent event) {
         final Double start = shift2BreakStartTime.get(event.getShiftId());
         double duration = event.getTime() - start;
-        final ShiftBreak drtShift = shifts.getShifts().get(event.getShiftId()).getBreak();
+        final DrtShiftBreakSpecification drtShift = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak();
         double plannedDuration = drtShift.getDuration();
         shift2plannedVsActualBreakDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
     }

@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
+import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.shift.ShiftsModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
@@ -52,17 +54,21 @@ import java.util.List;
 public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
     private final DrtConfigGroup drtCfg;
+	private ShiftDrtConfigGroup shiftCfg;
 
-    public ShiftDrtModeModule(DrtConfigGroup drtCfg) {
+	public ShiftDrtModeModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftCfg) {
         super(drtCfg.getMode());
         this.drtCfg = drtCfg;
-    }
+		this.shiftCfg = shiftCfg;
+	}
 
     @Override
     public void install() {
         DvrpModes.registerDvrpMode(binder(), getMode());
         install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
         bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
+
+		install(new ShiftsModule(getMode(), drtCfg, shiftCfg));
 
         install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
                 drtCfg.isChangeStartLinkToLastLinkInSchedule()));

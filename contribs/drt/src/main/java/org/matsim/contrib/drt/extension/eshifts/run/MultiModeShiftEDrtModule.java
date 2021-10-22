@@ -32,21 +32,11 @@ public class MultiModeShiftEDrtModule extends AbstractModule {
     @Override
     public void install() {
         for (DrtConfigGroup drtCfg : this.multiModeDrtCfg.getModalElements()) {
-            this.install(new ShiftDrtModeModule(drtCfg));
+            this.install(new ShiftDrtModeModule(drtCfg, shiftConfigGroup ));
             installQSimModule(new DrtModeQSimModule(drtCfg, new ShiftEDrtModeOptimizerQSimModule(drtCfg, shiftConfigGroup)));
 			install(new DrtModeAnalysisModule(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE,
 					DrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
 					ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)));        }
-
-        bind(ShiftDurationXY.class);
-        bind(BreakCorridorXY.class);
-        addEventHandlerBinding().to(ShiftDurationXY.class);
-        addEventHandlerBinding().to(BreakCorridorXY.class);
-        addControlerListenerBinding().to(ShiftAnalysisControlerListener.class);
-
-        bind(ShiftHistogram.class);
-        addControlerListenerBinding().to(ShiftHistogramListener.class);
-        addEventHandlerBinding().to(ShiftHistogram.class);
 
         installQSimModule(new AbstractQSimModule() {
             @Override

@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
@@ -52,7 +53,6 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
@@ -118,14 +118,12 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 			@Override
 			public DrtShiftDispatcher get() {
-				return new DrtShiftDispatcherImpl(DrtShiftUtils.getShifts(scenario), getModalInstance(Fleet.class),
+				return new DrtShiftDispatcherImpl(getModalInstance(DrtShifts.class), getModalInstance(Fleet.class),
 						timer, getModalInstance(OperationFacilityFinder.class),
 						getModalInstance(ShiftTaskScheduler.class), getModalInstance(Network.class), eventsManager,
 						shiftConfigGroup);
 			}
 		}).asEagerSingleton();
-
-		addMobsimScopeEventHandlerBinding().to(modalKey(DrtShiftDispatcher.class));
 
 		addModalComponent(QSimScopeForkJoinPoolHolder.class,
 				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));

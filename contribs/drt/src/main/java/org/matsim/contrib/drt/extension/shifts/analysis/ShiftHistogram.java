@@ -27,8 +27,8 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     private final int nofBins;
     private DataFrame data = null;
 
-    @Inject
-    ShiftHistogram(Population population, EventsManager eventsManager) {
+
+    public ShiftHistogram(Population population, EventsManager eventsManager) {
         this(300);
         if (population == null) {
             this.shiftIds = null;

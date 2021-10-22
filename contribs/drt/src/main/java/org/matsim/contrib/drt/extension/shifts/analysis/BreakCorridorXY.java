@@ -1,15 +1,13 @@
 package org.matsim.contrib.drt.extension.shifts.analysis;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.shifts.events.DrtShiftBreakEndedEvent;
 import org.matsim.contrib.drt.extension.shifts.events.DrtShiftBreakEndedEventHandler;
 import org.matsim.contrib.drt.extension.shifts.events.DrtShiftBreakStartedEvent;
 import org.matsim.contrib.drt.extension.shifts.events.DrtShiftBreakStartedEventHandler;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftUtils;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreakSpecification;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftsSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -27,17 +25,16 @@ import java.util.Map;
  */
 public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
-    private final DrtShifts shifts;
+    private final DrtShiftsSpecification shifts;
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakStart = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakEnd = new HashMap<>();
 
-    @Inject
-    BreakCorridorXY(Scenario scenario, EventsManager eventsManager) {
-        this(DrtShiftUtils.getShifts(scenario));
+	public BreakCorridorXY(DrtShiftsSpecification shiftsSpecification, EventsManager eventsManager) {
+        this(shiftsSpecification);
         eventsManager.addHandler(this);
     }
 
-    public BreakCorridorXY(DrtShifts shifts) {
+    public BreakCorridorXY(DrtShiftsSpecification shifts) {
         super();
         this.shifts = shifts;
         reset(0);
@@ -47,14 +44,14 @@ public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShi
 
     @Override
     public void handleEvent(DrtShiftBreakStartedEvent event) {
-        final ShiftBreak drtShiftBreak = shifts.getShifts().get(event.getShiftId()).getBreak();
+        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak();
         final double earliestBreakStartTime = drtShiftBreak.getEarliestBreakStartTime();
         shift2plannedVsActualBreakStart.put(event.getShiftId(), new Tuple<>(earliestBreakStartTime, event.getTime()));
     }
 
     @Override
     public void handleEvent(DrtShiftBreakEndedEvent event) {
-        final ShiftBreak drtShiftBreak = shifts.getShifts().get(event.getShiftId()).getBreak();
+        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak();
         final double latestBreakEndTime = drtShiftBreak.getLatestBreakEndTime();
         shift2plannedVsActualBreakEnd.put(event.getShiftId(), new Tuple<>(latestBreakEndTime, event.getTime()));
     }
