@@ -2,9 +2,8 @@ package org.matsim.contrib.drt.extension.shifts.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.drt.extension.shifts.shift.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -15,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class DrtShiftsWriter extends MatsimXmlWriter {
 
@@ -34,12 +33,12 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
 
     private static final Logger log = Logger.getLogger(DrtShiftsWriter.class);
 
-    private final Map<Id<DrtShift>, ? extends DrtShift> shifts;
+    private final Map<Id<DrtShift>, DrtShiftSpecification> shifts;
 
     private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 
-    public DrtShiftsWriter(DrtShifts shifts) {
-        this.shifts = shifts.getShifts();
+    public DrtShiftsWriter(DrtShiftsSpecification shiftsSpecification) {
+        this.shifts = shiftsSpecification.getShiftSpecifications();
     }
 
     public void writeFile(String filename) {
@@ -55,12 +54,12 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
         close();
     }
 
-    private void writeShifts(Map<Id<DrtShift>, ? extends DrtShift> shifts) throws UncheckedIOException, IOException {
-        List<DrtShift> sortedShifts = shifts.values()
+    private void writeShifts(Map<Id<DrtShift>, DrtShiftSpecification> shifts) throws UncheckedIOException, IOException {
+        List<DrtShiftSpecification> sortedShifts = shifts.values()
                 .stream()
-                .sorted(Comparator.comparing(DrtShift::getId))
+                .sorted(Comparator.comparing(Identifiable::getId))
                 .collect(Collectors.toList());
-        for (DrtShift shift : sortedShifts) {
+        for (DrtShiftSpecification shift : sortedShifts) {
             atts.clear();
             atts.add(createTuple(ID, shift.getId().toString()));
             atts.add(createTuple(START_TIME, shift.getStartTime()));
@@ -69,7 +68,7 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
 
             //Write break, if present
             if (shift.getBreak() != null) {
-                final DrtShiftBreak shiftBreak = shift.getBreak();
+                final DrtShiftBreakSpecification shiftBreak = shift.getBreak();
                 atts.clear();
                 atts.add(createTuple(EARLIEST_BREAK_START_TIME, shiftBreak.getEarliestBreakStartTime()));
                 atts.add(createTuple(LATEST_BREAK_END_TIME, shiftBreak.getLatestBreakEndTime()));
