@@ -120,7 +120,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
     public Integer call() throws Exception {
 
 
-        Network network = NetworkUtils.createNetwork();
+        Network network = NetworkUtils.createTimeInvariantNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
 
         SumoNetworkHandler handler = convert(network, lanes);
@@ -231,6 +231,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
             if (edge.name != null)
                 link.getAttributes().putAttribute("name", edge.name);
+
+            link.getAttributes().putAttribute("type", edge.type);
 
             link.setNumberOfLanes(edge.lanes.size());
             Set<String> modes = Sets.newHashSet(TransportMode.car, TransportMode.ride);

@@ -146,7 +146,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testfindNearestPointOnLink(){
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Coord n1 = new Coord(1,1);
 		Coord n2 = new Coord(100,100);
 		Coord plainX = new Coord(1,100);
@@ -205,7 +205,7 @@ public class NetworkUtilsTest {
 	@Test
 	public void getOriginalGeometry() {
 
-		var network = NetworkUtils.createNetwork();
+		var network = NetworkUtils.createTimeInvariantNetwork();
 		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
 		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
 		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
@@ -236,7 +236,7 @@ public class NetworkUtilsTest {
 	@Test
 	public void getOriginalGeometry_noGeometryStored() {
 
-		var network = NetworkUtils.createNetwork();
+		var network = NetworkUtils.createTimeInvariantNetwork();
 		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
 		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
 		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
@@ -264,7 +264,7 @@ public class NetworkUtilsTest {
 	@Test
 	public void getOriginalGeometry_emptyGeometryStored() {
 
-		var network = NetworkUtils.createNetwork();
+		var network = NetworkUtils.createTimeInvariantNetwork();
 		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
 		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
 		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);

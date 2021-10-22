@@ -37,7 +37,7 @@ public class CalcBoundingBoxTest {
 
 	@Test
 	public void testRun() {
-		Network net = NetworkUtils.createNetwork();
+		Network net = NetworkUtils.createTimeInvariantNetwork();
 		NetworkFactory nf = net.getFactory();
 
 		Node n0 = nf.createNode(Id.create(0, Node.class), new Coord((double) 100, (double) 500));
@@ -73,7 +73,7 @@ public class CalcBoundingBoxTest {
 
 	@Test
 	public void testRun_allNegative() {
-		Network net = NetworkUtils.createNetwork();
+		Network net = NetworkUtils.createTimeInvariantNetwork();
 		NetworkFactory nf = net.getFactory();
 
 		final double x4 = -100;

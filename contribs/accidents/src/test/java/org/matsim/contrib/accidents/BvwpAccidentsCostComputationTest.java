@@ -23,7 +23,7 @@ public class BvwpAccidentsCostComputationTest {
 		
 	@Test
 	public void test1() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		NetworkFactory factory = network.getFactory();
 		
 		Node n0 = factory.createNode(Id.createNodeId(0), new Coord(0, 1));
@@ -45,7 +45,7 @@ public class BvwpAccidentsCostComputationTest {
 	
 	@Test
 	public void test2() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		NetworkFactory factory = network.getFactory();
 		
 		Node n0 = factory.createNode(Id.createNodeId(0), new Coord(0, 1));
@@ -67,7 +67,7 @@ public class BvwpAccidentsCostComputationTest {
 	
 	@Test
 	public void test3() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		NetworkFactory factory = network.getFactory();
 		
 		Node n0 = factory.createNode(Id.createNodeId(0), new Coord(0, 1));

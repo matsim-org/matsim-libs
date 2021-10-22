@@ -166,7 +166,7 @@ class TourPlanning {
 			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
 			log.info("routing plan for carrier " + carrier.getId());
-			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, (NetworkBasedTransportCosts) transportCosts); // we need to route
+			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, transportCosts); // we need to route
 																									// the plans in
 																									// order to create
 																									// reasonable
