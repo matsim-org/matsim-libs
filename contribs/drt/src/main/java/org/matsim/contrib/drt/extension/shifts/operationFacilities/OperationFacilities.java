@@ -8,8 +8,4 @@ import org.matsim.api.core.v01.Id;
  */
 public interface OperationFacilities {
     ImmutableMap<Id<OperationFacility>, OperationFacility> getDrtOperationFacilities();
-
-    void addOperationFacility(OperationFacility facility);
-
-    OperationFacility removeOperationFacility(Id<OperationFacility> facilityId);
 }

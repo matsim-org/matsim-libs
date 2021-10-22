@@ -2,6 +2,10 @@ package org.matsim.contrib.drt.extension.shifts.run;
 
 import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityImpl;
 import org.matsim.contrib.drt.extension.shifts.shift.*;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -19,7 +23,6 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 	@Override
 	public void configureQSim() {
 		bindModal(DrtShifts.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-
 			@Override
 			public DrtShifts get() {
 				DrtShiftsSpecification shiftsSpecification = getModalInstance(DrtShiftsSpecification.class);
@@ -35,6 +38,22 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 						})
 						.collect(ImmutableMap.toImmutableMap(DrtShift::getId, s -> s));
 				return () -> shifts;
+			}
+		}).asEagerSingleton();
+
+		bindModal(OperationFacilities.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+
+			@Override
+			public OperationFacilities get() {
+				OperationFacilitiesSpecification operationFacilitiesSpecification = getModalInstance(OperationFacilitiesSpecification.class);
+				ImmutableMap<Id<OperationFacility>, OperationFacility> operationFacilities = operationFacilitiesSpecification.getOperationFacilitySpecifications().values()
+						.stream()
+						.map(spec -> (OperationFacility) new OperationFacilityImpl(
+								spec.getId(), spec.getLinkId(), spec.getCoord(),
+								spec.getCapacity(), spec.getCharger(), spec.getType()
+						))
+						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
+				return () -> operationFacilities;
 			}
 		}).asEagerSingleton();
 	}
