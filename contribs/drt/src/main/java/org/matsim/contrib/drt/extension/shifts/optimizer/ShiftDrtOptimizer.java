@@ -14,7 +14,7 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class ShiftDrtOptimizer implements DrtOptimizer {
 

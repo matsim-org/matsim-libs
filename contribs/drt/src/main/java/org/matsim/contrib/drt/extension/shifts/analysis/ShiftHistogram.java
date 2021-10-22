@@ -16,7 +16,7 @@ import java.io.PrintStream;
 import java.util.Set;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
 		DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {

@@ -7,7 +7,7 @@ import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ChargingPowerEstimations {
 

@@ -6,7 +6,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFaci
 
 /**
  * A task representing stopping and waiting for a new shift.
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftChangeoverTaskImpl extends DrtStopTask implements ShiftChangeOverTask {
 

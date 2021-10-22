@@ -14,7 +14,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftDrtScheduleInquiry extends DrtScheduleInquiry implements ScheduleInquiry {
 

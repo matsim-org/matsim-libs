@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftHistogramChart {
     static JFreeChart getGraphic(final ShiftHistogram.DataFrame dataFrame, int iteration) {

@@ -4,7 +4,7 @@ import org.matsim.contrib.evrp.ChargingActivity;
 import org.matsim.contrib.evrp.ChargingTask;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ChargingWaitForShiftActivity extends ChargingActivity {
 

@@ -51,7 +51,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 

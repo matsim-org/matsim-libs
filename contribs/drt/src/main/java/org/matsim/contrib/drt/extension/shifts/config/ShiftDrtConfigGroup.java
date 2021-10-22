@@ -7,7 +7,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import java.util.Map;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
 

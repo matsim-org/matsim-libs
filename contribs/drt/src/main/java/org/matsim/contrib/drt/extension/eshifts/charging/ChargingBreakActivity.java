@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * based on {@link BusStopActivity} and {@link ChargingActivity}
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ChargingBreakActivity extends FirstLastSimStepDynActivity implements DynActivity, PassengerPickupActivity {
 

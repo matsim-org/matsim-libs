@@ -6,7 +6,7 @@ import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import java.util.Queue;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public interface ShiftDvrpVehicle extends DvrpVehicle {
 

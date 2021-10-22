@@ -12,7 +12,7 @@ import org.xml.sax.Attributes;
 import java.util.Stack;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class OperationFacilitiesReader extends MatsimXmlParser {
 

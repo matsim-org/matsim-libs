@@ -12,6 +12,9 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.modal.ModalProviders;
 
+/**
+ * @author nkuehnel / MOIA
+ */
 public class EvShiftDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 
 	public EvShiftDvrpFleetQSimModule(String mode) {

@@ -38,7 +38,7 @@ import java.util.List;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftTaskScheduler {
 

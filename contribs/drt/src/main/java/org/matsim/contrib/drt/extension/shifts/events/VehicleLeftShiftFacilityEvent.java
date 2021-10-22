@@ -8,7 +8,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFaci
 import java.util.Map;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class VehicleLeftShiftFacilityEvent extends Event {
 

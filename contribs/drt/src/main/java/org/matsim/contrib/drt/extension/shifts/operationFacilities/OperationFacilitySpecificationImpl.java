@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class OperationFacilitySpecificationImpl implements OperationFacilitySpecification {
 

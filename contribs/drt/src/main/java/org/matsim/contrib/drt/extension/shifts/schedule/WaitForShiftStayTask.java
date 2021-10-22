@@ -6,7 +6,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class WaitForShiftStayTask extends DrtStayTask implements OperationalStop {
 

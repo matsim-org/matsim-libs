@@ -49,7 +49,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 

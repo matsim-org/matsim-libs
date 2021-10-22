@@ -13,9 +13,8 @@ import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 
 import java.util.Queue;
 
-
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class EvShiftDvrpVehicle extends EvDvrpVehicle implements ShiftDvrpVehicle {
 

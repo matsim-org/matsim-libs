@@ -12,7 +12,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import javax.inject.Inject;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftHistogramListener implements IterationEndsListener, IterationStartsListener {
 

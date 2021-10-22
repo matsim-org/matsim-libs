@@ -4,7 +4,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public interface ShiftBreakTask extends Task, OperationalStop {
 

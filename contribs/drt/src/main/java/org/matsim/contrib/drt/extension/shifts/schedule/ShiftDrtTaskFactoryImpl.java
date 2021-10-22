@@ -8,7 +8,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFaci
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 

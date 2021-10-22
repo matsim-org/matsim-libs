@@ -12,7 +12,7 @@ import org.matsim.core.config.Config;
 import javax.inject.Inject;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 

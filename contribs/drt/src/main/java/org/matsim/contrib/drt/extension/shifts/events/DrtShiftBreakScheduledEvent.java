@@ -9,7 +9,7 @@ import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import java.util.Map;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class DrtShiftBreakScheduledEvent extends Event {
 

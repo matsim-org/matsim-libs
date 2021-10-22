@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 

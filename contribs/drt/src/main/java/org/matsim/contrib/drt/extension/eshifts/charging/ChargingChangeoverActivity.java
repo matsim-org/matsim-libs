@@ -14,7 +14,7 @@ import org.matsim.contrib.evrp.ChargingTask;
 import java.util.Map;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ChargingChangeoverActivity implements DynActivity {
 

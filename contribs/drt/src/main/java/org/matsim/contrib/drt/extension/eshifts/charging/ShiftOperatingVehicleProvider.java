@@ -12,7 +12,7 @@ import org.matsim.contrib.evrp.OperatingVehicleProvider;
 import org.matsim.contrib.drt.extension.shifts.schedule.OperationalStop;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftOperatingVehicleProvider implements AuxDischargingHandler.VehicleProvider {
 

@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class OperationFacilitiesWriter extends MatsimXmlWriter {
 

@@ -11,7 +11,7 @@ import org.matsim.contrib.drt.extension.shifts.fleet.DefaultShiftDvrpVehicle;
 import org.matsim.core.modal.ModalProviders;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class ShiftDvrpFleetQsimModule extends AbstractDvrpModeQSimModule {
 

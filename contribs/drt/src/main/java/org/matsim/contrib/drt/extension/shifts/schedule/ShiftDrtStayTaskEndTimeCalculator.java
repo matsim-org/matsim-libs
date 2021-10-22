@@ -13,7 +13,7 @@ import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import java.util.List;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftDrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 

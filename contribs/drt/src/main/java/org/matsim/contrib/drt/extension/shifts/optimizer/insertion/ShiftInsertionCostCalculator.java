@@ -21,6 +21,9 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+/**
+ * @author nkuehnel / MOIA
+ */
 public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
 
 	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
