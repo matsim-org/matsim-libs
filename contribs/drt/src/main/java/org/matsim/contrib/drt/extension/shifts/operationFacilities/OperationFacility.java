@@ -9,7 +9,7 @@ import org.matsim.facilities.Facility;
 import java.util.Set;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public interface OperationFacility extends Identifiable<OperationFacility>, Facility {
 

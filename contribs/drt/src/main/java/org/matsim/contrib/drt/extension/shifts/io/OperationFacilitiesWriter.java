@@ -2,8 +2,9 @@ package org.matsim.contrib.drt.extension.shifts.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitySpecification;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -31,12 +32,12 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
     public static final String CHARGER_ID = "chargerId";
     public static final String TYPE = "type";
 
-    private final Map<Id<OperationFacility>, ? extends OperationFacility> facilities;
+    private final Map<Id<OperationFacility>, OperationFacilitySpecification> facilities;
 
     private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 
-    public OperationFacilitiesWriter(OperationFacilities facilities) {
-        this.facilities = facilities.getDrtOperationFacilities();
+    public OperationFacilitiesWriter(OperationFacilitiesSpecification facilities) {
+        this.facilities = facilities.getOperationFacilitySpecifications();
     }
 
     public void writeFile(String filename) {
@@ -52,12 +53,12 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
         close();
     }
 
-    private void writeShifts(Map<Id<OperationFacility>, ? extends OperationFacility> facilities) throws UncheckedIOException, IOException {
-        List<OperationFacility> sortedFacilities = facilities.values()
+    private void writeShifts(Map<Id<OperationFacility>, OperationFacilitySpecification> facilities) throws UncheckedIOException, IOException {
+        List<OperationFacilitySpecification> sortedFacilities = facilities.values()
                 .stream()
-                .sorted(Comparator.comparing(OperationFacility::getId))
+                .sorted(Comparator.comparing(OperationFacilitySpecification::getId))
                 .collect(Collectors.toList());
-        for (OperationFacility facility : sortedFacilities) {
+        for (OperationFacilitySpecification facility : sortedFacilities) {
             atts.clear();
             atts.add(createTuple(ID, facility.getId().toString()));
             atts.add(createTuple(LINK_ID, facility.getLinkId().toString()));

@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.shifts.operationFacilities;
 import org.matsim.api.core.v01.Coord;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public interface OperationFacilityFinder {
 

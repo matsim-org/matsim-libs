@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class OperationFacilityImpl implements OperationFacility {
 

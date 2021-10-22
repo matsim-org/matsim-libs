@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.operationFacilities;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public enum OperationFacilityType {
     hub, inField

@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class NearestOperationFacilityWithCapacityFinder implements OperationFacilityFinder {
 
