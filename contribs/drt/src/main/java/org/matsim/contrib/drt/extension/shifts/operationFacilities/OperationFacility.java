@@ -13,8 +13,6 @@ import java.util.Set;
  */
 public interface OperationFacility extends Identifiable<OperationFacility>, Facility {
 
-	// separate the fixed specification data (preferably immutable) from the mutable state (registered vehicles)
-
 	int getCapacity();
 
     boolean hasCapacity();
