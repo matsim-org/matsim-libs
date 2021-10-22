@@ -45,7 +45,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.events.EventsUtils;

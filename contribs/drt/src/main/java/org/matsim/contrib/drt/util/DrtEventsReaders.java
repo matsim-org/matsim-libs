@@ -32,7 +32,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.util.DvrpEventsReaders;
-import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
