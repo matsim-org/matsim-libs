@@ -7,7 +7,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFaci
 import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class EDrtWaitForShiftStayTask extends WaitForShiftStayTask implements ETask {
 

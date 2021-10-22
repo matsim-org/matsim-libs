@@ -48,7 +48,7 @@ import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskSchedul
 import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class EShiftTaskScheduler {
 

@@ -25,7 +25,7 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class ShiftEDrtActionCreator implements DynActionCreator {
 

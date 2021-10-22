@@ -3,6 +3,12 @@ package org.matsim.contrib.drt.extension.shifts.optimizer;
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.shifts.schedule.OperationalStop;
+import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
@@ -24,25 +30,18 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.shifts.schedule.OperationalStop;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
 
 /**
  * @author nkuehnel
@@ -73,7 +72,6 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
 
     public void initSchedules() {
         final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = shiftBreakNetwork.getDrtOperationFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
-        facilitiesByLink.values().stream().flatMap(Collection::stream).forEach(OperationFacility::reset);
         for (DvrpVehicle veh : fleet.getVehicles().values()) {
             try {
                 final OperationFacility operationFacility = facilitiesByLink.get(veh.getStartLink().getId()).stream().findFirst().orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));

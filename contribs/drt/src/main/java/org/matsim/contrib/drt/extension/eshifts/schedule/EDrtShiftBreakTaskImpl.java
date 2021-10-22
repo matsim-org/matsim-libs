@@ -9,7 +9,7 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class EDrtShiftBreakTaskImpl extends ShiftBreakTaskImpl implements ShiftBreakTask, ETask {
 

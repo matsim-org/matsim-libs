@@ -18,9 +18,10 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.MainModeIdentifier;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class MultiModeShiftEDrtModule extends AbstractModule {
+
     @Inject
     private MultiModeDrtConfigGroup multiModeDrtCfg;
     @Inject
@@ -37,14 +38,6 @@ public class MultiModeShiftEDrtModule extends AbstractModule {
 			install(new DrtModeAnalysisModule(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE,
 					DrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
 					ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)));        }
-
-        installQSimModule(new AbstractQSimModule() {
-            @Override
-            protected void configureQSim() {
-                addQSimComponentBinding("SHIFT_COMPONENT").toProvider(
-                        IndividualCapacityTimeProfileCollectorProvider.class);
-            }
-        });
 
         bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(this.multiModeDrtCfg));
     }

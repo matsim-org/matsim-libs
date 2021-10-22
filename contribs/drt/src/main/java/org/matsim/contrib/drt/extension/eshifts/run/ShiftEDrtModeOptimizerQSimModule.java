@@ -54,6 +54,9 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+/**
+ * @author nkuehnel / MOIA
+ */
 public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 	private final ShiftDrtConfigGroup shiftConfigGroup;

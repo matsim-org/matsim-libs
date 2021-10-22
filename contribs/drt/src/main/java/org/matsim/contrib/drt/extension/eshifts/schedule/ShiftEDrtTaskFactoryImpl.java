@@ -20,6 +20,9 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
+/**
+ * @author nkuehnel / MOIA
+ */
 public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     private final EDrtTaskFactoryImpl delegate;

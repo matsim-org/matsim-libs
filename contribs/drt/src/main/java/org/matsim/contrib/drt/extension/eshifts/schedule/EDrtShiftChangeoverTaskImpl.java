@@ -8,7 +8,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFaci
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class EDrtShiftChangeoverTaskImpl extends DrtStopTask implements ShiftChangeOverTask, ETask {
 

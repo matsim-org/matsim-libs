@@ -95,9 +95,4 @@ public class OperationFacilityImpl implements OperationFacility {
     public Set<Id<DvrpVehicle>> getRegisteredVehicles() {
         return Collections.unmodifiableSet(reservedVehicles);
     }
-
-    @Override
-    public void reset() {
-        this.reservedVehicles.clear();
-    }
 }

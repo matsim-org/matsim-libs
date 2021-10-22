@@ -26,6 +26,4 @@ public interface OperationFacility extends Identifiable<OperationFacility>, Faci
     OperationFacilityType getType();
 
     Set<Id<DvrpVehicle>> getRegisteredVehicles();
-
-    void reset();
 }

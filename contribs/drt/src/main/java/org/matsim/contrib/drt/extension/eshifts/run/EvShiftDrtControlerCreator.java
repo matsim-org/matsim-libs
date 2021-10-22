@@ -25,7 +25,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class EvShiftDrtControlerCreator {
 
@@ -36,8 +36,6 @@ public class EvShiftDrtControlerCreator {
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
-
-		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeShiftEDrtModule());
@@ -55,9 +53,6 @@ public class EvShiftDrtControlerCreator {
 				this.bind(AuxDischargingHandler.VehicleProvider.class).to(ShiftOperatingVehicleProvider.class);
 			}
 		});
-
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT, "SHIFT_COMPONENT"),
-				multiModeDrtConfig.modes().collect(toList())));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
