@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.shifts.shift;
 import org.matsim.api.core.v01.Id;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
 public class DrtShiftImpl implements DrtShift {
 
@@ -12,34 +12,15 @@ public class DrtShiftImpl implements DrtShift {
 	private double start;
 	private double end;
 
-	private ShiftBreak shiftBreak;
+	private DrtShiftBreak shiftBreak;
 
 	private boolean started = false;
 	private boolean ended = false;
 
-
-	public DrtShiftImpl(Id<DrtShift> id) {
+	public DrtShiftImpl(Id<DrtShift> id, double start, double end, DrtShiftBreak shiftBreak) {
 		this.id = id;
-	}
-
-	@Override
-	public void setStartTime(double time) {
-		if ((time % 1) != 0) {
-			throw new RuntimeException("Cannot use fractions of seconds!");
-		}
-		this.start = time;
-	}
-
-	@Override
-	public void setEndTime(double time) {
-		if ((time % 1) != 0) {
-			throw new RuntimeException("Cannot use fractions of seconds!");
-		}
-		this.end = time;
-	}
-
-	@Override
-	public void setBreak(ShiftBreak shiftBreak) {
+		this.start = start;
+		this.end = end;
 		this.shiftBreak = shiftBreak;
 	}
 
@@ -54,7 +35,7 @@ public class DrtShiftImpl implements DrtShift {
 	}
 
 	@Override
-	public ShiftBreak getBreak() {
+	public DrtShiftBreak getBreak() {
 		return shiftBreak;
 	}
 
@@ -83,15 +64,6 @@ public class DrtShiftImpl implements DrtShift {
 			ended = true;
 		} else {
 			throw new IllegalStateException("Shift already ended!");
-		}
-	}
-
-	@Override
-	public void reset() {
-		ended = false;
-		started = false;
-		if(shiftBreak != null) {
-			shiftBreak.reset();
 		}
 	}
 
