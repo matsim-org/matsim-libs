@@ -255,7 +255,7 @@ public class QueueAgentSnapshotInfoBuilderTest {
                 Id.createLinkId(1),
                 NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
                 NetworkUtils.createNode(Id.createNodeId(2), toCoord),
-                NetworkUtils.createNetwork(),
+                NetworkUtils.createTimeInvariantNetwork(),
                 linkLength,
                 freespeed,
                 linkCapacity,

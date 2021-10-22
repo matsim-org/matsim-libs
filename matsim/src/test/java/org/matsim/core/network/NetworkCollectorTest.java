@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -16,7 +17,7 @@ public class NetworkCollectorTest {
     private static Network getNetworkFromExample() {
 
         var networkUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz");
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createTimeInvariantNetwork();
         new MatsimNetworkReader(network).readURL(networkUrl);
         return network;
     }
@@ -27,7 +28,7 @@ public class NetworkCollectorTest {
         var network = getNetworkFromExample();
 
         var collectedNetwork = network.getLinks().values().stream()
-                .collect(NetworkUtils.getCollector());
+                .collect(NetworkUtils.getTimeInvariantCollector());
 
         assertTrue(NetworkUtils.compare(network, collectedNetwork));
     }
@@ -38,7 +39,7 @@ public class NetworkCollectorTest {
         var network = getNetworkFromExample();
 
         var collectedNetwork = network.getLinks().values().parallelStream()
-                .collect(NetworkUtils.getCollector());
+                .collect(NetworkUtils.getTimeInvariantCollector());
 
         assertTrue(NetworkUtils.compare(network, collectedNetwork));
     }
@@ -52,7 +53,7 @@ public class NetworkCollectorTest {
 
         var collectedNetwork = network.getLinks().values().stream()
                 .filter(link -> !link.getId().equals(filterId))
-                .collect(NetworkUtils.getCollector());
+                .collect(NetworkUtils.getTimeInvariantCollector());
 
         // make sure the link is not in filtered network
         assertFalse(collectedNetwork.getLinks().containsKey(filterId));

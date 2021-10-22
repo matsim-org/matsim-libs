@@ -212,7 +212,7 @@ public class PlanImplTest {
 
 	@Test
 	public void testCopyPlan_NetworkRoute() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord(2000, 0));
@@ -243,7 +243,7 @@ public class PlanImplTest {
 
 	@Test
 	public void testCopyPlan_GenericRoute() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord(2000, 0));

@@ -63,7 +63,7 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 		}
 
 		if (networkPath != null) {
-			network = NetworkUtils.readNetwork(networkPath.toString());
+			network = NetworkUtils.readTimeInvariantNetwork(networkPath.toString());
 		}
 
 

@@ -74,13 +74,13 @@ public class AirPollutionSpatialAggregation implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		Network network = NetworkUtils.readNetwork(this.network.toString());
+		Network network = NetworkUtils.readTimeInvariantNetwork(this.network.toString());
 
 		ShpOptions.Index index = shp.getShapeFile() != null ? shp.createIndex(ProjectionUtils.getCRS(network), "_") : null;
 
 		var filteredNetwork = network.getLinks().values().parallelStream()
 				.filter(link -> index == null || index.contains(link.getCoord()))
-				.collect(NetworkUtils.getCollector());
+				.collect(NetworkUtils.getTimeInvariantCollector());
 
 		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processEventsFile(events.toString(), filteredNetwork, gridSize, 20);
 

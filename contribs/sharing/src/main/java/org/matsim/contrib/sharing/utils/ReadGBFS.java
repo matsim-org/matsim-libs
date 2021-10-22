@@ -52,13 +52,13 @@ public class ReadGBFS {
 
 		// Filter network according to modes
 
-		Network fullNetwork = NetworkUtils.createNetwork();
+		Network fullNetwork = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(fullNetwork).readFile(cmd.getOptionStrict("network-path"));
 
 		Set<String> modes = Arrays.asList(cmd.getOptionStrict("network-modes").split(",")).stream().map(String::trim)
 				.collect(Collectors.toSet());
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new TransportModeNetworkFilter(fullNetwork).filter(network, modes);
 
 		// Load main feed

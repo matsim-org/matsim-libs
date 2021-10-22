@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkUtils;
  */
 public class DvrpTravelTimeMatrixTest {
 
-	private final Network network = NetworkUtils.createNetwork();
+	private final Network network = NetworkUtils.createTimeInvariantNetwork();
 	private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 	private final Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 	private final DvrpTravelTimeMatrix matrix;
@@ -44,14 +44,14 @@ public class DvrpTravelTimeMatrixTest {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), nodeB, nodeA, 300, 15, 40, 1);
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
 		params.setCellSize(100);
-		matrix = new DvrpTravelTimeMatrix(network, params, 1);
+		matrix = new DvrpTravelTimeMatrix(network, params, 1, 1);
 	}
 
 	@Test
 	public void test_centralNodes() {
 		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20);
+		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20 + 1); // 1 s for moving over nodes
 		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeB)).isEqualTo(0);
 	}
 
@@ -61,8 +61,8 @@ public class DvrpTravelTimeMatrixTest {
 		Node nodeD = NetworkUtils.createAndAddNode(network, Id.createNodeId("D"), new Coord(140, 140));
 
 		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeC)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeD)).isEqualTo(10);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeD, nodeC)).isEqualTo(20);
+		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeD)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeD, nodeC)).isEqualTo(20 + 1); // 1 s for moving over nodes
 		assertThat(matrix.getFreeSpeedTravelTime(nodeD, nodeD)).isEqualTo(0);
 	}
 }

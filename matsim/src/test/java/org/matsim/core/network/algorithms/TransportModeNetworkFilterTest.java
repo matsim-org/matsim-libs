@@ -34,7 +34,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -295,6 +302,44 @@ public class TransportModeNetworkFilterTest {
 		Assert.assertEquals("wrong number of nodes.", 1, subNetwork.getNodes().size());
 		Assert.assertEquals("wrong number of links", 1, subNetwork.getLinks().size());
 		Assert.assertTrue(subNetwork.getLinks().containsKey(Id.create(1, Link.class)));
+	}
+	
+	/**
+	 * Tests that tiem-varying information is converted
+	 */
+	@Test
+	public void testFilter_timeVariant() {
+		Config config = ConfigUtils.createConfig();
+		config.network().setTimeVariantNetwork(true);
+		
+		Network sourceNetwork = NetworkUtils.createNetwork(config);
+		Node node1 = sourceNetwork.getFactory().createNode(Id.createNodeId("1"), new Coord(0.0, 0.0));
+		Node node2 = sourceNetwork.getFactory().createNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
+		sourceNetwork.addNode(node1);
+		sourceNetwork.addNode(node2);
+		
+		Link sourceLink = sourceNetwork.getFactory().createLink(Id.createLinkId("link"), node1, node2);
+		sourceLink.setFreespeed(50.0);
+		sourceLink.setAllowedModes(Collections.singleton("car"));
+		sourceNetwork.addLink(sourceLink);
+		
+		NetworkChangeEvent changeEvent = new NetworkChangeEvent(120.0);
+		changeEvent.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 2.0));
+		changeEvent.addLink(sourceLink);
+		((TimeDependentNetwork) sourceNetwork).addNetworkChangeEvent(changeEvent);
+		
+		Assert.assertEquals(50.0, sourceLink.getFreespeed(), 1e-3);
+		Assert.assertEquals(50.0, sourceLink.getFreespeed(0.0), 1e-3);
+		Assert.assertEquals(100.0, sourceLink.getFreespeed(120.0), 1e-3);
+		
+		
+		Network targetNetwork = NetworkUtils.createNetwork(config);
+		new TransportModeNetworkFilter(sourceNetwork).filter(targetNetwork, Collections.singleton("car"));
+		Link targetLink = targetNetwork.getLinks().get(sourceLink.getId());
+
+		Assert.assertEquals(50.0, targetLink.getFreespeed(), 1e-3);
+		Assert.assertEquals(50.0, targetLink.getFreespeed(0.0), 1e-3);
+		Assert.assertEquals(100.0, targetLink.getFreespeed(120.0), 1e-3);
 	}
 
 	/**

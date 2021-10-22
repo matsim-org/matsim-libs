@@ -146,7 +146,7 @@ public class FixedCostsTest extends MatsimTestCase {
 
 		URL context = org.matsim.examples.ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 		URL networkURL = IOUtils.extendUrl( context, "grid9x9.xml" );
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readURL(networkURL);
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );

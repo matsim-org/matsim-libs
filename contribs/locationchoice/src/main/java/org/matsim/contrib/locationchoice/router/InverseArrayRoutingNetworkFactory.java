@@ -101,9 +101,4 @@ public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFac
 			RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
 		return new ArrayRoutingNetworkLink(link, fromNode, toNode, linkArrayIndexCounter++);
 	}
-
-	@Override
-	public void setLinkFactory(LinkFactory factory) {
-		throw new RuntimeException("not implemented") ;
-	}
 }

@@ -98,7 +98,7 @@ public final class LinkQuadTree {
 //		private final static int CHILD_SE = 2;
 //		private final static int CHILD_SW = 3;
 		
-		private enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW,NO_CHILD } ;
+		private enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW,NO_CHILD }
 
 		// I replaced the "int" by an enum since I find it easier to read, and I needed/wanted to understand the code.  If this causes
 		// computational performance losses, we need to change it back.  kai, sep'16
@@ -272,13 +272,13 @@ public final class LinkQuadTree {
 			if (x >= centerX && y >= centerY) {
 				return ChildPosition.CHILD_NE;
 			}
-			if (x >= centerX && y < centerY) {
+			if (x >= centerX/* && y < centerY // this is always true */) {
 				return ChildPosition.CHILD_SE;
 			}
-			if (x < centerX && y < centerY) {
+//			if (x < centerX && y < centerY) { // this should now always be true
 				return ChildPosition.CHILD_SW;
-			}
-			throw new RuntimeException("should never get here since (x,y) has to be _somewhere_ with respect to centerX and centerY") ;
+//			}
+//			throw new RuntimeException("should never get here since (x,y) has to be _somewhere_ with respect to centerX and centerY") ;
 		}
 
 		/**
@@ -361,15 +361,15 @@ public final class LinkQuadTree {
 
 			if (fx == tx) {
 				// enforce minimal extent
-				this.minX = fx - fx*1e-8; // make it adaptive within the number of significant digits
-				this.maxX = fx + fx*1e-8; // make it adaptive within the number of significant digits
+				this.minX = fx - Math.abs(fx)*1e-8; // make it adaptive within the number of significant digits
+				this.maxX = fx + Math.abs(fx)*1e-8; // make it adaptive within the number of significant digits
 			} else {
 				this.minX = Math.min(fx, tx);
 				this.maxX = Math.max(fx, tx);
 			}
 			if (fy == ty) {
-				this.minY = fy - fy*1e-8; // make it adaptive within the number of significant digits
-				this.maxY = fy + fy*1e-8; // make it adaptive within the number of significant digits
+				this.minY = fy - Math.abs(fy)*1e-8; // make it adaptive within the number of significant digits
+				this.maxY = fy + Math.abs(fy)*1e-8; // make it adaptive within the number of significant digits
 			} else {
 				this.minY = Math.min(fy, ty);
 				this.maxY = Math.max(fy, ty);

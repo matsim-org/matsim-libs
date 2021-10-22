@@ -455,7 +455,7 @@ public abstract class AbstractNetworkRouteTest {
 		 *    v             v|             v|             v|
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node node0 = NetworkUtils.createAndAddNode(network, Id.create("0", Node.class), new Coord((double) 0, (double) 500));
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));

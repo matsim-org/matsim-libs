@@ -41,10 +41,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	/** Tests the method {@link NetworkUtils#getFreespeedTravelTime(Link, double)}.	 */
 	public void testGetFreespeedTravelTime(){
 	    for (LinkFactory lf : linkFactories(1, 5)) {
-    		final Network network = NetworkUtils.createNetwork();
-    		NetworkFactory nf = network.getFactory();
-    		nf.setLinkFactory(lf);
-    		((NetworkImpl)network).setFactory(nf);
+    		final Network network = new NetworkImpl(lf);
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
     		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
     		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
@@ -84,10 +81,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFreespeedChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final Network network = NetworkUtils.createNetwork();
-    		NetworkFactory nf = network.getFactory();
-    		nf.setLinkFactory(lf);
-    		((NetworkImpl)network).setFactory(nf);
+        	final Network network = new NetworkImpl(lf);
     
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
     		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
@@ -129,10 +123,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFreespeedChangeRelative() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final Network network = NetworkUtils.createNetwork();
-    		NetworkFactory nf = network.getFactory();
-    		nf.setLinkFactory(lf);
-    		((NetworkImpl)network).setFactory(nf);
+        	final Network network = new NetworkImpl(lf);
     
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
     		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
@@ -174,10 +165,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testMultipleFreespeedChanges() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final Network network = NetworkUtils.createNetwork();
-    		NetworkFactory nf = network.getFactory();
-    		nf.setLinkFactory(lf);
-    		((NetworkImpl)network).setFactory(nf);
+        	final Network network = new NetworkImpl(lf);
     
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
     		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
@@ -283,10 +271,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFlowCapChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final Network network = NetworkUtils.createNetwork();
-    		NetworkFactory nf = network.getFactory();
-    		nf.setLinkFactory(lf);
-    		((NetworkImpl)network).setFactory(nf);
+        	final Network network = new NetworkImpl(lf);
     		network.setCapacityPeriod(3600.0);
     
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -322,10 +307,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testLanesChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final Network network = NetworkUtils.createNetwork();
-    		NetworkFactory nf = network.getFactory();
-    		nf.setLinkFactory(lf);
-    		((NetworkImpl)network).setFactory(nf);
+        	final Network network = new NetworkImpl(lf);
     		network.setCapacityPeriod(3600.0);
     
     		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));

@@ -81,7 +81,7 @@ public class NoiseRLS19IT {
 
 
         ReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
-        Network network = NetworkUtils.createNetwork();
+        Network network = NetworkUtils.createTimeInvariantNetwork();
         Node from = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(6,7));
         Node to = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(7,6));
         Link link = NetworkUtils.createLink(Id.createLinkId("link"), from, to, network, 10, 0,0,0);

@@ -21,21 +21,32 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 03.05.2019
  */
 
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.VehicleType;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class JointDemandModule extends AbstractModule {
 
@@ -56,6 +67,7 @@ public class JointDemandModule extends AbstractModule {
         bind(CommercialJobGenerator.class).to(DefaultCommercialJobGenerator.class).in(Singleton.class);
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
+        bind(VRPTransportCosts.class).to(NetworkBasedTransportCosts.class).in(Singleton.class);
 
         //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
@@ -88,6 +100,26 @@ public class JointDemandModule extends AbstractModule {
         public Carriers get() {
             return FreightUtils.getCarriers(this.scenario);
         }
+    }
+
+    @Provides
+    @Singleton
+    private NetworkBasedTransportCosts provideNetworkBasedTransportCosts(Scenario scenario,
+                                                                        Carriers carriers, Map<String, TravelTime> travelTimes, Config config) {
+
+        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config,
+                FreightConfigGroup.class);
+
+        Set<VehicleType> vehicleTypes = new HashSet<>();
+        carriers.getCarriers().values().forEach(
+                carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
+
+        NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder
+                .newInstance(scenario.getNetwork(), vehicleTypes);
+
+        netBuilder.setTimeSliceWidth(freightConfigGroup.getTravelTimeSliceWidth());
+        netBuilder.setTravelTime(travelTimes.get(TransportMode.car));
+        return netBuilder.build();
     }
 
 }
