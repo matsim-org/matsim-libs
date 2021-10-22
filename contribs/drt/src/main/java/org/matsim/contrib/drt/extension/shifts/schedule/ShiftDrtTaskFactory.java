@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 /**
  * @author nkuehnel
@@ -12,7 +12,7 @@ import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
 public interface ShiftDrtTaskFactory extends DrtTaskFactory {
 
     ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-										ShiftBreak shiftBreak, OperationFacility facility);
+                                        DrtShiftBreak shiftBreak, OperationFacility facility);
 
     ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
                                                   Link link, double latestArrivalTime, OperationFacility facility);

@@ -5,7 +5,7 @@ import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 /**
  * @author nkuehnel, fzwick
@@ -35,7 +35,7 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime,
-											   Link link, ShiftBreak shiftBreak, OperationFacility facility) {
+                                               Link link, DrtShiftBreak shiftBreak, OperationFacility facility) {
         return new ShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, facility);
     }
 

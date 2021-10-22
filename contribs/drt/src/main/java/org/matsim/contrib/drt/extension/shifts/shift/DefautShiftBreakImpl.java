@@ -3,9 +3,9 @@ package org.matsim.contrib.drt.extension.shifts.shift;
 import org.matsim.core.gbl.Gbl;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
-public class DefautShiftBreakImpl implements ShiftBreak {
+public class DefautShiftBreakImpl implements DrtShiftBreak {
 
     private final static double UNSCHEDULED_ARRIVAL_TIME = Double.NaN;
 

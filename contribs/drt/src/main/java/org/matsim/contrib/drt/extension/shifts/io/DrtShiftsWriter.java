@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -69,7 +69,7 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
 
             //Write break, if present
             if (shift.getBreak() != null) {
-                final ShiftBreak shiftBreak = shift.getBreak();
+                final DrtShiftBreak shiftBreak = shift.getBreak();
                 atts.clear();
                 atts.add(createTuple(EARLIEST_BREAK_START_TIME, shiftBreak.getEarliestBreakStartTime()));
                 atts.add(createTuple(LATEST_BREAK_END_TIME, shiftBreak.getLatestBreakEndTime()));

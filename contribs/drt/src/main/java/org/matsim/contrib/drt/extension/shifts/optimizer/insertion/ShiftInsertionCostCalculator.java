@@ -18,7 +18,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
@@ -82,7 +82,7 @@ public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<
 		for (int s = pickupIdx; s < dropoffIdx; s++) {
 			Waypoint.Stop stop = vEntry.stops.get(s);
 			if (stop.task instanceof ShiftBreakTask) {
-				final ShiftBreak shiftBreak = ((ShiftBreakTask)stop.task).getShiftBreak();
+				final DrtShiftBreak shiftBreak = ((ShiftBreakTask)stop.task).getShiftBreak();
 				if (shiftBreak != null) {
 					if (stop.task.getBeginTime() + pickupDetourTimeLoss > shiftBreak.getScheduledLatestArrival()) {
 						return false;
@@ -99,7 +99,7 @@ public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<
 		for (int s = dropoffIdx; s < vEntry.stops.size(); s++) {
 			Waypoint.Stop stop = vEntry.stops.get(s);
 			if (stop.task instanceof ShiftBreakTask) {
-				final ShiftBreak shiftBreak = ((ShiftBreakTask)stop.task).getShiftBreak();
+				final DrtShiftBreak shiftBreak = ((ShiftBreakTask)stop.task).getShiftBreak();
 				if (shiftBreak != null) {
 					final double beginTime = stop.task.getBeginTime();
 					if (beginTime + totalTimeLoss > shiftBreak.getScheduledLatestArrival()) {

@@ -1,9 +1,9 @@
 package org.matsim.contrib.drt.extension.shifts.shift;
 
 /**
- * @author nkuehnel, fzwick
+ * @author nkuehnel, fzwick / MOIA
  */
-public interface ShiftBreak {
+public interface DrtShiftBreak {
 
     double getEarliestBreakStartTime();
 

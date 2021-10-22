@@ -2,19 +2,17 @@ package org.matsim.contrib.drt.extension.shifts.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftFactory;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import java.util.Stack;
 
 /**
- * @author nkuehnel
+ * @author nkuehnel / MOIA
  */
 public class DrtShiftsReader extends MatsimXmlParser {
+
     private final static String ROOT = "shifts";
 
     private final static String SHIFT_NAME = "shift";
@@ -30,15 +28,13 @@ public class DrtShiftsReader extends MatsimXmlParser {
 
     private static final Logger log = Logger.getLogger( DrtShiftsReader.class ) ;
 
-    private final DrtShifts shifts;
-    private final DrtShiftFactory builder;
+    private final DrtShiftsSpecification shiftsSpecification;
 
-    private DrtShift currentShift;
+    private DrtShiftSpecificationImpl.Builder currentBuilder;
 
-    public DrtShiftsReader( final DrtShifts shifts){
+    public DrtShiftsReader( final DrtShiftsSpecification shiftsSpecification){
         log.info("Using " + this.getClass().getName());
-        this.shifts = shifts;
-        this.builder = this.shifts.getFactory();
+		this.shiftsSpecification = shiftsSpecification;
         this.setValidating(false);
     }
 
@@ -46,17 +42,18 @@ public class DrtShiftsReader extends MatsimXmlParser {
     public void startTag(final String name, final Attributes atts, final Stack<String> context ){
         switch( name ){
             case SHIFT_NAME:
-                currentShift = this.builder.createShift( Id.create( atts.getValue(ID), DrtShift.class ) );
-                currentShift.setStartTime(Double.parseDouble(atts.getValue(START_TIME)));
-                currentShift.setEndTime(Double.parseDouble(atts.getValue(END_TIME)));
-                this.shifts.addShift(currentShift);
+				DrtShiftSpecificationImpl.Builder builder = DrtShiftSpecificationImpl.newBuilder();
+				builder.id(Id.create( atts.getValue(ID), DrtShift.class ));
+				builder.start(Double.parseDouble(atts.getValue(START_TIME)));
+				builder.end(Double.parseDouble(atts.getValue(END_TIME)));
+                currentBuilder = builder;
                 break;
             case BREAK_NAME:
-                final double earliestStartTime = Double.parseDouble(atts.getValue(EARLIEST_BREAK_START_TIME));
-                final double latestEndTime = Double.parseDouble(atts.getValue(LATEST_BREAK_END_TIME));
-                final double duration = Double.parseDouble(atts.getValue(BREAK_DURATION));
-                final ShiftBreak shiftBreak = this.builder.createBreak(earliestStartTime, latestEndTime, duration);
-                currentShift.setBreak(shiftBreak);
+				final DrtShiftBreakSpecificationImpl.Builder shiftBreakBuilder = DrtShiftBreakSpecificationImpl.newBuilder();
+				shiftBreakBuilder.earliestStart(Double.parseDouble(atts.getValue(EARLIEST_BREAK_START_TIME)));
+				shiftBreakBuilder.latestEnd(Double.parseDouble(atts.getValue(LATEST_BREAK_END_TIME)));
+				shiftBreakBuilder.duration(Double.parseDouble(atts.getValue(BREAK_DURATION)));
+				currentBuilder.shiftBreak(shiftBreakBuilder.build());
                 break;
             case ROOT:
                 break;
@@ -67,6 +64,9 @@ public class DrtShiftsReader extends MatsimXmlParser {
 
     @Override
     public void endTag(String name, String content, Stack<String> context) {
-
+		if(SHIFT_NAME.equals(name)) {
+			shiftsSpecification.addShiftSpecification(currentBuilder.build());
+			currentBuilder = null;
+		}
     }
 }

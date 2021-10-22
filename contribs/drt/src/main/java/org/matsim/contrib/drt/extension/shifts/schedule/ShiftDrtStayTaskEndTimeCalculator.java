@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.shift.ShiftBreak;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class ShiftDrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.
     @Override
     public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
         if(task instanceof ShiftBreakTask) {
-            final ShiftBreak shiftBreak = ((ShiftBreakTask) task).getShiftBreak();
+            final DrtShiftBreak shiftBreak = ((ShiftBreakTask) task).getShiftBreak();
             return newBeginTime + shiftBreak.getDuration();
         } else if(task instanceof ShiftChangeOverTask) {
             return Math.max(newBeginTime, ((ShiftChangeOverTask) task).getShiftEndTime()) + config.getChangeoverDuration();
