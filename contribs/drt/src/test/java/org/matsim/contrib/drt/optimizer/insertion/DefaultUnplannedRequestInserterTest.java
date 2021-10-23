@@ -139,7 +139,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		//make sure the retry queue contains an updated copy of request1 pending retry at time 25 (retry is ON)
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval - 1)).isEmpty();
-		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingFieldByFieldElementComparator()
+		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request1)
 						.latestStartTime(request1.getLatestStartTime() + retryInterval)
 						.latestArrivalTime(request1.getLatestArrivalTime() + retryInterval)

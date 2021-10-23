@@ -89,7 +89,8 @@ public class DrtEventsReadersTest {
 						ControlerConfigGroup.EventsFileFormat.xml);
 		eventsManager.finishProcessing();
 
-		assertThat(handler.handledEvents).usingFieldByFieldElementComparator().containsExactlyElementsOf(drtEvents);
+		assertThat(handler.handledEvents).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyElementsOf(drtEvents);
 	}
 
 	private TaskStartedEvent taskStarted(double time, DrtTaskType taskType, int taskIndex, Id<Link> linkId) {
