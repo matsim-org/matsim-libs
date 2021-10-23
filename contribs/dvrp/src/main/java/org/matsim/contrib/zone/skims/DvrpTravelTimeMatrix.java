@@ -33,6 +33,7 @@ import org.matsim.contrib.zone.ZonalSystems;
 public class DvrpTravelTimeMatrix {
 	private final SquareGridSystem gridSystem;
 	private final Matrix freeSpeedTravelTimeMatrix;
+	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
 	public DvrpTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
 			double qSimTimeStepSize) {
@@ -42,11 +43,17 @@ public class DvrpTravelTimeMatrix {
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(dvrpNetwork, centralNodes, 0,
 				travelTime, travelDisutility, numberOfThreads);
+		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(dvrpNetwork,
+				params.getMaxNeighborDistance(), 0, travelTime, travelDisutility, numberOfThreads);
 	}
 
 	public int getFreeSpeedTravelTime(Node fromNode, Node toNode) {
 		if (fromNode == toNode) {
 			return 0;
+		}
+		int time = freeSpeedTravelTimeSparseMatrix.get(fromNode, toNode);
+		if (time >= 0) {// value is present
+			return time;
 		}
 		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
 	}
