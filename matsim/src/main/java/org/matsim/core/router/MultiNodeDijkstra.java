@@ -113,8 +113,8 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 	}
 	
 	@Override
-	/*package*/ Node searchLogic( final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes,
-				      Id<Person> personId, Id<Vehicle> vehicleId ) {
+	/*package*/ Node searchLogic( final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes, Person person,
+				      Vehicle vehicle ) {
 		
 		// If it is an imaginary node...
 		if (toNode instanceof ImaginaryNode) {
@@ -143,7 +143,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 					if (minCostNode == null) {
 						if ( log.isTraceEnabled() ) {
 							log.trace("No route was found from node " + fromNode.getId() + " to any of the destination nodes was found.");
-							log.trace("PersonID=" + personId + "; vehicleID=" + vehicleId );
+							log.trace( Dijkstra.createInfoMessage( person, vehicle ) );
 							// seems we have no more nodes left, but not yet reached all endNodes...
 							StringBuffer sb = new StringBuffer("\tnot reached destionation nodes: ");
 							for (InitialNode endNode : endNodes.values()) {
@@ -157,7 +157,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 					if (searchAllEndNodes && endNodes.size() > 0) {
 						for (InitialNode endNode : endNodes.values()) {
 							log.trace("No route was found from node " + fromNode.getId() + " to destination node " + endNode.node.getId() + ".");
-							log.trace("PersonID=" + personId + "; vehicleID=" + vehicleId );
+							log.trace( Dijkstra.createInfoMessage( person, vehicle ) );
 						}
 					}
 					
@@ -199,7 +199,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 			return minCostNode;
 		} 
 		// ... otherwise: default behaviour.
-		else return super.searchLogic(fromNode, toNode, pendingNodes, personId, vehicleId );
+		else return super.searchLogic(fromNode, toNode, pendingNodes, person, vehicle );
 	}
 	
 	/*
