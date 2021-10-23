@@ -231,7 +231,7 @@ import org.matsim.vehicles.Vehicle;
 		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
-		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes);
+		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes, person2, vehicle2 );
 		
 		if (foundToNode == null) return null;
 		else {
@@ -293,15 +293,17 @@ import org.matsim.vehicles.Vehicle;
 	 * Returns the last node of the path. By default this is the to-node.
 	 * The MultiNodeDijkstra returns the cheapest of all given to-nodes.
 	 */
-	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
-		
+	/*package*/ Node searchLogic( final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes, Person person, Vehicle vehicle ) {
+		// It is a bit overkill to pass Person and Vehicle.  However, since the method is package-private, I think that it is acceptable.  For
+		// a more public method, presumably only an "info" string should be passed.  kai, oct'21
+
 		boolean stillSearching = true;
 		
 		while (stillSearching) {
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". Some possible reasons:");
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". " + createInfoMessage( person, vehicle ) + "Some possible reasons:" );
 				log.warn("  * Network is not connected.  Run NetworkCleaner().") ;
 				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
 				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
@@ -317,7 +319,23 @@ import org.matsim.vehicles.Vehicle;
 		}
 		return toNode;
 	}
-	
+	static StringBuilder createInfoMessage( Person person, Vehicle vehicle ){
+		StringBuilder strb = new StringBuilder();
+		boolean flag = false ;
+		if ( person != null ) {
+			strb.append( person.getId() );
+			flag = true ;
+		}
+		if ( vehicle !=null ) {
+			strb.append( vehicle.getId() );
+			flag = true;
+		}
+		if ( flag ) {
+			strb.append( ". " );
+		}
+		return strb;
+	}
+
 	/**
 	 * Constructs the path after the algorithm has been run.
 	 *
