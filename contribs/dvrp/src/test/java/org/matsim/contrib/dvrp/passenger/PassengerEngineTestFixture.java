@@ -108,6 +108,6 @@ public class PassengerEngineTestFixture {
 		assertThat(recordedEvents.size()).isGreaterThanOrEqualTo(events.length);
 		var recordedPassengerEvents = recordedEvents.stream()
 				.filter(e -> e instanceof HasPersonId && ((HasPersonId)e).getPersonId().equals(PERSON_ID));
-		assertThat(recordedPassengerEvents).usingFieldByFieldElementComparator().containsExactly(events);
+		assertThat(recordedPassengerEvents).usingRecursiveFieldByFieldElementComparator().containsExactly(events);
 	}
 }
