@@ -86,7 +86,8 @@ public class TaxiEventsReadersTest {
 						ControlerConfigGroup.EventsFileFormat.xml);
 		eventsManager.finishProcessing();
 
-		assertThat(handler.handledEvents).usingFieldByFieldElementComparator().containsExactlyElementsOf(taxiEvents);
+		assertThat(handler.handledEvents).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyElementsOf(taxiEvents);
 	}
 
 	private TaskStartedEvent taskStarted(double time, TaxiTaskType taskType, int taskIndex, Id<Link> linkId) {
