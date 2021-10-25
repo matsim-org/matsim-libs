@@ -66,7 +66,7 @@ public class DrtRequestInsertionRetryQueueTest {
 
 		//retry
 		double now = SUBMISSION_TIME + 2;
-		assertThat(queue.getRequestsToRetryNow(now)).usingFieldByFieldElementComparator()
+		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request)
 						.latestStartTime(now + MAX_WAIT_TIME)
 						.latestArrivalTime(now + MAX_TRAVEL_TIME)
@@ -83,7 +83,7 @@ public class DrtRequestInsertionRetryQueueTest {
 
 		//retry
 		double now = 999999;// no guarantee the method is called every second, so let's make a very late call
-		assertThat(queue.getRequestsToRetryNow(now)).usingFieldByFieldElementComparator()
+		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request)
 						.latestStartTime(now + MAX_WAIT_TIME)
 						.latestArrivalTime(now + MAX_TRAVEL_TIME)

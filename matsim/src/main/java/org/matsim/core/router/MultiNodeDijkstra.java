@@ -31,11 +31,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * <p>An extended implementation of the Dijkstra algorithm that supports multiple
@@ -111,7 +113,8 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 	}
 	
 	@Override
-	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
+	/*package*/ Node searchLogic( final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes, Person person,
+				      Vehicle vehicle ) {
 		
 		// If it is an imaginary node...
 		if (toNode instanceof ImaginaryNode) {
@@ -140,6 +143,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 					if (minCostNode == null) {
 						if ( log.isTraceEnabled() ) {
 							log.trace("No route was found from node " + fromNode.getId() + " to any of the destination nodes was found.");
+							log.trace( Dijkstra.createInfoMessage( person, vehicle ) );
 							// seems we have no more nodes left, but not yet reached all endNodes...
 							StringBuffer sb = new StringBuffer("\tnot reached destionation nodes: ");
 							for (InitialNode endNode : endNodes.values()) {
@@ -153,6 +157,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 					if (searchAllEndNodes && endNodes.size() > 0) {
 						for (InitialNode endNode : endNodes.values()) {
 							log.trace("No route was found from node " + fromNode.getId() + " to destination node " + endNode.node.getId() + ".");
+							log.trace( Dijkstra.createInfoMessage( person, vehicle ) );
 						}
 					}
 					
@@ -194,7 +199,7 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 			return minCostNode;
 		} 
 		// ... otherwise: default behaviour.
-		else return super.searchLogic(fromNode, toNode, pendingNodes);
+		else return super.searchLogic(fromNode, toNode, pendingNodes, person, vehicle );
 	}
 	
 	/*
