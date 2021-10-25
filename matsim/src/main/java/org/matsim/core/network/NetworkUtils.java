@@ -856,6 +856,13 @@ public final class NetworkUtils {
 		return network;
 	}
 	
+	@Deprecated
+	public static Network readNetwork(String string) {
+		log.warn("Using NetworkUtils.readNetwork() is deprecated. Use readNetwork(Path, Config) or readTimeInvariantNetwork(Path) and see createNetwork() for further information.");
+		return readTimeInvariantNetwork(string);
+	}
+
+	
 	/**
 	 * reads network form file and applies a coordinate transformation.
 	 * @param filename network file name
