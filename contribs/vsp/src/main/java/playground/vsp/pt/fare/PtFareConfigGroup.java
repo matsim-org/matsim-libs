@@ -3,6 +3,7 @@ package playground.vsp.pt.fare;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.Map;
 
 public class PtFareConfigGroup extends ReflectiveConfigGroup {
@@ -12,15 +13,16 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     public static final String APPLY_UPPER_BOUND = "applyUpperBound";
     public static final String UPPER_BOUND_FACTOR = "upperBoundFactor";
 
+    public enum PtFareCalculationModels {distanceBased} // More to come (e.g. zone based, hybrid...)
+
+    private PtFareCalculationModels ptFareCalculation = PtFareCalculationModels.distanceBased; // Use distance based calculation by default
+    private boolean applyUpperBound = true;
+    @PositiveOrZero
+    private double upperBoundFactor = 1.5;
+
     public PtFareConfigGroup() {
         super(MODULE_NAME);
     }
-
-    private String ptFareCalculation = DistanceBasedPtFareParams.SET_NAME; // Use distance based calculation by default
-    private boolean applyUpperBound = true;
-
-    @PositiveOrZero
-    private double upperBoundFactor = 1.5;
 
     @Override
     public Map<String, String> getComments() {
@@ -34,12 +36,12 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringGetter(PT_FARE_CALCULATION)
-    public String getPtFareCalculation() {
+    public PtFareCalculationModels getPtFareCalculation() {
         return ptFareCalculation;
     }
 
     @StringSetter(PT_FARE_CALCULATION)
-    public void setPtFareCalculation(String ptFareCalculation) {
+    public void setPtFareCalculationModel(PtFareCalculationModels ptFareCalculation) {
         this.ptFareCalculation = ptFareCalculation;
     }
 
