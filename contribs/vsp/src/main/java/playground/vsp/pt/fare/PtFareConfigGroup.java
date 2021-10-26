@@ -27,7 +27,7 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
-        map.put(PT_FARE_CALCULATION, "PT fare calculation scheme. Current implementation: distanceBasedPtFare (more to come...)");
+        map.put(PT_FARE_CALCULATION, "PT fare calculation scheme. Current implementation: distanceBased (more to come...)");
         map.put(APPLY_UPPER_BOUND, "Enable the upper bound for daily PT fare to count for ticket subscription. Input value: true or false");
         map.put(UPPER_BOUND_FACTOR, "When upper bound is applied, upperBound  = upperBoundFactor * max Fare of the day. " +
                 "This value is decided by the ratio between average daily cost of a ticket subscription and the single " +

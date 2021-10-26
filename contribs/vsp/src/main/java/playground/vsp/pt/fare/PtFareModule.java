@@ -1,11 +1,14 @@
 package playground.vsp.pt.fare;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 
 public class PtFareModule extends AbstractModule {
 
     @Override
     public void install() {
+        getConfig().planCalcScore().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
+        getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
         PtFareConfigGroup ptFareConfigGroup = new PtFareConfigGroup();
         if (ptFareConfigGroup.getPtFareCalculation() == PtFareConfigGroup.PtFareCalculationModels.distanceBased) {
             DistanceBasedPtFareParams distanceBasedPtFareParams = new DistanceBasedPtFareParams();
