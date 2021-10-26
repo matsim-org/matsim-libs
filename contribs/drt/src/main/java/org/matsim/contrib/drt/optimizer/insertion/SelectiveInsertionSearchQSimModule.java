@@ -27,9 +27,9 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -57,9 +57,15 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			var provider = SelectiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
 					getter.getModal(DvrpTravelTimeMatrix.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			var insertionCostCalculator = insertionCostCalculatorFactory.create(PathData::getTravelTime, null);
+			// Use 0 as the cost for the selected insertion:
+			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
+			//   no other insertion to compare with.
+			// - We assume that the travel times obtained from DvrpTravelTimeMatrix are reasonably well estimated(*),
+			//   so we do not want to check for time window violations
+			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
+			InsertionCostCalculator<PathData> zeroCostInsertionCostCalculator = (drtRequest, insertion) -> 0;
 			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
-					insertionCostCalculator);
+					zeroCostInsertionCostCalculator);
 		})).asEagerSingleton();
 
 		addModalComponent(SingleInsertionDetourPathCalculator.class,
