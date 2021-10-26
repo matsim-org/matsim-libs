@@ -1,10 +1,12 @@
 package org.matsim.contrib.drt.extension.shifts.config;
 
+import java.net.URL;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-
-import java.util.Map;
 
 /**
  * @author nkuehnel / MOIA
@@ -113,12 +115,22 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
         return this.shiftInputFile;
     }
 
-    @StringGetter( OPERATION_FACILITY_INPUT_FILE )
+	public URL getShiftInputUrl(URL context) {
+		return shiftInputFile == null ? null : ConfigGroup.getInputFileURL(context, shiftInputFile);
+	}
+
+	@StringGetter( OPERATION_FACILITY_INPUT_FILE )
     public String getOperationFacilityInputFile() {
         return this.operationFacilityInputFile;
     }
 
-    @StringGetter( CHANGEOVER_DURATION )
+	public URL getOperationFacilityInputUrl(URL context) {
+		return operationFacilityInputFile == null ?
+				null :
+				ConfigGroup.getInputFileURL(context, operationFacilityInputFile);
+	}
+
+	@StringGetter( CHANGEOVER_DURATION )
     public double getChangeoverDuration() {
         return this.changeoverDuration;
     }

@@ -32,7 +32,7 @@ public class ShiftsModule extends AbstractDvrpModeModule {
 		if (shiftConfig.getShiftInputFile() != null) {
 			bindModal(DrtShiftsSpecification.class).toProvider(() -> {
 				DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
-				new DrtShiftsReader(drtShiftsSpecification).readFile(shiftConfig.getShiftInputFile());
+				new DrtShiftsReader(drtShiftsSpecification).readURL(shiftConfig.getShiftInputUrl(getConfig().getContext()));
 				return drtShiftsSpecification;
 			}).asEagerSingleton();
 		}
@@ -40,7 +40,7 @@ public class ShiftsModule extends AbstractDvrpModeModule {
 		if (shiftConfig.getOperationFacilityInputFile() != null) {
 			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
 				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
-				new OperationFacilitiesReader(operationFacilitiesSpecification).readFile(shiftConfig.getOperationFacilityInputFile());
+				new OperationFacilitiesReader(operationFacilitiesSpecification).readURL(shiftConfig.getOperationFacilityInputUrl(getConfig().getContext()));
 				return operationFacilitiesSpecification;
 			}).asEagerSingleton();
 		}

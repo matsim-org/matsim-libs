@@ -1,8 +1,13 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -10,8 +15,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -20,11 +23,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-
-import java.net.URL;
-import java.util.*;
 
 public class RunShiftDrtScenarioIT {
 
@@ -36,11 +35,11 @@ public class RunShiftDrtScenarioIT {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 
-		URL fleet = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenFleet.xml");
-		URL plans = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenPlans.xml.gz");
-		URL network = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenNetwork.xml.gz");
-		URL opFacilities = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenOperationFacilities.xml");
-		URL shifts = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenShifts.xml");
+		String fleetFile = "holzkirchenFleet.xml";
+		String plansFile = "holzkirchenPlans.xml.gz";
+		String networkFile = "holzkirchenNetwork.xml.gz";
+		String opFacilitiesFile = "holzkirchenOperationFacilities.xml";
+		String shiftsFile = "holzkirchenShifts.xml";
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
 				.setMaxTravelTimeAlpha(1.5)
@@ -49,7 +48,7 @@ public class RunShiftDrtScenarioIT {
 				.setMaxWaitTime(600.)
 				.setRejectRequestIfMaxWaitOrTravelTimeViolated(true)
 				.setUseModeFilteredSubnetwork(false)
-				.setVehiclesFile(fleet.getFile())
+				.setVehiclesFile(fleetFile)
 				.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door)
 				.setPlotDetailedCustomerStats(true)
 				.setMaxWalkDistance(1000.)
@@ -81,6 +80,7 @@ public class RunShiftDrtScenarioIT {
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
+		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();
 		modes.add("drt");
@@ -91,8 +91,8 @@ public class RunShiftDrtScenarioIT {
 		PlanCalcScoreConfigGroup.ModeParams scoreParams2 = new PlanCalcScoreConfigGroup.ModeParams("walk");
 		config.planCalcScore().addModeParams(scoreParams2);
 
-		config.plans().setInputFile(plans.getFile());
-		config.network().setInputFile(network.getFile());
+		config.plans().setInputFile(plansFile);
+		config.network().setInputFile(networkFile);
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
@@ -127,8 +127,8 @@ public class RunShiftDrtScenarioIT {
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
 
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilities.getFile());
-		shiftDrtConfigGroup.setShiftInputFile(shifts.getFile());
+		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
 		shiftDrtConfigGroup.setAllowInFieldChangeover(infield);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);

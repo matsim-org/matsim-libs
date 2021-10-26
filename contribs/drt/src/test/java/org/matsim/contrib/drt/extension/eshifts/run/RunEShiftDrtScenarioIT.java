@@ -45,13 +45,13 @@ public class RunEShiftDrtScenarioIT {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 
-		URL fleet = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenFleet.xml");
-		URL plans = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenPlans.xml.gz");
-		URL network = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenNetwork.xml.gz");
-		URL opFacilities = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenOperationFacilities.xml");
-		URL shifts = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenShifts.xml");
-		URL chargers = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenChargers.xml");
-		URL evs = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("holzkirchen"), "holzkirchenElectricFleet.xml");
+		String fleetFile =  "holzkirchenFleet.xml";
+		String plansFile =  "holzkirchenPlans.xml.gz";
+		String networkFile =  "holzkirchenNetwork.xml.gz";
+		String opFacilitiesFile =  "holzkirchenOperationFacilities.xml";
+		String shiftsFile =  "holzkirchenShifts.xml";
+		String chargersFile =  "holzkirchenChargers.xml";
+		String evsFile =  "holzkirchenElectricFleet.xml";
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
 				.setMaxTravelTimeAlpha(1.5)
@@ -60,7 +60,7 @@ public class RunEShiftDrtScenarioIT {
 				.setMaxWaitTime(600.)
 				.setRejectRequestIfMaxWaitOrTravelTimeViolated(true)
 				.setUseModeFilteredSubnetwork(false)
-				.setVehiclesFile(fleet.getFile())
+				.setVehiclesFile(fleetFile)
 				.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door)
 				.setPlotDetailedCustomerStats(true)
 				.setMaxWalkDistance(1000.)
@@ -92,6 +92,7 @@ public class RunEShiftDrtScenarioIT {
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
+		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
 
 		Set<String> modes = new HashSet<>();
 		modes.add("drt");
@@ -102,8 +103,8 @@ public class RunEShiftDrtScenarioIT {
 		PlanCalcScoreConfigGroup.ModeParams scoreParams2 = new PlanCalcScoreConfigGroup.ModeParams("walk");
 		config.planCalcScore().addModeParams(scoreParams2);
 
-		config.plans().setInputFile(plans.getFile());
-		config.network().setInputFile(network.getFile());
+		config.plans().setInputFile(plansFile);
+		config.network().setInputFile(networkFile);
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
@@ -138,8 +139,8 @@ public class RunEShiftDrtScenarioIT {
 		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
 
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilities.getFile());
-		shiftDrtConfigGroup.setShiftInputFile(shifts.getFile());
+		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
 		shiftDrtConfigGroup.setAllowInFieldChangeover(infield);
 
 		//e shifts
@@ -147,9 +148,9 @@ public class RunEShiftDrtScenarioIT {
 		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.setChargersFile(chargers.getFile());
+		evConfigGroup.setChargersFile(chargersFile);
 		evConfigGroup.setMinimumChargeTime(0);
-		evConfigGroup.setVehiclesFile(evs.getFile());
+		evConfigGroup.setVehiclesFile(evsFile);
 		evConfigGroup.setTimeProfiles(true);
 		config.addModule(evConfigGroup);
 
