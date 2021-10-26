@@ -52,7 +52,6 @@ public class RunShiftDrtScenarioIT {
 				.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door)
 				.setPlotDetailedCustomerStats(true)
 				.setMaxWalkDistance(1000.)
-				.setNumberOfThreads(6)
 				.setIdleVehiclesReturnToDepots(false);
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
