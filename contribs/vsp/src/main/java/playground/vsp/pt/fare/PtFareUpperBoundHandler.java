@@ -22,6 +22,7 @@ import java.util.Map;
  * e.g. ticket subscription). If the upper bound is reached, refund will be issued at the end of the
  * iteration (i.e. after Mobsim). In that case, we assume that PT user is a frequent traveller and will use subscription
  * instead of single tickets.
+ * @author Chengqi Lu (luchengqi7)
  */
 public class PtFareUpperBoundHandler implements PersonMoneyEventHandler, AfterMobsimListener {
     public static final String PT_REFUND = "pt fare refund";

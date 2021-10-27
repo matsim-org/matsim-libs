@@ -16,7 +16,7 @@ import java.util.Map;
 public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
     public static final String PT_FARE_DISTANCE_BASED = "distance based pt fare";
 
-    public static final String SET_NAME = "distanceBasedPtFare";
+    public static final String SET_NAME = "ptFareCalculationDistanceBased";
     public static final String MIN_FARE = "minFare";
     public static final String SHORT_TRIP_SLOPE = "shortTripSlope";
     public static final String SHORT_TRIP_INTERCEPT = "shortTripIntercept";
