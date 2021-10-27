@@ -1,3 +1,5 @@
+Simulated travel demand data were provided by the Professorship of Travel Behavior at the Technical University of Munich (Prof. Dr. Rolf Moeckel)
+
 Based on (and extended with basic shifts support) 
 
 Zwick et al. (2021)
