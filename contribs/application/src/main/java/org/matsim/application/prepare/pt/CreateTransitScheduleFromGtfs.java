@@ -28,7 +28,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 
@@ -328,6 +330,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					lineVehicleType = ptVehicleType;
 			}
 
+			Set<TransitRoute> toRemove = new HashSet<>();
+
 			for (TransitRoute route: line.getRoutes().values()) {
 				int routeVehId = 0; // simple counter for vehicle id _per_ TransitRoute
 
@@ -335,7 +339,15 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				List<TransitRouteStop> routeStops = route.getStops();
 				if (routeStops.size() < 2) {
 					log.warn("TransitRoute with less than 2 stops found: line {}, route {}", line.getId(), route.getId());
+					toRemove.add(route);
 					continue;
+				}
+
+				// create vehicles for Departures
+				for (Departure departure: route.getDepartures().values()) {
+					Vehicle veh = vehicleFactory.createVehicle(Id.create("pt_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
+					scenario.getTransitVehicles().addVehicle(veh);
+					departure.setVehicleId(veh.getId());
 				}
 
 				double lastDepartureOffset = route.getStops().get(0).getDepartureOffset().seconds();
@@ -361,13 +373,6 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					lastDepartureOffset = routeStop.getDepartureOffset().seconds();
 				}
 
-				// create vehicles for Departures
-				for (Departure departure: route.getDepartures().values()) {
-					Vehicle veh = vehicleFactory.createVehicle(Id.create("pt_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
-					scenario.getTransitVehicles().addVehicle(veh);
-					departure.setVehicleId(veh.getId());
-				}
-
 				// tag RE, RB, S- and U-Bahn stations for Drt stop filter attribute
 				if (!stopFilter.isEmpty()) {
 					for (TransitRouteStop routeStop: route.getStops()) {
@@ -375,6 +380,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					}
 				}
 			}
+
+			toRemove.forEach(line::removeRoute);
 		}
 
 		return scenario;
