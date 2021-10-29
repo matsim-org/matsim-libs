@@ -82,12 +82,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
      * getTravelTime(org.matsim.contrib.analysis.vsp.traveltimes.CarTrip)
      */
     @Override
-    public Tuple<Double, Double> getTravelTime(CarTrip trip) {
-        String tripId = trip.getPersonId().toString() + "_" + trip.getDepartureTime();
-        return getTravelTime(trip.getDepartureLocation(), trip.getArrivalLocation(), trip.getDepartureTime(), tripId);
-    }
-
-    @Override
     public Tuple<Double, Double> getTravelTime(Coord fromCoord, Coord toCoord, double departureTime, String tripId) {
         long travelTime = 0;
         long distance = 0;

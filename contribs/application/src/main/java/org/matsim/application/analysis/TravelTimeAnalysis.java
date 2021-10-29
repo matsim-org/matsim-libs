@@ -11,6 +11,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.*;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.utils.collections.Tuple;
@@ -48,11 +49,14 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--output", defaultValue = "travelTimeValidation", description = "Name of output folder", required = true)
     private String output;
 
-    @CommandLine.Option(names = "--api", description = "Online API used. Choose from [HERE, GOOGLE_MAP]", defaultValue = "HERE", required = true)
+    @CommandLine.Option(names = "--api", description = "Online API used.", defaultValue = "HERE", required = true, showDefaultValue = CommandLine.Help.Visibility.ALWAYS)
     private API api;
 
-    @CommandLine.Option(names = "--api-key", description = "API key. You can apply for free API key on their website", required = true)
+    @CommandLine.Option(names = "--api-key", description = "API key. You can apply for free API key on their website", required = false)
     private String appCode;
+
+    @CommandLine.Option(names = "--network", description = "Path to network file if API=NETWORK_FILE ", required = false)
+    private Path timeVariantNetwork;
 
     @CommandLine.Option(names = "--date", description = "The date to validate travel times for, format: YYYY-MM-DD")
     private LocalDate date;
@@ -78,10 +82,8 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Mixin
     private ShpOptions shp = new ShpOptions();
 
-    private final Random rnd = new Random(1234);
-
     enum API {
-        HERE, GOOGLE_MAP
+        HERE, GOOGLE_MAP, NETWORK_FILE
     }
 
     enum AnalysisTypes {
@@ -133,6 +135,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
             } else if (api == API.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else if (api == API.NETWORK_FILE) {
+                NetworkConfigGroup configGroup = new NetworkConfigGroup();
+                configGroup.setTimeVariantNetwork(true);
+                validator = new TimeVariantNetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }
@@ -165,6 +171,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
                 validator = new HereMapsRouteValidator(outputFolder, appCode, "2021-01-01", transformation, writeDetails);
             } else if (api == API.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, appCode, date.toString(), transformation, writeDetails);
+            } else if (api == API.NETWORK_FILE) {
+                NetworkConfigGroup configGroup = new NetworkConfigGroup();
+                configGroup.setTimeVariantNetwork(true);
+                validator = new TimeVariantNetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }
