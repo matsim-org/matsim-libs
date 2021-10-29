@@ -23,7 +23,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,7 +47,7 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
+import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -73,20 +74,20 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     private Set<Id<Person>> freightDrivers = new HashSet<>();
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
 	private StrategyManager strategyManager;
-    private final static Logger log = Logger.getLogger(DefaultCommercialJobGenerator.class);
+    private final static Logger log = LogManager.getLogger(DefaultCommercialJobGenerator.class);
 	private int changeOperatorInterval;
     private Set<String> drtModes = new HashSet<>();
-    private VRPTransportCosts vrpTransportCosts;
+    private VRPTransportCostsFactory vrpTransportCostsFactory;
 
     @Inject
-    DefaultCommercialJobGenerator(StrategyManager strategyManager, Scenario scenario, Carriers carriers, VRPTransportCosts vrpTransportCosts) {
+    DefaultCommercialJobGenerator(StrategyManager strategyManager, Scenario scenario, Carriers carriers, VRPTransportCostsFactory vrpTransportCostsFactory) {
         JointDemandConfigGroup cfg = JointDemandConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firstTourTraveltimeBuffer = cfg.getFirstLegTraveltimeBufferFactor();
         this.scenario = scenario;
         this.strategyManager = strategyManager;
         this.changeOperatorInterval = cfg.getChangeCommercialJobOperatorInterval();
-        this.vrpTransportCosts = vrpTransportCosts;
+        this.vrpTransportCostsFactory = vrpTransportCostsFactory;
         getDrtModes(scenario.getConfig());
     }
 
@@ -176,7 +177,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 							double expectedArrivalTime = nextLeg.getDepartureTime().seconds()
 									- Double.parseDouble(Objects.requireNonNull(currentActivity.getAttributes().getAttribute(SERVICE_DURATION_NAME)).toString());
 
-							// Set endTimes to avoid an too early departure after service
+							// Set endTimes to avoid a too early departure after service
 							// The earliestPrevActEndTime will include a waiting time,
 							// for which the vehicle remains at previous activity
 							double earliestPrevActEndTime = expectedArrivalTime - prevLeg.getTravelTime().seconds();
@@ -195,7 +196,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 					double initialLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob * this.firstTourTraveltimeBuffer;
 					double expectedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firstTourTraveltimeBuffer;
 
-					//Set optimal endTimes to avoid an too early arrival at first job
+					//Set optimal endTimes to avoid a too early arrival at first job
 					 planElements.get(i+2).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expectedArrivalTimeAtFirstJob );
 					currentActivity.setEndTime(initialLegDepartureTime);
 					((Leg) planElements.get(i+1)).setDepartureTime(initialLegDepartureTime);
@@ -359,7 +360,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
     }
 
     private void buildTours() throws InterruptedException, ExecutionException {
-        TourPlanning.runTourPlanningForCarriers(carriers,scenario,vrpTransportCosts);
+        TourPlanning.runTourPlanningForCarriers(carriers,scenario,vrpTransportCostsFactory.createVRPTransportCosts());
     }
 
     private static Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x) {
@@ -401,7 +402,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 	}
 
 	/**
-	 * Enable or disable ChangeCommercialJobOperator strategy depending to current situation
+	 * Enable or disable ChangeCommercialJobOperator strategy depending on current situation
 	 */
 	private void toggleChangeCommercialJobOperatorStrategy(int currentIteration) {
 
