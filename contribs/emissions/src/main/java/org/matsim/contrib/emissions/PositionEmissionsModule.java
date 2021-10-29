@@ -70,7 +70,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		@Inject
 		private EmissionModule emissionModule;
 
-		Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time, double speed) {
+		Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time) {
 
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
@@ -96,6 +96,10 @@ public class PositionEmissionsModule extends AbstractModule {
 		}
 
 		private Map<Pollutant, Double> getEmptyColdEmissions() {
+			return emissionModule.getColdPollutants().stream().collect(Collectors.toMap(p -> p, p -> 0.0));
+		}
+
+		private Map<Pollutant, Double> getEmptyWarmEmissions() {
 			return emissionModule.getWarmPollutants().stream().collect(Collectors.toMap(p -> p, p -> 0.0));
 		}
 	}
@@ -253,7 +257,7 @@ public class PositionEmissionsModule extends AbstractModule {
 					var vehicle = getVehicle(event.getVehicleId());
 
 					var coldEmissions = computeColdEmissions(event, vehicle, distanceToLastPosition);
-					var warmEmissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
+					var warmEmissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime);
 					var combinedEmissions = Stream.concat(coldEmissions.entrySet().stream(), warmEmissions.entrySet().stream())
 							.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
 
@@ -268,8 +272,7 @@ public class PositionEmissionsModule extends AbstractModule {
 				// but generate the 0 emission positions in the necdf module in the palm project but this is much easier
 				// and will do for now
 				// janek july'21
-				var emissions = emissionCalculator.emissionModule.getWarmPollutants().stream()
-						.collect(Collectors.toMap(key -> key, key -> 0.0));
+				var emissions = emissionCalculator.getEmptyWarmEmissions();
 				eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
 			}
 		}
