@@ -1,35 +1,36 @@
 package org.matsim.application.automatedCalibration;
 
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * This simple tuner will tune the ASC and marginal traveling utility by analyzing the difference between actual
- * mode share and reference mode share. One mode will be tuned each time. The distance group with the largest error
- * (non-absolute value!) and smallest error (non-absolute value!) will form an equation set. Solving for the equation
- * set, we will get the new parameters for the given mode.
+ * This simple tuner will tune the ASC and marginal traveling utility based on the error between simulated output
+ * and reference data. One mode will be tuned each time. Average travel time of trips for each distance group is
+ * calculated and the cost of the trip can then be estimated. Based on the error, we will slightly modify the cost
+ * and a new cost structure will be computed based on the linear regression. If the walk mode is being calibrated
+ * only the marginal traveling utility will be tuned and the ASC for walk will always remain 0.
  */
 public class SimpleParameterTuner implements ParameterTuner {
-    private final Map<String, Double> speedMap = new HashMap<>();
+    private final String[] modes;
     private final double targetError;
+    private final DistanceGrouping distanceGrouping = new StandardDistanceGrouping();
 
-    public SimpleParameterTuner(double targetError) {
+    public SimpleParameterTuner(double targetError, String[] modes) {
         this.targetError = targetError;
-        speedMap.put(TransportMode.car, 13.8);  // 50 km/h
-        speedMap.put(TransportMode.ride, 13.8);
-        speedMap.put(TransportMode.pt, 10.0); // 36 km/h
-        speedMap.put(TransportMode.bike, 4.2); // 15 km/h
-        speedMap.put(TransportMode.walk, 1.4); // 5 km/h
+        this.modes = modes;
     }
 
     @Override
-    public void tune(Config config, Map<String, Map<Double, Double>> errorMap) {
-        String[] modes = new String[]{TransportMode.car, TransportMode.ride, TransportMode.pt, TransportMode.bike, TransportMode.walk};
+    public void tune(Config config, Map<String, Map<String, Double>> errorMap, List<AutomaticScenarioCalibrator.Trip> trips) {
+        // Find the mode to tune
         double maxError = 0;
-        String modeToTune = null;
+        String modeToTune = "unknown";
         for (String mode : modes) {
             double error = errorMap.get(mode).values().stream().mapToDouble(Math::abs).max().orElseThrow();
             if (error > maxError) {
@@ -37,73 +38,80 @@ public class SimpleParameterTuner implements ParameterTuner {
                 modeToTune = mode;
             }
         }
-        double speed = speedMap.get(modeToTune);
 
-        double upperBound = -1.0;
-        double upperBoundDistance = -1;
-        double lowerBound = 1.0;
-        double lowerBoundDistance = -1;
-
-        // Calculate upper bound and lower bound
-        Map<Double, Double> errorMapForModeToTune = errorMap.get(modeToTune);
-        for (double distance : errorMapForModeToTune.keySet()) {
-            double error = errorMapForModeToTune.get(distance);
-            if (error > upperBound) {
-                upperBound = error;
-                upperBoundDistance = distance;
+        // Calculate average travel time of the mode for each distance group
+        if (!modeToTune.equals(TransportMode.walk)) {
+            Map<String, List<Double>> relevantTrips = new HashMap<>();
+            Map<String, Double> averageTravelTimes = new HashMap<>();
+            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
+                relevantTrips.put(distanceGroup, new ArrayList<>());
             }
 
-            if (error < lowerBound) {
-                lowerBound = error;
-                lowerBoundDistance = distance;
+            for (AutomaticScenarioCalibrator.Trip trip : trips) {
+                if (trip.getMode().equals(modeToTune)) {
+                    String distanceGroup = distanceGrouping.assignDistanceGroup(trip.getDistance());
+                    relevantTrips.get(distanceGroup).add(trip.getTravelTime());
+                }
             }
+
+            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
+                double average = relevantTrips.get(distanceGroup).stream().mapToDouble(t -> t).average().orElse(0);
+                averageTravelTimes.put(distanceGroup, average);
+            }
+
+            // Tune the parameter by fitting the new cost structure
+            SimpleRegression regression = new SimpleRegression();
+            Map<String, Double> errorMapForModeToTune = errorMap.get(modeToTune);
+            double a0 = config.planCalcScore().getModes().get(modeToTune).getMarginalUtilityOfTraveling();
+            double b0 = config.planCalcScore().getModes().get(modeToTune).getConstant();
+            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
+                double x = averageTravelTimes.get(distanceGroup); // x-axis: travel time. We use average travel time of the distance group
+                double y0 = a0 * x + b0; // y-axis: the cost of the trip
+                double alpha = calculateAdjustmentRatio(errorMapForModeToTune.get(distanceGroup));
+                double y = (1 + alpha) * y0;
+                regression.addData(x, y);
+            }
+
+            double a = regression.getSlope();
+            double b = regression.getIntercept();
+
+            // Apply constriants
+            SimpleParameterConstraints simpleParameterConstraints = new SimpleParameterConstraints(config);
+            a = simpleParameterConstraints.processMarginalTravelUtility(a);
+            b = simpleParameterConstraints.processASC(b);
+
+            // Tune the parameter
+            config.planCalcScore().getModes().get(modeToTune).setMarginalUtilityOfTraveling(a);
+            config.planCalcScore().getModes().get(modeToTune).setConstant(b);
+        } else {
+            // For walk, we only tune the marginal cost and constant is always 0
+            double a0 = config.planCalcScore().getModes().get(modeToTune).getMarginalUtilityOfTraveling();
+            double totalError = 0;
+            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
+                totalError += errorMap.get(modeToTune).get(distanceGroup);
+            }
+            double a = Math.max(a0 + calculateAdjustmentForWalk(totalError), 0);
+            config.planCalcScore().getModes().get(modeToTune).setMarginalUtilityOfTraveling(a);
         }
-
-        double upperBoundAdjustment = calculateAdjustment(upperBound);
-        double lowerBoundAdjustment = calculateAdjustment(lowerBound);
-
-        double a0 = config.planCalcScore().getModes().get(modeToTune).getMarginalUtilityOfTraveling();
-        double b0 = config.planCalcScore().getModes().get(modeToTune).getConstant();
-        double t1 = upperBoundDistance / speed;
-        double t2 = lowerBoundDistance / speed;
-        double deltaC1 = (a0 * t1 + b0) * upperBoundAdjustment;
-        double deltaC2 = (a0 * t2 + b0) * lowerBoundAdjustment;
-
-        double deltaA = (deltaC2 - deltaC1) / (t2 - t1);
-        double deltaB = deltaC1 - deltaA * t1;
-
-        double a = a0 + deltaA;
-        double b = b0 + deltaB;
-
-        // Apply constriants
-        SimpleParameterConstraints simpleParameterConstraints = new SimpleParameterConstraints(config);
-        a = simpleParameterConstraints.processMarginalTravelUtility(a);
-        b = simpleParameterConstraints.processASC(b);
-
-        // Tune the parameter
-        config.planCalcScore().getModes().get(modeToTune).setMarginalUtilityOfTraveling(a);
-        config.planCalcScore().getModes().get(modeToTune).setConstant(b);
     }
 
-    private double calculateAdjustment(double error) {
+    private double calculateAdjustmentRatio(double error) {
         if (error < -4 * targetError) {
-            return -0.5;
-        }
-        if (error < -2 * targetError) {
             return -0.2;
         }
-        if (error < -1 * targetError) {
-            return -0.1;
-        }
         if (error > 4 * targetError) {
-            return 0.5;
-        }
-        if (error > 2 * targetError) {
             return 0.2;
         }
-        if (error > targetError) {
-            return 0.1;
+        return error / (20 * targetError);
+    }
+
+    private double calculateAdjustmentForWalk(double totalError) {
+        if (totalError < -0.1) {
+            return -1.0;
         }
-        return 0;
+        if (totalError > 0.1) {
+            return 1.0;
+        }
+        return 10 * totalError;
     }
 }
