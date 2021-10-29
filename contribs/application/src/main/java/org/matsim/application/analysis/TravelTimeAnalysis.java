@@ -54,7 +54,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     private String output;
 
     @CommandLine.Option(names = "--api", description = "Online API used. Choose from [HERE, GOOGLE_MAP]", defaultValue = "HERE", required = true)
-    private TravelTimeDistanceValidators api;
+    private API api;
 
     @CommandLine.Option(names = "--api-key", description = "API key. You can apply for free API key on their website", required = true)
     private String appCode;
@@ -91,7 +91,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
     private final Random rnd = new Random(1234);
 
-    enum TravelTimeDistanceValidators {
+    enum API {
         HERE, GOOGLE_MAP
     }
 
@@ -147,9 +147,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
 
             TravelTimeDistanceValidator validator;
-            if (api == TravelTimeDistanceValidators.HERE) {
+            if (api == API.HERE) {
                 validator = new HereMapsRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation, writeDetails);
-            } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
+            } else if (api == API.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
@@ -179,9 +179,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             Network network = NetworkUtils.readTimeInvariantNetwork(networkPath.toString());
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
             TravelTimeDistanceValidator validator;
-            if (api == TravelTimeDistanceValidators.HERE) {
+            if (api == API.HERE) {
                 validator = new HereMapsRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation, writeDetails);
-            } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
+            } else if (api == API.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
