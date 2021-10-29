@@ -27,9 +27,7 @@ import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
-import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.fare.TaxiFareHandler;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
@@ -63,7 +61,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		taxiCfg.getTaxiFareParams()
 				.ifPresent(params -> addEventHandlerBinding().toInstance(new TaxiFareHandler(getMode(), params)));
 
-		bindModal(TaxiStatsDumper.class).toProvider(ModalProviders.createProvider(getMode(),
+		bindModal(TaxiStatsDumper.class).toProvider(modalProvider(
 				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
 						getter.get(IterationCounter.class), getter.getModal(ExecutedScheduleCollector.class),
 						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();

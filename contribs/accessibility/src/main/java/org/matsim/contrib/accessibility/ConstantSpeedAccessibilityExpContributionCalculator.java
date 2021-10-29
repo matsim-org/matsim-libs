@@ -104,7 +104,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 		LOG.warn("Initializing calculator for mode " + mode + "...");
 		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
-		subNetwork = NetworkUtils.createNetwork();
+		subNetwork = NetworkUtils.createNetwork(config);
 		Set<String> modeSet = new HashSet<>();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		if (mode.equals(Modes4Accessibility.freespeed.name())) {

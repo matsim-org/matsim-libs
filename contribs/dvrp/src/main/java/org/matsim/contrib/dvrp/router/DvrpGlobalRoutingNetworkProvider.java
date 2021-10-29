@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 
@@ -37,11 +38,13 @@ public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 
 	private final Network network;
 	private final DvrpConfigGroup dvrpCfg;
+	private final NetworkConfigGroup networkConfigGroup;
 
 	@Inject
-	public DvrpGlobalRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
+	public DvrpGlobalRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg, NetworkConfigGroup networkConfigGroup) {
 		this.network = network;
 		this.dvrpCfg = dvrpCfg;
+		this.networkConfigGroup = networkConfigGroup;
 	}
 
 	@Override
@@ -52,7 +55,7 @@ public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 			return network;
 		}
 
-		Network filteredNetwork = NetworkUtils.createNetwork();
+		Network filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
 		new TransportModeNetworkFilter(network).filter(filteredNetwork, dvrpCfg.getNetworkModes());
 		logNetworkSize("filtered", filteredNetwork);
 		return filteredNetwork;

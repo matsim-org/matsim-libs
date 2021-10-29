@@ -2,7 +2,8 @@ package playground.vsp.pt.fare;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.Map;
 
 public class PtFareConfigGroup extends ReflectiveConfigGroup {
@@ -12,20 +13,21 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     public static final String APPLY_UPPER_BOUND = "applyUpperBound";
     public static final String UPPER_BOUND_FACTOR = "upperBoundFactor";
 
+    public enum PtFareCalculationModels {distanceBased} // More to come (e.g. zone based, hybrid...)
+
+    private PtFareCalculationModels ptFareCalculation = PtFareCalculationModels.distanceBased; // Use distance based calculation by default
+    private boolean applyUpperBound = true;
+    @PositiveOrZero
+    private double upperBoundFactor = 1.5;
+
     public PtFareConfigGroup() {
         super(MODULE_NAME);
     }
 
-    private String ptFareCalculation = DistanceBasedPtFareParams.SET_NAME; // Use distance based calculation by default
-    private boolean applyUpperBound = true;
-
-    @PositiveOrZero
-    private double upperBoundFactor = 1.5;
-
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
-        map.put(PT_FARE_CALCULATION, "PT fare calculation scheme. Current implementation: distanceBasedPtFare (more to come...)");
+        map.put(PT_FARE_CALCULATION, "PT fare calculation scheme. Current implementation: distanceBased (more to come...)");
         map.put(APPLY_UPPER_BOUND, "Enable the upper bound for daily PT fare to count for ticket subscription. Input value: true or false");
         map.put(UPPER_BOUND_FACTOR, "When upper bound is applied, upperBound  = upperBoundFactor * max Fare of the day. " +
                 "This value is decided by the ratio between average daily cost of a ticket subscription and the single " +
@@ -34,12 +36,12 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringGetter(PT_FARE_CALCULATION)
-    public String getPtFareCalculation() {
+    public PtFareCalculationModels getPtFareCalculation() {
         return ptFareCalculation;
     }
 
     @StringSetter(PT_FARE_CALCULATION)
-    public void setPtFareCalculation(String ptFareCalculation) {
+    public void setPtFareCalculationModel(PtFareCalculationModels ptFareCalculation) {
         this.ptFareCalculation = ptFareCalculation;
     }
 

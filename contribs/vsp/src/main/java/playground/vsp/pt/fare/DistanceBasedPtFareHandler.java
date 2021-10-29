@@ -3,7 +3,6 @@ package playground.vsp.pt.fare;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -32,11 +31,11 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
 
     public DistanceBasedPtFareHandler(DistanceBasedPtFareParams params) {
         this.minFare = params.getMinFare();
-        this.shortTripIntercept = params.getShortTripIntercept();
-        this.shortTripSlope = params.getShortTripSlope();
-        this.longTripIntercept = params.getLongTripIntercept();
-        this.longTripSlope = params.getLongTripSlope();
-        this.longTripThreshold = params.getLongTripThreshold();
+        this.shortTripIntercept = params.getNormalTripIntercept();
+        this.shortTripSlope = params.getNormalTripSlope();
+        this.longTripIntercept = params.getLongDistanceTripIntercept();
+        this.longTripSlope = params.getLongDistanceTripSlope();
+        this.longTripThreshold = params.getLongDistanceTripThreshold();
     }
 
     @Override

@@ -25,7 +25,6 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstConstraint;
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
-import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.log4j.Logger;
@@ -37,7 +36,7 @@ import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-//import commercialtraffic.vwUserCode.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 
@@ -78,10 +77,7 @@ class TourPlanning {
 		runTourPlanningForCarriers(carriers, scenario, netBasedCosts);
 	}
 
-	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, VehicleRoutingTransportCosts transportCosts) throws InterruptedException, ExecutionException {
-
-		if(! (transportCosts instanceof NetworkBasedTransportCosts)) throw new IllegalArgumentException("currently, carrier plans can only be routed with " + NetworkBasedTransportCosts.class +
-				". Sorry! We aim to provide another solution. Please refer to tschlenther or kmt...");
+	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, VRPTransportCosts transportCosts) throws InterruptedException, ExecutionException {
 
 		HashMap<Id<Carrier>, Integer> carrierServiceCounterMap = new HashMap<>();
 
@@ -170,7 +166,7 @@ class TourPlanning {
 			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
 			log.info("routing plan for carrier " + carrier.getId());
-			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, (NetworkBasedTransportCosts) transportCosts); // we need to route
+			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, transportCosts); // we need to route
 																									// the plans in
 																									// order to create
 																									// reasonable

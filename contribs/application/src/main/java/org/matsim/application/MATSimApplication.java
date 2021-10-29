@@ -383,6 +383,17 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			return;
 		}
 
+		// GUI does not pass any argument
+		boolean runInGUi = "true".equals(System.getenv("MATSIM_GUI"));
+		if (runInGUi) {
+
+			// prepend necessary options
+			List<String> l = Lists.newArrayList("run", "--config");
+			l.addAll(Arrays.asList(args));
+
+			args = l.toArray(new String[0]);
+		}
+
 		prepareArgs(args);
 
 		CommandLine cli = prepare(app);

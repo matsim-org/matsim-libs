@@ -24,7 +24,7 @@ public class BicycleLinkSpeedCalculatorTest {
     private static final double MAX_BICYCLE_SPEED = 15;
 
     private final BicycleConfigGroup configGroup = new BicycleConfigGroup();
-    private final Network unusedNetwork = NetworkUtils.createNetwork();
+    private final Network unusedNetwork = NetworkUtils.createTimeInvariantNetwork();
 
     @Before
     public void before() {

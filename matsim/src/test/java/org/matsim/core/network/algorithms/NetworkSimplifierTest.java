@@ -102,7 +102,7 @@ public class NetworkSimplifierTest {
 		 originally, the algorithm had a problem and corrupted the network, resulting in a non-routable network
 		 */
 
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node a = NetworkUtils.createAndAddNode(network, Id.create("A", Node.class), new Coord(0.0, 10.0));
 		Node b = NetworkUtils.createAndAddNode(network, Id.create("B", Node.class), new Coord(0.0, -10.0));
 		Node c = NetworkUtils.createAndAddNode(network, Id.create("C", Node.class), new Coord(0.0, 0.0));
@@ -211,7 +211,7 @@ public class NetworkSimplifierTest {
 	 * @return
 	 */
 	private Network buildNetwork(){
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node a = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), CoordUtils.createCoord(0.0,  0.0));
 		Node b = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), CoordUtils.createCoord(10.0,  0.0));
 		Node c = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), CoordUtils.createCoord(20.0,  0.0));

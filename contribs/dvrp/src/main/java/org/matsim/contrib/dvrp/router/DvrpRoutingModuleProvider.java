@@ -24,7 +24,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
@@ -35,7 +37,7 @@ import com.google.inject.name.Named;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpRoutingModule> {
+public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpMode, DvrpRoutingModule> {
 	public enum Stage {ACCESS, MAIN, EGRESS}
 
 	@Inject
@@ -46,7 +48,7 @@ public class DvrpRoutingModuleProvider extends ModalProviders.AbstractProvider<D
 	private TimeInterpretation timeInterpretation;
 
 	public DvrpRoutingModuleProvider(String mode) {
-		super(mode);
+		super(mode, DvrpModes::mode);
 	}
 
 	@Override

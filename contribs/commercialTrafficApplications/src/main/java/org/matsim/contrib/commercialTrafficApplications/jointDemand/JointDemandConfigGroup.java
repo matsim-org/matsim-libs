@@ -24,7 +24,9 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.Map;
 
 public class JointDemandConfigGroup extends ReflectiveConfigGroup {
@@ -49,6 +51,12 @@ public class JointDemandConfigGroup extends ReflectiveConfigGroup {
     private double maxJobScore = 6;
     private double minJobScore = -6;
 
+	public static final String CHANGEOPERATORINTERVAL = "changeOperatorInterval";
+	public static final String CHANGEOPERATORINTERVALDESC = ChangeCommercialJobOperator.SELECTOR_NAME
+			+ " is actively used only every n-th iteration. Between this interval, assigned operator "
+			+ "per job is kept constant and jsprit tourplanning gets bypassed.";
+	@PositiveOrZero
+	private int changeOperatorInterval = 0;
 
     public static final String GROUP_NAME = "commercialTraffic";
 
@@ -60,9 +68,22 @@ public class JointDemandConfigGroup extends ReflectiveConfigGroup {
         return (JointDemandConfigGroup) config.getModules().get(GROUP_NAME);
     }
 
+	/**
+	 * @return -- {@value #CHANGEOPERATORINTERVAL}
+	 */
+	public int getChangeCommercialJobOperatorInterval() {
+		return changeOperatorInterval;
+	}
+
+	/**
+	 * @param changeOperatorInterval-- {@value #CHANGEOPERATORINTERVAL}
+	 */
+	public void setChangeCommercialJobOperatorInterval(int changeOperatorInterval) {
+		this.changeOperatorInterval = changeOperatorInterval;
+	}
 
     /**
-     * @return -- {@value #FIRSTLEGBUFFERDESC}
+     * @return firstLegTraveltimeBufferFactor --{@value #FIRSTLEGBUFFERDESC}
      */
 //    @StringGetter(FIRSTLEGBUFFER)
     double getFirstLegTraveltimeBufferFactor() {
@@ -70,7 +91,7 @@ public class JointDemandConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #FIRSTLEGBUFFERDESC}
+     * @param firstLegTraveltimeBufferFactor --{@value #FIRSTLEGBUFFERDESC}
      */
 //    @StringSetter(FIRSTLEGBUFFER)
     public void setFirstLegTraveltimeBufferFactor(double firstLegTraveltimeBufferFactor) {

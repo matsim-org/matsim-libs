@@ -85,7 +85,7 @@ public class OSM2Intersection {
 
         @Override
         public void complete() {
-            Network network = NetworkUtils.createNetwork();
+            Network network = NetworkUtils.createTimeInvariantNetwork();
             new MatsimNetworkReader(network).readFile("D:\\resultStorage\\moia-msm\\realisticModeChoice\\outputMixedCarOnly126\\croppedDenseNetwork_surface.xml.gz");
 
             TLongObjectMap<List<Link>> id2Link = new TLongObjectHashMap<>();

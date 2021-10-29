@@ -28,7 +28,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 
@@ -56,8 +58,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	@CommandLine.Option(names = "--network", description = "Base network that will be merged with pt network.", required = true)
 	private Path networkFile;
 
-	@CommandLine.Option(names = "--date", description = "The day for which the schedules will be extracted", required = true)
-	private LocalDate date;
+	@CommandLine.Option(names = "--date", arity = "1..*", description = "The day for which the schedules will be extracted, can also be multiple", required = true)
+	private List<LocalDate> date;
 
 	@CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
 	private File output;
@@ -104,12 +106,17 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			filter = filter.and((Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance());
 		}
 
+		int i = 0;
 		for (Path gtfsFile : gtfsFiles) {
+
+			LocalDate date = this.date.size() > 1 ? this.date.get(i) : this.date.get(0);
+
+			log.info("Converting {} at date {}", gtfsFile, date);
 
 			GtfsConverter converter = GtfsConverter.newBuilder()
 					.setScenario(scenario)
 					.setTransform(ct)
-					.setDate(date)
+					.setDate(date) // use first date for all sets
 					.setFeed(gtfsFile)
 					//.setIncludeAgency(agency -> agency.equals("rbg-70"))
 					.setIncludeStop(filter)
@@ -117,6 +124,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					.build();
 
 			converter.convert();
+			i++;
 		}
 
 		if (copyLateEarlyDepartures) {
@@ -125,7 +133,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			TransitSchedulePostProcessTools.copyEarlyDeparturesToFollowingNight(scenario.getTransitSchedule(), 6 * 3600, "copied");
 		}
 
-		Network network = Files.exists(networkFile) ? NetworkUtils.readNetwork(networkFile.toString()) : scenario.getNetwork();
+		Network network = Files.exists(networkFile) ? NetworkUtils.readTimeInvariantNetwork(networkFile.toString()) : scenario.getNetwork();
 
 		Scenario ptScenario = getScenarioWithPseudoPtNetworkAndTransitVehicles(network, scenario.getTransitSchedule(), "pt_");
 
@@ -228,6 +236,18 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 			VehicleUtils.setEgressTime(ferryVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
 			scenario.getTransitVehicles().addVehicleType( ferryVehicleType );
 		}
+
+		VehicleType ptVehicleType = vehicleFactory.createVehicleType( Id.create( "Pt_veh_type", VehicleType.class ) );
+		{
+			VehicleCapacity capacity = ptVehicleType.getCapacity() ;
+			capacity.setSeats( 100 );
+			capacity.setStandingRoom( 100 );
+			VehicleUtils.setDoorOperationMode(ptVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
+			VehicleUtils.setAccessTime(ptVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
+			VehicleUtils.setEgressTime(ptVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
+			scenario.getTransitVehicles().addVehicleType( ptVehicleType );
+		}
+
 		// set link speeds and create vehicles according to pt mode
 		for (TransitLine line: scenario.getTransitSchedule().getTransitLines().values()) {
 			VehicleType lineVehicleType;
@@ -239,17 +259,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				gtfsTransitType = Integer.parseInt( (String) line.getAttributes().getAttribute("gtfs_route_type"));
 			} catch (NumberFormatException e) {
 				log.error("unknown transit mode! Line id was " + line.getId().toString() +
-						"; gtfs route type was " + (String) line.getAttributes().getAttribute("gtfs_route_type"));
+						"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
 				throw new RuntimeException("unknown transit mode");
-			}
-
-			int agencyId;
-			try {
-				agencyId = Integer.parseInt( (String) line.getAttributes().getAttribute("gtfs_agency_id"));
-			} catch (NumberFormatException e) {
-				log.error("invalid transit agency! Line id was " + line.getId().toString() +
-						"; gtfs agency was " + (String) line.getAttributes().getAttribute("gtfs_agency_id"));
-				throw new RuntimeException("invalid transit agency");
 			}
 
 			switch (gtfsTransitType) {
@@ -262,6 +273,14 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				// and arrivals are as punctual (not too early) as possible
 				case 2:
 				case 100:
+				case 101:
+				case 102:
+				case 103:
+				case 104:
+				case 105:
+				case 106:
+				case 107:
+				case 108:
 					lineVehicleType = reRbVehicleType;
 					stopFilter = "station_S/U/RE/RB";
 					break;
@@ -305,10 +324,13 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					lineVehicleType = ferryVehicleType;
 					break;
 				default:
-					log.error("unknown transit mode! Line id was " + line.getId().toString() +
+					log.warn("unknown transit mode! Line id was " + line.getId().toString() +
 							"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
-					throw new RuntimeException("unknown transit mode");
+
+					lineVehicleType = ptVehicleType;
 			}
+
+			Set<TransitRoute> toRemove = new HashSet<>();
 
 			for (TransitRoute route: line.getRoutes().values()) {
 				int routeVehId = 0; // simple counter for vehicle id _per_ TransitRoute
@@ -316,9 +338,16 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				// increase speed if current freespeed is lower.
 				List<TransitRouteStop> routeStops = route.getStops();
 				if (routeStops.size() < 2) {
-					log.error("TransitRoute with less than 2 stops found: line " + line.getId().toString() +
-							", route " + route.getId().toString());
-					throw new RuntimeException("");
+					log.warn("TransitRoute with less than 2 stops found: line {}, route {}", line.getId(), route.getId());
+					toRemove.add(route);
+					continue;
+				}
+
+				// create vehicles for Departures
+				for (Departure departure: route.getDepartures().values()) {
+					Vehicle veh = vehicleFactory.createVehicle(Id.create("pt_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
+					scenario.getTransitVehicles().addVehicle(veh);
+					departure.setVehicleId(veh.getId());
 				}
 
 				double lastDepartureOffset = route.getStops().get(0).getDepartureOffset().seconds();
@@ -344,13 +373,6 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					lastDepartureOffset = routeStop.getDepartureOffset().seconds();
 				}
 
-				// create vehicles for Departures
-				for (Departure departure: route.getDepartures().values()) {
-					Vehicle veh = vehicleFactory.createVehicle(Id.create("pt_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
-					scenario.getTransitVehicles().addVehicle(veh);
-					departure.setVehicleId(veh.getId());
-				}
-
 				// tag RE, RB, S- and U-Bahn stations for Drt stop filter attribute
 				if (!stopFilter.isEmpty()) {
 					for (TransitRouteStop routeStop: route.getStops()) {
@@ -358,6 +380,8 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					}
 				}
 			}
+
+			toRemove.forEach(line::removeRoute);
 		}
 
 		return scenario;

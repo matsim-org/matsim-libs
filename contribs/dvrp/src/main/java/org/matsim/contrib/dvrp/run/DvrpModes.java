@@ -20,9 +20,12 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+
 import com.google.inject.Binder;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 
 /**
@@ -33,15 +36,46 @@ public class DvrpModes {
 		return new DvrpModeImpl(mode);
 	}
 
-	public static <T> Key<T> key(Class<T> type, String mode) {
-		return Key.get(type, mode(mode));
-	}
-
-	public static <T> Key<T> key(TypeLiteral<T> typeLiteral, String mode) {
-		return Key.get(typeLiteral, mode(mode));
-	}
-
 	public static void registerDvrpMode(Binder binder, String mode) {
 		Multibinder.newSetBinder(binder, DvrpMode.class).addBinding().toInstance(DvrpModes.mode(mode));
+	}
+
+	/**
+	 * This class is based on guava's NamedImpl.
+	 */
+	private static class DvrpModeImpl implements DvrpMode, Serializable {
+		private final String value;
+
+		DvrpModeImpl(String value) {
+			this.value = checkNotNull(value, "value");
+		}
+
+		public String value() {
+			return this.value;
+		}
+
+		public int hashCode() {
+			// This is specified in java.lang.Annotation.
+			return (127 * "value".hashCode()) ^ value.hashCode();
+		}
+
+		public boolean equals(Object o) {
+			if (!(o instanceof DvrpMode)) {
+				return false;
+			}
+
+			DvrpMode other = (DvrpMode)o;
+			return value.equals(other.value());
+		}
+
+		public String toString() {
+			return "@" + DvrpMode.class.getName() + "(value=" + value + ")";
+		}
+
+		public Class<? extends Annotation> annotationType() {
+			return DvrpMode.class;
+		}
+
+		private static final long serialVersionUID = 0;
 	}
 }

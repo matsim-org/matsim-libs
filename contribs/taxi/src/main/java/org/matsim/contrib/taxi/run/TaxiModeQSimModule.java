@@ -32,7 +32,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -73,62 +74,65 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 		install(new VrpAgentSourceQSimModule(getMode()));
 		install(new PassengerEngineQSimModule(getMode()));
 
-		addModalComponent(TaxiOptimizer.class, new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
-			@Inject
-			private MobsimTimer timer;
+		addModalComponent(TaxiOptimizer.class,
+				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
+					@Inject
+					private MobsimTimer timer;
 
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
 
-			@Inject
-			private EventsManager events;
+					@Inject
+					private EventsManager events;
 
-			@Override
-			public TaxiOptimizer get() {
-				Fleet fleet = getModalInstance(Fleet.class);
-				Network network = getModalInstance(Network.class);
-				TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+					@Override
+					public TaxiOptimizer get() {
+						Fleet fleet = getModalInstance(Fleet.class);
+						Network network = getModalInstance(Network.class);
+						TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 
-				ScheduleTimingUpdater scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
-				return new DefaultTaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility, taxiScheduler, scheduleTimingUpdater, getConfig().getContext()).get();
-			}
-		});
+						ScheduleTimingUpdater scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
+						return new DefaultTaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime,
+								travelDisutility, taxiScheduler, scheduleTimingUpdater, getConfig().getContext()).get();
+					}
+				});
 
-		addModalComponent(TaxiScheduler.class, new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
-			@Inject
-			private MobsimTimer timer;
+		addModalComponent(TaxiScheduler.class,
+				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
+					@Inject
+					private MobsimTimer timer;
 
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
 
-			@Inject
-			private EventsManager events;
+					@Inject
+					private EventsManager events;
 
-			@Override
-			public TaxiScheduler get() {
-				Fleet fleet = getModalInstance(Fleet.class);
-				TaxiScheduleInquiry taxiScheduleInquiry = new TaxiScheduleInquiry(taxiCfg, timer);
-				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				var speedyALTFactory = new SpeedyALTFactory();
-				Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(network,
-						travelDisutility, travelTime);
-				return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator, events, timer);
-			}
-		});
+					@Override
+					public TaxiScheduler get() {
+						Fleet fleet = getModalInstance(Fleet.class);
+						TaxiScheduleInquiry taxiScheduleInquiry = new TaxiScheduleInquiry(taxiCfg, timer);
+						Network network = getModalInstance(Network.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						var speedyALTFactory = new SpeedyALTFactory();
+						Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(
+								network, travelDisutility, travelTime);
+						return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator, events,
+								timer);
+					}
+				});
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
 						new TaxiStayTaskEndTimeCalculator(taxiCfg)))).asEagerSingleton();
 
 		bindModal(DynActionCreator.class).toProvider(
-				new ModalProviders.AbstractProvider<TaxiActionCreator>(taxiCfg.getMode()) {
+				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
 					@Inject
 					private MobsimTimer timer;
 
@@ -141,15 +145,16 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
-			@Inject
-			private EventsManager events;
+		bindModal(PassengerRequestCreator.class).toProvider(
+				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+					@Inject
+					private EventsManager events;
 
-			@Override
-			public TaxiRequestCreator get() {
-				return new TaxiRequestCreator(getMode(), events);
-			}
-		}).asEagerSingleton();
+					@Override
+					public TaxiRequestCreator get() {
+						return new TaxiRequestCreator(getMode(), events);
+					}
+				}).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 

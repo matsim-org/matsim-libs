@@ -19,6 +19,7 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -217,7 +218,7 @@ public class TestPositionEmissionModule {
      */
     private Network createSingleLinkNetwork() {
 
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         addLink(network, "start-link",
                 network.getFactory().createNode(Id.createNodeId("1"), new Coord(-100, 0)),
                 network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)));

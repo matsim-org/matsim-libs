@@ -1,10 +1,9 @@
 package playground.vsp.pt.fare;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.pt.PtConstants;
 
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.Map;
 
 /**
@@ -16,26 +15,26 @@ import java.util.Map;
 public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
     public static final String PT_FARE_DISTANCE_BASED = "distance based pt fare";
 
-    public static final String SET_NAME = "distanceBasedPtFare";
+    public static final String SET_NAME = "ptFareCalculationDistanceBased";
     public static final String MIN_FARE = "minFare";
-    public static final String SHORT_TRIP_SLOPE = "shortTripSlope";
-    public static final String SHORT_TRIP_INTERCEPT = "shortTripIntercept";
-    public static final String LONG_TRIP_THRESHOLD = "longTripThreshold";
-    public static final String LONG_TRIP_SLOPE = "longTripSlope";
-    public static final String LONG_TRIP_INTERCEPT = "longTripIntercept";
+    public static final String NORMAL_TRIP_SLOPE = "normalTripSlope";
+    public static final String NORMAL_TRIP_INTERCEPT = "normalTripIntercept";
+    public static final String LONG_DISTANCE_TRIP_THRESHOLD = "longDistanceTripThreshold";
+    public static final String LONG_DISTANCE_TRIP_SLOPE = "longDistanceTripSlope";
+    public static final String LONG_DISTANCE_TRIP_INTERCEPT = "longDistanceTripIntercept";
 
     @PositiveOrZero
     private double minFare = 2.0;
     @PositiveOrZero
-    private double shortTripIntercept = 1.6;
+    private double normalTripIntercept = 1.6;
     @PositiveOrZero
-    private double shortTripSlope = 0.00017;
+    private double normalTripSlope = 0.00017;
     @PositiveOrZero
-    private double longTripThreshold = 50000.0;
+    private double longDistanceTripThreshold = 50000.0;
     @PositiveOrZero
-    private double longTripIntercept = 30.0;
+    private double longDistanceTripIntercept = 30.0;
     @PositiveOrZero
-    private double longTripSlope = 0.00025;
+    private double longDistanceTripSlope = 0.00025;
 
     public DistanceBasedPtFareParams() {
         super(SET_NAME);
@@ -46,12 +45,13 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
         Map<String, String> map = super.getComments();
         map.put(MIN_FARE, "Minimum fare for a PT trip " +
                 "(e.g. Kurzstrecke/short distance ticket in cities, ticket for 1 zone in rural areas)");
-        map.put(SHORT_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for short trips");
-        map.put(SHORT_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for short trips");
-        map.put(LONG_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for long trips");
-        map.put(LONG_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for long trips");
-        map.put(LONG_TRIP_THRESHOLD, "Threshold of the long trips in meters. Below this value, " +
-                "the trips are mostly regional trips. Above this value, the trips are usually inter-city trips");
+        map.put(NORMAL_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for normal trips (e.g. within the city or region)");
+        map.put(NORMAL_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for normal trips");
+        map.put(LONG_DISTANCE_TRIP_SLOPE, "Linear model y = ax + b: the value of a, for long distance trips (e.g. intercity trips)");
+        map.put(LONG_DISTANCE_TRIP_INTERCEPT, "Linear model y = ax + b: the value of b, for long trips");
+        map.put(LONG_DISTANCE_TRIP_THRESHOLD, "Threshold of the long trips in meters. Below this value, " +
+                "the trips are considered as normal trips. Above this value, the trips are considered as " +
+                "inter-city trips");
         return map;
     }
 
@@ -65,53 +65,53 @@ public class DistanceBasedPtFareParams extends ReflectiveConfigGroup {
         this.minFare = minFare;
     }
 
-    @StringGetter(SHORT_TRIP_SLOPE)
-    public double getShortTripSlope() {
-        return shortTripSlope;
+    @StringGetter(NORMAL_TRIP_SLOPE)
+    public double getNormalTripSlope() {
+        return normalTripSlope;
     }
 
-    @StringSetter(SHORT_TRIP_SLOPE)
-    public void setShortTripSlope(double shortTripSlope) {
-        this.shortTripSlope = shortTripSlope;
+    @StringSetter(NORMAL_TRIP_SLOPE)
+    public void setNormalTripSlope(double normalTripSlope) {
+        this.normalTripSlope = normalTripSlope;
     }
 
-    @StringGetter(SHORT_TRIP_INTERCEPT)
-    public double getShortTripIntercept() {
-        return shortTripIntercept;
+    @StringGetter(NORMAL_TRIP_INTERCEPT)
+    public double getNormalTripIntercept() {
+        return normalTripIntercept;
     }
 
-    @StringSetter(SHORT_TRIP_INTERCEPT)
-    public void setShortTripIntercept(double shortTripIntercept) {
-        this.shortTripIntercept = shortTripIntercept;
+    @StringSetter(NORMAL_TRIP_INTERCEPT)
+    public void setNormalTripIntercept(double normalTripIntercept) {
+        this.normalTripIntercept = normalTripIntercept;
     }
 
-    @StringGetter(LONG_TRIP_SLOPE)
-    public double getLongTripSlope() {
-        return longTripSlope;
+    @StringGetter(LONG_DISTANCE_TRIP_SLOPE)
+    public double getLongDistanceTripSlope() {
+        return longDistanceTripSlope;
     }
 
-    @StringSetter(LONG_TRIP_SLOPE)
-    public void setLongTripSlope(double longTripSlope) {
-        this.longTripSlope = longTripSlope;
+    @StringSetter(LONG_DISTANCE_TRIP_SLOPE)
+    public void setLongDistanceTripSlope(double longDistanceTripSlope) {
+        this.longDistanceTripSlope = longDistanceTripSlope;
     }
 
-    @StringGetter(LONG_TRIP_INTERCEPT)
-    public double getLongTripIntercept() {
-        return longTripIntercept;
+    @StringGetter(LONG_DISTANCE_TRIP_INTERCEPT)
+    public double getLongDistanceTripIntercept() {
+        return longDistanceTripIntercept;
     }
 
-    @StringSetter(LONG_TRIP_INTERCEPT)
-    public void setLongTripIntercept(double longTripIntercept) {
-        this.longTripIntercept = longTripIntercept;
+    @StringSetter(LONG_DISTANCE_TRIP_INTERCEPT)
+    public void setLongDistanceTripIntercept(double longDistanceTripIntercept) {
+        this.longDistanceTripIntercept = longDistanceTripIntercept;
     }
 
-    @StringGetter(LONG_TRIP_THRESHOLD)
-    public double getLongTripThreshold() {
-        return longTripThreshold;
+    @StringGetter(LONG_DISTANCE_TRIP_THRESHOLD)
+    public double getLongDistanceTripThreshold() {
+        return longDistanceTripThreshold;
     }
 
-    @StringSetter(LONG_TRIP_THRESHOLD)
-    public void setLongTripThreshold(double longTripThreshold) {
-        this.longTripThreshold = longTripThreshold;
+    @StringSetter(LONG_DISTANCE_TRIP_THRESHOLD)
+    public void setLongDistanceTripThreshold(double longDistanceTripThreshold) {
+        this.longDistanceTripThreshold = longDistanceTripThreshold;
     }
 }

@@ -44,7 +44,7 @@ public class DrtGridUtilsTest {
 	}
 
 	static Network createNetwork() {
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		Node a = network.getFactory().createNode(Id.createNodeId("a"), new Coord(0, 0));
 		Node b = network.getFactory().createNode(Id.createNodeId("b"), new Coord(0, 1000));
 		Node c = network.getFactory().createNode(Id.createNodeId("c"), new Coord(1000, 1000));
