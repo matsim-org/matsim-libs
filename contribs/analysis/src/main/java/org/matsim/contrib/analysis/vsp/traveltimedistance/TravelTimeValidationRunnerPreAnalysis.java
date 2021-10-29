@@ -70,7 +70,7 @@ public class TravelTimeValidationRunnerPreAnalysis {
         this.crossBorderTripProportion = crossBorderTripProportion;
     }
 
-    public void run() throws IOException {
+    public void run() throws IOException, InterruptedException {
         List<Link> links = network.getLinks().values().stream().
                 filter(l -> l.getAllowedModes().contains(TransportMode.car)).
                 collect(Collectors.toList());
@@ -136,6 +136,7 @@ public class TravelTimeValidationRunnerPreAnalysis {
                 double validatedTravelTime = validator.getTravelTime
                         (fromCorrd, toCoord, 1, detailedFile).getFirst();
                 counter++;
+                Thread.sleep(100);
                 if (validatedTravelTime < 60) {
                     continue;
                 }
