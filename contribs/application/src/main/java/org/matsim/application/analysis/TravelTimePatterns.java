@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @CommandLine.Command(
-		name = "travel-time-pattern",
+		name = "travel-time-patterns",
 		description = "Download travel time pattern from online API.",
 		mixinStandardHelpOptions = true
 )
