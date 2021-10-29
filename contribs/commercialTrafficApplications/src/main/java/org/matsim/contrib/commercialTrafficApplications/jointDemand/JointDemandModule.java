@@ -30,8 +30,9 @@ import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCostsFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.VRPTransportCosts;
+import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -67,7 +68,7 @@ public class JointDemandModule extends AbstractModule {
         bind(CommercialJobGenerator.class).to(DefaultCommercialJobGenerator.class).in(Singleton.class);
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-        bind(VRPTransportCosts.class).to(NetworkBasedTransportCosts.class).in(Singleton.class);
+        bind(VRPTransportCostsFactory.class).to(NetworkBasedTransportCostsFactory.class).in(Singleton.class);
 
         //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
@@ -104,22 +105,11 @@ public class JointDemandModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private NetworkBasedTransportCosts provideNetworkBasedTransportCosts(Scenario scenario,
-                                                                        Carriers carriers, Map<String, TravelTime> travelTimes, Config config) {
+    private NetworkBasedTransportCostsFactory provideNetworkBasedTransportCostsFactory(Scenario scenario,
+                                                                                       Carriers carriers, Map<String, TravelTime> travelTimes, Config config) {
 
-        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config,
-                FreightConfigGroup.class);
-
-        Set<VehicleType> vehicleTypes = new HashSet<>();
-        carriers.getCarriers().values().forEach(
-                carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
-
-        NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder
-                .newInstance(scenario.getNetwork(), vehicleTypes);
-
-        netBuilder.setTimeSliceWidth(freightConfigGroup.getTravelTimeSliceWidth());
-        netBuilder.setTravelTime(travelTimes.get(TransportMode.car));
-        return netBuilder.build();
+        return new NetworkBasedTransportCostsFactory(scenario,
+                carriers, travelTimes, config);
     }
 
 }
