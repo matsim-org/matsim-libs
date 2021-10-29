@@ -102,7 +102,7 @@ public class TravelTimeValidationRunner {
 	}
 
 
-	public void run() {
+	public void run() throws InterruptedException {
 		ParallelEventsManager eventManager = new ParallelEventsManager(false, eventsQueueSize);
 //		EventsManager events = EventsUtils.createEventsManager();
 		CarTripsExtractor carTripsExtractor = new CarTripsExtractor(populationIds, network);
@@ -124,6 +124,7 @@ public class TravelTimeValidationRunner {
 				trip.setValidatedTravelTime(validatedTravelTime);
 				trip.setValidatedTravelDistance(timeDistance.getSecond());
 				i++;
+				Thread.sleep(100);
 			}
 
 			if (i >= numberOfTripsToValidate) {

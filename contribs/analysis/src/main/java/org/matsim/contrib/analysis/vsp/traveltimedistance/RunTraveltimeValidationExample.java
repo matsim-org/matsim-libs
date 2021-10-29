@@ -63,7 +63,7 @@ public class RunTraveltimeValidationExample {
 	</ol>
 	 *  
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		String plans = args[0];
 		String events = args[1];
 		String network = args [2];
