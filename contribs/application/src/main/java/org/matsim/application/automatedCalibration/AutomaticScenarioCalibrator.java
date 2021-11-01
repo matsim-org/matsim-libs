@@ -14,11 +14,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 public abstract class AutomaticScenarioCalibrator {
     /**
@@ -54,9 +55,14 @@ public abstract class AutomaticScenarioCalibrator {
 
     private final String[] modes = new String[]{TransportMode.car, TransportMode.ride, TransportMode.pt, TransportMode.bike, TransportMode.walk};
     private final DistanceGrouping distanceGrouping;
-    private final String distanceName = "euclidean_distance"; // TODO make this configurable later (euclidean_distance or traveled_distance)
 
-    public AutomaticScenarioCalibrator(String configFile, String output, String referenceDataFile, double targetError, long maxRunningTime, int patience, String relevantPersonsFile) throws IOException {
+    public enum DistanceInterpretations {euclideanDistance, networkDistance}
+
+    private final DistanceInterpretations distanceInterpretations;
+
+    public AutomaticScenarioCalibrator(String configFile, String output, String referenceDataFile,
+                                       double targetError, long maxRunningTime, int patience,
+                                       String relevantPersonsFile, DistanceInterpretations distanceInterpretations) throws IOException {
         this.targetError = targetError;
         this.maxRunningTime = maxRunningTime;
         this.patience = patience;
@@ -68,6 +74,7 @@ public abstract class AutomaticScenarioCalibrator {
             output = "./output/auto-calibration";
         }
         this.outputFolder = output;
+        this.distanceInterpretations = distanceInterpretations;
 
         readRelevantPersonsFile(relevantPersonsFile);
         readReferenceData(referenceDataFile);
@@ -138,7 +145,21 @@ public abstract class AutomaticScenarioCalibrator {
         if (runId != null && !runId.equals("")) {
             outputTripsFileName = "/" + runId + ".output_trips.csv.gz";
         }
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(outputTripsFileName)),
+        String outputTripsPath = config.controler().getOutputDirectory() + outputTripsFileName;
+        String decompressedTripsPath = outputTripsPath.replace(".gz", "");
+
+        try (GZIPInputStream gis = new GZIPInputStream(
+                new FileInputStream(Path.of(outputTripsPath).toFile()));
+             FileOutputStream fos = new FileOutputStream(Path.of(decompressedTripsPath).toFile())) {
+
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = gis.read(buffer)) > 0) {
+                fos.write(buffer, 0, len);
+            }
+        }
+
+        try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(decompressedTripsPath)),
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser.getRecords()) {
                 Id<Person> personId = Id.createPersonId(record.get("person"));
@@ -146,6 +167,18 @@ public abstract class AutomaticScenarioCalibrator {
                     continue;
                 }
                 String mode = record.get("main_mode");
+                String distanceName;
+                switch (distanceInterpretations) {
+                    case networkDistance:
+                        distanceName = "traveled_distance";
+                        break;
+                    case euclideanDistance:
+                        distanceName = "euclidean_distance";
+                        break;
+                    default:
+                        throw new RuntimeException("Please use the the correct distance interpretation: " +
+                                "[euclideanDistance, networkDistance]");
+                }
                 double distance = Double.parseDouble(record.get(distanceName));
                 double travelTime = Time.parseTime(record.get("trav_time"));
                 Trip trip = new Trip(mode, distance, travelTime);
@@ -229,7 +262,8 @@ public abstract class AutomaticScenarioCalibrator {
         // Tune parameter
         parameterTuner.tune(config, errorMap, trips);
         // update output folder for next run
-        config.controler().setOutputDirectory(outputFolder + "/run-" + counter);
+        int number = counter % (patience + 1); // Only keep the last (patience + 1) output. Override previous ones to prevent generating too many not very useful things...
+        config.controler().setOutputDirectory(outputFolder + "/run-" + number);
     }
 
     // Initializations
@@ -250,8 +284,9 @@ public abstract class AutomaticScenarioCalibrator {
         // For a sample reference data, please see the svn //TODO
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(referenceDataFile)),
                 CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
-            List<String> distancesGroups = Arrays.asList(distanceGrouping.getDistanceGroupings());
-            distancesGroups.add(0, "mode"); // The first column is mode (this here is simply a placeholder)
+            List<String> distancesGroups = new ArrayList<>();
+            distancesGroups.add("mode"); // The first column is mode (this here is simply a placeholder)
+            distancesGroups.addAll(Arrays.stream(distanceGrouping.getDistanceGroupings()).collect(Collectors.toList()));
             for (CSVRecord record : parser) {
                 String mode = record.get(0);
                 referenceMap.put(mode, new HashMap<>());
