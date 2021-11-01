@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -38,11 +39,18 @@ public class VrpPaths {
 	 */
 	public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink, double departureTime,
 			LeastCostPathCalculator router, TravelTime travelTime) {
-		Path path = fromLink == toLink ?
-				null :
-				router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
+		Path path = fromLink == toLink ? null
+				: router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
 						null, null);
 		return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
+	}
+
+	public static VrpPathWithTravelData calcAndCreatePath(LinkTimePair diversionPoint, Link toLink,
+			LeastCostPathCalculator router, TravelTime travelTime) {
+		Path path = diversionPoint.link == toLink ? null
+				: router.calcLeastCostPath(diversionPoint.link.getToNode(), toLink.getFromNode(), diversionPoint.time,
+						null, null);
+		return VrpPaths.createPath(diversionPoint, toLink, path, travelTime);
 	}
 
 	public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime) {
@@ -54,13 +62,23 @@ public class VrpPaths {
 		return createPath(fromLink, toLink, departureTime, pathData.getPath(), travelTime);
 	}
 
-	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
+	public static VrpPathWithTravelData createPath(LinkTimePair diversionPoint, Link toLink, PathData pathData,
 			TravelTime travelTime) {
-		return createPath(fromLink, toLink, departureTime, path, travelTime, true);
+		return createPath(diversionPoint, toLink, pathData.getPath(), travelTime);
 	}
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
-			TravelTime travelTime, boolean considerZeroLengthPath) {
+			TravelTime travelTime) {
+		return createPath(fromLink, toLink, departureTime, path, travelTime, true, true);
+	}
+
+	public static VrpPathWithTravelData createPath(LinkTimePair diversionPoint, Link toLink, Path path,
+			TravelTime travelTime) {
+		return createPath(diversionPoint.link, toLink, diversionPoint.time, path, travelTime, true, false);
+	}
+
+	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
+			TravelTime travelTime, boolean considerZeroLengthPath, boolean considerFirstLinkTravelTime) {
 		if (considerZeroLengthPath && fromLink == toLink) {
 			return createZeroLengthPath(fromLink, departureTime);
 		}
@@ -84,7 +102,7 @@ public class VrpPaths {
 		// otherwise it can take much longer)
 		double currentTime = departureTime;
 		links[0] = fromLink;
-		double linkTT = FIRST_LINK_TT;
+		double linkTT = considerFirstLinkTravelTime ? FIRST_LINK_TT : 0.0;
 		linkTTs[0] = linkTT;
 		currentTime += linkTT;
 
@@ -100,12 +118,12 @@ public class VrpPaths {
 		links[count + 1] = toLink;
 		linkTT = getLastLinkTT(toLink, currentTime);// as long as we cannot divert from the last link this is okay
 		linkTTs[count + 1] = linkTT;
-		double totalTT = FIRST_LINK_TT + path.travelTime + linkTT;
+		double totalTT = (considerFirstLinkTravelTime ? FIRST_LINK_TT : 0.0) + path.travelTime + linkTT;
 
 		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
 	}
 
-	public static final double FIRST_LINK_TT = 1;
+	public static final double FIRST_LINK_TT = 2;
 
 	public static double getLastLinkTT(Link lastLink, double time) {
 		// XXX imprecise if qsimCfg.timeStepSize != 1
@@ -113,7 +131,8 @@ public class VrpPaths {
 	}
 
 	/**
-	 * Used for OTFVis. Does not contain info on timing, distance and cost. Can be extended...
+	 * Used for OTFVis. Does not contain info on timing, distance and cost. Can be
+	 * extended...
 	 *
 	 * @param path
 	 * @param routeFactories
@@ -138,7 +157,8 @@ public class VrpPaths {
 	}
 
 	/**
-	 * @return The distance of a VRP path Includes the to link, but not the from link
+	 * @return The distance of a VRP path Includes the to link, but not the from
+	 *         link
 	 */
 	public static double calcDistance(VrpPath path) {
 		double distance = 0.0;

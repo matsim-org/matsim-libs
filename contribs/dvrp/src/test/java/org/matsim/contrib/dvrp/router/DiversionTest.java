@@ -368,8 +368,8 @@ public class DiversionTest {
 						LinkTimePair diversionPoint = tracker.getDiversionPoint();
 
 						// (2) Perform rerouting from the diversion point
-						VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(diversionPoint.link, endLink,
-								diversionPoint.time, router, travelTime);
+						VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(diversionPoint, endLink, router,
+								travelTime);
 
 						// (3) Implement the diversion
 						tracker.divertPath(path);
