@@ -28,6 +28,7 @@ import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(
 		name = "travel-time-patterns",
@@ -157,13 +158,13 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 		if (linkOutput != null) {
 
-			log.info("Writing attributes to {}", linkOutput);
-
 			HereMapsLayer geom = new HereMapsLayer("ROAD_GEOM", appId, appCode);
 
 			Map<String, String> geometries = createGeometries(geom.fetchAll(bbox, fc));
 
 			Set<String> written = new HashSet<>();
+
+			log.info("Writing attributes to {}", linkOutput);
 
 			try (CSVPrinter printer = csv.createPrinter(this.linkOutput)) {
 
@@ -212,14 +213,18 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			NetworkFactory f = network.getFactory();
 
 			// TODO: write time variant network
-			// TODO: also need to download link attr
 
 			HereMapsLayer attrLayer = new HereMapsLayer("LINK_ATTRIBUTE", appId, appCode);
 			HereMapsLayer.Result attrs = attrLayer.fetchAll(bbox, fc);
 
+			Set<String> written = new HashSet<>();
+
 			for (CSVRecord record : attrs.getRecords()) {
 
 				String id = record.get("LINK_ID");
+
+				if (!written.add(id))
+					continue;
 
 				CSVRecord linkRecord = linkRecords.get(id);
 
@@ -231,23 +236,61 @@ public class TravelTimePatterns implements MATSimAppCommand {
 				Node ref = addOrGetNode(network, linkRecord.get("REF_NODE_ID"), ct.transform(new Coord(lon[0], lat[0])));
 				Node nonRef = addOrGetNode(network, linkRecord.get("NONREF_NODE_ID"), ct.transform(new Coord(lon[1], lat[1])));
 
+				Set<String> modes = HereMapsLayer.VehicleType.parse(Integer.parseInt(record.get("VEHICLE_TYPES"))).stream()
+						.map(Object::toString).collect(Collectors.toSet());
+
 				// create links for both directions
 				if (t.equals("B")) {
+
+					Link linkF = f.createLink(Id.createLinkId(id + "f"), ref, nonRef);
+					Link linkT = f.createLink(Id.createLinkId(id + "t"), nonRef, ref);
+
+					linkF.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+					linkT.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+
+					linkT.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
+					linkF.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
+
+					linkF.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+					linkT.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+
+					linkF.setAllowedModes(modes);
+					linkT.setAllowedModes(modes);
+
+					network.addLink(linkF);
+					network.addLink(linkT);
 
 				} else if (t.equals("F")) {
 					// from ref node
 					Link link = f.createLink(Id.createLinkId(id), ref, nonRef);
 
+					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+					link.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
+
+					link.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+					link.setAllowedModes(modes);
+
+					network.addLink(link);
 
 				} else if (t.equals("T")) {
 					// to ref node
 					Link link = f.createLink(Id.createLinkId(id), nonRef, ref);
 
+					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+					link.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
 
+					link.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+					link.setAllowedModes(modes);
+
+					network.addLink(link);
 				} else
 					throw new IllegalStateException("Unknown travel direction: " + t);
 
 			}
+
+			log.info("Writing network to {}", networkOutput);
+
+			NetworkUtils.writeNetwork(network, networkOutput.toString());
 		}
 
 		return 0;
@@ -336,7 +379,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 	}
 
 	private static double parseDouble(String s) {
-		if (s.isBlank())
+		if (s.isBlank() || s.equals("null"))
 			return 0;
 
 		return Double.parseDouble(s);
