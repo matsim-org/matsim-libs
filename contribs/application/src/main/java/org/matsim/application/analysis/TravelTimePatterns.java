@@ -9,10 +9,21 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Envelope;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ProjectionUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -46,14 +57,20 @@ public class TravelTimePatterns implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", defaultValue = "trafficPatterns.csv", description = "Output csv", required = true)
 	private Path output;
 
-	@CommandLine.Option(names = "--output-links", description = "Path to csv to write link attributes.")
+	@CommandLine.Option(names = "--output-links", description = "Path to csv in order to write link attributes.")
 	private Path linkOutput;
+
+	@CommandLine.Option(names = "--output-network", description = "Write a time-variant in MATSim format.")
+	private Path networkOutput;
 
 	@CommandLine.Mixin
 	private ShpOptions shp = new ShpOptions();
 
 	@CommandLine.Mixin
 	private CsvOptions csv = new CsvOptions();
+
+	@CommandLine.Mixin
+	private CrsOptions crs = new CrsOptions("EPSG:4326");
 
 	public static void main(String[] args) {
 		new TravelTimePatterns().execute(args);
@@ -125,15 +142,26 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 		}
 
+		HereMapsLayer linkLayer = new HereMapsLayer("LINK", appId, appCode);
+		HereMapsLayer.Result links = null;
+
+		Map<String, CSVRecord> linkRecords = new HashMap<>();
+
+		// fetch link layer if required
+		if (linkOutput != null || networkOutput != null) {
+			links = linkLayer.fetchAll(bbox, fc);
+			for (CSVRecord record : links.getRecords()) {
+				linkRecords.put(record.get("LINK_ID"), record);
+			}
+		}
+
 		if (linkOutput != null) {
 
-			HereMapsLayer linkLayer = new HereMapsLayer("LINK", appId, appCode);
+			log.info("Writing attributes to {}", linkOutput);
 
 			HereMapsLayer geom = new HereMapsLayer("ROAD_GEOM", appId, appCode);
 
 			Map<String, String> geometries = createGeometries(geom.fetchAll(bbox, fc));
-
-			HereMapsLayer.Result links = linkLayer.fetchAll(bbox, fc);
 
 			Set<String> written = new HashSet<>();
 
@@ -169,7 +197,72 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			}
 		}
 
+		if (networkOutput != null) {
+
+
+			NetworkConfigGroup group = new NetworkConfigGroup();
+			group.setTimeVariantNetwork(true);
+
+			Network network = NetworkUtils.createNetwork(group);
+
+			ProjectionUtils.putCRS(network, crs.getTargetCRS());
+
+			CoordinateTransformation ct = crs.getTransformation();
+
+			NetworkFactory f = network.getFactory();
+
+			// TODO: write time variant network
+			// TODO: also need to download link attr
+
+			HereMapsLayer attrLayer = new HereMapsLayer("LINK_ATTRIBUTE", appId, appCode);
+			HereMapsLayer.Result attrs = attrLayer.fetchAll(bbox, fc);
+
+			for (CSVRecord record : attrs.getRecords()) {
+
+				String id = record.get("LINK_ID");
+
+				CSVRecord linkRecord = linkRecords.get(id);
+
+				double[] lat = parseCoords(linkRecord.get("LAT"));
+				double[] lon = parseCoords(linkRecord.get("LON"));
+
+				String t = record.get("TRAVEL_DIRECTION");
+
+				Node ref = addOrGetNode(network, linkRecord.get("REF_NODE_ID"), ct.transform(new Coord(lon[0], lat[0])));
+				Node nonRef = addOrGetNode(network, linkRecord.get("NONREF_NODE_ID"), ct.transform(new Coord(lon[1], lat[1])));
+
+				// create links for both directions
+				if (t.equals("B")) {
+
+				} else if (t.equals("F")) {
+					// from ref node
+					Link link = f.createLink(Id.createLinkId(id), ref, nonRef);
+
+
+				} else if (t.equals("T")) {
+					// to ref node
+					Link link = f.createLink(Id.createLinkId(id), nonRef, ref);
+
+
+				} else
+					throw new IllegalStateException("Unknown travel direction: " + t);
+
+			}
+		}
+
 		return 0;
+	}
+
+	private Node addOrGetNode(Network network, String nodeId, Coord transform) {
+
+		Id<Node> id = Id.createNodeId(nodeId);
+
+		if (network.getNodes().containsKey(id))
+			return network.getNodes().get(id);
+
+		Node node = network.getFactory().createNode(id, transform);
+		network.addNode(node);
+		return node;
 	}
 
 	private Map<String, double[]> createSpeedValues(HereMapsLayer.Result st) {
@@ -227,6 +320,19 @@ public class TravelTimePatterns implements MATSimAppCommand {
 		}
 
 		return map;
+	}
+
+	/**
+	 * Converts HERE coordinates from [10^-5 degree WGS84]. Comma separated. Each value is relative to the previous.
+	 */
+	private static double[] parseCoords(String s) {
+		double[] x = Arrays.stream(s.split(",")).mapToDouble(TravelTimePatterns::parseDouble).toArray();
+		x[0] *= 10e-6;
+		for (int i = 1; i < x.length; i++) {
+			x[i] = x[i - 1] + x[i] * 10e-6;
+		}
+
+		return x;
 	}
 
 	private static double parseDouble(String s) {
