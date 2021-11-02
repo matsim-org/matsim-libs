@@ -65,8 +65,8 @@ public class SimpleParameterTuner implements ParameterTuner {
             double a0 = config.planCalcScore().getModes().get(modeToTune).getMarginalUtilityOfTraveling();
             double b0 = config.planCalcScore().getModes().get(modeToTune).getConstant();
             for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
-                double x = averageTravelTimes.get(distanceGroup); // x-axis: travel time. We use average travel time of the distance group
-                double y0 = a0 * x + b0; // y-axis: the cost of the trip
+                double x = averageTravelTimes.get(distanceGroup); // x-axis: travel time (unit: second). We use average travel time of the distance group
+                double y0 = a0 * (x / 3600) + b0; // y-axis: the cost of the trip
                 double alpha = calculateAdjustmentRatio(errorMapForModeToTune.get(distanceGroup));
                 double y = (1 + alpha) * y0;
                 regression.addData(x, y);
@@ -107,11 +107,11 @@ public class SimpleParameterTuner implements ParameterTuner {
 
     private double calculateAdjustmentForWalk(double totalError) {
         if (totalError < -0.1) {
-            return -1.0;
-        }
-        if (totalError > 0.1) {
             return 1.0;
         }
-        return 10 * totalError;
+        if (totalError > 0.1) {
+            return -1.0;
+        }
+        return -10 * totalError;
     }
 }
