@@ -17,7 +17,9 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Helper class to load layer information from HERE API
@@ -213,5 +215,47 @@ public final class HereMapsLayer {
 		FC(int level) {
 			this.level = level;
 		}
+	}
+
+	/**
+	 * Enum with bitmasks for vehicle types.
+	 */
+	public enum VehicleType {
+		car(1),
+		bus(2),
+		taxi(4),
+		car_pool(8),
+		pedestrian(16),
+		truck(32),
+		delivery(64),
+		emergency(128),
+		through_traffic(256),
+		motorcycle(512),
+		road_train(1024);
+
+		/**
+		 * The corresponding bit as integer 2^x
+		 */
+		final int bit;
+
+		VehicleType(int bit) {
+			this.bit = bit;
+		}
+
+		/**
+		 * Parse contained vehicle types from a bit set.
+		 */
+		static Set<VehicleType> parse(int value) {
+
+			Set<VehicleType> set = new HashSet<>();
+
+			for (VehicleType t : VehicleType.values()) {
+				if ((value & t.bit) == t.bit)
+					set.add(t);
+			}
+
+			return set;
+		}
+
 	}
 }
