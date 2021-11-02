@@ -245,7 +245,7 @@ public final class HereMapsLayer {
 		/**
 		 * Parse contained vehicle types from a bit set.
 		 */
-		static Set<VehicleType> parse(int value) {
+		public static Set<VehicleType> parse(int value) {
 
 			Set<VehicleType> set = new HashSet<>();
 
