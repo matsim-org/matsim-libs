@@ -177,7 +177,7 @@ public class EShiftTaskScheduler {
                 dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
                         endTime, link, shift.getBreak(), breakFacility);
             } else {
-				double energyCharge = ((BatteryCharging) ev.getChargingPower()).calcEnergyCharge(charger.getSpecification(), endTime - startTime);
+				double energyCharge = ((BatteryCharging) ev.getChargingPower()).calcEnergyCharged(charger.getSpecification(), endTime - startTime);
 				double totalEnergy = -energyCharge;
                 ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(ev);
                 dropoffStopTask = ((ShiftEDrtTaskFactoryImpl) taskFactory).createChargingShiftBreakTask(vehicle,
@@ -310,7 +310,7 @@ public class EShiftTaskScheduler {
                 dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
                         endTime, link, shift.getEndTime(), breakFacility);
             } else {
-				double energyCharge = ((BatteryCharging) ev.getChargingPower()).calcEnergyCharge(charger.getSpecification(), endTime - startTime);
+				double energyCharge = ((BatteryCharging) ev.getChargingPower()).calcEnergyCharged(charger.getSpecification(), endTime - startTime);
 				double totalEnergy = -energyCharge;
                 ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(ev);
                 dropoffStopTask = ((ShiftEDrtTaskFactoryImpl) taskFactory).createChargingShiftChangeoverTask(vehicle,

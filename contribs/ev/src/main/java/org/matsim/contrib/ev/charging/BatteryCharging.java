@@ -27,7 +27,7 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
  */
 public interface BatteryCharging extends ChargingPower {
 
-	double calcEnergyCharge(ChargerSpecification charger, double chargePeriod);
+	double calcEnergyCharged(ChargerSpecification charger, double chargingPeriod);
 
 	double calcChargingTime(ChargerSpecification charger, double energy);
 }
