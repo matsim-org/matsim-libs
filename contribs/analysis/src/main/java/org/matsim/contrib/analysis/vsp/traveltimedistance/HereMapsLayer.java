@@ -258,4 +258,29 @@ public final class HereMapsLayer {
 		}
 
 	}
+
+	/**
+	 * Speed category as defined by the API.
+	 */
+	public enum SpeedCategory {
+		UNDEFINED(0),
+		SC_1(150/3.6),
+		SC_2(130/3.6),
+		SC_3(100/3.6),
+		SC_4(90/3.6),
+		SC_5(70/3.6),
+		SC_6(50/3.6),
+		SC_7(30/3.6),
+		SC_8(11/3.6),
+		;
+
+		/**
+		 * Speed in m/s.
+		 */
+		public final double speed;
+
+		SpeedCategory(double speed) {
+			this.speed = speed;
+		}
+	}
 }

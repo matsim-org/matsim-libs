@@ -251,8 +251,8 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					linkT.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
 					linkF.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
 
-					linkF.setFreespeed(ffSpeed.getOrDefault(id, 0d));
-					linkT.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+					linkF.setFreespeed(retrieveSpeed(ffSpeed, id, record));
+					linkT.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 
 					linkF.setAllowedModes(modes);
 					linkT.setAllowedModes(modes);
@@ -267,7 +267,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
 					link.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
 
-					link.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 					link.setAllowedModes(modes);
 
 					network.addLink(link);
@@ -279,7 +279,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
 					link.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
 
-					link.setFreespeed(ffSpeed.getOrDefault(id, 0d));
+					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 					link.setAllowedModes(modes);
 
 					network.addLink(link);
@@ -296,7 +296,14 @@ public class TravelTimePatterns implements MATSimAppCommand {
 		return 0;
 	}
 
-	private Node addOrGetNode(Network network, String nodeId, Coord transform) {
+	private static double retrieveSpeed(Map<String, Double> ffSpeed, String id, CSVRecord record) {
+
+		double speed = ffSpeed.getOrDefault(id, 0d);
+
+		return speed != 0 ? speed : HereMapsLayer.SpeedCategory.values()[Integer.parseInt(record.get("SPEED_CATEGORY"))].speed;
+	}
+
+	private static Node addOrGetNode(Network network, String nodeId, Coord transform) {
 
 		Id<Node> id = Id.createNodeId(nodeId);
 
@@ -308,7 +315,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 		return node;
 	}
 
-	private Map<String, double[]> createSpeedValues(HereMapsLayer.Result st) {
+	private static Map<String, double[]> createSpeedValues(HereMapsLayer.Result st) {
 
 		Map<String, double[]> map = new HashMap<>();
 
@@ -324,7 +331,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 		return map;
 	}
 
-	private Map<String, String> createGeometries(HereMapsLayer.Result geom) {
+	private static Map<String, String> createGeometries(HereMapsLayer.Result geom) {
 
 		HashMap<String, String> map = new HashMap<>();
 
