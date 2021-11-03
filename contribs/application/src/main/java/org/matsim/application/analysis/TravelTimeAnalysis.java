@@ -156,7 +156,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             } else if (api == API.NETWORK_FILE) {
                 NetworkConfigGroup configGroup = new NetworkConfigGroup();
                 configGroup.setTimeVariantNetwork(true);
-                validator = new TimeVariantNetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
+                validator = new NetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }
@@ -192,7 +192,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             } else if (api == API.NETWORK_FILE) {
                 NetworkConfigGroup configGroup = new NetworkConfigGroup();
                 configGroup.setTimeVariantNetwork(true);
-                validator = new TimeVariantNetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
+                validator = new NetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }
