@@ -74,17 +74,16 @@ public class SparseMatrix {
 		public int get(int toNodeIndex) {
 			return presentNodes.get(toNodeIndex) ?
 					values[Arrays.binarySearch(nodeIndices, toNodeIndex)] :
-					-1; //not present in the row
+					-1; // value not present in the row
 		}
 	}
-
-	private static final SparseRow EMPTY_ROW = new SparseRow(List.of());
 
 	private final SparseRow[] rows = new SparseRow[Id.getNumberOfIds(Node.class)];
 
 	public int get(Node fromNode, Node toNode) {
-		var row = Objects.requireNonNullElse(rows[fromNode.getId().index()], EMPTY_ROW);
-		return row.get(toNode.getId().index());
+		var row = rows[fromNode.getId().index()];
+		return row != null ? row.get(toNode.getId().index()) // get the value from the selected row
+				: -1; // value not present if no row
 	}
 
 	public void setRow(Node fromNode, SparseRow row) {
