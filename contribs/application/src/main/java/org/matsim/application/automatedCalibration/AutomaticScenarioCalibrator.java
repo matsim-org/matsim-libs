@@ -219,14 +219,15 @@ public abstract class AutomaticScenarioCalibrator {
      */
     private void writeRecord() throws IOException {
         CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputFolder + "/record.csv", true), CSVFormat.DEFAULT);
-        csvWriter.printRecord("mode", "asc", "marginal");
-        csvWriter.printRecord("Tuning run " + counter, "Max abs error = " + currentMaxAbsError,
-                "Sum abs error = " + currentSumAbsError);
+        csvWriter.printRecord("Run-" + counter, "ASC", "Marginal", "Mode share Error");
         for (String mode : modes) {
             csvWriter.printRecord(mode,
                     config.planCalcScore().getModes().get(mode).getConstant(),
-                    config.planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling());
+                    config.planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling(),
+                    Double.toString(errorMap.get(mode).values().stream().mapToDouble(v -> v).sum()));
         }
+        csvWriter.printRecord("Summary", "Max abs err = " + currentMaxAbsError,
+                "Sum abs err = " + currentSumAbsError, "Best max abs err = " + maxAbsError);
         csvWriter.close();
     }
 

@@ -11,10 +11,10 @@ import java.util.Map;
 
 /**
  * This simple tuner will tune the ASC and marginal traveling utility based on the error between simulated output
- * and reference data. One mode will be tuned each time. Average travel time of trips for each distance group is
+ * and reference data. All modes (except walk) are tuned. Average travel time of trips for each distance group is
  * calculated and the cost of the trip can then be estimated. Based on the error, we will slightly modify the cost
- * and a new cost structure will be computed based on the linear regression. If the walk mode is being calibrated
- * only the marginal traveling utility will be tuned and the ASC for walk will always remain 0.
+ * and a new cost structure will be computed based on the linear regression. The walk cost for the walk mode is
+ * fixed.
  */
 public class SimpleParameterTuner implements ParameterTuner {
     private final String[] modes;
@@ -29,18 +29,12 @@ public class SimpleParameterTuner implements ParameterTuner {
     @Override
     public void tune(Config config, Map<String, Map<String, Double>> errorMap, List<AutomaticScenarioCalibrator.Trip> trips) {
         // Find the mode to tune
-        double maxError = 0;
-        String modeToTune = "unknown";
         for (String mode : modes) {
-            double error = errorMap.get(mode).values().stream().mapToDouble(Math::abs).max().orElseThrow();
-            if (error > maxError) {
-                maxError = error;
-                modeToTune = mode;
+            if (mode.equals(TransportMode.walk)){
+                continue; // The cost for walk is fixed
             }
-        }
 
-        // Calculate average travel time of the mode for each distance group
-        if (!modeToTune.equals(TransportMode.walk)) {
+            // Tuning the parameter
             Map<String, List<Double>> relevantTrips = new HashMap<>();
             Map<String, Double> averageTravelTimes = new HashMap<>();
             for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
@@ -48,7 +42,7 @@ public class SimpleParameterTuner implements ParameterTuner {
             }
 
             for (AutomaticScenarioCalibrator.Trip trip : trips) {
-                if (trip.getMode().equals(modeToTune)) {
+                if (trip.getMode().equals(mode)) {
                     String distanceGroup = distanceGrouping.assignDistanceGroup(trip.getDistance());
                     relevantTrips.get(distanceGroup).add(trip.getTravelTime());
                 }
@@ -61,9 +55,9 @@ public class SimpleParameterTuner implements ParameterTuner {
 
             // Tune the parameter by fitting the new cost structure
             SimpleRegression regression = new SimpleRegression();
-            Map<String, Double> errorMapForModeToTune = errorMap.get(modeToTune);
-            double a0 = config.planCalcScore().getModes().get(modeToTune).getMarginalUtilityOfTraveling();
-            double b0 = config.planCalcScore().getModes().get(modeToTune).getConstant();
+            Map<String, Double> errorMapForModeToTune = errorMap.get(mode);
+            double a0 = config.planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling();
+            double b0 = config.planCalcScore().getModes().get(mode).getConstant();
             for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
                 double x = averageTravelTimes.get(distanceGroup); // x-axis: travel time (unit: second). We use average travel time of the distance group
                 double y0 = a0 * (x / 3600) + b0; // y-axis: the cost of the trip
@@ -81,37 +75,18 @@ public class SimpleParameterTuner implements ParameterTuner {
             b = simpleParameterConstraints.processASC(b);
 
             // Tune the parameter
-            config.planCalcScore().getModes().get(modeToTune).setMarginalUtilityOfTraveling(a);
-            config.planCalcScore().getModes().get(modeToTune).setConstant(b);
-        } else {
-            // For walk, we only tune the marginal cost and constant is always 0
-            double a0 = config.planCalcScore().getModes().get(modeToTune).getMarginalUtilityOfTraveling();
-            double totalError = 0;
-            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
-                totalError += errorMap.get(modeToTune).get(distanceGroup);
-            }
-            double a = Math.max(a0 + calculateAdjustmentForWalk(totalError), 0);
-            config.planCalcScore().getModes().get(modeToTune).setMarginalUtilityOfTraveling(a);
+            config.planCalcScore().getModes().get(mode).setMarginalUtilityOfTraveling(a);
+            config.planCalcScore().getModes().get(mode).setConstant(b);
         }
     }
 
     private double calculateAdjustmentRatio(double error) {
         if (error < -4 * targetError) {
-            return -0.2;
+            return -0.1;
         }
         if (error > 4 * targetError) {
-            return 0.2;
+            return 0.1;
         }
-        return error / (20 * targetError);
-    }
-
-    private double calculateAdjustmentForWalk(double totalError) {
-        if (totalError < -0.1) {
-            return 1.0;
-        }
-        if (totalError > 0.1) {
-            return -1.0;
-        }
-        return -10 * totalError;
+        return error / (40 * targetError);
     }
 }
