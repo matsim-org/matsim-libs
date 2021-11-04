@@ -35,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
@@ -52,6 +53,66 @@ public class RunDrtExampleIT {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//disable rejections
+			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		}
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.0)
+				.rejections(0)
+				.waitAverage(296.95)
+				.inVehicleTravelTimeMean(387.02)
+				.totalTravelTimeMean(683.97)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
+	public void testRunDrtExampleWithNoRejections_SelectiveSearch() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//replace extensive with selective search
+			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
+			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);// using exactly free-speed estimates
+			drtCfg.addParameterSet(selectiveInsertionSearchParams);
+
+			//disable rejections
+			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		}
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.0)
+				.rejections(0)
+				.waitAverage(293.47)
+				.inVehicleTravelTimeMean(389.71)
+				.totalTravelTimeMean(683.18)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
 
 	@Test
 	public void testRunDrtExampleWithRequestRetry() {
