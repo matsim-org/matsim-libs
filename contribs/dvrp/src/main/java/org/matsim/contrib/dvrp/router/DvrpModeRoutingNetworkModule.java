@@ -73,7 +73,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 				return subnetwork;
 			})).asEagerSingleton();
 
-			//lazily initialised: optimisers may do not need it
+			//lazily initialised: optimisers may not need it
 			bindModal(DvrpTravelTimeMatrix.class).toProvider(modalProvider(
 					getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class),
 							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads(),
