@@ -228,6 +228,7 @@ public abstract class AutomaticScenarioCalibrator {
         }
         csvWriter.printRecord("Summary", "Max abs err = " + currentMaxAbsError,
                 "Sum abs err = " + currentSumAbsError, "Best max abs err = " + maxAbsError);
+        csvWriter.println();
         csvWriter.close();
     }
 
