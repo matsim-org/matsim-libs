@@ -33,7 +33,7 @@ public final class LinkStatsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITELINKSTATSINTERVAL = "writeLinkStatsInterval";
 	private static final String AVERAGELINKSTATSOVERITERATIONS = "averageLinkStatsOverIterations";
 
-	private int writeLinkStatsInterval = 10;
+	private int writeLinkStatsInterval = 50;
 	private int averageLinkStatsOverIterations = 5;
 
 	public LinkStatsConfigGroup() {
