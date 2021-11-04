@@ -98,7 +98,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 
         ScoringParameters scoringParametersForThisPerson = params.get(person.getId());
         if (scoringParametersForThisPerson == null) {
-            final String subpopulation = PopulationUtils.getSubpopulation(person);
+            final String subpopulation = PopulationUtils.getSubpopulation(person) == null ? "default" : PopulationUtils.getSubpopulation(person) ;
 
             //the following is a comment that was orinally put into SubpopulationScoringParams, which is the template for this class...
             /* lazy initialization of params. not strictly thread safe, as different threads could
