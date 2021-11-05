@@ -30,7 +30,7 @@ public class SimpleParameterTuner implements ParameterTuner {
     public void tune(Config config, Map<String, Map<String, Double>> errorMap, List<AutomaticScenarioCalibrator.Trip> trips) {
         // Find the mode to tune
         for (String mode : modes) {
-            if (mode.equals(TransportMode.walk)){
+            if (mode.equals(TransportMode.walk)) {
                 continue; // The cost for walk is fixed
             }
 
@@ -59,8 +59,8 @@ public class SimpleParameterTuner implements ParameterTuner {
             double a0 = config.planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling();
             double b0 = config.planCalcScore().getModes().get(mode).getConstant();
             for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
-                double x = averageTravelTimes.get(distanceGroup); // x-axis: travel time (unit: second). We use average travel time of the distance group
-                double y0 = a0 * (x / 3600) + b0; // y-axis: the cost of the trip
+                double x = averageTravelTimes.get(distanceGroup) / 3600; // x-axis: travel time (unit: hour). We use average travel time of the distance group
+                double y0 = a0 * x + b0; // y-axis: the cost of the trip
                 double alpha = calculateAdjustmentRatio(errorMapForModeToTune.get(distanceGroup));
                 double y = (1 + alpha) * y0;
                 regression.addData(x, y);
