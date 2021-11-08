@@ -519,9 +519,7 @@ public final class EditTrips {
 			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
 			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
-			if (Double.isFinite(
-					previousActivity.getEndTime().seconds()) && previousActivity.getEndTime().seconds()
-					< now) {
+			if (previousActivity.getEndTime().isDefined() && previousActivity.getEndTime().seconds() < now) {
 				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
 				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + travelTime;
 				// plausibility check: The agent can only arrive after the current time
