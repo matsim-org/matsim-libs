@@ -41,6 +41,7 @@ public abstract class AutomaticScenarioCalibrator {
     protected int counter = 0;
     private int nonImprovingRuns = 0;
     private double maxAbsError = 1.0;
+    private double sumAbsError = Double.MAX_VALUE;
     private boolean complete = false;
     private long startTime;
     protected final Config config;
@@ -319,13 +320,14 @@ public abstract class AutomaticScenarioCalibrator {
                 }
             }
         }
-        if (currentMaxAbsError >= maxAbsError) {
+        if (currentMaxAbsError >= maxAbsError && currentSumAbsError >= sumAbsError) {
             // No improvements for this run
             nonImprovingRuns++;
         } else {
             // Results have been improved
             nonImprovingRuns = 0;
             maxAbsError = currentMaxAbsError;
+            sumAbsError = currentSumAbsError;
         }
     }
 }
