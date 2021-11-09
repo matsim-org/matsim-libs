@@ -310,6 +310,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions from stop-go fraction:
 					efkey.setTrafficSituation(STOPANDGO);
 					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
+					logger.debug("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
+
 				}
 
 				double efFreeFlow_gpkm = 0. ;
@@ -317,6 +319,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions for free-flow fraction:
 					efkey.setTrafficSituation(FREEFLOW);
 					efFreeFlow_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
+					logger.debug("pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm);
 				}
 
 				// sum them up:
