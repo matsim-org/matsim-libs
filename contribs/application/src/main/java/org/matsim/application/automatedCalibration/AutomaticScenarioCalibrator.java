@@ -326,8 +326,8 @@ public abstract class AutomaticScenarioCalibrator {
         } else {
             // Results have been improved
             nonImprovingRuns = 0;
-            maxAbsError = currentMaxAbsError;
-            sumAbsError = currentSumAbsError;
+            maxAbsError = Math.min(currentMaxAbsError, maxAbsError);
+            sumAbsError = Math.min(currentSumAbsError, sumAbsError;
         }
     }
 }
