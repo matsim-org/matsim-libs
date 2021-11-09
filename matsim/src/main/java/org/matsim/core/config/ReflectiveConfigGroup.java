@@ -33,6 +33,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
+import com.google.common.base.Preconditions;
+
 /**
  * A module using reflection for easy implementation of config groups.
  * <br>
@@ -289,6 +291,8 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			setter.invoke( this , Long.parseLong( value ) );
 		}
 		else if ( type.equals( Boolean.class ) || type.equals( Boolean.TYPE ) ) {
+			Preconditions.checkArgument(value.equals("true") || value.equals("false"),
+					"Incorrect value of the boolean parameter: %s", value);
 			setter.invoke( this , Boolean.parseBoolean( value ) );
 		}
 		else if ( type.equals( Character.class ) || type.equals( Character.TYPE ) ) {
