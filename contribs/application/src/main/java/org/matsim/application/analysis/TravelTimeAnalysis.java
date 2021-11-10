@@ -111,6 +111,16 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             return 2;
         }
 
+        // Set date to next Wednesday if not configured
+        if (date == null) {
+
+            // Google API only allows days in the future
+            if (api == TravelTimeDistanceValidators.GOOGLE_MAP)
+                date = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
+            else
+                date = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.WEDNESDAY));
+        }
+
         String outputFolder = runDirectory.resolve(output).toString();
         if (type == AnalysisTypes.POST_ANALYSIS) {
             Path events = globFile(runDirectory, runId + ".*events.*");
@@ -131,11 +141,6 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
                     tripFilter = carTrip -> index.contains(carTrip.getArrivalLocation()) || index.contains(carTrip.getDepartureLocation());
             }
             log.info("Removed {} agents not selecting their best plan", size - populationIds.size());
-
-            // Set date to next Wednesday if not configured
-            if (date == null) {
-                date = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
-            }
 
             log.info("Running analysis for {} trips at {} on file {}", trips, date, events);
 
