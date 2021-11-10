@@ -21,7 +21,9 @@ import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import picocli.CommandLine;
@@ -105,6 +107,10 @@ public class TravelTimePatterns implements MATSimAppCommand {
 		Map<String, Double> ffSpeed = new HashMap<>();
 		Map<String, Double> avgSpeed = new HashMap<>();
 
+		// from ref and to ref speeds
+		Map<String, double[]> fSpeeds = new HashMap<>();
+		Map<String, double[]> tSpeeds = new HashMap<>();
+
 		try (CSVPrinter printer = csv.createPrinter(output)) {
 
 			Set<String> written = new HashSet<>();
@@ -123,10 +129,13 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 				double[] values = null;
 
-				if (record.get("F_WEEKDAY").contains(","))
+				if (record.get("F_WEEKDAY").contains(",")) {
 					values = speedValues.get(record.get("F_WEEKDAY").split(",")[weekday]);
-				else if (record.get("T_WEEKDAY").contains(","))
+					fSpeeds.put(id, values);
+				} else if (record.get("T_WEEKDAY").contains(",")) {
 					values = speedValues.get(record.get("T_WEEKDAY").split(",")[weekday]);
+					tSpeeds.put(id, values);
+				}
 
 				if (values == null) {
 					continue;
@@ -205,14 +214,13 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			group.setTimeVariantNetwork(true);
 
 			Network network = NetworkUtils.createNetwork(group);
+			List<NetworkChangeEvent> changeEvents = new ArrayList<>();
 
 			ProjectionUtils.putCRS(network, crs.getTargetCRS());
 
 			CoordinateTransformation ct = crs.getTransformation();
 
 			NetworkFactory f = network.getFactory();
-
-			// TODO: write time variant network
 
 			HereMapsLayer attrLayer = new HereMapsLayer("LINK_ATTRIBUTE", appId, appCode);
 			HereMapsLayer.Result attrs = attrLayer.fetchAll(bbox, fc);
@@ -257,6 +265,9 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					linkF.setAllowedModes(modes);
 					linkT.setAllowedModes(modes);
 
+					changeEvents.addAll(createChangeEvents(linkF, fSpeeds.getOrDefault(id, null)));
+					changeEvents.addAll(createChangeEvents(linkT, tSpeeds.getOrDefault(id, null)));
+
 					network.addLink(linkF);
 					network.addLink(linkT);
 
@@ -270,6 +281,8 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 					link.setAllowedModes(modes);
 
+					changeEvents.addAll(createChangeEvents(link, fSpeeds.getOrDefault(id, null)));
+
 					network.addLink(link);
 
 				} else if (t.equals("T")) {
@@ -282,6 +295,8 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 					link.setAllowedModes(modes);
 
+					changeEvents.addAll(createChangeEvents(link, tSpeeds.getOrDefault(id, null)));
+
 					network.addLink(link);
 				} else
 					throw new IllegalStateException("Unknown travel direction: " + t);
@@ -291,9 +306,43 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			log.info("Writing network to {}", networkOutput);
 
 			NetworkUtils.writeNetwork(network, networkOutput.toString());
+
+			String eventPath = networkOutput.toString().replace(".xml", "-events.xml");
+			log.info("Writing {} change events to {}", changeEvents.size(), eventPath);
+
+			NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
+			writer.write(eventPath, changeEvents);
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Creates network change events from time bin interpretation.
+	 */
+	private Collection<NetworkChangeEvent> createChangeEvents(Link link, double[] speeds) {
+
+		List<NetworkChangeEvent> events = new ArrayList<>();
+
+		if (speeds == null)
+			return events;
+
+		double last = Double.MAX_VALUE;
+
+		for (int i = 0; i < speeds.length; i++) {
+
+			double v = speeds[i];
+			if (v != last) {
+
+				NetworkChangeEvent ev = new NetworkChangeEvent(i * 900);
+				ev.addLink(link);
+				ev.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, v));
+				events.add(ev);
+				last = v;
+			}
+		}
+
+		return events;
 	}
 
 	private static double retrieveSpeed(Map<String, Double> ffSpeed, String id, CSVRecord record) {
