@@ -21,7 +21,9 @@ import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -130,8 +132,10 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             }
             log.info("Removed {} agents not selecting their best plan", size - populationIds.size());
 
-            if (date == null)
-                date = LocalDate.now();
+            // Set date to next Wednesday if not configured
+            if (date == null) {
+                date = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
+            }
 
             log.info("Running analysis for {} trips at {} on file {}", trips, date, events);
 
@@ -171,7 +175,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
             TravelTimeDistanceValidator validator;
             if (api == TravelTimeDistanceValidators.HERE) {
-                validator = new HereMapsRouteValidator(outputFolder, apiMode, appCode, "2021-01-01", transformation, writeDetails);
+                validator = new HereMapsRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation, writeDetails);
             } else if (api == TravelTimeDistanceValidators.GOOGLE_MAP) {
                 validator = new GoogleMapRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation);
             } else {
