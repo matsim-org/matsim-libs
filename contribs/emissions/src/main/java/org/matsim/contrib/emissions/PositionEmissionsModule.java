@@ -49,9 +49,13 @@ public class PositionEmissionsModule extends AbstractModule {
 		if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
 			throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
 		}
-		if (!(config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue) || !config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.kinematicWaves))) {
+		if (isNotCorrectSnapshotStyle(config.qsim().getSnapshotStyle())) {
 			throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue or == kinematicWaves");
 		}
+	}
+
+	private static boolean isNotCorrectSnapshotStyle(QSimConfigGroup.SnapshotStyle style) {
+		return !(style.equals(QSimConfigGroup.SnapshotStyle.queue) || style.equals(QSimConfigGroup.SnapshotStyle.kinematicWaves));
 	}
 
 	@Override
