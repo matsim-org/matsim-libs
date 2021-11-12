@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.assertj.core.api.ListAssert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -66,7 +65,7 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0, 1, 2, null, 0));
+				insertion(entry, 0, 0, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -76,10 +75,10 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0, 1, 2, null, 4),//
-				insertion(entry, 0, 1, 1, 2, 3., 0),
+				insertion(entry, 0, 0, 1, 2, Double.POSITIVE_INFINITY, 4),//
+				insertion(entry, 0, 1, 1, 2, 3, 0),
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 0));
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -90,7 +89,7 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after stop
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 0));
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -101,14 +100,14 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0, 1, 2, null, 4),//
-				insertion(entry, 0, 1, 1, 2, 3., 4),//
-				insertion(entry, 0, 2, 1, 2, 3., 0),
+				insertion(entry, 0, 0, 1, 2, Double.POSITIVE_INFINITY, 4),//
+				insertion(entry, 0, 1, 1, 2, 3, 4),//
+				insertion(entry, 0, 2, 1, 2, 3, 0),
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 4),//
-				insertion(entry, 1, 2, 1, 2, 3., 0),
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 4),//
+				insertion(entry, 1, 2, 1, 2, 3, 0),
 				//pickup after stop 1
-				insertion(entry, 2, 2, 1, 2, null, 0));
+				insertion(entry, 2, 2, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -119,10 +118,10 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0, 1, 2, null, 4),
+				insertion(entry, 0, 0, 1, 2, Double.POSITIVE_INFINITY, 4),
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(entry, 2, 2, 1, 2, null, 0));
+				insertion(entry, 2, 2, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -134,10 +133,10 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 4),//
-				insertion(entry, 1, 2, 1, 2, 3., 0),
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 4),//
+				insertion(entry, 1, 2, 1, 2, 3, 0),
 				//pickup after stop 1
-				insertion(entry, 2, 2, 1, 2, null, 0));
+				insertion(entry, 2, 2, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -150,7 +149,7 @@ public class InsertionGeneratorTest {
 				//no pickup after start
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(entry, 2, 2, 1, 2, null, 0));
+				insertion(entry, 2, 2, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -162,13 +161,13 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0, 1, 2, null, 4),//
-				insertion(entry, 0, 1, 1, 2, 3., 4),
+				insertion(entry, 0, 0, 1, 2, Double.POSITIVE_INFINITY, 4),//
+				insertion(entry, 0, 1, 1, 2, 3, 4),
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 4),
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 4),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(entry, 3, 3, 1, 2, null, 0));
+				insertion(entry, 3, 3, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -181,10 +180,10 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 4),
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 4),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(entry, 3, 3, 1, 2, null, 0));
+				insertion(entry, 3, 3, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -195,7 +194,7 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after start (pickup is exactly at stop0)
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 0));
+				insertion(entry, 1, 1, 0, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -205,9 +204,9 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertions(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(entry, 0, 1, 1, 2, 3., 0),
+				insertion(entry, 0, 1, 1, 2, 0, 0),
 				//pickup after stop 0
-				insertion(entry, 1, 1, 1, 2, null, 0));
+				insertion(entry, 1, 1, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	@Test
@@ -220,9 +219,9 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertions(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(entry, 0, 1, 1, 2, 3., 4),
+				insertion(entry, 0, 1, 1, 2, 0, 4),
 				//pickup after stop 0
-				insertion(entry, 2, 2, 1, 2, null, 0));
+				insertion(entry, 2, 2, 1, 2, Double.POSITIVE_INFINITY, 0));
 	}
 
 	private Link link(String id) {
@@ -235,13 +234,28 @@ public class InsertionGeneratorTest {
 		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
 
+		DetourTimeEstimator timeEstimator = (from, to) -> {
+			if (from == to) {
+				return 0;
+			} else if (to.equals(drtRequest.getFromLink())) {
+				return 1;//to pickup
+			} else if (from.equals(drtRequest.getFromLink())) {
+				return 2;//from pickup
+			} else if (to.equals(drtRequest.getToLink())) {
+				return 3;//to dropoff
+			} else if (from.equals(drtRequest.getToLink())) {
+				return 4;//from dropoff
+			}
+			throw new IllegalArgumentException();
+		};
+
 		assertThat(new InsertionGenerator().generateInsertions(drtRequest, entry,
-				new DetourData<>(l -> 1., l -> 2., l -> 3., l -> 4., 0.))).usingRecursiveFieldByFieldElementComparator()
+				new DetourTime(timeEstimator))).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(expectedInsertions);
 	}
 
 	private InsertionWithDetourData<Double> insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,
-			double timeToPickup, double timeFromPickup, Double timeToDropoff, double timeFromDropoff) {
+			double timeToPickup, double timeFromPickup, double timeToDropoff, double timeFromDropoff) {
 		return new InsertionWithDetourData<>(new Insertion(drtRequest, entry, pickupIdx, dropoffIdx), timeToPickup,
 				timeFromPickup, timeToDropoff, timeFromDropoff);
 	}

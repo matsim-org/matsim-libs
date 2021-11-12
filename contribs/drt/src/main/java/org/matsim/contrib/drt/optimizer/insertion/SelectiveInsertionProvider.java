@@ -74,7 +74,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		DetourData<Double> restrictiveTimeData = DetourData.create(restrictiveTimeEstimator, drtRequest);
+		DetourTime restrictiveDetourTime = new DetourTime(restrictiveTimeEstimator);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		Optional<InsertionWithDetourData<Double>> bestInsertion = forkJoinPool.submit(
@@ -83,8 +83,8 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 						//for each vehicle entry
 						vehicleEntries.parallelStream()
 								//generate feasible insertions (wrt occupancy limits) with restrictive detour times
-								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e, restrictiveTimeData)
-										.stream()))).join();
+								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e,
+										restrictiveDetourTime).stream()))).join();
 
 		return bestInsertion.map(InsertionWithDetourData::getInsertion).stream().collect(toList());
 	}

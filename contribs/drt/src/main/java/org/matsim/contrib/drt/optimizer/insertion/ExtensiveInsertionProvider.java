@@ -76,13 +76,14 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		DetourData<Double> admissibleTimeData = DetourData.create(admissibleTimeEstimator, drtRequest);
+		DetourTime admissibleDetourTime = new DetourTime(admissibleTimeEstimator);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<InsertionWithDetourData<Double>> preFilteredInsertions = forkJoinPool.submit(
 				() -> vehicleEntries.parallelStream()
 						//generate feasible insertions (wrt occupancy limits) with admissible detour times
-						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e, admissibleTimeData).stream())
+						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e, admissibleDetourTime)
+								.stream())
 						//optimistic pre-filtering wrt admissible cost function
 						.filter(insertion -> admissibleCostCalculator.calculate(drtRequest, insertion)
 								< INFEASIBLE_SOLUTION_COST)
