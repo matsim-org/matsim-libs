@@ -34,6 +34,17 @@ public abstract class AutomaticScenarioCalibrator {
      * The auto-tuning process will stop when all the error (normalized to total number of trips) are within the allowed range
      */
     private final double targetError;
+    /**
+     * There are 2 stages in the automated tuning process:
+     * Stage 1 (rough-tuning):
+     * Always start from the original input plans, longer iteration process (e.g. 300 - 500) should be used.
+     * Stage 2 (fine-tuning):
+     * After the mode share distribution is not so far away from the reference data (e.g., +/- 5% for all modes),
+     * we will start to use the output plans from previous run as the new starting point.
+     * Meanwhile, the number of iterations (150) will also be reduced, as everything tends to be more stable.
+     */
+    private static boolean usePreviousOutput = false;
+
     protected final String configFile;
 
     private static final Logger log = LogManager.getLogger(AutomaticScenarioCalibrator.class);
@@ -220,7 +231,7 @@ public abstract class AutomaticScenarioCalibrator {
      */
     private void writeRecord() throws IOException {
         CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputFolder + "/record.csv", true), CSVFormat.DEFAULT);
-        csvWriter.printRecord("Run-" + counter, "ASC", "Marginal", "Mode share Error");
+        csvWriter.printRecord("Run " + counter + "(run-" + counter % (patience + 1) + ")", "ASC", "Marginal", "Mode share Error");
         for (String mode : modes) {
             csvWriter.printRecord(mode,
                     config.planCalcScore().getModes().get(mode).getConstant(),
@@ -228,7 +239,7 @@ public abstract class AutomaticScenarioCalibrator {
                     Double.toString(errorMap.get(mode).values().stream().mapToDouble(v -> v).sum()));
         }
         csvWriter.printRecord("Summary", "Max abs err = " + currentMaxAbsError,
-                "Sum abs err = " + currentSumAbsError, "Best max abs err = " + maxAbsError);
+                "Sum abs err = " + currentSumAbsError, "Use previous output plans = " + usePreviousOutput);
         csvWriter.println();
         csvWriter.close();
     }
@@ -237,6 +248,16 @@ public abstract class AutomaticScenarioCalibrator {
      * Checking if the calibration should be terminated (either complete or certain limit is reached)
      */
     private void checkIfComplete() {
+        // Check if we reach the stage 2:
+        usePreviousOutput = true;
+        for (String mode : modes) {
+            if (errorMap.get(mode).values().stream().mapToDouble(v -> v).sum() > 0.05) {
+                usePreviousOutput = false;
+                break;
+            }
+        }
+
+        // Check if the termination condition is reached
         // Case 1: Everything is within range
         if (maxAbsError < targetError) {
             complete = true;
@@ -262,11 +283,25 @@ public abstract class AutomaticScenarioCalibrator {
      * Calibrate the parameter in the config file and prepare for the next run
      */
     private void modifyConfig() {
+        // get previous output directory
+        String previousOutputDirectory = config.controler().getOutputDirectory();
+        String runId = config.controler().getRunId();
+        String previousOutputPlans = "/output_plans.xml.gz";
+        if (runId != null && !runId.equals("")) {
+            previousOutputPlans = "/" + runId + ".output_plans.xml.gz";
+        }
+
         // Tune parameter
         parameterTuner.tune(config, errorMap, trips);
+
         // update output folder for next run
         int number = counter % (patience + 1); // Only keep the last (patience + 1) output. Override previous ones to prevent generating too many not very useful things...
         config.controler().setOutputDirectory(outputFolder + "/run-" + number);
+        if (usePreviousOutput) {
+            config.plans().setInputFile(previousOutputDirectory + previousOutputPlans);
+            config.controler().setLastIteration(150);
+            config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+        }
     }
 
     // Initializations
