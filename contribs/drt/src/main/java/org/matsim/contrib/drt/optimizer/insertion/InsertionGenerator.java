@@ -123,8 +123,13 @@ public class InsertionGenerator {
 		}
 	}
 
-	public List<InsertionWithDetourData<Double>> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry,
-			DetourTime detourTime) {
+	private final DetourTime detourTime;
+
+	public InsertionGenerator(DetourTimeEstimator detourTimeEstimator) {
+		detourTime = new DetourTime(detourTimeEstimator);
+	}
+
+	public List<InsertionWithDetourData<Double>> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<InsertionWithDetourData<Double>> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
@@ -158,9 +163,7 @@ public class InsertionGenerator {
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (drtRequest.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
-						insertions.add(
-								detourTime.createInsertionWithDetourData(new Insertion(drtRequest, vEntry, i, j),
-										drtRequest));
+						insertions.add(createInsertionWithDetourData(drtRequest, vEntry, i, j));
 					}
 
 					return;// stop iterating -- cannot insert dropoff after node j
@@ -168,14 +171,12 @@ public class InsertionGenerator {
 			}
 
 			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
-				insertions.add(
-						detourTime.createInsertionWithDetourData(new Insertion(drtRequest, vEntry, i, j), drtRequest));
+				insertions.add(createInsertionWithDetourData(drtRequest, vEntry, i, j));
 			}
 			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
-		insertions.add(detourTime.createInsertionWithDetourData(new Insertion(drtRequest, vEntry, i, stopCount),
-				drtRequest));// insertion after last stop
+		insertions.add(createInsertionWithDetourData(drtRequest, vEntry, i, stopCount));// insertion after last stop
 	}
 
 	private Waypoint.Stop currentStop(VehicleEntry entry, int insertionIdx) {
@@ -184,5 +185,15 @@ public class InsertionGenerator {
 
 	private Waypoint.Stop nextStop(VehicleEntry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
+	}
+
+	private InsertionWithDetourData<Double> createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
+			int pickupIdx, int dropoffIdx) {
+		var insertion = new Insertion(request, vehicleEntry, pickupIdx, dropoffIdx);
+		double toPickup = detourTime.calcToPickupTime(insertion, request);
+		double fromPickup = detourTime.calcFromPickupTime(insertion, request);
+		double toDropoff = detourTime.calcToDropoffTime(insertion, request);
+		double fromDropoff = detourTime.calcFromDropoffTime(insertion, request);
+		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
 	}
 }

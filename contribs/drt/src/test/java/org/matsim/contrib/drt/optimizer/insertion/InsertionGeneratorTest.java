@@ -249,9 +249,8 @@ public class InsertionGeneratorTest {
 			throw new IllegalArgumentException();
 		};
 
-		assertThat(new InsertionGenerator().generateInsertions(drtRequest, entry,
-				new DetourTime(timeEstimator))).usingRecursiveFieldByFieldElementComparator()
-				.containsExactly(expectedInsertions);
+		assertThat(new InsertionGenerator(timeEstimator).generateInsertions(drtRequest,
+				entry)).usingRecursiveFieldByFieldElementComparator().containsExactly(expectedInsertions);
 	}
 
 	private InsertionWithDetourData<Double> insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,

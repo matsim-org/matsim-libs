@@ -51,7 +51,7 @@ public class SelectiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new SelectiveInsertionProvider(null, initialInsertionFinder, new InsertionGenerator(),
+		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder, new InsertionGenerator(null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
@@ -74,7 +74,7 @@ public class SelectiveInsertionProviderTest {
 		var insertion1 = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertion2 = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertionGenerator = mock(InsertionGenerator.class);
-		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry), any())).thenReturn(
+		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(
 				List.of(insertionWithDetourData(insertion1), insertionWithDetourData(insertion2)));
 
 		//init restrictiveDetourTimeEstimator
@@ -91,8 +91,8 @@ public class SelectiveInsertionProviderTest {
 				.thenReturn(selectedInsertionWithDetourData);
 
 		//test insertionProvider
-		var insertionProvider = new SelectiveInsertionProvider(restrictiveDetourTimeEstimator, initialInsertionFinder,
-				insertionGenerator, rule.forkJoinPool);
+		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder, insertionGenerator,
+				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(
 				selectedInsertion.stream().collect(toList()));
 	}

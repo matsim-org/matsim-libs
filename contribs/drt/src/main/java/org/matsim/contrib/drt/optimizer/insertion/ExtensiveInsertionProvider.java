@@ -53,37 +53,32 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 
 	private final ExtensiveInsertionSearchParams insertionParams;
 	private final InsertionCostCalculator<Double> admissibleCostCalculator;
-	private final DetourTimeEstimator admissibleTimeEstimator;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
 	public ExtensiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator admissibleTimeEstimator,
 			ForkJoinPool forkJoinPool, InsertionCostCalculator<Double> admissibleCostCalculator) {
 		this((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(), admissibleCostCalculator,
-				admissibleTimeEstimator, new InsertionGenerator(), forkJoinPool);
+				new InsertionGenerator(admissibleTimeEstimator), forkJoinPool);
 	}
 
 	@VisibleForTesting
 	ExtensiveInsertionProvider(ExtensiveInsertionSearchParams insertionParams,
-			InsertionCostCalculator<Double> admissibleCostCalculator, DetourTimeEstimator admissibleTimeEstimator,
-			InsertionGenerator insertionGenerator, ForkJoinPool forkJoinPool) {
+			InsertionCostCalculator<Double> admissibleCostCalculator, InsertionGenerator insertionGenerator,
+			ForkJoinPool forkJoinPool) {
 		this.insertionParams = insertionParams;
 		this.admissibleCostCalculator = admissibleCostCalculator;
-		this.admissibleTimeEstimator = admissibleTimeEstimator;
 		this.insertionGenerator = insertionGenerator;
 		this.forkJoinPool = forkJoinPool;
 	}
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		DetourTime admissibleDetourTime = new DetourTime(admissibleTimeEstimator);
-
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<InsertionWithDetourData<Double>> preFilteredInsertions = forkJoinPool.submit(
 				() -> vehicleEntries.parallelStream()
 						//generate feasible insertions (wrt occupancy limits) with admissible detour times
-						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e, admissibleDetourTime)
-								.stream())
+						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 						//optimistic pre-filtering wrt admissible cost function
 						.filter(insertion -> admissibleCostCalculator.calculate(drtRequest, insertion)
 								< INFEASIBLE_SOLUTION_COST)

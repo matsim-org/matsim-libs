@@ -51,22 +51,19 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 		return new SelectiveInsertionProvider(restrictiveDetourTimeEstimator, forkJoinPool, restrictiveCostCalculator);
 	}
 
-	private final DetourTimeEstimator restrictiveTimeEstimator;
 	private final BestInsertionFinder<Double> initialInsertionFinder;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
 	public SelectiveInsertionProvider(DetourTimeEstimator restrictiveTimeEstimator, ForkJoinPool forkJoinPool,
 			InsertionCostCalculator<Double> restrictiveCostCalculator) {
-		this(restrictiveTimeEstimator, new BestInsertionFinder<>(restrictiveCostCalculator), new InsertionGenerator(),
+		this(new BestInsertionFinder<>(restrictiveCostCalculator), new InsertionGenerator(restrictiveTimeEstimator),
 				forkJoinPool);
 	}
 
 	@VisibleForTesting
-	SelectiveInsertionProvider(DetourTimeEstimator restrictiveTimeEstimator,
-			BestInsertionFinder<Double> initialInsertionFinder, InsertionGenerator insertionGenerator,
-			ForkJoinPool forkJoinPool) {
-		this.restrictiveTimeEstimator = restrictiveTimeEstimator;
+	SelectiveInsertionProvider(BestInsertionFinder<Double> initialInsertionFinder,
+			InsertionGenerator insertionGenerator, ForkJoinPool forkJoinPool) {
 		this.initialInsertionFinder = initialInsertionFinder;
 		this.insertionGenerator = insertionGenerator;
 		this.forkJoinPool = forkJoinPool;
@@ -74,8 +71,6 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		DetourTime restrictiveDetourTime = new DetourTime(restrictiveTimeEstimator);
-
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		Optional<InsertionWithDetourData<Double>> bestInsertion = forkJoinPool.submit(
 				// find best insertion given a stream of insertion with time data
@@ -83,8 +78,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 						//for each vehicle entry
 						vehicleEntries.parallelStream()
 								//generate feasible insertions (wrt occupancy limits) with restrictive detour times
-								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e,
-										restrictiveDetourTime).stream()))).join();
+								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream()))).join();
 
 		return bestInsertion.map(InsertionWithDetourData::getInsertion).stream().collect(toList());
 	}

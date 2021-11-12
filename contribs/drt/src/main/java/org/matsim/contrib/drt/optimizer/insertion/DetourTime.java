@@ -35,15 +35,6 @@ public class DetourTime {
 		this.detourTimeEstimator = detourTimeEstimator;
 	}
 
-	public InsertionWithDetourData<Double> createInsertionWithDetourData(InsertionGenerator.Insertion insertion,
-			DrtRequest request) {
-		double toPickup = calcToPickupTime(insertion, request);
-		double fromPickup = calcFromPickupTime(insertion, request);
-		double toDropoff = calcToDropoffTime(insertion, request);
-		double fromDropoff = calcFromDropoffTime(insertion, request);
-		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
-	}
-
 	public double calcToPickupTime(InsertionGenerator.Insertion insertion, DrtRequest drtRequest) {
 		return detourTimeEstimator.estimateTime(insertion.pickup.previousWaypoint.getLink(), drtRequest.getFromLink());
 	}
