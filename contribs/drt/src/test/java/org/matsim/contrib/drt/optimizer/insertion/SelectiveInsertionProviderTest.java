@@ -83,7 +83,7 @@ public class SelectiveInsertionProviderTest {
 		//mock initialInsertionFinder
 		var selectedInsertion = oneSelected ? Optional.of(insertion1) : Optional.<Insertion>empty();
 		var selectedInsertionWithDetourData = selectedInsertion.map(
-				DetourData.create(restrictiveDetourTimeEstimator, request)::createInsertionWithDetourData);
+				new DetourData<>(l -> 987., l -> 987., l -> 987., l -> 987., 0.)::createInsertionWithDetourData);
 		when(initialInsertionFinder.findBestInsertion(eq(request),
 				argThat(argument -> argument.map(InsertionWithDetourData::getInsertion)
 						.collect(toSet())
