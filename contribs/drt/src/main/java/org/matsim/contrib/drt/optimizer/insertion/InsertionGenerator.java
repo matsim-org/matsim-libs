@@ -27,7 +27,6 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 
 /**
  * Generates all possible pickup and dropoff insertion point pairs that do not violate the vehicle capacity. In order to
@@ -122,35 +121,19 @@ public class InsertionGenerator {
 					.add("dropoff", dropoff)
 					.toString();
 		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
-			Insertion insertion = (Insertion)o;
-			return Objects.equal(vehicleEntry, insertion.vehicleEntry)
-					&& Objects.equal(pickup, insertion.pickup)
-					&& Objects.equal(dropoff, insertion.dropoff);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashCode(vehicleEntry, pickup, dropoff);
-		}
 	}
 
-	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
+	public List<InsertionWithDetourData<Double>> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry,
+			DetourData<Double> detourData) {
 		int stopCount = vEntry.stops.size();
-		List<Insertion> insertions = new ArrayList<>();
+		List<InsertionWithDetourData<Double>> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
 			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
 				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
-					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
+					generateDropoffInsertions(drtRequest, vEntry, i, detourData, insertions);
 				}
 				// else: do not evaluate insertion _before_stop i, evaluate only insertion _after_ stop i
 			}
@@ -158,13 +141,14 @@ public class InsertionGenerator {
 			occupancy = nextStop.outgoingOccupancy;
 		}
 
-		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// at/after last stop
+		generateDropoffInsertions(drtRequest, vEntry, stopCount, detourData, insertions);// at/after last stop
+
 		return insertions;
 	}
 
 	//TODO replace argument: int i -> InsertionPoint pickup//?
 	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleEntry vEntry, int i,
-			List<Insertion> insertions) {
+			DetourData<Double> detourData, List<InsertionWithDetourData<Double>> insertions) {
 		int stopCount = vEntry.stops.size();
 		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
@@ -174,7 +158,8 @@ public class InsertionGenerator {
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (drtRequest.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
-						insertions.add(new Insertion(drtRequest, vEntry, i, j));
+						insertions.add(
+								detourData.createInsertionWithDetourData(new Insertion(drtRequest, vEntry, i, j)));
 					}
 
 					return;// stop iterating -- cannot insert dropoff after node j
@@ -182,12 +167,13 @@ public class InsertionGenerator {
 			}
 
 			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
-				insertions.add(new Insertion(drtRequest, vEntry, i, j));
+				insertions.add(detourData.createInsertionWithDetourData(new Insertion(drtRequest, vEntry, i, j)));
 			}
 			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
-		insertions.add(new Insertion(drtRequest, vEntry, i, stopCount));// insertion after last stop
+		insertions.add(detourData.createInsertionWithDetourData(
+				new Insertion(drtRequest, vEntry, i, stopCount)));// insertion after last stop
 	}
 
 	private Waypoint.Stop currentStop(VehicleEntry entry, int insertionIdx) {

@@ -70,8 +70,9 @@ public class ExtensiveInsertionProviderTest {
 		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertionGenerator = mock(InsertionGenerator.class);
-		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
-				.thenReturn(List.of(feasibleInsertion, infeasibleInsertion));
+		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry), any()))//
+				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),
+						insertionWithDetourData(infeasibleInsertion)));
 
 		//mock admissibleCostCalculator
 		@SuppressWarnings("unchecked")
@@ -94,5 +95,9 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionGenerator.InsertionPoint insertionPoint() {
 		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
+	}
+
+	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
+		return new InsertionWithDetourData<>(insertion, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 	}
 }

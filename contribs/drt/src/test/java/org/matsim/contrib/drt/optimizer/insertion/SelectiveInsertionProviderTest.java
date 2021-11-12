@@ -23,8 +23,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,8 +74,8 @@ public class SelectiveInsertionProviderTest {
 		var insertion1 = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertion2 = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertionGenerator = mock(InsertionGenerator.class);
-		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(
-				List.of(insertion1, insertion2));
+		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry), any())).thenReturn(
+				List.of(insertionWithDetourData(insertion1), insertionWithDetourData(insertion2)));
 
 		//init restrictiveDetourTimeEstimator
 		DetourTimeEstimator restrictiveDetourTimeEstimator = (from, to) -> 987.;
@@ -100,5 +99,9 @@ public class SelectiveInsertionProviderTest {
 
 	private InsertionGenerator.InsertionPoint insertionPoint() {
 		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
+	}
+
+	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
+		return new InsertionWithDetourData<>(insertion, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 	}
 }

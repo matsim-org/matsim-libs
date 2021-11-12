@@ -64,9 +64,9 @@ public class InsertionGeneratorTest {
 	public void generateInsertions_startEmpty_noStops() {
 		Waypoint.Start start = new Waypoint.Start(null, link("0"), 0, 0); //no stops => must be empty
 		VehicleEntry entry = entry(start);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0));
+				insertion(entry, 0, 0, 1, 2, null, 0));
 	}
 
 	@Test
@@ -74,11 +74,12 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax aboard
 		Waypoint.Stop stop0 = stop(link("stop0"), 0);//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0), insertion(entry, 0, 1),
-				//picup after stop 0
-				insertion(entry, 1, 1));
+				insertion(entry, 0, 0, 1, 2, null, 4),//
+				insertion(entry, 0, 1, 1, 2, 3., 0),
+				//pickup after stop 0
+				insertion(entry, 1, 1, 1, 2, null, 0));
 	}
 
 	@Test
@@ -86,10 +87,10 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, CAPACITY); //full
 		Waypoint.Stop stop0 = stop(link("stop0"), 0);//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//no pickup after stop
 				//pickup after stop 0
-				insertion(entry, 1, 1));
+				insertion(entry, 1, 1, 1, 2, null, 0));
 	}
 
 	@Test
@@ -98,13 +99,16 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(link("stop0"), 1);//pick up 1 pax
 		Waypoint.Stop stop1 = stop(link("stop1"), 0);//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0), insertion(entry, 0, 1), insertion(entry, 0, 2),
+				insertion(entry, 0, 0, 1, 2, null, 4),//
+				insertion(entry, 0, 1, 1, 2, 3., 4),//
+				insertion(entry, 0, 2, 1, 2, 3., 0),
 				//pickup after stop 0
-				insertion(entry, 1, 1), insertion(entry, 1, 2),
+				insertion(entry, 1, 1, 1, 2, null, 4),//
+				insertion(entry, 1, 2, 1, 2, 3., 0),
 				//pickup after stop 1
-				insertion(entry, 2, 2));
+				insertion(entry, 2, 2, 1, 2, null, 0));
 	}
 
 	@Test
@@ -113,12 +117,12 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(link("stop0"), CAPACITY);//pick up 4 pax (full)
 		Waypoint.Stop stop1 = stop(link("stop1"), 0);//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0),
+				insertion(entry, 0, 0, 1, 2, null, 4),
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(entry, 2, 2));
+				insertion(entry, 2, 2, 1, 2, null, 0));
 	}
 
 	@Test
@@ -127,12 +131,13 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(link("stop0"), 2);//drop off 2 pax
 		Waypoint.Stop stop1 = stop(link("stop1"), 0);//drop off 2 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//pickup after stop 0
-				insertion(entry, 1, 1), insertion(entry, 1, 2),
+				insertion(entry, 1, 1, 1, 2, null, 4),//
+				insertion(entry, 1, 2, 1, 2, 3., 0),
 				//pickup after stop 1
-				insertion(entry, 2, 2));
+				insertion(entry, 2, 2, 1, 2, null, 0));
 	}
 
 	@Test
@@ -141,11 +146,11 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(link("stop0"), CAPACITY);//drop off 1 pax, pickup 1 pax (full)
 		Waypoint.Stop stop1 = stop(link("stop1"), 0);//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(entry, 2, 2));
+				insertion(entry, 2, 2, 1, 2, null, 0));
 	}
 
 	@Test
@@ -155,14 +160,15 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop1 = stop(link("stop1"), CAPACITY);// pickup 4 pax
 		Waypoint.Stop stop2 = stop(link("stop2"), 0);// dropoff 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(entry, 0, 0), insertion(entry, 0, 1),
+				insertion(entry, 0, 0, 1, 2, null, 4),//
+				insertion(entry, 0, 1, 1, 2, 3., 4),
 				//pickup after stop 0
-				insertion(entry, 1, 1),
+				insertion(entry, 1, 1, 1, 2, null, 4),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(entry, 3, 3));
+				insertion(entry, 3, 3, 1, 2, null, 0));
 	}
 
 	@Test
@@ -172,13 +178,13 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop1 = stop(link("stop1"), CAPACITY);// pickup 4 pax
 		Waypoint.Stop stop2 = stop(link("stop2"), 0);// dropoff 4 pax
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//pickup after stop 0
-				insertion(entry, 1, 1),
+				insertion(entry, 1, 1, 1, 2, null, 4),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(entry, 3, 3));
+				insertion(entry, 3, 3, 1, 2, null, 0));
 	}
 
 	@Test
@@ -186,10 +192,10 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
 		Waypoint.Stop stop0 = stop(fromLink, 0);//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//no pickup after start (pickup is exactly at stop0)
 				//pickup after stop 0
-				insertion(entry, 1, 1));
+				insertion(entry, 1, 1, 1, 2, null, 0));
 	}
 
 	@Test
@@ -197,11 +203,11 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 1); // 1 pax
 		Waypoint.Stop stop0 = stop(toLink, 0);//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(entry, 0, 1),
+				insertion(entry, 0, 1, 1, 2, 3., 0),
 				//pickup after stop 0
-				insertion(entry, 1, 1));
+				insertion(entry, 1, 1, 1, 2, null, 0));
 	}
 
 	@Test
@@ -212,27 +218,32 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(toLink, CAPACITY);//dropoff 1 pax
 		Waypoint.Stop stop1 = stop(link("stop1"), 0);//dropoff 1 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
-		assertThatInsertions(drtRequest, entry).usingRecursiveFieldByFieldElementComparator().containsExactly(
+		assertInsertions(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(entry, 0, 1),
+				insertion(entry, 0, 1, 1, 2, 3., 4),
 				//pickup after stop 0
-				insertion(entry, 2, 2));
+				insertion(entry, 2, 2, 1, 2, null, 0));
 	}
 
 	private Link link(String id) {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
-	private ListAssert<Insertion> assertThatInsertions(DrtRequest drtRequest, VehicleEntry entry) {
+	private void assertInsertions(DrtRequest drtRequest, VehicleEntry entry,
+			InsertionWithDetourData<Double>... expectedInsertions) {
 		int stopCount = entry.stops.size();
 		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
 
-		return assertThat(new InsertionGenerator().generateInsertions(drtRequest, entry));
+		assertThat(new InsertionGenerator().generateInsertions(drtRequest, entry,
+				new DetourData<>(l -> 1., l -> 2., l -> 3., l -> 4., 0.))).usingRecursiveFieldByFieldElementComparator()
+				.containsExactly(expectedInsertions);
 	}
 
-	private Insertion insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx) {
-		return new Insertion(drtRequest, entry, pickupIdx, dropoffIdx);
+	private InsertionWithDetourData<Double> insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,
+			double timeToPickup, double timeFromPickup, Double timeToDropoff, double timeFromDropoff) {
+		return new InsertionWithDetourData<>(new Insertion(drtRequest, entry, pickupIdx, dropoffIdx), timeToPickup,
+				timeFromPickup, timeToDropoff, timeFromDropoff);
 	}
 
 	private Waypoint.Stop stop(Link link, int outgoingOccupancy) {

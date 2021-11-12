@@ -82,10 +82,9 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 				() -> initialInsertionFinder.findBestInsertion(drtRequest,
 						//for each vehicle entry
 						vehicleEntries.parallelStream()
-								//generate feasible insertions (wrt occupancy limits)
-								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
-								//map them to insertions with restrictive detour times
-								.map(restrictiveTimeData::createInsertionWithDetourData))).join();
+								//generate feasible insertions (wrt occupancy limits) with restrictive detour times
+								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e, restrictiveTimeData)
+										.stream()))).join();
 
 		return bestInsertion.map(InsertionWithDetourData::getInsertion).stream().collect(toList());
 	}
