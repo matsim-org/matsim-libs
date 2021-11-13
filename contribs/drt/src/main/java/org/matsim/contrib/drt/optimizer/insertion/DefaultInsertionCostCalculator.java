@@ -130,8 +130,12 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 		return true; //all time constraints of all stops are satisfied
 	}
 
+	//we assume slack time is never negative
 	static double calcVehicleSlackTime(VehicleEntry vEntry, double now) {
 		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		return vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(), now);
+		//if the last task is started, take 'now', otherwise take the planned begin time
+		double availableFromTime = Math.max(lastTask.getBeginTime(), now);
+		//for an already delayed vehicle, assume slack is 0 (instead of a negative number)
+		return Math.max(0, vEntry.vehicle.getServiceEndTime() - availableFromTime);
 	}
 }

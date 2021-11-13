@@ -39,12 +39,6 @@ public class CostCalculationStrategyTest {
 	}
 
 	@Test
-	public void RejectSoftConstraintViolations_negativeSlackTime_butNoTimeLoss() {
-		assertRejectSoftConstraintViolations(9999, 9999, -10,
-				new InsertionDetourTimeCalculator.DetourTimeInfo(0, 0, 0, 0), 0);
-	}
-
-	@Test
 	public void RejectSoftConstraintViolations_tooLongWaitTime() {
 		assertRejectSoftConstraintViolations(10, 9999, 9999,
 				new InsertionDetourTimeCalculator.DetourTimeInfo(11, 22, 0, 0), INFEASIBLE_SOLUTION_COST);
@@ -76,12 +70,6 @@ public class CostCalculationStrategyTest {
 	public void DiscourageSoftConstraintViolations_tooLittleSlackTime() {
 		assertDiscourageSoftConstraintViolations(9999, 9999, 10,
 				new InsertionDetourTimeCalculator.DetourTimeInfo(0, 0, 5, 5.01), INFEASIBLE_SOLUTION_COST);
-	}
-
-	@Test
-	public void DiscourageSoftConstraintViolations_negativeSlackTime_butNoTimeLoss() {
-		assertDiscourageSoftConstraintViolations(9999, 9999, -10,
-				new InsertionDetourTimeCalculator.DetourTimeInfo(0, 0, 0, 0), 0);
 	}
 
 	@Test

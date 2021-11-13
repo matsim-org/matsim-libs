@@ -41,7 +41,7 @@ public interface CostCalculationStrategy {
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
 				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if ((totalTimeLoss > 0 && totalTimeLoss > vehicleSlackTime)
+			if (totalTimeLoss > vehicleSlackTime
 					|| detourTimeInfo.departureTime > request.getLatestStartTime()
 					|| detourTimeInfo.arrivalTime > request.getLatestArrivalTime()) {
 				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
@@ -62,7 +62,7 @@ public interface CostCalculationStrategy {
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
 				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss > 0 && totalTimeLoss > vehicleSlackTime) {
+			if (totalTimeLoss > vehicleSlackTime) {
 				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
 				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 			}
