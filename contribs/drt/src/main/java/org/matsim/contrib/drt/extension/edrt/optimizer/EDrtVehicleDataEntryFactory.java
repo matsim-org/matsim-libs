@@ -59,7 +59,7 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 
 	@Override
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		if (!entryFactory.isEligibleForRequestInsertion(vehicle, currentTime)) {
+		if (entryFactory.isNotEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
 

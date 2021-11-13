@@ -52,7 +52,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	}
 
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
+		if (isNotEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
 
@@ -111,7 +111,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				ImmutableList.copyOf(stops));
 	}
 
-	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
-		return !(currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime());
+	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
+		return currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime();
 	}
 }
