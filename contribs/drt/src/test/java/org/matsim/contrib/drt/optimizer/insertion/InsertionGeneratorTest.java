@@ -264,6 +264,6 @@ public class InsertionGeneratorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops));
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null);
 	}
 }

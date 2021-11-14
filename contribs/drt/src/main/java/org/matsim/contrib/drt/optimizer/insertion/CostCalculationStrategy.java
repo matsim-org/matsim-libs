@@ -29,20 +29,18 @@ public interface CostCalculationStrategy {
 	/**
 	 * @param request
 	 * @param insertion
-	 * @param vehicleSlackTime
 	 * @param detourTimeInfo
 	 * @return the cost of insertion, INFEASIBLE_SOLUTION_COST if insertion is not feasible
 	 */
-	double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
+	double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 			InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo);
 
 	class RejectSoftConstraintViolations implements CostCalculationStrategy {
 		@Override
-		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
+		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss > vehicleSlackTime
-					|| detourTimeInfo.departureTime > request.getLatestStartTime()
+			if (detourTimeInfo.departureTime > request.getLatestStartTime()
 					|| detourTimeInfo.arrivalTime > request.getLatestArrivalTime()) {
 				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
 				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
@@ -59,14 +57,9 @@ public interface CostCalculationStrategy {
 		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
 
 		@Override
-		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
+		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss > vehicleSlackTime) {
-				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
-				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-			}
-
 			double waitTimeViolation = Math.max(0, detourTimeInfo.departureTime - request.getLatestStartTime());
 			double travelTimeViolation = Math.max(0, detourTimeInfo.arrivalTime - request.getLatestArrivalTime());
 			return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
