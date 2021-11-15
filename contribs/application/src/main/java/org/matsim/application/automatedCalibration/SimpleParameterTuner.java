@@ -58,11 +58,14 @@ public class SimpleParameterTuner implements ParameterTuner {
             Map<String, Double> errorMapForModeToTune = errorMap.get(mode);
             double a0 = config.planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling();
             double b0 = config.planCalcScore().getModes().get(mode).getConstant();
+            double xBase = averageTravelTimes.get(distanceGrouping.getDistanceGroupings()[0]) / 3600;
+            double yBase = a0 * xBase + b0;
             for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
                 double x = averageTravelTimes.get(distanceGroup) / 3600; // x-axis: travel time (unit: hour). We use average travel time of the distance group
                 double y0 = a0 * x + b0; // y-axis: the cost of the trip
+                double ratio = y0 / yBase; // The long distance trips normally have higher impact on the regression. Therefore, we need to normalize the cost adjustment
                 double alpha = calculateAdjustmentRatio(errorMapForModeToTune.get(distanceGroup));
-                double y = (1 + alpha) * y0;
+                double y = (1 + alpha / ratio) * y0;
                 regression.addData(x, y);
             }
 
@@ -82,11 +85,11 @@ public class SimpleParameterTuner implements ParameterTuner {
 
     private double calculateAdjustmentRatio(double error) {
         if (error < -4 * targetError) {
-            return -0.1;
+            return -0.2;
         }
         if (error > 4 * targetError) {
-            return 0.1;
+            return 0.2;
         }
-        return error / (40 * targetError);
+        return error / (20 * targetError);
     }
 }
