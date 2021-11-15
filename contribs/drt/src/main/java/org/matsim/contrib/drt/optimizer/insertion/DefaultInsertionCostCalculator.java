@@ -24,12 +24,8 @@ import java.util.function.ToDoubleFunction;
 
 import javax.annotation.Nullable;
 
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -45,28 +41,24 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 			@Override
 			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
 					DetourTimeEstimator replacedDriveTimeEstimator) {
-				return new DefaultInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, detourTime,
+				return new DefaultInsertionCostCalculator<>(drtCfg, costCalculationStrategy, detourTime,
 						replacedDriveTimeEstimator);
 			}
 		};
 	}
 
-	private final DoubleSupplier timeOfDay;
 	private final CostCalculationStrategy costCalculationStrategy;
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 
-	public DefaultInsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
-			@Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
-		this(timer::getTimeOfDay, costCalculationStrategy,
-				new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
-						replacedDriveTimeEstimator));
+	public DefaultInsertionCostCalculator(DrtConfigGroup drtConfig, CostCalculationStrategy costCalculationStrategy,
+			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
+		this(costCalculationStrategy, new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
+				replacedDriveTimeEstimator));
 	}
 
 	@VisibleForTesting
-	DefaultInsertionCostCalculator(DoubleSupplier timeOfDay, CostCalculationStrategy costCalculationStrategy,
+	DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
 			InsertionDetourTimeCalculator<D> detourTimeCalculator) {
-		this.timeOfDay = timeOfDay;
 		this.costCalculationStrategy = costCalculationStrategy;
 		this.detourTimeCalculator = detourTimeCalculator;
 	}
@@ -89,49 +81,14 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 
 		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
 
-		if (!checkTimeConstraintsForScheduledRequests(insertion.getInsertion(), detourTimeInfo.pickupTimeLoss,
-				detourTimeInfo.getTotalTimeLoss())) {
+		var insertion1 = insertion.getInsertion();
+		var vEntry = insertion1.vehicleEntry;
+
+		if (vEntry.getSlackTime(insertion1.pickup.index) < detourTimeInfo.pickupTimeLoss
+				|| vEntry.getSlackTime(insertion1.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
-		double vehicleSlackTime = calcVehicleSlackTime(insertion.getVehicleEntry(), timeOfDay.getAsDouble());
-		return costCalculationStrategy.calcCost(drtRequest, insertion.getInsertion(), vehicleSlackTime, detourTimeInfo);
-	}
-
-	static boolean checkTimeConstraintsForScheduledRequests(InsertionGenerator.Insertion insertion,
-			double pickupDetourTimeLoss, double totalTimeLoss) {
-		VehicleEntry vEntry = insertion.vehicleEntry;
-		final int pickupIdx = insertion.pickup.index;
-		final int dropoffIdx = insertion.dropoff.index;
-
-		// each existing stop has 2 time constraints: latestArrivalTime and latestDepartureTime (see: Waypoint.Stop)
-		// we are looking only at the time constraints of the scheduled requests (the new request is checked separately)
-
-		// all stops after the new (potential) pickup but before the new dropoff are delayed by pickupDetourTimeLoss
-		// check if this delay satisfies the time constraints at these stops
-		for (int s = pickupIdx; s < dropoffIdx; s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-			if (stop.task.getBeginTime() + pickupDetourTimeLoss > stop.latestArrivalTime
-					|| stop.task.getEndTime() + pickupDetourTimeLoss > stop.latestDepartureTime) {
-				return false;
-			}
-		}
-
-		// all stops after the new (potential) dropoff are delayed by totalTimeLoss
-		// check if this delay satisfies the time constraints at these stops
-		for (int s = dropoffIdx; s < vEntry.stops.size(); s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-			if (stop.task.getBeginTime() + totalTimeLoss > stop.latestArrivalTime
-					|| stop.task.getEndTime() + totalTimeLoss > stop.latestDepartureTime) {
-				return false;
-			}
-		}
-
-		return true; //all time constraints of all stops are satisfied
-	}
-
-	static double calcVehicleSlackTime(VehicleEntry vEntry, double now) {
-		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		return vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(), now);
+		return costCalculationStrategy.calcCost(drtRequest, insertion1, detourTimeInfo);
 	}
 }
