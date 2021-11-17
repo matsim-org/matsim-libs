@@ -251,7 +251,7 @@ public abstract class AutomaticScenarioCalibrator {
         // Check if we reach the stage 2:
         usePreviousOutput = true;
         for (String mode : modes) {
-            if (errorMap.get(mode).values().stream().mapToDouble(v -> v).sum() > 0.05) {
+            if (errorMap.get(mode).values().stream().mapToDouble(v -> v).sum() > 0.2) {
                 usePreviousOutput = false;
                 break;
             }
