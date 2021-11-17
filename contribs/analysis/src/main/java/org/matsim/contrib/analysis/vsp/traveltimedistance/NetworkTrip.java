@@ -23,7 +23,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-public class CarTrip {
+public class NetworkTrip {
+
 	final private Id<Person> personId;
 	final private double departureTime;
 	final private double arrivalTime;
@@ -35,11 +36,11 @@ public class CarTrip {
 	private Double validatedTravelDistance = null;
 	private double actualTravelTime;
 
-	CarTrip(Id<Person> personId, double departureTime, double arrivaldTime, double distance, Coord departureLocation,
-			Coord arrivalLocation) {
+	NetworkTrip(Id<Person> personId, double departureTime, double arrivalTime, double distance, Coord departureLocation,
+	            Coord arrivalLocation) {
 		this.personId = personId;
 		this.departureTime = departureTime;
-		this.arrivalTime = arrivaldTime;
+		this.arrivalTime = arrivalTime;
 		this.departureLocation = departureLocation;
 		this.arrivalLocation = arrivalLocation;
 		this.travelledDistance = distance;

@@ -24,6 +24,7 @@ package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -91,7 +92,7 @@ public class RunTraveltimeValidationExample {
 
 
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);
-		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, apiKey, date, transformation, false);
+		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, TransportMode.car, apiKey, date, transformation, false);
         //Setting "writeDetailedFiles" to true will write out the raw JSON files for each calculated route
 		TravelTimeValidationRunner runner;
 		if (tripsToValidate != null){

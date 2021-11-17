@@ -11,7 +11,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -24,11 +23,11 @@ import java.util.Locale;
 
 public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
     private static final Logger log = LogManager.getLogger(GoogleMapRouteValidator.class);
-    final String apiAccessKey;
-    final String outputFolder;
-    final String date;
-    final CoordinateTransformation ct;
-    boolean writeDetailedFiles;
+
+    private final String mode;
+    private final String apiAccessKey;
+    private final String date;
+    private final CoordinateTransformation ct;
 
     /**
      * Travel time and distance validator based on Google Map API.
@@ -37,21 +36,15 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
      * @param date         Google Map API only accept date in the future. If a past date is used, today in the next week will be used as the date by default.
      * @param ct           The target CRS of the Coordinate Transformation should be WGS84.
      */
-    public GoogleMapRouteValidator(String outputFolder, String apiAccessKey, String date, CoordinateTransformation ct, boolean writeDetailedFiles) {
-        this.outputFolder = outputFolder;
+    public GoogleMapRouteValidator(String outputFolder, String mode, String apiAccessKey, String date, CoordinateTransformation ct) {
+        this.mode = mode == null ? "DRIVING" : mode;
         this.apiAccessKey = apiAccessKey;
         this.date = date;
         this.ct = ct;
-        this.writeDetailedFiles = writeDetailedFiles;
-
-        File outDir = new File(outputFolder);
-        if (!outDir.exists()) {
-            outDir.mkdirs();
-        }
     }
 
     @Override
-    public Tuple<Double, Double> getTravelTime(CarTrip trip) {
+    public Tuple<Double, Double> getTravelTime(NetworkTrip trip) {
         String tripId = trip.getPersonId().toString() + "_" + trip.getDepartureTime();
         return getTravelTime(trip.getDepartureLocation(), trip.getArrivalLocation(), trip.getDepartureTime(), tripId);
     }
@@ -73,6 +66,7 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
 
         String urlString = "https://maps.googleapis.com/maps/api/distancematrix/json" +
                 "?departure_time=" + Long.toString((long) adjustedDepartureTime) +
+                "&mode=" + mode +
                 "&destinations=" + df.format(to.getY()) + "%2C" + df.format(to.getX()) +
                 "&origins=" + df.format(from.getY()) + "%2C" + df.format(from.getX()) +
                 "&key=" + apiAccessKey;
@@ -100,11 +94,7 @@ public class GoogleMapRouteValidator implements TravelTimeDistanceValidator {
         } catch (IOException | ParseException e) {
             log.error("The contents on the URL cannot be read properly. Please check your API or check the contents on URL manually", e);
         }
-        return new Tuple<Double, Double>((double) travelTime, (double) distance);
-    }
-
-    public void setWriteDetailedFiles(boolean writeDetailedFiles) {
-        this.writeDetailedFiles = writeDetailedFiles;
+        return new Tuple<>((double) travelTime, (double) distance);
     }
 
     private double calculateGoogleDepartureTime(double departureTime) {

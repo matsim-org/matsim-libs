@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -41,6 +43,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.MatsimEventsReader;
@@ -55,39 +58,43 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class TravelTimeValidationRunner {
 
+	private static final Logger log = LogManager.getLogger(TravelTimeValidationRunner.class);
+
 	private final Network network;
 	private final String eventsFile;
+	private final String mode;
 	private final TravelTimeDistanceValidator travelTimeValidator;
 	private final int numberOfTripsToValidate;
 	private final Set<Id<Person>> populationIds;
 	private final String outputfolder;
 	private final int eventsQueueSize = 1048576 * 32;
 	private final Tuple<Double, Double> timeWindow;
-	private final Predicate<CarTrip> tripFilter;
+	private final Predicate<NetworkTrip> tripFilter;
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate) {
-		this(network, populationIds, eventsFile, outputFolder, travelTimeValidator,
+		this(network, populationIds, eventsFile, outputFolder, TransportMode.car, travelTimeValidator,
 				numberOfTripsToValidate, new Tuple<>((double) 0, (double) 3600 * 30), null);
 	}
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator) {
-		this(network, populationIds, eventsFile, outputFolder, travelTimeValidator,
+		this(network, populationIds, eventsFile, outputFolder, TransportMode.car, travelTimeValidator,
 				Integer.MAX_VALUE, new Tuple<>((double) 0, (double) 3600 * 30), null);
 	}
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
 			Tuple<Double, Double> timeWindow) {
-		this(network, populationIds, eventsFile, outputFolder, travelTimeValidator, numberOfTripsToValidate, timeWindow, null);
+		this(network, populationIds, eventsFile, outputFolder, TransportMode.car, travelTimeValidator, numberOfTripsToValidate, timeWindow, null);
 	}
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
-	                                  String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
-	                                  Tuple<Double, Double> timeWindow, Predicate<CarTrip> tripFilter) {
+	                                  String outputFolder, String mode, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
+	                                  Tuple<Double, Double> timeWindow, Predicate<NetworkTrip> tripFilter) {
 		this.network = network;
 		this.eventsFile = eventsFile;
+		this.mode = mode;
 		this.travelTimeValidator = travelTimeValidator;
 		this.numberOfTripsToValidate = numberOfTripsToValidate;
 		this.outputfolder = outputFolder;
@@ -105,15 +112,17 @@ public class TravelTimeValidationRunner {
 	public void run() throws InterruptedException {
 		ParallelEventsManager eventManager = new ParallelEventsManager(false, eventsQueueSize);
 //		EventsManager events = EventsUtils.createEventsManager();
-		CarTripsExtractor carTripsExtractor = new CarTripsExtractor(populationIds, network);
-		eventManager.addHandler(carTripsExtractor);
+		TripsExtractor tripsExtractor = new TripsExtractor(populationIds, network, mode);
+		eventManager.addHandler(tripsExtractor);
 		eventManager.initProcessing();
 		new MatsimEventsReader(eventManager).readFile(eventsFile);
-		List<CarTrip> carTrips = carTripsExtractor.getTrips();
-		System.out.println("there are " + carTrips.size() + " car trips");
-		Collections.shuffle(carTrips, MatsimRandom.getRandom());
+		List<NetworkTrip> trips = tripsExtractor.getTrips();
+
+		log.info("There are {} trips for mode {}", trips.size(), mode);
+
+		Collections.shuffle(trips, MatsimRandom.getRandom());
 		int i = 0;
-		for (CarTrip trip : carTrips) {
+		for (NetworkTrip trip : trips) {
 
 			if (tripFilter != null && !tripFilter.test(trip))
 				continue;
@@ -131,11 +140,11 @@ public class TravelTimeValidationRunner {
 				break;
 			}
 		}
-		writeTravelTimeValidation(outputfolder, carTrips);
+		writeTravelTimeValidation(outputfolder, trips);
 
 	}
 
-	private void writeTravelTimeValidation(String folder, List<CarTrip> trips) {
+	private void writeTravelTimeValidation(String folder, List<NetworkTrip> trips) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "/validated_trips.csv");
 		XYSeriesCollection times = new XYSeriesCollection();
 		XYSeriesCollection distances = new XYSeriesCollection();
@@ -147,7 +156,7 @@ public class TravelTimeValidationRunner {
 		try {
 			bw.append(
 					"agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated;traveledDistance;validatedDistance");
-			for (CarTrip trip : trips) {
+			for (NetworkTrip trip : trips) {
 				if (trip.getValidatedTravelTime() != null) {
 					bw.newLine();
 					bw.append(trip.toString());
@@ -182,7 +191,7 @@ public class TravelTimeValidationRunner {
 					yAxisd.getRange().getUpperBound());
 			((XYPlot) chart.getPlot()).addAnnotation(diagonald);
 
-			ChartUtils.writeChartAsPNG(new FileOutputStream(folder + "/validated_traveltimes" + ".png"), chart2, 1500,
+			ChartUtils.writeChartAsPNG(new FileOutputStream(folder + "/validated_traveltimes.png"), chart2, 1500,
 					1500);
 			ChartUtils.writeChartAsPNG(new FileOutputStream(folder + "/validated_traveldistances.png"), chart, 1500,
 					1500);

@@ -26,6 +26,7 @@ public class TravelTimeValidationRunnerPreAnalysis {
     private final Network network;
     private final int trips;
     private Geometry keyAreaGeometry;
+    private final String mode;
     private final TravelTimeDistanceValidator validator;
     private final String outputFolder;
 
@@ -40,10 +41,11 @@ public class TravelTimeValidationRunnerPreAnalysis {
 
     private final Random rnd = new Random(1234);
 
-    public TravelTimeValidationRunnerPreAnalysis(Network network, int trips, String outputFolder, TravelTimeDistanceValidator validator, Geometry keyAreaGeometry) {
+    public TravelTimeValidationRunnerPreAnalysis(Network network, int trips, String outputFolder, String mode, TravelTimeDistanceValidator validator, Geometry keyAreaGeometry) {
         this.network = network;
         this.trips = trips;
         this.outputFolder = outputFolder;
+        this.mode = mode;
         this.validator = validator;
         this.keyAreaGeometry = keyAreaGeometry;
     }
@@ -72,7 +74,7 @@ public class TravelTimeValidationRunnerPreAnalysis {
 
     public void run() throws IOException, InterruptedException {
         List<Link> links = network.getLinks().values().stream().
-                filter(l -> l.getAllowedModes().contains(TransportMode.car)).
+                filter(l -> l.getAllowedModes().contains(mode)).
                 collect(Collectors.toList());
         int numOfLinks = links.size();
 
