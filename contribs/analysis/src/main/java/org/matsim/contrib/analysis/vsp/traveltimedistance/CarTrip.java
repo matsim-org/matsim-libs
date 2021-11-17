@@ -23,6 +23,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CarTrip {
 	final private Id<Person> personId;
 	final private double departureTime;
@@ -30,7 +33,7 @@ public class CarTrip {
 	final private double travelledDistance;
 	final private Coord departureLocation;
 	final private Coord arrivalLocation;
-	
+
 	private Double validatedTravelTime = null;
 	private Double validatedTravelDistance = null;
 	private double actualTravelTime;
@@ -43,10 +46,10 @@ public class CarTrip {
 		this.departureLocation = departureLocation;
 		this.arrivalLocation = arrivalLocation;
 		this.travelledDistance = distance;
-		
+
 	}
 
-	
+
 	public Id<Person> getPersonId() {
 		return personId;
 	}
@@ -90,7 +93,7 @@ public class CarTrip {
 	public Double getValidatedTravelTime() {
 		return validatedTravelTime;
 	}
-	
+
 	public Double getValidatedTravelDistance() {
 		return validatedTravelDistance;
 	}
@@ -105,10 +108,11 @@ public class CarTrip {
 		return travelledDistance;
 	}
 
-
-	public String toString(){
-//		bw.append("agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated;traveledDistance;validatedDistance");
-		return (this.personId.toString()+";"+departureTime+";"+departureLocation.getX()+";"+departureLocation.getY()+";"+arrivalLocation.getX()+";"+arrivalLocation.getY()+";"+actualTravelTime+";"+validatedTravelTime+";"+travelledDistance+";"+validatedTravelDistance);
+	public List<String> getTripData() {
+		String dataString = this.personId.toString() + ";" + departureTime + ";" + departureLocation.getX() + ";" +
+				departureLocation.getY() + ";" + arrivalLocation.getX() + ";" + arrivalLocation.getY() + ";" +
+				actualTravelTime + ";" + validatedTravelTime + ";" + travelledDistance + ";" + validatedTravelDistance;
+		String[] data = dataString.split(";");
+		return Arrays.asList(data);
 	}
-
 }
