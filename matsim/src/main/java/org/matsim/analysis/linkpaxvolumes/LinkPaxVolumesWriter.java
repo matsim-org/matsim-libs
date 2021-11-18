@@ -32,20 +32,20 @@ import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-class LinkPaxVolumesWriter {
+public class LinkPaxVolumesWriter {
     private final LinkPaxVolumesAnalysis linkPaxVolumesAnalysis;
     private final Network network;
     private final String columnSeparator;
     private final int numberOfHours;
 
-    LinkPaxVolumesWriter(LinkPaxVolumesAnalysis linkPaxVolumesAnalysis, Network network, String sep) {
+    public LinkPaxVolumesWriter(LinkPaxVolumesAnalysis linkPaxVolumesAnalysis, Network network, String sep) {
         this.linkPaxVolumesAnalysis = linkPaxVolumesAnalysis;
         this.network = network;
         this.columnSeparator = sep;
         this.numberOfHours = linkPaxVolumesAnalysis.getNumberOfHours();
     }
 
-    void writeLinkVehicleAndPaxVolumesAllPerDayCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesAllPerDayCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
 
