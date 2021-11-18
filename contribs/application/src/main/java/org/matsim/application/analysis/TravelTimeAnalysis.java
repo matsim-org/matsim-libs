@@ -13,7 +13,9 @@ import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.*;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -25,6 +27,8 @@ import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -54,7 +58,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
     @CommandLine.Option(names = "--output", defaultValue = "travelTimeValidation", description = "Name of output folder", required = true)
     private String output;
 
-    @CommandLine.Option(names = "--api", description = "Online API used.", defaultValue = "HERE", required = true, showDefaultValue = CommandLine.Help.Visibility.ALWAYS)
+    @CommandLine.Option(names = "--api", description = "API to use for validation.", defaultValue = "HERE", required = true, showDefaultValue = CommandLine.Help.Visibility.ALWAYS)
     private API api;
 
     @CommandLine.Option(names = "--api-key", description = "API key. You can apply for free API key on their website", required = false)
@@ -62,6 +66,9 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--network", description = "Path to network file if API=NETWORK_FILE ", required = false)
     private Path timeVariantNetwork;
+
+    @CommandLine.Option(names = "--network-change-events", description = "Path to network change events for time-variant network ", required = false)
+    private Path networkChangeEvents;
 
     @CommandLine.Option(names = "--date", description = "The date to validate travel times for, format: YYYY-MM-DD")
     private LocalDate date;
@@ -113,11 +120,19 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             return 2;
         }
 
+        if ((api == API.HERE || api == API.GOOGLE_MAP) && appCode == null) {
+            log.error("API key is required when using {}", api);
+            return 2;
+        } else if (api == API.NETWORK_FILE && timeVariantNetwork == null) {
+            log.error("Network must be give when using {}", api);
+            return 2;
+        }
+
         // Set date to next Wednesday if not configured
         if (date == null) {
 
             // Google API only allows days in the future
-            if (api == TravelTimeDistanceValidators.GOOGLE_MAP)
+            if (api == API.GOOGLE_MAP)
                 date = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
             else
                 date = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.WEDNESDAY));
@@ -155,8 +170,25 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
                 validator = new GoogleMapRouteValidator(outputFolder, apiMode, appCode, date.toString(), transformation);
             } else if (api == API.NETWORK_FILE) {
                 NetworkConfigGroup configGroup = new NetworkConfigGroup();
-                configGroup.setTimeVariantNetwork(true);
-                validator = new NetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
+
+                Network network;
+                if (networkChangeEvents != null) {
+                    configGroup.setChangeEventsInputFile(networkChangeEvents.toString());
+                    configGroup.setTimeVariantNetwork(true);
+
+                    network = NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup);
+
+                    log.info("Using time variant network {}", networkChangeEvents);
+
+                    List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
+                    NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
+                    parser.readFile(networkChangeEvents.toString());
+
+                    NetworkUtils.setNetworkChangeEvents(network, changeEvents);
+                } else
+                    network = NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup);
+
+                validator = new NetworkRouteValidator(network, apiMode);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }
@@ -165,6 +197,8 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             if (timeFrom != null && timeTo != null) {
                 timeWindow = new Tuple<>(timeFrom, timeTo);
             }
+
+            Files.createDirectories(Path.of(outputFolder));
 
             TravelTimeValidationRunner runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events.toString(), outputFolder, tripMode, validator, trips, timeWindow, tripFilter);
             runner.run();
@@ -192,7 +226,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
             } else if (api == API.NETWORK_FILE) {
                 NetworkConfigGroup configGroup = new NetworkConfigGroup();
                 configGroup.setTimeVariantNetwork(true);
-                validator = new NetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup));
+                validator = new NetworkRouteValidator(NetworkUtils.readNetwork(timeVariantNetwork.toString(), configGroup), apiMode);
             } else {
                 throw new RuntimeException("Please enter the api correctly. Please choose from [here, google-map]");
             }

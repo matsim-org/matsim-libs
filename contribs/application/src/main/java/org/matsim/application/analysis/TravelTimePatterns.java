@@ -23,6 +23,7 @@ import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -51,8 +52,8 @@ public class TravelTimePatterns implements MATSimAppCommand {
 	@CommandLine.Option(names = "--app-code", description = "App code for HERE API", required = true)
 	private String appCode;
 
-	@CommandLine.Option(names = "--max-fc", defaultValue = "FC4", description = "Max detail level, where FC5 is the most detailed.")
-	private HereMapsLayer.FC fc = HereMapsLayer.FC.FC4;
+	@CommandLine.Option(names = "--max-fc", defaultValue = "FC5", description = "Max detail level, where FC5 is the most detailed.")
+	private HereMapsLayer.FC fc;
 
 	@CommandLine.Option(names = "--weekday", defaultValue = "4", description = "Number of weekday to use, 0=Sunday")
 	private int weekday = 3;
@@ -302,6 +303,8 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					throw new IllegalStateException("Unknown travel direction: " + t);
 
 			}
+
+			new NetworkCleaner().run(network);
 
 			log.info("Writing network to {}", networkOutput);
 
