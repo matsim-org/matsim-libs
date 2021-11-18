@@ -115,7 +115,7 @@ public class PtStop2StopAnalysisTest {
         events.initProcessing();
         events.processEvent(new TransitDriverStartsEvent(1.0, driverId_bus1, veh_bus1.getId(),
                 transitLineId_bus1, transitRouteId_bus1_route1, departureId_bus1_route1_dep1));
-        events.processEvent(new PersonDepartureEvent(1.0, driverId_bus1, linkId1, networkMode_bus));
+        events.processEvent(new PersonDepartureEvent(1.0, driverId_bus1, linkId1, networkMode_bus, networkMode_bus));
         events.processEvent(new PersonEntersVehicleEvent(1.0, driverId_bus1, veh_bus1.getId()));
         events.processEvent(new VehicleEntersTrafficEvent(1.0, driverId_bus1, linkId1, veh_bus1.getId(), networkMode_bus, 1.0));
         events.processEvent(new VehicleArrivesAtFacilityEvent(1.0, veh_bus1.getId(), transitStopFacilityId1, 0.0));
@@ -286,8 +286,8 @@ public class PtStop2StopAnalysisTest {
         events.processEvent(new TransitDriverStartsEvent(1.0, driverId_train1, veh_train1_dep1.getId(),
                 transitLineId_train1, transitRouteId_train1_route1, departureId_train1_dep1));
 
-        events.processEvent(new PersonDepartureEvent(1.0, driverId_bus1, linkId1, networkMode_bus));
-        events.processEvent(new PersonDepartureEvent(1.0, driverId_train1, linkId7, networkMode_train));
+        events.processEvent(new PersonDepartureEvent(1.0, driverId_bus1, linkId1, networkMode_bus, networkMode_bus));
+        events.processEvent(new PersonDepartureEvent(1.0, driverId_train1, linkId7, networkMode_train, networkMode_train));
 
         events.processEvent(new PersonEntersVehicleEvent(1.0, driverId_bus1, veh_bus1_dep1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(1.0, driverId_train1, veh_train1_dep1.getId()));
@@ -340,7 +340,7 @@ public class PtStop2StopAnalysisTest {
 //      BUS2 :stopSequence == 0
         events.processEvent(new TransitDriverStartsEvent(11.0, driverId_bus2, veh_bus1_dep2.getId(),
                 transitLineId_bus1, transitRouteId_bus1_route1, departureId_bus1_dep2));
-        events.processEvent(new PersonDepartureEvent(11.0, driverId_bus2, linkId1, networkMode_bus));
+        events.processEvent(new PersonDepartureEvent(11.0, driverId_bus2, linkId1, networkMode_bus, networkMode_bus));
         events.processEvent(new PersonEntersVehicleEvent(11.0, driverId_bus2, veh_bus1_dep2.getId()));
         events.processEvent(new VehicleEntersTrafficEvent(11.0, driverId_bus2, linkId1, veh_bus1_dep2.getId(), networkMode_bus, 1.0));
         events.processEvent(new VehicleArrivesAtFacilityEvent(11.0, veh_bus1_dep2.getId(), transitStopFacilityId1, 0.0));
@@ -369,7 +369,7 @@ public class PtStop2StopAnalysisTest {
 //      ( BUS1 :stopSequence == 3 )
         events.processEvent(new TransitDriverStartsEvent(21.0, driverId_bus1, veh_bus1_dep1.getId(),
                 transitLineId_bus1, transitRouteId_bus1_route2, departureId_bus1_dep1));
-        events.processEvent(new PersonDepartureEvent(21.0, driverId_bus1, linkId4, networkMode_bus));
+        events.processEvent(new PersonDepartureEvent(21.0, driverId_bus1, linkId4, networkMode_bus, networkMode_bus));
         events.processEvent(new PersonEntersVehicleEvent(22.0, driverId_bus1, veh_bus1_dep1.getId()));
         events.processEvent(new VehicleEntersTrafficEvent(22.0, driverId_bus1, linkId4, veh_bus1_dep1.getId(), networkMode_bus, 1.0));
         events.processEvent(new VehicleArrivesAtFacilityEvent(23.0, veh_bus1_dep1.getId(), transitStopFacilityId4, 0.0));
