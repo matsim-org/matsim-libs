@@ -100,8 +100,8 @@ public class TravelTimeValidationRunnerPreAnalysis {
                 travelTime);
 
         // Choose random trips to validate
-        CSVPrinter csvWriter = new CSVPrinter(new FileWriter(outputFolder + "/pre-analysis-results.csv"), CSVFormat.DEFAULT);
-        csvWriter.printRecord("trip_number", "trip_category", "from_x", "from_y", "to_x", "to_y", "simulated_travel_time", "validated_travel_time");
+        CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(outputFolder + "/pre-analysis-results.csv"), CSVFormat.TDF);
+        tsvWriter.printRecord("trip_number", "trip_category", "from_x", "from_y", "to_x", "to_y", "simulated_travel_time", "validated_travel_time");
         int counter = 0;
 
         Link fromLink;
@@ -144,13 +144,13 @@ public class TravelTimeValidationRunnerPreAnalysis {
                 }
                 double simulatedTravelTime = router.calcLeastCostPath
                         (fromLink.getToNode(), toLink.getToNode(), 0, null, null).travelTime;
-                csvWriter.printRecord(Integer.toString(counter), tripType, Double.toString(fromCorrd.getX()),
+                tsvWriter.printRecord(Integer.toString(counter), tripType, Double.toString(fromCorrd.getX()),
                         Double.toString(fromCorrd.getY()), Double.toString(toCoord.getX()),
                         Double.toString(toCoord.getY()), Double.toString(simulatedTravelTime),
                         Double.toString(validatedTravelTime));
             }
         }
-        csvWriter.close();
+        tsvWriter.close();
 
     }
 }

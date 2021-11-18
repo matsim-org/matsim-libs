@@ -34,6 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,7 +65,7 @@ public class RunTraveltimeValidationExample {
 	</ol>
 	 *  
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		String plans = args[0];
 		String events = args[1];
 		String network = args [2];
