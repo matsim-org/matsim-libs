@@ -50,8 +50,8 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 public class DefaultDrtInsertionSearchTest {
 	@Test
 	public void findBestInsertion_noInsertionsProvided() {
-		var insertionCostCalculator = new DefaultInsertionCostCalculator<>(new DrtConfigGroup(), new MobsimTimer(),
-				null, PathData::getTravelTime, null);
+		var insertionCostCalculator = new DefaultInsertionCostCalculator<>(new DrtConfigGroup(), null,
+				PathData::getTravelTime, null);
 		var insertionSearch = new DefaultDrtInsertionSearch(mock(InsertionProvider.class), null,
 				insertionCostCalculator);
 		assertThat(insertionSearch.findBestInsertion(null, List.of())).isEmpty();
