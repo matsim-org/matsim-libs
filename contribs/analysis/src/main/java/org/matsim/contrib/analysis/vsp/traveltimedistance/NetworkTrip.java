@@ -22,6 +22,7 @@ package org.matsim.contrib.analysis.vsp.traveltimedistance;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,16 +103,27 @@ public class NetworkTrip {
 		this.validatedTravelDistance = validatedTravelDistance;
 	}
 
-
 	public double getTravelledDistance() {
 		return travelledDistance;
 	}
 
-	public List<String> getTripData() {
-		String dataString = this.personId.toString() + ";" + departureTime + ";" + departureLocation.getX() + ";" +
-				departureLocation.getY() + ";" + arrivalLocation.getX() + ";" + arrivalLocation.getY() + ";" +
-				actualTravelTime + ";" + validatedTravelTime + ";" + travelledDistance + ";" + validatedTravelDistance;
-		String[] data = dataString.split(";");
-		return Arrays.asList(data);
-	}
+    public List<String> getTripData() {
+        String[] data = new String[]{this.personId.toString(), Double.toString(departureTime),
+                Double.toString(departureLocation.getX()), Double.toString(departureLocation.getY()),
+                Double.toString(arrivalLocation.getX()), Double.toString(arrivalLocation.getY()),
+                Double.toString(actualTravelTime), Double.toString(validatedTravelTime),
+                Double.toString(travelledDistance), Double.toString(validatedTravelDistance)};
+        return Arrays.asList(data);
+    }
+
+
+    /**
+     * This function should not be used in the future! It is a bad design with a bad naming. Please use getTripData instead.
+     * */
+    @Deprecated
+    public String toString(){
+//		bw.append("agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated;traveledDistance;validatedDistance");
+        return (this.personId.toString()+";"+departureTime+";"+departureLocation.getX()+";"+departureLocation.getY()+";"+arrivalLocation.getX()+";"+arrivalLocation.getY()+";"+actualTravelTime+";"+validatedTravelTime+";"+travelledDistance+";"+validatedTravelDistance);
+        }
+
 }
