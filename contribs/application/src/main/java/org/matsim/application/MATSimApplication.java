@@ -383,6 +383,17 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			return;
 		}
 
+		// GUI does not pass any argument
+		boolean runInGUi = "true".equals(System.getenv("MATSIM_GUI"));
+		if (runInGUi) {
+
+			// prepend necessary options
+			List<String> l = Lists.newArrayList("run", "--config");
+			l.addAll(Arrays.asList(args));
+
+			args = l.toArray(new String[0]);
+		}
+
 		prepareArgs(args);
 
 		CommandLine cli = prepare(app);
@@ -517,9 +528,27 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * Check if unmatched options are correct.
 	 */
 	private static List<String> unmatched(CommandLine.ParseResult parseResult) {
-		return parseResult.unmatched().stream().filter(
-				s -> !s.startsWith("-c:") && !s.startsWith("--config:")
-		).collect(Collectors.toList());
+		List<String> unmatched = Lists.newArrayList(parseResult.unmatched());
+		ListIterator<String> it = unmatched.listIterator();
+
+		// previous string
+		String prev = null;
+		while (it.hasNext()) {
+
+			String current = it.next();
+
+			// filter string handled by matsim parser
+			if (current.startsWith("-c:") || current.startsWith("--config:"))
+				it.remove();
+
+			// separate arguments should also be valid, e.g --c:global.threads 5
+			if (!current.startsWith("--") && prev != null && (prev.startsWith("-c:") || prev.startsWith("--config:")))
+				it.remove();
+
+			prev = current;
+		}
+
+		return unmatched;
 	}
 
 	private static CommandLine prepare(MATSimApplication app) {

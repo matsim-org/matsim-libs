@@ -139,7 +139,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		//make sure the retry queue contains an updated copy of request1 pending retry at time 25 (retry is ON)
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval - 1)).isEmpty();
-		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingFieldByFieldElementComparator()
+		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request1)
 						.latestStartTime(request1.getLatestStartTime() + retryInterval)
 						.latestArrivalTime(request1.getLatestArrivalTime() + retryInterval)
@@ -189,7 +189,7 @@ public class DefaultUnplannedRequestInserterTest {
 		var unplannedRequests = requests(request1);
 		double now = 15;
 
-		var vehicle1Entry = new VehicleEntry(vehicle1, null, null);
+		var vehicle1Entry = new VehicleEntry(vehicle1, null, null, null);
 		var createEntryCounter = new MutableInt();
 		VehicleEntry.EntryFactory entryFactory = (vehicle, currentTime) -> {
 			//make sure the right arguments are passed

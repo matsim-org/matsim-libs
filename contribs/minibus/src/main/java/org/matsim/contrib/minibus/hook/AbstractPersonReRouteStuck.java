@@ -53,7 +53,7 @@ abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork();
+			net = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);

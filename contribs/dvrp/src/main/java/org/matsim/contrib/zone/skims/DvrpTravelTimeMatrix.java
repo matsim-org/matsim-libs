@@ -23,9 +23,9 @@ package org.matsim.contrib.zone.skims;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystems;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -33,16 +33,28 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 public class DvrpTravelTimeMatrix {
 	private final SquareGridSystem gridSystem;
 	private final Matrix freeSpeedTravelTimeMatrix;
+	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
-	public DvrpTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads) {
+	public DvrpTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
+			double qSimTimeStepSize) {
 		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.getCellSize());
 		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
-		var travelTime = new FreeSpeedTravelTime();
+		var travelTime = new QSimFreeSpeedTravelTime(qSimTimeStepSize);
+		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(dvrpNetwork, centralNodes, 0,
-				travelTime, new TimeAsTravelDisutility(travelTime), numberOfThreads);
+				travelTime, travelDisutility, numberOfThreads);
+		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(dvrpNetwork,
+				params.getMaxNeighborDistance(), 0, travelTime, travelDisutility, numberOfThreads);
 	}
 
-	public float getFreeSpeedTravelTime(Node fromNode, Node toNode) {
+	public int getFreeSpeedTravelTime(Node fromNode, Node toNode) {
+		if (fromNode == toNode) {
+			return 0;
+		}
+		int time = freeSpeedTravelTimeSparseMatrix.get(fromNode, toNode);
+		if (time >= 0) {// value is present
+			return time;
+		}
 		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
 	}
 }

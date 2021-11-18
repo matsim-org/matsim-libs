@@ -43,6 +43,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -63,13 +64,15 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 	private final Collection<String> vehicularModes;
 	private final boolean allowNullRoutes;
 	private final VehicleRessources vehicleRessources;
+	private final TimeInterpretation timeInterpretation;
 
 	public OptimizeVehicleAllocationAtTourLevelAlgorithm(
 			final Set<String> stageActivitiesForSubtourDetection,
 			final Random random,
 			final VehicleRessources vehicleRessources,
 			final Collection<String> modes,
-			final boolean allowNullRoutes) {
+			final boolean allowNullRoutes,
+			final TimeInterpretation timeInterpretation) {
 		this.randomAllocator = new AllocateVehicleToPlansInGroupPlanAlgorithm(
 			random,
 			vehicleRessources,
@@ -80,6 +83,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		this.allowNullRoutes = allowNullRoutes;
 		this.stageActs = stageActivitiesForSubtourDetection;
 		this.vehicleRessources = vehicleRessources;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -197,7 +201,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 									s,
 									factory.getRecords(
 										vehicleRessources.identifyVehiclesUsableForAgent(
-											p.getPerson().getId() ))) );
+											p.getPerson().getId() )), timeInterpretation) );
 						break;
 					}
 					if ( !isFirstTrip && isVehicular( t ) ) {
@@ -280,7 +284,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 		public SubtourRecord(
 				final Subtour subtour,
-				final List<VehicleRecord> possibleVehicles) {
+				final List<VehicleRecord> possibleVehicles, TimeInterpretation timeInterpretation) {
 			this.possibleVehicles = possibleVehicles; 
 			this.subtour = subtour;
 			
@@ -288,7 +292,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			this.startTime = firstTrip.getOriginActivity().getEndTime().seconds();
 
 			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
-			this.endTime = calcArrivalTime( lastTrip );
+			this.endTime = calcArrivalTime( lastTrip, timeInterpretation );
 		}
 	}
 
@@ -323,7 +327,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		}
 	}
 
-	private static double calcArrivalTime(final Trip trip) {
+	private static double calcArrivalTime(final Trip trip, TimeInterpretation timeInterpretation) {
 		double now = trip.getOriginActivity().getEndTime().seconds();
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
@@ -332,7 +336,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			}
 			else if ( pe instanceof Leg ) {
 				Leg leg = (Leg)pe;
-				final OptionalTime tt = PopulationUtils.decideOnTravelTimeForLeg(leg);
+				final OptionalTime tt = timeInterpretation.decideOnLegTravelTime(leg);
 				now += tt.orElse(0);// no info: just assume instantaneous (i.e. 0). This will give poor results!
 			}
 		}

@@ -35,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
@@ -54,6 +55,66 @@ public class RunDrtExampleIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	public void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//disable rejections
+			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		}
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.0)
+				.rejections(0)
+				.waitAverage(296.95)
+				.inVehicleTravelTimeMean(387.02)
+				.totalTravelTimeMean(683.97)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
+	public void testRunDrtExampleWithNoRejections_SelectiveSearch() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//replace extensive with selective search
+			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
+			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);// using exactly free-speed estimates
+			drtCfg.addParameterSet(selectiveInsertionSearchParams);
+
+			//disable rejections
+			drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		}
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.0)
+				.rejections(0)
+				.waitAverage(293.47)
+				.inVehicleTravelTimeMean(389.71)
+				.totalTravelTimeMean(683.18)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
 	public void testRunDrtExampleWithRequestRetry() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
@@ -70,11 +131,11 @@ public class RunDrtExampleIT {
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.01)
-				.rejections(5)
-				.waitAverage(700.11)
-				.inVehicleTravelTimeMean(381.06)
-				.totalTravelTimeMean(1081.17)
+				.rejectionRate(0.0)
+				.rejections(1)
+				.waitAverage(310.71)
+				.inVehicleTravelTimeMean(376.06)
+				.totalTravelTimeMean(686.78)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -94,10 +155,10 @@ public class RunDrtExampleIT {
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.05)
-				.rejections(18)
-				.waitAverage(255.6)
-				.inVehicleTravelTimeMean(378.99)
-				.totalTravelTimeMean(634.59)
+				.rejections(20)
+				.waitAverage(251.86)
+				.inVehicleTravelTimeMean(377.35)
+				.totalTravelTimeMean(629.21)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -117,10 +178,10 @@ public class RunDrtExampleIT {
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.03)
-				.rejections(11)
-				.waitAverage(227.56)
-				.inVehicleTravelTimeMean(385.43)
-				.totalTravelTimeMean(612.98)
+				.rejections(10)
+				.waitAverage(226.37)
+				.inVehicleTravelTimeMean(389.87)
+				.totalTravelTimeMean(616.24)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -159,12 +220,12 @@ public class RunDrtExampleIT {
 		double rejectionRate = Double.parseDouble(params.get("rejectionRate"));
 		double totalTravelTimeMean = Double.parseDouble(params.get("totalTravelTime_mean"));
 
-		var percentage = Percentage.withPercentage(1);
-		assertThat(expectedStats.rejectionRate).isCloseTo(rejectionRate, percentage);
-		assertThat(expectedStats.rejections).isCloseTo(rejections, percentage);
-		assertThat(expectedStats.waitAverage).isCloseTo(waitAverage, percentage);
-		assertThat(expectedStats.inVehicleTravelTimeMean).isCloseTo(inVehicleTravelTimeMean, percentage);
-		assertThat(expectedStats.totalTravelTimeMean).isCloseTo(totalTravelTimeMean, percentage);
+		var percentage = Percentage.withPercentage(0.00001);
+		assertThat(rejectionRate).isCloseTo(expectedStats.rejectionRate, percentage);
+		assertThat(rejections).isCloseTo(expectedStats.rejections, percentage);
+		assertThat(waitAverage).isCloseTo(expectedStats.waitAverage, percentage);
+		assertThat(inVehicleTravelTimeMean).isCloseTo(expectedStats.inVehicleTravelTimeMean, percentage);
+		assertThat(totalTravelTimeMean).isCloseTo(expectedStats.totalTravelTimeMean, percentage);
 	}
 
 	private static class Stats {

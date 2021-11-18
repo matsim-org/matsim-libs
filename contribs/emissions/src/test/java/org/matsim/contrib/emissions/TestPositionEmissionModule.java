@@ -7,16 +7,19 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.EmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -25,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -32,11 +36,13 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.facilities.filters.Filter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import javax.inject.Singleton;
 import java.util.HashMap;
@@ -126,108 +132,45 @@ public class TestPositionEmissionModule {
         var controler = new Controler(scenario);
 
         controler.addOverridingModule(new PositionEmissionsModule());
-        var handler = new AllEmissionsHandler();
-        var mainLinkWarmHandler = new MainLinkWarmHandler();
-        var coldHandler = new ColdHandler();
+        // exclude last link since both emission calculations work slightly different for the last link of a trip.
+        var combinedHandler = new FilterLinkHandler(Set.of(Id.createLinkId("start-link"), Id.createLinkId("link")));
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addEventHandlerBinding().toInstance(handler);
-                addEventHandlerBinding().toInstance(mainLinkWarmHandler);
-                addEventHandlerBinding().toInstance(coldHandler);
+                addEventHandlerBinding().toInstance(combinedHandler);
+                addEventHandlerBinding().toInstance((BasicEventHandler) event -> {
+                    if (!event.getEventType().equals(PositionEvent.EVENT_TYPE) && !event.getEventType().equals(PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE)) {
+                        System.out.println(event.getEventType());
+                    }
+                });
                 bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
             }
         });
 
         controler.run();
 
-        // check for equal values on the main link for warm emissions
-        for (var entry : mainLinkWarmHandler.getClassicEmissions().entrySet()) {
-            assertEquals(entry.getValue(), mainLinkWarmHandler.getPositionEmissions().get(entry.getKey()), 0.1);
-        }
-
-        // check for equal values for cold emissions
-        for (var entry : coldHandler.getClassicEmissions().entrySet()) {
-            assertEquals(entry.getValue(), coldHandler.getPositionEmissions().get(entry.getKey()), 0.1);
-        }
-
-        // this test fails because WarmEmissionHandler doesn't generate an event for the last link of a leg.
-        // I think this is not correct. But talk to kai about it.
-        // In the end the overall ammount of emissions should also be equal.
-       /* for (var entry : handler.getClassicEmissions().entrySet()) {
-            assertEquals(entry.getValue(), handler.getPositionEmissions().get(entry.getKey()), 0.1);
-        }
-        */
-    }
-
-    private static class AllEmissionsHandler extends Handler implements BasicEventHandler {
-
-        @Override
-        public void handleEvent(Event event) {
-
-            switch (event.getEventType()) {
-                case ColdEmissionEvent.EVENT_TYPE:
-                    sumAll(classicEmissions, ((ColdEmissionEvent) event).getColdEmissions());
-                    break;
-                case WarmEmissionEvent.EVENT_TYPE:
-                    sumAll(classicEmissions, ((WarmEmissionEvent) event).getWarmEmissions());
-                    break;
-                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
-                    sumAll(positionEmissions, ((PositionEmissionsModule.PositionEmissionEvent) event).getEmissions());
-                    break;
-            }
+        // check that the overall amount of emissions is equal for the main link
+        for (var entry : combinedHandler.getClassicEmissions().entrySet()) {
+            assertEquals(entry.getValue(), combinedHandler.getPositionEmissions().get(entry.getKey()), 0.1);
         }
     }
 
-    private static class MainLinkWarmHandler extends Handler implements BasicEventHandler {
+    private static class FilterLinkHandler implements BasicEventHandler {
 
-        @Override
-        public void handleEvent(Event event) {
+        private final Set<Id<Link>> filterLinks;
+        private final Map<Pollutant, Double> classicEmissions = new HashMap<>();
+        private final Map<Pollutant, Double> positionEmissions = new HashMap<>();
 
-            switch (event.getEventType()) {
-                case WarmEmissionEvent.EVENT_TYPE:
-                    var warmEmissionEvent = (WarmEmissionEvent) event;
-                    if (warmEmissionEvent.getLinkId().equals(Id.createLinkId("link")))
-                        sumAll(classicEmissions, warmEmissionEvent.getWarmEmissions());
-                    break;
-                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
-                    var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
-                    if (positionEvent.getLinkId().equals(Id.createLinkId("link")) && positionEvent.getEmissionType().equals("warm"))
-                        sumAll(positionEmissions, positionEvent.getEmissions());
-                    break;
-            }
+        private FilterLinkHandler(Set<Id<Link>> filterLinks) {
+            this.filterLinks = filterLinks;
         }
-    }
 
-    private static class ColdHandler extends Handler implements BasicEventHandler {
-
-        @Override
-        public void handleEvent(Event event) {
-
-            switch (event.getEventType()) {
-                case ColdEmissionEvent.EVENT_TYPE:
-                    var coldEmissionEvent = (ColdEmissionEvent) event;
-                    sumAll(classicEmissions, coldEmissionEvent.getColdEmissions());
-                    break;
-                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
-                    var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
-                    if (positionEvent.getEmissionType().equals("cold"))
-                        sumAll(positionEmissions, positionEvent.getEmissions());
-                    break;
-            }
-        }
-    }
-
-    private static class Handler {
-
-        final Map<Pollutant, Double> classicEmissions = new HashMap<>();
-        final Map<Pollutant, Double> positionEmissions = new HashMap<>();
-
-        public Map<Pollutant, Double> getClassicEmissions() {
+        Map<Pollutant, Double> getClassicEmissions() {
             return classicEmissions;
         }
 
-        public Map<Pollutant, Double> getPositionEmissions() {
+        Map<Pollutant, Double> getPositionEmissions() {
             return positionEmissions;
         }
 
@@ -235,6 +178,25 @@ public class TestPositionEmissionModule {
 
             for (Map.Entry<Pollutant, Double> pollutantDoubleEntry : from.entrySet()) {
                 to.merge(pollutantDoubleEntry.getKey(), pollutantDoubleEntry.getValue(), Double::sum);
+            }
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            switch (event.getEventType()) {
+                case WarmEmissionEvent.EVENT_TYPE:
+                case ColdEmissionEvent.EVENT_TYPE:
+                    var emissionEvent = (EmissionEvent) event;
+                    if (filterLinks.contains(emissionEvent.getLinkId())) {
+                        sumAll(classicEmissions, emissionEvent.getEmissions());
+                    }
+                    break;
+                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
+                    var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
+                    if (positionEvent.getLinkId().equals(Id.createLinkId("link")) && positionEvent.getEmissionType().equals("combined"))
+                        sumAll(positionEmissions, positionEvent.getEmissions());
+                    break;
+
             }
         }
     }
@@ -256,16 +218,16 @@ public class TestPositionEmissionModule {
      */
     private Network createSingleLinkNetwork() {
 
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         addLink(network, "start-link",
                 network.getFactory().createNode(Id.createNodeId("1"), new Coord(-100, 0)),
                 network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)));
         addLink(network, "link",
                 network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)),
-                network.getFactory().createNode(Id.createNodeId("3"), new Coord(1000, 0)));
+                network.getFactory().createNode(Id.createNodeId("3"), new Coord(10000, 0)));
         addLink(network, "end-link",
                 network.getFactory().createNode(Id.createNodeId("3"), new Coord(1000, 0)),
-                network.getFactory().createNode(Id.createNodeId("4"), new Coord(1100, 0)));
+                network.getFactory().createNode(Id.createNodeId("4"), new Coord(10100, 0)));
         return network;
     }
 
@@ -292,7 +254,7 @@ public class TestPositionEmissionModule {
         leg.setRoute(RouteUtils.createNetworkRoute(List.of(Id.createLinkId("start"), Id.createLinkId("link"), Id.createLinkId("end"))));
         plan.addLeg(leg);
 
-        var work = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(1100, 0));
+        var work = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(10100, 0));
         work.setEndTime(3600);
 
         var person = factory.createPerson(Id.createPersonId("person"));

@@ -23,7 +23,7 @@
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -50,6 +49,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -73,6 +73,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private double activityEndTime;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
+	final private TimeInterpretation timeInterpretation;
+	
 	/**
 	 * This notes how far a route is advanced.  One could move this into the DriverAgent(Impl).  There, however, is no method to know about the
 	 * start of the route, thus one has to guess when to set it back to zero.  Also, IMO there is really some logic to providing this as a service
@@ -80,7 +82,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	 */
 	private int currentLinkIndex = 0;
 
-	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
+	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer, TimeInterpretation timeInterpretation) {
 
 		this.plan = PopulationUtils.unmodifiablePlan(plan2) ;
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
@@ -88,6 +90,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		this.scenario = scenario ;
 		this.events = events ;
 		this.simTimer = simTimer ;
+		this.timeInterpretation = timeInterpretation;
 
 		List<PlanElement> planElements = this.plan.getPlanElements();
 		Preconditions.checkArgument(!planElements.isEmpty(), "Plan must consist of at least one activity");
@@ -175,9 +178,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	 * ensure that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
 	private final void calculateAndSetDepartureTime(Activity act) {
-		PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = this.getScenario().getConfig().plans().getActivityDurationInterpretation();
 		double now = this.getSimTimer().getTimeOfDay() ;
-		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
+		double departure = Math.max(now, timeInterpretation.decideOnActivityEndTime(act, now).orElse(Double.POSITIVE_INFINITY));
 	
 		if ( this.getCurrentPlanElementIndex() == this.getCurrentPlan().getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
@@ -253,7 +255,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	}
 	@Override
 	public final OptionalTime getExpectedTravelTime() {
-		return PopulationUtils.decideOnTravelTimeForLeg((Leg)this.getCurrentPlanElement());
+		return timeInterpretation.decideOnLegTravelTime((Leg)this.getCurrentPlanElement());
 	}
 
     @Override

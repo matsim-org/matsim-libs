@@ -21,7 +21,7 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.TripRouter;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
@@ -40,15 +40,17 @@ public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
 	private final PlanRoutingAlgorithmFactory routingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 
 	@Inject
 	public GroupReRouteFactory( Scenario sc , PlanRoutingAlgorithmFactory routingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier, TimeInterpretation timeInterpretation ) {
 		this.sc = sc;
 		this.routingAlgorithmFactory = routingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -65,7 +67,7 @@ public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					sc.getConfig(),
-					tripRouterFactory ) );
+					tripRouterFactory, timeInterpretation ) );
 		
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(

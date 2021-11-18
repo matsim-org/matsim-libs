@@ -13,10 +13,12 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 public final class GridUtils {
@@ -32,13 +34,10 @@ public final class GridUtils {
 
 		try{
 			// get boundaries of study area
-			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFileName );
+			List<Geometry> featureSet = ShpGeometryUtils.loadGeometries(IOUtils.resolveFileOrResource(shapeFileName));
 			// yyyy I find this quite terrible to have the reader hidden in here.  Now I cannot pass a shape file which
 			// I may have gotten in some way, but need to first write it to file. kai, mar'14
-
-			LOG.info("Extracting boundary of the shape file ...");
-			Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
-			LOG.info("Done extracting boundary ...");
+			Geometry boundary = featureSet.iterator().next();
 
 			if(featureSet.size() > 1){
 				LOG.warn("The given shape file is not suitable for accessibility calculations.");
@@ -49,10 +48,6 @@ public final class GridUtils {
 			return boundary;
 		} catch (NullPointerException npe){
 			npe.printStackTrace();
-		} catch (IOException io){
-			io.printStackTrace();
-			LOG.error("Geometry object containing the study area boundary shape is null !");
-			System.exit(-1);
 		}
 		return null;
 	}

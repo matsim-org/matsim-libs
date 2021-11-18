@@ -21,8 +21,8 @@ package org.matsim.contrib.minibus.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConstants;
-import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.PPlan;
+import org.matsim.contrib.minibus.hook.Operator;
+import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.ArrayList;

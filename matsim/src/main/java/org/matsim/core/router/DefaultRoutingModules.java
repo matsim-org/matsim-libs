@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import javax.annotation.Nullable;
 
@@ -70,22 +71,24 @@ public final class DefaultRoutingModules {
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter ) {
+											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter,
+											 TimeInterpretation timeInterpretation) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,
-			  scenario, filteredNetwork, null, accessEgressToNetworkRouter, accessEgressToNetworkRouter );
+			  scenario, filteredNetwork, null, accessEgressToNetworkRouter, accessEgressToNetworkRouter, timeInterpretation );
 	}
 
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 																 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter) {
+																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
+																 TimeInterpretation timeInterpretation) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
-				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter);
+				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation);
 	}
 
 	/**
@@ -95,9 +98,10 @@ public final class DefaultRoutingModules {
 	 */
 	static RoutingModule createAccessEgressNetworkRouter( String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
 																 Network filteredNetwork, @Nullable Network invertedNetwork,
-																 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter) {
+																 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
+																 TimeInterpretation timeInterpretation) {
 		return new NetworkRoutingInclAccessEgressModule(
-				mode, routeAlgo, scenario, filteredNetwork, invertedNetwork, accessToNetworkRouter, egressFromNetworkRouter
+				mode, routeAlgo, scenario, filteredNetwork, invertedNetwork, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation
 		);
 	}
 

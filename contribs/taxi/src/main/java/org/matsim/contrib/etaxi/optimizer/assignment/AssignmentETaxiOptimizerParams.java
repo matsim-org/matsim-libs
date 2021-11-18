@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Positive;
 
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;

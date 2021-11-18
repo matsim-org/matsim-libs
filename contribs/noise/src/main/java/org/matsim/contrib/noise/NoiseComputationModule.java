@@ -66,6 +66,7 @@ public final class NoiseComputationModule extends AbstractModule {
 				}
 				this.bind(RoadSurfaceContext.class).in(Singleton.class);
 				this.bind(IntersectionContext.class).in(Singleton.class);
+				this.bind(DEMContext.class).to(DEMContextImpl.class).in(Singleton.class);
 
 				break;
 			default:

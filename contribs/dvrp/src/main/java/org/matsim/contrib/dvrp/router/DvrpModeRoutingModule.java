@@ -23,7 +23,9 @@ package org.matsim.contrib.dvrp.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -49,18 +51,18 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
 
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
-				DvrpRoutingModuleProvider.Stage.MAIN)
+						DvrpRoutingModuleProvider.Stage.MAIN)
 				.toProvider(new DefaultMainLegRouterProvider(getMode()));// not singleton
 
 		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
 				new GenericRouteCreatorProvider(getMode(), leastCostPathCalculatorFactory));
 
 		bindModal(DvrpRoutingModule.AccessEgressFacilityFinder.class).toProvider(
-				modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
+						modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 				.asEagerSingleton();
 	}
 
-	public static class DefaultMainLegRouterProvider extends ModalProviders.AbstractProvider<RoutingModule> {
+	public static class DefaultMainLegRouterProvider extends ModalProviders.AbstractProvider<DvrpMode, RoutingModule> {
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
@@ -69,7 +71,7 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 		private Scenario scenario;
 
 		public DefaultMainLegRouterProvider(String mode) {
-			super(mode);
+			super(mode, DvrpModes::mode);
 		}
 
 		@Override
@@ -79,7 +81,8 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 		}
 	}
 
-	private static class GenericRouteCreatorProvider extends ModalProviders.AbstractProvider<GenericRouteCreator> {
+	private static class GenericRouteCreatorProvider
+			extends ModalProviders.AbstractProvider<DvrpMode, GenericRouteCreator> {
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
@@ -88,7 +91,7 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 
 		private GenericRouteCreatorProvider(String mode,
 				LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
-			super(mode);
+			super(mode, DvrpModes::mode);
 			this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 		}
 

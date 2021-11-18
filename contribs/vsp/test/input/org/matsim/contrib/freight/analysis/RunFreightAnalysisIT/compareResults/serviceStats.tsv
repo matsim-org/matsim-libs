@@ -1,0 +1,8 @@
+carrierId	serviceId	driverId	vehicleId	serviceETA	tourETA 	arrivalTime
+carrier1	1	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	24032.0	?24405.0
+carrier1	11	##freight_carrier1_veh_carrier_19_lightVehicle_1	##freight_carrier1_veh_carrier_19_lightVehicle_1	0.0	23766.0	?23777.0
+carrier1	12	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	25566.0	?25945.0
+carrier1	13	##freight_carrier1_veh_carrier_19_lightVehicle_1	##freight_carrier1_veh_carrier_19_lightVehicle_1	0.0	22533.0	?22538.0
+carrier1	14	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	23066.0	?23434.0
+carrier1	15	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	26399.0	?26782.0
+carrier1	16	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	24732.0	?25108.0

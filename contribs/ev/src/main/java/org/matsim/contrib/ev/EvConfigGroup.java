@@ -19,12 +19,14 @@
 
 package org.matsim.contrib.ev;
 
+import java.util.Map;
+
+import javax.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import java.util.Map;
 
 public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ev";
@@ -48,12 +50,13 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	static final String CHARGERS_FILE_EXP = "Location of the chargers file";
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
-	static final String VEHICLES_FILE_EXP = "Location of the vehicles file";
+	static final String VEHICLES_FILE_EXP = "Location of the vehicles file."
+			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
+			+ " See ElectricFleetModule.";
 
 	// output
 	public static final String TIME_PROFILES = "timeProfiles";
 	static final String TIME_PROFILES_EXP = "If true, SOC time profile plots will be created";
-
 
 	// no need to simulate with 1-second time step
 	@Positive
@@ -68,7 +71,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@NotNull
 	private String chargersFile = null;
 
-	@NotNull
+	@Nullable
 	private String vehiclesFile = null;
 
 	private boolean timeProfiles = false;

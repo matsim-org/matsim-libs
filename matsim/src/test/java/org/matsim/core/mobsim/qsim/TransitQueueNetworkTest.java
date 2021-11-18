@@ -59,6 +59,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -1150,7 +1151,7 @@ public class TransitQueueNetworkTest extends TestCase {
         }
         
 		private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person person) {
-			PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), qsim);
+			PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), qsim, qsim.getChildInjector().getInstance(TimeInterpretation.class));
 			qsim.insertAgentIntoMobsim(agent); 
 			return agent;
 		}

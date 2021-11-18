@@ -25,24 +25,28 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author michalm
  */
 public class TaxiRequestCreator implements PassengerRequestCreator {
 	private final String mode;
-	private final SubmittedTaxiRequestsCollector requestsCollector;
+	private final EventsManager eventsManager;
 
-	public TaxiRequestCreator(String mode, SubmittedTaxiRequestsCollector requestsCollector) {
+	public TaxiRequestCreator(String mode, EventsManager eventsManager) {
 		this.mode = mode;
-		this.requestsCollector = requestsCollector;
+		this.eventsManager = eventsManager;
 	}
 
 	@Override
 	public TaxiRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
-		TaxiRequest request = new TaxiRequest(id, passengerId, mode, fromLink, toLink, departureTime, submissionTime);
-		requestsCollector.addRequest(request);
-		return request;
+		eventsManager.processEvent(
+				new PassengerRequestSubmittedEvent(submissionTime, mode, id, passengerId, fromLink.getId(),
+						toLink.getId()));
+
+		return new TaxiRequest(id, passengerId, mode, fromLink, toLink, departureTime, submissionTime);
 	}
 }

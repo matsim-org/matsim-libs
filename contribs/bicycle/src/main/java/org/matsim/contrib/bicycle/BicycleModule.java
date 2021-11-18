@@ -47,6 +47,10 @@ final class BicycleModule extends AbstractModule {
 
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
+
+		// TODO: bicycle contrib can not be used with other scoring functions at the moment, as only one can be installed
+		// TODO: scoring should work via a score event so it can be used together with other scoring functions
+
 		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;

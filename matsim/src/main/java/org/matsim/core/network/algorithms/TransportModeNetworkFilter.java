@@ -19,17 +19,19 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class extracts a subnetwork from a given network containing only
@@ -61,6 +63,9 @@ public final class TransportModeNetworkFilter {
 	 * on the order of the nodes and links in the network. This problem might occur also
 	 * in other places, therefore, I fixed it here.
 	 * cdobler, sep'17
+	 * 
+	 * Time-varying networks did not copy time-dependent information. This functionality
+	 * is included now. sebhoerl, aug'24
 	 *
 	 * @param subNetwork the network object where to store the extracted subnetwork
 	 * @param extractModes set of modes that should be contained in the subnetwork
@@ -106,5 +111,38 @@ public final class TransportModeNetworkFilter {
 			if (!nodesToInclude.contains(node.getId())) nodesToRemove.add(node.getId());
 		}
 		for (Id<Node> nodeId : nodesToRemove) subNetwork.removeNode(nodeId);
+		
+		// fourth, recover the network change events
+		if (fullNetwork instanceof TimeDependentNetwork) {
+			TimeDependentNetwork fullTimeDependentNetwork = (TimeDependentNetwork) fullNetwork;
+			
+			if (fullTimeDependentNetwork.getNetworkChangeEvents().size() > 0) {
+				if (!(subNetwork instanceof TimeDependentNetwork)) {
+					throw new RuntimeException("Filtering time-dependent network with change events into a static network. Information on change events would be lost!");
+				} else {
+					TimeDependentNetwork timeDependentSubNetwork = (TimeDependentNetwork) subNetwork;
+					
+					for (NetworkChangeEvent event : fullTimeDependentNetwork.getNetworkChangeEvents()) {
+						NetworkChangeEvent subNetworkEvent = new NetworkChangeEvent(event.getStartTime());
+						
+						for (Link link : event.getLinks()) {
+							Link subNetworkLink = subNetwork.getLinks().get(link.getId());
+							
+							if (subNetworkLink != null) {
+								subNetworkEvent.addLink(subNetworkLink);
+							}
+						}
+						
+						subNetworkEvent.setFlowCapacityChange(event.getFlowCapacityChange());
+						subNetworkEvent.setFreespeedChange(event.getFreespeedChange());
+						subNetworkEvent.setLanesChange(event.getLanesChange());
+						
+						if (subNetwork.getLinks().size() > 0) {
+							timeDependentSubNetwork.addNetworkChangeEvent(subNetworkEvent);
+						}
+					}
+				}
+			}
+		}
 	}
 }

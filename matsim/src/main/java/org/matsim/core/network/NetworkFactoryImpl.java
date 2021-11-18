@@ -37,13 +37,13 @@ import org.matsim.core.utils.geometry.CoordUtils;
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(NetworkFactory.class);
 
-	private LinkFactory linkFactory = null;
+	private final LinkFactory linkFactory;
 
 	private final Network network;
 
-	NetworkFactoryImpl(final Network network) {
+	NetworkFactoryImpl(final Network network, final LinkFactory linkFactory) {
 		this.network = network;
-		this.linkFactory = NetworkUtils.createLinkFactory();
+		this.linkFactory = linkFactory;
 	}
 
 	@Override
@@ -57,9 +57,5 @@ import org.matsim.core.utils.geometry.CoordUtils;
 	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
 		return this.linkFactory.createLink(id, fromNode, toNode, 
 				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
-	}
-	@Override
-	public void setLinkFactory(final LinkFactory factory) {
-		this.linkFactory = factory;
 	}
 }

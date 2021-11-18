@@ -87,6 +87,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
@@ -1092,7 +1093,7 @@ public class QSimTest {
 		sim.addParkedVehicle(vehicle2, Id.create(2, Link.class));
 
 		sim.getSimTimer().setTime(100.0);
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), sim);
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
 		sim.insertAgentIntoMobsim(agent); 
 		agent.endActivityAndComputeNextState(100.0);
 		sim.internalInterface.arrangeNextAgentState(agent);

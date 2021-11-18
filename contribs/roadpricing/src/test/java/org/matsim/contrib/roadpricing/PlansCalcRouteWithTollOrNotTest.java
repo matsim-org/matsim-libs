@@ -48,6 +48,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -168,7 +169,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 				new ControlerDefaultCoreListenersModule(), 
 				new NewControlerModule()).getProvider(TripRouter.class);
 
-			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider ) ;
+			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider, TimeInterpretation.create(scenario.getConfig()) ) ;
 			// yy might be more plausible to get the full class out of the injector, but that ain't that easy ...  kai, oct'19
 	}
 

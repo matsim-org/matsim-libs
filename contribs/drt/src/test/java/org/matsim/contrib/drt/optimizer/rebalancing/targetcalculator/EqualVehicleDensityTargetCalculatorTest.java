@@ -50,7 +50,7 @@ public class EqualVehicleDensityTargetCalculatorTest {
 			IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml"),
 			new MultiModeDrtConfigGroup());
 
-	private final Network network = NetworkUtils.readNetwork(
+	private final Network network = NetworkUtils.readTimeInvariantNetwork(
 			config.network().getInputFileURL(config.getContext()).toString());
 
 	private final DrtZonalSystem zonalSystem = DrtZonalSystem.createFromPreparedGeometries(network,
