@@ -48,11 +48,12 @@ import org.matsim.core.utils.misc.Time;
  */
 public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
     private static final Logger log = LogManager.getLogger(HereMapsRouteValidator.class);
-    final String apiAccessKey;
-    final String outputPath;
-    final String date;
-    final CoordinateTransformation transformation;
-    boolean writeDetailedFiles = false;
+    private final String mode;
+    private final String apiAccessKey;
+    private final String outputPath;
+    private final String date;
+    private final CoordinateTransformation transformation;
+    private final boolean writeDetailedFiles;
 
     /**
      * @param outputFolder   folder to write gzipped json files
@@ -60,9 +61,10 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
      * @param date           a date to run the validation for, format: 2017-06-08
      * @param transformation A coordinate transformation to WGS 84
      */
-    public HereMapsRouteValidator(String outputFolder, String apiAccessKey, String date,
+    public HereMapsRouteValidator(String outputFolder, String mode, String apiAccessKey, String date,
                                   CoordinateTransformation transformation, boolean writeDetailedFiles) {
         this.outputPath = outputFolder;
+        this.mode = mode == null ? "car" : mode;
         this.apiAccessKey = apiAccessKey;
         this.date = date;
         this.transformation = transformation;
@@ -82,7 +84,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
      * getTravelTime(org.matsim.contrib.analysis.vsp.traveltimes.CarTrip)
      */
     @Override
-    public Tuple<Double, Double> getTravelTime(CarTrip trip) {
+    public Tuple<Double, Double> getTravelTime(NetworkTrip trip) {
         String tripId = trip.getPersonId().toString() + "_" + trip.getDepartureTime();
         return getTravelTime(trip.getDepartureLocation(), trip.getArrivalLocation(), trip.getDepartureTime(), tripId);
     }
@@ -101,7 +103,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
         DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(locale);
         df.applyPattern(pattern);
 
-        String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAccessKey + "&transportmode=car&origin="
+        String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAccessKey + "&transportmode=" + mode + "&origin="
                 + df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
                 + df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(departureTime)
                 + "&return=summary";
@@ -138,20 +140,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
             log.error("Cannot read the content on the URL properly. Please manually check the URL", e);
         }
         return new Tuple<Double, Double>((double) travelTime, (double) distance);
-    }
-
-    /**
-     * @return the writeDetailedFiles
-     */
-    public boolean isWriteDetailedFiles() {
-        return writeDetailedFiles;
-    }
-
-    /**
-     * @param writeDetailedFiles the writeDetailedFiles to set
-     */
-    public void setWriteDetailedFiles(boolean writeDetailedFiles) {
-        this.writeDetailedFiles = writeDetailedFiles;
     }
 
 }

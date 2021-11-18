@@ -25,8 +25,6 @@ package org.matsim.contrib.analysis.vsp.traveltimedistance;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 
-import java.util.Deque;
-
 /**
  * @author  jbischoff, Chengqi Lu
  * An Interface for Traveltime Validation
@@ -41,7 +39,7 @@ public interface TravelTimeDistanceValidator {
 	 * @param trip the trip to validate
 	 * @return a tuple of validated TravelTime and Distance
 	 */
-	Tuple<Double,Double> getTravelTime(CarTrip trip);
+	Tuple<Double,Double> getTravelTime(NetworkTrip trip);
 
 	/**
 	 * A more general form for the trip validation
