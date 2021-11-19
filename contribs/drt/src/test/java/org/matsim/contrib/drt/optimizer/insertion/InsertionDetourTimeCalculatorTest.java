@@ -186,14 +186,14 @@ public class InsertionDetourTimeCalculatorTest {
 		double arrivalTime = stop0.getDepartureTime() + pickupTimeLoss + detour.toDropoff;
 		double dropoffTimeLoss = detour.toDropoff + STOP_DURATION + detour.fromDropoff
 				- dropoffDetourReplacedDriveEstimate;
-		assertThat(actualDetourTimeInfo).isEqualToComparingFieldByField(
-				new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss));
+		assertThat(actualDetourTimeInfo).usingRecursiveComparison()
+				.isEqualTo(new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss));
 	}
 
 	private void assertDetourTimeInfo(InsertionWithDetourData<Double> insertion, DetourTimeInfo expected) {
 		var detourTimeCalculator = new InsertionDetourTimeCalculator<>(STOP_DURATION, Double::doubleValue, null);
 		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
-		assertThat(detourTimeInfo).isEqualToComparingFieldByField(expected);
+		assertThat(detourTimeInfo).usingRecursiveComparison().isEqualTo(expected);
 	}
 
 	private Link link(String id) {

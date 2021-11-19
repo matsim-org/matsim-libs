@@ -122,28 +122,49 @@ public class InsertionDetourTimeCalculator<D> {
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
-	//move to InsertionDetourTimeCalculator; make InsertionDetourTimeCalculator an interface?
-	public static class DetourTimeInfo {
+	public static class PickupDetourInfo {
 		// expected departure time for the new request
 		public final double departureTime;
-		// expected arrival time for the new request
-		public final double arrivalTime;
 		// time delay of each stop placed after the pickup insertion point
 		public final double pickupTimeLoss;
+
+		public PickupDetourInfo(double departureTime, double pickupTimeLoss) {
+			this.departureTime = departureTime;
+			this.pickupTimeLoss = pickupTimeLoss;
+		}
+	}
+
+	public static class DropoffDetourInfo {
+		// expected arrival time for the new request
+		public final double arrivalTime;
 		// ADDITIONAL time delay of each stop placed after the dropoff insertion point
 		public final double dropoffTimeLoss;
 
-		public DetourTimeInfo(double departureTime, double arrivalTime, double pickupTimeLoss, double dropoffTimeLoss) {
-			this.departureTime = departureTime;
+		public DropoffDetourInfo(double arrivalTime, double dropoffTimeLoss) {
 			this.arrivalTime = arrivalTime;
-			this.pickupTimeLoss = pickupTimeLoss;
 			this.dropoffTimeLoss = dropoffTimeLoss;
+		}
+	}
+
+	//move to InsertionDetourTimeCalculator; make InsertionDetourTimeCalculator an interface?
+	public static class DetourTimeInfo {
+		public final PickupDetourInfo pickupDetourInfo;
+		public final DropoffDetourInfo dropoffDetourInfo;
+
+		public DetourTimeInfo(PickupDetourInfo pickupDetourInfo, DropoffDetourInfo dropoffDetourInfo) {
+			this.pickupDetourInfo = pickupDetourInfo;
+			this.dropoffDetourInfo = dropoffDetourInfo;
+		}
+
+		public DetourTimeInfo(double departureTime, double arrivalTime, double pickupTimeLoss, double dropoffTimeLoss) {
+			this(new PickupDetourInfo(departureTime, pickupTimeLoss),
+					new DropoffDetourInfo(arrivalTime, dropoffTimeLoss));
 		}
 
 		// TOTAL time delay of each stop placed after the dropoff insertion point
 		// (this is the amount of extra time the vehicle will operate if this insertion is applied)
 		public double getTotalTimeLoss() {
-			return pickupTimeLoss + dropoffTimeLoss;
+			return pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss;
 		}
 	}
 }
