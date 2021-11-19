@@ -3,11 +3,12 @@ package org.matsim.application.options;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -24,7 +25,7 @@ public final class CsvOptions {
 	private Character csvDelimiter;
 
 	@CommandLine.Option(names = "--csv-charset", description = "CSV input encoding", defaultValue = "UTF8")
-	private Charset csvCharset;
+	private Charset csvCharset = StandardCharsets.UTF_8;
 
 	/**
 	 * Default constructor.
@@ -63,15 +64,14 @@ public final class CsvOptions {
 	 * Creates a new csv parser from specified options.
 	 */
 	public CSVParser createParser(Path path) throws IOException {
-		return new CSVParser(Files.newBufferedReader(path, csvCharset), getFormat());
+		return new CSVParser(IOUtils.getBufferedReader(path.toUri().toURL(), csvCharset), getFormat());
 	}
 
 	/**
 	 * Creates a new csv writer.
 	 */
 	public CSVPrinter createPrinter(Path path) throws IOException {
-		return new CSVPrinter(Files.newBufferedWriter(path, csvCharset), getFormat());
+		return new CSVPrinter(IOUtils.getBufferedWriter(path.toUri().toURL(),  csvCharset, false), getFormat());
 	}
-
 
 }
