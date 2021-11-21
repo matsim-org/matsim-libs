@@ -21,7 +21,7 @@ package org.matsim.contrib.freight;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 import java.net.URL;
 import java.util.Map;
 
