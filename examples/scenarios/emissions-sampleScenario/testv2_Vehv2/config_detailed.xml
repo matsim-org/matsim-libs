@@ -47,7 +47,8 @@
 		<param name="hbefaVehicleDescriptionSource" value="asEngineInformationAttributes" />
 
 		<!-- if true then detailed emission factor files must be provided! -->
-		<param name="usingDetailedEmissionCalculation" value="true" />
+<!--		<param name="usingDetailedEmissionCalculation" value="true" />-->
+		<param name="detailedVsAverageLookupBehavior" value="tryDetailedThenTechnologyAverageThenAverageTable" />
 
 	</module>
 
