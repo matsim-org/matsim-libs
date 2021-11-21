@@ -30,20 +30,36 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class InsertionWithDetourData<D> {
+	public static class InsertionDetourData<D> {
+		public final D detourToPickup;
+		public final D detourFromPickup; // "zero" detour if pickup inserted at the end of schedule !!!
+		public final D detourToDropoff; // detour from pickup if dropoff inserted directly after pickup
+		public final D detourFromDropoff; // "zero" detour if dropoff inserted at the end of schedule
+
+		public InsertionDetourData(D detourToPickup, D detourFromPickup, D detourToDropoff, D detourFromDropoff) {
+			this.detourToPickup = detourToPickup;
+			this.detourFromPickup = detourFromPickup;
+			this.detourToDropoff = detourToDropoff;
+			this.detourFromDropoff = detourFromDropoff;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("detourToPickup", detourToPickup)
+					.add("detourFromPickup", detourFromPickup)
+					.add("detourToDropoff", detourToDropoff)
+					.add("detourFromDropoff", detourFromDropoff)
+					.toString();
+		}
+	}
+
 	private final Insertion insertion;
+	private final InsertionDetourData<D> insertionDetourData;
 
-	private final D detourToPickup;
-	private final D detourFromPickup; // "zero" detour if pickup inserted at the end of schedule !!!
-	private final D detourToDropoff; // detour from pickup if dropoff inserted directly after pickup
-	private final D detourFromDropoff; // "zero" detour if dropoff inserted at the end of schedule
-
-	InsertionWithDetourData(Insertion insertion, D detourToPickup, D detourFromPickup, D detourToDropoff,
-			D detourFromDropoff) {
+	InsertionWithDetourData(Insertion insertion, InsertionDetourData<D> insertionDetourData) {
 		this.insertion = insertion;
-		this.detourToPickup = detourToPickup;
-		this.detourFromPickup = detourFromPickup;
-		this.detourToDropoff = detourToDropoff;
-		this.detourFromDropoff = detourFromDropoff;
+		this.insertionDetourData = insertionDetourData;
 	}
 
 	public Insertion getInsertion() {
@@ -70,7 +86,7 @@ public class InsertionWithDetourData<D> {
 	 * @return
 	 */
 	public D getDetourToPickup() {
-		return detourToPickup;
+		return insertionDetourData.detourToPickup;
 	}
 
 	/**
@@ -81,7 +97,7 @@ public class InsertionWithDetourData<D> {
 	 * @return
 	 */
 	public D getDetourFromPickup() {
-		return detourFromPickup;
+		return insertionDetourData.detourFromPickup;
 	}
 
 	/**
@@ -92,7 +108,7 @@ public class InsertionWithDetourData<D> {
 	 * @return
 	 */
 	public D getDetourToDropoff() {
-		return detourToDropoff;
+		return insertionDetourData.detourToDropoff;
 	}
 
 	/**
@@ -101,17 +117,14 @@ public class InsertionWithDetourData<D> {
 	 * @return
 	 */
 	public D getDetourFromDropoff() {
-		return detourFromDropoff;
+		return insertionDetourData.detourFromDropoff;
 	}
 
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("insertion", insertion)
-				.add("detourToPickup", detourToPickup)
-				.add("detourFromPickup", detourFromPickup)
-				.add("detourToDropoff", detourToDropoff)
-				.add("detourFromDropoff", detourFromDropoff)
+				.add("insertionDetourData", insertionDetourData)
 				.toString();
 	}
 }

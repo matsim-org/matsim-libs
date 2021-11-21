@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
@@ -53,7 +54,7 @@ public class DetourPathData {
 		this.zeroDetour = zeroDetour;
 	}
 
-	public InsertionWithDetourData<PathData> createInsertionWithDetourData(InsertionGenerator.Insertion insertion) {
+	public InsertionDetourData<PathData> createInsertionDetourData(InsertionGenerator.Insertion insertion) {
 		PathData toPickup = detourToPickup.get(insertion.pickup.previousWaypoint.getLink());
 		PathData fromPickup = detourFromPickup.get(insertion.pickup.nextWaypoint.getLink());
 		PathData toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
@@ -62,6 +63,6 @@ public class DetourPathData {
 		PathData fromDropoff = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
 				zeroDetour :
 				detourFromDropoff.get(insertion.dropoff.nextWaypoint.getLink());
-		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
+		return new InsertionDetourData<>(toPickup, fromPickup, toDropoff, fromDropoff);
 	}
 }

@@ -65,6 +65,6 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 
 		DetourPathData pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
 		return bestInsertionFinder.findBestInsertion(drtRequest,
-				insertions.stream().map(pathData::createInsertionWithDetourData));
+				insertions.stream().map(i -> new InsertionWithDetourData<>(i, pathData.createInsertionDetourData(i))));
 	}
 }

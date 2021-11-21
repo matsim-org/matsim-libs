@@ -204,8 +204,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch<PathData> insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData<PathData>(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null, null, null,
-						null)) :
+						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null)) :
 				fail("request1 expected");
 
 		double pickupEndTime = now + 20;

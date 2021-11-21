@@ -86,12 +86,12 @@ public class MultiInsertionDetourPathCalculatorTest {
 		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertThat(insertionWithDetourData.getDetourToPickup()).isEqualTo(pathToPickup);
-		assertThat(insertionWithDetourData.getDetourFromPickup()).isEqualTo(pathFromPickup);
-		assertThat(insertionWithDetourData.getDetourToDropoff()).isEqualTo(pathToDropoff);
-		assertThat(insertionWithDetourData.getDetourFromDropoff()).isEqualTo(pathFromDropoff);
+		assertThat(insertionWithDetourData.detourToPickup).isEqualTo(pathToPickup);
+		assertThat(insertionWithDetourData.detourFromPickup).isEqualTo(pathFromPickup);
+		assertThat(insertionWithDetourData.detourToDropoff).isEqualTo(pathToDropoff);
+		assertThat(insertionWithDetourData.detourFromDropoff).isEqualTo(pathFromDropoff);
 	}
 
 	@Test
@@ -107,12 +107,12 @@ public class MultiInsertionDetourPathCalculatorTest {
 		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertThat(insertionWithDetourData.getDetourToPickup()).isEqualTo(pathToPickup);
-		assertThat(insertionWithDetourData.getDetourFromPickup()).isEqualTo(pathFromPickup);
-		assertThat(insertionWithDetourData.getDetourToDropoff()).isNull();
-		assertThat(insertionWithDetourData.getDetourFromDropoff().getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourToPickup).isEqualTo(pathToPickup);
+		assertThat(insertionWithDetourData.detourFromPickup).isEqualTo(pathFromPickup);
+		assertThat(insertionWithDetourData.detourToDropoff).isNull();
+		assertThat(insertionWithDetourData.detourFromDropoff.getTravelTime()).isZero();
 	}
 
 	@Test
@@ -130,12 +130,12 @@ public class MultiInsertionDetourPathCalculatorTest {
 		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertThat(insertionWithDetourData.getDetourToPickup()).isEqualTo(PathData.EMPTY);
-		assertThat(insertionWithDetourData.getDetourFromPickup()).isEqualTo(PathData.EMPTY);
-		assertThat(insertionWithDetourData.getDetourToDropoff()).isEqualTo(PathData.EMPTY);
-		assertThat(insertionWithDetourData.getDetourFromDropoff()).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourToPickup).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourFromPickup).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourToDropoff).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourFromDropoff).isEqualTo(PathData.EMPTY);
 	}
 
 	private PathData mockCalcPathData(Link fromLink, Link toLink, double startTimeArg, boolean forward,

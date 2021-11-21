@@ -83,7 +83,8 @@ public class DefaultDrtInsertionSearchTest {
 		when(detourPathCalculator.calculatePaths(eq(request), eq(filteredInsertions))).thenReturn(detourData);
 
 		//mock bestInsertionFinder
-		var selectedInsertionWithPathData = detourData.createInsertionWithDetourData(selectedInsertion);
+		var selectedInsertionWithPathData = new InsertionWithDetourData<>(selectedInsertion,
+				detourData.createInsertionDetourData(selectedInsertion));
 		@SuppressWarnings("unchecked")
 		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
 		when(bestInsertionFinder.findBestInsertion(eq(request),

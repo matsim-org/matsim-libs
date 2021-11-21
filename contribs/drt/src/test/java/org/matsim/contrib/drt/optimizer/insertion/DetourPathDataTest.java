@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -116,10 +117,12 @@ public class DetourPathDataTest {
 	private void assertInsertion(int pickupIdx, int dropoffIdx, PathData detourToPickup, PathData detourFromPickup,
 			PathData detourToDropoff, PathData detourFromDropoff) {
 		Insertion insertion = new Insertion(request, entry, pickupIdx, dropoffIdx);
-		var actual = detourPathData.createInsertionWithDetourData(insertion);
-		var expected = new InsertionWithDetourData<>(insertion, detourToPickup, detourFromPickup, detourToDropoff,
+		var actual = detourPathData.createInsertionDetourData(insertion);
+
+		var expectedInsertionDetourData = new InsertionDetourData<>(detourToPickup, detourFromPickup, detourToDropoff,
 				detourFromDropoff);
-		assertThat(actual).isEqualToComparingFieldByField(expected);
+
+		assertThat(actual).usingRecursiveComparison().isEqualTo(expectedInsertionDetourData);
 	}
 
 	private Link link(String id) {

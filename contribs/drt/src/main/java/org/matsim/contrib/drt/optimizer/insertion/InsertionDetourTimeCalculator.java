@@ -7,6 +7,7 @@ import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -29,8 +30,8 @@ public class InsertionDetourTimeCalculator<D> {
 	}
 
 	public DetourTimeInfo calculateDetourTimeInfo(InsertionWithDetourData<D> insertion) {
-		InsertionGenerator.InsertionPoint pickup = insertion.getPickup();
-		InsertionGenerator.InsertionPoint dropoff = insertion.getDropoff();
+		InsertionPoint pickup = insertion.getPickup();
+		InsertionPoint dropoff = insertion.getDropoff();
 		if (pickup.index == dropoff.index) {
 			//handle the pickup->dropoff case separately
 			return calculateDetourTimeInfoForIfPickupToDropoffDetour(insertion);
@@ -73,7 +74,7 @@ public class InsertionDetourTimeCalculator<D> {
 
 	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(InsertionWithDetourData<D> insertion) {
 		VehicleEntry vEntry = insertion.getVehicleEntry();
-		InsertionGenerator.InsertionPoint pickup = insertion.getPickup();
+		InsertionPoint pickup = insertion.getPickup();
 
 		final double toPickupTT;
 		final double additionalPickupStopDuration;

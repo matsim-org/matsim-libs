@@ -36,6 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -71,8 +72,8 @@ public class SelectiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var insertionWithDetourData = new InsertionWithDetourData<>(new Insertion(vehicleEntry, null, null), Double.NaN,
-				Double.NaN, Double.NaN, Double.NaN);
+		var insertionWithDetourData = new InsertionWithDetourData<>(new Insertion(vehicleEntry, null, null),
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN));
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(
 				List.of(insertionWithDetourData));
