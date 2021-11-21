@@ -12,7 +12,7 @@ For more information see the org.matsim.contrib.emissions package above.
 
 #### Example files:
 You can find some example files in the matsim-examples.
-There is also an free to use file for _cold_ emission factors (all set to 0.0) for those vehicle types which does not has values in the database. 
+There is also a free to use file for _cold_ emission factors (all set to 0.0) for those vehicle types which do not have values in the database. 
 
 
   
