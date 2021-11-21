@@ -41,14 +41,14 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 public class EmissionResponsibilityCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionResponsibilityCostModule.class);
 	
-	private final double emissionCostMultiplicationFactor;
+	private final double emissionCostMultiplicationFactor = 1.;
 	private final ResponsibilityGridTools responsibilityGridTools;
-	private final boolean considerCO2Costs ;
+	private final boolean considerCO2Costs = true;
 
 	@Inject
-	public EmissionResponsibilityCostModule(EmissionsConfigGroup emissionsConfigGroup, ResponsibilityGridTools rgt) {
-		this.emissionCostMultiplicationFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
-		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
+	EmissionResponsibilityCostModule(EmissionsConfigGroup emissionsConfigGroup, ResponsibilityGridTools rgt) {
+//		this.emissionCostMultiplicationFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
+//		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
 
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
 
