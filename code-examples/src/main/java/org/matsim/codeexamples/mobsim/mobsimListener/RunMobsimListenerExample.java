@@ -19,7 +19,7 @@ public class RunMobsimListenerExample {
 	public static String outputDirectory = "output/mobsimListenerExample/";
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.loadConfig("scenarios/equil/config.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory(outputDirectory);
