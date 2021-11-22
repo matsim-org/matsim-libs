@@ -83,6 +83,7 @@ public class TravelTimeValidationRunner {
                 Integer.MAX_VALUE, new Tuple<>((double) 0, (double) 3600 * 30), null);
     }
 
+    @Deprecated
     public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
                                       String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
                                       Tuple<Double, Double> timeWindow) {
