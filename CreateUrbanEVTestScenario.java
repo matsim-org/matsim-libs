@@ -40,7 +40,7 @@ import java.util.*;
 
 class CreateUrbanEVTestScenario {
 
-	static final double CAR_INITIAL_ENERGY = 4.;
+	static final double CAR_INITIAL_ENERGY = 10.;
 	static final double BIKE_INITIAL_ENERGY = 4.;
 
 	static Scenario createTestScenario(){
@@ -54,9 +54,11 @@ class CreateUrbanEVTestScenario {
 		RunUrbanEVExample.prepareConfig(config);
 		config.network().setInputFile("1pctNetwork.xml");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(3);
+		config.controler().setLastIteration(5);
+		config.controler().setWriteEventsInterval(1);
 		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+		config.qsim().setEndTime(20*3600);
 
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -85,7 +87,7 @@ class CreateUrbanEVTestScenario {
 			chargerTypes.add("DC");
 
 
-			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString() + "_car", VehicleType.class));
+			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(), VehicleType.class));
 			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
 			EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), CAR_INITIAL_ENERGY);
