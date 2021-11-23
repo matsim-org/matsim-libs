@@ -13,7 +13,7 @@ import static org.matsim.examples.ExamplesUtils.getTestScenarioURL;
 
 
 
-public class RunModifyNetwork1 {
+public class OnePercentageConsumptionPerLink {
 
     public static void main(String[] args) {
 

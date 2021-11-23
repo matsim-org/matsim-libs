@@ -50,19 +50,19 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
     @Inject
     Scenario scenario;
 
-
-//   private Map<Id<Charger>, List<String>> actsPerCharger = new HashMap<>();
    private Map<Id<Person>, List<String>> actsPerPersons = new HashMap<>();
    private Map<Id<Charger>, Id<Link>> chargersAtLinks = new HashMap<>();
    static List<Container> containers = new ArrayList<>();
    static List<PersonContainer> personContainers = new ArrayList<>();
 
-
+    /*
+     *This class collects the activities while charging. Therefore it listens to the ActivityStartEvents and ChargingStartEvent.
+     *Maybe this is a bit too inefficient coding but i couldn't find a other solution for the lifetime of the variables.
+     * @author Jonas116
+     */
 
     @Inject
     public ActsWhileChargingAnalyzer(ChargingInfrastructureSpecification chargingInfrastructureSpecification, Scenario scenario){
-
-
 
         for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
             List<String> acts = new ArrayList<>();
@@ -70,7 +70,6 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
             containers.add(container);
 
         }
-
         for (Id<Charger> chargerId : chargingInfrastructureSpecification.getChargerSpecifications().keySet()) {
 
             Id<Link> chargerLink = chargingInfrastructureSpecification.getChargerSpecifications().values().stream()
@@ -79,11 +78,9 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                                     .findAny()
                                     .get();
             chargersAtLinks.put(chargerId, chargerLink);
-
         }
-
-
     }
+
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
@@ -124,10 +121,7 @@ public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, Act
                 personContainer.setChargerId(event.getChargerId());
             }
         }
-//      String chargingActAndTime =event.getEventType() + event.getTime();
-//      containers.stream().filter(container -> container.personId.equals(personsId)).findAny().get().acts.add(chargingActAndTime);
-//      PersonContainer personContainer = new PersonContainer(personsId.toString(), chargingActAndTime , event.getTime(), event.getChargerId());
-//      personContainers.add(personContainer);
+
 
     }
     @Override

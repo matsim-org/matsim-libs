@@ -29,17 +29,17 @@ import java.util.*;
 
 import static java.lang.Double.parseDouble;
 
-public class CSVToXML2 {
+public class CSVToXML {
+    /*
+    This class was made to collect the coordinates of an official csv of the chargers in Berlin. Since this was not used, this can be deleted.
+    @Jonas116
+     */
 
     private static final String COMMA_DELIMITER = ";";
     public String fileName;
     List<ChargerSpecification> chargers = new ArrayList<>();
 
-
-
-
-
-    public CSVToXML2(String fileName, Network network) throws IOException, CsvException {
+    public CSVToXML(String fileName, Network network) throws IOException, CsvException {
 
         List<List<String>> records = new ArrayList<>();
 
@@ -59,8 +59,6 @@ public class CSVToXML2 {
             }
             List<Link> chargerLinks = new ArrayList<>();
             for (List<String> record : Iterables.skip(records, 2)) {
-//                URL url = new URL("https://download.geofabrik.de/europe/germany/berlin-latest-free.shp.zip");
-//                List<Geometry> berlinSHP = ShpGeometryUtils.loadGeometries(url);
 
                 double x = Double.parseDouble(record.get(0));
                 double y = Double.parseDouble(record.get(1));
@@ -76,7 +74,6 @@ public class CSVToXML2 {
                                .linkId(Id.createLinkId(chargerLink.getId()))
                                .id(Id.create("charger" + record.get(11), Charger.class))
                                .chargerType("DC")
-//                           .plugCount((int) Math.round(parseDouble(record.get(5))))
                                .plugCount(5)
                                .plugPower((int) Math.round(parseDouble(record.get(7))*1000))
                                .build());
@@ -86,37 +83,13 @@ public class CSVToXML2 {
                                .linkId(Id.createLinkId(chargerLink.getId()))
                                .id(Id.create("charger" + record.get(11), Charger.class))
                                .chargerType("AC")
-//                           .plugCount((int) Math.round(parseDouble(record.get(5))))
                                .plugCount(5)
                                .plugPower((int) Math.round(parseDouble(record.get(7))*1000))
                                .build());
                    }
-
-
                }
-
-
-
-
-
-
-        }
-
-
-
-
-
-
-//
-
-
-
-
-
-
-
-
-        }
+                       }
+                    }
 
         }
 

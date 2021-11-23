@@ -35,6 +35,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleets;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.contrib.ev.stats.ChargerPowerCollector;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.contrib.ev.stats.IndividualSocTimeProfileCollectorProvider;
@@ -128,7 +129,6 @@ public class UrbanEVModule extends AbstractModule {
 		//bind custom analysis
 		//install(new XYModule());
 		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
-		addControlerListenerBinding().to(ChargerToXY.class);
 		addMobsimListenerBinding().to(ChargerToXY.class);
 		addEventHandlerBinding().to(ActsWhileChargingAnalyzer.class).in(Singleton.class);
 		addControlerListenerBinding().to(ActsWhileChargingAnalyzer.class);
