@@ -156,7 +156,7 @@ public class LinkStats implements MATSimAppCommand {
 			titleRow.add("average_daily_speed");
 			for (int i = 0; i < maxTime; i += timeSlice) {
 				networkSpeedRatiosMap.put(i, new DoubleArrayList());
-				titleRow.add(Double.toString(i));
+				titleRow.add(Integer.toString(i));
 			}
 			writer.printRecord(titleRow);
 
