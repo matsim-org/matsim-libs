@@ -1,7 +1,10 @@
 package org.matsim.application.analysis;
 
 import com.beust.jcommander.internal.Lists;
-import org.apache.commons.csv.CSVFormat;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,6 +12,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -19,24 +23,28 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
+import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@CommandLine.Command(name = "link-stats", description = "Compute aggregated link statistics, like volume and travel time")
+@CommandLine.Command(name = "link-stats", description = "Compute aggregated link statistics, like volume, travel time and congestion")
 public class LinkStats implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(LinkStats.class);
 
-	@CommandLine.Option(names = "--events", description = "Input event file", required = true)
-	private Path events;
-
 	@CommandLine.Option(names = "--network", description = "Input network file", required = true)
 	private Path network;
 
+	@CommandLine.Option(names = "--events", description = "Input event file", required = true)
+	private Path events;
+
 	@CommandLine.Option(names = "--output", description = "Path for output csv", required = true)
 	private Path output;
+
+	@CommandLine.Option(names = "--output-congestion", description = "Path for output csv for congestion", required = true)
+	private Path outputCongestion;
 
 	//@CommandLine.Option(names = "--link-to-link", description = "Also calculate link to link travel times", defaultValue = "false")
 	//private boolean l2l;
@@ -44,11 +52,17 @@ public class LinkStats implements MATSimAppCommand {
 	@CommandLine.Option(names = "--max-time", description = "Maximum time used in aggregation", defaultValue = "86399")
 	private int maxTime;
 
-	@CommandLine.Option(names = "--time-slice", description = "Number of seconds per time slice", defaultValue = "900")
+	@CommandLine.Option(names = "--interval", description = "Number of seconds per time slice", defaultValue = "900")
 	private int timeSlice;
 
+	@CommandLine.Option(names = "--min-volume", description = "Minimum daily total traffic count in order for a link to be considered", defaultValue = "100")
+	private int minVolume;
+
 	@CommandLine.Mixin
-	private ShpOptions shp;
+	private ShpOptions shp = new ShpOptions();
+
+	@CommandLine.Mixin
+	private CsvOptions csv = new CsvOptions();
 
 	@Override
 	public Integer call() throws Exception {
@@ -87,17 +101,22 @@ public class LinkStats implements MATSimAppCommand {
 
 		TravelTime tt = calculator.getLinkTravelTimes();
 
-		ShpOptions.Index index = shp.getShapeFile() != null ? shp.createIndex(ProjectionUtils.getCRS(network), "_") : null;
+		ShpOptions.Index index = shp.isDefined() ? shp.createIndex(ProjectionUtils.getCRS(network), "_") : null;
 
 		int n = volume.getVolumesArraySize();
 
-		try (CSVPrinter writer = new CSVPrinter(IOUtils.getBufferedWriter(output.toString()), CSVFormat.DEFAULT)) {
+		try (CSVPrinter writer = csv.createPrinter(output)) {
 
 			writer.printRecord(header);
 
 			for (Link link : network.getLinks().values()) {
 
 				if (index != null && !index.contains(link.getCoord()))
+					continue;
+
+				int total = Arrays.stream(volume.getVolumesForLink(link.getId())).sum();
+
+				if (total < minVolume)
 					continue;
 
 				for (int i = 0; i < n; i++) {
@@ -120,6 +139,85 @@ public class LinkStats implements MATSimAppCommand {
 					writer.printRecord(row);
 				}
 			}
+		}
+
+		double networkCongestionIndex = 0;
+		double totalLength = 0;
+		Int2ObjectMap<DoubleList> networkSpeedRatiosMap = new Int2ObjectOpenHashMap<>();
+
+		// calculate congestion index according to
+		// A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index
+		// Feifei He, Xuedong Yan*, Yang Liu, Lu Ma
+
+		try (CSVPrinter writer = csv.createPrinter(outputCongestion)) {
+
+			List<String> titleRow = new ArrayList<>();
+			titleRow.add("link_id");
+			titleRow.add("congestion_index");
+			titleRow.add("average_daily_speed");
+			for (int i = 0; i < maxTime; i += timeSlice) {
+				networkSpeedRatiosMap.put(i, new DoubleArrayList());
+				titleRow.add(Double.toString(i));
+			}
+			writer.printRecord(titleRow);
+
+			for (Link link : network.getLinks().values()) {
+
+				if (index != null && !index.contains(link.getCoord()))
+					continue;
+
+				int total = Arrays.stream(volume.getVolumesForLink(link.getId())).sum();
+
+				if (total < minVolume)
+					continue;
+
+				DoubleList linksSpeedRatios = new DoubleArrayList();
+
+				double counter = 0;
+				double congestedPeriods = 0;
+				for (int t = 0; t < 86400; t += timeSlice) {
+					double freeSpeedTravelTime = Math.floor(link.getLength() / link.getFreespeed()) + 1;
+					double actualTravelTime = tt.getLinkTravelTime(link, t, null, null);
+					double speedRatio = freeSpeedTravelTime / actualTravelTime;
+					if (speedRatio > 1) {
+						speedRatio = 1;
+					}
+					networkSpeedRatiosMap.get(t).add(speedRatio);
+					linksSpeedRatios.add(speedRatio);
+					counter++;
+					if (speedRatio <= 0.5) {
+						congestedPeriods++;
+					}
+				}
+				double linkDailyAverageSpeed = linksSpeedRatios.doubleStream().average().orElse(-1);
+				double linkCongestionIndex = linkDailyAverageSpeed * (1 - congestedPeriods / counter);
+
+				List<String> outputRow = new ArrayList<>();
+				outputRow.add(link.getId().toString());
+				outputRow.add(Double.toString(linkCongestionIndex));
+				outputRow.add(Double.toString(linkDailyAverageSpeed));
+				outputRow.addAll(linksSpeedRatios.doubleStream().mapToObj(Double::toString).collect(Collectors.toList()));
+				writer.printRecord(outputRow);
+
+				networkCongestionIndex += linkCongestionIndex * link.getLength();
+				totalLength += link.getLength();
+
+			}
+
+			// final row (whole network)
+			networkCongestionIndex = networkCongestionIndex / totalLength;
+			DoubleList networkSpeedRatios = new DoubleArrayList();
+			for (int t : networkSpeedRatiosMap.keySet()) {
+				double averageSpeedRatioForTimePeriod = networkSpeedRatiosMap.get(t).doubleStream().average().orElse(-1);
+				networkSpeedRatios.add(averageSpeedRatioForTimePeriod);
+			}
+
+			List<String> lastRow = new ArrayList<>();
+			lastRow.add("full_network");
+			lastRow.add(Double.toString(networkCongestionIndex));
+			lastRow.add(Double.toString(networkSpeedRatios.doubleStream().average().orElse(-1)));
+			lastRow.addAll(networkSpeedRatios.doubleStream().mapToObj(Double::toString).collect(Collectors.toList()));
+			writer.printRecord(lastRow);
 		}
 
 		return 0;
