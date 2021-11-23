@@ -64,6 +64,10 @@ public class LinkStats implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private CsvOptions csv = new CsvOptions();
 
+	public static void main(String[] args) {
+		new LinkStats().execute(args);
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
