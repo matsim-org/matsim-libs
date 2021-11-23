@@ -20,13 +20,13 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
-import java.io.FileWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "link-stats", description = "Compute aggregated link statistics, like volume, travel time and congestion")
@@ -115,12 +115,7 @@ public class LinkStats implements MATSimAppCommand {
 
 			for (Link link : network.getLinks().values()) {
 
-				if (index != null && !index.contains(link.getCoord()))
-					continue;
-
-				int total = Arrays.stream(volume.getVolumesForLink(link.getId())).sum();
-
-				if (total < minVolume)
+				if (!considerLink(link, index, volume))
 					continue;
 
 				for (int i = 0; i < n; i++) {
@@ -167,12 +162,7 @@ public class LinkStats implements MATSimAppCommand {
 
 			for (Link link : network.getLinks().values()) {
 
-				if (index != null && !index.contains(link.getCoord()))
-					continue;
-
-				int total = Arrays.stream(volume.getVolumesForLink(link.getId())).sum();
-
-				if (total < minVolume)
+				if (!considerLink(link, index, volume))
 					continue;
 
 				DoubleList linksSpeedRatios = new DoubleArrayList();
@@ -226,4 +216,20 @@ public class LinkStats implements MATSimAppCommand {
 
 		return 0;
 	}
+
+	private boolean considerLink(Link link, ShpOptions.Index index, VolumesAnalyzer volume) {
+		if (index != null && !index.contains(link.getCoord()))
+			return false;
+
+		int[] vol = volume.getVolumesForLink(link.getId());
+
+		// No volume at all
+		if (vol == null)
+			return 0 >= minVolume;
+
+		int total = Arrays.stream(vol).sum();
+
+		return total >= minVolume;
+	}
+
 }
