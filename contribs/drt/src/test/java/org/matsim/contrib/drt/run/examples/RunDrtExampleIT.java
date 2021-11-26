@@ -73,8 +73,8 @@ public class RunDrtExampleIT {
 				.rejectionRate(0.0)
 				.rejections(1)
 				.waitAverage(309.1)
-				.inVehicleTravelTimeMean(376.06)
-				.totalTravelTimeMean(686.78)
+				.inVehicleTravelTimeMean(373.48)
+				.totalTravelTimeMean(682.58)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -96,7 +96,7 @@ public class RunDrtExampleIT {
 				.rejectionRate(0.05)
 				.rejections(20)
 				.waitAverage(251.41)
-				.inVehicleTravelTimeMean(377.35)
+				.inVehicleTravelTimeMean(377.79)
 				.totalTravelTimeMean(629.21)
 				.build();
 
