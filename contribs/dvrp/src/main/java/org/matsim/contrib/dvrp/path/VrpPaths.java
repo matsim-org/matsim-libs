@@ -59,11 +59,10 @@ public class VrpPaths {
 		double travelTime = calculateForDiversion ? -NODE_TRANSITION_TIME : 0.0;
 		return new VrpPathWithTravelDataImpl(departureTime, travelTime, new Link[] { fromTolink }, new double[] { 0 });
 	}
-	
+
 	public static VrpPathWithTravelData createZeroLengthPath(LinkTimePair diversionPoint) {
 		return createZeroLengthPath(diversionPoint.link, diversionPoint.time, true);
 	}
-
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, PathData pathData,
 			TravelTime travelTime) {
@@ -146,8 +145,7 @@ public class VrpPaths {
 	}
 
 	/**
-	 * Used for OTFVis. Does not contain info on timing, distance and cost. Can be
-	 * extended...
+	 * Used for OTFVis. Does not contain info on timing, distance and cost. Can be extended...
 	 *
 	 * @param path
 	 * @param routeFactories
@@ -172,8 +170,7 @@ public class VrpPaths {
 	}
 
 	/**
-	 * @return The distance of a VRP path Includes the to link, but not the from
-	 *         link
+	 * @return The distance of a VRP path Includes the to link, but not the from link
 	 */
 	public static double calcDistance(VrpPath path) {
 		double distance = 0.0;

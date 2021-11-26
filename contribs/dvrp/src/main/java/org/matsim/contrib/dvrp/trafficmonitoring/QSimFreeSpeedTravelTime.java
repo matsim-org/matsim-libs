@@ -44,7 +44,7 @@ public class QSimFreeSpeedTravelTime implements TravelTime {
 	public QSimFreeSpeedTravelTime(double timeStepSize) {
 		this.timeStepSize = timeStepSize;
 	}
-	
+
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		double freeSpeedTT = link.getLength() / link.getFreespeed(time); // equiv. to FreeSpeedTravelTime
