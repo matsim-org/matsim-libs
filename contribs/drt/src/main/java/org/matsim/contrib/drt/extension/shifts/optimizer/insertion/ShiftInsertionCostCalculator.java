@@ -46,7 +46,7 @@ public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<
 			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
 			DetourTimeEstimator replacedDriveTimeEstimator) {
 		this.timer = timer;
-		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator<>(drtConfig, timer, costCalculationStrategy,
+		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator<>(drtConfig, costCalculationStrategy,
 				detourTime, replacedDriveTimeEstimator);
 		detourTimeCalculator = new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
 				replacedDriveTimeEstimator);

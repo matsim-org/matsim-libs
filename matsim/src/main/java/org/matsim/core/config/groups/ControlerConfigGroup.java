@@ -85,9 +85,9 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
 
-	private int writeEventsInterval=10;
-	private int writePlansInterval=10;
-	private int writeTripsInterval = 10;
+	private int writeEventsInterval= 50;
+	private int writePlansInterval= 50;
+	private int writeTripsInterval = 50;
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;

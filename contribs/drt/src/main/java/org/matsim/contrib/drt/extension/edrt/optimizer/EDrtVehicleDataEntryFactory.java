@@ -44,7 +44,7 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		public final double socBeforeFinalStay;
 
 		public EVehicleEntry(VehicleEntry entry, double socBeforeFinalStay) {
-			super(entry.vehicle, entry.start, entry.stops);
+			super(entry);
 			this.socBeforeFinalStay = socBeforeFinalStay;
 		}
 	}
@@ -59,7 +59,7 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 
 	@Override
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		if (!entryFactory.isEligibleForRequestInsertion(vehicle, currentTime)) {
+		if (entryFactory.isNotEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
 

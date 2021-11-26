@@ -75,6 +75,8 @@ public class LinkStatsControlerListenerTest {
 		});
 		LinkStatsControlerListener lscl = injector.getInstance(LinkStatsControlerListener.class);
 
+		config.linkStats().setWriteLinkStatsInterval(10);
+
 		// test defaults
 		Assert.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
 		Assert.assertEquals(5, config.linkStats().getAverageLinkStatsOverIterations());
