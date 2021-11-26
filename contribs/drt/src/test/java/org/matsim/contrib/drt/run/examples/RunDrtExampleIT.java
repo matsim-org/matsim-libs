@@ -72,7 +72,7 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(1)
-				.waitAverage(310.71)
+				.waitAverage(309.1)
 				.inVehicleTravelTimeMean(376.06)
 				.totalTravelTimeMean(686.78)
 				.build();
@@ -95,7 +95,7 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.05)
 				.rejections(20)
-				.waitAverage(251.86)
+				.waitAverage(251.41)
 				.inVehicleTravelTimeMean(377.35)
 				.totalTravelTimeMean(629.21)
 				.build();

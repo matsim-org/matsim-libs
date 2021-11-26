@@ -53,9 +53,17 @@ public class VrpPaths {
 		return VrpPaths.createPath(diversionPoint, toLink, path, travelTime);
 	}
 
-	public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime) {
-		return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromTolink }, new double[] { 0 });
+	public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime, boolean calculateForDiversion) {
+		// To make sure that arrival time stays correct although no special diversion
+		// will be implemented after calling OnlienDriveTaskTracker.divert
+		double travelTime = calculateForDiversion ? -NODE_TRANSITION_TIME : 0.0;
+		return new VrpPathWithTravelDataImpl(departureTime, travelTime, new Link[] { fromTolink }, new double[] { 0 });
 	}
+	
+	public static VrpPathWithTravelData createZeroLengthPath(LinkTimePair diversionPoint) {
+		return createZeroLengthPath(diversionPoint.link, diversionPoint.time, true);
+	}
+
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, PathData pathData,
 			TravelTime travelTime) {
@@ -69,18 +77,18 @@ public class VrpPaths {
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
 			TravelTime travelTime) {
-		return createPath(fromLink, toLink, departureTime, path, travelTime, true, true);
+		return createPath(fromLink, toLink, departureTime, path, travelTime, true, false);
 	}
 
 	public static VrpPathWithTravelData createPath(LinkTimePair diversionPoint, Link toLink, Path path,
 			TravelTime travelTime) {
-		return createPath(diversionPoint.link, toLink, diversionPoint.time, path, travelTime, true, false);
+		return createPath(diversionPoint.link, toLink, diversionPoint.time, path, travelTime, true, true);
 	}
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
-			TravelTime travelTime, boolean considerZeroLengthPath, boolean considerFirstLinkTravelTime) {
+			TravelTime travelTime, boolean considerZeroLengthPath, boolean calculateForDiversion) {
 		if (considerZeroLengthPath && fromLink == toLink) {
-			return createZeroLengthPath(fromLink, departureTime);
+			return createZeroLengthPath(fromLink, departureTime, calculateForDiversion);
 		}
 
 		int count = path.links.size();
@@ -102,7 +110,7 @@ public class VrpPaths {
 		// otherwise it can take much longer)
 		double currentTime = departureTime;
 		links[0] = fromLink;
-		double linkTT = considerFirstLinkTravelTime ? FIRST_LINK_TT : 0.0;
+		double linkTT = !calculateForDiversion ? FIRST_LINK_TT : 0.0;
 		linkTTs[0] = linkTT;
 		currentTime += linkTT;
 
@@ -116,18 +124,25 @@ public class VrpPaths {
 
 		// there is no extra time spent on queuing at the end of the last link
 		links[count + 1] = toLink;
-		linkTT = getLastLinkTT(toLink, currentTime);// as long as we cannot divert from the last link this is okay
+		linkTT = travelTime.getLinkTravelTime(toLink, currentTime, null, null);
 		linkTTs[count + 1] = linkTT;
-		double totalTT = (considerFirstLinkTravelTime ? FIRST_LINK_TT : 0.0) + path.travelTime + linkTT;
 
+		double totalTT = (!calculateForDiversion ? FIRST_LINK_TT : 0.0) + path.travelTime + linkTT;
+		totalTT -= NODE_TRANSITION_TIME;
+		
 		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
 	}
 
 	public static final double FIRST_LINK_TT = 2;
+	public static final double NODE_TRANSITION_TIME = 1;
 
+	/**
+	 * It would make sense to replace these calls with TravelTime.getTravelTime(...) whereever it is used /sh nov 21
+	 */
+	@Deprecated
 	public static double getLastLinkTT(Link lastLink, double time) {
 		// XXX imprecise if qsimCfg.timeStepSize != 1
-		return Math.floor(lastLink.getLength() / lastLink.getFreespeed(time));
+		return Math.floor(lastLink.getLength() / lastLink.getFreespeed(time)) - NODE_TRANSITION_TIME;
 	}
 
 	/**

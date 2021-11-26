@@ -193,7 +193,7 @@ public class OneToManyPathCalculatorTest {
 
 		//path: B -> C -> D
 		assertPathData(pathCalculator.createPathDataLazily(linkDE),
-				new Path(ImmutableList.of(nodeB, nodeC, nodeD), ImmutableList.of(linkBC, linkCD), 20, 20), 1 + 10);
+				new Path(ImmutableList.of(nodeB, nodeC, nodeD), ImmutableList.of(linkBC, linkCD), 20, 20), 10 + 1);
 	}
 
 	@Test
@@ -205,7 +205,7 @@ public class OneToManyPathCalculatorTest {
 
 		//path: B -> C -> D
 		assertPathData(pathCalculator.createPathDataLazily(linkAB),
-				new Path(ImmutableList.of(nodeB, nodeC, nodeD), ImmutableList.of(linkBC, linkCD), 20, 20), 1 + 10);
+				new Path(ImmutableList.of(nodeB, nodeC, nodeD), ImmutableList.of(linkBC, linkCD), 20, 20), 10 + 1);
 	}
 
 	@Test

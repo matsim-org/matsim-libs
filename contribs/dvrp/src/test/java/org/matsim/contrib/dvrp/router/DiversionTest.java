@@ -1,7 +1,5 @@
 package org.matsim.contrib.dvrp.router;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +39,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -64,6 +63,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.inject.Singleton;
+
+import junit.framework.Assert;
 
 /**
  * @author Sebastian Hörl (sebhoerl)
@@ -117,7 +118,7 @@ public class DiversionTest {
 	 * current one.</li>
 	 * </ul>
 	 */
-	public void testDiversions() {
+	public void testRepeatedSameDestinationDiversions() {
 		Config config = ConfigUtils.createConfig();
 
 		{
@@ -187,6 +188,25 @@ public class DiversionTest {
 		controller.addOverridingModule(new TestModeModule(testTracker));
 		controller.addOverridingQSimModule(new TestModeQSimModule(fleetSpecification, testTracker));
 
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(MODE) {
+			@Override
+			protected void configureQSim() {
+				/*
+				 * Bind Optimizer (see different variant for second test below)
+				 */
+				bindModal(VrpOptimizer.class).to(TestOptimizerSameDestination.class);
+				addModalComponent(TestOptimizerSameDestination.class);
+
+				bind(TestOptimizerSameDestination.class).toProvider(modalProvider(getter -> {
+					Network network = getter.getModal(Network.class);
+					MobsimTimer timer = getter.get(MobsimTimer.class);
+					Fleet fleet = getter.getModal(Fleet.class);
+
+					return new TestOptimizerSameDestination(timer, network, fleet, getConfig().qsim(), testTracker);
+				})).in(Singleton.class);
+			}
+		});
+
 		// Active test mode and run
 		controller.configureQSimComponents(DvrpQSimComponents.activateModes(MODE));
 		controller.run();
@@ -199,16 +219,21 @@ public class DiversionTest {
 
 		// Took the fixed value from the simulation, to make sure this stays consistent
 		// over refactorings
-		assertThat(testTracker.eventBasedArrivalTime).isEqualTo(657.0);
+		Assert.assertEquals(testTracker.eventBasedArrivalTime, 657.0);
 
 		// Initially calculated arrival time should predict correctly the final arrival
 		// time
-		assertThat(testTracker.initialArrivalTime).isEqualTo(657.0);
+		Assert.assertEquals(testTracker.initialArrivalTime, 657.0);
 
 		// Along the route, when diverting to the same destination, arrival time should
 		// stay constant
 		testTracker.diversionArrivalTimes.forEach(t -> {
-			assertThat(t).isEqualTo(657.0);
+			Assert.assertEquals(t, 657.0);
+		});
+		
+		// Also ,the task end time should be consistent with the path
+		testTracker.taskEndTimes.forEach(t -> {
+			Assert.assertEquals(t, 657.0);
 		});
 	}
 
@@ -279,24 +304,10 @@ public class DiversionTest {
 							}, getter.get(MobsimTimer.class));
 				};
 			}));
-
-			/*
-			 * Bind TestOptimizer
-			 */
-			bindModal(VrpOptimizer.class).to(TestOptimizer.class);
-			addModalComponent(TestOptimizer.class);
-
-			bind(TestOptimizer.class).toProvider(modalProvider(getter -> {
-				Network network = getter.getModal(Network.class);
-				MobsimTimer timer = getter.get(MobsimTimer.class);
-				Fleet fleet = getter.getModal(Fleet.class);
-
-				return new TestOptimizer(timer, network, fleet, getConfig().qsim(), testTracker);
-			})).in(Singleton.class);
 		}
 	}
 
-	static private class TestOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
+	static private class TestOptimizerSameDestination implements VrpOptimizer, MobsimBeforeSimStepListener {
 		private final MobsimTimer timer;
 
 		private final TravelTime travelTime;
@@ -309,7 +320,7 @@ public class DiversionTest {
 
 		private TestTracker testTracker;
 
-		public TestOptimizer(MobsimTimer timer, Network network, Fleet fleet, QSimConfigGroup qsimConfig,
+		public TestOptimizerSameDestination(MobsimTimer timer, Network network, Fleet fleet, QSimConfigGroup qsimConfig,
 				TestTracker testTracker) {
 			this.timer = timer;
 			this.testTracker = testTracker;
@@ -376,6 +387,7 @@ public class DiversionTest {
 
 						// (4) Track the currently estimated arrival time
 						this.testTracker.diversionArrivalTimes.add(path.getArrivalTime());
+						this.testTracker.taskEndTimes.add(TaskTrackers.predictEndTime(currentTask, timer.getTimeOfDay()));
 					}
 				}
 			}
@@ -408,5 +420,243 @@ public class DiversionTest {
 		private double initialArrivalTime;
 		private double eventBasedArrivalTime;
 		private List<Double> diversionArrivalTimes = new LinkedList<>();
+		private List<Double> taskEndTimes = new LinkedList<>();
+	}
+
+	@Test
+	/**
+	 * This test is similar as the one above. However, there is another catch when
+	 * diverting, which is not covered on top. In fact, following the QSim and
+	 * according to QSimFreeSpeedTravelTime, the traversal time for a link is
+	 * floor(length / speed + 1, i.e. always one time step (second) longer than
+	 * predicted by distance and speed. This additional second is needed to traverse
+	 * the node. HOWEVER, this additional second is not relevant on the last link of
+	 * the route as the vehicle will just arrive on the last link. This is why there
+	 * is a special implementation for the calculation of the last link's travel
+	 * time in VrpPaths.
+	 * 
+	 * Now, when diverting from the last link, the vehicle *will* pass the node at
+	 * the end of that link, so we need to add back one second when calculating the
+	 * diversion point.
+	 * 
+	 * In this test, we let the vehicle traverse L0 to L8 as before, however the
+	 * network has an additional L9. In every diversion step, we calculate the
+	 * arrival time at L9 if we would divert, but we *do not* implement the
+	 * diversion. Without any code fixes, we will get a certain prediction for the
+	 * arrival time at L9 until we reach L8, and after having entered L8, we will
+	 * get a reduced arrival time estimate by one second.
+	 * 
+	 */
+	public void testRepeatedDiversionToDifferentDestinationRightBeforeLastLink() {
+		Config config = ConfigUtils.createConfig();
+
+		{
+			/* Create some necessary configuration for the test */
+
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controler().setLastIteration(0);
+
+			config.qsim().setStartTime(0.0);
+			config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
+
+			DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+			config.addModule(dvrpConfigGroup);
+		}
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		{
+			/*
+			 * Create a network of 10 nodes and 9 links along a line with distance 1000m
+			 * each and odd freespeed of 12.23 to make sure we're using the correct
+			 * QSim-based freespeed and get corrected travel time values.
+			 */
+
+			Network network = scenario.getNetwork();
+			NetworkFactory networkFactory = network.getFactory();
+
+			for (int i = 0; i < 11; i++) { // One more than in the previous test
+				Node node = networkFactory.createNode(Id.createNodeId("n" + i), new Coord(0.0, 1000.0));
+				network.addNode(node);
+			}
+
+			for (int i = 0; i < 10; i++) { // One more than in the previous test
+				Node fromNode = network.getNodes().get(Id.createNodeId("n" + i));
+				Node toNode = network.getNodes().get(Id.createNodeId("n" + (i + 1)));
+
+				Link link = networkFactory.createLink(Id.createLinkId("l" + i), fromNode, toNode);
+				link.setFreespeed(12.23);
+				link.setCapacity(1e9);
+				link.setLength(1000.0);
+				network.addLink(link);
+			}
+		}
+
+		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
+
+		{
+			/* Create fleet specification of one vehicle at the first link (id = l0) */
+
+			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
+					.capacity(4) //
+					.id(Id.create("vehicle", DvrpVehicle.class)) //
+					.serviceBeginTime(0.0) //
+					.serviceEndTime(2000.0) //
+					.startLinkId(Id.createLinkId("l0")) //
+					.build());
+		}
+
+		// Set up tracker
+		TestTracker testTracker = new TestTracker();
+
+		// Create controller with DVRP
+		Controler controller = new Controler(scenario);
+		controller.addOverridingModule(new DvrpModule());
+
+		// Add bindings for test case
+		controller.addOverridingModule(new TestModeModule(testTracker));
+		controller.addOverridingQSimModule(new TestModeQSimModule(fleetSpecification, testTracker));
+
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(MODE) {
+			@Override
+			protected void configureQSim() {
+				/*
+				 * Bind Optimizer (see different variant for second test below)
+				 */
+				bindModal(VrpOptimizer.class).to(TestOptimizerDifferentDestinationFromLastLink.class);
+				addModalComponent(TestOptimizerDifferentDestinationFromLastLink.class);
+
+				bind(TestOptimizerDifferentDestinationFromLastLink.class).toProvider(modalProvider(getter -> {
+					Network network = getter.getModal(Network.class);
+					MobsimTimer timer = getter.get(MobsimTimer.class);
+					Fleet fleet = getter.getModal(Fleet.class);
+
+					return new TestOptimizerDifferentDestinationFromLastLink(timer, network, fleet, getConfig().qsim(),
+							testTracker);
+				})).in(Singleton.class);
+			}
+		});
+
+		// Active test mode and run
+		controller.configureQSimComponents(DvrpQSimComponents.activateModes(MODE));
+		controller.run();
+
+		// Log results
+
+		System.out.println("Arrival in simulation acc. to events: " + testTracker.eventBasedArrivalTime);
+		System.out.println("Predicted arrival time when preparing drive task: " + testTracker.initialArrivalTime);
+		System.out.println("Predicted arrival time for diversions: " + testTracker.diversionArrivalTimes);
+
+		// Took the fixed value from the simulation, to make sure this stays consistent
+		// over refactorings - same as previous unit test
+		Assert.assertEquals(testTracker.eventBasedArrivalTime, 657.0);
+
+		// Initially calculated arrival time should predict correctly the final arrival
+		// time - as in the first unit test as we route to L8
+		Assert.assertEquals(testTracker.initialArrivalTime, 657.0);
+
+		// Along the route, when diverting to the same destination, arrival time should
+		// stay constant
+		testTracker.diversionArrivalTimes.forEach(t -> {
+			Assert.assertEquals(t, 739.0);
+		});
+
+		// Without fix in OnlineDriveTaskTrackerImpl, the last test will lead to a
+		// difference of one second for the samples at late times
+	}
+
+	static private class TestOptimizerDifferentDestinationFromLastLink
+			implements VrpOptimizer, MobsimBeforeSimStepListener {
+		private final MobsimTimer timer;
+
+		private final TravelTime travelTime;
+
+		private final LeastCostPathCalculator router;
+		private final DvrpVehicle vehicle;
+
+		private final Link startLink;
+		private final Link initialEndLink;
+		private final Link updatedEndLink;
+
+		private TestTracker testTracker;
+
+		public TestOptimizerDifferentDestinationFromLastLink(MobsimTimer timer, Network network, Fleet fleet,
+				QSimConfigGroup qsimConfig, TestTracker testTracker) {
+			this.timer = timer;
+			this.testTracker = testTracker;
+
+			this.travelTime = new QSimFreeSpeedTravelTime(qsimConfig);
+			TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
+
+			this.router = new DijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
+			this.vehicle = fleet.getVehicles().values().iterator().next();
+
+			/*
+			 * We save the links. We want to go from L0 to L7 and later we switch to L8
+			 */
+			this.startLink = Objects.requireNonNull(network.getLinks().get(Id.createLinkId("l0")));
+			this.initialEndLink = Objects.requireNonNull(network.getLinks().get(Id.createLinkId("l8")));
+			this.updatedEndLink = Objects.requireNonNull(network.getLinks().get(Id.createLinkId("l9")));
+
+			/*
+			 * Prepare vehicle schedule by adding drive task
+			 */
+			insertDriveTask();
+		}
+
+		private void insertDriveTask() {
+			Schedule schedule = vehicle.getSchedule();
+
+			/*
+			 * Here we perform an initial routing at time 0.0 from the chosen start link to
+			 * the end link
+			 */
+			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(startLink, initialEndLink, timer.getTimeOfDay(),
+					router, travelTime);
+
+			// ... and we add it as the first and only task to the schedule
+			DriveTask driveTask = new DriveTask(() -> "drive", path);
+			schedule.addTask(driveTask);
+
+			// Track the initially obtained arrival time
+			testTracker.initialArrivalTime = path.getArrivalTime();
+		}
+
+		@Override
+		public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+			if (vehicle.getSchedule().getStatus().equals(ScheduleStatus.STARTED)) {
+				if (timer.getTimeOfDay() % DIVERSION_FREQUENCY == 0) {
+					Task currentTask = vehicle.getSchedule().getCurrentTask();
+
+					if (currentTask instanceof DriveTask) {
+						// (1) Obtain task tracker from the active drive task
+						OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker) currentTask.getTaskTracker();
+						LinkTimePair diversionPoint = tracker.getDiversionPoint();
+
+						// if (diversionPoint.link.getId().toString().equals("l8")) {
+						// We have arrived at L6 and now want to divert to L7
+
+						// (2) Perform rerouting from the diversion point
+						VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(diversionPoint, updatedEndLink, router,
+								travelTime);
+
+						// (3) Implement the diversion (acutally, NOT)
+						// tracker.divertPath(path);
+
+						// (4) Track the currently estimated arrival time
+						this.testTracker.diversionArrivalTimes.add(path.getArrivalTime());
+					}
+				}
+			}
+		}
+
+		@Override
+		public void requestSubmitted(Request request) {
+		}
+
+		@Override
+		public void nextTask(DvrpVehicle vehicle) {
+			vehicle.getSchedule().nextTask(); // Just advance
+		}
 	}
 }
