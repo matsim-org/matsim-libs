@@ -212,16 +212,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				ElectricVehicleSpecification electricVehicleSpecification = electricFleetSpecification.getVehicleSpecifications()
 						.get(getWrappedElectricVehicleId(ev));
 				Leg legWithCriticalSOC;
-				ElectricVehicle pseudoVehicle;
+				ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);;
 				List <Leg> evCarLegs = TripStructureUtils.getLegs(modifiablePlan).stream().filter(leg -> leg.getMode().equals(TransportMode.car)).collect(toList());
-				pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
 				boolean pluginBeforeStart = configGroup.getPluginBeforeStartingThePlan();
-				Activity firstAct = (Activity) modifiablePlan.getPlanElements().get(0);
 
-				if(pluginBeforeStart && hasHomeCharger(mobsimagent, modifiablePlan, evCarLegs, pseudoVehicle) &&
-						(pseudoVehicle.getBattery().getSoc() > 0 &&
-								pseudoVehicle.getBattery().getSoc() > pseudoVehicle.getBattery().getCapacity()) &&
-									firstAct.getEndTime().seconds() > 10*60){
+				if(pluginBeforeStart && hasHomeCharger(mobsimagent, modifiablePlan, evCarLegs, pseudoVehicle)){ //TODO potentially check for activity duration and/or SoC
+
 					Leg firstEvLeg = evCarLegs.get(0);
 //					Activity originalActWhileCharging = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(firstEvLeg));
 //					Activity lastAct = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(firstEvLeg));
@@ -234,14 +230,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 					Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 					planPlugoutTrip(modifiablePlan, routingMode, electricVehicleSpecification, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
-					
+					//TODO don't we need to trigger SoC emulation here (in order to account for the energy charged before home actvity is ended?) see also todo-comment below
 				}
 				
 
-
 				do {
-
-					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev).getType().getEngineInformation())* EvUnits.J_PER_kWh;
+					double newSoC = EVUtils.getInitialEnergy(vehicles.getVehicles().get(ev).getType().getEngineInformation())* EvUnits.J_PER_kWh; //TODO is this correct if vehicle was plugged in before start (sse above) ?
 					pseudoVehicle.getBattery().setSoc(newSoC);
 					double capacityThreshold = pseudoVehicle.getBattery().getCapacity() * (configGroup.getCriticalRelativeSOC());
 					legWithCriticalSOC = getCriticalOrLastEvLeg(modifiablePlan, pseudoVehicle, ev);
@@ -288,14 +282,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					}
 
 				} while (legWithCriticalSOC != null && cnt > 0);
-
 			}
-
 		}
 	}
 
 	/**
-	 * retruns leg for which the crtitical soc is exceeded or the last of all ev legs.
+	 * returns leg for which the critical soc is exceeded or the last of all ev legs.
 	 *
 	 * @param modifiablePlan
 	 * @param pseudoVehicle
@@ -395,19 +387,12 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 		//TODO what if actWhileCharging does not hold a link id?
 
-
-
-
 		Link chargingLink = modeNetwork.getLinks().get(selectedCharger.getLinkId());
 
 //		Activity pluginTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
 		Activity pluginTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
 
-//		critical leg should always be the plugout leg, shouldn't it? tschlenther jan' '21
 		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
-//		Leg plugoutLeg = leg;
-//		Activity plugoutTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
-//		Activity plugoutTripDestination = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 		Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
@@ -566,8 +551,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 //			//throw new RuntimeException("There are no chargers within 1000m");
 //			log.warn("Charger out of range. Inefficient charging " + NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()));
 //		}
-		else
-		return nearestChargers.get(0);
+		else{
+			return nearestChargers.get(0);
+		}
 	}
 
 	/**
@@ -699,8 +685,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			}
 		}
 
-//		plan.getPlanElements().add(1, routeToCharger.get(0));
-
 
 		//add plugin act
 		Activity pluginAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
@@ -713,24 +697,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		int indexRouteFromChargerToAct = plan.getPlanElements().indexOf(pluginAct) + 1;
 		plan.getPlanElements().add(indexRouteFromChargerToAct, routeFromChargerToAct.get(0));
 		plan.getPlanElements().add(indexRouteFromChargerToAct+1, actWhileCharging);
-
-
-
-
-		//add leg to charger
-//		List<? extends PlanElement> routeFromActToCharger = tripRouter.calcRoute(TransportMode.walk, fromFacility, chargerFacility,
-//				now, plan.getPerson());
-//		plan.getPlanElements().add(5, routeFromActToCharger.get(0));
-//
-//		//add plugOut act
-//		Activity plugOutAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(chargingLink.getCoord(),
-//				chargingLink.getId(), routingMode + UrbanVehicleChargingHandler.PLUGOUT_IDENTIFIER);
-//		now = TripRouter.calcEndOfPlanElement(now, plugOutAct, config);
-//		plugOutAct.setEndTime(now);
-//		plan.getPlanElements().add(6, plugOutAct);
-
-
-
 
 	}
 
