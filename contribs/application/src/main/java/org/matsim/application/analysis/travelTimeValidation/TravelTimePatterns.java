@@ -1,4 +1,4 @@
-package org.matsim.application.analysis;
+package org.matsim.application.analysis.travelTimeValidation;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.csv.CSVPrinter;
