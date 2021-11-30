@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.pt.UmlaufStueckI;
 
 import java.net.URL;
 import java.util.Arrays;
