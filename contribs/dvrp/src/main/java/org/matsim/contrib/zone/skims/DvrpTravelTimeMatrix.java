@@ -26,20 +26,26 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystems;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpTravelTimeMatrix {
+	public static DvrpTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork,
+			DvrpTravelTimeMatrixParams params, int numberOfThreads, double qSimTimeStepSize) {
+		return new DvrpTravelTimeMatrix(dvrpNetwork, params, numberOfThreads,
+				new QSimFreeSpeedTravelTime(qSimTimeStepSize));
+	}
+
 	private final SquareGridSystem gridSystem;
 	private final Matrix freeSpeedTravelTimeMatrix;
 	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
 	public DvrpTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
-			double qSimTimeStepSize) {
+			TravelTime travelTime) {
 		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.getCellSize());
 		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
-		var travelTime = new QSimFreeSpeedTravelTime(qSimTimeStepSize);
 		var travelDisutility = new TimeAsTravelDisutility(travelTime);
 		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(dvrpNetwork, centralNodes, 0,
 				travelTime, travelDisutility, numberOfThreads);
