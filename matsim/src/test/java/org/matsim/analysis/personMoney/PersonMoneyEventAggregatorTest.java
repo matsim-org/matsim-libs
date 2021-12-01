@@ -78,7 +78,7 @@ public class PersonMoneyEventAggregatorTest {
 		events.processEvent(new PersonMoneyEvent(3, passenger2, -2.5, "drtFare", drt_A, "discount"));
 		events.processEvent(new PersonMoneyEvent(3, passenger3, -1.23, "drtFare", drt_A, "discount"));
 		events.processEvent(new PersonMoneyEvent(5, passenger1, 22.3, "drtFare", drt_A, "testFee"));
-		events.processEvent(new PersonMoneyEvent(1, passenger2, 4.10, "", "", "testFee"));
+		events.processEvent(new PersonMoneyEvent(1, passenger2, 4.10, "DrtFare", "DrtA", "testFee"));
 		events.processEvent(new PersonMoneyEvent(3, passenger2, 0.50, "drtFare", drt_A, "testFee"));
 		events.processEvent(new PersonMoneyEvent(6, passenger1, 6.50, "drtFare", drt_B, "testFee"));
 		events.processEvent(new PersonMoneyEvent(2, passenger2, 9.50, "drtFare", drt_B, "testFee"));
@@ -91,35 +91,19 @@ public class PersonMoneyEventAggregatorTest {
 
 		CSVFormat format = CSVFormat.newFormat(';').withFirstRecordAsHeader();
 
-/*		try (BufferedReader br = Files.newBufferedReader(Paths.get(utils.getOutputDirectory() + "/PersonMoneyEventsAggregator.csv"))) {
-
-			String DELIMITER = ";";
-
-			String line;
-			while ((line = br.readLine()) != null) {
-				String columns[] = line.split(DELIMITER);
-				List<String> drtFareAmountSums = new ArrayList<>();
-				drtFareAmountSums.add(columns[2]);
-				System.out.println(drtFareAmountSums);
-		//		System.out.println(String.join("; ", columns));
-
-			}
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}*/
 		try (FileReader aggregatorCsv = new FileReader(utils.getOutputDirectory() + "/PersonMoneyEventsAggregator.csv");
 			 CSVParser parser = CSVParser.parse(aggregatorCsv, format)) {
 
 			List<CSVRecord> csvRecordList = parser.getRecords();
 
+
 			List<CSVRecord> csvRecordListA = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals(drt_A) && record.get(parser.getHeaderMap().get("purpose")).equals("drtFare")).collect(Collectors.toList());
 			Assert.assertEquals("Either no record or more than one record",1, csvRecordListA.size());
 			Assert.assertEquals("Wrong personMoneyAmountSum for drt_A",19.07, Double.parseDouble(csvRecordListA.get(0).get(2)),MatsimTestUtils.EPSILON);
 
-//			List<CSVRecord> csvRecordList0 = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals(0.0) && record.get(parser.getHeaderMap().get("purpose")).equals("")).collect(Collectors.toList());
-//			Assert.assertEquals("Either no record or more than one record",1, csvRecordList0.size());
-//			Assert.assertEquals("Wrong personMoneyAmountSum for empty purpose",4.1, Double.parseDouble(csvRecordList0.get(0).get(2)),MatsimTestUtils.EPSILON);
+			List<CSVRecord> csvRecordList0 = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals("DrtA") && record.get(parser.getHeaderMap().get("purpose")).equals("DrtFare")).collect(Collectors.toList());
+			Assert.assertEquals("Either no record or more than one record",1, csvRecordList0.size());
+			Assert.assertEquals("Wrong personMoneyAmountSum for empty purpose",4.1, Double.parseDouble(csvRecordList0.get(0).get(2)),MatsimTestUtils.EPSILON);
 
 			List<CSVRecord> csvRecordListB = csvRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("transactionPartner")).equals(drt_B) && record.get(parser.getHeaderMap().get("purpose")).equals("drtFare")).collect(Collectors.toList());
 			Assert.assertEquals("Either no record or more than one record",1, csvRecordListB.size());
