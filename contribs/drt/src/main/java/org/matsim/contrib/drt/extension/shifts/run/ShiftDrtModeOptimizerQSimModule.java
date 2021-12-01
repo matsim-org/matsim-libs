@@ -1,8 +1,5 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
-import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
@@ -22,10 +19,20 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
-import org.matsim.contrib.drt.optimizer.*;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
@@ -44,7 +51,6 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -52,6 +58,9 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.TypeLiteral;
 
 /**
  * @author nkuehnel, fzwick / MOIA
@@ -141,14 +150,11 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(ShiftDrtTaskFactory.class).toInstance(taskFactory);
 		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
 			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
-
-			@Inject
 			private MobsimTimer timer;
 
 			@Override
 			public EmptyVehicleRelocator get() {
+				var travelTime = getModalInstance(TravelTime.class);
 				Network network = getModalInstance(Network.class);
 				DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
 				TravelDisutility travelDisutility = getModalInstance(
@@ -160,13 +166,11 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(ShiftTaskScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<DvrpMode, ShiftTaskScheduler>(drtCfg.getMode(), DvrpModes::mode) {
 					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-					@Inject
 					private MobsimTimer timer;
 
 					@Override
 					public ShiftTaskScheduler get() {
+						var travelTime = getModalInstance(TravelTime.class);
 						Network network = getModalInstance(Network.class);
 						ShiftDrtTaskFactory taskFactory = getModalInstance(ShiftDrtTaskFactory.class);
 						TravelDisutility travelDisutility = getModalInstance(
@@ -179,8 +183,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 				getter -> new ShiftRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class),
-						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
+						getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class),
 						getter.getModal(OperationFacilities.class)))).asEagerSingleton();
 
