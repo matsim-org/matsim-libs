@@ -22,7 +22,6 @@ package org.matsim.contrib.etaxi.optimizer;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
@@ -47,7 +46,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 
 public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final EventsManager eventsManager;
@@ -62,9 +60,8 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public ETaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
-			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutility travelDisutility, ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
-			ChargingInfrastructure chargingInfrastructure) {
+			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, ETaxiScheduler eScheduler,
+			ScheduleTimingUpdater scheduleTimingUpdater, ChargingInfrastructure chargingInfrastructure) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
@@ -97,8 +94,8 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 			return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, network, travelTime,
 					travelDisutility, eScheduler, scheduleTimingUpdater, chargingInfrastructure, router);
 		} else {
-			throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().
-					getName());
+			throw new RuntimeException(
+					"Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 		}
 	}
 

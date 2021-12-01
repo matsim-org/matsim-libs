@@ -44,7 +44,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
@@ -65,7 +64,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.util.concurrent.Futures;
-import com.google.inject.name.Named;
 
 public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	protected final TaxiConfigGroup taxiCfg;
@@ -85,8 +83,8 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	private final ExecutorServiceWithResource<LeastCostPathCalculator> executorService;
 
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			Supplier<LeastCostPathCalculator> routerCreator, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+			TravelTime travelTime, Supplier<LeastCostPathCalculator> routerCreator, EventsManager eventsManager,
+			MobsimTimer mobsimTimer) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.taxiScheduleInquiry = taxiScheduleInquiry;
