@@ -51,6 +51,7 @@ public class DvrpGlobalTravelTimesMatrixProvider implements Provider<DvrpTravelT
 
 	@Override
 	public DvrpTravelTimeMatrix get() {
-		return new DvrpTravelTimeMatrix(network, params, numberOfThreads, qSimConfigGroup.getTimeStepSize());
+		return DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
+				qSimConfigGroup.getTimeStepSize());
 	}
 }
