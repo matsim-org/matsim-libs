@@ -305,7 +305,7 @@ public class TeleAtlas2Network {
 //		str = str.trim();
 //		args = str.split(" ");
 
-		network = NetworkUtils.createNetwork();
+		network = NetworkUtils.createTimeInvariantNetwork();
 		parseArguments(args);
 		convert();
 		// TODO balmermi: more options

@@ -31,8 +31,8 @@ public class LinkStatsConfigGroupTest {
 	public void testWriteLinkStatsInterval() {
 		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
 		// test initial value
-		Assert.assertEquals(10, cg.getWriteLinkStatsInterval());
-		Assert.assertEquals("10", cg.getValue("writeLinkStatsInterval"));
+		Assert.assertEquals(50, cg.getWriteLinkStatsInterval());
+		Assert.assertEquals("50", cg.getValue("writeLinkStatsInterval"));
 		// test setting with setMobsim
 		cg.setWriteLinkStatsInterval(4);
 		Assert.assertEquals(4, cg.getWriteLinkStatsInterval());

@@ -47,7 +47,7 @@ public class DvrpRoutingModule implements RoutingModule {
 	private static final Logger logger = Logger.getLogger(DvrpRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
-		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, 
+		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,
 				Attributes tripAttributes);
 	}
 
@@ -74,7 +74,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"),
@@ -110,7 +110,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
-			
+
 			// interaction activity:
 			trip.add(createDrtStageActivity(accessFacility, now));
 			now++;

@@ -32,6 +32,7 @@ import org.matsim.vis.snapshotwriters.PositionInfo;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PositionEmissionsModule extends AbstractModule {
 
@@ -48,9 +49,13 @@ public class PositionEmissionsModule extends AbstractModule {
 		if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
 			throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
 		}
-		if (!(config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue) || config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.kinematicWaves))) {
+		if (isNotCorrectSnapshotStyle(config.qsim().getSnapshotStyle())) {
 			throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue or == kinematicWaves");
 		}
+	}
+
+	private static boolean isNotCorrectSnapshotStyle(QSimConfigGroup.SnapshotStyle style) {
+		return !(style.equals(QSimConfigGroup.SnapshotStyle.queue) || style.equals(QSimConfigGroup.SnapshotStyle.kinematicWaves));
 	}
 
 	@Override
@@ -69,16 +74,18 @@ public class PositionEmissionsModule extends AbstractModule {
 		@Inject
 		private EmissionModule emissionModule;
 
-		Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time, double speed) {
+		Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time) {
 
 			var vehicleAttributes = getVehicleAttributes(vehicle);
 			var roadType = EmissionUtils.getHbefaRoadType(link);
 			return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
 		}
 
-		Map<Pollutant, Double> calculateColdEmissions(Vehicle vehicle, Id<Link> linkId, double startEngineTime, double parkingDuration, int distance) {
+		Map<Pollutant, Double> calculateColdEmissions(Vehicle vehicle, double parkingDuration, int distance) {
+
+			// linkid and event time are never used in the underlying code.
 			return emissionModule.getColdEmissionAnalysisModule()
-					.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startEngineTime, parkingDuration, distance);
+					.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), null, -1, parkingDuration, distance);
 		}
 
 		private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
@@ -91,6 +98,14 @@ public class PositionEmissionsModule extends AbstractModule {
 			}
 			return EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicle.getType());
 		}
+
+		private Map<Pollutant, Double> getEmptyColdEmissions() {
+			return emissionModule.getColdPollutants().stream().collect(Collectors.toMap(p -> p, p -> 0.0));
+		}
+
+		private Map<Pollutant, Double> getEmptyWarmEmissions() {
+			return emissionModule.getWarmPollutants().stream().collect(Collectors.toMap(p -> p, p -> 0.0));
+		}
 	}
 
 	static class Handler implements BasicEventHandler {
@@ -99,7 +114,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		private final Map<Id<Vehicle>, VehicleEntersTrafficEvent> vehiclesInTraffic = new HashMap<>();
 		private final Map<Id<Vehicle>, VehicleLeavesTrafficEvent> parkedVehicles = new HashMap<>();
 		private final Map<Id<Vehicle>, Double> parkingDurations = new HashMap<>();
-		private final Set<Id<Vehicle>> vehiclesWaitingForSecondColdEmissionEvent = new HashSet<>();
+		private final Set<Id<Vehicle>> vehiclesEmittingColdEmissions = new HashSet<>();
 
 		@Inject
 		private EmissionCalculator emissionCalculator;
@@ -141,7 +156,7 @@ public class PositionEmissionsModule extends AbstractModule {
 			if (!event.getNetworkMode().equals(TransportMode.car)) return;
 
 			vehiclesInTraffic.put(event.getVehicleId(), event);
-			vehiclesWaitingForSecondColdEmissionEvent.add(event.getVehicleId());
+			vehiclesEmittingColdEmissions.add(event.getVehicleId());
 			var parkingDuration = calculateParkingTime(event.getVehicleId(), event.getTime());
 			this.parkingDurations.put(event.getVehicleId(), parkingDuration);
 		}
@@ -175,12 +190,7 @@ public class PositionEmissionsModule extends AbstractModule {
 				return; // only collect positions if vehicle has entered traffic (if vehicle is wait2link its position is calculated but it hasn't entered traffic yet.
 
 			if (trajectories.containsKey(event.getVehicleId())) {
-				computeWarmEmissionEvent(event);
-
-				if (vehiclesWaitingForSecondColdEmissionEvent.contains(event.getVehicleId()))
-					computeSecondColdEmissionEvent(event);
-			} else {
-				computeFirstColdEmissionEvent(event);
+				computeCombinedEmissionEvent(event);
 			}
 
 			// remember all the positions. It is important to do it here, so that the current event is not yet in the
@@ -189,31 +199,33 @@ public class PositionEmissionsModule extends AbstractModule {
 			trajectories.computeIfAbsent(event.getVehicleId(), key -> new LinkedList<>()).add(event);
 		}
 
-		private void computeFirstColdEmissionEvent(PositionEvent event) {
+		private Map<Pollutant, Double> computeColdEmissions(PositionEvent event, Vehicle vehicle, double distanceToLastPosition) {
 
-			var vehicle = getVehicle(event.getVehicleId());
-			var startEngineTime = vehiclesInTraffic.get(vehicle.getId()).getTime();
-			var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
-					startEngineTime, parkingDurations.get(vehicle.getId()), 1);
+			// we remember the vehicles which are currently emmitting cold emissions if not stored here return nothing
+			if (!vehiclesEmittingColdEmissions.contains(vehicle.getId()))
+				return emissionCalculator.getEmptyColdEmissions();
 
-			var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
-			eventsManager.processEvent(emisPosEv);
-		}
-
-		private void computeSecondColdEmissionEvent(PositionEvent event) {
-			// check for cold emissions which should be computed once if distance is > 1000m
 			double distance = calculateTravelledDistance(event);
 
-			if (distance > 1000) {
-				var vehicle = getVehicle(event.getVehicleId());
-				var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
-						event.getTime(), parkingDurations.get(vehicle.getId()), 2);
-				var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
-				eventsManager.processEvent(emisPosEv);
-
-				// this makes sure that this is only computed once
-				vehiclesWaitingForSecondColdEmissionEvent.remove(vehicle.getId());
+			// this model assumes vehicles to emmit cold emissions for the first 2000m of a trip remove a vehicle from
+			// the list of emmiting vehicles if the current trajectory is longer than 2000m
+			if (distance > 2000) {
+				vehiclesEmittingColdEmissions.remove(vehicle.getId());
+				return emissionCalculator.getEmptyColdEmissions();
 			}
+
+			// HBEFA assumes a constantly decreasing ammount of cold emissions depending on the distance travelled
+			// the underlying emission module simplifies this into two steps. Between 0-1km and 1-2km. We use the same
+			// classes here because we don't want to rewrite all the stuff. The cold emission module computes emissions
+			// for 1000m. We take these as is and muliply with distanceToLastPosition / 1000. This way we have the fraction
+			// of cold emissions for the distance travelled during the last time step janek oct' 2021
+			int distanceClass = distance <= 1000 ? 1 : 2;
+
+			var coldEmissionsFor1km = emissionCalculator.calculateColdEmissions(
+					vehicle, parkingDurations.get(vehicle.getId()), distanceClass
+			);
+			return coldEmissionsFor1km.entrySet().stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue() * distanceToLastPosition / 1000));
 		}
 
 		private double calculateTravelledDistance(PositionEvent event) {
@@ -232,7 +244,7 @@ public class PositionEmissionsModule extends AbstractModule {
 			return distance;
 		}
 
-		private void computeWarmEmissionEvent(PositionEvent event) {
+		private void computeCombinedEmissionEvent(PositionEvent event) {
 
 			var previousPosition = trajectories.get(event.getVehicleId()).getLast();
 			var distanceToLastPosition = CoordUtils.calcEuclideanDistance(event.getCoord(), previousPosition.getCoord());
@@ -247,8 +259,13 @@ public class PositionEmissionsModule extends AbstractModule {
 				// add a rounding error to the compared freespeed. The warm emission module has a tolerance of 1km/h
 				if (speed <= link.getFreespeed() + 0.01) {
 					var vehicle = getVehicle(event.getVehicleId());
-					var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
-					eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
+
+					var coldEmissions = computeColdEmissions(event, vehicle, distanceToLastPosition);
+					var warmEmissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime);
+					var combinedEmissions = Stream.concat(coldEmissions.entrySet().stream(), warmEmissions.entrySet().stream())
+							.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
+
+					eventsManager.processEvent(new PositionEmissionEvent(event, combinedEmissions, "combined"));
 
 				} else {
 					log.warn("speed was too fast: " + speed + "m/s Current time: " + event.getTime() + " prev time: " + previousPosition.getTime() + " current linkId: " + event.getLinkId() + " prev linkId: " + previousPosition.getLinkId() + " agentId: " + event.getPersonId());
@@ -259,8 +276,7 @@ public class PositionEmissionsModule extends AbstractModule {
 				// but generate the 0 emission positions in the necdf module in the palm project but this is much easier
 				// and will do for now
 				// janek july'21
-				var emissions = emissionCalculator.emissionModule.getWarmPollutants().stream()
-						.collect(Collectors.toMap(key -> key, key -> 0.0));
+				var emissions = emissionCalculator.getEmptyWarmEmissions();
 				eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
 			}
 		}

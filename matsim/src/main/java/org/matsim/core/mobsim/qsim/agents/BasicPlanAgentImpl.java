@@ -23,7 +23,7 @@
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

@@ -180,7 +180,7 @@ public class VrpAgentLogicTest {
 	private void verifyEvents(AbstractTaskEvent... events) {
 		ArgumentCaptor<AbstractTaskEvent> captor = ArgumentCaptor.forClass(AbstractTaskEvent.class);
 		verify(eventsManager, times(events.length)).processEvent(captor.capture());
-		assertThat(captor.getAllValues()).usingFieldByFieldElementComparator().containsExactly(events);
+		assertThat(captor.getAllValues()).usingRecursiveFieldByFieldElementComparator().containsExactly(events);
 	}
 
 	private TaskStartedEvent taskStartedEvent(double time, Task task) {

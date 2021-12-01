@@ -55,6 +55,50 @@ public class FastThenSlowCharging implements BatteryCharging {
 	}
 
 	@Override
+	public double calcEnergyCharged(ChargerSpecification charger, double chargingPeriod) {
+		Preconditions.checkArgument(chargingPeriod  >= 0, "Charging period is negative: %s", chargingPeriod );
+
+		double remainingTime = chargingPeriod;
+
+		double maxChargingPower = charger.getPlugPower();
+		double energyCharged = 0;
+
+		final Battery battery = electricVehicle.getBattery();
+		double maxRemainingEnergy = battery.getCapacity() - battery.getSoc();
+		double relativeSoc = battery.getSoc() / battery.getCapacity();
+
+		double c = battery.getCapacity() / 3600;
+		double capB = 0.5 * battery.getCapacity();
+		double capC = 0.75 * battery.getCapacity();
+
+		if (relativeSoc <= 0.5 && maxRemainingEnergy > 0) {
+			double diff = capB - battery.getSoc();
+			final double chargingSpeed = Math.min(maxChargingPower, 1.75 * c);
+			double maxTime = diff / chargingSpeed;
+			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
+			remainingTime -= maxTime;
+			relativeSoc = (battery.getSoc() + energyCharged) / battery.getCapacity();
+		}
+
+		if (remainingTime > 0 && relativeSoc <= 0.75 && maxRemainingEnergy > energyCharged) {
+			double diff = capC - (battery.getSoc() + energyCharged);
+			final double chargingSpeed = Math.min(maxChargingPower, 1.25 * c);
+			double maxTime = diff / chargingSpeed;
+			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
+			remainingTime -= maxTime;
+			relativeSoc = (battery.getSoc() + energyCharged) / battery.getCapacity();
+		}
+
+		if (remainingTime > 0 && relativeSoc < 1. && maxRemainingEnergy > energyCharged) {
+			double diff = battery.getCapacity() - (battery.getSoc() + energyCharged);
+			final double chargingSpeed = Math.min(maxChargingPower, 0.5 * c);
+			double maxTime = diff / chargingSpeed;
+			energyCharged += Math.min(maxTime, remainingTime) * chargingSpeed;
+		}
+		return Math.min(energyCharged, maxRemainingEnergy);
+	}
+
+	@Override
 	public double calcChargingTime(ChargerSpecification charger, double energy) {
 		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
 

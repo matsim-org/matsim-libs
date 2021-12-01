@@ -43,7 +43,7 @@ public class ExtensiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, null, new InsertionGenerator(),
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
@@ -71,7 +71,8 @@ public class ExtensiveInsertionProviderTest {
 		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
-				.thenReturn(List.of(feasibleInsertion, infeasibleInsertion));
+				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),
+						insertionWithDetourData(infeasibleInsertion)));
 
 		//mock admissibleCostCalculator
 		@SuppressWarnings("unchecked")
@@ -86,13 +87,17 @@ public class ExtensiveInsertionProviderTest {
 		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
 		//pretend all insertions are at end to check KNearestInsertionsAtEndFilter
 		when(vehicleEntry.isAfterLastStop(anyInt())).thenReturn(true);
-		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, (from, to) -> 978.,
-				insertionGenerator, rule.forkJoinPool);
+		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, insertionGenerator,
+				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(
 				nearestInsertionsAtEndLimit == 0 ? List.of() : List.of(feasibleInsertion));
 	}
 
 	private InsertionGenerator.InsertionPoint insertionPoint() {
 		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
+	}
+
+	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
+		return new InsertionWithDetourData<>(insertion, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 	}
 }

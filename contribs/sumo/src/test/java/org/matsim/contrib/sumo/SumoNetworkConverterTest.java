@@ -38,7 +38,7 @@ public class SumoNetworkConverterTest {
 
         converter.call();
 
-        Network network = NetworkUtils.readNetwork(output.toString());
+        Network network = NetworkUtils.readTimeInvariantNetwork(output.toString());
 
         assert network.getNodes().size() == 21 : "Must contain 21 nodes";
         assert network.getNodes().containsKey(Id.createNodeId("251106770")) : "Must contain specific id";

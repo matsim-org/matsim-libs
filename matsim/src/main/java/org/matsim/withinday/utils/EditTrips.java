@@ -73,6 +73,12 @@ import org.matsim.withinday.events.ReplanningEvent;
 
 /**
  * The methods here should modify trips, i.e. material between two non-stage-activities.
+ *
+ * TODO: When the same agent is replanned multiple times it is problematic to have legs with undefined travel time.
+ * These cause undefined time exceptions when EditTrips struggles to find a departure time to route from.
+ * At some places the code now sets a travel time which is not really correct because the real value is hard to obtain.
+ * Still a defined value at least keeps the simulation running. This should be fixed with look-ups in the transit
+ * schedule when exactly the agent arrives at the next stop and can disembark. vsp-gleich nov'21
  * 
  * @author kainagel
  */
@@ -290,10 +296,7 @@ public final class EditTrips {
 						// the agent will stay at the same stop where the agent is already waiting
 						log.debug( "agent with ID=" + agent.getId() + " will wait for vehicle departing at the same stop facility." ) ;
 						// don't remove the agent from the stop tracker
-						currentLeg.setRoute(new DefaultTransitPassengerRoute( //
-								oldPtRoute.getStartLinkId(), newPtRoute.getEndLinkId(), //
-								oldPtRoute.getAccessStopId(), newPtRoute.getEgressStopId(), //
-								newPtRoute.getLineId(), newPtRoute.getRouteId()));
+						currentLeg.setRoute(newPtRoute);
 						// There is an access_walk leg in the new trip (router assumes the trip begins
 						// here) so we should remove the access_walk leg and the pt interaction
 						// element 0 is the useless walk from the stop to the same stop
@@ -361,11 +364,20 @@ public final class EditTrips {
 												currentOrNextStop.getId(), newPtRoute.getEgressStopId()))) {
 							// Same TransitRoute or other TransitRoute which also serves the new egress stop
 							// -> Agent can stay on the same vehicle
-							currentLeg.setRoute(new DefaultTransitPassengerRoute( //
+							DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute( //
 									oldPtRoute.getStartLinkId(), newPtRoute.getEndLinkId(), //
 									oldPtRoute.getAccessStopId(), newPtRoute.getEgressStopId(), //
 									oldPtRoute.getLineId(), oldPtRoute.getRouteId()
-									));
+							);
+							if (newPtRoute.getBoardingTime().isDefined()) {
+								route.setBoardingTime(newPtRoute.getBoardingTime().seconds());
+							}
+							if (newPtRoute.getTravelTime().isDefined()) {
+								// this is wrong but better than nothing.
+								// TODO: calculate travel time from original boarding stop to new alighting stop.
+								route.setTravelTime(newPtRoute.getTravelTime().seconds());
+							}
+							currentLeg.setRoute(route);
 							// There is an access_walk leg in the new trip (router assumes the trip begins
 							// here) so we should remove the access_walk leg and the pt interaction
 							// element 0 is the useless walk from the stop to the same stop
@@ -507,9 +519,7 @@ public final class EditTrips {
 			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
 			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
-			if (Double.isFinite(
-					previousActivity.getEndTime().seconds()) && previousActivity.getEndTime().seconds()
-					< now) {
+			if (previousActivity.getEndTime().isDefined() && previousActivity.getEndTime().seconds() < now) {
 				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
 				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + travelTime;
 				// plausibility check: The agent can only arrive after the current time
@@ -640,11 +650,20 @@ public final class EditTrips {
 		}		
 
 		// prune remaining route from current route:
-		currentLeg.setRoute(new DefaultTransitPassengerRoute( //
+		DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute( //
 				oldPtRoute.getStartLinkId(), nextStop.getLinkId(), //
 				oldPtRoute.getAccessStopId(), nextStop.getId(), //
 				oldPtRoute.getLineId(), oldPtRoute.getRouteId()
-				));
+		);
+		if (oldPtRoute.getBoardingTime().isDefined()) {
+			route.setBoardingTime(oldPtRoute.getBoardingTime().seconds());
+		}
+		if (oldPtRoute.getTravelTime().isDefined()) {
+			// this is wrong but better than nothing.
+			// TODO: calculate travel time to "next stop" where the agent alights
+			route.setTravelTime(oldPtRoute.getTravelTime().seconds());
+		}
+		currentLeg.setRoute(route);
 		// add pt interaction activity
 		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
 				nextStop.getCoord(), nextStop.getLinkId());

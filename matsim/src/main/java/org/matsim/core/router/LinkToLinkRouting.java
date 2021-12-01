@@ -101,7 +101,7 @@ public class LinkToLinkRouting
                 TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
                 Set<String> modes = new HashSet<>();
                 modes.add(mode);
-                filteredNetwork = NetworkUtils.createNetwork();
+                filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
                 filter.filter(filteredNetwork, modes);
 
                 invertedNetwork = new NetworkInverter(filteredNetwork, networkTurnInfoBuilder.createAllowedTurnInfos()).getInvertedNetwork();

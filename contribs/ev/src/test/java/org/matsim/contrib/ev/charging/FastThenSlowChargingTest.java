@@ -165,4 +165,47 @@ public class FastThenSlowChargingTest {
 			throw new UnsupportedOperationException();
 		}, FastThenSlowCharging::new);
 	}
+
+
+	@Test
+	public void calcEnergyCharge() {
+		assertCalcEnergyCharge(100, 100, 200, 10, 0);
+		assertCalcEnergyCharge(100, 76, 200, 10, 500000);
+		assertCalcEnergyCharge(100, 51, 200, 10, 1250000);
+		assertCalcEnergyCharge(100, 50, 200, 10, 1250000);
+		assertCalcEnergyCharge(100, 0, 200, 10, 1750000);
+	}
+
+	private void assertCalcEnergyCharge(double capacity_kWh, double soc_kWh, double chargerPower_kW,
+										double chargingPeriod, double expectedEnergy) {
+		ChargerSpecification charger = createCharger(chargerPower_kW);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
+		double energy = ((FastThenSlowCharging) electricVehicle.getChargingPower()).calcEnergyCharged(charger, chargingPeriod);
+		Assertions.assertThat(energy).isCloseTo(expectedEnergy, Percentage.withPercentage(1e-13));
+	}
+
+	@Test
+	public void calcEnergyCharged_exceptions() {
+		Assertions.assertThatThrownBy(() -> assertCalcEnergyCharge(100, 100, 10, -1, 0))
+				.isExactlyInstanceOf(IllegalArgumentException.class)
+				.hasMessageStartingWith("Charging period is negative: ");
+	}
+
+	@Test
+	public void calcEnergyChargeAndVerifyWithDuration() {
+		assertEnergyAndDurationCalcCompliance(100, 76, 200, 100);
+		assertEnergyAndDurationCalcCompliance(100, 51, 200, 100);
+		assertEnergyAndDurationCalcCompliance(100, 50, 200, 100);
+		assertEnergyAndDurationCalcCompliance(100, 0, 200, 3000);
+	}
+
+	private void assertEnergyAndDurationCalcCompliance(double capacity_kWh, double soc_kWh, double chargerPower_kW,
+													   double chargingPeriod) {
+		ChargerSpecification charger = createCharger(chargerPower_kW);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
+		double energyCharged_J = ((FastThenSlowCharging) electricVehicle.getChargingPower()).calcEnergyCharged(charger, chargingPeriod);
+		double chargingTime = ((FastThenSlowCharging) electricVehicle.getChargingPower()).calcChargingTime(charger, energyCharged_J);
+		Assertions.assertThat(chargingTime).isCloseTo(chargingPeriod, Percentage.withPercentage(1e-13));
+	}
+
 }

@@ -67,7 +67,7 @@ public final class NetworkInverter {
 	}
 
 	private void invertNetwork(){
-		this.invertedNetwork = NetworkUtils.createNetwork();
+		this.invertedNetwork = NetworkUtils.createTimeInvariantNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
