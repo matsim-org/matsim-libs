@@ -81,14 +81,11 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					private MobsimTimer timer;
 
 					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-
-					@Inject
 					private EventsManager events;
 
 					@Override
 					public TaxiOptimizer get() {
+						var travelTime = getModalInstance(TravelTime.class);
 						var fleet = getModalInstance(Fleet.class);
 						var network = getModalInstance(Network.class);
 						var eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
@@ -111,14 +108,11 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					private MobsimTimer timer;
 
 					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-
-					@Inject
 					private EventsManager events;
 
 					@Override
 					public ETaxiScheduler get() {
+						var travelTime = getModalInstance(TravelTime.class);
 						Fleet fleet = getModalInstance(Fleet.class);
 						TaxiScheduleInquiry taxiScheduleInquiry = new TaxiScheduleInquiry(taxiCfg, timer);
 						Network network = getModalInstance(Network.class);

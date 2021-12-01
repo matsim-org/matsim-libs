@@ -251,7 +251,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv")) {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
-				bw.write("runId;iteration;");
+				bw.write("runId;iteration");
 				for (int i = 0; i <= maxcap; i++) {
 					bw.write(";" + i + " pax distance_m");
 				}

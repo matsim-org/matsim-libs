@@ -44,7 +44,8 @@
 		<param name="hbefaRoadTypeSource" value="fromLinkAttributes" />
 
 		<!-- if true then detailed emission factor files must be provided! -->
-		<param name="usingDetailedEmissionCalculation" value="true" />
+<!--		<param name="usingDetailedEmissionCalculation" value="true" />-->
+		<param name="detailedVsAverageLookupBehavior" value="tryDetailedThenTechnologyAverageThenAverageTable" />
 
 		<!-- Each vehicle in matsim points to a VehicleType.  For the emissions package to work,
 			each VehicleType needs to contain corresponding information.  This switch

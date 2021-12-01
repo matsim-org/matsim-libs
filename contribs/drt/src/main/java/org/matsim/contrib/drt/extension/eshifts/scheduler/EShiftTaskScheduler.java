@@ -1,6 +1,12 @@
 package org.matsim.contrib.drt.extension.eshifts.scheduler;
 
-import com.google.inject.name.Named;
+import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE;
+import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -24,7 +30,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.ev.charging.BatteryCharging;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
@@ -39,13 +44,6 @@ import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE;
-import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 /**
  * @author nkuehnel / MOIA
@@ -64,17 +62,17 @@ public class EShiftTaskScheduler {
     private final Network network;
     private final ChargingInfrastructure chargingInfrastructure;
 
-    public EShiftTaskScheduler(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-							   TravelDisutility travelDisutility, MobsimTimer timer, ShiftDrtTaskFactory taskFactory,
-							   ShiftDrtConfigGroup shiftConfig, ChargingInfrastructure chargingInfrastructure) {
-        this.travelTime = travelTime;
-        this.timer = timer;
-        this.taskFactory = taskFactory;
-        this.network = network;
-        this.shiftConfig = shiftConfig;
-        this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-        this.chargingInfrastructure = chargingInfrastructure;
-    }
+	public EShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+			MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftDrtConfigGroup shiftConfig,
+			ChargingInfrastructure chargingInfrastructure) {
+		this.travelTime = travelTime;
+		this.timer = timer;
+		this.taskFactory = taskFactory;
+		this.network = network;
+		this.shiftConfig = shiftConfig;
+		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
+		this.chargingInfrastructure = chargingInfrastructure;
+	}
 
     public void relocateForBreak(ShiftDvrpVehicle vehicle, OperationFacility breakFacility, DrtShift shift) {
         final Schedule schedule = vehicle.getSchedule();
