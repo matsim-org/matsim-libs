@@ -311,9 +311,9 @@ public class LinkPaxVolumesAnalysisTest {
             e.printStackTrace();
         }
 
-        LinkPaxVolumesWriter LinkVehicleAndPaxVolumesPerNetworkModePerHourCsv = new LinkPaxVolumesWriter(linkPaxVolumes, network, ";");
+        LinkPaxVolumesWriter linkVehicleAndPaxVolumesPerNetworkModePerHourCsv = new LinkPaxVolumesWriter(linkPaxVolumes, network, ";");
 
-        LinkVehicleAndPaxVolumesPerNetworkModePerHourCsv.writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerNetworkModePerHour.csv");
+        linkVehicleAndPaxVolumesPerNetworkModePerHourCsv.writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerNetworkModePerHour.csv");
 
         try(FileReader modePerHourCsv = new FileReader(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerNetworkModePerHour.csv");
             CSVParser parser = CSVParser.parse(modePerHourCsv, format)){
@@ -341,9 +341,9 @@ public class LinkPaxVolumesAnalysisTest {
             e.printStackTrace();
         }
 
-        LinkPaxVolumesWriter LinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv = new LinkPaxVolumesWriter(linkPaxVolumes, network, ";");
+        LinkPaxVolumesWriter linkVehicleAndPaxVolumesPerVehicleTypePerHourCsv = new LinkPaxVolumesWriter(linkPaxVolumes, network, ";");
 
-        LinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv.writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerVehicleTypePerHour.csv");
+        linkVehicleAndPaxVolumesPerVehicleTypePerHourCsv.writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerVehicleTypePerHour.csv");
 
         try(FileReader vehicleTypePerHourCsv = new FileReader(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerVehicleTypePerHour.csv");
             CSVParser parser = CSVParser.parse(vehicleTypePerHourCsv, format)){

@@ -65,7 +65,7 @@ public class LinkPaxVolumesWriter {
         }
     }
 
-    void writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<String> networkModesSorted = new TreeSet(linkPaxVolumesAnalysis.getNetworkModes());
@@ -100,7 +100,7 @@ public class LinkPaxVolumesWriter {
      * Please note that the same vehicle is counted for each passenger mode it is serving here. E.g. a pt vehicle
      * will be counted with the driver's passenger mode and with the passenger's passenger mode, i.e. multiple times.
      */
-    void writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<String> passengerModesSorted = new TreeSet(linkPaxVolumesAnalysis.getPassengerModes());
@@ -131,7 +131,7 @@ public class LinkPaxVolumesWriter {
         }
     }
 
-    void writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<Id<VehicleType>> vehicleIdsSorted = new TreeSet(linkPaxVolumesAnalysis.getVehicleTypes());
