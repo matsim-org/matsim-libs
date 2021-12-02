@@ -45,12 +45,12 @@ public class VrpPaths {
 		return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
 	}
 
-	public static VrpPathWithTravelData calcAndCreatePath(LinkTimePair diversionPoint, Link toLink,
+	public static VrpPathWithTravelData calcAndCreatePathForDiversion(LinkTimePair diversionPoint, Link toLink,
 			LeastCostPathCalculator router, TravelTime travelTime) {
 		Path path = diversionPoint.link == toLink ? null
 				: router.calcLeastCostPath(diversionPoint.link.getToNode(), toLink.getFromNode(), diversionPoint.time,
 						null, null);
-		return VrpPaths.createPath(diversionPoint, toLink, path, travelTime);
+		return VrpPaths.createPathForDiversion(diversionPoint, toLink, path, travelTime);
 	}
 
 	public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime, boolean calculateForDiversion) {
@@ -60,7 +60,7 @@ public class VrpPaths {
 		return new VrpPathWithTravelDataImpl(departureTime, travelTime, new Link[] { fromTolink }, new double[] { 0 });
 	}
 
-	public static VrpPathWithTravelData createZeroLengthPath(LinkTimePair diversionPoint) {
+	public static VrpPathWithTravelData createZeroLengthPathForDiversion(LinkTimePair diversionPoint) {
 		return createZeroLengthPath(diversionPoint.link, diversionPoint.time, true);
 	}
 
@@ -69,9 +69,9 @@ public class VrpPaths {
 		return createPath(fromLink, toLink, departureTime, pathData.getPath(), travelTime);
 	}
 
-	public static VrpPathWithTravelData createPath(LinkTimePair diversionPoint, Link toLink, PathData pathData,
+	public static VrpPathWithTravelData createPathForDiversion(LinkTimePair diversionPoint, Link toLink, PathData pathData,
 			TravelTime travelTime) {
-		return createPath(diversionPoint, toLink, pathData.getPath(), travelTime);
+		return createPathForDiversion(diversionPoint, toLink, pathData.getPath(), travelTime);
 	}
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
@@ -79,7 +79,7 @@ public class VrpPaths {
 		return createPath(fromLink, toLink, departureTime, path, travelTime, true, false);
 	}
 
-	public static VrpPathWithTravelData createPath(LinkTimePair diversionPoint, Link toLink, Path path,
+	public static VrpPathWithTravelData createPathForDiversion(LinkTimePair diversionPoint, Link toLink, Path path,
 			TravelTime travelTime) {
 		return createPath(diversionPoint.link, toLink, diversionPoint.time, path, travelTime, true, true);
 	}
