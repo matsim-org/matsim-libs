@@ -13,11 +13,11 @@ import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup.Hybrid
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup.MatrixEstimatorParameters;
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup.RoutingEstimatorParameters;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraAlgorithm;
+import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraAlgorithm.AlgorithmSettings;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraRequestFactory;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraVehicleFactory;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.DefaultAlonsoMoraRequestFactory;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.DefaultAlonsoMoraVehicle;
-import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraAlgorithm.AlgorithmSettings;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.assignment.AssignmentSolver;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.assignment.BestResponseAssignmentSolver;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.assignment.CbcMpsAssignmentSolver;
@@ -39,10 +39,10 @@ import org.matsim.contrib.drt.extension.alonso_mora.algorithm.relocation.GlpkMps
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.relocation.RelocationSolver;
 import org.matsim.contrib.drt.extension.alonso_mora.scheduling.AlonsoMoraScheduler;
 import org.matsim.contrib.drt.extension.alonso_mora.scheduling.DefaultAlonsoMoraScheduler;
-import org.matsim.contrib.drt.extension.alonso_mora.scheduling.ParallelLeastCostPathCalculator;
-import org.matsim.contrib.drt.extension.alonso_mora.scheduling.StandardRebalancer;
 import org.matsim.contrib.drt.extension.alonso_mora.scheduling.DefaultAlonsoMoraScheduler.NoopOperationalVoter;
 import org.matsim.contrib.drt.extension.alonso_mora.scheduling.DefaultAlonsoMoraScheduler.OperationalVoter;
+import org.matsim.contrib.drt.extension.alonso_mora.scheduling.ParallelLeastCostPathCalculator;
+import org.matsim.contrib.drt.extension.alonso_mora.scheduling.StandardRebalancer;
 import org.matsim.contrib.drt.extension.alonso_mora.travel_time.DrtDetourTravelTimeEstimator;
 import org.matsim.contrib.drt.extension.alonso_mora.travel_time.EuclideanTravelTimeEstimator;
 import org.matsim.contrib.drt.extension.alonso_mora.travel_time.HybridTravelTimeEstimator;
@@ -63,7 +63,6 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.StayTaskEndTimeCalculator;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -74,9 +73,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Key;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 
 /**
  * Registers all components for the Alonso-Mora dispatcher in the MATSim QSim
@@ -202,8 +199,6 @@ public class AlonsoMoraModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(RelocationSolver.class).to(modalKey(GlpkMpsRelocationSolver.class));
 			break;
 		}
-
-		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 
 		bindModal(LeastCostPathCalculatorFactory.class).to(LeastCostPathCalculatorFactory.class);
 
