@@ -87,7 +87,7 @@ public class QSimProvider implements Provider<QSim> {
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, Collections.emptyList());
 		
 		for (AbstractQSimModule override : overridingModules) {
-			qsimModule = AbstractQSimModule.overrideQSimModules(modules, Collections.singletonList(override));
+			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
 		
 		final AbstractQSimModule finalQsimModule = qsimModule;
