@@ -121,14 +121,11 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(EmptyVehicleRelocator.class).toProvider(
 				new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
 					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-
-					@Inject
 					private MobsimTimer timer;
 
 					@Override
 					public EmptyVehicleRelocator get() {
+						var travelTime = getModalInstance(TravelTime.class);
 						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
 						TravelDisutility travelDisutility = getModalInstance(
@@ -142,7 +139,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class),
-								getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
+								getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
