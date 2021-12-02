@@ -66,13 +66,16 @@ public class NetDepartureReplenishDemandEstimator implements PassengerRequestSch
 		// Then remove the travel information from the potential trips Map
 		if (event.getMode().equals(mode)) {
 			Triple<Double, DrtZone, DrtZone> triple = potentialDrtTripsMap.remove(event.getRequestId());
-			double timeBin = triple.getLeft();
-			DrtZone departureZone = triple.getMiddle();
-			DrtZone arrivalZone = triple.getRight();
-
-			var zoneNetDepartureMapSlice = currentZoneNetDepartureMap.computeIfAbsent(timeBin, t -> new HashMap<>());
-			zoneNetDepartureMapSlice.computeIfAbsent(departureZone, z -> new MutableInt()).increment();
-			zoneNetDepartureMapSlice.computeIfAbsent(arrivalZone, z -> new MutableInt()).decrement();
+			
+			if (triple != null) { // In case the request is scheduled multiple times
+				double timeBin = triple.getLeft();
+				DrtZone departureZone = triple.getMiddle();
+				DrtZone arrivalZone = triple.getRight();
+	
+				var zoneNetDepartureMapSlice = currentZoneNetDepartureMap.computeIfAbsent(timeBin, t -> new HashMap<>());
+				zoneNetDepartureMapSlice.computeIfAbsent(departureZone, z -> new MutableInt()).increment();
+				zoneNetDepartureMapSlice.computeIfAbsent(arrivalZone, z -> new MutableInt()).decrement();
+			}
 		}
 	}
 

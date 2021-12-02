@@ -82,9 +82,12 @@ public class PlusOneRebalancingStrategy
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		if (event.getMode().equals(mode)) {
 			Id<Link> linkId = potentialDrtTripMap.remove(event.getRequestId());
-			synchronized (this) {
-				// event was emitted by UnplannedRequestInserter, it may arrive during calcRelocations()
-				targetLinkIdList.add(linkId);
+		
+			if (linkId != null) { // In case one request is scheduled multiple times
+				synchronized (this) {
+					// event was emitted by UnplannedRequestInserter, it may arrive during calcRelocations()
+					targetLinkIdList.add(linkId);
+				}
 			}
 		}
 	}
