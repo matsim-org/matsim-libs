@@ -67,7 +67,7 @@ public class VehicleStatsPerVehicleType {
                         sumVehicleKm += linkPaxVolumesAnalysis.getVolumePerDayFromTimeBinArray(vehicleVolumes) * linkLengthKm;
                     }
 
-                    int[] passengerVolumes = linkPaxVolumesAnalysis.getVehicleVolumesForLinkPerVehicleType(linkId, vehicleTypeId);
+                    int[] passengerVolumes = linkPaxVolumesAnalysis.getPaxVolumesForLinkPerVehicleType(linkId, vehicleTypeId);
                     if (passengerVolumes != null) {
                         sumPaxKm += linkPaxVolumesAnalysis.getVolumePerDayFromTimeBinArray(passengerVolumes) * linkLengthKm;
                     }
