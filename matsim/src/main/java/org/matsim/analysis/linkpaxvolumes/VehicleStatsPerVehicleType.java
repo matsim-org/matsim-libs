@@ -60,16 +60,16 @@ public class VehicleStatsPerVehicleType {
                 double sumVehicleKm = 0.0;
                 double sumPaxKm = 0.0;
                 for (Id<Link> linkId : linkPaxVolumesAnalysis.getLinkIds()) {
-                    double linkLength = network.getLinks().get(linkId).getLength();
+                    double linkLengthKm = network.getLinks().get(linkId).getLength() / 1000;
 
                     int[] vehicleVolumes = linkPaxVolumesAnalysis.getVehicleVolumesForLinkPerVehicleType(linkId, vehicleTypeId);
                     if (vehicleVolumes != null) {
-                        sumVehicleKm += linkPaxVolumesAnalysis.getVolumePerDayFromTimeBinArray(vehicleVolumes) * linkLength;
+                        sumVehicleKm += linkPaxVolumesAnalysis.getVolumePerDayFromTimeBinArray(vehicleVolumes) * linkLengthKm;
                     }
 
-                    int[] passengerVolumes = linkPaxVolumesAnalysis.getVehicleVolumesForLinkPerVehicleType(linkId, vehicleTypeId);
+                    int[] passengerVolumes = linkPaxVolumesAnalysis.getPaxVolumesForLinkPerVehicleType(linkId, vehicleTypeId);
                     if (passengerVolumes != null) {
-                        sumPaxKm += linkPaxVolumesAnalysis.getVolumePerDayFromTimeBinArray(passengerVolumes) * linkLength;
+                        sumPaxKm += linkPaxVolumesAnalysis.getVolumePerDayFromTimeBinArray(passengerVolumes) * linkLengthKm;
                     }
 
                 }
