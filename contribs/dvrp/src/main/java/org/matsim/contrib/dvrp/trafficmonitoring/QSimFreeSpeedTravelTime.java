@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -48,6 +49,6 @@ public class QSimFreeSpeedTravelTime implements TravelTime {
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		double freeSpeedTT = link.getLength() / link.getFreespeed(time); // equiv. to FreeSpeedTravelTime
 		double linkTravelTime = timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
-		return linkTravelTime + 1;// adds 1 extra second for moving over nodes
+		return linkTravelTime + VrpPaths.NODE_TRANSITION_TIME;// adds 1 extra second for moving over nodes
 	}
 }
