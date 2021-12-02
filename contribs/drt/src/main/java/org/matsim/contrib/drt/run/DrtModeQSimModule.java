@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.passenger.DrtRequestCreator.TimeConstraintCalculator;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
@@ -31,11 +32,7 @@ import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRo
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -72,14 +69,12 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
-			@Inject
-			private EventsManager events;
-
-			@Override
-			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events);
-			}
-		}).asEagerSingleton();
+		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
+			EventsManager events = getter.get(EventsManager.class);
+			TimeConstraintCalculator timeConstraintCalculator = getter.getModal(TimeConstraintCalculator.class);
+			return new DrtRequestCreator(getMode(), events, timeConstraintCalculator);
+		}));
+		
+		bindModal(TimeConstraintCalculator.class).toInstance(DrtRequestCreator.DEFAULT_TIME_CONSTRAINT_CALCULATOR);
 	}
 }
