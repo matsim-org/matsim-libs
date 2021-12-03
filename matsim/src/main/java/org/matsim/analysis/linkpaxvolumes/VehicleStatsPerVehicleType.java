@@ -47,7 +47,7 @@ public class VehicleStatsPerVehicleType {
         this.columnSeparator = sep;
     }
 
-    void writeOperatingStatsPerVehicleType(String fileName) {
+    public void writeOperatingStatsPerVehicleType(String fileName) {
         // have results sorted
         SortedSet<Id<VehicleType>> vehicleIdsSorted = new TreeSet(linkPaxVolumesAnalysis.getVehicleTypes());
 
