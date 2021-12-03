@@ -23,6 +23,7 @@ package org.matsim.contrib.evrp;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -76,5 +77,10 @@ public class EvDvrpVehicle implements DvrpVehicle {
 	@Override
 	public Schedule getSchedule() {
 		return vehicle.getSchedule();
+	}
+
+	@Override
+	public DvrpVehicleSpecification getSpecification() {
+		return vehicle.getSpecification();
 	}
 }
