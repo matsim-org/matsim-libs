@@ -27,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesAnalysis;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesWriter;
+import org.matsim.analysis.linkpaxvolumes.VehicleStatsPerVehicleType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -143,7 +144,11 @@ public class LinkPaxVolumesAnalysisTest {
         Id<Person> person14 = Id.createPersonId("person14");
 
         String networkModeCar = TransportMode.car;
-        String networkModePt = TransportMode.pt;
+        String networkModePt = TransportMode.train;
+        String legModeCar = TransportMode.car;
+        String legModePt = TransportMode.pt;
+        String routingMode = "does not matter";
+
 
 
         Network network = scenario.getNetwork();
@@ -203,31 +208,41 @@ public class LinkPaxVolumesAnalysisTest {
 
         events.initProcessing();
         //vehicle1
-        events.processEvent(new PersonDepartureEvent(1, person1, linkId1, networkModeCar, networkModeCar));
+        events.processEvent(new PersonDepartureEvent(1, person1, linkId1, legModeCar, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(1.0, person1, vehicle1.getId()));
         events.processEvent(new VehicleEntersTrafficEvent(1.0, person1, linkId1, vehicle1.getId(), networkModeCar, 1.0));
+        events.processEvent(new PersonDepartureEvent(2, person2, linkId1, legModeCar, routingMode));
+        events.processEvent(new PersonDepartureEvent(2, person3, linkId1, legModePt, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(2.0, person2, vehicle1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(2.0, person3, vehicle1.getId()));
         events.processEvent(new LinkLeaveEvent(4.0, vehicle1.getId(), linkId1));
         events.processEvent(new LinkEnterEvent(5.0, vehicle1.getId(), linkId2));
         events.processEvent(new PersonLeavesVehicleEvent(7.0, person2, vehicle1.getId()));
+        events.processEvent(new PersonArrivalEvent(7, person2, linkId2, legModeCar));
+        events.processEvent(new PersonDepartureEvent(7, person4, linkId1, legModeCar, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(7.0, person4, vehicle1.getId()));
         events.processEvent(new LinkLeaveEvent(9.0, vehicle1.getId(), linkId2));
         events.processEvent(new LinkEnterEvent(10.0, vehicle1.getId(), linkId3));
         events.processEvent(new PersonLeavesVehicleEvent(12.0, person3, vehicle1.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(12.0, person4, vehicle1.getId()));
+        events.processEvent(new PersonArrivalEvent(12.0, person3, linkId3, legModePt));
+        events.processEvent(new PersonArrivalEvent(12.0, person4, linkId3, legModeCar));
         events.processEvent(new VehicleLeavesTrafficEvent(14.0, person1, linkId3, vehicle1.getId(), networkModeCar, 1.0));
         events.processEvent(new PersonLeavesVehicleEvent(15.0, person1, vehicle1.getId()));
-        events.processEvent(new PersonArrivalEvent(15.0, person1, linkId3, networkModeCar));
+        events.processEvent(new PersonArrivalEvent(15.0, person1, linkId3, legModeCar));
         //vehicle 2
-        events.processEvent(new PersonDepartureEvent(1.0, person5, linkId3b, networkModeCar, networkModeCar));
+        events.processEvent(new PersonDepartureEvent(1.0, person5, linkId3b, legModeCar, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(1.0, person5, vehicle2.getId()));
         events.processEvent(new VehicleEntersTrafficEvent(1.0, person5, linkId3b, vehicle2.getId(), networkModeCar, 1.0));
+        events.processEvent(new PersonDepartureEvent(2.0, person6, linkId3b, legModeCar, routingMode));
+        events.processEvent(new PersonDepartureEvent(2.0, person7, linkId3b, legModeCar, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(2.0, person6, vehicle2.getId()));
         events.processEvent(new PersonEntersVehicleEvent(2.0, person7, vehicle2.getId()));
         events.processEvent(new LinkLeaveEvent(4.0, vehicle2.getId(), linkId3b));
         events.processEvent(new LinkEnterEvent(5.0, vehicle2.getId(), linkId2b));
         events.processEvent(new PersonLeavesVehicleEvent(7.0, person7, vehicle2.getId()));
+        events.processEvent(new PersonArrivalEvent(7.0, person7, linkId2b, legModeCar));
+        events.processEvent(new PersonDepartureEvent(7.0, person8, linkId2b, legModeCar, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(7.0, person8, vehicle2.getId()));
         events.processEvent(new LinkLeaveEvent(9.0, vehicle2.getId(), linkId2b));
         events.processEvent(new LinkEnterEvent(10.0, vehicle2.getId(), linkId5b));
@@ -241,13 +256,19 @@ public class LinkPaxVolumesAnalysisTest {
         events.processEvent(new LinkEnterEvent(22.0, vehicle2.getId(), linkId5b));
         events.processEvent(new PersonLeavesVehicleEvent(22.0, person6, vehicle2.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(22.0, person8, vehicle2.getId()));
+        events.processEvent(new PersonArrivalEvent(22.0, person6, linkId5b, legModeCar));
+        events.processEvent(new PersonArrivalEvent(22.0, person8, linkId5b, legModeCar));
         events.processEvent(new VehicleLeavesTrafficEvent(24.0, person5, linkId5b, vehicle2.getId(), networkModeCar, 1.0));
         events.processEvent(new PersonLeavesVehicleEvent(25.0, person5, vehicle2.getId()));
-        events.processEvent(new PersonArrivalEvent(25.0, person5, linkId5b, networkModeCar));
+        events.processEvent(new PersonArrivalEvent(25.0, person5, linkId5b, legModeCar));
         //transitVehicle
-        events.processEvent(new PersonDepartureEvent(3800.0, person9, linkId1, networkModePt, networkModePt));
+        events.processEvent(new PersonDepartureEvent(3800.0, person9, linkId1, legModeCar, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(3801.0, person9, transitVehicle1.getId()));
         events.processEvent(new VehicleEntersTrafficEvent(3801.0, person9, linkId1, transitVehicle1.getId(), networkModePt, 1.0));
+        events.processEvent(new PersonDepartureEvent(3802, person10, linkId1, legModeCar, routingMode));
+        events.processEvent(new PersonDepartureEvent(3802, person11, linkId1, legModeCar, routingMode));
+        events.processEvent(new PersonDepartureEvent(3802, person12, linkId1, legModePt, routingMode));
+        events.processEvent(new PersonDepartureEvent(3802, person13, linkId1, legModePt, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(3802.0, person10, transitVehicle1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(3802.0, person11, transitVehicle1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(3802.0, person12, transitVehicle1.getId()));
@@ -255,6 +276,8 @@ public class LinkPaxVolumesAnalysisTest {
         events.processEvent(new LinkLeaveEvent(3804.0, transitVehicle1.getId(), linkId1));
         events.processEvent(new LinkEnterEvent(3805.0, transitVehicle1.getId(), linkId2));
         events.processEvent(new PersonLeavesVehicleEvent(3807.0, person10, transitVehicle1.getId()));
+        events.processEvent(new PersonArrivalEvent(3807.0, person10, linkId2, legModeCar));
+        events.processEvent(new PersonDepartureEvent(3807, person14, linkId2, legModePt, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(3807.0, person14, transitVehicle1.getId()));
         events.processEvent(new LinkLeaveEvent(3809.0, transitVehicle1.getId(), linkId2));
         events.processEvent(new LinkEnterEvent(3810.0, transitVehicle1.getId(), linkId3));
@@ -264,6 +287,13 @@ public class LinkPaxVolumesAnalysisTest {
         events.processEvent(new PersonLeavesVehicleEvent(3815.0, person12, transitVehicle1.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(3815.0, person13, transitVehicle1.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(3815.0, person14, transitVehicle1.getId()));
+        events.processEvent(new PersonArrivalEvent(3815.0, person11, linkId4, legModeCar));
+        events.processEvent(new PersonArrivalEvent(3815.0, person12, linkId4, legModePt));
+        events.processEvent(new PersonArrivalEvent(3815.0, person13, linkId4, legModePt));
+        events.processEvent(new PersonArrivalEvent(3815.0, person14, linkId4, legModePt));
+        events.processEvent(new PersonDepartureEvent(3820, person1, linkId4, legModePt, routingMode));
+        events.processEvent(new PersonDepartureEvent(3820, person2, linkId4, legModePt, routingMode));
+        events.processEvent(new PersonDepartureEvent(3820, person3, linkId4, legModePt, routingMode));
         events.processEvent(new PersonEntersVehicleEvent(3820.0, person1, transitVehicle1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(3820.0, person2, transitVehicle1.getId()));
         events.processEvent(new PersonEntersVehicleEvent(3822.0, person3, transitVehicle1.getId()));
@@ -278,9 +308,12 @@ public class LinkPaxVolumesAnalysisTest {
         events.processEvent(new PersonLeavesVehicleEvent(3842.0, person1, transitVehicle1.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(3842.0, person2, transitVehicle1.getId()));
         events.processEvent(new PersonLeavesVehicleEvent(3844.0, person3, transitVehicle1.getId()));
+        events.processEvent(new PersonArrivalEvent(3844.0, person1, linkId1b, legModePt));
+        events.processEvent(new PersonArrivalEvent(3844.0, person2, linkId1b, legModePt));
+        events.processEvent(new PersonArrivalEvent(3844.0, person3, linkId1b, legModePt));
         events.processEvent(new VehicleLeavesTrafficEvent(3846.0, person1, linkId1b, transitVehicle1.getId(), networkModePt, 1.0));
         events.processEvent(new PersonLeavesVehicleEvent(3850.0, person1, transitVehicle1.getId()));
-        events.processEvent(new PersonArrivalEvent(3850.0, person1, linkId1b, networkModePt));
+        events.processEvent(new PersonArrivalEvent(3850.0, person1, linkId1b, legModeCar));
 
         events.finishProcessing();
 
@@ -317,23 +350,23 @@ public class LinkPaxVolumesAnalysisTest {
 
         try(FileReader modePerHourCsv = new FileReader(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerNetworkModePerHour.csv");
             CSVParser parser = CSVParser.parse(modePerHourCsv, format)){
-            List<CSVRecord> modePerHourRecordList = parser.getRecords();
+            List<CSVRecord> networkModePerHourRecordList = parser.getRecords();
 
-            List<CSVRecord> modePerHourRecordListLink2 = modePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, modePerHourRecordListLink2.size());
-            Assert.assertEquals("Wrong PassengerInclDriver on Link2",3, Double.parseDouble(modePerHourRecordListLink2.get(0).get(4)),MatsimTestUtils.EPSILON);
+            List<CSVRecord> networkModePerHourRecordListLink2 = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink2.size());
+            Assert.assertEquals("Wrong PassengerInclDriver on Link2",3, Double.parseDouble(networkModePerHourRecordListLink2.get(0).get("passengersInclDriver")),MatsimTestUtils.EPSILON);
 
-            List<CSVRecord> modePerHourRecordListLink2b = modePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2b") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, modePerHourRecordListLink2b.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link2b",2, Double.parseDouble(modePerHourRecordListLink2b.get(0).get(3)),MatsimTestUtils.EPSILON);
+            List<CSVRecord> networkModePerHourRecordListLink2b = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2b") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink2b.size());
+            Assert.assertEquals("Wrong amount of Vehicles on Link2b",2, Double.parseDouble(networkModePerHourRecordListLink2b.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
 
-            List<CSVRecord> modePerHourRecordListLink2Pt = modePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("networkMode")).equals("pt") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, modePerHourRecordListLink2Pt.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link2",5, Double.parseDouble(modePerHourRecordListLink2Pt.get(0).get(4)),MatsimTestUtils.EPSILON);
+            List<CSVRecord> networkModePerHourRecordListLink2Pt = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("networkMode")).equals("train") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink2Pt.size());
+            Assert.assertEquals("Wrong amount of passengersInclDriver on Link2",5, Double.parseDouble(networkModePerHourRecordListLink2Pt.get(0).get("passengersInclDriver")),MatsimTestUtils.EPSILON);
 
-            List<CSVRecord> modePerHourRecordListLink4b = modePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link4b") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("10")).collect(Collectors.toList());
-            Assert.assertEquals("Either no record or more than one record",1, modePerHourRecordListLink4b.size());
-            Assert.assertEquals("Wrong amount of Vehicles on Link4b",0, Double.parseDouble(modePerHourRecordListLink4b.get(0).get(3)),MatsimTestUtils.EPSILON);
+            List<CSVRecord> networkModePerHourRecordListLink4b = networkModePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link4b") && record.get(parser.getHeaderMap().get("networkMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("10")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, networkModePerHourRecordListLink4b.size());
+            Assert.assertEquals("Wrong amount of Vehicles on Link4b",0, Double.parseDouble(networkModePerHourRecordListLink4b.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -356,6 +389,52 @@ public class LinkPaxVolumesAnalysisTest {
             List<CSVRecord> vehicleTypePerHourRecordListLink2b = vehicleTypePerHourRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2b") && record.get(parser.getHeaderMap().get("vehicleType")).equals("transitVehicleType") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
             Assert.assertEquals("Either no record or more than one record",1, vehicleTypePerHourRecordListLink2b.size());
             Assert.assertEquals("Wrong amount of Vehicles on Link2b",1, Double.parseDouble(vehicleTypePerHourRecordListLink2b.get(0).get(3)),MatsimTestUtils.EPSILON);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        LinkPaxVolumesWriter LinkVehicleAndPaxVolumesPerPassengerModePerHourCsv = new LinkPaxVolumesWriter(linkPaxVolumes, network, ";");
+        LinkVehicleAndPaxVolumesPerPassengerModePerHourCsv.writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerPassengerModePerHour.csv");
+
+        try(FileReader perPassengerModeCsv = new FileReader(utils.getOutputDirectory() + "/LinkVehicleAndPaxVolumesPerPassengerModePerHour.csv");
+            CSVParser parser = CSVParser.parse(perPassengerModeCsv, format)){
+            List<CSVRecord> perPassengerModeRecordList = parser.getRecords();
+
+            List<CSVRecord> perPassengerModeRecordListLink4b = perPassengerModeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link4b") && record.get(parser.getHeaderMap().get("passengerMode")).equals("pt") && record.get(parser.getHeaderMap().get("hour")).equals("1")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, perPassengerModeRecordListLink4b.size());
+            Assert.assertEquals("Wrong amount of Vehicles on Link4b",1, Double.parseDouble(perPassengerModeRecordListLink4b.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
+            Assert.assertEquals("Wrong amount of passengersPossiblyInclDriver on Link4b",3, Double.parseDouble(perPassengerModeRecordListLink4b.get(0).get("passengersPossiblyInclDriver")),MatsimTestUtils.EPSILON);
+
+            List<CSVRecord> perPassengerModeRecordListLink2 = perPassengerModeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("link")).equals("link2") && record.get(parser.getHeaderMap().get("passengerMode")).equals("car") && record.get(parser.getHeaderMap().get("hour")).equals("0")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, perPassengerModeRecordListLink2.size());
+            Assert.assertEquals("Wrong amount of Vehicles on Link2b",1, Double.parseDouble(perPassengerModeRecordListLink2.get(0).get("vehicles")),MatsimTestUtils.EPSILON);
+            Assert.assertEquals("Wrong amount of passengersPossiblyInclDriver on Link4b",2, Double.parseDouble(perPassengerModeRecordListLink2.get(0).get("passengersPossiblyInclDriver")),MatsimTestUtils.EPSILON);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        VehicleStatsPerVehicleType OperatingStatsPerVehicleTypeCsv = new VehicleStatsPerVehicleType(linkPaxVolumes, network, ";");
+        OperatingStatsPerVehicleTypeCsv.writeOperatingStatsPerVehicleType(utils.getOutputDirectory() + "/OperatingStatsPerVehicleType.csv");
+
+        try(FileReader statsPerVehicleTypeCsv = new FileReader(utils.getOutputDirectory() + "/OperatingStatsPerVehicleType.csv");
+            CSVParser parser = CSVParser.parse(statsPerVehicleTypeCsv, format)){
+            List<CSVRecord> statsPerVehicleTypeRecordList = parser.getRecords();
+
+            List<CSVRecord> statsPerVehicleTypeRecordListVehiclesType1 = statsPerVehicleTypeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("vehicleType")).equals("vehiclesType1")).collect(Collectors.toList());
+            Assert.assertEquals("Either no record or more than one record",1, statsPerVehicleTypeRecordListVehiclesType1.size());
+            Assert.assertEquals("Wrong sum of passengerKm",0.6, Double.parseDouble(statsPerVehicleTypeRecordListVehiclesType1.get(0).get("passengerKm")),MatsimTestUtils.EPSILON);
+            Assert.assertEquals("Wrong sum of vehicleKm",0.2, Double.parseDouble(statsPerVehicleTypeRecordListVehiclesType1.get(0).get("vehicleKm")),MatsimTestUtils.EPSILON);
+
+            List<CSVRecord> statsPerVehicleTypeRecordListTransitVehicleType = statsPerVehicleTypeRecordList.stream().filter(record -> record.get(parser.getHeaderMap().get("vehicleType")).equals("transitVehicleType")).collect(Collectors.toList());
+            Assert.assertEquals("Wrong sum of passengerKm",3.1, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("passengerKm")),MatsimTestUtils.EPSILON);
+            Assert.assertEquals("Wrong sum of vehicleKm",0.7, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("vehicleKm")),MatsimTestUtils.EPSILON);
+            Assert.assertEquals("Wrong vehicleHoursOnNetwork",0.0125, Double.parseDouble(statsPerVehicleTypeRecordListTransitVehicleType.get(0).get("vehicleHoursOnNetwork")),MatsimTestUtils.EPSILON);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
