@@ -65,7 +65,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 				return fleetSpecification;
 			}).asEagerSingleton();
 		} else if (getConfig().qsim().getVehiclesSource() == QSimConfigGroup.VehiclesSource.fromVehiclesData) {
-			bind(FleetSpecification.class).toProvider(new Provider<>() {
+			bindModal(FleetSpecification.class).toProvider(new Provider<>() {
 				@Inject
 				private Vehicles vehicles;
 
