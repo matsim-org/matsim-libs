@@ -33,13 +33,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
@@ -261,25 +262,27 @@ public class DrtSpeedUpTest {
 	}
 
 	//mock request analyser instead of running simulations
-	private void updateRequestAnalyser(PerformedRequestEventSequence... eventSequences) {
+	private void updateRequestAnalyser(EventSequence... eventSequences) {
 		var sequences = Arrays.stream(eventSequences)
 				.collect(ImmutableMap.toImmutableMap(seq -> seq.getSubmitted().getRequestId(), seq -> seq));
 		when(requestAnalyzer.getPerformedRequestSequences()).thenReturn(sequences);
 	}
 
-	private PerformedRequestEventSequence eventSequence(String id, double submittedTime, double waitTime,
+	private EventSequence eventSequence(String id, double submittedTime, double waitTime,
 			double inVehicleSpeed) {
 		var requestId = Id.create(id, Request.class);
 		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, null, linkAB.getId(),
-				linkBC.getId(), Double.NaN, Double.NaN);
+				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 		var pickupEvent = new PassengerPickedUpEvent(submittedTime + waitTime, MODE, requestId, null, null);
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
 		var dropoffEvent = new PassengerDroppedOffEvent(submittedTime + waitTime + rideTime, MODE, requestId, null,
 				null);
 		var drtFare = new PersonMoneyEvent(submittedTime, null, 5.5, DrtFareHandler.PERSON_MONEY_EVENT_PURPOSE_DRT_FARE,
 				MODE, requestId.toString());
-		return new PerformedRequestEventSequence(submittedEvent, mock(PassengerRequestScheduledEvent.class),
-				pickupEvent, dropoffEvent, List.of(drtFare));
+		var departedEvent = mock(PersonDepartureEvent.class);
+				
+		return new EventSequence(departedEvent, submittedEvent,
+				mock(PassengerRequestScheduledEvent.class), pickupEvent, dropoffEvent, List.of(drtFare));
 	}
 
 	DvrpVehicleSpecification vehicleSpecification(String id) {

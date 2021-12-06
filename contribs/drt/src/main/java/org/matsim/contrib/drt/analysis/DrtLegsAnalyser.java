@@ -491,4 +491,35 @@ public class DrtLegsAnalyser {
 		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
 		return count * 100 / waitingTimes.length;
 	}
+	
+	public static void analyseConstraints(String fileName, List<DrtLeg> legs, boolean createGraphs) {
+		if (legs == null)
+			return;
+
+		if (!createGraphs)
+			return;
+
+		XYSeries waitingTimes = new XYSeries("max_wait_times");
+		XYSeries travelTimes = new XYSeries("max_travel_times");
+
+		for (DrtLeg leg : legs) {
+			double waitingTime = leg.waitTime;
+			double maximumWaitingTime = leg.latestDepartureTime - leg.departureTime;
+			waitingTimes.add(maximumWaitingTime, waitingTime);
+
+			if (leg.toLink != null) {
+				double travelTime = leg.arrivalTime - leg.departureTime;
+				double maximumTravelTime = leg.latestArrivalTime - leg.departureTime;
+				travelTimes.add(maximumTravelTime, travelTime);
+			}
+		}
+
+		final JFreeChart chart = DensityScatterPlots.createPlot("Maximum wait time", "Maximum wait time [s]",
+				"Actual wait time [s]", waitingTimes);
+		ChartSaveUtils.saveAsPNG(chart, fileName + "_waiting_time", 1500, 1500);
+
+		final JFreeChart chart2 = DensityScatterPlots.createPlot("Maximum travel time", "Maximum travel time [s]",
+				"Actual travel time [s]", travelTimes);
+		ChartSaveUtils.saveAsPNG(chart2, fileName + "_travel_time", 1500, 1500);
+	}
 }
