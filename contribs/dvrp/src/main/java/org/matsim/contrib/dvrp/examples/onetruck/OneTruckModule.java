@@ -30,11 +30,14 @@ import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
@@ -52,6 +55,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		install(new DvrpModeRoutingNetworkModule(getMode(), false));
+		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(createTruckType());

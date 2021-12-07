@@ -22,13 +22,16 @@ package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
 
-import org.matsim.analysis.personMoney.PersonMoneyEventsAnalysisModule;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTimeModule;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -38,8 +41,25 @@ public class RunMultiModeDrtExample {
 	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
+
 		Controler controler = DrtControlerCreator.createControler(config, otfvis);
-		controler.addOverridingModule(new PersonMoneyEventsAnalysisModule());
+
+		// max allowed speed for AV
+		double maxSpeed = controler.getScenario()
+				.getVehicles()
+				.getVehicleTypes()
+				.get(Id.create("autonomous_vehicle", VehicleType.class))
+				.getMaximumVelocity();
+
+		controler.addOverridingModule(
+				new DvrpModeLimitedMaxSpeedTravelTimeModule("drt_autonomous", config.qsim().getTimeStepSize(),
+						maxSpeed));
+
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
+
 		controler.run();
 	}
 }

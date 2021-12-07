@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -45,7 +44,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.util.concurrent.Futures;
-import com.google.inject.name.Named;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -56,8 +54,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final Population population;
 	private final ExecutorServiceWithResource<DrtRouteCreator> executorService;
 
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
 		this.drtCfg = drtCfg;
 		this.network = network;
@@ -73,17 +70,18 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		List<Future<?>> futures = new LinkedList<>();
-		
+
 		for (Person person : population.getPersons().values()) {
 			for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				for (Leg leg : trip.getLegsOnly()) {
 					if (leg.getMode().equals(drtCfg.getMode())) {
-						futures.add(executorService.submitRunnable(router -> updateDrtRoute(router, person, trip.getTripAttributes(), leg)));
+						futures.add(executorService.submitRunnable(
+								router -> updateDrtRoute(router, person, trip.getTripAttributes(), leg)));
 					}
 				}
 			}
 		}
-		
+
 		futures.forEach(Futures::getUnchecked);
 	}
 
@@ -91,9 +89,8 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
 		RouteFactories routeFactories = population.getFactory().getRouteFactories();
-		drtLeg.setRoute(
-				drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, 
-						person, tripAttributes, routeFactories));
+		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, person,
+				tripAttributes, routeFactories));
 	}
 
 	@Override

@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,40 +18,19 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.zone.skims;
+package org.matsim.contrib.drt.run.examples;
 
-import javax.inject.Provider;
+import java.net.URL;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-/**
- * @author Michal Maciejewski (michalm)
- */
-public class DvrpGlobalTravelTimesMatrixProvider implements Provider<DvrpTravelTimeMatrix> {
-	private final DvrpTravelTimeMatrixParams params;
-	private final int numberOfThreads;
-
-	@Inject
-	@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
-	private Network network;
-
-	@Inject
-	private QSimConfigGroup qSimConfigGroup;
-
-	public DvrpGlobalTravelTimesMatrixProvider(GlobalConfigGroup globalConfig, DvrpTravelTimeMatrixParams params) {
-		this.params = params;
-		this.numberOfThreads = globalConfig.getNumberOfThreads();
-	}
-
-	@Override
-	public DvrpTravelTimeMatrix get() {
-		return DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
-				qSimConfigGroup.getTimeStepSize());
+public class RunMultiModeDrtExampleIT {
+	@Test
+	public void testRun() {
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+				"multi_mode_one_shared_taxi_config.xml");
+		RunMultiModeDrtExample.run(configUrl, false, 0);
 	}
 }

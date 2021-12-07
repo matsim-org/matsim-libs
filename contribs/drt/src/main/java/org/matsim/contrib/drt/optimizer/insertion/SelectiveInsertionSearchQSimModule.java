@@ -70,12 +70,9 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 		addModalComponent(SingleInsertionDetourPathCalculator.class,
 				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-
 					@Override
 					public SingleInsertionDetourPathCalculator get() {
+						var travelTime = getModalInstance(TravelTime.class);
 						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);

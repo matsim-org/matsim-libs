@@ -31,15 +31,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.inject.Named;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
@@ -68,11 +65,9 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	private final ExecutorService executorService;
 
-	public SingleInsertionDetourPathCalculator(Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			DrtConfigGroup drtCfg) {
-		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(),
-				new SpeedyALTFactory());
+	public SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
+		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(), new SpeedyALTFactory());
 	}
 
 	@VisibleForTesting

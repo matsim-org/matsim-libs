@@ -2,7 +2,10 @@ package org.matsim.contrib.drt.extension.shifts.run;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.Key;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
+
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -66,6 +69,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
     public void install() {
         DvrpModes.registerDvrpMode(binder(), getMode());
         install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
+		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
         bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new ShiftsModule(getMode(), drtCfg, shiftCfg));
@@ -125,10 +129,6 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
         bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
             @Inject
-            @Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-            private TravelTime travelTime;
-
-            @Inject
             private Population population;
 
             @Inject
@@ -136,6 +136,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
             @Override
             public DefaultDrtRouteUpdater get() {
+				var travelTime = getModalInstance(TravelTime.class);
                 Network network = getModalInstance(Network.class);
                 return new DefaultDrtRouteUpdater(drtCfg, network, travelTime,
                         getModalInstance(TravelDisutilityFactory.class), population, config);
@@ -158,10 +159,6 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
     }
 
     private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {
-        @Inject
-        @Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-        private TravelTime travelTime;
-
         private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
         private final DrtConfigGroup drtCfg;
@@ -174,6 +171,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
         @Override
         public DrtRouteCreator get() {
+			var travelTime = getModalInstance(TravelTime.class);
             return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
                     travelTime, getModalInstance(TravelDisutilityFactory.class));
         }

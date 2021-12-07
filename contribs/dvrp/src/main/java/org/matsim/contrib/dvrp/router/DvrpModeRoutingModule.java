@@ -26,14 +26,12 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.modal.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -64,10 +62,6 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 
 	public static class DefaultMainLegRouterProvider extends ModalProviders.AbstractProvider<DvrpMode, RoutingModule> {
 		@Inject
-		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-		private TravelTime travelTime;
-
-		@Inject
 		private Scenario scenario;
 
 		public DefaultMainLegRouterProvider(String mode) {
@@ -83,10 +77,6 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 
 	private static class GenericRouteCreatorProvider
 			extends ModalProviders.AbstractProvider<DvrpMode, GenericRouteCreator> {
-		@Inject
-		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-		private TravelTime travelTime;
-
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 		private GenericRouteCreatorProvider(String mode,
@@ -97,6 +87,7 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 
 		@Override
 		public GenericRouteCreator get() {
+			var travelTime = getModalInstance(TravelTime.class);
 			return new GenericRouteCreator(leastCostPathCalculatorFactory, getModalInstance(Network.class), travelTime,
 					getModalInstance(TravelDisutilityFactory.class));
 		}

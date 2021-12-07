@@ -1,6 +1,14 @@
 package org.matsim.contrib.drt.extension.shifts.optimizer;
 
-import com.google.inject.name.Named;
+import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
@@ -28,20 +36,10 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 /**
  * @author nkuehnel / MOIA
@@ -57,18 +55,18 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
     private final OperationFacilities shiftBreakNetwork;
 
 
-    public ShiftRequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
-                                          @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-                                          ScheduleTimingUpdater scheduleTimingUpdater, ShiftDrtTaskFactory taskFactory, OperationFacilities shiftBreakNetwork) {
-        this.fleet = fleet;
-        this.stopDuration = drtCfg.getStopDuration();
-        this.timer = timer;
-        this.travelTime = travelTime;
-        this.scheduleTimingUpdater = scheduleTimingUpdater;
-        this.taskFactory = taskFactory;
-        this.shiftBreakNetwork = shiftBreakNetwork;
-        initSchedules();
-    }
+    public ShiftRequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer, TravelTime travelTime,
+			ScheduleTimingUpdater scheduleTimingUpdater, ShiftDrtTaskFactory taskFactory,
+			OperationFacilities shiftBreakNetwork) {
+		this.fleet = fleet;
+		this.stopDuration = drtCfg.getStopDuration();
+		this.timer = timer;
+		this.travelTime = travelTime;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
+		this.taskFactory = taskFactory;
+		this.shiftBreakNetwork = shiftBreakNetwork;
+		initSchedules();
+	}
 
     public void initSchedules() {
         final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = shiftBreakNetwork.getDrtOperationFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
