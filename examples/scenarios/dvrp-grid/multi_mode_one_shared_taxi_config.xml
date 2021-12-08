@@ -57,7 +57,6 @@
 		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
 		<param name="snapshotStyle" value="queue"/>
-		<param name="vehiclesSource" value="fromVehiclesData"/>
 	</module>
 
 	<module name="otfvis">
