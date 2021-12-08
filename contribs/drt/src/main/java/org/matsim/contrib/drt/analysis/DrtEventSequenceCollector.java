@@ -179,14 +179,14 @@ public class DrtEventSequenceCollector
 			EventSequence sequence = new EventSequence(event);
 			sequences.put(event.getRequestId(), sequence);
 			
-			Optional<PersonDepartureEvent> departureEvent = popDepartureForSubmission(event);
+			PersonDepartureEvent departureEvent = popDepartureForSubmission(event);
 			
-			if (departureEvent.isEmpty()) {
+			if (departureEvent == null) {
 				// We have a submitted request, but no departure event yet (i.e. a prebooking). We start the
 				// sequence and note down the person id to fill in the departure event later on.
 				sequencesWithoutDeparture.computeIfAbsent(event.getPersonId(), id -> new LinkedList<>()).add(sequence);
 			} else {
-				sequence.departure = departureEvent.get();
+				sequence.departure = departureEvent;
 			}
 		}
 	}
@@ -194,15 +194,15 @@ public class DrtEventSequenceCollector
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(mode)) {
-			Optional<EventSequence> sequence = popSequenceForDeparture(event);
+			EventSequence sequence = popSequenceForDeparture(event);
 			
-			if (sequence.isEmpty()) {
+			if (sequence == null) {
 				// We have a departure event, but no submission yet (i.e. and instant booking).
 				// We note down the departure event here to recover it later when the submission
 				// is down (usually right after).
 				departuresWithoutSequence.computeIfAbsent(event.getPersonId(), id -> new LinkedList<>()).add(event);
 			} else {
-				sequence.get().departure = event;
+				sequence.departure = event;
 			}
 		}
 	}
@@ -260,11 +260,9 @@ public class DrtEventSequenceCollector
 	 * DrtRequestSubmittedEvent. This means that the departure has happened before
 	 * submission, which is the usually case for instant requests.
 	 */
-	private Optional<PersonDepartureEvent> popDepartureForSubmission(DrtRequestSubmittedEvent event) {
+	private PersonDepartureEvent popDepartureForSubmission(DrtRequestSubmittedEvent event) {
 		List<PersonDepartureEvent> potentialDepartures = departuresWithoutSequence.get(event.getPersonId());
-		Optional<PersonDepartureEvent> result = Optional.empty();
-
-		boolean foundDeparture = false;
+		PersonDepartureEvent result = null;
 
 		if (potentialDepartures != null) {
 			Iterator<PersonDepartureEvent> iterator = potentialDepartures.iterator();
@@ -273,14 +271,13 @@ public class DrtEventSequenceCollector
 				PersonDepartureEvent departedEvent = iterator.next();
 
 				if (event.getFromLinkId().equals(departedEvent.getLinkId())) {
-					if (foundDeparture) {
+					if (result != null) {
 						throw new IllegalStateException(
 								"Ambiguous matching between submission and departure - not sure how to solve this");
 					}
 
 					iterator.remove();
-					result = Optional.of(departedEvent);
-					foundDeparture = true;
+					result = departedEvent;
 				}
 			}
 
@@ -297,11 +294,9 @@ public class DrtEventSequenceCollector
 	 * This means that a sequence has started (the request has been submitted)
 	 * before the agent has departed, i.e. this is a pre-booking of some sort.
 	 */
-	private Optional<EventSequence> popSequenceForDeparture(PersonDepartureEvent event) {
-		Optional<EventSequence> result = Optional.empty();
-
+	private EventSequence popSequenceForDeparture(PersonDepartureEvent event) {
+		EventSequence result = null;
 		List<EventSequence> potentialSequences = sequencesWithoutDeparture.get(event.getPersonId());
-		boolean foundSequence = false;
 
 		if (potentialSequences != null) {
 			Iterator<EventSequence> iterator = potentialSequences.iterator();
@@ -310,14 +305,13 @@ public class DrtEventSequenceCollector
 				EventSequence sequence = iterator.next();
 
 				if (sequence.submitted.getFromLinkId().equals(event.getLinkId())) {
-					if (foundSequence) {
+					if (result != null) {
 						throw new IllegalStateException(
 								"Ambiguous matching between submission and departure - not sure how to solve this");
 					}
 
 					iterator.remove();
-					result = Optional.of(sequence);
-					foundSequence = true;
+					result = sequence;
 				}
 			}
 
