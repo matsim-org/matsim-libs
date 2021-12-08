@@ -138,15 +138,6 @@ public class VrpPaths {
 	public static final double FIRST_LINK_TT = 2;
 	public static final double NODE_TRANSITION_TIME = 1;
 
-	/**
-	 * It would make sense to replace these calls with TravelTime.getTravelTime(...) whereever it is used /sh nov 21
-	 */
-	@Deprecated
-	public static double getLastLinkTT(Link lastLink, double time) {
-		// XXX imprecise if qsimCfg.timeStepSize != 1
-		return Math.floor(lastLink.getLength() / lastLink.getFreespeed(time)) - NODE_TRANSITION_TIME;
-	}
-
 	public static double getLastLinkTT(TravelTime travelTime, Link lastLink, double time) {
 		return travelTime.getLinkTravelTime(lastLink, time, null, null) - NODE_TRANSITION_TIME;
 	}
