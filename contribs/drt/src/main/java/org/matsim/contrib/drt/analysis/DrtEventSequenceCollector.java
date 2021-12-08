@@ -76,7 +76,7 @@ public class DrtEventSequenceCollector
 		private PassengerRequestRejectedEvent rejected;
 		
 		@Nullable
-		private PersonDepartureEvent departed;
+		private PersonDepartureEvent departure;
 		@Nullable
 		private PassengerPickedUpEvent pickedUp;
 		@Nullable
@@ -93,7 +93,7 @@ public class DrtEventSequenceCollector
 				PassengerDroppedOffEvent droppedOff, List<PersonMoneyEvent> drtFares) {
 			this.submitted = Objects.requireNonNull(submitted);
 			this.scheduled = Objects.requireNonNull(scheduled);
-			this.departed = departed;
+			this.departure = departed;
 			this.pickedUp = pickedUp;
 			this.droppedOff = droppedOff;
 			this.drtFares = new ArrayList<>(drtFares);
@@ -112,7 +112,7 @@ public class DrtEventSequenceCollector
 		}
 		
 		public Optional<PersonDepartureEvent> getDeparted() {
-			return Optional.ofNullable(departed);
+			return Optional.ofNullable(departure);
 		}
 
 		public Optional<PassengerPickedUpEvent> getPickedUp() {
@@ -186,7 +186,7 @@ public class DrtEventSequenceCollector
 				// sequence and note down the person id to fill in the departure event later on.
 				sequencesWithoutDeparture.computeIfAbsent(event.getPersonId(), id -> new LinkedList<>()).add(sequence);
 			} else {
-				sequence.departed = departureEvent.get();
+				sequence.departure = departureEvent.get();
 			}
 		}
 	}
@@ -202,7 +202,7 @@ public class DrtEventSequenceCollector
 				// is down (usually right after).
 				departuresWithoutSequence.computeIfAbsent(event.getPersonId(), id -> new LinkedList<>()).add(event);
 			} else {
-				sequence.get().departed = event;
+				sequence.get().departure = event;
 			}
 		}
 	}
