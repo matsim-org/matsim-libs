@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.common.collect.ImmutableList;
-
-import org.matsim.core.router.speedy.SpeedyGraph;
-import org.matsim.core.router.speedy.LeastCostPathTree;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -64,8 +64,9 @@ public class OneToManyPathCalculatorTest {
 
 	private final IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 
-	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(new SpeedyGraph(network), new FreeSpeedTravelTime(),
-			new TimeAsTravelDisutility(new FreeSpeedTravelTime()));
+	private final TravelTime travelTime = new FreeSpeedTravelTime();
+	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(new SpeedyGraph(network), travelTime,
+			new TimeAsTravelDisutility(travelTime));
 
 	@Before
 	public void init() {
@@ -77,7 +78,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void forward_fromNodeB_toNodeB() {
 		//forward search starting from nodeB at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, true, linkAB, 0);
 
 		//search until node B is reached
 		pathCalculator.calculateDijkstraTree(List.of(linkBC));
@@ -95,7 +96,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void forward_fromNodeB_toNodesBD() {
 		//forward search starting from nodeB at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, true, linkAB, 0);
 
 		//search until nodes B and D are reached
 		pathCalculator.calculateDijkstraTree(List.of(linkBC, linkDE));
@@ -110,7 +111,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void forward_fromNodeB_toNodesBD_maxTravelTime() {
 		//forward search starting from nodeB at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, true, linkAB, 0);
 
 		//search until nodes B and D are reached with max travel time of 5
 		pathCalculator.calculateDijkstraTree(List.of(linkBC, linkDE), 5);
@@ -125,7 +126,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void backward_fromNodeD_toNodeD() {
 		//backward search starting from nodeD at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, false, linkDE, 0);
 
 		//search until node D is reached
 		pathCalculator.calculateDijkstraTree(List.of(linkCD));
@@ -143,7 +144,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void backward_fromNodeD_toNodesBD() {
 		//backward search starting from nodeD at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, false, linkDE, 0);
 
 		//search until nodes B and D are reached
 		pathCalculator.calculateDijkstraTree(List.of(linkAB, linkCD));
@@ -158,7 +159,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void backward_fromNodeD_toNodesBD_maxTravelTime() {
 		//backward search starting from nodeD at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, false, linkDE, 0);
 
 		//search until nodes B and D are reached with max travel time of 5
 		pathCalculator.calculateDijkstraTree(List.of(linkAB, linkCD), 5);
@@ -175,7 +176,7 @@ public class OneToManyPathCalculatorTest {
 		LeastCostPathTree mockedTree = mock(LeastCostPathTree.class);
 
 		for (boolean forward : List.of(true, false)) {
-			var pathCalculator = new OneToManyPathCalculator(nodeMap, mockedTree, forward, linkAB, 0);
+			var pathCalculator = new OneToManyPathCalculator(nodeMap, mockedTree, travelTime, forward, linkAB, 0);
 
 			//toLink == fromLink, so no search is done
 			pathCalculator.calculateDijkstraTree(List.of(linkAB));
@@ -187,7 +188,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void pathData_forward() {
 		//forward search starting from linkAB at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, true, linkAB, 0);
 
 		pathCalculator.calculateDijkstraTree(List.of(linkDE));
 
@@ -199,7 +200,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void pathData_backward() {
 		//backward search starting from linkDE at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, false, linkDE, 0);
 
 		pathCalculator.calculateDijkstraTree(List.of(linkAB));
 
@@ -211,7 +212,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void pathData_fromLinkEqualsToLink() {
 		for (boolean forward : List.of(true, false)) {
-			var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, linkAB, 0);
+			var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, forward, linkAB, 0);
 			pathCalculator.calculateDijkstraTree(List.of(linkAB));
 			assertThat(pathCalculator.createPathDataLazily(linkAB)).isEqualTo(PathData.EMPTY);
 		}
@@ -220,7 +221,7 @@ public class OneToManyPathCalculatorTest {
 	@Test
 	public void pathData_nodeNotReached() {
 		for (boolean forward : List.of(true, false)) {
-			var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, linkAB, 0);
+			var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, forward, linkAB, 0);
 			pathCalculator.calculateDijkstraTree(List.of(linkBC));
 			assertThat(pathCalculator.createPathDataLazily(linkDE)).isEqualTo(PathData.INFEASIBLE);
 		}
@@ -238,9 +239,5 @@ public class OneToManyPathCalculatorTest {
 	private Link createAndAddLink(String id, Node fromNode, Node toNode, double length, double freespeed) {
 		return NetworkUtils.createAndAddLink(network, Id.createLinkId(id), fromNode, toNode, length, freespeed,
 				length / 7.5, 1);
-	}
-
-	private double travelTime(Link link) {
-		return link.getLength() / link.getFreespeed();
 	}
 }
