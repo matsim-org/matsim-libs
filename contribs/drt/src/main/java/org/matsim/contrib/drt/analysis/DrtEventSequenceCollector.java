@@ -85,14 +85,14 @@ public class DrtEventSequenceCollector
 		private List<PersonMoneyEvent> drtFares = new LinkedList<>();
 
 		EventSequence(DrtRequestSubmittedEvent submitted) {
-			this.submitted = submitted;
+			this.submitted = Objects.requireNonNull(submitted);
 		}
 		
 		public EventSequence(PersonDepartureEvent departed, DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
 				PassengerDroppedOffEvent droppedOff, List<PersonMoneyEvent> drtFares) {
 			this.submitted = Objects.requireNonNull(submitted);
-			this.scheduled = Objects.requireNonNull(scheduled);
+			this.scheduled = scheduled;
 			this.departure = departed;
 			this.pickedUp = pickedUp;
 			this.droppedOff = droppedOff;
@@ -103,12 +103,12 @@ public class DrtEventSequenceCollector
 			return submitted;
 		}
 
-		public PassengerRequestScheduledEvent getScheduled() {
-			return scheduled;
+		public Optional<PassengerRequestScheduledEvent> getScheduled() {
+			return Optional.ofNullable(scheduled);
 		}
 		
-		public PassengerRequestRejectedEvent getRejected() {
-			return rejected;
+		public Optional<PassengerRequestRejectedEvent> getRejected() {
+			return Optional.ofNullable(rejected);
 		}
 		
 		public Optional<PersonDepartureEvent> getDeparted() {
@@ -151,13 +151,13 @@ public class DrtEventSequenceCollector
 
 	public Map<Id<Request>, EventSequence> getRejectedRequestSequences() {
 		return sequences.entrySet().stream() //
-				.filter(e -> e.getValue().getRejected() != null) //
+				.filter(e -> e.getValue().getRejected().isPresent()) //
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 
 	public Map<Id<Request>, EventSequence> getPerformedRequestSequences() {
 		return sequences.entrySet().stream() //
-				.filter(e -> e.getValue().getRejected() == null) //
+				.filter(e -> e.getValue().getRejected().isEmpty()) //
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 

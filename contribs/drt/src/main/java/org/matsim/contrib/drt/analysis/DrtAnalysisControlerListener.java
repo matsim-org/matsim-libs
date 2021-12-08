@@ -279,7 +279,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			for (EventSequence seq : performedRequestEventSequences) {
 				if (seq.getPickedUp().isPresent()) {
 					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-					double estimatedWaitTime = seq.getScheduled().getPickupTime() - seq.getSubmitted().getTime();
+					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getTime();
 					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime,
 							actualWaitTime - estimatedWaitTime));
 					times.add(actualWaitTime, estimatedWaitTime);
