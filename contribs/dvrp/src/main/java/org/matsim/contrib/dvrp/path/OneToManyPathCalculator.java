@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -48,14 +49,16 @@ import org.matsim.core.utils.misc.OptionalTime;
 class OneToManyPathCalculator {
 	private final IdMap<Node, Node> nodeMap;
 	private final LeastCostPathTree dijkstraTree;
+	private final TravelTime travelTime;
 	private final boolean forwardSearch;
 	private final Link fromLink;
 	private final double startTime;
 
-	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, boolean forwardSearch,
-			Link fromLink, double startTime) {
+	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
+			boolean forwardSearch, Link fromLink, double startTime) {
 		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
+		this.travelTime = travelTime;
 		this.forwardSearch = forwardSearch;
 		this.fromLink = fromLink;
 		this.startTime = startTime;
@@ -175,8 +178,8 @@ class OneToManyPathCalculator {
 
 	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, double pathTravelTime, double time) {
 		double lastLinkTT = forwardSearch ?
-				VrpPaths.getLastLinkTT(toLink, time + pathTravelTime) :
-				VrpPaths.getLastLinkTT(fromLink, time);
+				VrpPaths.getLastLinkTT(travelTime, toLink, time + pathTravelTime) :
+				VrpPaths.getLastLinkTT(travelTime, fromLink, time);
 		return FIRST_LINK_TT + lastLinkTT;
 	}
 }
