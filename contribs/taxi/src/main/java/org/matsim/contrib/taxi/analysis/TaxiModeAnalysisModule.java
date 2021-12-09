@@ -23,21 +23,23 @@
  */
 package org.matsim.contrib.taxi.analysis;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
-import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
-import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
-import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.util.stats.TaxiVehicleOccupancyProfiles;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
+import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 
-import com.google.common.collect.ImmutableSet;
+import java.awt.*;
+import java.util.Comparator;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -75,6 +77,20 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 			addControlerListenerBinding().toProvider(modalProvider(
 					getter -> TaxiVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
 							getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
+
+
+			bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
+					getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
+							300, getter.get(QSimConfigGroup.class)))).asEagerSingleton();
+			addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
+			addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
+
+			addControlerListenerBinding().toProvider(modalProvider(
+					getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class),
+							getMode(), getter.getModal(VehicleTaskProfileCalculator.class),
+							Comparator.comparing(Task.TaskType::name), ImmutableMap.of(TaxiStayTask.TYPE,
+							Color.LIGHT_GRAY))));
+
 		}
 	}
 }
