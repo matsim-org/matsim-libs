@@ -27,16 +27,13 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -55,7 +52,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		}).toProvider(modalProvider(getter -> {
 			var insertionCostCalculatorFactory = getter.getModal(InsertionCostCalculatorFactory.class);
 			var provider = SelectiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
-					getter.getModal(DvrpTravelTimeMatrix.class),
+					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
 			// Use 0 as the cost for the selected insertion:
 			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
