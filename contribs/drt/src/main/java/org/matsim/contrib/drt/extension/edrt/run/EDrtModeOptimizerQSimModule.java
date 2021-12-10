@@ -57,6 +57,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.StayTaskEndTimeCalculator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
@@ -170,10 +171,14 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
-
+		
+		bindModal(StayTaskEndTimeCalculator.class).toProvider(modalProvider(getter -> {
+			return new EDrtStayTaskEndTimeCalculator(drtCfg);
+		})).asEagerSingleton();
+		
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new EDrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
+						getter.getModal(StayTaskEndTimeCalculator.class)))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
 				getter -> new EDrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),

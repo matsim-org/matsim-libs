@@ -1,6 +1,5 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
@@ -20,16 +19,10 @@ import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftDrtScheduleInquiry
 import org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
@@ -43,24 +36,16 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.StayTaskEndTimeCalculator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
 
 /**
  * @author nkuehnel, fzwick / MOIA
@@ -124,12 +109,11 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class),
 						getter.getModal(OperationFacilities.class)))
 		).asEagerSingleton();
-
-		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new ShiftDrtStayTaskEndTimeCalculator(shiftConfigGroup,
-								new DrtStayTaskEndTimeCalculator(drtCfg))))
-		).asEagerSingleton();
+		
+		bindModal(StayTaskEndTimeCalculator.class).toProvider(modalProvider(getter -> {
+			return new ShiftDrtStayTaskEndTimeCalculator(shiftConfigGroup,
+					new DrtStayTaskEndTimeCalculator(drtCfg));
+		})).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
 				(getter) -> new ShiftDrtActionCreator(getter.getModal(PassengerHandler.class),

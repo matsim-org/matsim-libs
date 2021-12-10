@@ -52,19 +52,18 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.StayTaskEndTimeCalculator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -142,10 +141,14 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 								getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
+		
+		bindModal(StayTaskEndTimeCalculator.class).toProvider(modalProvider(getter -> {
+			return new DrtStayTaskEndTimeCalculator(drtCfg);
+		})).asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new DrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
+						getter.getModal(StayTaskEndTimeCalculator.class)))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
 				getter -> new DrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),
