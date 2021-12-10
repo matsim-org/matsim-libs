@@ -22,20 +22,6 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nkuehnel, fzwick / MOIA
  */
 public class ShiftDrtControlerCreator {
-	/**
-	 * Creates a standard scenario and adds a DRT route factory to the route factories.
-	 *
-	 * @param config
-	 * @return
-	 */
-	public static Scenario createScenarioWithDrtRouteFactory(Config config) {
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		scenario.getPopulation()
-				.getFactory()
-				.getRouteFactories()
-				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		return scenario;
-	}
 
 	/**
 	 * Creates a controller in one step. Assumes a single DRT service.
@@ -47,14 +33,8 @@ public class ShiftDrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute());
 
-		Scenario scenario = createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
+		Controler controler = DrtControlerCreator.createControler(config, otfvis);
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg, shiftDrtConfigGroup));
@@ -67,9 +47,6 @@ public class ShiftDrtControlerCreator {
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
 		return controler;
 	}
 }
