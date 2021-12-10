@@ -1,16 +1,14 @@
 package org.matsim.contrib.drt.extension.shifts.optimizer;
 
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
@@ -18,12 +16,12 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  */
 public class ShiftDrtOptimizer implements DrtOptimizer {
 
-    private final DefaultDrtOptimizer optimizer;
+    private final DrtOptimizer optimizer;
 
     private DrtShiftDispatcher dispatcher;
     private final ScheduleTimingUpdater scheduleTimingUpdater;
 
-    public ShiftDrtOptimizer(DrtConfigGroup drtConfigGroup, DefaultDrtOptimizer optimizer,
+    public ShiftDrtOptimizer(DrtOptimizer optimizer,
 							 DrtShiftDispatcher dispatcher, ScheduleTimingUpdater scheduleTimingUpdater) {
         this.optimizer = optimizer;
         this.dispatcher = dispatcher;

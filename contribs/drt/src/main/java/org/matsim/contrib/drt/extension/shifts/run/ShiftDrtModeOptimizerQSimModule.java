@@ -79,25 +79,17 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 	@Override
 	protected void configureQSim() {
 		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> new ShiftDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
+				getter -> new ShiftDrtOptimizer(
+						new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+							getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
+							getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+							getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
+							getter.getModal(DrtRequestInsertionRetryQueue.class)
+						),
 						getter.getModal(DrtShiftDispatcher.class),
 						getter.getModal(ScheduleTimingUpdater.class))));
 
-		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
-				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
-						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
-						getter.getModal(DrtRequestInsertionRetryQueue.class)))).asEagerSingleton();
-
-		bindModal(DepotFinder.class).toProvider(
-				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class)))).asEagerSingleton();
-
-		bindModal(DrtRequestInsertionRetryQueue.class).toInstance(new DrtRequestInsertionRetryQueue(
-				drtCfg.getDrtRequestInsertionRetryParams().orElse(new DrtRequestInsertionRetryParams())));
-
 		bindModal(OperationFacilityFinder.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
-
 			@Override
 			public OperationFacilityFinder get() {
 				return new NearestOperationFacilityWithCapacityFinder(getModalInstance(OperationFacilities.class));
@@ -121,47 +113,15 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 			}
 		}).asEagerSingleton();
 
-		addModalComponent(QSimScopeForkJoinPoolHolder.class,
-				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
-
-		bindModal(UnplannedRequestInserter.class).toProvider(modalProvider(
-				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
-						getter.getModal(RequestInsertionScheduler.class),
-						getter.getModal(VehicleEntry.EntryFactory.class),
-						getter.getModal(new TypeLiteral<DrtInsertionSearch<OneToManyPathSearch.PathData>>() {
-						}), getter.getModal(DrtRequestInsertionRetryQueue.class),
-						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
-
 		bindModal(InsertionCostCalculator.InsertionCostCalculatorFactory.class).toProvider(modalProvider(
 				getter -> ShiftInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
 						getter.getModal(CostCalculationStrategy.class))));
 
-		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
-
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(drtCfg));
-		bindModal(CostCalculationStrategy.class).to(drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
-				CostCalculationStrategy.RejectSoftConstraintViolations.class :
-				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
 		final ShiftDrtTaskFactoryImpl taskFactory = new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl());
-
 		bindModal(DrtTaskFactory.class).toInstance(taskFactory);
 		bindModal(ShiftDrtTaskFactory.class).toInstance(taskFactory);
-		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode(), DvrpModes::mode) {
-			@Inject
-			private MobsimTimer timer;
-
-			@Override
-			public EmptyVehicleRelocator get() {
-				var travelTime = getModalInstance(TravelTime.class);
-				Network network = getModalInstance(Network.class);
-				DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
-			}
-		}).asEagerSingleton();
 
 		bindModal(ShiftTaskScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<DvrpMode, ShiftTaskScheduler>(drtCfg.getMode(), DvrpModes::mode) {
@@ -196,6 +156,5 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				(getter) -> new ShiftDrtActionCreator(getter.getModal(PassengerHandler.class),
 						new DrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),
 								getter.get(DvrpConfigGroup.class))))).asEagerSingleton();
-		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}
 }

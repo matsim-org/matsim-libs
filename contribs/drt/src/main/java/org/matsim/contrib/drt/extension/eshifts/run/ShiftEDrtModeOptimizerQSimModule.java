@@ -79,7 +79,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 	@Override
 	protected void configureQSim() {
 		this.addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> new ShiftDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
+				getter -> new ShiftDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
 						getter.getModal(DrtShiftDispatcher.class),
 						getter.getModal(ScheduleTimingUpdater.class))));
 

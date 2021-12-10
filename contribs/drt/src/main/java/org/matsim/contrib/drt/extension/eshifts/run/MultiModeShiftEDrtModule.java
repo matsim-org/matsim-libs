@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -33,7 +34,8 @@ public class MultiModeShiftEDrtModule extends AbstractModule {
     @Override
     public void install() {
         for (DrtConfigGroup drtCfg : this.multiModeDrtCfg.getModalElements()) {
-            this.install(new ShiftDrtModeModule(drtCfg, shiftConfigGroup ));
+			install(new DrtModeModule(drtCfg));
+			install(new ShiftDrtModeModule(drtCfg, shiftConfigGroup ));
             installQSimModule(new DrtModeQSimModule(drtCfg, new ShiftEDrtModeOptimizerQSimModule(drtCfg, shiftConfigGroup)));
 			install(new DrtModeAnalysisModule(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE,
 					DrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
