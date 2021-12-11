@@ -105,6 +105,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private void checkFreespeedSemantics() {
 		if ((this.freespeed <= 0.0) && (fsWarnCnt < maxFsWarnCnt) ) {
 			fsWarnCnt++ ;
+			log.warn("freespeed=" + this.freespeed + " of link id " + this.getId() +" may cause problems");
 			if ( fsWarnCnt == maxFsWarnCnt )
 				log.warn( Gbl.FUTURE_SUPPRESSED) ;
 		}
