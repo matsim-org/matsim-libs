@@ -105,38 +105,36 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
 					// Eventually vehicle category and vehicle attribute should be alligned in order to make the allCombinations setting useful
 					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
-					if (detailedHbefaWarmTable != null) {
-						Set<String> roadCategories = new HashSet<>();
-						Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
-						Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
-						Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
-						Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
-						for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
-							roadCategories.add(emissionFactorKey.getRoadCategory());
-							trafficSituations.add(emissionFactorKey.getTrafficSituation());
-							vehicleCategories.add(emissionFactorKey.getVehicleCategory());
-							vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
-							pollutantsInTable.add(emissionFactorKey.getComponent());
-						}
-						for (String roadCategory : roadCategories) {
-							for (HbefaTrafficSituation trafficSituation : trafficSituations) {
-								for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
-									for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
-										for (Pollutant pollutant : pollutantsInTable) {
-											HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
-											key.setRoadCategory(roadCategory);
-											key.setTrafficSituation(trafficSituation);
-											key.setVehicleCategory(vehicleCategory);
-											key.setVehicleAttributes(vehicleAttribute);
-											key.setComponent(pollutant);
-											HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
-											if (result == null) {
-												throw new RuntimeException("emissions factor for key=" + key + " is missing." +
-														"  There used to be some " +
-														"fallback, but it was " +
-														"inconsistent and confusing, so " +
-														"we are now just aborting.");
-											}
+					Set<String> roadCategories = new HashSet<>();
+					Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
+					Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
+					Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+					Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
+					for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
+						roadCategories.add(emissionFactorKey.getRoadCategory());
+						trafficSituations.add(emissionFactorKey.getTrafficSituation());
+						vehicleCategories.add(emissionFactorKey.getVehicleCategory());
+						vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
+						pollutantsInTable.add(emissionFactorKey.getComponent());
+					}
+					for (String roadCategory : roadCategories) {
+						for (HbefaTrafficSituation trafficSituation : trafficSituations) {
+							for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+								for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+									for (Pollutant pollutant : pollutantsInTable) {
+										HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+										key.setRoadCategory(roadCategory);
+										key.setTrafficSituation(trafficSituation);
+										key.setVehicleCategory(vehicleCategory);
+										key.setVehicleAttributes(vehicleAttribute);
+										key.setComponent(pollutant);
+										HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
+										if (result == null) {
+											throw new RuntimeException("emissions factor for key=" + key + " is missing." +
+													"  There used to be some " +
+													"fallback, but it was " +
+													"inconsistent and confusing, so " +
+													"we are now just aborting.");
 										}
 									}
 								}
@@ -298,7 +296,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// for each pollutant, compute and memorize emissions:
 		for ( Pollutant warmPollutant : warmPollutants) {
-			double generatedEmissions;
 
 			efkey.setComponent(warmPollutant);
 
@@ -307,14 +304,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 				// compute faction.  This cannot be done earlier since efkey.component is needed.
 				fractionStopGo = getFractionStopAndGo(freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey);
-				logger.info("fractionStopGo is: " + fractionStopGo);
 
 				double efStopGo_gpkm = 0.;
 				if (fractionStopGo > 0) {
 					// compute emissions from stop-go fraction:
 					efkey.setTrafficSituation(STOPANDGO);
 					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-					logger.warn("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
+					logger.debug("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
+
 				}
 
 				double efFreeFlow_gpkm = 0. ;
@@ -322,7 +319,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions for free-flow fraction:
 					efkey.setTrafficSituation(FREEFLOW);
 					efFreeFlow_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-					logger.warn("pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm);
+					logger.debug("pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm);
 				}
 
 				// sum them up:
@@ -335,7 +332,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}
 
-			generatedEmissions = (linkLength_m / 1000) * ef_gpkm;
+			double generatedEmissions = (linkLength_m / 1000) * ef_gpkm;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
 

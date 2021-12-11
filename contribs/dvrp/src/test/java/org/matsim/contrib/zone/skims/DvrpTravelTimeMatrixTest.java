@@ -49,7 +49,7 @@ public class DvrpTravelTimeMatrixTest {
 	@Test
 	public void matrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100).setMaxNeighborDistance(0);
-		var matrix = new DvrpTravelTimeMatrix(network, params, 1, 1);
+		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
 		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);
@@ -68,7 +68,7 @@ public class DvrpTravelTimeMatrixTest {
 	public void sparseMatrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100)
 				.setMaxNeighborDistance(9999);
-		var matrix = new DvrpTravelTimeMatrix(network, params, 1, 1);
+		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
 		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);

@@ -95,6 +95,8 @@ import com.google.inject.Inject;
 
 /**
 * @author smueller, gleich
+ *
+ * TODO: Add test that first edits one trip of an agent and then later on edits another one -> notice issues with undefined travel times and similar.
 */
 
 public class EditTripsTest {

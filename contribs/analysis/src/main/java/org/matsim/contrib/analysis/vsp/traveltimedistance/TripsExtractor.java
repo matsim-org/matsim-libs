@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -44,27 +43,26 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 /**
+ *
  * @author  jbischoff
- *
  */
-/**
- *
- */
-public class CarTripsExtractor implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler {
+public class TripsExtractor implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler {
 
 	
 	private final Set<Id<Person>> personsWithPlan;
 	private final Network network;
+	private final String mode;
 	private final Map<Id<Person>,Double> lastDepartureTime = new HashMap<>();
 	private final Map<Id<Person>,Coord> lastDepartureLocation = new HashMap<>();
 	private final Map<Id<Person>,Id<Vehicle>> vehicle2pax  = new HashMap<>();;
 	private final Map<Id<Vehicle>,Double> distanceTraveled = new HashMap<>();
-	private final List<CarTrip> trips = new ArrayList<>();
+	private final List<NetworkTrip> trips = new ArrayList<>();
 	
 	
-	public CarTripsExtractor(Set<Id<Person>> personsWithPlan, Network network) {
+	public TripsExtractor(Set<Id<Person>> personsWithPlan, Network network, String mode) {
 		this.personsWithPlan = personsWithPlan;
 		this.network = network;
+		this.mode = mode;
 	}
 
 	/* (non-Javadoc)
@@ -84,7 +82,7 @@ public class CarTripsExtractor implements PersonDepartureEventHandler, PersonArr
 	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)){
+		if (event.getLegMode().equals(mode)){
 			if (this.personsWithPlan.contains(event.getPersonId()))
 			{
 				Coord arrivalCoord = network.getLinks().get(event.getLinkId()).getCoord();
@@ -92,7 +90,7 @@ public class CarTripsExtractor implements PersonDepartureEventHandler, PersonArr
 				double departureTime = this.lastDepartureTime.remove(event.getPersonId());
 				Id<Vehicle> vehicleId = vehicle2pax.remove(event.getPersonId());
 				double distance = this.distanceTraveled.remove(vehicleId);
-				CarTrip trip = new CarTrip(event.getPersonId(), departureTime, event.getTime(), distance, departureCoord, arrivalCoord);
+				NetworkTrip trip = new NetworkTrip(event.getPersonId(), departureTime, event.getTime(), distance, departureCoord, arrivalCoord);
 				trip.setActualTravelTime(event.getTime()-departureTime);
 				this.trips.add(trip);
 			}
@@ -104,7 +102,7 @@ public class CarTripsExtractor implements PersonDepartureEventHandler, PersonArr
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)){
+		if (event.getLegMode().equals(mode)){
 			if (this.personsWithPlan.contains(event.getPersonId()))
 			{
 				Coord departureCoord = network.getLinks().get(event.getLinkId()).getCoord();
@@ -117,7 +115,7 @@ public class CarTripsExtractor implements PersonDepartureEventHandler, PersonArr
 	/**
 	 * @return the trips
 	 */
-	public List<CarTrip> getTrips() {
+	public List<NetworkTrip> getTrips() {
 		return trips;
 	}
 

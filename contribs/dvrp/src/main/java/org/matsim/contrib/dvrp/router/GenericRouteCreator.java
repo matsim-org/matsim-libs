@@ -45,7 +45,7 @@ public class GenericRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	private final LeastCostPathCalculator router;
 
 	public GenericRouteCreator(LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Network modalNetwork,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory) {
 		this.travelTime = travelTime;
 		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,

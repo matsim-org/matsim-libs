@@ -66,6 +66,13 @@ public final class ShpOptions {
 	}
 
 	/**
+	 * Return whether a shape was set.
+	 */
+	public boolean isDefined() {
+		return shp != null && !shp.toString().isBlank();
+	}
+
+	/**
 	 * Get the provided input crs.
 	 */
 	public Path getShapeFile() {

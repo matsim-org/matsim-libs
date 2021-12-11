@@ -48,7 +48,7 @@ import java.util.*;
  * @author vsp-gleich
  * (adapted from VolumesAnalyzer by mrieser, inspired by ikaddoura DynamicLinkDemandEventHandler in matsim-analysis)
  */
-final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler,
+public final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler,
 		VehicleLeavesTrafficEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler {
 
@@ -79,7 +79,7 @@ final class LinkPaxVolumesAnalysis implements LinkEnterEventHandler, VehicleEnte
 	private final IdMap<VehicleType, Integer> vehicleType2numberSeen;
 	private final IdSet<Vehicle> vehicleIdsSeen;
 
-	LinkPaxVolumesAnalysis(Vehicles vehicles, Vehicles transitVehicles /* TODO: add some config settings */) {
+	public LinkPaxVolumesAnalysis(Vehicles vehicles, Vehicles transitVehicles /* TODO: add some config settings */) {
 		this(3600, 30 * 3600 - 1, vehicles, transitVehicles, true, true, true);
 	}
 

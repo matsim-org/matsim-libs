@@ -27,16 +27,13 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -55,7 +52,7 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		}).toProvider(modalProvider(getter -> {
 			var insertionCostCalculatorFactory = getter.getModal(InsertionCostCalculatorFactory.class);
 			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
-					getter.getModal(DvrpTravelTimeMatrix.class),
+					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
 			var insertionCostCalculator = insertionCostCalculatorFactory.create(PathData::getTravelTime, null);
 			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
@@ -64,12 +61,9 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 		addModalComponent(MultiInsertionDetourPathCalculator.class,
 				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
-
 					@Override
 					public MultiInsertionDetourPathCalculator get() {
+						var travelTime = getModalInstance(TravelTime.class);
 						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);

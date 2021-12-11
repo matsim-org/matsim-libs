@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -42,31 +43,28 @@ import com.google.common.annotations.VisibleForTesting;
 public class SelectiveInsertionProvider implements InsertionProvider {
 	public static SelectiveInsertionProvider create(DrtConfigGroup drtCfg,
 			InsertionCostCalculatorFactory insertionCostCalculatorFactory, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
-			ForkJoinPool forkJoinPool) {
+			TravelTime travelTime, ForkJoinPool forkJoinPool) {
 		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
-				insertionParams.getRestrictiveBeelineSpeedFactor(), dvrpTravelTimeMatrix);
+				insertionParams.getRestrictiveBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
 		var restrictiveCostCalculator = insertionCostCalculatorFactory.create(Double::doubleValue,
 				restrictiveDetourTimeEstimator);
 		return new SelectiveInsertionProvider(restrictiveDetourTimeEstimator, forkJoinPool, restrictiveCostCalculator);
 	}
 
-	private final DetourTimeEstimator restrictiveTimeEstimator;
 	private final BestInsertionFinder<Double> initialInsertionFinder;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
 	public SelectiveInsertionProvider(DetourTimeEstimator restrictiveTimeEstimator, ForkJoinPool forkJoinPool,
 			InsertionCostCalculator<Double> restrictiveCostCalculator) {
-		this(restrictiveTimeEstimator, new BestInsertionFinder<>(restrictiveCostCalculator), new InsertionGenerator(),
+		this(new BestInsertionFinder<>(restrictiveCostCalculator), new InsertionGenerator(restrictiveTimeEstimator),
 				forkJoinPool);
 	}
 
 	@VisibleForTesting
-	SelectiveInsertionProvider(DetourTimeEstimator restrictiveTimeEstimator,
-			BestInsertionFinder<Double> initialInsertionFinder, InsertionGenerator insertionGenerator,
-			ForkJoinPool forkJoinPool) {
-		this.restrictiveTimeEstimator = restrictiveTimeEstimator;
+	SelectiveInsertionProvider(BestInsertionFinder<Double> initialInsertionFinder,
+			InsertionGenerator insertionGenerator, ForkJoinPool forkJoinPool) {
 		this.initialInsertionFinder = initialInsertionFinder;
 		this.insertionGenerator = insertionGenerator;
 		this.forkJoinPool = forkJoinPool;
@@ -74,18 +72,14 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		DetourData<Double> restrictiveTimeData = DetourData.create(restrictiveTimeEstimator, drtRequest);
-
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		Optional<InsertionWithDetourData<Double>> bestInsertion = forkJoinPool.submit(
 				// find best insertion given a stream of insertion with time data
 				() -> initialInsertionFinder.findBestInsertion(drtRequest,
 						//for each vehicle entry
 						vehicleEntries.parallelStream()
-								//generate feasible insertions (wrt occupancy limits)
-								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
-								//map them to insertions with admissible detour times
-								.map(restrictiveTimeData::createInsertionWithDetourData))).join();
+								//generate feasible insertions (wrt occupancy limits) with restrictive detour times
+								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream()))).join();
 
 		return bestInsertion.map(InsertionWithDetourData::getInsertion).stream().collect(toList());
 	}

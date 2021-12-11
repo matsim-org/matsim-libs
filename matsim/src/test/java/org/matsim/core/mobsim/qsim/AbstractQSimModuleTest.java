@@ -103,6 +103,33 @@ public class AbstractQSimModuleTest {
 
 		Assert.assertTrue(value.get() > 0);
 	}
+	
+	@Test
+	public void testOverrideAgentFactoryTwice() {
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(0);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+		Person person = populationFactory.createPerson(Id.createPersonId("person"));
+		Plan plan =  populationFactory.createPlan();
+		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
+
+		AtomicLong value1 = new AtomicLong(0);
+		AtomicLong value2 = new AtomicLong(0);
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingQSimModule(new TestQSimModule(value1));
+		controler.addOverridingQSimModule(new TestQSimModule(value2));
+		controler.run();
+
+		Assert.assertTrue(value1.get() == 0);
+		Assert.assertTrue(value2.get() > 0);
+	}
 
 	private class TestQSimModule extends AbstractQSimModule {
 		private final AtomicLong value;

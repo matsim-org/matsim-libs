@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -42,10 +43,10 @@ import com.google.common.annotations.VisibleForTesting;
 public class ExtensiveInsertionProvider implements InsertionProvider {
 	public static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg,
 			InsertionCostCalculatorFactory insertionCostCalculatorFactory, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
-			ForkJoinPool forkJoinPool) {
+			TravelTime travelTime, ForkJoinPool forkJoinPool) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var admissibleTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
-				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix);
+				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
 		var admissibleCostCalculator = insertionCostCalculatorFactory.create(Double::doubleValue,
 				admissibleTimeEstimator);
 		return new ExtensiveInsertionProvider(drtCfg, admissibleTimeEstimator, forkJoinPool, admissibleCostCalculator);
@@ -53,38 +54,32 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 
 	private final ExtensiveInsertionSearchParams insertionParams;
 	private final InsertionCostCalculator<Double> admissibleCostCalculator;
-	private final DetourTimeEstimator admissibleTimeEstimator;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
 	public ExtensiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator admissibleTimeEstimator,
 			ForkJoinPool forkJoinPool, InsertionCostCalculator<Double> admissibleCostCalculator) {
 		this((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(), admissibleCostCalculator,
-				admissibleTimeEstimator, new InsertionGenerator(), forkJoinPool);
+				new InsertionGenerator(admissibleTimeEstimator), forkJoinPool);
 	}
 
 	@VisibleForTesting
 	ExtensiveInsertionProvider(ExtensiveInsertionSearchParams insertionParams,
-			InsertionCostCalculator<Double> admissibleCostCalculator, DetourTimeEstimator admissibleTimeEstimator,
-			InsertionGenerator insertionGenerator, ForkJoinPool forkJoinPool) {
+			InsertionCostCalculator<Double> admissibleCostCalculator, InsertionGenerator insertionGenerator,
+			ForkJoinPool forkJoinPool) {
 		this.insertionParams = insertionParams;
 		this.admissibleCostCalculator = admissibleCostCalculator;
-		this.admissibleTimeEstimator = admissibleTimeEstimator;
 		this.insertionGenerator = insertionGenerator;
 		this.forkJoinPool = forkJoinPool;
 	}
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		DetourData<Double> admissibleTimeData = DetourData.create(admissibleTimeEstimator, drtRequest);
-
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<InsertionWithDetourData<Double>> preFilteredInsertions = forkJoinPool.submit(
 				() -> vehicleEntries.parallelStream()
-						//generate feasible insertions (wrt occupancy limits)
+						//generate feasible insertions (wrt occupancy limits) with admissible detour times
 						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
-						//map insertions to insertions with admissible detour times (i.e. admissible beeline speed factor)
-						.map(admissibleTimeData::createInsertionWithDetourData)
 						//optimistic pre-filtering wrt admissible cost function
 						.filter(insertion -> admissibleCostCalculator.calculate(drtRequest, insertion)
 								< INFEASIBLE_SOLUTION_COST)
