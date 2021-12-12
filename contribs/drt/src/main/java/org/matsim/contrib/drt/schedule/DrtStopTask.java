@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 import com.google.common.base.MoreObjects;
 
@@ -40,7 +40,7 @@ import com.google.common.base.MoreObjects;
  *
  * @author michalm
  */
-public class DrtStopTask extends StayTask {
+public class DrtStopTask extends DefaultStayTask {
 	public static final DrtTaskType TYPE = new DrtTaskType(STOP);
 
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
