@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
@@ -33,14 +34,15 @@ public interface DetourTimeEstimator {
 		return (from, to) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
 	}
 
-	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double speedFactor, DvrpTravelTimeMatrix matrix) {
+	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double speedFactor, DvrpTravelTimeMatrix matrix,
+			TravelTime travelTime) {
 		return (from, to) -> {
 			if (from == to) {
 				return 0;
 			}
 			double time = FIRST_LINK_TT
 					+ matrix.getFreeSpeedTravelTime(from.getToNode(), to.getFromNode())
-					+ VrpPaths.getLastLinkTT(to, 0);
+					+ VrpPaths.getLastLinkTT(travelTime, to, 0);
 			return time / speedFactor;
 		};
 	}

@@ -45,6 +45,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 
@@ -71,7 +72,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);
 	private final SingleInsertionDetourPathCalculator detourPathCalculator = new SingleInsertionDetourPathCalculator(
-			null, null, null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
+			null, new FreeSpeedTravelTime(), null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
 
 	@After
 	public void after() {
@@ -146,7 +147,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 	private void assertPathData(PathData pathData, Path inputPath, Link toLink) {
 		assertThat(pathData.getTravelTime()).isEqualTo(
-				inputPath.travelTime + FIRST_LINK_TT + getLastLinkTT(toLink, Double.NaN));
+				inputPath.travelTime + FIRST_LINK_TT + getLastLinkTT(new FreeSpeedTravelTime(), toLink, Double.NaN));
 	}
 
 	private Link link(String id) {

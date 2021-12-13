@@ -58,6 +58,8 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	public static final int MAX_THREADS = 4;
 
+	private final TravelTime travelTime;
+
 	private final LeastCostPathCalculator toPickupPathSearch;
 	private final LeastCostPathCalculator fromPickupPathSearch;
 	private final LeastCostPathCalculator toDropoffPathSearch;
@@ -73,6 +75,8 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 	@VisibleForTesting
 	SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			int numberOfThreads, LeastCostPathCalculatorFactory pathCalculatorFactory) {
+		this.travelTime = travelTime;
+
 		toPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		fromPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		toDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
@@ -136,7 +140,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
 				null, null);
-		double firstAndLastLinkTT = FIRST_LINK_TT + VrpPaths.getLastLinkTT(toLink,
+		double firstAndLastLinkTT = FIRST_LINK_TT + VrpPaths.getLastLinkTT(travelTime, toLink,
 				departureTime + FIRST_LINK_TT + path.travelTime);
 
 		return new PathData(path, firstAndLastLinkTT);
