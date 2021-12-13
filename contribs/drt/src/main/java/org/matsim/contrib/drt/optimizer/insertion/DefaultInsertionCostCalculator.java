@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -35,13 +36,13 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
 
-	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
+	public static InsertionCostCalculatorFactory createFactory(StopDuration stopDuration, MobsimTimer timer,
 			CostCalculationStrategy costCalculationStrategy) {
 		return new InsertionCostCalculatorFactory() {
 			@Override
 			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
 					DetourTimeEstimator replacedDriveTimeEstimator) {
-				return new DefaultInsertionCostCalculator<>(drtCfg, costCalculationStrategy, detourTime,
+				return new DefaultInsertionCostCalculator<>(stopDuration, costCalculationStrategy, detourTime,
 						replacedDriveTimeEstimator);
 			}
 		};
@@ -50,9 +51,9 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 	private final CostCalculationStrategy costCalculationStrategy;
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 
-	public DefaultInsertionCostCalculator(DrtConfigGroup drtConfig, CostCalculationStrategy costCalculationStrategy,
+	public DefaultInsertionCostCalculator(StopDuration stopDuration, CostCalculationStrategy costCalculationStrategy,
 			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
-		this(costCalculationStrategy, new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
+		this(costCalculationStrategy, new InsertionDetourTimeCalculator<>(stopDuration, detourTime,
 				replacedDriveTimeEstimator));
 	}
 
@@ -79,7 +80,7 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion, drtRequest);
 
 		var insertion1 = insertion.getInsertion();
 		var vEntry = insertion1.vehicleEntry;

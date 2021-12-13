@@ -46,6 +46,7 @@ import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -169,6 +170,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
+		
+		bindModal(StopDuration.class).toInstance((d, p) -> drtCfg.getStopDuration());
 	}
 
 	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {

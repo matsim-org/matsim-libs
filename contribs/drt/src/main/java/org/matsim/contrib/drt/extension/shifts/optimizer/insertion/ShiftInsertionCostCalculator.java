@@ -15,6 +15,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
@@ -26,13 +27,13 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
 
-	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
+	public static InsertionCostCalculatorFactory createFactory(StopDuration stopDuration, MobsimTimer timer,
 			CostCalculationStrategy costCalculationStrategy) {
 		return new InsertionCostCalculatorFactory() {
 			@Override
 			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
 					DetourTimeEstimator replacedDriveTimeEstimator) {
-				return new ShiftInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, detourTime,
+				return new ShiftInsertionCostCalculator<>(stopDuration, timer, costCalculationStrategy, detourTime,
 						replacedDriveTimeEstimator);
 			}
 		};
@@ -42,20 +43,20 @@ public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<
 	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 	private final MobsimTimer timer;
 
-	public ShiftInsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer,
+	public ShiftInsertionCostCalculator(StopDuration stopDuration, MobsimTimer timer,
 			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
 			DetourTimeEstimator replacedDriveTimeEstimator) {
 		this.timer = timer;
-		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator<>(drtConfig, costCalculationStrategy,
+		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator<>(stopDuration, costCalculationStrategy,
 				detourTime, replacedDriveTimeEstimator);
-		detourTimeCalculator = new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
+		detourTimeCalculator = new InsertionDetourTimeCalculator<>(stopDuration, detourTime,
 				replacedDriveTimeEstimator);
 	}
 
 	@Override
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion, drtRequest);
 		if (!checkShiftTimeConstraintsForScheduledRequests(insertion.getInsertion(), detourTimeInfo.pickupTimeLoss,
 				detourTimeInfo.getTotalTimeLoss())) {
 			return INFEASIBLE_SOLUTION_COST;

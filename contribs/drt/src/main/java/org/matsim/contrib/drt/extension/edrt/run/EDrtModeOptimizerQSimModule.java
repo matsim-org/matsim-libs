@@ -45,6 +45,7 @@ import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
@@ -133,7 +134,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.InsertionCostCalculatorFactory.class).toProvider(modalProvider(
-				getter -> DefaultInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
+				getter -> DefaultInsertionCostCalculator.createFactory(getter.getModal(StopDuration.class), getter.get(MobsimTimer.class),
 						getter.getModal(CostCalculationStrategy.class))));
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
@@ -166,14 +167,14 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+						getter -> new DefaultRequestInsertionScheduler(getter.getModal(StopDuration.class), getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new EDrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
+						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopDuration.class))))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
 				getter -> new EDrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),

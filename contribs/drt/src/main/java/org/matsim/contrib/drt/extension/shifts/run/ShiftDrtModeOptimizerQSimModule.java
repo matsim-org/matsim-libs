@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
+import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -101,7 +102,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.InsertionCostCalculatorFactory.class).toProvider(modalProvider(
-				getter -> ShiftInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
+				getter -> ShiftInsertionCostCalculator.createFactory(getter.getModal(StopDuration.class), getter.get(MobsimTimer.class),
 						getter.getModal(CostCalculationStrategy.class))));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(drtCfg));
@@ -119,7 +120,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-				getter -> new ShiftRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+				getter -> new ShiftRequestInsertionScheduler(getter.getModal(StopDuration.class), getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class),
 						getter.getModal(OperationFacilities.class)))
@@ -128,7 +129,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
 						new ShiftDrtStayTaskEndTimeCalculator(shiftConfigGroup,
-								new DrtStayTaskEndTimeCalculator(drtCfg))))
+								new DrtStayTaskEndTimeCalculator(getter.getModal(StopDuration.class)))))
 		).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(

@@ -74,7 +74,7 @@ public class InsertionCostCalculatorTest {
 		var detourTimeCalculator = (InsertionDetourTimeCalculator<D>)mock(InsertionDetourTimeCalculator.class);
 		var insertionCostCalculator = new DefaultInsertionCostCalculator<>(
 				new CostCalculationStrategy.RejectSoftConstraintViolations(), detourTimeCalculator);
-		when(detourTimeCalculator.calculateDetourTimeInfo(insertion)).thenReturn(detourTimeInfo);
+		when(detourTimeCalculator.calculateDetourTimeInfo(insertion, drtRequest)).thenReturn(detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertion)).isEqualTo(expectedCost);
 	}
 

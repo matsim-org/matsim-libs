@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.schedule;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -79,5 +80,9 @@ public class DrtStopTask extends StayTask {
 				.add("pickupRequests", pickupRequests)
 				.add("super", super.toString())
 				.toString();
+	}
+	
+	public interface StopDuration {
+		double calculateStopDuration(Collection<DrtRequest> dropoffRequests, Collection<DrtRequest> pickupRequests);
 	}
 }
