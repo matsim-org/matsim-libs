@@ -102,14 +102,8 @@ public class InsertionDetourTimeCalculator<D> {
 		double fromDropoffTT = detourTime.applyAsDouble(insertion.getDetourFromDropoff());
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
 		double pickupTimeLoss = toPickupTT + additionalPickupStopDuration + fromPickupToDropoffTT - replacedDriveTT;
-
-		final double dropoffTimeLoss;
-		if (dropoff.newWaypoint.getLink() == dropoff.nextWaypoint.getLink()) {
-			dropoffTimeLoss = calcAdditionalDropoffStopDurationIfSameLinkAsPrevious(vEntry, dropoff.index, request);
-		} else {
-			double dropoffStopDuration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
-			dropoffTimeLoss = dropoffStopDuration + fromDropoffTT;
-		}
+		double dropoffStopDuration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
+		double dropoffTimeLoss = dropoffStopDuration + fromDropoffTT;
 
 		double departureTime = pickup.previousWaypoint.getDepartureTime() + toPickupTT + additionalPickupStopDuration;
 		double arrivalTime = departureTime + fromPickupToDropoffTT;
