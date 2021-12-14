@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Stream;
 
 import com.google.common.base.Verify;
@@ -34,8 +34,8 @@ public class MultiModals {
 		Verify.verify(isAllModesUnique(multiModal.modes()), "There are non-unique modes in: %s", multiModal);
 	}
 
-	public static void requireAllModesUnique(String... modes) {
-		Verify.verify(isAllModesUnique(Arrays.stream(modes)), "There are non-unique modes in: %s", modes);
+	public static void requireAllModesUnique(List<String> modes) {
+		Verify.verify(isAllModesUnique(modes.stream()), "There are non-unique modes in: %s", modes);
 	}
 
 	public static boolean isAllModesUnique(Stream<String> modes) {

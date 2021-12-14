@@ -28,8 +28,6 @@ import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRo
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import com.google.common.base.Preconditions;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -46,8 +44,8 @@ public class DrtTeleportedRouteCalculator implements TeleportedRouteCalculator {
 	public Route calculateRoute(PassengerRequest request) {
 		Link startLink = request.getFromLink();
 		Link endLink = request.getToLink();
-		final Coord fromActCoord = Preconditions.checkNotNull(startLink.getCoord());
-		final Coord toActCoord = Preconditions.checkNotNull(endLink.getCoord());
+		final Coord fromActCoord = startLink.getToNode().getCoord();
+		final Coord toActCoord = endLink.getToNode().getCoord();
 		double dist = CoordUtils.calcEuclideanDistance(fromActCoord, toActCoord);
 		Route route = new GenericRouteImpl(startLink.getId(), endLink.getId());
 		//TODO move wait time outside the route (handle it explicitly by the TeleportingPassengerEngine)

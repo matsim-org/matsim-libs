@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -110,7 +111,12 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return new HashMap<>();
 	}
 	    @Override
-	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(RoutingRequest request) {
+	    final Facility fromFacility = request.getFromFacility();
+	    final Facility toFacility = request.getToFacility();
+	    final double departureTime = request.getDepartureTime();
+	    final Person person = request.getPerson();
+	    	
 		// find possible start stops
 		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops

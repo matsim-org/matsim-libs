@@ -16,7 +16,11 @@ import org.matsim.contrib.analysis.spatial.Grid;
 import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.TestUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.FileReader;
@@ -51,7 +55,7 @@ public class EmissionGridAnalyzerTest {
         new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(1)
                 .withGridSize(1000)
-                .withNetwork(NetworkUtils.createNetwork())
+                .withNetwork(NetworkUtils.createTimeInvariantNetwork())
                 .withTimeBinSize(1)
                 .build();
 
@@ -90,7 +94,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createNetwork();
+        final Network network = NetworkUtils.createTimeInvariantNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -129,7 +133,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createNetwork();
+        final Network network = NetworkUtils.createTimeInvariantNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -168,7 +172,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createNetwork();
+        final Network network = NetworkUtils.createTimeInvariantNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -210,7 +214,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createNetwork();
+        final Network network = NetworkUtils.createTimeInvariantNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -318,7 +322,12 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process_regression() throws IOException {
 
-        var network = NetworkUtils.readNetwork("./scenarios/sampleScenario/sample_network.xml");
+        var scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" );
+        var configUrl = IOUtils.extendUrl( scenarioUrl, "config_empty.xml" );
+        var config = ConfigUtils.loadConfig( configUrl.toString() );
+        config.network().setInputFile( "sample_network.xml" );
+        var network = ScenarioUtils.loadScenario( config ).getNetwork(); // this is a bit overkill, but it is an easy way to get the directory context into the loading.
+//        var network = NetworkUtils.readNetwork(config.get + "/sample_network.xml");
         var analyzer = new EmissionGridAnalyzer.Builder()
                 .withGridSize(10)
                 .withTimeBinSize(1000000) // aiming for single time bin

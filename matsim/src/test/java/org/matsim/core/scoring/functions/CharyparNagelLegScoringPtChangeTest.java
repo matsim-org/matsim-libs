@@ -78,7 +78,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 		scoring1.handleEvent( endFirstAct );
 		scoring2.handleEvent( endFirstAct );
 
-		final Event departure = new PersonDepartureEvent(leg.getDepartureTime().seconds(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+		final Event departure = new PersonDepartureEvent(leg.getDepartureTime().seconds(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode(), leg.getMode());
 		scoring1.handleEvent( departure );
 		scoring2.handleEvent( departure );
 

@@ -26,15 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandUtils;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.List;
 
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
@@ -110,7 +109,7 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", "pizza_italian;1;" + 12 * 3600 + ";" + 13 * 3600 + ";180");
+        work.getAttributes().putAttribute(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", List.of("pizza_italian","1",String.valueOf(12 * 3600), String.valueOf(13 * 3600),"180"));
         plan.addActivity(work);
         plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 

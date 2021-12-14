@@ -74,6 +74,10 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		}
 	}
 
+	public final void addDrtConfig( DrtConfigGroup set ) {
+		addParameterSet( set );
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public Collection<DrtConfigGroup> getModalElements() {

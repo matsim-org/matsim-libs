@@ -31,6 +31,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     private final Provider<RaptorStopFinder> stopFinderProvider;
     private final OccupancyData occupancyData;
     private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
+    private final RaptorTransferCostCalculator transferCostCalculator;
 
     private final Network network;
 
@@ -39,6 +40,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
                                   RaptorParametersForPerson raptorParametersForPerson, RaptorRouteSelector routeSelector,
                                   Provider<RaptorStopFinder> stopFinderProvider, OccupancyData occupancyData,
                                   RaptorInVehicleCostCalculator inVehicleCostCalculator,
+                                  RaptorTransferCostCalculator transferCostCalculator,
                                   final EventsManager events) {
         this.schedule = scenario.getTransitSchedule();
         this.transitVehicles = scenario.getTransitVehicles();
@@ -49,6 +51,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
         this.stopFinderProvider = stopFinderProvider;
         this.occupancyData = occupancyData;
         this.inVehicleCostCalculator = inVehicleCostCalculator;
+        this.transferCostCalculator = transferCostCalculator;
 
         if (events != null) {
             events.addHandler((TransitScheduleChangedEventHandler) event -> this.data = null);
@@ -58,7 +61,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     @Override
     public SwissRailRaptor get() {
         SwissRailRaptorData data = getData();
-        return new SwissRailRaptor(data, this.raptorParametersForPerson, this.routeSelector, this.stopFinderProvider.get(), this.inVehicleCostCalculator);
+        return new SwissRailRaptor(data, this.raptorParametersForPerson, this.routeSelector, this.stopFinderProvider.get(), this.inVehicleCostCalculator, this.transferCostCalculator);
     }
 
     private SwissRailRaptorData getData() {

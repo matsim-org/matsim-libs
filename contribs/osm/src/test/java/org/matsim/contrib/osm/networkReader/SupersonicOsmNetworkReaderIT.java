@@ -24,14 +24,26 @@ public class SupersonicOsmNetworkReaderIT {
 
 		Network network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(coordinateTransformation)
+				.setFreeSpeedFactor(LinkProperties.DEFAULT_FREESPEED_FACTOR)
 				.build()
 				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
 
-		Network expectedResult = NetworkUtils.readNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
+		Network expectedResult = NetworkUtils.readTimeInvariantNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
 
 		log.info("expected result contains: " + expectedResult.getLinks().size() + " links and " + expectedResult.getNodes().size() + " nodes");
 		log.info("result contains: " + network.getLinks().size() + " links and " + network.getNodes().size() + " nodes");
 
 		Utils.assertEquals(expectedResult, network);
+
+		// Alternative expression with functional API that should do the same
+		Network alternative = new SupersonicOsmNetworkReader.Builder()
+				.setCoordinateTransformation(coordinateTransformation)
+				.setFreeSpeedFactor(1.0)
+				.setAfterLinkCreated(SupersonicOsmNetworkReader.adjustFreespeed(LinkProperties.DEFAULT_FREESPEED_FACTOR))
+				.build()
+				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
+
+		Utils.assertEquals(alternative, network);
 	}
+
 }

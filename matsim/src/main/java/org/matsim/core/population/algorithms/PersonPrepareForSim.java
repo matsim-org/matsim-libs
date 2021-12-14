@@ -20,9 +20,6 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.HashSet;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,6 +36,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -87,7 +89,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		if (NetworkUtils.isMultimodal( carOnlyNetwork )) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( carOnlyNetwork );
-			net = NetworkUtils.createNetwork();
+			net = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
@@ -124,7 +126,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 					for (Leg leg : legs) {
 						// check all legs either have the same routing mode or all have routingMode==null
-						if (TripStructureUtils.getRoutingMode(leg) == null) {
+						String existingRoutingMode = TripStructureUtils.getRoutingMode(leg);
+						if (existingRoutingMode == null) {
 							if (routingMode == null) {
 								// outdated initial plan without routingMode
 							} else {
@@ -134,9 +137,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 								throw new RuntimeException(errorMessage);
 							}
 						} else {
-							if (routingMode.equals(TripStructureUtils.getRoutingMode(leg))) {
-								TripStructureUtils.setRoutingMode(leg, routingMode);
-							} else {
+							if (!routingMode.equals(existingRoutingMode)) {
 								String errorMessage = "Found a trip whose legs have different routingModes. "
 										+ "This is inconsistent. Agent id: " + person.getId().toString();
 								log.error(errorMessage);
@@ -207,6 +208,17 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 //							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
 							// using the full network for the distance calculation.  kai, jul'18
+						} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+							// replace deprecated ExperimentalTransitRoute with DefaultTransitPassengerRoute
+							ExperimentalTransitRoute oldRoute = (ExperimentalTransitRoute) leg.getRoute();
+							DefaultTransitPassengerRoute newRoute = new DefaultTransitPassengerRoute(
+									oldRoute.getStartLinkId(),
+									oldRoute.getEndLinkId(),
+									oldRoute.getAccessStopId(),
+									oldRoute.getEgressStopId(),
+									oldRoute.getLineId(),
+									oldRoute.getRouteId());
+							leg.setRoute(newRoute);
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

@@ -21,10 +21,7 @@
  */
 package org.matsim.jaxb.lanedefinitions20;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 /**
  * This type can be used for all attributes of classes in MATSim that implement the Attributable interface.
@@ -36,15 +33,14 @@ import javax.xml.bind.annotation.XmlType;
  * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="attributeType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
- *       &lt;attribute name="clazz" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
- *       &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *  <xs:complexType name="attributeType">
+ * 	<xs:simpleContent>
+ * 		<xs:extension base="xs:string">
+ * 			<xs:attribute name="name" type="xs:string"/>
+ * 			<xs:attribute name="class" type="xs:string"/>
+ * 		</xs:extension>
+ * 	</xs:simpleContent>
+ * </xs:complexType>
  * </pre>
  * 
  * @author tthunig
@@ -52,25 +48,24 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "attributeType", propOrder = {
-	    "key",
+	    "name",
 	    "clazz",
-	    "value"
 	})
 public class XMLAttributeType {
 
 	@XmlAttribute(required = true)
-    protected String key;
-	@XmlAttribute(required = true)
+    protected String name;
+	@XmlAttribute(name = "class", required = true)
     protected String clazz;
-	@XmlAttribute(required = true)
+	@XmlValue()
     protected String value;
 
-	public String getKey() {
-		return key;
+	public String getName() {
+		return name;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public String getClazz() {

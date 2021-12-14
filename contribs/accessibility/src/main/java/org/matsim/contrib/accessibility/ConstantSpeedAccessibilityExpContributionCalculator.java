@@ -20,10 +20,7 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -33,6 +30,7 @@ import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -52,7 +50,8 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 
 	private final String mode;
 	private Config config;
-	private Network network;
+	// private Network network;
+	private Network subNetwork;
 	private Scenario scenario;
 	
 	private double logitScaleParameter;
@@ -77,7 +76,6 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		this.scenario = scenario;
 
 		this.config = scenario.getConfig();
-		this.network = scenario.getNetwork();
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
 
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
@@ -104,16 +102,32 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 
 	@Override
 	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
-		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
-		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, scenario.getConfig());
+		LOG.warn("Initializing calculator for mode " + mode + "...");
+		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
+		subNetwork = NetworkUtils.createNetwork(config);
+		Set<String> modeSet = new HashSet<>();
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+		if (mode.equals(Modes4Accessibility.freespeed.name())) {
+			modeSet.add(TransportMode.car);
+		} else {
+			modeSet.add(mode);
+		}
+		filter.filter(subNetwork, modeSet);
+		if (subNetwork.getNodes().size() == 0) {
+			throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
+		}
+		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
+
+		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
+		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, subNetwork, scenario.getConfig());
 	}
 
 
 	
 	@Override
 	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
-		this.fromNode = network.getNodes().get(fromNodeId);
-		this.lcptTravelDistance.calculate(network, fromNode, departureTime);
+		this.fromNode = subNetwork.getNodes().get(fromNodeId);
+		this.lcptTravelDistance.calculate(subNetwork, fromNode, departureTime);
 	}
 
 	
@@ -124,7 +138,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {
 			// TODO departure time is not used, dz, apr'17
-			Link nearestLinkToOrigin = NetworkUtils.getNearestLinkExactly(network, origin.getCoord());
+			Link nearestLinkToOrigin = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
 
 			// Captures the distance between the origin via the link to the node:
 			Distances distances = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLinkToOrigin, fromNode);
@@ -161,6 +175,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		LOG.info("Creating another ConstantSpeedAccessibilityExpContributionCalculator object.");
 		ConstantSpeedAccessibilityExpContributionCalculator constantSpeedAccessibilityExpContributionCalculator =
 				new ConstantSpeedAccessibilityExpContributionCalculator(this.mode, this.scenario);
+		constantSpeedAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;
 		constantSpeedAccessibilityExpContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		constantSpeedAccessibilityExpContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
 		return constantSpeedAccessibilityExpContributionCalculator;

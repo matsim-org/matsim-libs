@@ -24,7 +24,8 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.BeforeClass;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -54,10 +55,10 @@ public class FixedCostsTest extends MatsimTestCase {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	Carriers carriers = new Carriers();
-	Carriers carriersPlannedAndRouted = new Carriers();
+	private final Carriers carriers = new Carriers();
+	private final Carriers carriersPlannedAndRouted = new Carriers();
 
-	@BeforeClass
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 //        Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
@@ -145,7 +146,7 @@ public class FixedCostsTest extends MatsimTestCase {
 
 		URL context = org.matsim.examples.ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 		URL networkURL = IOUtils.extendUrl( context, "grid9x9.xml" );
-		Network network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createTimeInvariantNetwork();
 		new MatsimNetworkReader(network).readURL(networkURL);
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );

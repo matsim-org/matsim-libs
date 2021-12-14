@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
@@ -22,9 +22,6 @@
             </manifest>
           </archive>
         </configuration>
-      </plugin>
-      <plugin>
-	      <artifactId>maven-assembly-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -48,7 +45,7 @@
     <dependency>
       <groupId>org.matsim</groupId>
       <artifactId>matsim</artifactId>
-      <version>13.0-SNAPSHOT</version>
+      <version>14.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <!-- only needed for external jar, no code dependency -->

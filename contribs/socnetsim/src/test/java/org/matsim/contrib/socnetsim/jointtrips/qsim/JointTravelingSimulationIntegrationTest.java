@@ -103,15 +103,15 @@ public class JointTravelingSimulationIntegrationTest {
 	private static final int N_RANDOM_SCENARIOS = 20;
 	private static final int N_LAPS = 5;
 
-	private static final Id<Link> ORIGIN_LINK = Id.create("origin", Link.class);
-	private static final Id<Link> TO_PU_LINK = Id.create("toPu", Link.class);
-	private static final Id<Link> PU_LINK = Id.create("pu", Link.class);
-	private static final Id<Link> TRAVEL_LINK_1 = Id.create(1, Link.class);
-	private static final Id<Link> TRAVEL_LINK_2 = Id.create(2, Link.class);
-	private static final Id<Link> DO_LINK = Id.create("do", Link.class);
-	private static final Id<Link> TO_DESTINATION_LINK = Id.create("to_destination", Link.class);
-	private static final Id<Link> DESTINATION_LINK = Id.create("destination", Link.class);
-	private static final Id<Link> RETURN_LINK = Id.create("return", Link.class);
+	private final Id<Link> ORIGIN_LINK = Id.create("origin", Link.class);
+	private final Id<Link> TO_PU_LINK = Id.create("toPu", Link.class);
+	private final Id<Link> PU_LINK = Id.create("pu", Link.class);
+	private final Id<Link> TRAVEL_LINK_1 = Id.create(1, Link.class);
+	private final Id<Link> TRAVEL_LINK_2 = Id.create(2, Link.class);
+	private final Id<Link> DO_LINK = Id.create("do", Link.class);
+	private final Id<Link> TO_DESTINATION_LINK = Id.create("to_destination", Link.class);
+	private final Id<Link> DESTINATION_LINK = Id.create("destination", Link.class);
+	private final Id<Link> RETURN_LINK = Id.create("return", Link.class);
 
 	private static final String ORIGIN_ACT = "chill";
 	private static final String DESTINATION_ACT = "stress";
@@ -343,7 +343,7 @@ public class JointTravelingSimulationIntegrationTest {
 		}
 	}
 
-	private static Fixture createFixture(
+	private Fixture createFixture(
 			final boolean insertDummyActivities,
 			final RouteType routeType) {
 		switch ( routeType ) {
@@ -412,7 +412,7 @@ public class JointTravelingSimulationIntegrationTest {
 		}
 	}
 
-	private static Scenario createTestScenario(
+	private Scenario createTestScenario(
 			final Fixture fixture,
 			final Random random) {
 		final Config config = ConfigUtils.createConfig();
@@ -572,7 +572,7 @@ public class JointTravelingSimulationIntegrationTest {
 		return sc;
 	}
 
-	private static void createNetwork(final Network network) {
+	private void createNetwork(final Network network) {
 		int c = 0;
 		int d = 0;
 

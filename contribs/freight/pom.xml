@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>13.0-SNAPSHOT</version>
+		<version>14.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -10,17 +10,9 @@
 	<name>freight</name>
 
 	<properties>
-		<matsim.version>13.0-SNAPSHOT</matsim.version>
 		<jsprit.version>1.8</jsprit.version>
 	</properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 
 	<dependencyManagement>
@@ -42,7 +34,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -82,19 +73,19 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
+			<artifactId>mockito-core</artifactId>
+			<version>3.3.3</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -112,7 +103,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

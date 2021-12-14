@@ -20,7 +20,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.core.config.ReflectiveConfigGroup;

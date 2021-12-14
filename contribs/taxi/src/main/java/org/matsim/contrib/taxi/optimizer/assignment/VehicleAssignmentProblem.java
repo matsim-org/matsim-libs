@@ -33,14 +33,14 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.util.StraightLineKnnFinder;
+import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
 
-import ch.sbb.matsim.routing.graph.Graph;
+import org.matsim.core.router.speedy.SpeedyGraph;
 
 /**
  * @author michalm
@@ -63,7 +63,7 @@ public class VehicleAssignmentProblem<D> {
 	private AssignmentDestinationData<D> dData;
 
 	public VehicleAssignmentProblem(Network network, TravelTime travelTime, TravelDisutility travelDisutility) {
-		// we do not need Euclidean router when there is no kNN filtering
+		// we do not need router when there is no kNN filtering
 		this(network, travelTime, travelDisutility, null, -1, -1);
 	}
 
@@ -74,7 +74,7 @@ public class VehicleAssignmentProblem<D> {
 
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
-		pathSearch = OneToManyPathSearch.createSearch(new Graph(network), nodeMap, travelTime, travelDisutility, false);
+		pathSearch = OneToManyPathSearch.createSearch(new SpeedyGraph(network), nodeMap, travelTime, travelDisutility, false);
 
 		// TODO this kNN is slow
 		destinationFinder = nearestDestinationLimit < 0 ?

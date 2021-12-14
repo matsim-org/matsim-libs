@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -40,6 +41,9 @@ public class DvrpGlobalTravelTimesMatrixProvider implements Provider<DvrpTravelT
 	@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
 	private Network network;
 
+	@Inject
+	private QSimConfigGroup qSimConfigGroup;
+
 	public DvrpGlobalTravelTimesMatrixProvider(GlobalConfigGroup globalConfig, DvrpTravelTimeMatrixParams params) {
 		this.params = params;
 		this.numberOfThreads = globalConfig.getNumberOfThreads();
@@ -47,6 +51,7 @@ public class DvrpGlobalTravelTimesMatrixProvider implements Provider<DvrpTravelT
 
 	@Override
 	public DvrpTravelTimeMatrix get() {
-		return new DvrpTravelTimeMatrix(network, params, numberOfThreads);
+		return DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
+				qSimConfigGroup.getTimeStepSize());
 	}
 }

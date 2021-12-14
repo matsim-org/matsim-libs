@@ -22,7 +22,7 @@ public class TaxiScheduleCharts {
 	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> task.getTaskType() + "";
 
 	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
-		TaxiTaskBaseType baseType = getBaseType(task);
+		TaxiTaskBaseType baseType = getBaseTypeOrElseThrow(task);
 		if (baseType == PICKUP) {
 			return task.getTaskType() + "_" + ((TaxiPickupTask)task).getRequest().getPassengerId();
 		}
@@ -39,7 +39,7 @@ public class TaxiScheduleCharts {
 	private static final Color STAY_COLOR = new Color(0, 0, 100);
 
 	public static final PaintSelector TAXI_PAINT_SELECTOR = task -> {
-		switch (getBaseType(task)) {
+		switch (getBaseTypeOrElseThrow(task)) {
 			case PICKUP:
 			case DROPOFF:
 				return PICKUP_DROPOFF_COLOR;

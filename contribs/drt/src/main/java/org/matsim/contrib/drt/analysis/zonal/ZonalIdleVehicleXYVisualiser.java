@@ -23,7 +23,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -49,7 +49,7 @@ public class ZonalIdleVehicleXYVisualiser
 	private final DrtZonalSystem zonalSystem;
 	private final MatsimServices services;
 
-	private final Map<DrtZone, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
+	private final Map<DrtZone, LinkedList<Tuple<Double, Integer>>> zoneEntries = new LinkedHashMap<>();
 
 	public ZonalIdleVehicleXYVisualiser(MatsimServices services, String mode, DrtZonalSystem zonalSystem) {
 		this.services = services;

@@ -26,7 +26,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 
 class FleetControlerListener implements ShutdownListener {
 
-	private static final String OUTPUT_FILE_NAME = "_vehicles.xml.gz";
+	private static final String OUTPUT_FILE_NAME = "vehicles.xml.gz";
 	private final OutputDirectoryHierarchy controlerIO;
 	private FleetSpecification fleetSpecification;
 	private final String mode;

@@ -34,35 +34,52 @@ import org.matsim.core.network.NetworkUtils;
  */
 public class DvrpTravelTimeMatrixTest {
 
-	private final Network network = NetworkUtils.createNetwork();
+	private final Network network = NetworkUtils.createTimeInvariantNetwork();
 	private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 	private final Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
-	private final DvrpTravelTimeMatrix matrix;
+	private final Node nodeC = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), new Coord(-10, -10));
 
 	public DvrpTravelTimeMatrixTest() {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), nodeA, nodeB, 150, 15, 20, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), nodeB, nodeA, 300, 15, 40, 1);
-		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
-		params.setCellSize(100);
-		matrix = new DvrpTravelTimeMatrix(network, params, 1);
+		NetworkUtils.createAndAddLink(network, Id.createLinkId("AC"), nodeA, nodeC, 165, 15, 20, 1);
+		NetworkUtils.createAndAddLink(network, Id.createLinkId("CA"), nodeC, nodeA, 135, 15, 20, 1);
 	}
 
 	@Test
-	public void test_centralNodes() {
+	public void matrix() {
+		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100).setMaxNeighborDistance(0);
+		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
+
+		// distances between central nodes: A and B
 		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20);
+		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20 + 1); // 1 s for moving over nodes
 		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeB)).isEqualTo(0);
+
+		// non-central node: C and A are in the same zone; A is the central node
+		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeC)).isEqualTo(0);
+		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeA)).isEqualTo(0);
+		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeC)).isEqualTo(20 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
 	}
 
 	@Test
-	public void test_nonCentralNodes() {
-		Node nodeC = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), new Coord(10, 10));
-		Node nodeD = NetworkUtils.createAndAddNode(network, Id.createNodeId("D"), new Coord(140, 140));
+	public void sparseMatrix() {
+		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100)
+				.setMaxNeighborDistance(9999);
+		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeC)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeD)).isEqualTo(10);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeD, nodeC)).isEqualTo(20);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeD, nodeD)).isEqualTo(0);
+		// distances between central nodes: A and B
+		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);
+		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeB)).isEqualTo(0);
+
+		// non-central node: C and A are in the same zone; A is the central node
+		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeC)).isEqualTo(11 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeA)).isEqualTo(9 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeC)).isEqualTo(20 + 11 + 2); // 2 s for moving over nodes
+		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeB)).isEqualTo(10 + 9 + 2); // 2 s for moving over nodes
 	}
 }

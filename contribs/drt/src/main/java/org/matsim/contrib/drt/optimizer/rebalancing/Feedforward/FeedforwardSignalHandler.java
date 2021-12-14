@@ -38,20 +38,19 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 	}
 
 	private void calculateFeedforwardSignal() {
+		netDepartureReplenishDemandEstimator.update(1);
 		feedforwardSignal.clear();
 		int progressCounter = 0;
 		int numOfTimeBin = simulationEndTime * 3600 / timeBinSize;
 		log.info("Start calculating rebalnace plan now");
 		for (int i = 0; i < numOfTimeBin; i++) {
 			double timeBin = i;
-
 			ToDoubleFunction<DrtZone> netDepartureInputFunction = netDepartureReplenishDemandEstimator.getExpectedDemandForTimeBin(
 					timeBin);
-
 			List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones()
 					.values()
 					.stream()
-					.map(z -> new DrtZoneVehicleSurplus(z, (int)netDepartureInputFunction.applyAsDouble(z)))
+					.map(z -> new DrtZoneVehicleSurplus(z, (int)netDepartureInputFunction.applyAsDouble(z) * -1))
 					.collect(toList());
 
 			feedforwardSignal.put(timeBin, TransportProblem.solveForVehicleSurplus(vehicleSurpluses));

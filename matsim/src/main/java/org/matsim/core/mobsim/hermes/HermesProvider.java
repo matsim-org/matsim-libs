@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class HermesProvider implements Provider<Mobsim> {
+public final class HermesProvider implements Provider<Mobsim> {
 
 	private final Scenario scenario;
     private final EventsManager eventsManager;

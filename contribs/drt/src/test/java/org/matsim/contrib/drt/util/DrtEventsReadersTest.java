@@ -45,7 +45,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -65,7 +65,7 @@ public class DrtEventsReadersTest {
 
 	//standard dvrp events are tested in DvrpEventsReadersTest
 	private final List<Event> drtEvents = List.of(
-			new DrtRequestSubmittedEvent(0, mode, request, person, link1, link2, 111, 222),//
+			new DrtRequestSubmittedEvent(0, mode, request, person, link1, link2, 111, 222, 412.0, 512.0),//
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
 			taskEnded(30, DrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//
@@ -89,7 +89,8 @@ public class DrtEventsReadersTest {
 						ControlerConfigGroup.EventsFileFormat.xml);
 		eventsManager.finishProcessing();
 
-		assertThat(handler.handledEvents).usingFieldByFieldElementComparator().containsExactlyElementsOf(drtEvents);
+		assertThat(handler.handledEvents).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyElementsOf(drtEvents);
 	}
 
 	private TaskStartedEvent taskStarted(double time, DrtTaskType taskType, int taskIndex, Id<Link> linkId) {

@@ -20,15 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,6 +38,7 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -54,21 +49,44 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = Logger.getLogger(NetworkUtils.class);
+	
 	public static Network createNetwork(Config config) {
 		return createNetwork(config.network());
 	}
 
-
 	public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
-		Network network = new NetworkImpl();
-
+		LinkFactory linkFactory = new LinkFactoryImpl();
+		
 		if (networkConfigGroup.isTimeVariantNetwork()) {
-			network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+			linkFactory = new VariableIntervalTimeVariantLinkFactory();
 		}
-
-		return network;
+		
+		return new NetworkImpl(linkFactory);
 	}
-
+	
+	public static Network createTimeInvariantNetwork() {
+		return new NetworkImpl(new LinkFactoryImpl());
+	}
+	
+	/**
+	 * This function is deprecated as it creates by default a non-time-varying
+	 * network. This poses problems where, for instance, you have a time-varying
+	 * network and want to use a TransportModeNetworkFilter to extract a specific
+	 * model network. Before, the time-varying information would have been lost,
+	 * because the present method was used to create the new network to which the
+	 * filtered links were added. Hence, make use of createNetwork(Config) or
+	 * createNetwork(NetworkConfigGroup) to avoid these errors.
+	 * 
+	 * If you're sure that your network will remain time invariant, use
+	 * NetworkUtils.createTimeInvariantNetwork().
+	 * 
+	 * @return
+	 */
+	@Deprecated
+	public static Network createNetwork() {
+		log.warn("Using NetworkUtils.createNetwork() is deprecated. Use createNetwork(Config).");
+		return new NetworkImpl(new LinkFactoryImpl());
+	}
 
 	/**
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
@@ -440,7 +458,7 @@ public final class NetworkUtils {
         }
 
         if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
-            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
+            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?][node = " + nearestNode.getId() + "]" ) ;
         }
 
         // now find nearest link from the nearest node
@@ -614,9 +632,17 @@ public final class NetworkUtils {
 	}
 
 
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link ) {
 		return link.getLength() / link.getFreespeed() ;
 	}
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link, double time ) {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
@@ -647,7 +673,8 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
 //		}
-		return (String) link.getAttributes().getAttribute(ORIGID);
+		Object o = link.getAttributes().getAttribute(ORIGID);
+		return o == null ? null : o.toString();
 	}
 
 	public static void setOrigId( Link link, String id ) {
@@ -666,12 +693,6 @@ public final class NetworkUtils {
 			double capacity, double lanes) {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
 	}
-
-
-	public static Network createNetwork() {
-		return new NetworkImpl();
-	}
-
 
 	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
 			final double capacity, final double numLanes) {
@@ -765,14 +786,6 @@ public final class NetworkUtils {
 		}
 	}
 
-	@Deprecated // use network.getFactory() instead
-	public static LinkFactoryImpl createLinkFactory() {
-		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
-		// the different factory types need to be visible, or at least configurable, during initialization: User needs to be able to select which factory to
-		// insert into NetworkFactory.  kai, may'17
-		return new LinkFactoryImpl();
-	}
-
 	public static final String ORIGID = "origid";
 	
 	public static void runNetworkCleaner( Network network ) {
@@ -827,9 +840,42 @@ public final class NetworkUtils {
 	}
 
 
-	public static Network readNetwork(String string) {
-		Network network = createNetwork();
+	public static Network readNetwork(String string, Config config) {
+		return readNetwork(string, config.network());
+	}
+
+	public static Network readNetwork(String string, NetworkConfigGroup networkConfigGroup) {
+		Network network = createNetwork(networkConfigGroup);
 		new MatsimNetworkReader(network).readFile(string);
+		return network;
+	}
+	
+	public static Network readTimeInvariantNetwork(String string) {
+		Network network = createTimeInvariantNetwork();
+		new MatsimNetworkReader(network).readFile(string);
+		return network;
+	}
+	
+	@Deprecated
+	public static Network readNetwork(String string) {
+		log.warn("Using NetworkUtils.readNetwork() is deprecated. Use readNetwork(Path, Config) or readTimeInvariantNetwork(Path) and see createNetwork() for further information.");
+		return readTimeInvariantNetwork(string);
+	}
+
+	
+	/**
+	 * reads network form file and applies a coordinate transformation.
+	 * @param filename network file name
+	 * @param transformation coordinate transformation as from @{{@link org.matsim.core.utils.geometry.transformations.TransformationFactory#getCoordinateTransformation(String, String)}}
+	 * @return network from file transformed onto target CRS
+	 */
+	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup, CoordinateTransformation transformation) {
+		var network = readNetwork(filename, networkConfigGroup);
+		network.getNodes().values().parallelStream()
+				.forEach(node -> {
+					var transformedCoord = transformation.transform(node.getCoord());
+					node.setCoord(transformedCoord);
+				});
 		return network;
 	}
 
@@ -861,15 +907,25 @@ public final class NetworkUtils {
 		return true;
 	}
 
-	public static NetworkCollector getCollector() {
-		return new NetworkCollector();
+	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
+		return new NetworkCollector(networkConfigGroup);
+	}
+
+	public static NetworkCollector getCollector(Config config) {
+		return new NetworkCollector(config.network());
+	}
+	
+	public static NetworkCollector getTimeInvariantCollector() {
+		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
+		networkConfigGroup.setTimeVariantNetwork(false);
+		return new NetworkCollector(networkConfigGroup);
 	}
 
 	private static boolean testLinksAreEqual(Link expected, Link actual) {
 
 		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
 				&& expected.getCapacity() == actual.getCapacity()
-				&& expected.getFlowCapacityPerSec() == actual.getFlowCapacityPerSec()
+				&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
 				&& expected.getFreespeed() == actual.getFreespeed()
 				&& expected.getLength() == actual.getLength()
 				&& expected.getNumberOfLanes() == actual.getNumberOfLanes();
@@ -887,6 +943,28 @@ public final class NetworkUtils {
 	 */
 	public static Coord findNearestPointOnLink(Coord coord, Link link) {
 		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+	}
 
+	public static final String ORIG_GEOM = "origgeom";
+	public static List<Node> getOriginalGeometry(Link link) {
+
+		// use a list since order is important
+		List<Node> result = new ArrayList<>();
+		result.add(link.getFromNode());
+		var attr = (String)link.getAttributes().getAttribute(ORIG_GEOM);
+
+		if (!StringUtils.isBlank(attr)) {
+			var data = attr.split(" ");
+			for (String date : data) {
+				var values = date.split(",");
+				if (values.length != 3) throw new RuntimeException("expected three values per node but found: " + date);
+				var coord = new Coord(Double.parseDouble(values[1]), Double.parseDouble(values[2]));
+				var node = new NodeImpl(Id.createNodeId(values[0]), coord);
+				result.add(node);
+			}
+		}
+
+		result.add(link.getToNode());
+		return result;
 	}
 }

@@ -10,6 +10,7 @@ import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -68,7 +69,7 @@ public class TestUtils {
 
     public static Network createRandomNetwork(int numberOfLinks, double maxX, double maxY) {
 
-        Network network = NetworkUtils.createNetwork();
+        Network network = NetworkUtils.createNetwork(new NetworkConfigGroup());
 
         for (long i = 0; i < numberOfLinks; i++) {
 

@@ -47,7 +47,8 @@ public class RebalancingUtils {
 			Link link = ((StayTask)v.getSchedule().getCurrentTask()).getLink();
 			DrtZone zone = zonalSystem.getZoneForLinkId(link.getId());
 			if (zone == null) {
-				zone = DrtZone.createDummyZone("single-vehicle-zone-" + v.getId(), List.of(link), link.getCoord());
+				zone = DrtZone.createDummyZone("single-vehicle-zone-" + v.getId(), List.of(link),
+						link.getToNode().getCoord());
 			}
 			rebalancableVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);
 		});

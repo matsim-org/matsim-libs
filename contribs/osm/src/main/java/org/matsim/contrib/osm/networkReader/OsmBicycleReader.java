@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkFactory;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -34,8 +33,8 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 	public OsmBicycleReader(OsmNetworkParser parser,
 							Predicate<Long> preserveNodeWithId,
 							BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-							SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated) {
-		super(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, (link, tags, direction) -> handleLink(link, tags, direction, afterLinkCreated));
+							AfterLinkCreated afterLinkCreated, double freeSpeedFactor, double adjustCapacityLength, boolean storeOriginalGeometry) {
+		super(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, (link, tags, direction) -> handleLink(link, tags, direction, afterLinkCreated), freeSpeedFactor, adjustCapacityLength, storeOriginalGeometry);
 		this.afterLinkCreated = afterLinkCreated;
 	}
 
@@ -87,13 +86,13 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 	}
 
 	@Override
-	Collection<Link> createLinks(WaySegment segment, NetworkFactory factory) {
+	Collection<Link> createLinks(WaySegment segment) {
 
-		Collection<Link> links = super.createLinks(segment, factory);
+		Collection<Link> links = super.createLinks(segment);
 
 		if (links.size() == 1 && isReverseCycleWay(segment.getTags())) {
 			Link link = links.iterator().next();
-			Link reverseLink = createReverseBicycleLink(link, factory);
+			Link reverseLink = createReverseBicycleLink(link);
 			links.add(reverseLink);
 
 			// test whether the reverse link is actually reverse relative to the segment
@@ -103,10 +102,10 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		return links;
 	}
 
-	private Link createReverseBicycleLink(Link forwardLink, NetworkFactory factory) {
+	private Link createReverseBicycleLink(Link forwardLink) {
 
 		String linkId = forwardLink.getId().toString() + "_bike-reverse";
-		Link result = factory.createLink(Id.createLinkId(linkId), forwardLink.getToNode(), forwardLink.getFromNode());
+		Link result = getNetworkFactory().createLink(Id.createLinkId(linkId), forwardLink.getToNode(), forwardLink.getFromNode());
 		result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
 
 		result.setCapacity(1500 * BIKE_PCU);
@@ -143,7 +142,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		@Override
 		OsmBicycleReader createInstance() {
 			OsmNetworkParser parser = new OsmNetworkParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
-			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated);
+			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated, freeSpeedFactor, adjustCapacityLength, storeOriginalGeometry);
 		}
 	}
 }

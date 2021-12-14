@@ -17,7 +17,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -52,25 +54,30 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
     }
 
     @Override
-    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-        List<Leg> legs = this.raptor.calcRoute(fromFacility, toFacility, departureTime, person);
+    public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+        List<? extends PlanElement> legs = this.raptor.calcRoute(request);
         return legs != null ?
                 fillWithActivities(legs) :
-                walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+                walkRouter.calcRoute(request);
     }
 
-    private List<? extends PlanElement> fillWithActivities(List<Leg> legs) {
-        List<PlanElement> planElements = new ArrayList<>(legs.size() * 2);
-        Leg prevLeg = null;
-        for (Leg leg : legs) {
+    private List<? extends PlanElement> fillWithActivities(List<? extends PlanElement> segments) {
+        List<PlanElement> planElements = new ArrayList<>(segments.size() * 2);
+        PlanElement prevLeg = null;
+        for (PlanElement pe : segments) {
             if (prevLeg != null) {
-                Coord coord = findCoordinate(prevLeg, leg);
-                Id<Link> linkId = leg.getRoute().getStartLinkId();
-                Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(coord, linkId, TransportMode.pt);
-                planElements.add(act);
+            	// only add pt interaction activities between two legs
+				// otherwise we maintain interaction activities from
+				// access and egress trips
+				if (prevLeg instanceof Leg && pe instanceof Leg) {
+					Coord coord = findCoordinate((Leg)prevLeg, (Leg)pe);
+                	Id<Link> linkId = ((Leg)pe).getRoute().getStartLinkId();
+                	Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(coord, linkId, TransportMode.pt);
+                	planElements.add(act);
+				}
             }
-            planElements.add(leg);
-            prevLeg = leg;
+            planElements.add(pe);
+            prevLeg = pe;
         }
         return planElements;
     }

@@ -65,7 +65,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
-	private boolean acceptModeParamsWithoutClearing = false;
+	private boolean acceptModeParamsWithoutClearing;
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
@@ -85,7 +85,14 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 																		"settings for helper modes such as for " + TransportMode.non_network_walk;
 	private boolean clearingDefaultModeRoutingParams = false ;
 	// ---
-
+	public static class TeleportedModeParams extends ModeRoutingParams {
+		public TeleportedModeParams( String mode ){
+			super( mode );
+		}
+	}
+	/**
+	 * @deprecated -- try to use {@link TeleportedModeParams} to be consistent with xml config (not always possible).
+	 */
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
@@ -106,7 +113,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
 		"teleportedModeFreespeedFactor wins over teleportedModeSpeed.";
 		
-		static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
+		private static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
 				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
 
 		public ModeRoutingParams(final String mode) {
@@ -321,6 +328,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			throw new RuntimeException( "you cannot set the clearing of the default mode routing params to false after you have already cleared once." ) ;
 		}
 	}
+	public void clearTeleportedModeParams() {
+		this.clearModeRoutingParams();
+	}
+	/**
+	 * @deprecated -- use {@link #clearTeleportedModeParams()} to be consistent with naming in xml config.
+	 */
 	public void clearModeRoutingParams( ) {
 		// This is essentially a config switch, except that it cannot be set back to false once it was set to true.
 
@@ -361,11 +374,22 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		super.addParameterSet( set );
 	}
 
+	public void addTeleportedModeParams( final TeleportedModeParams pars ) {
+		this.addModeRoutingParams( pars );
+	}
+	/**
+	 * @deprecated -- try to use {@link #addTeleportedModeParams(TeleportedModeParams)} instead.
+	 */
 	public void addModeRoutingParams(final ModeRoutingParams pars) {
 		testForLocked() ;
 		addParameterSet( pars );
 	}
-	
+	public void removeTeleportedModeParams( String key ){
+		this.removeModeRoutingParams( key );
+	}
+	/**
+	 * @deprecated -- try to use {@link #removeTeleportedModeParams(String)} instead.
+	 */
 	public void removeModeRoutingParams( String key ) {
 		testForLocked() ;
 		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
@@ -444,10 +468,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		} else if (RANDOMNESS.equals( key ) ) {
 			this.setRoutingRandomness( Double.parseDouble( value ) );
 		}
-//		else if (ISINSERTINGACCESSEGRESSWALK.equals( key ) ) {
-//			this.setInsertingAccessEgressWalk(AccessEgressType.valueOf(value));
-//		}
-//		TODO: uncomment this for release 13.0
+		else if (ACCESSEGRESSTYPE.equals( key ) ) {
+			this.setAccessEgressType(AccessEgressType.valueOf(value));
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -459,8 +482,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
-//		map.put(  ISINSERTINGACCESSEGRESSWALK,getAccessEgressType().toString()) ;
-//TODO: uncomment this for release 13.0
+		map.put(  ACCESSEGRESSTYPE, getAccessEgressType().toString()) ;
 		return map;
 	}
 

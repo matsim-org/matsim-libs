@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>13.0-SNAPSHOT</version>
+		<version>14.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -24,30 +24,25 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-		</plugins>
 	</build>
-	
+
 	<repositories>
 		<repository>
 		    <id>jitpack.io</id>
 		    <url>https://jitpack.io</url>
 		</repository>
 	</repositories>
-		
+
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>matrixbasedptrouter</artifactId>
-			<version>13.0-SNAPSHOT</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>13.0-SNAPSHOT</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
@@ -75,7 +70,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>13.0-SNAPSHOT</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.matsim.contrib</groupId>-->
@@ -85,13 +80,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
 		</dependency>
 		<!-- This dependency is required to be able to push to the GeoServer -->
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
-			<version>21.5</version>
+			<version>${geotools.version}</version>
 		</dependency>
 	</dependencies>
 </project>

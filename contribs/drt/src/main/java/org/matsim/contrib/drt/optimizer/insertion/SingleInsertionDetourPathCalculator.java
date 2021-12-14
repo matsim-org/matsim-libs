@@ -31,23 +31,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.inject.Named;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.router.FastAStarLandmarksFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
@@ -59,6 +58,8 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	public static final int MAX_THREADS = 4;
 
+	private final TravelTime travelTime;
+
 	private final LeastCostPathCalculator toPickupPathSearch;
 	private final LeastCostPathCalculator fromPickupPathSearch;
 	private final LeastCostPathCalculator toDropoffPathSearch;
@@ -66,16 +67,21 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	private final ExecutorService executorService;
 
-	public SingleInsertionDetourPathCalculator(Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			DrtConfigGroup drtCfg) {
-		LeastCostPathCalculatorFactory pathCalculatorFactory = new FastAStarLandmarksFactory(
-				drtCfg.getNumberOfThreads());
+	public SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
+		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(), new SpeedyALTFactory());
+	}
+
+	@VisibleForTesting
+	SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+			int numberOfThreads, LeastCostPathCalculatorFactory pathCalculatorFactory) {
+		this.travelTime = travelTime;
+
 		toPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		fromPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		toDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		fromDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
-		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
 	@Override
@@ -84,7 +90,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		Link dropoff = drtRequest.getToLink();
 
 		Preconditions.checkArgument(filteredInsertions.size() == 1);
-		Insertion insertion = filteredInsertions.get(0);
+		var insertion = filteredInsertions.get(0);
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
 		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
@@ -93,26 +99,30 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		//  passing it as an argument, instead of Insertion)
 
 		Future<Map<Link, PathData>> pathsToPickupFuture = executorService.submit(
-				() -> Map.of(insertion.pickup.previousLink,
-						calcPathData(toPickupPathSearch, insertion.pickup.previousLink, pickup, earliestPickupTime)));
+				() -> Map.of(insertion.pickup.previousWaypoint.getLink(),
+						calcPathData(toPickupPathSearch, insertion.pickup.previousWaypoint.getLink(), pickup,
+								earliestPickupTime)));
 
 		Future<Map<Link, PathData>> pathsFromPickupFuture = executorService.submit(
-				() -> Map.of(insertion.pickup.nextLink,
-						calcPathData(fromPickupPathSearch, pickup, insertion.pickup.nextLink, earliestPickupTime)));
+				() -> Map.of(insertion.pickup.nextWaypoint.getLink(),
+						calcPathData(fromPickupPathSearch, pickup, insertion.pickup.nextWaypoint.getLink(),
+								earliestPickupTime)));
 
-		Future<Map<Link, PathData>> pathsToDropoffFuture = insertion.dropoff.previousLink == null ?
+		Future<Map<Link, PathData>> pathsToDropoffFuture = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
 				Futures.immediateFuture(ImmutableMap.of()) :
-				executorService.submit(() -> Map.of(insertion.dropoff.previousLink,
-						calcPathData(toDropoffPathSearch, insertion.dropoff.previousLink, dropoff, latestDropoffTime)));
+				executorService.submit(() -> Map.of(insertion.dropoff.previousWaypoint.getLink(),
+						calcPathData(toDropoffPathSearch, insertion.dropoff.previousWaypoint.getLink(), dropoff,
+								latestDropoffTime)));
 
-		Future<Map<Link, PathData>> pathsFromDropoffFuture = insertion.dropoff.nextLink == null ?
+		Future<Map<Link, PathData>> pathsFromDropoffFuture = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
 				Futures.immediateFuture(ImmutableMap.of()) :
-				executorService.submit(() -> Map.of(insertion.dropoff.nextLink,
-						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextLink, latestDropoffTime)));
+				executorService.submit(() -> Map.of(insertion.dropoff.nextWaypoint.getLink(),
+						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextWaypoint.getLink(),
+								latestDropoffTime)));
 
 		try {
 			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
-					pathsFromDropoffFuture.get());
+					pathsFromDropoffFuture.get(), PathData.EMPTY);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
@@ -130,7 +140,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
 				null, null);
-		double firstAndLastLinkTT = FIRST_LINK_TT + VrpPaths.getLastLinkTT(toLink,
+		double firstAndLastLinkTT = FIRST_LINK_TT + VrpPaths.getLastLinkTT(travelTime, toLink,
 				departureTime + FIRST_LINK_TT + path.travelTime);
 
 		return new PathData(path, firstAndLastLinkTT);

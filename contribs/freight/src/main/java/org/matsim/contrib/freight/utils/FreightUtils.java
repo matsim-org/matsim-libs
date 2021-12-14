@@ -58,8 +58,7 @@ public class FreightUtils {
 	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .
 	 * This string constant will eventually become private.
 	 */
-	@Deprecated
-	public static final String CARRIERS = "carriers";
+	private static final String CARRIERS = "carriers";
 	private static final String CARRIERVEHICLETYPES = "carrierVehicleTypes";
 	private static final Logger log = Logger.getLogger(FreightUtils.class);
 
@@ -73,10 +72,10 @@ public class FreightUtils {
 	 *
 	 *
 	 * @param scenario
-	 * @param freightConfigGroup
 	 * @throws ExecutionException, InterruptedException
 	 */
-	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws ExecutionException, InterruptedException {
+	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException{
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class );
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
 				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() );
@@ -174,7 +173,13 @@ public class FreightUtils {
 		return carriersWithShipments;
 	}
 
-	public static Carriers getOrCreateCarriers(Scenario scenario) {
+	/**
+	 * @deprecated -- please inline.  Reason: move syntax closer to how it is done in {@link ConfigUtils}.
+	 */
+	public static Carriers getOrCreateCarriers(Scenario scenario){
+		return addOrGetCarriers( scenario );
+	}
+	public static Carriers addOrGetCarriers( Scenario scenario ) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
 		// controler is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
@@ -187,9 +192,12 @@ public class FreightUtils {
 	}
 
 	public static Carriers getCarriers(Scenario scenario) {
-		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controler is started, it is better to fail if the carriers are not found.
-		// kai, oct'19
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
+		// not found. kai, oct'19
+		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
+			throw new RuntimeException( "\n\ncannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
+								    "FreightUtils.getOrCreateCarriers(...) or FreightUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
+		}
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
 
@@ -208,10 +216,9 @@ public class FreightUtils {
 	 * @param scenario
 	 */
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				FreightConfigGroup.class);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class);
 
-		Carriers carriers = getOrCreateCarriers( scenario ); // also registers with scenario
+		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
 		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );

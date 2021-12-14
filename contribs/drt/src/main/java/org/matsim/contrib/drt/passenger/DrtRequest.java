@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.passenger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
@@ -45,9 +44,6 @@ public class DrtRequest implements PassengerRequest {
 	private final Link fromLink;
 	private final Link toLink;
 
-	private DrtStopTask pickupTask = null;
-	private DrtStopTask dropoffTask = null;
-
 	private DrtRequest(Builder builder) {
 		id = builder.id;
 		submissionTime = builder.submissionTime;
@@ -58,8 +54,6 @@ public class DrtRequest implements PassengerRequest {
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
-		setPickupTask(builder.pickupTask);
-		setDropoffTask(builder.dropoffTask);
 	}
 
 	public static Builder newBuilder() {
@@ -77,8 +71,6 @@ public class DrtRequest implements PassengerRequest {
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
-		builder.pickupTask = copy.getPickupTask();
-		builder.dropoffTask = copy.getDropoffTask();
 		return builder;
 	}
 
@@ -126,22 +118,6 @@ public class DrtRequest implements PassengerRequest {
 		return mode;
 	}
 
-	public DrtStopTask getPickupTask() {
-		return pickupTask;
-	}
-
-	public void setPickupTask(DrtStopTask pickupTask) {
-		this.pickupTask = pickupTask;
-	}
-
-	public DrtStopTask getDropoffTask() {
-		return dropoffTask;
-	}
-
-	public void setDropoffTask(DrtStopTask dropoffTask) {
-		this.dropoffTask = dropoffTask;
-	}
-
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -154,8 +130,6 @@ public class DrtRequest implements PassengerRequest {
 				.add("mode", mode)
 				.add("fromLink", fromLink)
 				.add("toLink", toLink)
-				.add("pickupTask", pickupTask)
-				.add("dropoffTask", dropoffTask)
 				.toString();
 	}
 
@@ -169,8 +143,6 @@ public class DrtRequest implements PassengerRequest {
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
-		private DrtStopTask pickupTask;
-		private DrtStopTask dropoffTask;
 
 		private Builder() {
 		}
@@ -217,16 +189,6 @@ public class DrtRequest implements PassengerRequest {
 
 		public Builder toLink(Link val) {
 			toLink = val;
-			return this;
-		}
-
-		public Builder pickupTask(DrtStopTask val) {
-			pickupTask = val;
-			return this;
-		}
-
-		public Builder dropoffTask(DrtStopTask val) {
-			dropoffTask = val;
 			return this;
 		}
 

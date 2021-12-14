@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>13.0-SNAPSHOT</version>
+		<version>14.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -11,63 +11,64 @@
 	<artifactId>vsp</artifactId>
 	<name>vsp</name>
 
-	<properties>
-		<matsim.version>13.0-SNAPSHOT</matsim.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>multimodal</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>taxi</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>parking</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>freight</artifactId>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>accessibility</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>minibus</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>common</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.processing</groupId>
-			<artifactId>core</artifactId>
-			<version>3.0.1</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.processing</groupId>-->
+<!--			<artifactId>core</artifactId>-->
+<!--			<version>3.0.1</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
 			<artifactId>gluegen-rt-main</artifactId>
@@ -81,7 +82,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.apache.commons</groupId>-->
@@ -91,12 +92,12 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>noise</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>signals</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
@@ -134,14 +135,14 @@
 		<dependency>
 			<groupId>de.micromata.jak</groupId>
 			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.0</version>
+			<version>2.2.1</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>cadytsIntegration</artifactId>
-			<version>${matsim.version}</version>
+			<artifactId>cadyts-integration</artifactId>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -170,17 +171,22 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
 			<version>11.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.graphhopper</groupId>
+			<artifactId>graphhopper-reader-osm</artifactId>
+			<version>2.1</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Michal Maciejewski (michalm)

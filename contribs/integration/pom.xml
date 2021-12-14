@@ -9,19 +9,8 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>13.0-SNAPSHOT</version>
+		<version>14.0-SNAPSHOT</version>
 	</parent>
-
-	<properties>
-		<!--release:-->
-		<!--		<matsim.version>11.0</matsim.version>-->
-
-		<!--weekly "release" (recommended):-->
-		<!--<matsim.version>0.11.0-2019w01-SNAPSHOT</matsim.version>-->
-
-		<!--development head:-->
-		<matsim.version>13.0-SNAPSHOT</matsim.version>
-	</properties>
 
 	<build>
 		<plugins>
@@ -91,28 +80,28 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>accessibility</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
-			<version>21.5</version>
+			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-			<version>${matsim.version}</version>
+			<version>14.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 

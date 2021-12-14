@@ -111,7 +111,7 @@ public class ControlerConfigGroupTest {
 	public void testWritePlansInterval() {
 		ControlerConfigGroup cg = new ControlerConfigGroup();
 		// test initial value
-		Assert.assertEquals(10, cg.getWritePlansInterval());
+		Assert.assertEquals(50, cg.getWritePlansInterval());
 		// test setting with setMobsim
 		cg.setWritePlansInterval(4);
 		Assert.assertEquals(4, cg.getWritePlansInterval());

@@ -198,12 +198,19 @@ public final class EventsReaderJson {
 		}
 		// === material related to wait2link above here
 		else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
+			Coord coord = null;
+			if (o.has(Event.ATTRIBUTE_X)) {
+				double xx = o.get(Event.ATTRIBUTE_X).asDouble();
+				double yy = o.get(Event.ATTRIBUTE_Y).asDouble();
+				coord = new Coord(xx, yy);
+			}
 			this.events.processEvent(new ActivityEndEvent(
 					time, 
 					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class),
 					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
-					o.get(ActivityEndEvent.ATTRIBUTE_ACTTYPE).asText()));
+					o.get(ActivityEndEvent.ATTRIBUTE_ACTTYPE).asText(),
+					coord));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			Coord coord = null;
 			if (o.has(Event.ATTRIBUTE_X)) {
@@ -240,12 +247,14 @@ public final class EventsReaderJson {
 					mode));
 		} else if (PersonDepartureEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = o.path(PersonDepartureEvent.ATTRIBUTE_LEGMODE).asText(null);
-			String mode = legMode == null ? null : legMode.intern();
+			String canonicalLegMode = legMode == null ? null : legMode.intern();
+			String routingMode = o.path(PersonDepartureEvent.ATTRIBUTE_ROUTING_MODE).asText(null);
+			String canonicalRoutingMode = routingMode == null ? null : routingMode.intern();
 			this.events.processEvent(new PersonDepartureEvent(
 					time,
 					Id.create(o.get(PersonDepartureEvent.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(PersonDepartureEvent.ATTRIBUTE_LINK).asText(), Link.class),
-					mode));
+					canonicalLegMode, canonicalRoutingMode));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = o.path(PersonStuckEvent.ATTRIBUTE_LEGMODE).asText(null);
 			String mode = legMode == null ? null : legMode.intern();

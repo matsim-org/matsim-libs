@@ -19,6 +19,7 @@
 
 package org.matsim.core.utils.collections;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,7 +33,7 @@ import org.matsim.core.utils.misc.StringUtils;
 public final class CollectionUtils {
 	private CollectionUtils(){} // to not intantiate
 
-	public static final <T> String idSetToString(final Set<Id<T>> values) {
+	public static <T> String idSetToString( final Set<Id<T>> values ) {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
 		for (Id<?> id : values) {
@@ -45,7 +46,10 @@ public final class CollectionUtils {
 		return str.toString();
 	}
 
-	public static final String setToString(final Set<String> values) {
+	public static String setToString( final Set<String> values ){
+		return collectionToString( values );
+	}
+	public static String collectionToString( final Collection<String> values ) {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
 		for (String s : values) {
@@ -58,7 +62,11 @@ public final class CollectionUtils {
 		return str.toString();
 	}
 
-	public static final String arrayToString(final String[] values) {
+	public static String [] collectionToStringArray( final Collection<String> values ) {
+		return values.toArray(new String[0] );
+	}
+
+	public static String arrayToString( final String[] values ) {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
 		for (String mode : values) {
@@ -74,15 +82,15 @@ public final class CollectionUtils {
 	/**
 	 * tokenizes a {@link String} at commas
 	 */
-	public static final String[] stringToArray(final String values) {
+	public static String[] stringToArray( final String values ) {
 		Set<String> tmp = stringToSet(values);
-		return tmp.toArray(new String[tmp.size()]);
+		return tmp.toArray( new String[0] );
 	}
 
 	/**
 	 * tokenizes a {@link String} at commas
 	 */
-	public static final Set<String> stringToSet(final String values) {
+	public static Set<String> stringToSet( final String values ) {
 		if (values == null) {
 			return Collections.emptySet();
 		}
@@ -97,7 +105,7 @@ public final class CollectionUtils {
 		return tmp;
 	}
 
-	public static final Set<String> stringArrayToSet(final String [] array) {
+	public static Set<String> stringArrayToSet( final String [] array ) {
 		if (array == null) {
 			return Collections.emptySet();
 		}

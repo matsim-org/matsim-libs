@@ -20,6 +20,7 @@
 package org.matsim.contrib.emissions.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -67,25 +68,25 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 
 	@Deprecated // kai, oct'18
 	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "emissionCostMultiplicationFactor";
-	@Deprecated // kai, oct'18
-	private double emissionCostMultiplicationFactor = 1.0;
+//	@Deprecated // kai, oct'18
+//	private double emissionCostMultiplicationFactor = 1.0;
 
 	@Deprecated // kai, oct'18
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
-	@Deprecated // kai, oct'18
-	private boolean consideringCO2Costs = false;
+//	@Deprecated // kai, oct'18
+//	private boolean consideringCO2Costs = false;
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
 	private boolean handleHighAverageSpeeds = false;
 	// yyyy should become an enum.  kai, jan'20
 
-	@Deprecated // See elsewhere in this class.  kai, oct'18
+//	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
-	@Deprecated // See elsewhere in this class.  kai, oct'18
+//	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
-	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
+//	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
 	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
-	// in the vehicles file.  kai, dec'19
+	// in the network file.  kai, dec'19
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
 
 	public enum NonScenarioVehicles { ignore, abort }
@@ -110,8 +111,8 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average warm emission factors";
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average cold emission factors";
-	@Deprecated //Use DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR instead
-	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is now deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
+//	@Deprecated //Use DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR instead
+//	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is now deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
 	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT = "Should the calculation bases on average or detailed emission factors? " + "\n\t\t" +
 			DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name() + " : try detailed values. Abort if values are not found. Requires DETAILED" +
 											      " emission factors. \n\t\t" +
@@ -148,7 +149,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; all warn emissions are multiplied with this factor; the factor is applied to the whole fleet. ";
 	@Deprecated
-	private static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
 	@Deprecated
 	private static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
 
@@ -196,23 +197,22 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, EMISSION_FACTORS_COLD_FILE_DETAILED_CMT);
 
-		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
+//		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
+		map.put(HBEFA_VEHICLE_DESCRIPTION_SOURCE, HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT) ;
 
 		map.put(WRITING_EMISSIONS_EVENTS, WRITING_EMISSIONS_EVENTS_CMT);
 
 		map.put(EMISSION_EFFICIENCY_FACTOR, EMISSION_EFFICIENCY_FACTOR_CMT);
 
-		map.put(EMISSION_COST_MULTIPLICATION_FACTOR, EMISSION_COST_MULTIPLICATION_FACTOR_CMT);
+//		map.put(EMISSION_COST_MULTIPLICATION_FACTOR, EMISSION_COST_MULTIPLICATION_FACTOR_CMT);
 
-		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
+//		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
 
 		map.put(HANDLE_HIGH_AVERAGE_SPEEDS, HANDLE_HIGH_AVERAGE_SPEEDS_CMT);
 
 		map.put(NON_SCENARIO_VEHICLES, NON_SCENARIO_VEHICLES_CMT);
 
 		map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
-
-		map.put(HBEFA_VEHICLE_DESCRIPTION_SOURCE, HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT) ;
 
 		return map;
 	}
@@ -269,48 +269,37 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 		return ConfigGroup.getInputFileURL(context, this.averageFleetColdEmissionFactorsFile);
 	}
 	// ===============
-	private static final String message = "The " + USING_DETAILED_EMISSION_CALCULATION + " switch is deprecated and will eventually be disabled.  Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead.";
+	private static final String message = "The " + USING_DETAILED_EMISSION_CALCULATION + " switch is now disabled.  ";
+	private static final String messageTrue = "Please use <param name=\"detailedVsAverageLookupBehavior\" value=\"tryDetailedThenTechnologyAverageThenAverageTable\" />";
+	private static final String messageFalse = "Please use <param name=\"detailedVsAverageLookupBehavior\" value=\"directlyTryAverageTable\" />";
 	/** @noinspection MethodMayBeStatic*/ // ---
 	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
 	@Deprecated
 	public Boolean isUsingDetailedEmissionCalculationStringGetter(){
-		log.warn( message + " Returning null here so that the code does not abort.");
+		log.warn(message);
+		log.warn("returning null so that config writer does not abort");
 		return null ;
 	}
-	/**
-	 * @param usingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
-	 */
 	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
 	public void setUsingDetailedEmissionCalculationStringSetter(final Boolean usingDetailedEmissionCalculation) {
-		log.warn( message + " Will try to retrofit ...");
+		log.error( message );
 		if ( usingDetailedEmissionCalculation==null ){
 			log.warn( "null as entry in " + USING_DETAILED_EMISSION_CALCULATION + " has no meaning; ignoring it." );
 		} else if ( usingDetailedEmissionCalculation ) {
-			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable;
+			log.warn( messageTrue );
 		} else {
-			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.directlyTryAverageTable;
+			log.warn( messageFalse );
 		}
+		throw new RuntimeException( );
+//		log.warn( message + " Will try to retrofit ...");
+//		if ( usingDetailedEmissionCalculation==null ){
+//			log.warn( "null as entry in " + USING_DETAILED_EMISSION_CALCULATION + " has no meaning; ignoring it." );
+//		} else if ( usingDetailedEmissionCalculation ) {
+//			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable;
+//		} else {
+//			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.directlyTryAverageTable;
+//		}
 	}
-	// ---
-	/**
-	 * @deprecated -- This method is only there to tell people who have used it from code what to do.  Use {@link #getDetailedVsAverageLookupBehavior()}
-	 * instead.
-	 * @noinspection MethodMayBeStatic
-	 */
-	@Deprecated
-	public boolean isUsingDetailedEmissionCalculation() {
-		throw new RuntimeException( message );
-	}
-	/**
-	 * @deprecated -- This method is only there to tell people who have used it from code what to do.  Use {@link #setHbefaVehicleDescriptionSource(HbefaVehicleDescriptionSource)}
-	 * instead.
-	 * @noinspection MethodMayBeStatic
-	 */
-	@Deprecated
-	public boolean setUsingDetailedEmissionCalculation( boolean val ) {
-		throw new RuntimeException( message );
-	}
-
 	// ---
 	/**
 	 * @param detailedVsAverageLookupBehavior -- {@value #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
@@ -332,12 +321,12 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @noinspection JavadocReference
 	 */
 	@StringSetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
-	public void setDetailedVsAverageLookupBehavior(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
+	public void setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
 		this.hbefaTableConsistencyCheckingLevel = hbefaTableConsistencyCheckingLevel;
 	}
 
 	@StringGetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
-	public HbefaTableConsistencyCheckingLevel gethbefaTableConsistencyCheckingLevel() {
+	public HbefaTableConsistencyCheckingLevel getHbefaTableConsistencyCheckingLevel() {
 		return this.hbefaTableConsistencyCheckingLevel;
 	}
 
@@ -380,35 +369,42 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	}
 	// ============================================
 	// ============================================
+	@Deprecated private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPT_MSG = "replace Boolean by enum hbefaVehicleDescriptionSource.  true <--> usingVehicleTypeId; false <--> fromVehicleTypeDescription; null <--> asEngineInformationAttributes." ;
 	@Deprecated // kai, oct'18
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	@StringGetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
-	@Deprecated // is there for backwards compatibility; in code please inline. kai/kai, sep'19
-	public Boolean isUsingVehicleTypeIdAsVehicleDescription() {
-		switch ( this.getHbefaVehicleDescriptionSource() ) {
-			case usingVehicleTypeId:
-				return true ;
-			case fromVehicleTypeDescription:
-				return false ;
-			case asEngineInformationAttributes:
-				return null ;
-			default:
-				throw new RuntimeException( "config switch setting not understood" ) ;
-		}
+	@Deprecated public Boolean isUsingVehicleTypeIdAsVehicleDescription() {
+		log.error(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPT_MSG);
+		return null; // otherwise config writer will fail. kai, nov'21
+/*
+//		switch ( this.getHbefaVehicleDescriptionSource() ) {
+//			case usingVehicleTypeId:
+//				return true ;
+//			case fromVehicleTypeDescription:
+//				return false ;
+//			case asEngineInformationAttributes:
+//				return null ;
+//			default:
+//				throw new RuntimeException( "config switch setting not understood" ) ;
+//		}
+*/
 	}
 	/**
 	 * @param usingVehicleIdAsVehicleDescription -- {@value #USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT}
 	 */
 	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
-	@Deprecated // is there for backwards compatibility; in code please inline.  kai/kai, sep19
+	@Deprecated // is there to tell people what to do.  kai, nov'21
 	public void setUsingVehicleTypeIdAsVehicleDescription(Boolean usingVehicleIdAsVehicleDescription) {
-		if ( usingVehicleIdAsVehicleDescription==null ) {
-			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( usingVehicleIdAsVehicleDescription ) {
-			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
+		throw new RuntimeException( USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPT_MSG );
+/*
+//		if ( usingVehicleIdAsVehicleDescription==null ) {
+//			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+//		} else if ( usingVehicleIdAsVehicleDescription ) {
+//			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.usingVehicleTypeId );
+//		} else {
+//			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+//		}
+*/
 	}
 	// ---
 	// ---
@@ -421,14 +417,14 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	public enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asEngineInformationAttributes }
 	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = HbefaVehicleDescriptionSource.asEngineInformationAttributes ;
 	//	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
-	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// I am now thinking that it would be more expressive to keep this setting, because it makes users aware of the fact that there needs to be something
 	// in the vehicles file.  kai, dec'19
 	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
 	public void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
 		this.hbefaVehicleDescriptionSource = hbefaVehicleDescriptionSource ;
 	}
 	//	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
-	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// I am now thinking that it would be more expressive to keep this setting, because it makes users aware of the fact that there needs to be something
 	// in the vehicles file.  kai, dec'19
 	@StringGetter( HBEFA_VEHICLE_DESCRIPTION_SOURCE )
 	public HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
@@ -475,38 +471,39 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 //		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 //	}
 //	// ============================================
+	private static final String COSTS_MSG="Cost calculations are not part of the emissions contrib.  Do not use this config setting.";
 	// ============================================
 //	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
-	@Deprecated // kai, oct'18
-	public double getEmissionCostMultiplicationFactor() {
-		return emissionCostMultiplicationFactor;
-	}
-	/**
-	 * @param emissionCostMultiplicationFactor -- {@value #EMISSION_COST_MULTIPLICATION_FACTOR_CMT}
-	 */
+//	@Deprecated // kai, oct'18
+//	public double getEmissionCostMultiplicationFactor() {
+//		throw new RuntimeException(COSTS_MSG);
+//	}
+//	/**
+//	 * @param emissionCostMultiplicationFactor -- {@value #EMISSION_COST_MULTIPLICATION_FACTOR_CMT}
+//	 */
 //	@StringSetter(EMISSION_COST_MULTIPLICATION_FACTOR)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
 	@Deprecated // kai, oct'18
 	public void setEmissionCostMultiplicationFactor(double emissionCostMultiplicationFactor) {
-		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
+		throw new RuntimeException(COSTS_MSG);
 	}
 	// ============================================
 	// ============================================
 	// 	@StringGetter(CONSIDERING_CO2_COSTS)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
-	@Deprecated // kai, oct'18
-	public boolean isConsideringCO2Costs() {
-		return consideringCO2Costs;
-	}
-	/**
-	 * @param consideringCO2Costs -- {@value #CONSIDERING_CO2_COSTS_CMT}
-	 */
+//	@Deprecated // kai, oct'18
+//	public boolean isConsideringCO2Costs() {
+//		throw new RuntimeException(COSTS_MSG);
+//	}
+//	/**
+//	 * @param consideringCO2Costs -- {@value #CONSIDERING_CO2_COSTS_CMT}
+//	 */
 	//	@StringSetter(CONSIDERING_CO2_COSTS)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
 	@Deprecated // kai, oct'18
 	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
-		this.consideringCO2Costs = consideringCO2Costs;
+		throw new RuntimeException(COSTS_MSG);
 	}
 	// ============================================
 	// ============================================
@@ -552,6 +549,24 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
 	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
+	}
+
+	@Override
+	protected final void checkConsistency(Config config){
+		switch (this.emissionsComputationMethod){
+			case StopAndGoFraction:
+				log.info("Please note that with setting of emissionsComputationMethod "+ EmissionsComputationMethod.StopAndGoFraction+ "" +
+						" the emission factors for both freeFlow and StopAndGo fractions are looked up independently and are " +
+						"therefore following the fallback behaviour set in " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR +
+						" independently. --> Depending on the input, it may be that e.g. for ff the detailed value is taken, while for the stopAndGo part " +
+						"a less detailed value is used, because the value with the same level of detail is missing.");
+				break;
+			case AverageSpeed:
+				log.warn("This setting of emissionsComputationMethod. "+ EmissionsComputationMethod.AverageSpeed + " is not covered by many test cases.");
+				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + this.emissionsComputationMethod);
+		}
 	}
 
 }

@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.Iterator;
 
-public class HLink {
+class HLink {
 
 	private float currentCapacity;
 	private final int initialCapacity;

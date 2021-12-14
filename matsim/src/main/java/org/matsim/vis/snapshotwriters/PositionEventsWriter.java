@@ -12,12 +12,12 @@ class PositionEventsWriter implements SnapshotWriter{
                 now = time;
         }
         @Override public void endSnapshot(){
-                throw new RuntimeException( "not implemented" );
+                //throw new RuntimeException( "not implemented" ); dont do anything
         }
         @Override public void addAgent( AgentSnapshotInfo position ){
                 eventsManager.processEvent( new PositionEvent( now, position ) );
         }
         @Override public void finish(){
-                throw new RuntimeException( "not implemented" );
+                //throw new RuntimeException( "not implemented" ); dont do anything
         }
 }

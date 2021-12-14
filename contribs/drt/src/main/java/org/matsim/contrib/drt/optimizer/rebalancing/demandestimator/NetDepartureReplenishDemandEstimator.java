@@ -20,9 +20,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 
-public class NetDepartureReplenishDemandEstimator
-		implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
-		PassengerRequestRejectedEventHandler {
+public class NetDepartureReplenishDemandEstimator implements PassengerRequestScheduledEventHandler,
+		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
@@ -31,8 +30,6 @@ public class NetDepartureReplenishDemandEstimator
 	private final Map<Double, Map<DrtZone, MutableInt>> previousZoneNetDepartureMap = new HashMap<>();
 	private final Map<Id<Request>, Triple<Double, DrtZone, DrtZone>> potentialDrtTripsMap = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
-	private final int simulationEndTime = 36; // simulation ending time in hour (greater than or equal to actual end
-	// time)
 
 	public NetDepartureReplenishDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
 			FeedforwardRebalancingStrategyParams strategySpecificParams) {
@@ -79,14 +76,13 @@ public class NetDepartureReplenishDemandEstimator
 		}
 	}
 
-	@Override
-	public void reset(int iteration) {
+	public void update(int iteration) {
 		previousZoneNetDepartureMap.clear();
 		previousZoneNetDepartureMap.putAll(currentZoneNetDepartureMap);
+		currentZoneNetDepartureMap.clear();
 	}
 
-	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
-		double timeBin = Math.floor(time / timeBinSize);
+	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double timeBin) {
 		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousZoneNetDepartureMap.getOrDefault(timeBin,
 				Collections.emptyMap());
 		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();

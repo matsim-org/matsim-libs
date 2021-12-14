@@ -74,7 +74,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class MatsimJspritFactory {
 
-	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
+	private static final  Logger log = Logger.getLogger(MatsimJspritFactory.class);
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18
@@ -243,7 +243,7 @@ public class MatsimJspritFactory {
 			throw new AssertionError("carrierVeh must have the same earliestDep as vrpVeh");
 		if (carrierVehicle.getLatestEndTime() != vehicle.getLatestArrival())
 			throw new AssertionError("carrierVeh must have the same latestArr as vrpVeh");
-		if (carrierVehicle.getLocation().toString() != vehicle.getStartLocation().getId())
+		if (!carrierVehicle.getLocation().toString().equals(vehicle.getStartLocation().getId()))
 			throw new AssertionError("locations must be equal");
 		return vehicle;
 	}
@@ -274,7 +274,7 @@ public class MatsimJspritFactory {
 			throw new AssertionError("vehicles must have the same earliestStartTime");
 		if (vehicle.getLatestArrival() != carrierVehicle.getLatestEndTime())
 			throw new AssertionError("vehicles must have the same latestEndTime");
-		if (vehicle.getStartLocation().getId() != carrierVehicle.getLocation().toString())
+		if (!vehicle.getStartLocation().getId().equals(carrierVehicle.getLocation().toString()))
 			throw new AssertionError("locs must be the same");
 		return carrierVehicle;
 	}
@@ -513,7 +513,7 @@ public class MatsimJspritFactory {
 		for (CarrierService service : carrier.getServices().values()) {
 			if (shipmentInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 			Coord coordinate = null;
 			if (network != null) {
@@ -530,7 +530,7 @@ public class MatsimJspritFactory {
 		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
 			if (serviceInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
@@ -610,7 +610,7 @@ public class MatsimJspritFactory {
 			log.debug("Handle CarrierService: " + service.toString());
 			if (shipmentInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 			Coord coordinate = null;
 			if (network != null) {
@@ -629,7 +629,7 @@ public class MatsimJspritFactory {
 			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
 			if (serviceInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 
 			Coord fromCoordinate = null;
@@ -733,12 +733,13 @@ public class MatsimJspritFactory {
 	public static VehicleRoutingAlgorithm loadOrCreateVehicleRoutingAlgorithm(Scenario scenario,
 			FreightConfigGroup freightConfig, NetworkBasedTransportCosts netBasedCosts, VehicleRoutingProblem problem) {
 		VehicleRoutingAlgorithm algorithm;
-		final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
-		if (vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals("")) {
-			log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
+		final String vehicleRoutingAlgorithmFile = freightConfig.getVehicleRoutingAlgorithmFile();
+
+		if (vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.equals("")) {
+			log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgorithmFile);
 			URL vraURL;
 			try {
-				vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgortihmFile);
+				vraURL = IOUtils.extendUrl(scenario.getConfig().getContext(), vehicleRoutingAlgorithmFile);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

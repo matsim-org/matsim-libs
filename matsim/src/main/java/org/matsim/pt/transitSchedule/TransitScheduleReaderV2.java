@@ -57,7 +57,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class TransitScheduleReaderV2 extends MatsimXmlParser {
-	private static Logger log = Logger.getLogger(TransitScheduleReaderV2.class);
+	private static final  Logger log = Logger.getLogger(TransitScheduleReaderV2.class);
 
 	private final String externalInputCRS;
 	private final String targetCRS;

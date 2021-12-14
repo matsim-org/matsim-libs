@@ -45,9 +45,12 @@ public interface RoadPricingScheme {
 	 */
 	String TOLL_TYPE_DISTANCE = "distance";
 	
-	/** The type to be used for cordon tolls. */
+	/**
+	 * The type to be used for cordon tolls.
+	 * @deprecated -- use link toll type instead
+	 * */
 	String TOLL_TYPE_CORDON = "cordon";
-	
+
 	/** The type to be used for area tolls. */
 	String TOLL_TYPE_AREA = "area";
 	

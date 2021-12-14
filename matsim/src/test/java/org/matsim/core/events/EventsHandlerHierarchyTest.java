@@ -92,7 +92,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 		assertEquals(this.eventHandled, 1);
 		//then test the reset
 		events.resetHandlers(0);
-		assertEquals(2, this.resetCalled);
+		assertEquals(1, this.resetCalled);
 	}
 
 }

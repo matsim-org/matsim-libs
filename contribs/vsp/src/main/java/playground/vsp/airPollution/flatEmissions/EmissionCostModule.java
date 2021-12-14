@@ -33,13 +33,13 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 public class EmissionCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionCostModule.class);
 	
-	private final double emissionCostFactor;
+	private final double emissionCostFactor = 1.;
 	private boolean considerCO2Costs = false;
 
 	@Inject
 	public EmissionCostModule( EmissionsConfigGroup emissionsConfigGroup ) {
-		this.emissionCostFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
-		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
+//		this.emissionCostFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
+//		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
 
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		

@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -52,8 +51,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
-
-import javax.inject.Inject;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -69,7 +67,7 @@ public class TripsAndLegsCSVWriter {
 
     public static final String[] LEGSHEADER_BASE = {"person", "trip_id",
             "dep_time", "trav_time", "wait_time", "distance", "mode", "start_link",
-            "start_x", "start_y", "end_link", "end_x", "end_y", "access_stop_id", "egress_stop_id", "transit_line", "transit_route"};
+            "start_x", "start_y", "end_link", "end_x", "end_y", "access_stop_id", "egress_stop_id", "transit_line", "transit_route", "vehicle_id"};
 
     private final String[] TRIPSHEADER;
     private final String[] LEGSHEADER;
@@ -209,7 +207,7 @@ public class TripsAndLegsCSVWriter {
             tripRecord.add(Double.toString(toCoord.getY()));
             tripRecord.add(firstPtBoardingStop != null ? firstPtBoardingStop : "");
             tripRecord.add(lastPtEgressStop != null ? lastPtEgressStop : "");
-            tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(trip));
+            tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(personId, trip));
             if (TRIPSHEADER.length != tripRecord.size()) {
                 // put the whole error message also into the RuntimeException, so maven shows it on the command line output (log messages are shown incompletely)
                 StringBuilder str = new StringBuilder();
@@ -264,6 +262,7 @@ public class TripsAndLegsCSVWriter {
 		record.add(Time.writeTime(leg.getDepartureTime().seconds()));
 		record.add(Time.writeTime(leg.getTravelTime().seconds()));
         Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
+        Id<Vehicle> vehicleId = (Id<Vehicle>) leg.getAttributes().getAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME);
         double waitingTime = 0.;
         if (boardingTime != null) {
 			waitingTime = boardingTime - leg.getDepartureTime().seconds();
@@ -294,6 +293,7 @@ public class TripsAndLegsCSVWriter {
         record.add(ptEgressStop);
         record.add(transitLine);
         record.add(transitRoute);
+        record.add(vehicleId != null ? vehicleId.toString() : "");
 
         record.addAll(legsWriterExtension.getAdditionalLegColumns(trip, leg));
         if (LEGSHEADER.length != record.size()) {
@@ -337,11 +337,15 @@ public class TripsAndLegsCSVWriter {
         return scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord();
     }
 
-
     public interface CustomTripsWriterExtension {
+
         String[] getAdditionalTripHeader();
 
         List<String> getAdditionalTripColumns(TripStructureUtils.Trip trip);
+
+        default List<String> getAdditionalTripColumns(Id<Person> personId, TripStructureUtils.Trip trip) {
+            return getAdditionalTripColumns(trip);
+        }
     }
 
     public interface CustomLegsWriterExtension {
@@ -360,6 +364,7 @@ public class TripsAndLegsCSVWriter {
         public List<String> getAdditionalTripColumns(TripStructureUtils.Trip trip) {
             return Collections.EMPTY_LIST;
         }
+
     }
 
     static class NoLegsWriterExtension implements CustomLegsWriterExtension {

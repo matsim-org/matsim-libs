@@ -29,6 +29,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,106 +43,103 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author jbischoff this class requests travel times and distances between two
- *         coordinates from HERE Maps. Please replace the API code with your own
- *         and obey here's usage policy
- *
+ * coordinates from HERE Maps. Please replace the API code with your own
+ * and obey here's usage policy
  */
 public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
+    private static final Logger log = LogManager.getLogger(HereMapsRouteValidator.class);
+    private final String mode;
+    private final String apiAccessKey;
+    private final String outputPath;
+    private final String date;
+    private final CoordinateTransformation transformation;
+    private final boolean writeDetailedFiles;
 
-	final String apiAcessKey;
-	final String outputPath;
-	final String date;
-	final CoordinateTransformation transformation;
-	boolean writeDetailedFiles = true;
+    /**
+     * @param outputFolder   folder to write gzipped json files
+     * @param apiAccessKey   your API Access Code (to be request on the here.com)
+     * @param date           a date to run the validation for, format: 2017-06-08
+     * @param transformation A coordinate transformation to WGS 84
+     */
+    public HereMapsRouteValidator(String outputFolder, String mode, String apiAccessKey, String date,
+                                  CoordinateTransformation transformation, boolean writeDetailedFiles) {
+        this.outputPath = outputFolder;
+        this.mode = mode == null ? "car" : mode;
+        this.apiAccessKey = apiAccessKey;
+        this.date = date;
+        this.transformation = transformation;
+        this.writeDetailedFiles = writeDetailedFiles;
 
-	/**
-	 * 
-	 * @param outputFolder   folder to write gzipped json files
-	 * @param apiAccessKey        your API Access Code (to be request on the here.com)
-	 * @param date           a date to run the validation for, format: 2017-06-08
-	 * @param transformation A coordinate transformation to WGS 84
-	 */
-	public HereMapsRouteValidator(String outputFolder, String apiAccessKey, String date,
-			CoordinateTransformation transformation) {
-		this.outputPath = outputFolder;
-		this.apiAcessKey = apiAccessKey;
-		this.date = date;
-		this.transformation = transformation;
-		File outDir = new File(outputFolder);
-		if (!outDir.exists()) {
-			outDir.mkdirs();
-		}
+        File outDir = new File(outputFolder);
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }
 
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.contrib.analysis.vsp.traveltimes.TravelTimeValidator#
-	 * getTravelTime(org.matsim.contrib.analysis.vsp.traveltimes.CarTrip)
-	 */
-	@Override
-	public Tuple<Double, Double> getTravelTime(CarTrip trip) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.matsim.contrib.analysis.vsp.traveltimes.TravelTimeValidator#
+     * getTravelTime(org.matsim.contrib.analysis.vsp.traveltimes.CarTrip)
+     */
+    @Override
+    public Tuple<Double, Double> getTravelTime(NetworkTrip trip) {
+        String tripId = trip.getPersonId().toString() + "_" + trip.getDepartureTime();
+        return getTravelTime(trip.getDepartureLocation(), trip.getArrivalLocation(), trip.getDepartureTime(), tripId);
+    }
 
-		long travelTime = 0;
-		long distance = 0;
-		Coord from = transformation.transform(trip.getDepartureLocation());
-		Coord to = transformation.transform(trip.getArrivalLocation());
-		String filename = outputPath + "/" + trip.getPersonId() + "_" + trip.getDepartureTime() + ".json.gz";
-		Locale locale = new Locale("en", "UK");
-		String pattern = "###.#####";
+    @Override
+    public Tuple<Double, Double> getTravelTime(Coord fromCoord, Coord toCoord, double departureTime, String tripId) {
+        long travelTime = 0;
+        long distance = 0;
 
-		DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(locale);
-		df.applyPattern(pattern);
+        Coord from = transformation.transform(fromCoord);
+        Coord to = transformation.transform(toCoord);
 
-		String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAcessKey + "&transportmode=car&origin="
-				+ df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
-				+ df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(trip.getDepartureTime())
-				+ "&return=summary";
+        Locale locale = new Locale("en", "UK");
+        String pattern = "###.#####";
 
-		try {
-			System.out.println(urlString);
-			URL url = new URL(urlString);
-			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-			JSONParser jp = new JSONParser();
+        DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(locale);
+        df.applyPattern(pattern);
 
-			JSONObject jsonObject = (JSONObject) jp.parse(in);
-			JSONArray routes = (JSONArray) jsonObject.get("routes");
-			if (!routes.isEmpty()) {
-				JSONObject route = (JSONObject) routes.get(0);
-				JSONArray sections = (JSONArray) route.get("sections");
-				JSONObject section = (JSONObject) sections.get(0);
-				JSONObject summary = (JSONObject) section.get("summary");
-				travelTime = (long) summary.get("duration");
-				distance = (long) summary.get("length");
+        String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAccessKey + "&transportmode=" + mode + "&origin="
+                + df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
+                + df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(departureTime)
+                + "&return=summary";
 
-				if (writeDetailedFiles) {
-					BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-					bw.write(jsonObject.toString());
-					bw.flush();
-					bw.close();
-				}
-			}
-		} catch (MalformedURLException e) {
-		} catch (IOException e) {
-		} catch (ParseException e) {
-		}
+        log.info(urlString);
 
-		return new Tuple<Double, Double>((double) travelTime, (double) distance);
-	}
+        try {
+            URL url = new URL(urlString);
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            JSONParser jp = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jp.parse(in);
+            JSONArray routes = (JSONArray) jsonObject.get("routes");
 
-	/**
-	 * @return the writeDetailedFiles
-	 */
-	public boolean isWriteDetailedFiles() {
-		return writeDetailedFiles;
-	}
+            if (!routes.isEmpty()) {
+                JSONObject route = (JSONObject) routes.get(0);
+                JSONArray sections = (JSONArray) route.get("sections");
+                JSONObject section = (JSONObject) sections.get(0);
+                JSONObject summary = (JSONObject) section.get("summary");
+                travelTime = (long) summary.get("duration");
+                distance = (long) summary.get("length");
+                if (writeDetailedFiles) {
+                    String filename = outputPath + "/" + tripId + ".json.gz";
+                    BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+                    bw.write(jsonObject.toString());
+                    bw.flush();
+                    bw.close();
+                }
+            }
 
-	/**
-	 * @param writeDetailedFiles the writeDetailedFiles to set
-	 */
-	public void setWriteDetailedFiles(boolean writeDetailedFiles) {
-		this.writeDetailedFiles = writeDetailedFiles;
-	}
+            in.close();
+        } catch (MalformedURLException e) {
+            log.error("URL is not working. Please check your API key", e);
+        } catch (IOException | ParseException e) {
+            log.error("Cannot read the content on the URL properly. Please manually check the URL", e);
+        }
+        return new Tuple<Double, Double>((double) travelTime, (double) distance);
+    }
 
 }

@@ -43,7 +43,7 @@ public class DrtFareHandlerTest {
 	public void testDrtFareHandler() {
 		String mode = "mode_0";
 		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.setBasefare(1);
+		fareParams.setBaseFare(1);
 		fareParams.setMinFarePerTrip(1.5);
 		fareParams.setDailySubscriptionFee(1);
 		fareParams.setDistanceFare_m(1.0 / 1000.0);
@@ -70,7 +70,7 @@ public class DrtFareHandlerTest {
 		{
 			var requestId = Id.create(0, Request.class);
 			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("12"),
-					Id.createLinkId("23"), 240, 1000));
+					Id.createLinkId("23"), 240, 1000, 0.0, 0.0));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
 			events.flush();
 
@@ -81,7 +81,7 @@ public class DrtFareHandlerTest {
 			// test minFarePerTrip
 			var requestId = Id.create(1, Request.class);
 			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("45"),
-					Id.createLinkId("56"), 24, 100));
+					Id.createLinkId("56"), 24, 100, 0.0, 0.0));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
 			events.finishProcessing();
 

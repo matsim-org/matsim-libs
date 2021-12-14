@@ -23,100 +23,66 @@ package org.matsim.contrib.emissions;
 /**
  * @author benjamin
  * @author julia
- * 
  **/
-class HbefaColdEmissionFactorKey {
-	
-	private HbefaVehicleCategory hbefaVehicleCategory;
-	private Pollutant hbefaComponent;
-	private int hbefaParkingTime;
-	private int hbefaDistance;
-	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-	
-	public HbefaColdEmissionFactorKey(){
+class HbefaColdEmissionFactorKey extends HbefaEmissionFactorKey {
+
+	private int parkingTime;
+	private int distance;
+
+	public HbefaColdEmissionFactorKey() {
+		super();
 	}
 
 	public HbefaColdEmissionFactorKey(HbefaColdEmissionFactorKey key) {
-		this.hbefaVehicleCategory = key.getHbefaVehicleCategory();
-		this.hbefaComponent = key.getHbefaComponent();
-		this.hbefaParkingTime = key.getHbefaParkingTime();
-		this.hbefaDistance = key.getHbefaDistance();
-		this.hbefaVehicleAttributes = key.getHbefaVehicleAttributes();
+		super(key);
+		this.parkingTime = key.getParkingTime();
+		this.distance = key.getDistance();
 	}
 
-
-	HbefaVehicleCategory getHbefaVehicleCategory() {
-		return hbefaVehicleCategory;
+	public int getParkingTime() {
+		return parkingTime;
 	}
 
-	public void setHbefaVehicleCategory(HbefaVehicleCategory hbefaVehicleCategory) {
-		this.hbefaVehicleCategory = hbefaVehicleCategory;
+	public void setParkingTime(int parkingTime) {
+		this.parkingTime = parkingTime;
 	}
 
-	public Pollutant getHbefaComponent() {
-		return hbefaComponent;
+	public int getDistance() {
+		return distance;
 	}
 
-	public void setHbefaComponent( Pollutant hbefaComponent ) {
-		this.hbefaComponent = hbefaComponent;
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 
-	public int getHbefaParkingTime() {
-		return hbefaParkingTime;
-	}
-
-	public void setHbefaParkingTime(Integer hbefaParkingTime) {
-		this.hbefaParkingTime = hbefaParkingTime;
-	}
-
-	public int getHbefaDistance() {
-		return hbefaDistance;
-	}
-
-	public void setHbefaDistance(Integer hbefaDistance) {
-		this.hbefaDistance = hbefaDistance;
-	}
-		
-	public HbefaVehicleAttributes getHbefaVehicleAttributes() {
-		return hbefaVehicleAttributes;
-	}
-
-	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
-		this.hbefaVehicleAttributes = hbefaVehicleAttributes;
-	}
-
-	/* need to implement the "equals" method in order to be able to construct an "equal" key
-	 later on (e.g. from data available in the simulation)*/
 	@Override
-	public boolean equals(Object obj) {
-	        if(this == obj) {
-	              return true;
-	         }
-	         if (!(obj instanceof HbefaColdEmissionFactorKey)) {
-	                return false; 
-	         }
-	         HbefaColdEmissionFactorKey key = (HbefaColdEmissionFactorKey) obj;
-	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
-	         && hbefaComponent.equals(key.getHbefaComponent())
-	         && hbefaParkingTime == (key.getHbefaParkingTime())
-	         && hbefaDistance == (key.getHbefaDistance())
-	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+
+		var that = (HbefaColdEmissionFactorKey) o;
+
+		if (parkingTime != that.getParkingTime()) return false;
+		return distance == that.getDistance();
 	}
 
-	// if "equals" is implemented, "hashCode" also needs to be implemented
 	@Override
-	public int hashCode(){
-		return toString().hashCode();
-	} 
-	
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + parkingTime;
+		result = 31 * result + distance;
+		return result;
+	}
+
 
 	// needed for "hashCode" method
 	@Override
 	public String toString(){
-		return hbefaVehicleCategory + "; " 
-		+ hbefaComponent + "; "
-		+ hbefaParkingTime + "; "
-		+ hbefaDistance+ "; "
-		+ hbefaVehicleAttributes;
+		return getVehicleCategory() + "; "
+				+ getComponent() + "; "
+				+ parkingTime + "; "
+				+ distance + "; "
+				+ getVehicleAttributes();
 	}
 }

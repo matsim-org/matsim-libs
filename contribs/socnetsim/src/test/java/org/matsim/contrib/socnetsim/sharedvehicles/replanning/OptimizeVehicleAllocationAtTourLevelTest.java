@@ -41,6 +41,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -51,8 +52,7 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
  * @author thibautd
  */
 public class OptimizeVehicleAllocationAtTourLevelTest {
-	private static Set<String> stages = new HashSet<>();// formerly EmptyStageActivityTypes.INSTANCE;
-	private static String MODE = "the_vehicular_mode";
+	private static final String MODE = "the_vehicular_mode";
 
 	private final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 
@@ -109,6 +109,8 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 
 	@Test
 	public void testCannotFindBetterAllocationRandomly() throws Exception {
+		Set<String> stages = new HashSet<>();// formerly EmptyStageActivityTypes.INSTANCE;
+
 		for ( int i = 0; i < 5; i++ ) {
 			final GroupPlans optimized = createTestPlan( new Random( i ) );
 
@@ -120,7 +122,8 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 						new Random( 1234 ),
 						vehs,
 						Collections.singleton( MODE ),
-						false );
+						false,
+						TimeInterpretation.create(ConfigUtils.createConfig()));
 			algo.run( optimized );
 			final double optimizedOverlap = algo.calcOverlap( optimized );
 			final Counter counter = new Counter( "test plan # "+(i+1)+", test # " );

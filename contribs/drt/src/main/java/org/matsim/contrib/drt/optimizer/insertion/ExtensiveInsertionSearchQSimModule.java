@@ -22,20 +22,18 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
-import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -50,26 +48,28 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
-		bindModal(new TypeLiteral<DrtInsertionSearch<OneToManyPathSearch.PathData>>() {
-		}).toProvider(modalProvider(
-				getter -> new ExtensiveInsertionSearch(getter.getModal(DetourPathCalculator.class), drtCfg,
-						getter.get(MobsimTimer.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
-						getter.getModal(DvrpTravelTimeMatrix.class))));
+		bindModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
+		}).toProvider(modalProvider(getter -> {
+			var insertionCostCalculatorFactory = getter.getModal(InsertionCostCalculatorFactory.class);
+			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
+					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
+					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
+			var insertionCostCalculator = insertionCostCalculatorFactory.create(PathData::getTravelTime, null);
+			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
+					insertionCostCalculator);
+		})).asEagerSingleton();
 
-		addModalComponent(MultiInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
-
-			@Override
-			public MultiInsertionDetourPathCalculator get() {
-				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
-			}
-		});
+		addModalComponent(MultiInsertionDetourPathCalculator.class,
+				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+					@Override
+					public MultiInsertionDetourPathCalculator get() {
+						var travelTime = getModalInstance(TravelTime.class);
+						Network network = getModalInstance(Network.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
+					}
+				});
 		bindModal(DetourPathCalculator.class).to(modalKey(MultiInsertionDetourPathCalculator.class));
 	}
 }

@@ -1,6 +1,6 @@
 package org.matsim.contrib.bicycle;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -21,14 +21,14 @@ import static org.junit.Assert.assertTrue;
 
 public class BicycleLinkSpeedCalculatorTest {
 
-    private static final BicycleConfigGroup configGroup = new BicycleConfigGroup();
-    private static final double maxBicycleSpeed = 15;
-    private static final Network unusedNetwork = NetworkUtils.createNetwork();
+    private static final double MAX_BICYCLE_SPEED = 15;
 
-    @BeforeClass
-    public static void before() {
+    private final BicycleConfigGroup configGroup = new BicycleConfigGroup();
+    private final Network unusedNetwork = NetworkUtils.createTimeInvariantNetwork();
 
-        configGroup.setMaxBicycleSpeedForRouting(maxBicycleSpeed);
+    @Before
+    public void before() {
+        configGroup.setMaxBicycleSpeedForRouting(MAX_BICYCLE_SPEED);
         configGroup.setBicycleMode("bike");
     }
 

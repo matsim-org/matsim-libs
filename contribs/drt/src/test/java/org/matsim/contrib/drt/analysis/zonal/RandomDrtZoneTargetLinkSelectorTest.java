@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Random;
+import java.util.function.IntUnaryOperator;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -48,9 +48,9 @@ public class RandomDrtZoneTargetLinkSelectorTest {
 		DrtZone zone = DrtZone.createDummyZone("zone", List.of(link0, link1, link2, link3), null);
 
 		//fake random sequence
-		Random random = mock(Random.class);
+		IntUnaryOperator random = mock(IntUnaryOperator.class);
 		ArgumentCaptor<Integer> boundCaptor = ArgumentCaptor.forClass(int.class);
-		when(random.nextInt(boundCaptor.capture())).thenReturn(0, 3, 1, 2);
+		when(random.applyAsInt(boundCaptor.capture())).thenReturn(0, 3, 1, 2);
 
 		//test selected target links
 		RandomDrtZoneTargetLinkSelector selector = new RandomDrtZoneTargetLinkSelector(random);

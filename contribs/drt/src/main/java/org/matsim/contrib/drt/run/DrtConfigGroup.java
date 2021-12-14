@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,6 +49,8 @@ import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -86,13 +88,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
 	static final String MAX_TRAVEL_TIME_ALPHA_EXP =
 			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
 					+ "Alpha should not be smaller than 1.";
 
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
 	static final String MAX_TRAVEL_TIME_BETA_EXP =
 			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
 					+ "Beta should not be smaller than 0.";
 
 	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
@@ -120,7 +122,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
-	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
+	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet."
+			+ " The file format according to dvrp_vehicles_v1.dtd"
+			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
+			+ " See FleetModule.";
 
 	public static final String TRANSIT_STOP_FILE = "transitStopFile";
 	static final String TRANSIT_STOP_FILE_EXP =
@@ -138,7 +143,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	static final String NUMBER_OF_THREADS_EXP =
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
-					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+					+ " using up to 4 threads."
+					+ " Default value is the number of cores available to JVM.";
+
+	public static final String STORE_UNSHARED_PATH = "storeUnsharedPath";
+	static final String STORE_UNSHARED_PATH_EXP = "Store planned unshared drt route as a link sequence";
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
@@ -188,6 +197,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	@PositiveOrZero
 	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
+
+	private boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
@@ -261,10 +272,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		if (config.qsim().getNumberOfThreads() > 1) {
-			log.warn("EXPERIMENTAL FEATURE: Running DRT with a multi-threaded QSim");
-		}
-
 		Verify.verify(getMaxWaitTime() >= getStopDuration(),
 				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
 
@@ -319,6 +326,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
+		map.put(STORE_UNSHARED_PATH, STORE_UNSHARED_PATH_EXP);
 		return map;
 	}
 
@@ -383,7 +391,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	}
 
 	/**
-	 * @param -- {@value #MAX_WAIT_TIME_EXP}
+	 * @param maxWaitTime -- {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public DrtConfigGroup setMaxWaitTime(double maxWaitTime) {
@@ -614,6 +622,22 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		return this;
 	}
 
+	/**
+	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
+	 */
+	@StringGetter(STORE_UNSHARED_PATH)
+	public boolean getStoreUnsharedPath() {
+		return storeUnsharedPath;
+	}
+
+	/**
+	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
+	 */
+	@StringSetter(STORE_UNSHARED_PATH)
+	void setStoreUnsharedPath(boolean storeUnsharedPath) {
+		this.storeUnsharedPath = storeUnsharedPath;
+	}
+
 	public double getAdvanceRequestPlanningHorizon() {
 		return advanceRequestPlanningHorizon;
 	}
@@ -646,4 +670,12 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
 	}
+
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 */
+	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		addParameterSet(pars);
+	}
+
 }

@@ -22,9 +22,10 @@ package org.matsim.contrib.drt.routing;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface DrtStopFacility extends Identifiable<DrtStopFacility>, Facility {
+public interface DrtStopFacility extends Identifiable<DrtStopFacility>, Facility, Attributable {
 }

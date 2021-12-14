@@ -28,7 +28,7 @@ public class OsmBicycleReaderIT {
 				.build()
 				.read(inputFile);
 
-		Network expectedResult = NetworkUtils.readNetwork(Paths.get(matsimTestUtils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
+		Network expectedResult = NetworkUtils.readTimeInvariantNetwork(Paths.get(matsimTestUtils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
 
 		Utils.assertEquals(expectedResult, network);
 	}

@@ -27,18 +27,18 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 
-public final class Hermes implements Mobsim {
+final class Hermes implements Mobsim {
 
 	final private static Logger log = Logger.getLogger(Hermes.class);
 	private Realm realm;
 	private Agent[] agents;
 	private ScenarioImporter si;
 	private final Scenario scenario;
-	private final ParallelEventsManager eventsManager;
+	private final EventsManager eventsManager;
 
 	public Hermes(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
-		this.eventsManager = (ParallelEventsManager) eventsManager;
+		this.eventsManager = eventsManager;
 	}
 
 	private void importScenario() throws Exception {
@@ -67,19 +67,19 @@ public final class Hermes implements Mobsim {
 		try {
 			time = System.currentTimeMillis();
 			importScenario();
-			log.info(String.format("ETHZ importing hermes scenario took %d ms", System.currentTimeMillis() - time));
+			log.info(String.format("Hermes importing scenario took %d ms", System.currentTimeMillis() - time));
 
 			eventsManager.initProcessing();
 
 			time = System.currentTimeMillis();
 			realm.run();
 			log.info(String.format(
-					"ETHZ hermes took %d ms", System.currentTimeMillis() - time));
+					"Hermes took %d ms", System.currentTimeMillis() - time));
 
 			time = System.currentTimeMillis();
 			processEvents();
 			eventsManager.finishProcessing();
-			log.info(String.format("ETHZ matsim event processing took %d ms", System.currentTimeMillis() - time));
+			log.info(String.format("Hermes MATSim event processing took %d ms", System.currentTimeMillis() - time));
 
 			// Launch scenario imported in background
 			si.reset();

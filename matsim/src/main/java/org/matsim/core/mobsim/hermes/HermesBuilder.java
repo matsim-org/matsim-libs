@@ -25,7 +25,7 @@ import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
-public class HermesBuilder implements AllowsConfiguration {
+class HermesBuilder implements AllowsConfiguration {
 
 	@Override
 	public AllowsConfiguration addOverridingModule(AbstractModule abstractModule) {

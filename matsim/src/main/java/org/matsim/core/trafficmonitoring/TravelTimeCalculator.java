@@ -22,6 +22,7 @@ package org.matsim.core.trafficmonitoring;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
@@ -81,7 +82,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	TimeSlotComputation aggregator;
 
 
-	private Map<Id<Link>, TravelTimeData> linkData;
+	private IdMap<Link, TravelTimeData> linkData;
 
 	private Map<Tuple<Id<Link>, Id<Link>>, TravelTimeData> linkToLinkData;
 
@@ -236,7 +237,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		this.travelTimeGetter = new AveragingTravelTimeGetter( this.aggregator ) ;
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		if (this.calculateLinkTravelTimes){
-			this.linkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4));
+			this.linkData = new IdMap<>(Link.class);
 
 			/*
 			 * So far, link data objects were stored in a HashMap. This lookup strategy is used
@@ -261,9 +262,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		// the vehicleEntersTraffic event.  So we need to memorize the ignored vehicles from there ...
 		this.vehiclesToIgnore = new HashSet<>();
 
-
 		this.reset(0);
-
 	}
 
 	@Override

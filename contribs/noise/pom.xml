@@ -3,30 +3,41 @@
     <parent>
         <groupId>org.matsim</groupId>
         <artifactId>contrib</artifactId>
-        <version>13.0-SNAPSHOT</version>
+        <version>14.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim.contrib</groupId>
     <artifactId>noise</artifactId>
     <name>noise</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>analysis</artifactId>
-            <version>13.0-SNAPSHOT</version>
+            <version>14.0-SNAPSHOT</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
-            <version>21.5</version>
+            <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-coverage</artifactId>
+            <version>${geotools.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geotiff</artifactId>
+            <version>${geotools.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
@@ -41,6 +52,5 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
     </dependencies>
 </project>

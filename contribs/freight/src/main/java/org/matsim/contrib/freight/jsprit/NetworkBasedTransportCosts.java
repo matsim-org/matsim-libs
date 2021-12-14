@@ -30,6 +30,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -71,7 +72,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author stefan schröder
  *
  */
-public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts {
+public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	public interface InternalLeastCostPathCalculatorListener {
 
@@ -93,6 +94,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		private Id<org.matsim.vehicles.Vehicle> id;
 
 		private org.matsim.vehicles.VehicleType type;
+
+		private Attributes attributes = new Attributes();
 
 		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
@@ -120,6 +123,9 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		public org.matsim.vehicles.VehicleType getType() {
 			return type;
 		}
+
+		@Override
+		public Attributes getAttributes() { return this.attributes; }
 	}
 
 	/**
@@ -834,10 +840,11 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 
 	private org.matsim.vehicles.Vehicle getMatsimVehicle(Vehicle vehicle) {
 		String typeId = vehicle.getType().getTypeId();
-		if (matsimVehicles.containsKey(typeId)) {
-			return matsimVehicles.get(typeId);
+		org.matsim.vehicles.Vehicle matsimVehicle = matsimVehicles.get(typeId);
+		if (matsimVehicle != null) {
+			return matsimVehicle;
 		}
-		org.matsim.vehicles.Vehicle matsimVehicle = new MatsimVehicleWrapper(vehicle);
+		matsimVehicle = new MatsimVehicleWrapper(vehicle);
 		matsimVehicles.put(typeId, matsimVehicle);
 		return matsimVehicle;
 	}
@@ -846,7 +853,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		return new TransportDataKey(fromId, toId, time, vehicleType);
 	}
 
-	LeastCostPathCalculator getRouter() {
+	public LeastCostPathCalculator getRouter() {
 		return createLeastCostPathCalculator();
 	}
 

@@ -70,9 +70,10 @@ public class RunCarsharing {
 
 		CarsharingUtils.addConfigModules(config);
 
-		final Scenario sc = ScenarioUtils.loadScenario(config);
+		final Scenario sc = ScenarioUtils.createScenario(config);
 		sc.getPopulation().getFactory().getRouteFactories().setRouteFactory(CarsharingRoute.class,
 				new CarsharingRouteFactory());
+		ScenarioUtils.loadScenario(sc);
 
 		final Controler controler = new Controler(sc);
 
@@ -88,7 +89,7 @@ public class RunCarsharing {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
-		Network networkFF = NetworkUtils.createNetwork();
+		Network networkFF = NetworkUtils.createTimeInvariantNetwork();
 		filter.filter(networkFF, modes);
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(networkFF);
 

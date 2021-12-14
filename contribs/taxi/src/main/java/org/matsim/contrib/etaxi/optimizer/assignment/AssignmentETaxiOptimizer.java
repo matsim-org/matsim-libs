@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -34,28 +36,25 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentRequestInserter;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.PartialSort;
+import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.collect.Maps;
 
 /**
  * Main assumptions:
@@ -72,16 +71,7 @@ import com.google.common.collect.Maps;
  * <li>since the destination remains unknown till the end of pickup, all schedules end with STAY or PICKUP tasks
  * </ul>
  */
-public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
-	public static AssignmentETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
-			ChargingInfrastructure chargingInfrastructure) {
-		LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility,
-				travelTime);
-		return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, network, travelTime, travelDisutility,
-				eScheduler, scheduleTimingUpdater, chargingInfrastructure, router);
-	}
+public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 
 	private final AssignmentETaxiOptimizerParams params;
 	private final ChargingInfrastructure chargingInfrastructure;
@@ -91,7 +81,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	private final Fleet fleet;
 	private final MobsimTimer timer;
 
-	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging;
+	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging = new HashMap<>();
 
 	public AssignmentETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			MobsimTimer timer, Network network, TravelTime travelTime, TravelDisutility travelDisutility,
@@ -116,11 +106,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		}
 
 		eAssignmentProblem = new VehicleAssignmentProblem<>(network, travelTime, travelDisutility);
-
 		eAssignmentCostProvider = new ETaxiToPlugAssignmentCostProvider(params);
-
-		int plugsCount = chargingInfrastructure.getChargers().size() * 2;// TODO
-		scheduledForCharging = Maps.newHashMapWithExpectedSize(plugsCount * 2);
 	}
 
 	private final boolean chargingTaskRemovalEnabled = true;
@@ -205,7 +191,8 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		// filter least charged vehicles
 		// assumption: all b.capacities are equal
 		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
-				vehiclesBelowMinSocLevel, v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc());
+				vehiclesBelowMinSocLevel,
+				Comparator.comparingDouble(v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc()));
 
 		return new VehicleData(timer.getTimeOfDay(), eScheduler.getScheduleInquiry(), leastChargedVehicles.stream());
 	}
