@@ -19,13 +19,11 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 

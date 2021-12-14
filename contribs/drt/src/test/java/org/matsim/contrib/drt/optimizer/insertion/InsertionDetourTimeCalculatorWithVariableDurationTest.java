@@ -151,7 +151,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 		double departureTime = start.getDepartureTime() + STOP_DURATION_ADDED;
 		double pickupTimeLoss = STOP_DURATION_ADDED;
 		double arrivalTime = stop0.getArrivalTime() + pickupTimeLoss;
-		double dropoffTimeLoss = 0;
+		double dropoffTimeLoss = STOP_DURATION_ADDED;
 		assertDetourTimeInfo(insertion,
 				new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss));
 	}
