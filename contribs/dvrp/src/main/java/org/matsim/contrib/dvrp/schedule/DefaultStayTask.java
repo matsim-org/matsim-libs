@@ -17,32 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.schedule;
+package org.matsim.contrib.dvrp.schedule;
 
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.DROPOFF;
-
-import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.base.MoreObjects;
 
-public class TaxiDropoffTask extends DefaultStayTask {
-	public static final TaxiTaskType TYPE = new TaxiTaskType(DROPOFF);
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class DefaultStayTask extends AbstractTask implements StayTask {
+	private final Link link;
 
-	private final TaxiRequest request;
-
-	public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request) {
-		super(TYPE, beginTime, endTime, request.getToLink());
-		this.request = request;
-		request.setDropoffTask(this);
+	public DefaultStayTask(TaskType taskType, double beginTime, double endTime, Link link) {
+		super(taskType, beginTime, endTime);
+		this.link = link;
 	}
 
-	public TaxiRequest getRequest() {
-		return request;
+	@Override
+	public final Link getLink() {
+		return link;
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
+		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("link", link).toString();
 	}
 }

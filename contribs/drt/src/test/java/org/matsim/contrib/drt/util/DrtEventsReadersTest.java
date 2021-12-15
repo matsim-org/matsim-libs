@@ -32,11 +32,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -45,7 +46,6 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -67,7 +67,7 @@ public class DrtEventsReadersTest {
 	private final List<Event> drtEvents = List.of(
 			new DrtRequestSubmittedEvent(0, mode, request, person, link1, link2, 111, 222, 412.0, 512.0),//
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
-			taskEnded(30, DrtStopTask.TYPE, 1, link2), //
+			taskEnded(30, DefaultDrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//
 			taskEnded(70, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, 3, link2),//
 			taskStarted(90, EDrtChargingTask.TYPE, 4, link2)//
