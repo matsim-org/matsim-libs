@@ -104,14 +104,8 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
 		double unsharedRideTime = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_TIME));
 		double unsharedRideDistance = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
-		double latestPickupTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_PICKUP_TIME, "-1"));
-		double latestDropoffTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_DROPOFF_TIME, "-1"));
-		if (latestPickupTime == -1) {
-			latestDropoffTime = Double.NaN;
-		}
-		if (latestDropoffTime == -1) {
-			latestDropoffTime = Double.NaN;
-		}
+		double latestPickupTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_PICKUP_TIME, "NaN"));
+		double latestDropoffTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_DROPOFF_TIME, "NaN"));
 		return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime,
 				unsharedRideDistance, latestPickupTime, latestDropoffTime);
 	}
