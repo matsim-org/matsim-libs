@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.eshifts.schedule;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.evrp.ChargingTask;
 import org.matsim.contrib.evrp.ETask;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
@@ -10,7 +10,7 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 /**
  * @author nkuehnel / MOIA
  */
-public class EDrtShiftChangeoverTaskImpl extends DrtStopTask implements ShiftChangeOverTask, ETask {
+public class EDrtShiftChangeoverTaskImpl extends DefaultDrtStopTask implements ShiftChangeOverTask, ETask {
 
     private final double shiftEndTime;
     private final double consumedEnergy;

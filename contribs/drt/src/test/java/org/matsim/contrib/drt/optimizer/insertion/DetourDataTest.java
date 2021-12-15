@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
@@ -130,6 +130,6 @@ public class DetourDataTest {
 	}
 
 	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.Stop(new DrtStopTask(0, 60, link), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), 0);
 	}
 }
