@@ -31,6 +31,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfiles;
+import org.matsim.contrib.drt.util.stats.DrtVehicleTaskProfiles;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -96,9 +97,8 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), drtCfg.getMode(),
-						getter.getModal(VehicleTaskProfileCalculator.class), Comparator.comparing(Task.TaskType::name),
-						ImmutableMap.of(DefaultDrtStopTask.TYPE, Color.LIGHT_GRAY))));
+				getter -> DrtVehicleTaskProfiles.createProfileWriter(getter.get(MatsimServices.class),
+						drtCfg.getMode(), getter.getModal(VehicleTaskProfileCalculator.class))));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,

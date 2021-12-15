@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.Map;
 
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
@@ -41,7 +43,8 @@ public class DrtVehicleOccupancyProfiles {
 		//we want the following order on the plot: STAY, RELOCATE, other
 		if (type.equals(DrtStayTask.TYPE)) {
 			return "C";
-		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE) ||
+				DrtTaskBaseType.STAY.equals(((DrtTaskType) type).getBaseType().orElse(null))) {
 			return "B";
 		} else {
 			return "A" + type.name();
