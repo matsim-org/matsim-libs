@@ -43,8 +43,7 @@ public class DrtVehicleOccupancyProfiles {
 		//we want the following order on the plot: STAY, RELOCATE, other
 		if (type.equals(DrtStayTask.TYPE)) {
 			return "C";
-		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE) ||
-				DrtTaskBaseType.STAY.equals(((DrtTaskType) type).getBaseType().orElse(null))) {
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
 			return "B";
 		} else {
 			return "A" + type.name();
