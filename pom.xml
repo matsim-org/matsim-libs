@@ -13,7 +13,7 @@
 	<properties>
 <!--		<matsim.version>14.0-SNAPSHOT</matsim.version>-->
 <!--		<matsim.version>13.0-2021w07-SNAPSHOT</matsim.version>-->
-		<matsim.version>14.0-PR1512</matsim.version>
+		<matsim.version>14.0-PR1802</matsim.version>
 	</properties>
 
 	<repositories>
