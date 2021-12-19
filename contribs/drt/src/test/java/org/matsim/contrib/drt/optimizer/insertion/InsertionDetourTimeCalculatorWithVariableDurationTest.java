@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableTable;
 
 /**
  * @author Michal Maciejewski (michalm)
+ * @author Sebastian Hörl (sebhoerl)
  */
 public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	private final static Link fromLink = link("from");

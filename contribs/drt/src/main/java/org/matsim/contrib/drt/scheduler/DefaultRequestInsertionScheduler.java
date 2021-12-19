@@ -141,7 +141,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				stopTask.addPickupRequest(request);
 				
 				double duration = stopDuration.calculateStopDuration(stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
-				stopTask.setEndTime(Math.max(stopTask.getBeginTime() + duration, request.getEarliestStartTime()));
+				stopTask.setEndTime(Math.max(Math.max(stopTask.getBeginTime() + duration, stopTask.getEndTime()), request.getEarliestStartTime()));
 
 				/// ADDED
 				//// TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
@@ -251,6 +251,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add dropoff request to stop task
 				stopTask.addDropoffRequest(request);
+				double duration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
+				stopTask.setEndTime(Math.max(stopTask.getBeginTime() + duration, stopTask.getEndTime()));
 				return stopTask;
 			} else { // add drive task to dropoff location
 
@@ -298,10 +300,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		} else {
 			Link toLink = stops.get(dropoffIdx).task.getLink(); // dropoff->j+1
 
-			double taskDuration = stopDuration.calculateStopDuration(
-					stops.get(dropoffIdx).task.getDropoffRequests().values(),
-					stops.get(dropoffIdx).task.getDropoffRequests().values());
-			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink, startTime + taskDuration,
+			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink, startTime + duration,
 					insertion.getDetourFromDropoff(), travelTime);
 			Task driveFromDropoffTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath, DrtDriveTask.TYPE);
 			schedule.addTask(taskIdx + 1, driveFromDropoffTask);
