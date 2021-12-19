@@ -177,7 +177,7 @@ public class InsertionDetourTimeCalculatorTest {
 				.put(stop0.getLink(), stop1.getLink(), dropoffDetourReplacedDriveEstimate)
 				.build();
 
-		var detourTimeCalculator = new InsertionDetourTimeCalculator<>((d, p) -> STOP_DURATION, Double::doubleValue,
+		var detourTimeCalculator = new InsertionDetourTimeCalculator<>((v, d, p) -> STOP_DURATION, Double::doubleValue,
 				replacedDriveTimeEstimates::get);
 		var actualDetourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion, drtRequest);
 
@@ -191,7 +191,7 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private void assertDetourTimeInfo(InsertionWithDetourData<Double> insertion, DetourTimeInfo expected) {
-		var detourTimeCalculator = new InsertionDetourTimeCalculator<>((d, p) -> STOP_DURATION, Double::doubleValue, null);
+		var detourTimeCalculator = new InsertionDetourTimeCalculator<>((v, d, p) -> STOP_DURATION, Double::doubleValue, null);
 		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion, drtRequest);
 		assertThat(detourTimeInfo).isEqualToComparingFieldByField(expected);
 	}

@@ -59,7 +59,7 @@ public class InsertionDetourTimeCalculator<D> {
 			double fromPickupTT = detourTime.applyAsDouble(insertion.getDetourFromPickup());
 			double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
 			
-			double pickupStopDuration = stopDuration.calculateStopDuration(Collections.emptySet(), Collections.singleton(request));
+			double pickupStopDuration = stopDuration.calculateStopDuration(vEntry.vehicle, Collections.emptySet(), Collections.singleton(request));
 			pickupTimeLoss = toPickupTT + pickupStopDuration + fromPickupTT - replacedDriveTT;
 			departureTime = toPickupDepartureTime + toPickupTT + pickupStopDuration;
 		}
@@ -74,7 +74,7 @@ public class InsertionDetourTimeCalculator<D> {
 			double toDropoffTT = detourTime.applyAsDouble(insertion.getDetourToDropoff());
 			double fromDropoffTT = detourTime.applyAsDouble(insertion.getDetourFromDropoff());
 			double replacedDriveTT = calculateReplacedDriveDuration(insertion.getVehicleEntry(), dropoff.index);
-			double dropoffStopDuration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
+			double dropoffStopDuration = stopDuration.calculateStopDuration(vEntry.vehicle, Collections.singleton(request), Collections.emptySet());
 			dropoffTimeLoss = toDropoffTT + dropoffStopDuration + fromDropoffTT - replacedDriveTT;
 			arrivalTime = dropoff.previousWaypoint.getDepartureTime() + pickupTimeLoss + toDropoffTT;
 		}
@@ -94,14 +94,14 @@ public class InsertionDetourTimeCalculator<D> {
 			additionalPickupStopDuration = calcAdditionalStopDurationIfSameLinkAsPrevious(vEntry, pickup.index, request);
 		} else {
 			toPickupTT = detourTime.applyAsDouble(insertion.getDetourToPickup());
-			additionalPickupStopDuration = stopDuration.calculateStopDuration(Collections.emptySet(), Collections.singleton(request));
+			additionalPickupStopDuration = stopDuration.calculateStopDuration(vEntry.vehicle, Collections.emptySet(), Collections.singleton(request));
 		}
 
 		double fromPickupToDropoffTT = detourTime.applyAsDouble(insertion.getDetourFromPickup());
 		double fromDropoffTT = detourTime.applyAsDouble(insertion.getDetourFromDropoff());
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
 		double pickupTimeLoss = toPickupTT + additionalPickupStopDuration + fromPickupToDropoffTT - replacedDriveTT;
-		double dropoffStopDuration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
+		double dropoffStopDuration = stopDuration.calculateStopDuration(vEntry.vehicle, Collections.singleton(request), Collections.emptySet());
 		double dropoffTimeLoss = dropoffStopDuration + fromDropoffTT;
 
 		double departureTime = pickup.previousWaypoint.getDepartureTime() + toPickupTT + additionalPickupStopDuration;
@@ -119,14 +119,14 @@ public class InsertionDetourTimeCalculator<D> {
 			if (startTask.isPresent() && STOP.isBaseTypeOf(startTask.get())) {
 				stopTask = (DrtStopTask) startTask.get();
 			} else {
-				return stopDuration.calculateStopDuration(Collections.emptySet(), Collections.singleton(request));
+				return stopDuration.calculateStopDuration(vEntry.vehicle, Collections.emptySet(), Collections.singleton(request));
 			}
 		} else {
 			stopTask = vEntry.stops.get(insertionIdx - 1).task;
 		}
 		
-		double intialDuration = stopDuration.calculateStopDuration(stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
-		double updatedDuration = stopDuration.calculateStopDuration(stopTask.getDropoffRequests().values(), CollectionUtils.union(stopTask.getPickupRequests().values(), Collections.singleton(request)));
+		double intialDuration = stopDuration.calculateStopDuration(vEntry.vehicle, stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
+		double updatedDuration = stopDuration.calculateStopDuration(vEntry.vehicle, stopTask.getDropoffRequests().values(), CollectionUtils.union(stopTask.getPickupRequests().values(), Collections.singleton(request)));
 		double timeLoss = updatedDuration - intialDuration;
 		
 		if (insertionIdx == 0 && timeLoss > 0.0) {

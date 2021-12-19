@@ -171,7 +171,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
 		
-		bindModal(StopDuration.class).toInstance((d, p) -> drtCfg.getStopDuration());
+		bindModal(StopDuration.class).toInstance((vehicle, dropoffs, pickups) -> drtCfg.getStopDuration());
 	}
 
 	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DvrpMode, DrtRouteCreator> {

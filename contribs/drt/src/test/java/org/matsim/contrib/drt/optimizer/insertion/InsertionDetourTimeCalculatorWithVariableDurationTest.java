@@ -52,7 +52,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	private static final int STOP_DURATION_INITIAL = 10;
 	private static final int STOP_DURATION_ADDED = 5;
 	
-	private static final StopDuration stopDuration = (d, p) -> {
+	private static final StopDuration stopDuration = (v, d, p) -> {
 		return 0.0
 				+ (d.contains(drtRequestInitial) || p.contains(drtRequestInitial) ? STOP_DURATION_INITIAL : 0.0)
 				+ (d.contains(drtRequestAdded) || p.contains(drtRequestAdded) ? STOP_DURATION_ADDED : 0.0);						

@@ -65,7 +65,7 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 						.max()
 						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
 				
-				double duration = stopDuration.calculateStopDuration(stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
+				double duration = stopDuration.calculateStopDuration(vehicle, stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
 				return Math.max(newBeginTime + duration, maxEarliestPickupTime);
 			}
 

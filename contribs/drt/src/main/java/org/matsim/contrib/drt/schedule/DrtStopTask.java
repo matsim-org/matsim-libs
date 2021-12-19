@@ -29,6 +29,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
@@ -83,6 +84,7 @@ public class DrtStopTask extends StayTask {
 	}
 	
 	public interface StopDuration {
-		double calculateStopDuration(Collection<DrtRequest> dropoffRequests, Collection<DrtRequest> pickupRequests);
+		double calculateStopDuration(DvrpVehicle vehicle, Collection<DrtRequest> dropoffRequests,
+				Collection<DrtRequest> pickupRequests);
 	}
 }

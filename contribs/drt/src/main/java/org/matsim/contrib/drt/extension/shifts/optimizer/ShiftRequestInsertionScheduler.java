@@ -148,7 +148,8 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
                         throw new RuntimeException("Cannot serve request!");
                     }
                 } else {
-                	double duration = stopDuration.calculateStopDuration(stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
+					double duration = stopDuration.calculateStopDuration(vehicleEntry.vehicle,
+							stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
     				stopTask.setEndTime(Math.max(Math.max(stopTask.getBeginTime() + duration, stopTask.getEndTime()), request.getEarliestStartTime()));
                 }
 
@@ -247,7 +248,8 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
         // insert pickup stop task
         double startTime = beforePickupTask.getEndTime();
         int taskIdx = beforePickupTask.getTaskIdx() + 1;
-        double duration = stopDuration.calculateStopDuration(Collections.emptySet(), Collections.singleton(request));
+		double duration = stopDuration.calculateStopDuration(vehicleEntry.vehicle, Collections.emptySet(),
+				Collections.singleton(request));
 		DrtStopTask pickupStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
                 Math.max(startTime + duration, request.getEarliestStartTime()), request.getFromLink());
         schedule.addTask(taskIdx, pickupStopTask);
@@ -287,7 +289,8 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
             if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
                 // add dropoff request to stop task
                 stopTask.addDropoffRequest(request);
-                double duration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
+				double duration = stopDuration.calculateStopDuration(vehicleEntry.vehicle,
+						Collections.singleton(request), Collections.emptySet());
 				stopTask.setEndTime(Math.max(stopTask.getBeginTime() + duration, stopTask.getEndTime()));
                 return stopTask;
             } else { // add drive task to dropoff location
@@ -328,7 +331,8 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
         // insert dropoff stop task
         double startTime = driveToDropoffTask.getEndTime();
         int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
-        double duration = stopDuration.calculateStopDuration(Collections.singleton(request), Collections.emptySet());
+		double duration = stopDuration.calculateStopDuration(vehicleEntry.vehicle, Collections.singleton(request),
+				Collections.emptySet());
 		DrtStopTask dropoffStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
                 startTime + duration, request.getToLink());
         schedule.addTask(taskIdx, dropoffStopTask);
