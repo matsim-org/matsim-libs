@@ -29,7 +29,7 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
@@ -260,7 +260,7 @@ public class InsertionGeneratorTest {
 	}
 
 	private Waypoint.Stop stop(Link link, int outgoingOccupancy) {
-		return new Waypoint.Stop(new DrtStopTask(0, 0, link), outgoingOccupancy);
+		return new Waypoint.Stop(new DefaultDrtStopTask(0, 0, link), outgoingOccupancy);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

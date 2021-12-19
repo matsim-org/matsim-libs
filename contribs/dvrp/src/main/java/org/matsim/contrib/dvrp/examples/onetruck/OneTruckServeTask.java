@@ -22,12 +22,12 @@ package org.matsim.contrib.dvrp.examples.onetruck;
 import static org.matsim.contrib.dvrp.examples.onetruck.OneTruckOptimizer.OneTruckTaskType;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 /**
  * @author michalm
  */
-public class OneTruckServeTask extends StayTask {
+public class OneTruckServeTask extends DefaultStayTask {
 	private final OneTruckRequest request;
 
 	public OneTruckServeTask(OneTruckTaskType taskType, double beginTime, double endTime, Link link,

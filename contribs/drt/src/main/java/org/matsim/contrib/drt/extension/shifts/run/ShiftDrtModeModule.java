@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author nkuehnel / MOIA
@@ -67,6 +68,18 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				getter -> new ShiftAnalysisControlerListener(drtConfigGroup,
 						getter.getModal(ShiftDurationXY.class), getter.getModal(BreakCorridorXY.class),
 						getter.get(MatsimServices.class)))).asEagerSingleton();
+
+		bindModal(DumpShiftDataAtEndImpl.class).toProvider(modalProvider(
+				getter -> new DumpShiftDataAtEndImpl(
+						getter.getModal(DrtShiftsSpecification.class),
+						getter.getModal(OperationFacilitiesSpecification.class),
+						getter.get(OutputDirectoryHierarchy.class)
+				))
+		).asEagerSingleton();
+
+		addControlerListenerBinding().toProvider(modalProvider(
+				getter -> getter.getModal(DumpShiftDataAtEndImpl.class)
+		));
 
 		this.installQSimModule(new ShiftDrtQSimModule(getMode()));
     }

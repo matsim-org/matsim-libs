@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask.StopDuration;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -76,7 +77,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	@Test
 	public void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
-		DrtStopTask stopTask = new DrtStopTask(20, 20 + STOP_DURATION_INITIAL, fromLink);
+		DrtStopTask stopTask = new DefaultDrtStopTask(20, 20 + STOP_DURATION_INITIAL, fromLink);
 		stopTask.addDropoffRequest(drtRequestInitial);
 		Waypoint.Start start = start(stopTask, STOP_DURATION_INITIAL, fromLink);
 		VehicleEntry entry = entry(start);
@@ -218,7 +219,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link) {
-		DrtStopTask stopTask = new DrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
+		DrtStopTask stopTask = new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
 		stopTask.addPickupRequest(drtRequestInitial);
 		return new Waypoint.Stop(stopTask, 0);
 	}
