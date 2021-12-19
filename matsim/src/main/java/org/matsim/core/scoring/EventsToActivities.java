@@ -20,10 +20,7 @@
 
  package org.matsim.core.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -110,8 +107,10 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     public void finish() {
-        for (Map.Entry<Id<Person>, Activity> entry : activities.entrySet()) {
-            for (ActivityHandler activityHandler : activityHandlers) {
+        for (Iterator<Map.Entry<Id<Person>, Activity>> entryIterator = activities.entrySet().iterator(); entryIterator.hasNext();) {
+            for(Iterator<ActivityHandler> activityHandlerIterator = activityHandlers.iterator(); activityHandlerIterator.hasNext();) {
+                Map.Entry<Id<Person>, Activity> entry = entryIterator.next();
+                ActivityHandler activityHandler = activityHandlerIterator.next();
                 activityHandler.handleActivity(new PersonExperiencedActivity(entry.getKey(), entry.getValue()));
             }
         }
