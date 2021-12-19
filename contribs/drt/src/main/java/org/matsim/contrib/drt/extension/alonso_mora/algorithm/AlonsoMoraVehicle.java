@@ -11,7 +11,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
  * 
  * @author sebhoerl
  */
-public interface AlonsoMoraVehicle {
+public interface AlonsoMoraVehicle extends Comparable<AlonsoMoraVehicle> {
 	public DvrpVehicle getVehicle();
 
 	public LinkTimePair getNextDiversion(double now);

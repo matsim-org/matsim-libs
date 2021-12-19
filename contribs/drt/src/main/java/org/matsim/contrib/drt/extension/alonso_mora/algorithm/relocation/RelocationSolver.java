@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.alonso_mora.algorithm.relocation;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraVehicle;
@@ -12,7 +13,7 @@ import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraVehicle;
  * @author sebhoerl
  */
 public interface RelocationSolver {
-	Collection<Relocation> solve(Collection<Relocation> candidates);
+	Collection<Relocation> solve(List<Relocation> candidates);
 
 	static public class Relocation {
 		public final AlonsoMoraVehicle vehicle;

@@ -39,7 +39,7 @@ public class CbcMpsRelocationSolver implements RelocationSolver {
 	}
 
 	@Override
-	public Collection<Relocation> solve(Collection<Relocation> candidates) {
+	public Collection<Relocation> solve(List<Relocation> candidates) {
 		try {
 			List<Relocation> relocations = new ArrayList<>(candidates);
 			new MpsRelocationWriter(relocations).write(problemPath);

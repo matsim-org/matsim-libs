@@ -18,7 +18,7 @@ public class BestResponseRelocationSolver implements RelocationSolver {
 	static public final String TYPE = "BestResponse";
 	
 	@Override
-	public Collection<Relocation> solve(Collection<Relocation> candidates) {
+	public Collection<Relocation> solve(List<Relocation> candidates) {
 		LinkedList<Relocation> relocationList = new LinkedList<>(candidates);
 		List<Relocation> selection = new LinkedList<>();
 

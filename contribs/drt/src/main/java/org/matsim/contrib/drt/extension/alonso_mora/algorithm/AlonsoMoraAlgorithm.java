@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.alonso_mora.algorithm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,8 @@ import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraStop.Sto
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.assignment.AssignmentSolver;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.assignment.AssignmentSolver.Solution;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.function.AlonsoMoraFunction;
-import org.matsim.contrib.drt.extension.alonso_mora.algorithm.function.RouteTracker;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.function.AlonsoMoraFunction.Result;
+import org.matsim.contrib.drt.extension.alonso_mora.algorithm.function.RouteTracker;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.graphs.DefaultRequestGraph;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.graphs.DefaultVehicleGraph;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.graphs.RequestGraph;
@@ -73,13 +74,13 @@ public class AlonsoMoraAlgorithm {
 	private final EventsManager eventsManager;
 	private final String mode;
 
-	private final Collection<AlonsoMoraVehicle> vehicles;
-	private final Map<AlonsoMoraVehicle, VehicleGraph> vehicleGraphs = new HashMap<>();
+	private final List<AlonsoMoraVehicle> vehicles;
+	private final Map<AlonsoMoraVehicle, VehicleGraph> vehicleGraphs = new TreeMap<>();
 
-	private final Set<AlonsoMoraRequest> queuedRequests = new HashSet<>();
-	private final Set<AlonsoMoraRequest> assignedRequests = new HashSet<>();
-	private final Set<AlonsoMoraRequest> onboardRequests = new HashSet<>();
-	private final Set<AlonsoMoraVehicle> relocatingVehicles = new HashSet<>();
+	private final Set<AlonsoMoraRequest> queuedRequests = new TreeSet<>();
+	private final Set<AlonsoMoraRequest> assignedRequests = new TreeSet<>();
+	private final Set<AlonsoMoraRequest> onboardRequests = new TreeSet<>();
+	private final Set<AlonsoMoraVehicle> relocatingVehicles = new TreeSet<>();
 
 	private int numberOfServedRequests = 0;
 	private int numberOfRejectedRequests = 0;
@@ -112,6 +113,8 @@ public class AlonsoMoraAlgorithm {
 		for (DvrpVehicle vehicle : fleet.getVehicles().values()) {
 			vehicles.add(vehicleFactory.createVehicle(vehicle));
 		}
+
+		Collections.sort(vehicles, (a, b) -> a.getVehicle().getId().compareTo(b.getVehicle().getId()));
 
 		maximumOccupancy = vehicles.stream().mapToInt(v -> v.getVehicle().getCapacity()).max().orElse(0);
 		updateRequestGraph(Double.NEGATIVE_INFINITY, new Information(maximumOccupancy));

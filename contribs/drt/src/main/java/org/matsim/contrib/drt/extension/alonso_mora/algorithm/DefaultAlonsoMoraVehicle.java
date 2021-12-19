@@ -94,4 +94,9 @@ public class DefaultAlonsoMoraVehicle implements AlonsoMoraVehicle {
 			return new LinkTimePair(vehicle.getStartLink(), Double.POSITIVE_INFINITY);
 		}
 	}
+
+	@Override
+	public int compareTo(AlonsoMoraVehicle o) {
+		return getVehicle().getId().compareTo(o.getVehicle().getId());
+	}
 }

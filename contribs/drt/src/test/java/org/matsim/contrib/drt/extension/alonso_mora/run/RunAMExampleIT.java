@@ -98,11 +98,11 @@ public class RunAMExampleIT {
 		controller.run();
 
 		var expectedStats = Stats.newBuilder() //
-				.rejectionRate(0.19) //
-				.rejections(75) //
-				.waitAverage(300.75) //
-				.inVehicleTravelTimeMean(384.59) //
-				.totalTravelTimeMean(685.35) //
+				.rejectionRate(0.2) //
+				.rejections(78) //
+				.waitAverage(215.88) //
+				.inVehicleTravelTimeMean(347.02) //
+				.totalTravelTimeMean(562.9) //
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
