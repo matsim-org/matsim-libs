@@ -258,7 +258,7 @@ public class DefaultAlonsoMoraScheduler implements AlonsoMoraScheduler {
 
 				// For pre-booked requests, we may need to wait for the customer
 				if (stop.getType().equals(StopType.Pickup)) {
-					double expectedStartTime = stop.getTime() - stopDuration;
+					double expectedStartTime = stop.getRequest().getEarliestPickupTime() - stopDuration;
 
 					if (expectedStartTime > currentTask.getEndTime()) {
 						currentTask = new WaitForStopTask(currentTask.getEndTime(), expectedStartTime, currentLink);
