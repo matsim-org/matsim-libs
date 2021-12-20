@@ -19,19 +19,6 @@
 
 package org.matsim.contrib.drt.extension.alonso_mora.run;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import org.assertj.core.data.Percentage;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,22 +29,15 @@ import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup;
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigurator;
 import org.matsim.contrib.drt.extension.alonso_mora.MultiModeAlonsoMoraConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecificationImpl;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitySpecificationImpl;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityType;
-import org.matsim.contrib.drt.extension.shifts.run.MultiModeShiftDrtModule;
-import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtQSimModule;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.*;
+import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtModeModule;
+import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.extension.shifts.run.ShiftDvrpFleetQsimModule;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreakSpecificationImpl;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftSpecificationImpl;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftsSpecification;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftsSpecificationImpl;
+import org.matsim.contrib.drt.extension.shifts.shift.*;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -73,6 +53,15 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author sebhoerl
@@ -136,7 +125,7 @@ public class AlonsoMoraExamplesIT {
 		AlonsoMoraConfigGroup amConfig = new AlonsoMoraConfigGroup();
 		MultiModeAlonsoMoraConfigGroup.get(config).addParameterSet(amConfig);
 
-		ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
+		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -215,12 +204,13 @@ public class AlonsoMoraExamplesIT {
 		Controler controller = new Controler(scenario);
 
 		controller.addOverridingModule(new DvrpModule());
-		controller.addOverridingModule(new MultiModeShiftDrtModule());
+		controller.addOverridingModule(new MultiModeDrtModule());
 		controller.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
 
 		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			controller.addOverridingModule(new ShiftDrtModeModule(drtCfg, shiftDrtConfigGroup));
+			controller.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg, shiftDrtConfigGroup)));
 			controller.addOverridingQSimModule(new ShiftDvrpFleetQsimModule(drtCfg.getMode()));
-			controller.addOverridingQSimModule(new ShiftDrtQSimModule(drtCfg.getMode()));
 		}
 
 		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {

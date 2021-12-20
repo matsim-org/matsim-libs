@@ -215,7 +215,7 @@ public class AlonsoMoraModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtDetourTravelTimeEstimator.class).toProvider(modalProvider(getter -> {
 			DetourTimeEstimator estimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(1.0,
-					getter.getModal(DvrpTravelTimeMatrix.class));
+					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class));
 			return new DrtDetourTravelTimeEstimator(estimator);
 		})).in(Singleton.class);
 

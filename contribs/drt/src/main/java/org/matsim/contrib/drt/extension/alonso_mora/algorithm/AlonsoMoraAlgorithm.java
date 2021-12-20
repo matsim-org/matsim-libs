@@ -1,20 +1,6 @@
 package org.matsim.contrib.drt.extension.alonso_mora.algorithm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Verify;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup;
@@ -34,32 +20,30 @@ import org.matsim.contrib.drt.extension.alonso_mora.algorithm.relocation.Relocat
 import org.matsim.contrib.drt.extension.alonso_mora.scheduling.AlonsoMoraScheduler;
 import org.matsim.contrib.drt.extension.alonso_mora.travel_time.TravelTimeEstimator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import com.google.common.base.Verify;
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 /**
  * This class performs all the request and vehicle management and bookkeeping
  * tasks to run the fleet control strategy described in
- * 
+ *
  * Alonso-Mora, J., Samaranayake, S., Wallar, A., Frazzoli, E., Rus, D., 2017.
  * On-demand high-capacity ride-sharing via dynamic trip-vehicle assignment.
  * Proc Natl Acad Sci USA 114, 462–467. https://doi.org/10.1073/pnas.1611675114
- * 
+ *
  */
 public class AlonsoMoraAlgorithm {
 	private final Logger logger = Logger.getLogger(AlonsoMoraAlgorithm.class);
@@ -132,7 +116,7 @@ public class AlonsoMoraAlgorithm {
 		 * We do not work with a simple flag here, but we examine the vehicle schedule.
 		 * This way the detecting is robust for outside manipulations of the schedule,
 		 * for instance, when we use the existing relocation algorithms for DRT.
-		 * 
+		 *
 		 * There are edge cases where a vehicle is currently relocating, but it then
 		 * gets a pickup assigned. However, the assignment rate is so high, that the
 		 * vehicle is still finishing the last link of the relocation trip when the next
@@ -166,7 +150,7 @@ public class AlonsoMoraAlgorithm {
 	 * As entering/exiting vehicles in MATSim does not need to be determinstic,
 	 * here, we detect whether agents enter/exit vehicles on the fly before the
 	 * dispatching step.
-	 * 
+	 *
 	 * Furthermore, the vehicles are informed whether passengers have entered or
 	 * exited.
 	 */
@@ -627,7 +611,7 @@ public class AlonsoMoraAlgorithm {
 				for (int k = schedule.getCurrentTask().getTaskIdx(); k < schedule.getTaskCount(); k++) {
 					Task task = schedule.getTasks().get(k);
 
-					if (DrtStopTask.TYPE.equals(task.getTaskType())) {
+					if (DefaultDrtStopTask.TYPE.equals(task.getTaskType())) {
 						// It can happen that we're dropping of customers (dropoff task has started),
 						// but we have already scheduled a relocation task.
 						return !relocatingVehicles.contains(v);

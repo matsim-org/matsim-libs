@@ -49,7 +49,7 @@ public class ShiftAlonsoMoraModule extends AbstractDvrpModeQSimModule {
 		// Wrap the Shift opimizer around the AlonsoMoraOptimizer instead of
 		// DefaultDrtOptimizer
 		addModalComponent(DrtOptimizer.class,
-				modalProvider((getter) -> new ShiftDrtOptimizer(drtConfig, getter.getModal(AlonsoMoraOptimizer.class),
+				modalProvider((getter) -> new ShiftDrtOptimizer(getter.getModal(AlonsoMoraOptimizer.class),
 						getter.getModal(DrtShiftDispatcher.class), getter.getModal(ScheduleTimingUpdater.class))));
 	}
 }
