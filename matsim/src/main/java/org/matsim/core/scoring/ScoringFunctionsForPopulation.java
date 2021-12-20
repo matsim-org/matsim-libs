@@ -88,7 +88,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
 	
-	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
@@ -185,15 +185,19 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	private void handleActivityStart(ActivityStartEvent event) {
 		this.actsDelegate.handleEvent(event);
-		if (StageActivityTypeIdentifier.isStageActivity( event.getActType() ) ) {
-			// we are at a stage activity.  Don't do anything ; activity will be added later
-		} else {
-			Plan plan = this.tripRecords.get( event.getPersonId() ); // as container for trip
+		if (!StageActivityTypeIdentifier.isStageActivity( event.getActType() ) ) {
+			this.callTripScoring(event);
+		}
+	}
+
+	private void callTripScoring(ActivityStartEvent event) {
+		Plan plan = this.tripRecords.get(event.getPersonId()); // as container for trip
+		if (plan != null) {
 			// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
 			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 			activity.setStartTime(event.getTime());
 			plan.addActivity(activity);
-			final List<Trip> trips = TripStructureUtils.getTrips( plan );
+			final List<Trip> trips = TripStructureUtils.getTrips(plan);
 			// yyyyyy should in principle only return one trip.  There are, however, situations where
 			// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
 			// something that has to do with not alternativing between acts and legs.
@@ -203,16 +207,15 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			// kai, sep'18
 
 			ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(event.getPersonId());
-			for ( Trip trip : trips ) {
-				if ( trip != null ) {
-					scoringFunction.handleTrip( trip );
+			for (Trip trip : trips) {
+				if (trip != null) {
+					scoringFunction.handleTrip(trip);
 				}
 			}
 
 			// ... and clean out the intermediate plan:
 			plan.getPlanElements().clear();
 		}
-
 	}
 
 	void handleLeg(PersonExperiencedLeg o) {
