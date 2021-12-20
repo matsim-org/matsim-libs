@@ -50,6 +50,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PopulationUtils;
@@ -168,7 +169,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		 * makes sure that the corresponding event was already seen by a scoring function when the call to handleActivity(),
 		 * handleLeg() or handleTrip() is done.
 		 */
-		if (o instanceof ActivityStartEvent) this.actsDelegate.handleEvent((ActivityStartEvent) o);
+		if (o instanceof ActivityStartEvent) this.handleActivityStart((ActivityStartEvent) o);
 		if (o instanceof ActivityEndEvent) this.actsDelegate.handleEvent((ActivityEndEvent) o);
 
 		if (o instanceof PersonDepartureEvent) this.legsDelegate.handleEvent((PersonDepartureEvent) o);
@@ -180,6 +181,38 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		if (o instanceof VehicleArrivesAtFacilityEvent) this.legsDelegate.handleEvent((VehicleArrivesAtFacilityEvent) o);
 		if (o instanceof VehicleEntersTrafficEvent) this.legsDelegate.handleEvent((VehicleEntersTrafficEvent) o);
 		if (o instanceof VehicleLeavesTrafficEvent) this.legsDelegate.handleEvent((VehicleLeavesTrafficEvent) o);
+	}
+
+	private void handleActivityStart(ActivityStartEvent event) {
+		this.actsDelegate.handleEvent(event);
+		if (StageActivityTypeIdentifier.isStageActivity( event.getActType() ) ) {
+			// we are at a stage activity.  Don't do anything ; activity will be added later
+		} else {
+			Plan plan = this.tripRecords.get( event.getPersonId() ); // as container for trip
+			// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
+			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
+			activity.setStartTime(event.getTime());
+			plan.addActivity(activity);
+			final List<Trip> trips = TripStructureUtils.getTrips( plan );
+			// yyyyyy should in principle only return one trip.  There are, however, situations where
+			// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
+			// something that has to do with not alternativing between acts and legs.
+			// (To make matters worse, it passes on my local machine, but fails in jenkins.  Possibly,
+			// the byte buffer memory management in the minibus raptor implementation has
+			// issues--???)
+			// kai, sep'18
+
+			ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(event.getPersonId());
+			for ( Trip trip : trips ) {
+				if ( trip != null ) {
+					scoringFunction.handleTrip( trip );
+				}
+			}
+
+			// ... and clean out the intermediate plan:
+			plan.getPlanElements().clear();
+		}
+
 	}
 
 	void handleLeg(PersonExperiencedLeg o) {
@@ -209,32 +242,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		
 		Plan plan = this.tripRecords.get( agentId ); // as container for trip
 		if ( plan!= null ) {
-			if ( !plan.getPlanElements().isEmpty() ) {
-				// plan != null, meaning we already have pre-existing material
-				if (StageActivityTypeIdentifier.isStageActivity( activity.getType() ) ) {
-					// we are at a stage activity.  Don't do anything ; activity will be added later
-				} else {
-					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
-					plan.addActivity( activity );
-					final List<Trip> trips = TripStructureUtils.getTrips( plan );
-					// yyyyyy should in principle only return one trip.  There are, however, situations where
-					// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
-					// something that has to do with not alternativing between acts and legs.
-					// (To make matters worse, it passes on my local machine, but fails in jenkins.  Possibly,
-					// the byte buffer memory management in the minibus raptor implementation has
-					// issues--???)
-					// kai, sep'18
-					
-					for ( Trip trip : trips ) {
-						if ( trip != null ) {
-							scoringFunction.handleTrip( trip );
-						}
-					}
-					
-					// ... and clean out the intermediate plan:
-					plan.getPlanElements().clear();
-				}
-			}
 			plan.addActivity( activity );
 		}
 	}
