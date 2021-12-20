@@ -18,19 +18,31 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.run.examples;
+package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import java.net.URL;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.core.router.util.TravelTime;
 
-import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class DvrpModeLimitedMaxSpeedTravelTimeModule extends AbstractDvrpModeModule {
+	private final double timeStepSize;
+	private final double maxSpeed;
 
-public class RunMultiModeDrtExampleTestIT {
-	@Test
-	public void testRun() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
-				"multi_mode_one_shared_taxi_config.xml");
-		RunMultiModeDrtExample.run(configUrl, false, 1);
+	public DvrpModeLimitedMaxSpeedTravelTimeModule(String mode, double timeStepSize, double maxSpeed) {
+		super(mode);
+		this.timeStepSize = timeStepSize;
+		this.maxSpeed = maxSpeed;
+	}
+
+	@Override
+	public void install() {
+		var qSimFreeSpeedTravelTimeWithMaxSpeedLimit = new QSimFreeSpeedTravelTimeWithMaxSpeedLimit(timeStepSize,
+				maxSpeed);
+		bindModal(TravelTime.class).toProvider(modalProvider(
+				getter -> TravelTimeUtils.maxOfTravelTimes(qSimFreeSpeedTravelTimeWithMaxSpeedLimit,
+						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED))));
 	}
 }
+

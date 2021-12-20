@@ -76,13 +76,13 @@ public class DrtPoolingParameterTest {
 	}
 
 	/**
-	 * With a maxWaitTime of 120s, the two closest drt vehicles should be able to reach 2 agents, but be
+	 * With a maxWaitTime of 121s, the two closest drt vehicles should be able to reach 2 agents, but be
 	 * unable to then pickup the other 2 agents without surpassing the maxWaitTime. All other DRT Vehicles
 	 * too far away to reach those agents.
 	 */
 	@Test
 	public void testMaxWaitTimeTwoVehiclesForTwoAgents() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(120,
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(121,
 			10.0,
 			10000.);
 

@@ -31,6 +31,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <argLine></argLine>
 
+        <log4j.version>2.17.0</log4j.version>
         <geotools.version>24.2</geotools.version>
         <jts.version>1.17.1</jts.version>
         <guice.version>5.0.1</guice.version>
@@ -192,12 +193,6 @@
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
                 <version>3.0.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.11</version>
             </dependency>
 
             <dependency>

@@ -135,7 +135,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		return (int)drtEventSequenceCollector.getPerformedRequestSequences()
 				.values()
 				.stream()
-				.filter(DrtEventSequenceCollector.PerformedRequestEventSequence::isCompleted)
+				.filter(DrtEventSequenceCollector.EventSequence::isCompleted)
 				.count();
 	}
 

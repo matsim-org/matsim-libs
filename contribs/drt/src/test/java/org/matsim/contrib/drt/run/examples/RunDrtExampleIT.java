@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.assertj.core.data.Percentage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -45,6 +44,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * @author jbischoff
@@ -73,9 +74,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(300.75)
-				.inVehicleTravelTimeMean(384.59)
-				.totalTravelTimeMean(685.35)
+				.waitAverage(296.95)
+				.inVehicleTravelTimeMean(387.02)
+				.totalTravelTimeMean(683.97)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -106,9 +107,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(0)
-				.waitAverage(304.37)
-				.inVehicleTravelTimeMean(387.41)
-				.totalTravelTimeMean(691.78)
+				.waitAverage(293.63)
+				.inVehicleTravelTimeMean(388.85)
+				.totalTravelTimeMean(682.48)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -133,9 +134,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.0)
 				.rejections(1)
-				.waitAverage(309.1)
-				.inVehicleTravelTimeMean(373.48)
-				.totalTravelTimeMean(682.58)
+				.waitAverage(305.97)
+				.inVehicleTravelTimeMean(378.18)
+				.totalTravelTimeMean(684.16)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -155,10 +156,10 @@ public class RunDrtExampleIT {
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.05)
-				.rejections(20)
-				.waitAverage(251.41)
-				.inVehicleTravelTimeMean(377.79)
-				.totalTravelTimeMean(629.21)
+				.rejections(17)
+				.waitAverage(260.41)
+				.inVehicleTravelTimeMean(374.87)
+				.totalTravelTimeMean(635.28)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -178,10 +179,10 @@ public class RunDrtExampleIT {
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.03)
-				.rejections(10)
-				.waitAverage(226.37)
-				.inVehicleTravelTimeMean(389.87)
-				.totalTravelTimeMean(616.24)
+				.rejections(11)
+				.waitAverage(223.86)
+				.inVehicleTravelTimeMean(389.57)
+				.totalTravelTimeMean(613.44)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -214,18 +215,15 @@ public class RunDrtExampleIT {
 			params.put(keys.get(i), lastIterationValues.get(i));
 		}
 
-		double inVehicleTravelTimeMean = Double.parseDouble(params.get("inVehicleTravelTime_mean"));
-		double waitAverage = Double.parseDouble(params.get("wait_average"));
-		double rejections = Double.parseDouble(params.get("rejections"));
-		double rejectionRate = Double.parseDouble(params.get("rejectionRate"));
-		double totalTravelTimeMean = Double.parseDouble(params.get("totalTravelTime_mean"));
+		var actualStats = Stats.newBuilder()
+				.rejectionRate(Double.parseDouble(params.get("rejectionRate")))
+				.rejections(Double.parseDouble(params.get("rejections")))
+				.waitAverage(Double.parseDouble(params.get("wait_average")))
+				.inVehicleTravelTimeMean(Double.parseDouble(params.get("inVehicleTravelTime_mean")))
+				.totalTravelTimeMean(Double.parseDouble(params.get("totalTravelTime_mean")))
+				.build();
 
-		var percentage = Percentage.withPercentage(0.00001);
-		assertThat(rejectionRate).isCloseTo(expectedStats.rejectionRate, percentage);
-		assertThat(rejections).isCloseTo(expectedStats.rejections, percentage);
-		assertThat(waitAverage).isCloseTo(expectedStats.waitAverage, percentage);
-		assertThat(inVehicleTravelTimeMean).isCloseTo(expectedStats.inVehicleTravelTimeMean, percentage);
-		assertThat(totalTravelTimeMean).isCloseTo(expectedStats.totalTravelTimeMean, percentage);
+		assertThat(actualStats).usingRecursiveComparison().isEqualTo(expectedStats);
 	}
 
 	private static class Stats {
@@ -241,6 +239,17 @@ public class RunDrtExampleIT {
 			waitAverage = builder.waitAverage;
 			inVehicleTravelTimeMean = builder.inVehicleTravelTimeMean;
 			totalTravelTimeMean = builder.totalTravelTimeMean;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("rejectionRate", rejectionRate)
+					.add("rejections", rejections)
+					.add("waitAverage", waitAverage)
+					.add("inVehicleTravelTimeMean", inVehicleTravelTimeMean)
+					.add("totalTravelTimeMean", totalTravelTimeMean)
+					.toString();
 		}
 
 		public static Builder newBuilder() {

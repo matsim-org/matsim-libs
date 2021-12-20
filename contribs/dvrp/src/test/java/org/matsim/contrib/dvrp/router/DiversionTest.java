@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -79,19 +80,19 @@ public class DiversionTest {
 	 * experiment is constructed as folows: We have one DVRP vehicle which moves
 	 * along 8 links (l0 to l8) with a distance of 1000m each and a odd freespeed to
 	 * that the QSim will perform rounding.
-	 * 
+	 *
 	 * To do so, before the simulation starts, the route from l0 to l8 is calculated
 	 * and assigned to a drive task, which is added to the vehicle. Here, we already
 	 * have an estimated for the arrival time, which should predict correctly the
 	 * final arrival time of the vehicle at l8. This is the first fact to check.
-	 * 
+	 *
 	 * After, we divert the vehicle every N seconds. To do so, we obtain the next
 	 * possible diversion point from the drive task tracker and perform a routing
 	 * from there to l8. Again, any time we do that, we should obtain the correct
 	 * arrival time if prediction is correct.
-	 * 
+	 *
 	 * State 1 Nov 2021 is the following: In this scenario:
-	 * 
+	 *
 	 * <ul>
 	 * <li>the vehicle arrives at the end of l8 at 657s (reference value).</li>
 	 * <li>the initial routing predicts an arrival time of 656s (wrong, too
@@ -101,9 +102,9 @@ public class DiversionTest {
 	 * <li>once the vehicle enters l8 all remaining diversions give 657s
 	 * (correct)</li>
 	 * </ul>
-	 * 
+	 *
 	 * Hypotheses for the time being:
-	 * 
+	 *
 	 * <ul>
 	 * <li>Different than stated in QSimFreeSpeedTravelTime, departing from the
 	 * current activity takes 2s according to the events. One for "enters traffic",
@@ -230,7 +231,7 @@ public class DiversionTest {
 		testTracker.diversionArrivalTimes.forEach(t -> {
 			Assert.assertEquals(t, 657.0);
 		});
-		
+
 		// Also ,the task end time should be consistent with the path
 		testTracker.taskEndTimes.forEach(t -> {
 			Assert.assertEquals(t, 657.0);
@@ -354,7 +355,7 @@ public class DiversionTest {
 					travelTime);
 
 			// ... and we add it as the first and only task to the schedule
-			DriveTask driveTask = new DriveTask(() -> "drive", path);
+			DriveTask driveTask = new DefaultDriveTask(() -> "drive", path);
 			schedule.addTask(driveTask);
 
 			// Track the initially obtained arrival time
@@ -367,7 +368,7 @@ public class DiversionTest {
 				if (timer.getTimeOfDay() % DIVERSION_FREQUENCY == 0) {
 					Task currentTask = vehicle.getSchedule().getCurrentTask();
 
-					if (currentTask instanceof DriveTask) {
+					if (currentTask instanceof DefaultDriveTask) {
 						/*
 						 * Every N seconds, we perform a diversion. For that, we use the current
 						 * diversion point as given by the trask tracker and we route from this
@@ -434,18 +435,18 @@ public class DiversionTest {
 	 * the route as the vehicle will just arrive on the last link. This is why there
 	 * is a special implementation for the calculation of the last link's travel
 	 * time in VrpPaths.
-	 * 
+	 *
 	 * Now, when diverting from the last link, the vehicle *will* pass the node at
 	 * the end of that link, so we need to add back one second when calculating the
 	 * diversion point.
-	 * 
+	 *
 	 * In this test, we let the vehicle traverse L0 to L8 as before, however the
 	 * network has an additional L9. In every diversion step, we calculate the
 	 * arrival time at L9 if we would divert, but we *do not* implement the
 	 * diversion. Without any code fixes, we will get a certain prediction for the
 	 * arrival time at L9 until we reach L8, and after having entered L8, we will
 	 * get a reduced arrival time estimate by one second.
-	 * 
+	 *
 	 */
 	public void testRepeatedDiversionToDifferentDestinationRightBeforeLastLink() {
 		Config config = ConfigUtils.createConfig();
@@ -615,7 +616,7 @@ public class DiversionTest {
 					router, travelTime);
 
 			// ... and we add it as the first and only task to the schedule
-			DriveTask driveTask = new DriveTask(() -> "drive", path);
+			DriveTask driveTask = new DefaultDriveTask(() -> "drive", path);
 			schedule.addTask(driveTask);
 
 			// Track the initially obtained arrival time

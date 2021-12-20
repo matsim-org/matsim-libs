@@ -20,13 +20,13 @@
 package org.matsim.contrib.drt.extension.edrt.schedule;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.evrp.ETask;
 
 /**
  * @author michalm
  */
-public class EDrtStopTask extends DrtStopTask implements ETask {
+public class EDrtStopTask extends DefaultDrtStopTask implements ETask {
 	private final double consumedEnergy;
 
 	public EDrtStopTask(double beginTime, double endTime, Link link, double consumedEnergy) {
