@@ -274,6 +274,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 }
             }
 
+            link.getAttributes().putAttribute("allowed_speed", speed);
+
             if (prop == null) {
                 log.warn("Skipping unknown link type: {}", type.highway);
                 continue;
