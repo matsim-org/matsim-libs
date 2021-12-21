@@ -17,21 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.schedule;
+package org.matsim.contrib.dvrp.schedule;
 
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
+import org.matsim.api.core.v01.network.Link;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import com.google.common.base.MoreObjects;
 
-public class TaxiOccupiedDriveTask extends DefaultDriveTask {
-	public static final TaxiTaskType TYPE = new TaxiTaskType(OCCUPIED_DRIVE);
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class DefaultStayTask extends AbstractTask implements StayTask {
+	private final Link link;
 
-	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {
-		super(TYPE, path);
-		if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
-			throw new IllegalArgumentException();
-		}
+	public DefaultStayTask(TaskType taskType, double beginTime, double endTime, Link link) {
+		super(taskType, beginTime, endTime);
+		this.link = link;
+	}
+
+	@Override
+	public final Link getLink() {
+		return link;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("link", link).toString();
 	}
 }

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2021 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,27 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
-import com.google.common.base.MoreObjects;
-
-public class DriveTask extends AbstractTask {
-	private VrpPath path;
-
-	public DriveTask(TaskType taskType, VrpPathWithTravelData path) {
-		super(taskType, path.getDepartureTime(), path.getArrivalTime());
-		this.path = path;
-	}
-
-	public final VrpPath getPath() {
-		return path;
-	}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface DriveTask extends Task {
+	VrpPath getPath();
 
 	/**
 	 * Vehicle changes its path. Just replaces the previous VrpPath with this one; this will work (if consistent) since
@@ -50,18 +42,5 @@ public class DriveTask extends AbstractTask {
 	 * <li>...
 	 * </ul>
 	 */
-	public final void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
-		// can only divert an ongoing task
-		if (getStatus() != TaskStatus.STARTED) {
-			throw new IllegalStateException();
-		}
-
-		path = divertedPath;
-		setEndTime(newEndTime);
-	}
-
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("path", path).toString();
-	}
+	void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);
 }

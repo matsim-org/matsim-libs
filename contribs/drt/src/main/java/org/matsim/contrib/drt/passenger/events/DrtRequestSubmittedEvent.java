@@ -37,7 +37,7 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 
 	public static final String ATTRIBUTE_UNSHARED_RIDE_TIME = "unsharedRideTime";
 	public static final String ATTRIBUTE_UNSHARED_RIDE_DISTANCE = "unsharedRideDistance";
-	
+
 	public static final String ATTRIBUTE_LATEST_PICKUP_TIME = "latestPickupTime";
 	public static final String ATTRIBUTE_LATEST_DROPOFF_TIME = "latestDropoffTime";
 
@@ -75,11 +75,11 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	public final double getUnsharedRideDistance() {
 		return unsharedRideDistance;
 	}
-	
+
 	public final double getLatestPickupTime() {
 		return latestPickupTime;
 	}
-	
+
 	public final double getLatestDropoffTime() {
 		return latestDropoffTime;
 	}
@@ -104,8 +104,8 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
 		double unsharedRideTime = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_TIME));
 		double unsharedRideDistance = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
-		double latestPickupTime = Double.parseDouble(attributes.get(ATTRIBUTE_LATEST_PICKUP_TIME));
-		double latestDropoffTime = Double.parseDouble(attributes.get(ATTRIBUTE_LATEST_DROPOFF_TIME));
+		double latestPickupTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_PICKUP_TIME, "NaN"));
+		double latestDropoffTime = Double.parseDouble(attributes.getOrDefault(ATTRIBUTE_LATEST_DROPOFF_TIME, "NaN"));
 		return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime,
 				unsharedRideDistance, latestPickupTime, latestDropoffTime);
 	}

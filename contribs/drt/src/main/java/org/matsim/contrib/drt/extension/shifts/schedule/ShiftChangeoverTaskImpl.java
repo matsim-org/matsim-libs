@@ -1,14 +1,14 @@
 package org.matsim.contrib.drt.extension.shifts.schedule;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 
 /**
  * A task representing stopping and waiting for a new shift.
  * @author nkuehnel / MOIA
  */
-public class ShiftChangeoverTaskImpl extends DrtStopTask implements ShiftChangeOverTask {
+public class ShiftChangeoverTaskImpl extends DefaultDrtStopTask implements ShiftChangeOverTask {
 
 	private final double shiftEndTime;
 	private final OperationFacility facility;
