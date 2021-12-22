@@ -45,6 +45,69 @@ import java.util.*;
 	enum SolutionType { original, direct }
 	private static SolutionType solutionType = SolutionType.direct;
 
+	public static void main (String [] args) throws CommandLine.ConfigurationException{
+
+		for( String arg : args ){
+			log.warn(arg);
+		}
+
+		//Set up required MATSim classes
+		Config config;
+		config = ConfigUtils.loadConfig( args );
+		CommandLine cmd = ConfigUtils.getCommandLine(args);
+
+		ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf( cmd.getOption( "solutionType" ).get() ) ;
+		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
+
+		log.info("Starting ...");
+		log.info("Set up required MATSim classes");
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		Network network = scenario.getNetwork();
+
+
+		//Create LSP and shipments
+		log.info("create LSP");
+		LSP lsp = createInitialLSP(network);
+		log.info("create initial LSPShipments");
+		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
+
+		//assign the shipments to the LSP
+		log.info("assign the shipments to the LSP");
+		for(LSPShipment shipment : shipments) {
+			lsp.assignShipmentToLSP(shipment);
+		}
+
+		//schedule the LSP with the shipments and according to the scheduler of the Resource
+		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
+		lsp.scheduleSoultions();
+
+		//print the schedules for the assigned LSPShipments
+		log.info("print the schedules for the assigned LSPShipments");
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/schedules.txt" ) ){
+			for( LSPShipment shipment : lsp.getShipments() ){
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
+				elementList.sort( new ShipmentPlanElementComparator() );
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println( str1 );
+				writer.write( str1 + "\n");
+				for( ShipmentPlanElement element : elementList ){
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println( str2 );
+					writer.write(str2);
+				}
+				System.out.println();
+				writer.write("\n");
+			}
+		} catch( IOException e ){
+			e.printStackTrace();
+		}
+
+		log.info("Done.");
+
+	}
+
 	private static LSP createInitialLSP(Network network) {
 		LSPResource depotResource;
 		{
@@ -331,68 +394,5 @@ import java.util.*;
 		return shipmentList;
 	}
 
-
-	public static void main (String [] args) throws CommandLine.ConfigurationException{
-
-		for( String arg : args ){
-			log.warn(arg);
-		}
-
-		//Set up required MATSim classes
-		Config config;
-		config = ConfigUtils.loadConfig( args );
-		CommandLine cmd = ConfigUtils.getCommandLine(args);
-
-		ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf( cmd.getOption( "solutionType" ).get() ) ;
-		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
-
-		log.info("Starting ...");
-		log.info("Set up required MATSim classes");
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
-
-
-		//Create LSP and shipments
-		log.info("create LSP");
-		LSP lsp = createInitialLSP(network);
-		log.info("create initial LSPShipments");
-		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
-
-		//assign the shipments to the LSP
-		log.info("assign the shipments to the LSP");
-		for(LSPShipment shipment : shipments) {
-			lsp.assignShipmentToLSP(shipment);
-		}
-
-		//schedule the LSP with the shipments and according to the scheduler of the Resource
-		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-		lsp.scheduleSoultions();
-
-		//print the schedules for the assigned LSPShipments
-		log.info("print the schedules for the assigned LSPShipments");
-		try ( BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/schedules.txt" ) ){
-			for( LSPShipment shipment : lsp.getShipments() ){
-				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
-				elementList.sort( new ShipmentPlanElementComparator() );
-				final String str1 = "Shipment: " + shipment.getId();
-				System.out.println( str1 );
-				writer.write( str1 + "\n");
-				for( ShipmentPlanElement element : elementList ){
-					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println( str2 );
-					writer.write(str2);
-				}
-				System.out.println();
-				writer.write("\n");
-			}
-		} catch( IOException e ){
-			e.printStackTrace();
-		}
-
-		log.info("Done.");
-
-	}
 
 }
