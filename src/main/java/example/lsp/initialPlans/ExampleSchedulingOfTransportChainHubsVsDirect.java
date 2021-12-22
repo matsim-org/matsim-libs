@@ -105,27 +105,6 @@ import java.util.*;
 
 	}
 
-	private static void printResults(String outputDir, LSP lsp) {
-		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/schedules.txt" ) ){
-			for( LSPShipment shipment : lsp.getShipments() ){
-				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
-				elementList.sort( new ShipmentPlanElementComparator() );
-				final String str1 = "Shipment: " + shipment.getId();
-				System.out.println( str1 );
-				writer.write( str1 + "\n");
-				for( ShipmentPlanElement element : elementList ){
-					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println( str2 );
-					writer.write(str2);
-				}
-				System.out.println();
-				writer.write("\n");
-			}
-		} catch( IOException e ){
-			e.printStackTrace();
-		}
-	}
-
 	private static LSP createInitialLSP(Network network) {
 		LSPResource depotResource;
 		{
@@ -412,5 +391,25 @@ import java.util.*;
 		return shipmentList;
 	}
 
+	private static void printResults(String outputDir, LSP lsp) {
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/schedules.txt" ) ){
+			for( LSPShipment shipment : lsp.getShipments() ){
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
+				elementList.sort( new ShipmentPlanElementComparator() );
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println( str1 );
+				writer.write( str1 + "\n");
+				for( ShipmentPlanElement element : elementList ){
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println( str2 );
+					writer.write(str2);
+				}
+				System.out.println();
+				writer.write("\n");
+			}
+		} catch( IOException e ){
+			e.printStackTrace();
+		}
+	}
 
 }
