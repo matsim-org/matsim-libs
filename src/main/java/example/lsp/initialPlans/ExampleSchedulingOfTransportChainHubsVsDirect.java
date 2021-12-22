@@ -155,8 +155,9 @@ import java.util.*;
 
 				Id<Link> fromLinkId = Id.createLinkId( "(4 2) (4 3)" );
 				Id<Vehicle> mainRunVehicleId = Id.createVehicleId( "MainRunVehicle" );
-				CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance( mainRunVehicleId, fromLinkId );
-				mainRunCarrierVehicle.setType( mainRunVehicleType );
+				CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance( mainRunVehicleId, fromLinkId )
+						.setType(mainRunVehicleType)
+						.build();
 
 				mainRunCarrier.setCarrierCapabilities(
 						CarrierCapabilities.Builder.newInstance().addType( mainRunVehicleType ).addVehicle( mainRunCarrierVehicle ).setFleetSize( FleetSize.INFINITE ).build() );
@@ -213,8 +214,9 @@ import java.util.*;
 			VehicleType distributionVehicleType = CarrierVehicleType.Builder.newInstance( Id.create( "DistributionCarrierVehicleType", VehicleType.class ) ).setCapacity( 10 )
 					.setCostPerDistanceUnit( 0.0004 ).setCostPerTimeUnit( 0.38 ).setFixCost( 49 ).setMaxVelocity( 50 / 3.6 ).build();
 
-			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance( Id.createVehicleId( "DistributionVehicle" ), Id.createLinkId( "(14 2) (14 3)" ) );
-			distributionCarrierVehicle.setType( distributionVehicleType );
+			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), Id.createLinkId( "(14 2) (14 3)" ) )
+					.setType(distributionVehicleType)
+					.build();
 
 			Carrier distributionCarrier = CarrierUtils.createCarrier( distributionCarrierId );
 			distributionCarrier.setCarrierCapabilities(
@@ -240,8 +242,9 @@ import java.util.*;
 				Id.create("DirectDistributionCarrierVehicleType", VehicleType.class ) ).setCapacity(10 ).setCostPerDistanceUnit(0.0004 )
 				.setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50/3.6 ).build();
 
-		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), Id.createLinkId("(4 2) (4 3)" ) );
-		directDistributionCarrierVehicle.setType( directDistributionVehicleType );
+		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), Id.createLinkId("(4 2) (4 3)" ) )
+				.setType(directDistributionVehicleType)
+				.build();
 
 		CarrierCapabilities directDistributionCarrierCapabilities = CarrierCapabilities.Builder.newInstance().addType(directDistributionVehicleType )
 				.addVehicle(directDistributionCarrierVehicle ).setFleetSize(FleetSize.INFINITE ).build();
@@ -321,9 +324,10 @@ import java.util.*;
 				directDistributionElement.setPreviousElement(depotElement);
 
 				//TODO WIP: KostenInfo an das Element dran hängen.
-				//		LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
-				//		SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
-				//		directDistributionElement.getInfos().add(costInfo);
+
+// 				LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
+//				SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
+//				directDistributionElement.getInfos().add(costInfo);
 
 				log.info("");
 				log.info("set up logistic Solution - direct distribution from the depot is created");
