@@ -85,7 +85,14 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		try ( BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/schedules.txt" ) ){
+		printResults(config.controler().getOutputDirectory() , lsp);
+
+		log.info("Done.");
+
+	}
+
+	private static void printResults(String outputDir, LSP lsp) {
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/schedules.txt" ) ){
 			for( LSPShipment shipment : lsp.getShipments() ){
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
 				elementList.sort( new ShipmentPlanElementComparator() );
@@ -103,9 +110,6 @@ import java.util.*;
 		} catch( IOException e ){
 			e.printStackTrace();
 		}
-
-		log.info("Done.");
-
 	}
 
 	private static LSP createInitialLSP(Network network) {
