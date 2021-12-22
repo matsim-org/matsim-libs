@@ -17,6 +17,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -52,11 +53,23 @@ import java.util.*;
 		}
 
 		//Set up required MATSim classes
-		Config config;
-		config = ConfigUtils.loadConfig( args );
-		CommandLine cmd = ConfigUtils.getCommandLine(args);
 
-		ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf( cmd.getOption( "solutionType" ).get() ) ;
+		Config config;
+		if (args.length != 0) {
+			for (String arg : args) {
+				log.warn(arg);
+			}
+			config = ConfigUtils.loadConfig(args);
+			CommandLine cmd = ConfigUtils.getCommandLine(args);
+
+			ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf(cmd.getOption("solutionType").get());
+		} else {
+			config = ConfigUtils.createConfig();
+			config.controler().setOutputDirectory("output/ChainVsDirect");
+			config.controler().setLastIteration(2);
+			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		}
+
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
 
 		log.info("Starting ...");
@@ -66,6 +79,7 @@ import java.util.*;
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
+		//########
 
 		//Create LSP and shipments
 		log.info("create LSP");
