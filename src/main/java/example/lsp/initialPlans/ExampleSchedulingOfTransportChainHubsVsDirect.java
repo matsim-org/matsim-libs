@@ -62,7 +62,7 @@ import java.util.*;
 			config = ConfigUtils.loadConfig(args);
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 
-			ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf(cmd.getOption("solutionType").get());
+			ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf(cmd.getOption("solutionType").orElseThrow());
 		} else {
 			config = ConfigUtils.createConfig();
 			config.controler().setOutputDirectory("output/ChainVsDirect");
