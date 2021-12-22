@@ -107,13 +107,15 @@ import java.util.*;
 
 	private static LSP createInitialLSP(Network network) {
 		LSPResource depotResource;
+		final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)");
+		final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");
+
 		{
 			log.info( "" );
 			log.info( "Create depot" );
 
 			Id<LSPResource> depotId = Id.create( "Depot", LSPResource.class );
-			Id<Link> depotLinkId = Id.createLinkId( "(4 2) (4 3)" );
-			UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance( depotId, depotLinkId );
+			UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance( depotId, depotLinkId);
 
 			//The scheduler for the first reloading point is created --> this will be the depot in this usecase
 			UsecaseUtils.ReloadingPointSchedulerBuilder depotSchedulerBuilder = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
@@ -137,11 +139,12 @@ import java.util.*;
 
 		//The adapter i.e. the main run resource is created
 		LSPResource mainRunResource;
+
 		{
 			UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(
 					Id.create( "MainRunAdapter", LSPResource.class ), network );
-			mainRunAdapterBuilder.setFromLinkId( Id.createLinkId( "(4 2) (4 3)" ) );
-			mainRunAdapterBuilder.setToLinkId( Id.createLinkId( "(14 2) (14 3)" ) );
+			mainRunAdapterBuilder.setFromLinkId(depotLinkId);
+			mainRunAdapterBuilder.setToLinkId(hubLinkId);
 
 			{
 				log.info( "" );
@@ -153,9 +156,8 @@ import java.util.*;
 				VehicleType mainRunVehicleType = CarrierVehicleType.Builder.newInstance( mainRunVehicleTypeId ).setCapacity( 30 ).setCostPerDistanceUnit( 0.0002 )
 						.setCostPerTimeUnit( 0.38 ).setFixCost( 120 ).setMaxVelocity( 50 / 3.6 ).build();
 
-				Id<Link> fromLinkId = Id.createLinkId( "(4 2) (4 3)" );
 				Id<Vehicle> mainRunVehicleId = Id.createVehicleId( "MainRunVehicle" );
-				CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance( mainRunVehicleId, fromLinkId )
+				CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance( mainRunVehicleId, depotLinkId)
 						.setType(mainRunVehicleType)
 						.build();
 
@@ -186,8 +188,7 @@ import java.util.*;
 			log.info( "The second reloading adapter i.e. the Resource is created" );
 			//The second reloading adapter i.e. the Resource is created
 			Id<LSPResource> secondReloadingId = Id.create( "ReloadingPoint2", LSPResource.class );
-			Id<Link> secondReloadingLinkId = Id.createLinkId( "(14 2) (14 3)" );
-			UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance( secondReloadingId, secondReloadingLinkId );
+			UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance( secondReloadingId, hubLinkId);
 
 			//The scheduler for the second reloading point is created
 			UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
@@ -214,7 +215,7 @@ import java.util.*;
 			VehicleType distributionVehicleType = CarrierVehicleType.Builder.newInstance( Id.create( "DistributionCarrierVehicleType", VehicleType.class ) ).setCapacity( 10 )
 					.setCostPerDistanceUnit( 0.0004 ).setCostPerTimeUnit( 0.38 ).setFixCost( 49 ).setMaxVelocity( 50 / 3.6 ).build();
 
-			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), Id.createLinkId( "(14 2) (14 3)" ) )
+			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), hubLinkId)
 					.setType(distributionVehicleType)
 					.build();
 
@@ -224,7 +225,7 @@ import java.util.*;
 
 			//The distribution adapter i.e. the Resource is created
 			distributionResource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-					Id.create("DistributionCarrierAdapter", LSPResource.class ), network ).setCarrier( distributionCarrier ).setLocationLinkId( Id.createLinkId( "(14 2) (14 3)" ) )
+					Id.create("DistributionCarrierAdapter", LSPResource.class ), network ).setCarrier( distributionCarrier ).setLocationLinkId(hubLinkId)
 					.setDistributionScheduler( UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
 			// (The scheduler is where jsprit comes into play.)
 
@@ -242,7 +243,7 @@ import java.util.*;
 				Id.create("DirectDistributionCarrierVehicleType", VehicleType.class ) ).setCapacity(10 ).setCostPerDistanceUnit(0.0004 )
 				.setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50/3.6 ).build();
 
-		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), Id.createLinkId("(4 2) (4 3)" ) )
+		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), depotLinkId)
 				.setType(directDistributionVehicleType)
 				.build();
 
@@ -253,7 +254,7 @@ import java.util.*;
 
 		//The distribution adapter i.e. the Resource is created
 		LSPResource directDistributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-				Id.create("DirectDistributionCarrierAdapter", LSPResource.class ), network ).setCarrier(directDistributionCarrier ).setLocationLinkId( Id.createLinkId("(4 2) (4 3)" ) )
+				Id.create("DirectDistributionCarrierAdapter", LSPResource.class ), network ).setCarrier(directDistributionCarrier ).setLocationLinkId(depotLinkId)
 				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
 		// (The scheduler is where jsprit comes into play.)
 
