@@ -212,8 +212,7 @@ import java.util.*;
 		{
 			//The Carrier for distribution from reloading Point is created
 			Id<Carrier> distributionCarrierId = Id.create( "DistributionCarrier", Carrier.class );
-			VehicleType distributionVehicleType = CarrierVehicleType.Builder.newInstance( Id.create( "DistributionCarrierVehicleType", VehicleType.class ) ).setCapacity( 10 )
-					.setCostPerDistanceUnit( 0.0004 ).setCostPerTimeUnit( 0.38 ).setFixCost( 49 ).setMaxVelocity( 50 / 3.6 ).build();
+			VehicleType distributionVehicleType = createCarrierVehicleType("DistributionCarrierVehicleType");
 
 			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), hubLinkId)
 					.setType(distributionVehicleType)
@@ -239,9 +238,7 @@ import java.util.*;
 		//### New (KMT): Carrier for direct distribution from Depot (without 2nd reloading Point)
 		//The Carrier for distribution from reloading Point is created
 		Id<Carrier> directDistributionCarrierId = Id.create("DirectDistributionCarrier", Carrier.class);
-		VehicleType directDistributionVehicleType = CarrierVehicleType.Builder.newInstance(
-				Id.create("DirectDistributionCarrierVehicleType", VehicleType.class ) ).setCapacity(10 ).setCostPerDistanceUnit(0.0004 )
-				.setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50/3.6 ).build();
+		VehicleType directDistributionVehicleType = createCarrierVehicleType("DirectDistributionCarrierVehicleType");
 
 		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), depotLinkId)
 				.setType(directDistributionVehicleType)
@@ -356,6 +353,16 @@ import java.util.*;
 				throw new IllegalStateException("Unexpected value: " + solutionType);
 		}
 
+	}
+
+	private static VehicleType createCarrierVehicleType(String vehicleTypeId) {
+		return CarrierVehicleType.Builder.newInstance(Id.create(vehicleTypeId, VehicleType.class))
+				.setCapacity(10)
+				.setCostPerDistanceUnit(0.0004)
+				.setCostPerTimeUnit(0.38)
+				.setFixCost(49)
+				.setMaxVelocity(50 / 3.6)
+				.build();
 	}
 
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
