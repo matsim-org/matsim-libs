@@ -183,8 +183,8 @@ import java.util.*;
 			mainRunElement = mainRunBuilder.build();
 		}
 
-		LogisticsSolutionElement secondReloadElement;
-		LSPResource secondReloadingPointResource;
+		LogisticsSolutionElement hubElement;
+		LSPResource hubResource;
 		{
 			log.info( "" );
 			log.info( "The second reloading adapter i.e. the Resource is created" );
@@ -200,11 +200,11 @@ import java.util.*;
 					secondReloadingId, hubLinkId);
 
 			secondReloadingPointBuilder.setReloadingScheduler( secondSchedulerBuilder.build() );
-			secondReloadingPointResource = secondReloadingPointBuilder.build();
+			hubResource = secondReloadingPointBuilder.build();
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-			secondReloadElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "SecondReloadElement", LogisticsSolutionElement.class ))
-					.setResource( secondReloadingPointResource )
+			hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "SecondReloadElement", LogisticsSolutionElement.class ))
+					.setResource( hubResource )
 					.build();
 		}
 
@@ -293,14 +293,14 @@ import java.util.*;
 
 				//Das ist wichtig, damit er die die Kette zur Verfügung hat.
 				depotElement.setNextElement(mainRunElement);
-				mainRunElement.setNextElement(secondReloadElement);
-				secondReloadElement.setNextElement(distributionElement);
+				mainRunElement.setNextElement(hubElement);
+				hubElement.setNextElement(distributionElement);
 
 				LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
 						Id.create("SolutionWithReloadingId", LogisticsSolution.class))
 						.addSolutionElement(depotElement)
 						.addSolutionElement(mainRunElement)
-						.addSolutionElement(secondReloadElement)
+						.addSolutionElement(hubElement)
 						.addSolutionElement(distributionElement)
 						.build();
 
@@ -314,12 +314,15 @@ import java.util.*;
 				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
 
 				List<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(
-						depotResource, mainRunResource, secondReloadingPointResource, distributionResource
-				)); //TODO KMT Dez21: Hole es aus allen SoluitionElementes.getRTessource und nicht "per-Hand".
+						depotResource, mainRunResource, hubResource, distributionResource
+				)); //TODO KMT Dez21: Hole es aus allen SolutionElementes.getRessource und nicht "per-Hand". -In UtilsKlasse(?) extractRewourcesFromSolutionElements()
 
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-				return LSPUtils.LSPBuilder.getInstance().setInitialPlan(completePlan).setId(Id.create("CollectionLSP", LSP.class)).setSolutionScheduler(simpleScheduler).build();
+				return LSPUtils.LSPBuilder.getInstance().setInitialPlan(completePlan)
+						.setId(Id.create("CollectionLSP", LSP.class))
+						.setSolutionScheduler(simpleScheduler)
+						.build();
 
 			}
 			case direct: {
