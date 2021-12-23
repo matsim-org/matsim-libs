@@ -34,8 +34,8 @@ import org.matsim.core.network.NetworkUtils;
  */
 public class DvrpTravelTimeMatrixTest {
 
-	private final Network network = NetworkUtils.createTimeInvariantNetwork();
-	private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
+	private final Network network = NetworkUtils.createNetwork();
+    private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 	private final Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 	private final Node nodeC = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), new Coord(-10, -10));
 

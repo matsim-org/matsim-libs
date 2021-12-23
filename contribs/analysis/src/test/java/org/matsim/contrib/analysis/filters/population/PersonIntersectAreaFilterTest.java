@@ -49,8 +49,8 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 	public void testFilter() throws Exception {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node0 = NetworkUtils.createAndAddNode(network, Id.create("0", Node.class), new Coord((double) 0, (double) 0));
+		Network network = NetworkUtils.createNetwork();
+        Node node0 = NetworkUtils.createAndAddNode(network, Id.create("0", Node.class), new Coord((double) 0, (double) 0));
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 10, (double) 10));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 90, (double) 10));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 10, (double) 90));
