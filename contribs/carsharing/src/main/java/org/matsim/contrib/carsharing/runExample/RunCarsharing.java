@@ -89,7 +89,7 @@ public class RunCarsharing {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
-		Network networkFF = NetworkUtils.createTimeInvariantNetwork();
+		Network networkFF = NetworkUtils.createNetwork();
 		filter.filter(networkFF, modes);
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(networkFF);
 

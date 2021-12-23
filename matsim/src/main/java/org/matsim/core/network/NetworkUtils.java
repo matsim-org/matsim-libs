@@ -63,28 +63,8 @@ public final class NetworkUtils {
 		
 		return new NetworkImpl(linkFactory);
 	}
-	
-	public static Network createTimeInvariantNetwork() {
-		return new NetworkImpl(new LinkFactoryImpl());
-	}
-	
-	/**
-	 * This function is deprecated as it creates by default a non-time-varying
-	 * network. This poses problems where, for instance, you have a time-varying
-	 * network and want to use a TransportModeNetworkFilter to extract a specific
-	 * model network. Before, the time-varying information would have been lost,
-	 * because the present method was used to create the new network to which the
-	 * filtered links were added. Hence, make use of createNetwork(Config) or
-	 * createNetwork(NetworkConfigGroup) to avoid these errors.
-	 * 
-	 * If you're sure that your network will remain time invariant, use
-	 * NetworkUtils.createTimeInvariantNetwork().
-	 * 
-	 * @return
-	 */
-	@Deprecated
+
 	public static Network createNetwork() {
-		log.warn("Using NetworkUtils.createNetwork() is deprecated. Use createNetwork(Config).");
 		return new NetworkImpl(new LinkFactoryImpl());
 	}
 
@@ -851,7 +831,7 @@ public final class NetworkUtils {
 	}
 	
 	public static Network readTimeInvariantNetwork(String string) {
-		Network network = createTimeInvariantNetwork();
+		Network network = createNetwork();
 		new MatsimNetworkReader(network).readFile(string);
 		return network;
 	}

@@ -246,7 +246,7 @@ public class Fcd {
 	
 	private void writeNetworkFromEvents(String netOutFile) {
 		log.info("Creating network from fcd events...");
-		Network net = NetworkUtils.createTimeInvariantNetwork();
+		Network net = NetworkUtils.createNetwork();
 		
 		FcdEvent lastEvent = null;
 		for (Iterator<FcdEvent> iterator = this.fcdEventsList.iterator(); iterator.hasNext();) {

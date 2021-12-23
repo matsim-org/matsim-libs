@@ -77,7 +77,7 @@ public class OSM2Surface {
 
         @Override
         public void complete() {
-            Network network = NetworkUtils.createTimeInvariantNetwork();
+            Network network = NetworkUtils.createNetwork();
             new MatsimNetworkReader(network).readFile("D:\\resultStorage\\moia-msm\\realisticModeChoice\\outputMixedCarOnly126\\croppedDenseNetwork.xml.gz");
 
             TLongObjectMap<List<Link>> id2Link = new TLongObjectHashMap<>();

@@ -17,7 +17,7 @@ public class NetworkCollectorTest {
     private static Network getNetworkFromExample() {
 
         var networkUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz");
-        var network = NetworkUtils.createTimeInvariantNetwork();
+        var network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readURL(networkUrl);
         return network;
     }
