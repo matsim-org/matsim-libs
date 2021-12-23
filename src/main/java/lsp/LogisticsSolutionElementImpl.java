@@ -51,7 +51,11 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void setNextElement(LogisticsSolutionElement element) {
-		this.nextElement =element;
+		this.nextElement = element;
+		//TODO KMT Dez21: add some functionality like
+		// * element.setPreviousElement(this); ->
+		// * rename Method to connectWithNextElement and co the bi-directional connection
+		// * and remove "setPreviousElement
 	}
 
 	@Override
