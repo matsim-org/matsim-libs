@@ -119,8 +119,8 @@ import java.util.*;
 
 			//The scheduler for the first reloading point is created --> this will be the depot in this usecase
 			UsecaseUtils.ReloadingPointSchedulerBuilder depotSchedulerBuilder = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
-			depotSchedulerBuilder.setCapacityNeedFixed( 10 );
-			depotSchedulerBuilder.setCapacityNeedLinear( 1 );
+			depotSchedulerBuilder.setCapacityNeedFixed( 10 ); //Time needed fixed (for Scheduler)
+			depotSchedulerBuilder.setCapacityNeedLinear( 1 ); //additional time needed per shipmentSize (for Scheduler)
 
 			//The scheduler is added to the Resource and the Resource is created
 			firstReloadingPointBuilder.setReloadingScheduler( depotSchedulerBuilder.build() );
