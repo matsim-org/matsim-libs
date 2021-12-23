@@ -120,7 +120,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
     public Integer call() throws Exception {
 
 
-        Network network = NetworkUtils.createTimeInvariantNetwork();
+        Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
 
         SumoNetworkHandler handler = convert(network, lanes);

@@ -80,9 +80,9 @@ public class NoiseRLS19IT {
         ShieldingContext context = new ShieldingContext(config, shieldingCorrection, barrierContext);
 
 
-        ReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
-        Network network = NetworkUtils.createTimeInvariantNetwork();
-        Node from = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(6,7));
+        ReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0, 0));
+        Network network = NetworkUtils.createNetwork();
+        Node from = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(6, 7));
         Node to = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(7,6));
         Link link = NetworkUtils.createLink(Id.createLinkId("link"), from, to, network, 10, 0,0,0);
         final Coord coord = CoordUtils.orthogonalProjectionOnLineSegment(

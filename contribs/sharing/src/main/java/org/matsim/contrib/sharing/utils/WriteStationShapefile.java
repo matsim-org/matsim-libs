@@ -30,7 +30,7 @@ public class WriteStationShapefile {
 		SharingServiceSpecification service = new DefaultSharingServiceSpecification();
 		new SharingServiceReader(service).readFile(cmd.getOptionStrict("service-path"));
 
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(cmd.getOptionStrict("network-path"));
 
 		CoordinateReferenceSystem crs = MGC.getCRS(cmd.getOptionStrict("crs"));

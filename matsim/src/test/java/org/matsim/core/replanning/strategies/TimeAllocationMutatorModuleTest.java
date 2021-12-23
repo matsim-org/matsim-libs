@@ -125,7 +125,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	 */
 	private static void runMutationRangeTest( final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange ) {
 		// setup network
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+		Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
@@ -206,7 +206,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	 */
 	private void runSimplifiedMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
 		// setup network
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+        Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
