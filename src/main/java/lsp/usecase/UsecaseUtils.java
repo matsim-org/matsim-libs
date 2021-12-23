@@ -2,6 +2,7 @@ package lsp.usecase;
 
 import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
+import lsp.resources.LSPResourceScheduler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -242,8 +243,8 @@ public class UsecaseUtils {
 			this.locationLinkId = locationLinkId;
 		}
 
-		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingPointScheduler){
-			this.reloadingScheduler = reloadingPointScheduler;
+		public ReloadingPointBuilder setReloadingScheduler( LSPResourceScheduler reloadingPointScheduler){
+			this.reloadingScheduler = (ReloadingPointScheduler) reloadingPointScheduler;
 			return this;
 		}
 
