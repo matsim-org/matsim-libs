@@ -17,7 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ReplanningAnnealerIT {
+public class ReplanningAnnealerTest {
 
     private static final String FILENAME_ANNEAL = "annealingRates.txt";
     @Rule
