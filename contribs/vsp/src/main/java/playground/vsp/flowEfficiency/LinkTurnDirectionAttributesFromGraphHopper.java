@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -96,7 +95,7 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
 
     public LinkTurnDirectionAttributesFromGraphHopper(String osmFilePath) {
         this.osm = Path.of(osmFilePath);
-    };
+    }
 
     private LinkTurnDirectionAttributesFromGraphHopper(String osmFilePath, String matsimNetworkFilePath, String networkCrs) {
         this.osm = Path.of(osmFilePath);
@@ -121,7 +120,7 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
 
 
     public Network assignLinkTurnAttributes(Path input, String networkCrs){
-        Network network = NetworkUtils.readTimeInvariantNetwork(input.toString());
+        Network network = NetworkUtils.readNetwork(input.toString());
         return assignLinkTurnAttributes(network, networkCrs);
     }
 

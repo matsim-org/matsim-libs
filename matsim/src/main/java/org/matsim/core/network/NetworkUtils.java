@@ -803,10 +803,6 @@ public final class NetworkUtils {
 		return null;
 	}
 
-	public static void readNetwork(Network network, String string) {
-		new MatsimNetworkReader(network).readFile(string);
-	}
-
 	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
 		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
@@ -821,44 +817,33 @@ public final class NetworkUtils {
 		link.getAttributes().putAttribute(attribute,accessTime);
 	}
 
-	public static OptionalTime getLinkEgressTime(Link link, String routingMode){
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+	public static OptionalTime getLinkEgressTime(Link link, String routingMode) {
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
-		if (o!=null){
+		if (o != null) {
 			return OptionalTime.defined((double) o);
-		}
-		else return OptionalTime.undefined();
+		} else return OptionalTime.undefined();
 	}
 
-	public static void setLinkEgressTime(Link link, String routingMode, double egressTime){
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
-		link.getAttributes().putAttribute(attribute,egressTime);
+	public static void setLinkEgressTime(Link link, String routingMode, double egressTime) {
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
+		link.getAttributes().putAttribute(attribute, egressTime);
 	}
 
-
-	public static Network readNetwork(String string, Config config) {
-		return readNetwork(string, config.network());
+	public static Network readNetwork(String filename) {
+		return readNetwork(filename, ConfigUtils.createConfig());
 	}
 
-	public static Network readNetwork(String string, NetworkConfigGroup networkConfigGroup) {
+	public static Network readNetwork(String filename, Config config) {
+		return readNetwork(filename, config.network());
+	}
+
+	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup) {
 		Network network = createNetwork(networkConfigGroup);
-		new MatsimNetworkReader(network).readFile(string);
+		new MatsimNetworkReader(network).readFile(filename);
 		return network;
-	}
-	
-	public static Network readTimeInvariantNetwork(String string) {
-		Network network = createNetwork();
-		new MatsimNetworkReader(network).readFile(string);
-		return network;
-	}
-	
-	@Deprecated
-	public static Network readNetwork(String string) {
-		log.warn("Using NetworkUtils.readNetwork() is deprecated. Use readNetwork(Path, Config) or readTimeInvariantNetwork(Path) and see createNetwork() for further information.");
-		return readTimeInvariantNetwork(string);
 	}
 
-	
 	/**
 	 * reads network form file and applies a coordinate transformation.
 	 * @param filename network file name
@@ -873,6 +858,10 @@ public final class NetworkUtils {
 					node.setCoord(transformedCoord);
 				});
 		return network;
+	}
+
+	public static void readNetwork(Network network, String string) {
+		new MatsimNetworkReader(network).readFile(string);
 	}
 
 	public static boolean compare(Network expected, Network actual) {

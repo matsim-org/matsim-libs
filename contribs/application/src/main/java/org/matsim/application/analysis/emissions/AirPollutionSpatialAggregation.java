@@ -74,7 +74,7 @@ public class AirPollutionSpatialAggregation implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		Network network = NetworkUtils.readTimeInvariantNetwork(this.network.toString());
+		Network network = NetworkUtils.readNetwork(this.network.toString());
 
 		ShpOptions.Index index = shp.getShapeFile() != null ? shp.createIndex(ProjectionUtils.getCRS(network), "_") : null;
 
