@@ -33,7 +33,7 @@ public interface LogisticsSolutionElement {
 	
 	public WaitingShipments getOutgoingShipments();
 	
-	public void schedulingOfResourceCompleted();
+//	public void schedulingOfResourceCompleted();
 
 	public void addSimulationTracker( LSPSimulationTracker tracker );
     

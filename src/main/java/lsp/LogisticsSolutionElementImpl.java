@@ -69,12 +69,13 @@ import lsp.controler.LSPSimulationTracker;
 		return outgoingShipments;
 	}
 
-	@Override
-	public void schedulingOfResourceCompleted() {
-		for( ShipmentWithTime tuple : outgoingShipments.getSortedShipments()){
-			nextElement.getIncomingShipments().addShipment(tuple.getTime(), tuple.getShipment());
-		}
-	}
+//	@Override
+//	//KMT, KN: Never Used? -- Wäre wenn eher eh was für eine Utilsklasse. (ggf. mit anderem Namen). Frage: gedoppelt mit Scheduler?
+//	public void schedulingOfResourceCompleted() {
+//		for( ShipmentWithTime tuple : outgoingShipments.getSortedShipments()){
+//			nextElement.getIncomingShipments().addShipment(tuple.getTime(), tuple.getShipment());
+//		}
+//	}
 
 	@Override
 	public void setLogisticsSolution(LogisticsSolution solution) {

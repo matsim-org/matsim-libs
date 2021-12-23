@@ -326,12 +326,12 @@ import java.util.*;
 
 			}
 			case direct: {
-				// ### This is the new solution with with directDistribution from the Depot.
+				// ### This is the new solution with  directDistribution from the Depot.
 
 				log.info("");
 				log.info("The order of the logisticsSolutionElements is now specified");
-				depotElement.setNextElement(directDistributionElement);
-				directDistributionElement.setPreviousElement(depotElement);
+				depotElement.setNextElement(directDistributionElement);	//TODO: Ist es Connect (beide Richtungen) oder nur setNext? -> Falls connect -> rename2: connectWithNextElement
+				directDistributionElement.setPreviousElement(depotElement); //Todo: Warum geht es in beide Richtungen??
 
 				//TODO WIP: KostenInfo an das Element dran hängen.
 
