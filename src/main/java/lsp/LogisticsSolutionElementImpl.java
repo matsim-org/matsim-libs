@@ -26,7 +26,7 @@ import lsp.controler.LSPSimulationTracker;
 	private Collection<LSPInfo> infos;
 	private Collection<LSPSimulationTracker> trackers;
 	private Collection<EventHandler> handlers;
-	private EventsManager eventsManager;
+//	private EventsManager eventsManager;
 
 	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
 		this.id = builder.id;
@@ -118,10 +118,10 @@ import lsp.controler.LSPSimulationTracker;
 		return trackers;
 	}
 
-	@Override
-	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
-	}
+//	@Override
+//	public void setEventsManager(EventsManager eventsManager) {
+//		this.eventsManager = eventsManager;
+//	}
 	
 
 }

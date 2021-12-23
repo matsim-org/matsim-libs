@@ -43,5 +43,5 @@ public interface LogisticsSolutionElement {
     
     public Collection <LSPSimulationTracker> getSimulationTrackers();
     
-    public void setEventsManager(EventsManager eventsManager);
+//    public void setEventsManager(EventsManager eventsManager);
 }
