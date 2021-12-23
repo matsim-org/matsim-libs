@@ -80,7 +80,7 @@ public class AirPollutionSpatialAggregation implements MATSimAppCommand {
 
 		var filteredNetwork = network.getLinks().values().parallelStream()
 				.filter(link -> index == null || index.contains(link.getCoord()))
-				.collect(NetworkUtils.getTimeInvariantCollector());
+				.collect(NetworkUtils.getCollector());
 
 		Map<Pollutant, Raster> rasterMap = FastEmissionGridAnalyzer.processEventsFile(events.toString(), filteredNetwork, gridSize, 20);
 
@@ -96,7 +96,7 @@ public class AirPollutionSpatialAggregation implements MATSimAppCommand {
 			return 2;
 		}
 
-		Raster raster = rasterMap.values().stream().findFirst().get();
+		Raster raster = rasterMap.values().stream().findFirst().orElseThrow();
 
 		try (CSVPrinter printer = csv.createPrinter(output)) {
 

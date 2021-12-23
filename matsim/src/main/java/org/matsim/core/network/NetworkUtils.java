@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
@@ -49,23 +50,38 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = Logger.getLogger(NetworkUtils.class);
-	
+
+	/**
+	 * This will create a time invariant network.
+	 *
+	 * @return Empty time invariant MATSim network
+	 */
+	public static Network createNetwork() {
+		return createNetwork(ConfigUtils.createConfig());
+	}
+
+	/**
+	 * Override for {@link NetworkUtils#createNetwork(NetworkConfigGroup)}
+	 */
 	public static Network createNetwork(Config config) {
 		return createNetwork(config.network());
 	}
 
+	/**
+	 * Creates a network based on the properties found in network config group. Either returns a default network or
+	 * a time variable network
+	 *
+	 * @param networkConfigGroup the 'isTimeVariantNetwork' property is read
+	 * @return Empty MATSim network
+	 */
 	public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
 		LinkFactory linkFactory = new LinkFactoryImpl();
-		
+
 		if (networkConfigGroup.isTimeVariantNetwork()) {
 			linkFactory = new VariableIntervalTimeVariantLinkFactory();
 		}
-		
-		return new NetworkImpl(linkFactory);
-	}
 
-	public static Network createNetwork() {
-		return new NetworkImpl(new LinkFactoryImpl());
+		return new NetworkImpl(linkFactory);
 	}
 
 	/**
@@ -99,7 +115,7 @@ public final class NetworkUtils {
 	 * @return array containing the nodes, sorted ascending by id.
 	 */
 	public static Node[] getSortedNodes(final Network network) {
-		Node[] nodes = network.getNodes().values().toArray(new Node[network.getNodes().size()]);
+		Node[] nodes = network.getNodes().values().toArray(Node[]::new);
 		Arrays.sort(nodes, Comparator.comparing(Identifiable::getId));
 		return nodes;
 	}
@@ -134,7 +150,7 @@ public final class NetworkUtils {
 	 * @return array containing the links, sorted ascending by id.
 	 */
 	public static Link[] getSortedLinks(final Network network) {
-		Link[] links = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
+		Link[] links = network.getLinks().values().toArray(Link[]::new);
 		Arrays.sort(links, Comparator.comparing(Identifiable::getId));
 		return links;
 	}
@@ -414,19 +430,19 @@ public final class NetworkUtils {
         if (nearestRightLink == null) {
             return nearestOverallLink;
         }
-        return nearestRightLink;
-    }
+		return nearestRightLink;
+	}
 
-    /**
-     * Finds the (approx.) nearest link to a given point on the map.
-     * It searches first for the nearest node, and then for the nearest link
-     * originating or ending at that node.
-     *
-     * @param coord
-     *          the coordinate for which the closest link should be found
-     * @return the link found closest to coord
-     * 
-     * @see {@link NetworkUtils#getNearestLinkExactly(Network, Coord)}
+	/**
+	 * Finds the (approx.) nearest link to a given point on the map.
+	 * It searches first for the nearest node, and then for the nearest link
+	 * originating or ending at that node.
+	 *
+	 * @param coord
+	 *          the coordinate for which the closest link should be found
+	 * @return the link found closest to coord
+	 *
+	 * @see NetworkUtils#getNearestLinkExactly(Network, Coord)
      */
     public static Link getNearestLink(Network network, final Coord coord) {
         Link nearestLink = null;
@@ -887,17 +903,17 @@ public final class NetworkUtils {
 		return true;
 	}
 
-	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
-		return new NetworkCollector(networkConfigGroup);
+	public static NetworkCollector getCollector() {
+		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
+		networkConfigGroup.setTimeVariantNetwork(false);
+		return getCollector(networkConfigGroup);
 	}
 
 	public static NetworkCollector getCollector(Config config) {
-		return new NetworkCollector(config.network());
+		return getCollector(config.network());
 	}
-	
-	public static NetworkCollector getTimeInvariantCollector() {
-		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
-		networkConfigGroup.setTimeVariantNetwork(false);
+
+	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
 		return new NetworkCollector(networkConfigGroup);
 	}
 
