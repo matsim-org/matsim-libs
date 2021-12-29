@@ -22,11 +22,18 @@
 
 package org.matsim.core.controler;
 
-import org.matsim.analysis.*;
+import org.matsim.analysis.IterationTravelStatsModule;
+import org.matsim.analysis.LegHistogramModule;
+import org.matsim.analysis.LegTimesModule;
+import org.matsim.analysis.LinkStatsModule;
+import org.matsim.analysis.ModeStatsModule;
+import org.matsim.analysis.ScoreStatsModule;
+import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.population.VspPlansCleanerModule;
 import org.matsim.core.replanning.StrategyManagerModule;
+import org.matsim.core.replanning.annealing.ReplanningAnnealer;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
@@ -48,7 +55,10 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new TripRouterModule());
         install(new StrategyManagerModule());
         install(new TimeInterpretationModule());
-    
+        if (getConfig().replanningAnnealer().isActivateAnnealingModule()) {
+            addControlerListenerBinding().to(ReplanningAnnealer.class);
+        }
+
         // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
         install(new LinkStatsModule());
         install(new VolumesAnalyzerModule());
