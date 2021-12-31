@@ -22,11 +22,10 @@ import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author michalm
  */
 public interface DetourPathCalculator {
-	DetourData<PathData> calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions);
+	DetourPathData calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions);
 }

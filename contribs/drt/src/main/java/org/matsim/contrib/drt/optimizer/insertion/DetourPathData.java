@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * Contains detour data for all potential insertions (i.e. pickup and dropoff indices)
@@ -38,20 +38,20 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * <p>
  * On the other hand, detour data (D) could itself provide time-dependent information.
  */
-public class DetourData<D> {
-	private final Function<Link, D> detourToPickup;
-	private final Function<Link, D> detourFromPickup;
-	private final Function<Link, D> detourToDropoff;
-	private final Function<Link, D> detourFromDropoff;
-	private final D zeroDetour;
+public class DetourPathData {
+	private final Function<Link, PathData> detourToPickup;
+	private final Function<Link, PathData> detourFromPickup;
+	private final Function<Link, PathData> detourToDropoff;
+	private final Function<Link, PathData> detourFromDropoff;
+	private final PathData zeroDetour;
 
-	DetourData(Map<Link, D> detourToPickup, Map<Link, D> detourFromPickup, Map<Link, D> detourToDropoff,
-			Map<Link, D> detourFromDropoff, D zeroDetour) {
+	DetourPathData(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
+			Map<Link, PathData> detourToDropoff, Map<Link, PathData> detourFromDropoff, PathData zeroDetour) {
 		this(detourToPickup::get, detourFromPickup::get, detourToDropoff::get, detourFromDropoff::get, zeroDetour);
 	}
 
-	DetourData(Function<Link, D> detourToPickup, Function<Link, D> detourFromPickup, Function<Link, D> detourToDropoff,
-			Function<Link, D> detourFromDropoff, D zeroDetour) {
+	DetourPathData(Function<Link, PathData> detourToPickup, Function<Link, PathData> detourFromPickup,
+			Function<Link, PathData> detourToDropoff, Function<Link, PathData> detourFromDropoff, PathData zeroDetour) {
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;
 		this.detourToDropoff = detourToDropoff;
@@ -59,13 +59,13 @@ public class DetourData<D> {
 		this.zeroDetour = zeroDetour;
 	}
 
-	public InsertionWithDetourData<D> createInsertionWithDetourData(InsertionGenerator.Insertion insertion) {
-		D toPickup = detourToPickup.apply(insertion.pickup.previousWaypoint.getLink());
-		D fromPickup = detourFromPickup.apply(insertion.pickup.nextWaypoint.getLink());
-		D toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
+	public InsertionWithDetourData<PathData> createInsertionWithDetourData(InsertionGenerator.Insertion insertion) {
+		PathData toPickup = detourToPickup.apply(insertion.pickup.previousWaypoint.getLink());
+		PathData fromPickup = detourFromPickup.apply(insertion.pickup.nextWaypoint.getLink());
+		PathData toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
 				null :
 				detourToDropoff.apply(insertion.dropoff.previousWaypoint.getLink());
-		D fromDropoff = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
+		PathData fromDropoff = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
 				zeroDetour :
 				detourFromDropoff.apply(insertion.dropoff.nextWaypoint.getLink());
 		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);

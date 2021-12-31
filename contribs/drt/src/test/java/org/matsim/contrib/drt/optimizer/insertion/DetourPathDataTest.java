@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 
@@ -32,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
@@ -40,46 +42,46 @@ import com.google.common.collect.ImmutableMap;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DetourDataTest {
+public class DetourPathDataTest {
 	private final Link pickupLink = link("pickupLink");
 	private final Link dropoffLink = link("dropoffLink");
 	private final Link startLink = link("startLink");
 	private final Link stop0Link = link("stop0Link");
 	private final Link stop1Link = link("stop1Link");
 
-	private final String start_pickup = "start_pickup";
-	private final String stop0_pickup = "stop0_pickup";
-	private final String stop1_pickup = "stop1_pickup";
+	private final PathData start_pickup = mock(PathData.class);
+	private final PathData stop0_pickup = mock(PathData.class);
+	private final PathData stop1_pickup = mock(PathData.class);
 
-	private final String pickup_stop0 = "pickup_stop0";
-	private final String pickup_stop1 = "pickup_stop1";
+	private final PathData pickup_stop0 = mock(PathData.class);
+	private final PathData pickup_stop1 = mock(PathData.class);
 
-	private final String pickup_dropoff = "pickup_dropoff";
+	private final PathData pickup_dropoff = mock(PathData.class);
 
-	private final String stop0_dropoff = "stop0_dropoff";
-	private final String stop1_dropoff = "stop1_dropoff";
+	private final PathData stop0_dropoff = mock(PathData.class);
+	private final PathData stop1_dropoff = mock(PathData.class);
 
-	private final String dropoff_stop0 = "dropoff_stop0";
-	private final String dropoff_stop1 = "dropoff_stop1";
+	private final PathData dropoff_stop0 = mock(PathData.class);
+	private final PathData dropoff_stop1 = mock(PathData.class);
 
 	private final DrtRequest request = DrtRequest.newBuilder().fromLink(pickupLink).toLink(dropoffLink).build();
 	private final VehicleEntry entry = entry(startLink, stop0Link, stop1Link);
 
-	private final ImmutableMap<Link, String> pathToPickupMap = ImmutableMap.of(startLink, start_pickup, stop0Link,
+	private final ImmutableMap<Link, PathData> pathToPickupMap = ImmutableMap.of(startLink, start_pickup, stop0Link,
 			stop0_pickup, stop1Link, stop1_pickup);
 
-	private final ImmutableMap<Link, String> pathFromPickupMap = ImmutableMap.of(stop0Link, pickup_stop0, stop1Link,
+	private final ImmutableMap<Link, PathData> pathFromPickupMap = ImmutableMap.of(stop0Link, pickup_stop0, stop1Link,
 			pickup_stop1, dropoffLink, pickup_dropoff);
 
-	private final ImmutableMap<Link, String> pathToDropoffMap = ImmutableMap.of(pickupLink, pickup_dropoff, stop0Link,
+	private final ImmutableMap<Link, PathData> pathToDropoffMap = ImmutableMap.of(pickupLink, pickup_dropoff, stop0Link,
 			stop0_dropoff, stop1Link, stop1_dropoff);
 
-	private final ImmutableMap<Link, String> pathFromDropoffMap = ImmutableMap.of(stop0Link, dropoff_stop0, stop1Link,
+	private final ImmutableMap<Link, PathData> pathFromDropoffMap = ImmutableMap.of(stop0Link, dropoff_stop0, stop1Link,
 			dropoff_stop1);
 
-	private static final String ZERO_DETOUR = "zero_detour";
-	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap, pathFromPickupMap, pathToDropoffMap,
-			pathFromDropoffMap, ZERO_DETOUR);
+	private static final PathData ZERO_DETOUR = mock(PathData.class);
+	private final DetourPathData detourPathData = new DetourPathData(pathToPickupMap, pathFromPickupMap,
+			pathToDropoffMap, pathFromDropoffMap, ZERO_DETOUR);
 
 	@Test
 	public void insertion_0_0() {
@@ -111,10 +113,10 @@ public class DetourDataTest {
 		assertInsertion(2, 2, stop1_pickup, pickup_dropoff, null, ZERO_DETOUR);
 	}
 
-	private void assertInsertion(int pickupIdx, int dropoffIdx, String detourToPickup, String detourFromPickup,
-			String detourToDropoff, String detourFromDropoff) {
+	private void assertInsertion(int pickupIdx, int dropoffIdx, PathData detourToPickup, PathData detourFromPickup,
+			PathData detourToDropoff, PathData detourFromDropoff) {
 		Insertion insertion = new Insertion(request, entry, pickupIdx, dropoffIdx);
-		var actual = detourData.createInsertionWithDetourData(insertion);
+		var actual = detourPathData.createInsertionWithDetourData(insertion);
 		var expected = new InsertionWithDetourData<>(insertion, detourToPickup, detourFromPickup, detourToDropoff,
 				detourFromDropoff);
 		assertThat(actual).isEqualToComparingFieldByField(expected);
