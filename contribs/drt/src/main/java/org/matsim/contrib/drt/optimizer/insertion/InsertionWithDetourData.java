@@ -31,10 +31,32 @@ import com.google.common.base.MoreObjects;
  */
 public class InsertionWithDetourData<D> {
 	public static class InsertionDetourData<D> {
+		/**
+		 * Detour necessary to get from start or the preceding stop to pickup.
+		 * <p>
+		 * If pickup is inserted at the (existing) previous stop -> no detour.
+		 */
 		public final D detourToPickup;
-		public final D detourFromPickup; // "zero" detour if pickup inserted at the end of schedule !!!
-		public final D detourToDropoff; // detour from pickup if dropoff inserted directly after pickup
-		public final D detourFromDropoff; // "zero" detour if dropoff inserted at the end of schedule
+		/**
+		 * Detour necessary to get from pickup to the next stop or 0 if appended at the end.
+		 * <p>
+		 * IMPORTANT: At this point the dropoff location is not taken into account !!!
+		 * "zero" detour if pickup inserted at the end of schedule !!!
+		 */
+		public final D detourFromPickup;
+		/**
+		 * Detour necessary to get from the preceding stop (could be a stop of the corresponding pickup) to dropoff.
+		 * <p>
+		 * If dropoff is inserted at the (existing) previous stop -> no detour.
+		 * If dropoff inserted directly after pickup -> detour from pickup
+		 */
+		public final D detourToDropoff;
+		/**
+		 * Detour necessary to get from dropoff to the next stop or no detour if appended at the end.
+		 * <p>
+		 * "zero" detour if dropoff inserted at the end of schedule
+		 */
+		public final D detourFromDropoff;
 
 		public InsertionDetourData(D detourToPickup, D detourFromPickup, D detourToDropoff, D detourFromDropoff) {
 			this.detourToPickup = detourToPickup;
@@ -66,58 +88,8 @@ public class InsertionWithDetourData<D> {
 		return insertion;
 	}
 
-	public VehicleEntry getVehicleEntry() {
-		return insertion.vehicleEntry;
-	}
-
-	public InsertionPoint getPickup() {
-		return insertion.pickup;
-	}
-
-	public InsertionPoint getDropoff() {
-		return insertion.dropoff;
-	}
-
-	/**
-	 * Detour necessary to get from start or the preceding stop to pickup.
-	 * <p>
-	 * If pickup is inserted at the (existing) previous stop -> no detour.
-	 *
-	 * @return
-	 */
-	public D getDetourToPickup() {
-		return insertionDetourData.detourToPickup;
-	}
-
-	/**
-	 * Detour necessary to get from pickup to the next stop or 0 if appended at the end.
-	 * <p>
-	 * IMPORTANT: At this point the dropoff location is not taken into account !!!
-	 *
-	 * @return
-	 */
-	public D getDetourFromPickup() {
-		return insertionDetourData.detourFromPickup;
-	}
-
-	/**
-	 * Detour necessary to get from the preceding stop (could be a stop of the corresponding pickup) to dropoff.
-	 * <p>
-	 * If dropoff is inserted at the (existing) previous stop -> no detour.
-	 *
-	 * @return
-	 */
-	public D getDetourToDropoff() {
-		return insertionDetourData.detourToDropoff;
-	}
-
-	/**
-	 * Detour necessary to get from dropoff to the next stop or no detour if appended at the end.
-	 *
-	 * @return
-	 */
-	public D getDetourFromDropoff() {
-		return insertionDetourData.detourFromDropoff;
+	public InsertionDetourData<D> getDetourData() {
+		return insertionDetourData;
 	}
 
 	@Override
