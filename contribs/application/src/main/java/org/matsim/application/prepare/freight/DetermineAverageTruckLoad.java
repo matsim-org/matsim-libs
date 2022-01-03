@@ -76,7 +76,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         checkIfAllRequiredFilesArePresent(freightDataPath, lookupTablePath, pathToBoundaryLinks,
                 pathToInternationalRegions, networkPath, shapeFilePath, freightTrafficCountPath);
 
-        Network network = NetworkUtils.readTimeInvariantNetwork(networkPath.toString());
+        Network network = NetworkUtils.readNetwork(networkPath.toString());
         LeastCostPathCalculator router = createRouter(network);
         ShpOptions shp = new ShpOptions(shapeFilePath, crs.getInputCRS(), StandardCharsets.UTF_8);
         ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "NUTS_ID");

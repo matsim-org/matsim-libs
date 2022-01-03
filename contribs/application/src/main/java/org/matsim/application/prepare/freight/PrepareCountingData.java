@@ -48,7 +48,7 @@ public class PrepareCountingData implements MATSimAppCommand {
 
     @Override
     public Integer call() throws Exception {
-        Network network = NetworkUtils.readTimeInvariantNetwork(networkPath.toString());
+        Network network = NetworkUtils.readNetwork(networkPath.toString());
 
         Counts counts = new Counts();
         counts.setName("BASt Automatische Zählstellen 2019");
