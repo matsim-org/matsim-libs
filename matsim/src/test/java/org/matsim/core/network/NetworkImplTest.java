@@ -109,8 +109,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 */
 	@Test
 	public void testAddLink_noNodes(){
-		Network n = NetworkUtils.createTimeInvariantNetwork();
-		Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
+		Network n = NetworkUtils.createNetwork();
+        Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
 		Node b = n.getFactory().createNode(Id.create("b", Node.class), new Coord(1000.0, 0.0));
 		Node c = n.getFactory().createNode(Id.create("c", Node.class), new Coord(0.0, 1000.0));
 		

@@ -189,7 +189,7 @@ public class FastEmissionGridAnalyzerTest {
         final var emissionEvents = Paths.get(utils.getOutputDirectory()).resolve("emission.events.xml.gz");
         final var biggestExpectedValue = 6.056547619047618E-6;
 
-        var network = NetworkUtils.readTimeInvariantNetwork(networkUrl.toString());
+        var network = NetworkUtils.readNetwork(networkUrl.toString());
         TestUtils.writeWarmEventsToFile(emissionEvents, network, Pollutant.NOx, 10, 1, 1);
 
         var rasterMap = FastEmissionGridAnalyzer.processEventsFile(emissionEvents.toString(), network, 1000, 1);

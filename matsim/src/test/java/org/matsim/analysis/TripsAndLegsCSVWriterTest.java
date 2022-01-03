@@ -659,7 +659,7 @@ public class TripsAndLegsCSVWriterTest {
 	/**************************Creating a network*********************************/
 	private void createNetwork() {
 
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory = network.getFactory();
 		
 		Node n0, n1, n2, n3;

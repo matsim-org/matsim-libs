@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
@@ -49,43 +50,38 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = Logger.getLogger(NetworkUtils.class);
-	
+
+	/**
+	 * This will create a time invariant network.
+	 *
+	 * @return Empty time invariant MATSim network
+	 */
+	public static Network createNetwork() {
+		return createNetwork(ConfigUtils.createConfig());
+	}
+
+	/**
+	 * Override for {@link NetworkUtils#createNetwork(NetworkConfigGroup)}
+	 */
 	public static Network createNetwork(Config config) {
 		return createNetwork(config.network());
 	}
 
+	/**
+	 * Creates a network based on the properties found in network config group. Either returns a default network or
+	 * a time variable network
+	 *
+	 * @param networkConfigGroup the 'isTimeVariantNetwork' property is read
+	 * @return Empty MATSim network
+	 */
 	public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
 		LinkFactory linkFactory = new LinkFactoryImpl();
-		
+
 		if (networkConfigGroup.isTimeVariantNetwork()) {
 			linkFactory = new VariableIntervalTimeVariantLinkFactory();
 		}
-		
+
 		return new NetworkImpl(linkFactory);
-	}
-	
-	public static Network createTimeInvariantNetwork() {
-		return new NetworkImpl(new LinkFactoryImpl());
-	}
-	
-	/**
-	 * This function is deprecated as it creates by default a non-time-varying
-	 * network. This poses problems where, for instance, you have a time-varying
-	 * network and want to use a TransportModeNetworkFilter to extract a specific
-	 * model network. Before, the time-varying information would have been lost,
-	 * because the present method was used to create the new network to which the
-	 * filtered links were added. Hence, make use of createNetwork(Config) or
-	 * createNetwork(NetworkConfigGroup) to avoid these errors.
-	 * 
-	 * If you're sure that your network will remain time invariant, use
-	 * NetworkUtils.createTimeInvariantNetwork().
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public static Network createNetwork() {
-		log.warn("Using NetworkUtils.createNetwork() is deprecated. Use createNetwork(Config).");
-		return new NetworkImpl(new LinkFactoryImpl());
 	}
 
 	/**
@@ -119,7 +115,7 @@ public final class NetworkUtils {
 	 * @return array containing the nodes, sorted ascending by id.
 	 */
 	public static Node[] getSortedNodes(final Network network) {
-		Node[] nodes = network.getNodes().values().toArray(new Node[network.getNodes().size()]);
+		Node[] nodes = network.getNodes().values().toArray(Node[]::new);
 		Arrays.sort(nodes, Comparator.comparing(Identifiable::getId));
 		return nodes;
 	}
@@ -154,7 +150,7 @@ public final class NetworkUtils {
 	 * @return array containing the links, sorted ascending by id.
 	 */
 	public static Link[] getSortedLinks(final Network network) {
-		Link[] links = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
+		Link[] links = network.getLinks().values().toArray(Link[]::new);
 		Arrays.sort(links, Comparator.comparing(Identifiable::getId));
 		return links;
 	}
@@ -434,19 +430,19 @@ public final class NetworkUtils {
         if (nearestRightLink == null) {
             return nearestOverallLink;
         }
-        return nearestRightLink;
-    }
+		return nearestRightLink;
+	}
 
-    /**
-     * Finds the (approx.) nearest link to a given point on the map.
-     * It searches first for the nearest node, and then for the nearest link
-     * originating or ending at that node.
-     *
-     * @param coord
-     *          the coordinate for which the closest link should be found
-     * @return the link found closest to coord
-     * 
-     * @see {@link NetworkUtils#getNearestLinkExactly(Network, Coord)}
+	/**
+	 * Finds the (approx.) nearest link to a given point on the map.
+	 * It searches first for the nearest node, and then for the nearest link
+	 * originating or ending at that node.
+	 *
+	 * @param coord
+	 *          the coordinate for which the closest link should be found
+	 * @return the link found closest to coord
+	 *
+	 * @see NetworkUtils#getNearestLinkExactly(Network, Coord)
      */
     public static Link getNearestLink(Network network, final Coord coord) {
         Link nearestLink = null;
@@ -807,10 +803,6 @@ public final class NetworkUtils {
 		return null;
 	}
 
-	public static void readNetwork(Network network, String string) {
-		new MatsimNetworkReader(network).readFile(string);
-	}
-
 	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
 		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
@@ -825,44 +817,33 @@ public final class NetworkUtils {
 		link.getAttributes().putAttribute(attribute,accessTime);
 	}
 
-	public static OptionalTime getLinkEgressTime(Link link, String routingMode){
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+	public static OptionalTime getLinkEgressTime(Link link, String routingMode) {
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
-		if (o!=null){
+		if (o != null) {
 			return OptionalTime.defined((double) o);
-		}
-		else return OptionalTime.undefined();
+		} else return OptionalTime.undefined();
 	}
 
-	public static void setLinkEgressTime(Link link, String routingMode, double egressTime){
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
-		link.getAttributes().putAttribute(attribute,egressTime);
+	public static void setLinkEgressTime(Link link, String routingMode, double egressTime) {
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
+		link.getAttributes().putAttribute(attribute, egressTime);
 	}
 
-
-	public static Network readNetwork(String string, Config config) {
-		return readNetwork(string, config.network());
+	public static Network readNetwork(String filename) {
+		return readNetwork(filename, ConfigUtils.createConfig());
 	}
 
-	public static Network readNetwork(String string, NetworkConfigGroup networkConfigGroup) {
+	public static Network readNetwork(String filename, Config config) {
+		return readNetwork(filename, config.network());
+	}
+
+	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup) {
 		Network network = createNetwork(networkConfigGroup);
-		new MatsimNetworkReader(network).readFile(string);
+		new MatsimNetworkReader(network).readFile(filename);
 		return network;
-	}
-	
-	public static Network readTimeInvariantNetwork(String string) {
-		Network network = createTimeInvariantNetwork();
-		new MatsimNetworkReader(network).readFile(string);
-		return network;
-	}
-	
-	@Deprecated
-	public static Network readNetwork(String string) {
-		log.warn("Using NetworkUtils.readNetwork() is deprecated. Use readNetwork(Path, Config) or readTimeInvariantNetwork(Path) and see createNetwork() for further information.");
-		return readTimeInvariantNetwork(string);
 	}
 
-	
 	/**
 	 * reads network form file and applies a coordinate transformation.
 	 * @param filename network file name
@@ -877,6 +858,10 @@ public final class NetworkUtils {
 					node.setCoord(transformedCoord);
 				});
 		return network;
+	}
+
+	public static void readNetwork(Network network, String string) {
+		new MatsimNetworkReader(network).readFile(string);
 	}
 
 	public static boolean compare(Network expected, Network actual) {
@@ -907,17 +892,17 @@ public final class NetworkUtils {
 		return true;
 	}
 
-	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
-		return new NetworkCollector(networkConfigGroup);
+	public static NetworkCollector getCollector() {
+		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
+		networkConfigGroup.setTimeVariantNetwork(false);
+		return getCollector(networkConfigGroup);
 	}
 
 	public static NetworkCollector getCollector(Config config) {
-		return new NetworkCollector(config.network());
+		return getCollector(config.network());
 	}
-	
-	public static NetworkCollector getTimeInvariantCollector() {
-		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
-		networkConfigGroup.setTimeVariantNetwork(false);
+
+	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
 		return new NetworkCollector(networkConfigGroup);
 	}
 

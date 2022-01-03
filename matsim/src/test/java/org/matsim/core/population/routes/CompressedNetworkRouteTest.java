@@ -132,8 +132,8 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Test
 	public void testClone() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		NetworkFactory builder = network.getFactory();
+		Network network = NetworkUtils.createNetwork();
+        NetworkFactory builder = network.getFactory();
 
 		Node node1 = builder.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 1000));
 		Node node2 = builder.createNode(Id.create(2, Node.class), new Coord((double) 0, (double) 2000));

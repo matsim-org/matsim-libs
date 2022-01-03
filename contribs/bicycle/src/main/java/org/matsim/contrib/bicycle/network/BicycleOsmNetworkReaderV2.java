@@ -83,7 +83,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 //		List<String> bicycleWayTags = Arrays.asList(
 //				new String[]{BicycleUtils.CYCLEWAY, BicycleUtils.SURFACE, BicycleUtils.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
 
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 		
 		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, outputCRS);

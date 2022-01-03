@@ -82,8 +82,8 @@ public class NetworkChangeEventsParserWriterTest {
 	public void testWriteChangeEventWithSmallValueAndReadBack() {
 		final String fileName = utils.getOutputDirectory() + "wurst.xml";
 
-		final Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		final Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
 
@@ -107,8 +107,8 @@ public class NetworkChangeEventsParserWriterTest {
 		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
 		new NetworkChangeEventsWriter().write(fileName, changeEvents);
 
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
+        Network network = NetworkUtils.createNetwork();
+        List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
 		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
 
 		// the main test is that there is no exception
@@ -117,8 +117,8 @@ public class NetworkChangeEventsParserWriterTest {
 
 	@Test
 	public void testAbsoluteChangeEvents() {
-		final Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        final Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
 
@@ -145,8 +145,8 @@ public class NetworkChangeEventsParserWriterTest {
 
 	@Test
 	public void testScaleFactorChangeEvents() {
-		final Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        final Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
 
@@ -173,8 +173,8 @@ public class NetworkChangeEventsParserWriterTest {
 
 	@Test
 	public void testPositiveOffsetChangeEvents() {
-		final Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        final Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
 
@@ -201,8 +201,8 @@ public class NetworkChangeEventsParserWriterTest {
 
 	@Test
 	public void testNegativeOffsetChangeEvents() {
-		final Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        final Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
 

@@ -627,7 +627,7 @@ public class MultiNodeDijkstraTest {
 		/*package*/ Network network;
 
 		public Fixture() {
-			this.network = (Network) NetworkUtils.createTimeInvariantNetwork();
+			this.network = (Network) NetworkUtils.createNetwork();
 			Node node1 = NetworkUtils.createAndAddNode(this.network, Id.create(1, Node.class), new Coord((double) 1000, (double) 0));
 			Node node2 = NetworkUtils.createAndAddNode(this.network, Id.create(2, Node.class), new Coord((double) 500, (double) 0));
 			Node node3 = NetworkUtils.createAndAddNode(this.network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));
