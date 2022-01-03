@@ -76,7 +76,7 @@ public class DefaultDrtInsertionSearchTest {
 		when(insertionProvider.getInsertions(eq(request), eq(List.of(vehicleEntry)))).thenReturn(filteredInsertions);
 
 		//mock detourPathCalculator
-		var detourData = new DetourPathData(Map.of(beforePickupLink, mock(PathData.class)),
+		var detourData = new DetourPathDataCache(Map.of(beforePickupLink, mock(PathData.class)),
 				Map.of(afterPickupLink, mock(PathData.class)), Map.of(beforeDropoffLink, mock(PathData.class)),
 				Map.of(afterDropoffLink, mock(PathData.class)), PathData.EMPTY);
 		var detourPathCalculator = mock(DetourPathCalculator.class);

@@ -24,28 +24,22 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
- * Contains detour data for all potential insertions (i.e. pickup and dropoff indices)
- * <p>
- * Having them collected in one set allows the typical use case where all paths are precomputed in one go
- * and then provided via InsertionWithPathData for a specific Insertion.
- * <p>
- * The current implementation assumes the DetourData functions are time independent. This may be changed in the future (esp.
- * for pre-booking or to enhance simple beeline TT estimation) to BiFunctions: (Link, time) -> data.
- * <p>
- * On the other hand, detour data (D) could itself provide time-dependent information.
+ * Contains detour data for all potential insertions (i.e. pickup and dropoff indices).
+ * Typically, all path data of a given type (i.e. to/from pickup/delivery) are precomputed in one go and then cached.
  */
-public class DetourPathData {
+public class DetourPathDataCache {
 	private final Map<Link, PathData> detourToPickup;
 	private final Map<Link, PathData> detourFromPickup;
 	private final Map<Link, PathData> detourToDropoff;
 	private final Map<Link, PathData> detourFromDropoff;
 	private final PathData zeroDetour;
 
-	DetourPathData(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
+	DetourPathDataCache(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
 			Map<Link, PathData> detourToDropoff, Map<Link, PathData> detourFromDropoff, PathData zeroDetour) {
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;
@@ -54,7 +48,7 @@ public class DetourPathData {
 		this.zeroDetour = zeroDetour;
 	}
 
-	public InsertionDetourData<PathData> createInsertionDetourData(InsertionGenerator.Insertion insertion) {
+	public InsertionDetourData<PathData> createInsertionDetourData(Insertion insertion) {
 		PathData toPickup = detourToPickup.get(insertion.pickup.previousWaypoint.getLink());
 		PathData fromPickup = detourFromPickup.get(insertion.pickup.nextWaypoint.getLink());
 		PathData toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?

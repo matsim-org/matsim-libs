@@ -43,7 +43,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DetourPathDataTest {
+public class DetourPathDataCacheTest {
 	private final Link pickupLink = link("pickupLink");
 	private final Link dropoffLink = link("dropoffLink");
 	private final Link startLink = link("startLink");
@@ -81,7 +81,7 @@ public class DetourPathDataTest {
 			dropoff_stop1);
 
 	private static final PathData ZERO_DETOUR = mock(PathData.class);
-	private final DetourPathData detourPathData = new DetourPathData(pathToPickupMap, pathFromPickupMap,
+	private final DetourPathDataCache detourPathDataCache = new DetourPathDataCache(pathToPickupMap, pathFromPickupMap,
 			pathToDropoffMap, pathFromDropoffMap, ZERO_DETOUR);
 
 	@Test
@@ -117,7 +117,7 @@ public class DetourPathDataTest {
 	private void assertInsertion(int pickupIdx, int dropoffIdx, PathData detourToPickup, PathData detourFromPickup,
 			PathData detourToDropoff, PathData detourFromDropoff) {
 		Insertion insertion = new Insertion(request, entry, pickupIdx, dropoffIdx);
-		var actual = detourPathData.createInsertionDetourData(insertion);
+		var actual = detourPathDataCache.createInsertionDetourData(insertion);
 
 		var expectedInsertionDetourData = new InsertionDetourData<>(detourToPickup, detourFromPickup, detourToDropoff,
 				detourFromDropoff);

@@ -83,7 +83,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 	}
 
 	@Override
-	public DetourPathData calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
+	public DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
 		// pathsFromDropoff is the least demanding one
 		var pathsToPickupFuture = executorService.submit(() -> calcPathsToPickup(drtRequest, filteredInsertions));
@@ -92,7 +92,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		var pathsFromDropoffFuture = executorService.submit(() -> calcPathsFromDropoff(drtRequest, filteredInsertions));
 
 		try {
-			return new DetourPathData(pathsToPickupFuture.get(), pathsFromPickupFuture.get(),
+			return new DetourPathDataCache(pathsToPickupFuture.get(), pathsFromPickupFuture.get(),
 					pathsToDropoffFuture.get(), pathsFromDropoffFuture.get(), PathData.EMPTY);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);

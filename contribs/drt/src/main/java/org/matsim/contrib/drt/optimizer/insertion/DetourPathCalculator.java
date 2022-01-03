@@ -27,5 +27,5 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author michalm
  */
 public interface DetourPathCalculator {
-	DetourPathData calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions);
+	DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions);
 }
