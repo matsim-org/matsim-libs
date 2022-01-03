@@ -82,11 +82,9 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 		addControlerListenerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
-		bindModal(VehicleOccupancyProfileWriter.class).toProvider(modalProvider(
+		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> DrtVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
 						drtCfg.getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
-		addControlerListenerBinding().toProvider(modalProvider((getter ->
-				getter.getModal(VehicleOccupancyProfileWriter.class))));
 
 		bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class), 300,
@@ -94,11 +92,9 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 		addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
-		bindModal(VehicleTaskProfileWriter.class).toProvider(modalProvider(
+		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> DrtVehicleTaskProfiles.createProfileWriter(getter.get(MatsimServices.class),
 						drtCfg.getMode(), getter.getModal(VehicleTaskProfileCalculator.class))));
-		addControlerListenerBinding().toProvider(modalProvider(getter ->
-				getter.getModal(VehicleTaskProfileWriter.class)));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,

@@ -133,15 +133,15 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 						DefaultDrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
 						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)))).asEagerSingleton();
 
-		bindModal(VehicleOccupancyProfileWriter.class).toProvider(modalProvider(
+		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new VehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 						getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator,
-						taskTypePaints))).in(Singleton.class);
+						taskTypePaints, "shift_occupancy_time_profiles"))).in(Singleton.class);
 
-		bindModal(VehicleTaskProfileWriter.class).toProvider(modalProvider(
+		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 						getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator,
-						taskTypePaints))).in(Singleton.class);
+						taskTypePaints, "shift_task_time_profiles"))).in(Singleton.class);
 
 		this.installQSimModule(new ShiftDrtQSimModule(getMode()));
     }
