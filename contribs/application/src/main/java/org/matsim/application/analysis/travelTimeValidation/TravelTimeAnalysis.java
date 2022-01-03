@@ -215,7 +215,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
                 log.error("Network file does not exist. Please make sure the network file is in the run directory");
                 return 2;
             }
-            Network network = NetworkUtils.readTimeInvariantNetwork(networkPath.toString());
+            Network network = NetworkUtils.readNetwork(networkPath.toString());
             CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(crs.getInputCRS(), TransformationFactory.WGS84);
             TravelTimeDistanceValidator validator;
             if (api == API.HERE) {

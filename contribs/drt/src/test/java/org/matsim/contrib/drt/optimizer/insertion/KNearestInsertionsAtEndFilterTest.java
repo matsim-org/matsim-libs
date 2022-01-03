@@ -30,7 +30,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import com.google.common.collect.ImmutableList;
@@ -107,9 +110,10 @@ public class KNearestInsertionsAtEndFilterTest {
 
 	private InsertionWithDetourData<Double> insertion(VehicleEntry vehicleEntry, int pickupIdx,
 			double toPickupDetourTime) {
-		return new InsertionWithDetourData<>(new InsertionGenerator.Insertion(vehicleEntry,
-				new InsertionGenerator.InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
-						vehicleEntry.getWaypoint(pickupIdx + 1)), null), toPickupDetourTime, null, null, null);
+		return new InsertionWithDetourData<>(new Insertion(vehicleEntry,
+				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
+						vehicleEntry.getWaypoint(pickupIdx + 1)), null),
+				new InsertionDetourData<>(toPickupDetourTime, null, null, null));
 	}
 
 	private Waypoint.Start start(double endTime) {
@@ -117,7 +121,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	private Waypoint.Stop stop(double endTime) {
-		return new Waypoint.Stop(new DrtStopTask(endTime - 10, endTime, null), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(endTime - 10, endTime, null), 0);
 	}
 
 	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {
@@ -127,7 +131,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@SafeVarargs
-	private List<InsertionGenerator.Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
+	private List<Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
 		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(1, 1, List.of(insertions));
 	}
 }

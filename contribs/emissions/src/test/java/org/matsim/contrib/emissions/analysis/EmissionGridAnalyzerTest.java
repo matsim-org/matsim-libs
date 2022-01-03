@@ -55,7 +55,7 @@ public class EmissionGridAnalyzerTest {
         new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(1)
                 .withGridSize(1000)
-                .withNetwork(NetworkUtils.createTimeInvariantNetwork())
+                .withNetwork(NetworkUtils.createNetwork())
                 .withTimeBinSize(1)
                 .build();
 
@@ -94,7 +94,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createTimeInvariantNetwork();
+        final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -133,7 +133,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createTimeInvariantNetwork();
+        final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -172,7 +172,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createTimeInvariantNetwork();
+        final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
@@ -214,7 +214,7 @@ public class EmissionGridAnalyzerTest {
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
-        final Network network = NetworkUtils.createTimeInvariantNetwork();
+        final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));

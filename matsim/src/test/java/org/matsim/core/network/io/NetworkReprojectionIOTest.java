@@ -62,7 +62,7 @@ public class NetworkReprojectionIOTest {
 
 		new NetworkWriter( initialNetwork ).write( networkFile );
 
-		final Network readNetwork = NetworkUtils.createTimeInvariantNetwork();
+		final Network readNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(
 				INITIAL_CRS, TARGET_CRS,
 				readNetwork ).readFile( networkFile );
@@ -91,7 +91,7 @@ public class NetworkReprojectionIOTest {
 				transformation,
 				initialNetwork ).write( networkFile );
 
-		final Network readNetwork = NetworkUtils.createTimeInvariantNetwork();
+        final Network readNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(
 				readNetwork ).readFile( networkFile );
 
@@ -149,7 +149,7 @@ public class NetworkReprojectionIOTest {
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
-		final Network dumpedNetwork = NetworkUtils.createTimeInvariantNetwork();
+        final Network dumpedNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader( dumpedNetwork ).readFile( outputDirectory+"/output_network.xml.gz" );
 
 		for ( Id<Node> id : scenario.getNetwork().getNodes().keySet() ) {
@@ -203,7 +203,7 @@ public class NetworkReprojectionIOTest {
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
-		final Network dumpedNetwork = NetworkUtils.createTimeInvariantNetwork();
+        final Network dumpedNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader( dumpedNetwork ).readFile( outputDirectory+"/output_network.xml.gz" );
 
 		for ( Id<Node> id : initialNetwork.getNodes().keySet() ) {
@@ -224,7 +224,7 @@ public class NetworkReprojectionIOTest {
 	}
 
 	private Network createInitialNetwork() {
-		final Network network = NetworkUtils.createTimeInvariantNetwork();
+        final Network network = NetworkUtils.createNetwork();
 
 		final Node node1 =
 				network.getFactory().createNode(

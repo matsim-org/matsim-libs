@@ -28,8 +28,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
@@ -255,12 +256,12 @@ public class InsertionGeneratorTest {
 
 	private InsertionWithDetourData<Double> insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,
 			double timeToPickup, double timeFromPickup, double timeToDropoff, double timeFromDropoff) {
-		return new InsertionWithDetourData<>(new Insertion(drtRequest, entry, pickupIdx, dropoffIdx), timeToPickup,
-				timeFromPickup, timeToDropoff, timeFromDropoff);
+		return new InsertionWithDetourData<>(new Insertion(drtRequest, entry, pickupIdx, dropoffIdx),
+				new InsertionDetourData<>(timeToPickup, timeFromPickup, timeToDropoff, timeFromDropoff));
 	}
 
 	private Waypoint.Stop stop(Link link, int outgoingOccupancy) {
-		return new Waypoint.Stop(new DrtStopTask(0, 0, link), outgoingOccupancy);
+		return new Waypoint.Stop(new DefaultDrtStopTask(0, 0, link), outgoingOccupancy);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {

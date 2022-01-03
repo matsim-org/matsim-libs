@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler.PickupDropoffTaskPair;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -204,16 +204,15 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch<PathData> insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData<PathData>(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null, null, null,
-						null)) :
+						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null)) :
 				fail("request1 expected");
 
 		double pickupEndTime = now + 20;
 		double dropoffBeginTime = now + 40;
 		RequestInsertionScheduler insertionScheduler = (request, insertion) -> {
-			var pickupTask = new DrtStopTask(pickupEndTime - 10, pickupEndTime, request1.getFromLink());
+			var pickupTask = new DefaultDrtStopTask(pickupEndTime - 10, pickupEndTime, request1.getFromLink());
 			pickupTask.addPickupRequest(request1);
-			var dropoffTask = new DrtStopTask(dropoffBeginTime, dropoffBeginTime + 10, request1.getToLink());
+			var dropoffTask = new DefaultDrtStopTask(dropoffBeginTime, dropoffBeginTime + 10, request1.getToLink());
 			dropoffTask.addPickupRequest(request1);
 			return new PickupDropoffTaskPair(pickupTask, dropoffTask);
 		};

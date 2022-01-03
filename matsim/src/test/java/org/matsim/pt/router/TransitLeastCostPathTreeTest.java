@@ -193,7 +193,7 @@ public class TransitLeastCostPathTreeTest {
         int count = 10000;
 
         public Fixture() {
-            this.network = NetworkUtils.createTimeInvariantNetwork();
+            this.network = NetworkUtils.createNetwork();
             Node linkStartNode = NetworkUtils.createAndAddNode(this.network, Id.create(0, Node.class), new Coord((double) 0, (double) 0));
             for (int i = 1; i < count; i++) {
                 Node linkEndNode = NetworkUtils.createAndAddNode(this.network, Id.create(i, Node.class), new Coord((double) i, (double) 0));

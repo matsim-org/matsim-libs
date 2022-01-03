@@ -65,7 +65,7 @@ public class NetworkUtilTest {
 		 * why is that a "special case"? in a normal network all sort of slopes are *normally* present. dz, feb'16
 		 */
 		
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));

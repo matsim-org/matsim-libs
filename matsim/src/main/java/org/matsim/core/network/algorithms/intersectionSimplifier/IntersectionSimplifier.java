@@ -71,7 +71,7 @@ public class IntersectionSimplifier {
 
 		LOG.info("Simplifying the intersections...");
 		reportNetworkStatistics(network);
-		Network newNetwork = NetworkUtils.createTimeInvariantNetwork();
+		Network newNetwork = NetworkUtils.createNetwork();
 
 		/* Get all the network's node coordinates that must be clustered. */
 		List<Node> nodes = new ArrayList<>();

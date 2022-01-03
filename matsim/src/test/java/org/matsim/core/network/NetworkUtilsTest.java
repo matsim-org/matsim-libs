@@ -146,8 +146,8 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testfindNearestPointOnLink(){
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Coord n1 = new Coord(1,1);
+		Network network = NetworkUtils.createNetwork();
+        Coord n1 = new Coord(1, 1);
 		Coord n2 = new Coord(100,100);
 		Coord plainX = new Coord(1,100);
 		Coord plainY = new Coord(100,1);
@@ -205,8 +205,8 @@ public class NetworkUtilsTest {
 	@Test
 	public void getOriginalGeometry() {
 
-		var network = NetworkUtils.createTimeInvariantNetwork();
-		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+        var network = NetworkUtils.createNetwork();
+        var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
 		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
 		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
 		network.addLink(link);
@@ -236,8 +236,8 @@ public class NetworkUtilsTest {
 	@Test
 	public void getOriginalGeometry_noGeometryStored() {
 
-		var network = NetworkUtils.createTimeInvariantNetwork();
-		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+        var network = NetworkUtils.createNetwork();
+        var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
 		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
 		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
 		network.addLink(link);
@@ -264,8 +264,8 @@ public class NetworkUtilsTest {
 	@Test
 	public void getOriginalGeometry_emptyGeometryStored() {
 
-		var network = NetworkUtils.createTimeInvariantNetwork();
-		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+        var network = NetworkUtils.createNetwork();
+        var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
 		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
 		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
 		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, "");

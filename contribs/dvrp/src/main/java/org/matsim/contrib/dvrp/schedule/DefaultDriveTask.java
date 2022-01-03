@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,45 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.run;
+package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
+import org.matsim.contrib.dvrp.path.VrpPath;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
+import com.google.common.base.MoreObjects;
 
 /**
- * This is currently only a substitute to the full Controler. 
- *
- * @author mrieser
+ * @author Michal Maciejewski (michalm)
  */
-public class Controler {
+public class DefaultDriveTask extends AbstractTask implements DriveTask {
+	private VrpPath path;
 
-	private final org.matsim.core.controler.Controler controler;
-	
-	public Controler(final String[] args) {
-		this.controler = new org.matsim.core.controler.Controler(args);
+	public DefaultDriveTask(TaskType taskType, VrpPathWithTravelData path) {
+		super(taskType, path.getDepartureTime(), path.getArrivalTime());
+		this.path = path;
 	}
-	
-	public Controler(final String configFilename) {
-		this.controler = new org.matsim.core.controler.Controler(configFilename);
+
+	@Override
+	public final VrpPath getPath() {
+		return path;
 	}
-	
-	public void setOverwriteFiles(final boolean overwriteFiles) {
-		this.controler.getConfig().controler().setOverwriteFileSetting(
-				overwriteFiles ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+	@Override
+	public final void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
+		// can only divert an ongoing task
+		if (getStatus() != TaskStatus.STARTED) {
+			throw new IllegalStateException();
+		}
+
+		path = divertedPath;
+		setEndTime(newEndTime);
 	}
-	
-	public Scenario getScenario() {
-		return this.controler.getScenario() ;
-	}
-	
-	public void run() {
-		this.controler.run();
-	}
-	
-	public  static void main(String[] args) {
-		new Controler(args).run();
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("path", path).toString();
 	}
 }

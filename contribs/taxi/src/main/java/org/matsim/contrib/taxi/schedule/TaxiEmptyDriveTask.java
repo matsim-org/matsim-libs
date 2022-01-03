@@ -22,11 +22,11 @@ package org.matsim.contrib.taxi.schedule;
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.EMPTY_DRIVE;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 
 import com.google.common.base.Preconditions;
 
-public class TaxiEmptyDriveTask extends DriveTask {
+public class TaxiEmptyDriveTask extends DefaultDriveTask {
 	public static final TaxiTaskType TYPE = new TaxiTaskType(EMPTY_DRIVE);
 
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path, TaxiTaskType taskType) {

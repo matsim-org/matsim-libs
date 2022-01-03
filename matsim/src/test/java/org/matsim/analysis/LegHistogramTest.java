@@ -47,8 +47,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * handled correctly.
 	 */
 	public void testDeparturesMiscModes() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -100,8 +100,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * do not lead to an exception.
 	 */
 	public void testNofBins() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -140,8 +140,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	}
 
 	public void testReset() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;

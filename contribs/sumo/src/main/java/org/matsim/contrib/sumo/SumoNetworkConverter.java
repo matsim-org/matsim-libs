@@ -120,7 +120,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
     public Integer call() throws Exception {
 
 
-        Network network = NetworkUtils.createTimeInvariantNetwork();
+        Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
 
         SumoNetworkHandler handler = convert(network, lanes);
@@ -273,6 +273,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
                     speed = edge.lanes.get(0).speed;
                 }
             }
+
+            link.getAttributes().putAttribute("allowed_speed", speed);
 
             if (prop == null) {
                 log.warn("Skipping unknown link type: {}", type.highway);
