@@ -21,9 +21,9 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
-import org.matsim.contrib.common.collections.PartialSort;
 
 /**
  * "Insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride
@@ -39,18 +39,20 @@ class KNearestInsertionsAtEndFilter {
 				BestInsertionFinder.createInsertionWithCostComparator());
 		var filteredInsertions = new ArrayList<InsertionGenerator.Insertion>(insertions.size());
 
-		for (var insertion : insertions) {
-			VehicleEntry vEntry = insertion.getVehicleEntry();
-			var pickup = insertion.getPickup();
+		for (var insertionWithDetourData : insertions) {
+			var insertion = insertionWithDetourData.getInsertion();
+			VehicleEntry vEntry = insertion.vehicleEntry;
+			var pickup = insertion.pickup;
 			if (!vEntry.isAfterLastStop(pickup.index)) {
-				filteredInsertions.add(insertion.getInsertion());
+				filteredInsertions.add(insertion);
 			} else if (k > 0) {
 				double departureTime = pickup.previousWaypoint.getDepartureTime();
 
 				// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles
 				// (timeToPickup is underestimated by this factor)
-				double timeDistance = departureTime + admissibleBeelineSpeedFactor * insertion.getDetourToPickup();
-				nearestInsertionsAtEnd.add(new InsertionWithCost<>(insertion, timeDistance));
+				double timeDistance = departureTime
+						+ admissibleBeelineSpeedFactor * insertionWithDetourData.getDetourData().detourToPickup;
+				nearestInsertionsAtEnd.add(new InsertionWithCost<>(insertionWithDetourData, timeDistance));
 			}
 		}
 
