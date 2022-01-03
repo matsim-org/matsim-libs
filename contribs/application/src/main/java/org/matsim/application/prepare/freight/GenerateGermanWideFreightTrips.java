@@ -37,6 +37,13 @@ import java.util.stream.Collectors;
  * table between NUTS zone ID and Verkehrszellen
  * <p>
  * Author: Chengqi Lu
+ *
+ * Design comments:<ul>
+ *         <li> The trips start and end at the German border.  The original data goes from/to international zones.  However, those zones are numbered
+ *         by some German scheme which we cannot find (and maybe they made up themselves).  The "Datensatzbeschreibung"
+ *         contains a drawing that maps it onto NUTS1 or NUTS2 zones.  However, we were not able to find an electronic version of that.  Hopefully,
+ *         eventually a student can extract a correspondence table for this (yy). </li>
+ * </ul>
  */
 @CommandLine.Command(
         name = "generate-german-freight-trips",
