@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.base.MoreObjects;
@@ -194,6 +195,7 @@ public class InsertionGenerator {
 		double fromPickup = detourTime.calcFromPickupTime(insertion, request);
 		double toDropoff = detourTime.calcToDropoffTime(insertion, request);
 		double fromDropoff = detourTime.calcFromDropoffTime(insertion, request);
-		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
+		var insertionDetourData = new InsertionDetourData<>(toPickup, fromPickup, toDropoff, fromDropoff);
+		return new InsertionWithDetourData<>(insertion, insertionDetourData);
 	}
 }

@@ -16,8 +16,8 @@ public class TravelTimeDataArrayTest{
 
 	@Test
 	public void test() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node from = NetworkUtils.createNode( Id.createNodeId( "1" ) );
+		Network network = NetworkUtils.createNetwork();
+        Node from = NetworkUtils.createNode(Id.createNodeId("1"));
 		Node to = NetworkUtils.createNode( Id.createNodeId( "2" ) );
 		Link link = NetworkUtils.createLink( Id.createLinkId( "1-2" ), from, to, network, 10, 10, 10, 1 );
 		final int numSlots = 24;

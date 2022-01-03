@@ -28,7 +28,7 @@ public class SupersonicOsmNetworkReaderIT {
 				.build()
 				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
 
-		Network expectedResult = NetworkUtils.readTimeInvariantNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
+		Network expectedResult = NetworkUtils.readNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
 
 		log.info("expected result contains: " + expectedResult.getLinks().size() + " links and " + expectedResult.getNodes().size() + " nodes");
 		log.info("result contains: " + network.getLinks().size() + " links and " + network.getNodes().size() + " nodes");
