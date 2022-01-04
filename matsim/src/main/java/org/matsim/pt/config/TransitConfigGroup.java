@@ -20,17 +20,18 @@
 
 package org.matsim.pt.config;
 
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
+
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author mrieser
@@ -45,10 +46,13 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	/*package*/ static final String VEHICLES_FILE = "vehiclesFile";
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
 	private static final String SCHEDULE_CRS = "inputScheduleCRS";
+	private static final String ROUTINGALGORITHM_TYPE = "routingAlgorithmType";
 
 	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedAttributeFiles" ;
 	private static final String USING_TRANSIT_IN_MOBSIM = "usingTransitInMobsim" ;
-	
+
+	public enum TransitRoutingAlgorithmType {DijkstraBased, SwissRailRaptor}
+
 	public static final String TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate transit stops and lines attribute files is deprecated." +
 			"  Add the information directly into each stop or line, using " +
 			"the Attributable feature.  If you insist on continuing to use the separate attribute files, set " +
@@ -62,6 +66,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	private String inputScheduleCRS = null;
 
 	private Set<String> transitModes;
+	private TransitRoutingAlgorithmType routingAlgorithmType = TransitRoutingAlgorithmType.SwissRailRaptor;
 	
 	// ---
 	private static final String USE_TRANSIT = "useTransit";
@@ -105,6 +110,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		comments.put(TRANSIT_LINES_ATTRIBUTES, "Optional input file containing additional attributes for transit lines, stored as ObjectAttributes.");
 		comments.put(TRANSIT_STOPS_ATTRIBUTES, "Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes.");
 		comments.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
+		comments.put(ROUTINGALGORITHM_TYPE, "The type of transit routing algorithm used, may have the values: " + Arrays.toString(TransitRoutingAlgorithmType.values()));
 
 		comments.put( SCHEDULE_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
 				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
@@ -182,6 +188,15 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		this.useTransit = val ;
 	}
 
+	@StringGetter( ROUTINGALGORITHM_TYPE )
+	public TransitRoutingAlgorithmType getRoutingAlgorithmType() {
+		return this.routingAlgorithmType;
+	}
+
+	@StringSetter( ROUTINGALGORITHM_TYPE )
+	public void setRoutingAlgorithmType(final TransitRoutingAlgorithmType type) {
+		this.routingAlgorithmType = type;
+	}
 
 	@StringGetter( SCHEDULE_CRS )
 	public String getInputScheduleCRS() {

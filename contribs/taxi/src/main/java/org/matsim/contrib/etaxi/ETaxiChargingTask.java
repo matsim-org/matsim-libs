@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.etaxi;
 
-import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
+import org.matsim.contrib.evrp.ChargingTaskImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;

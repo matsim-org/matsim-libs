@@ -155,36 +155,40 @@ public class CalcPaidTollTest {
 		Id<Person> id8 = Id.create("8", Person.class);
 
 		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1( config ).getPersons();
-		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "cordon", config ).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "link", config ).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore(),
 				population.get(id1).getPlans().get(0).getScore(),
-				2.00);
+				3.00);
 		compareScores(
 				referencePopulation.get(id2).getPlans().get(0).getScore(),
 				population.get(id2).getPlans().get(0).getScore(),
-				1.00);
+				1.50);
 		compareScores(
 				referencePopulation.get(id3).getPlans().get(0).getScore(),
 				population.get(id3).getPlans().get(0).getScore(),
-				2.00);
+				3.00);
 		compareScores(
 				referencePopulation.get(id4).getPlans().get(0).getScore(),
 				population.get(id4).getPlans().get(0).getScore(),
-				1.50);
-		compareScores(
-				referencePopulation.get(id5).getPlans().get(0).getScore(),
-				population.get(id5).getPlans().get(0).getScore(),
-				1.00); // this agent only pays when entering in the second area, as it starts in the first where it should not be tolled.
-		compareScores(
-				referencePopulation.get(id7).getPlans().get(0).getScore(),
-				population.get(id7).getPlans().get(0).getScore(),
-				0.00); // this agent only leaves the area and should thus never pay a toll
-		compareScores(
-				referencePopulation.get(id8).getPlans().get(0).getScore(),
-				population.get(id8).getPlans().get(0).getScore(),
-				0.00); // this agent only travels within the area and should thus never pay a toll
+				2.0);
+//		compareScores(
+//				referencePopulation.get(id5).getPlans().get(0).getScore(),
+//				population.get(id5).getPlans().get(0).getScore(),
+//				1.00); // this agent only pays when entering in the second area, as it starts in the first where it should not be tolled.
+//		compareScores(
+//				referencePopulation.get(id7).getPlans().get(0).getScore(),
+//				population.get(id7).getPlans().get(0).getScore(),
+//				0.00); // this agent only leaves the area and should thus never pay a toll
+//		compareScores(
+//				referencePopulation.get(id8).getPlans().get(0).getScore(),
+//				population.get(id8).getPlans().get(0).getScore(),
+//				0.00); // this agent only travels within the area and should thus never pay a toll
+
+		// The above test cases have to do with that somewhat weird cording pricing implementation where the toll was only paid on the first tolled link that was encountered.
+		// (The assumption being that one has an area toll file and wants to use it for cording pricing.)  That execution path is now deleted.  kai/kai, feb'21
+
 	}
 
 	private void compareScores(final double scoreWithoutToll, final double scoreWithToll, final double expectedToll) {
@@ -204,7 +208,7 @@ public class CalcPaidTollTest {
 	private Population runTollSimulation(final String tollFile, final String tollType, final Config config) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( config );
 		RoadPricingTestUtils.createNetwork1(scenario);
-        RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+        RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		reader.readFile(tollFile);
 		Assert.assertEquals(tollType, scheme.getType());
@@ -219,7 +223,7 @@ public class CalcPaidTollTest {
 		@SuppressWarnings("unused")
 		RoadPricingTollCalculator paidToll = new RoadPricingTollCalculator(scenario.getNetwork(), toll, eventsManager);
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), eventsManager);
-		scoring.beginIteration(0);
+		scoring.beginIteration(0, false);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //

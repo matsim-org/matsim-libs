@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.NetworkInverter;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -56,11 +57,10 @@ public class InvertertedNetworkRoutingTest {
         Facility toFacility = new LinkWrapperFacility(//
                 f.s.getNetwork().getLinks().get(Id.create("78", Link.class)));
 
-		LinkToLinkRoutingModule router =
-				new LinkToLinkRoutingModule(
-						"mode",
-						f.s.getPopulation().getFactory(),
-						f.s.getNetwork(), lcpFactory,tc, tt, new NetworkTurnInfoBuilder(f.s));
+		Network invertedNetwork = new NetworkInverter(f.s.getNetwork(), new NetworkTurnInfoBuilder(f.s).createAllowedTurnInfos()).getInvertedNetwork();
+		InvertedLeastPathCalculator calc = InvertedLeastPathCalculator.create(lcpFactory, tc, f.s.getNetwork(), invertedNetwork, tt);
+		LinkToLinkRoutingModule router = new LinkToLinkRoutingModule("mode", f.s.getPopulation().getFactory(), f.s.getNetwork(), invertedNetwork, calc);
+
 		//test 1
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		
@@ -103,7 +103,7 @@ public class InvertertedNetworkRoutingTest {
 	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility fromFacility,
             final Facility toFacility, final Person person)
 	{
-        Leg leg = (Leg)router.calcRoute(fromFacility, toFacility, 0.0, person).get(0);
+        Leg leg = (Leg)router.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 0.0, person)).get(0);
         return (NetworkRoute) leg.getRoute();
 	}
 	

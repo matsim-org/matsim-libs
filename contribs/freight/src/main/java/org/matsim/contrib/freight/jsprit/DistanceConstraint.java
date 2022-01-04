@@ -300,8 +300,8 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle) {
-		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), from.getEndTime(),
-				null, vehicle);
+		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), from.getEndTime(),
+				vehicle);
 		if (!(distance >= 0.))
 			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
 					+ " distance " + distance);
@@ -309,7 +309,7 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {
-		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), departureTime, null,
+		double distance = netBasedCosts.getDistance(from.getLocation(), to.getLocation(), departureTime,
 				vehicle);
 		if (!(distance >= 0.))
 			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()

@@ -23,6 +23,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.utils.timing.TimeInterpretation;
+
+import javax.annotation.Nullable;
 
 /**
  * @author nagel
@@ -31,8 +34,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 public final class DefaultRoutingModules {
 	// despite the fact that this class is in "old", I actually think that it is ok, providing a public interface to functionality that could be changed
 	// underneath.  Have to keep in in the "old" package in order to package-protect the infrastructure that is used underneath. kai, mar'15
-	
-	
+
+
 	private DefaultRoutingModules(){} // do not instantiate
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
@@ -57,33 +60,49 @@ public final class DefaultRoutingModules {
 	 * Creates network router without access/egress.
 	 */
 	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		return new NetworkRoutingModule(	
+		return new NetworkRoutingModule(
 				mode,
 				popFact,
 				net,
 				routeAlgo);
 	}
-	
+
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter ) {
+											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter,
+											 TimeInterpretation timeInterpretation) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,
-			  scenario, filteredNetwork, accessEgressToNetworkRouter, accessEgressToNetworkRouter );
+			  scenario, filteredNetwork, null, accessEgressToNetworkRouter, accessEgressToNetworkRouter, timeInterpretation );
 	}
 
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 																 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter) {
+																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
+																 TimeInterpretation timeInterpretation) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
-				scenario, filteredNetwork, accessToNetworkRouter, egressFromNetworkRouter);
+				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation);
+	}
+
+	/**
+	 * Creates a new access egress network router.
+	 *
+	 * @param invertedNetwork if not null, routing will be on the inverted network, in which case routeAlgo needs to be an {@link InvertedLeastPathCalculator}
+	 */
+	static RoutingModule createAccessEgressNetworkRouter( String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
+																 Network filteredNetwork, @Nullable Network invertedNetwork,
+																 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
+																 TimeInterpretation timeInterpretation) {
+		return new NetworkRoutingInclAccessEgressModule(
+				mode, routeAlgo, scenario, filteredNetwork, invertedNetwork, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation
+		);
 	}
 
 }

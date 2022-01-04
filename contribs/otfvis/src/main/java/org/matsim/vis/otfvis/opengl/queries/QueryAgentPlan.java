@@ -43,7 +43,6 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -53,8 +52,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import javax.swing.*;
@@ -70,7 +68,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jogamp.opengl.GL2GL3.GL_QUADS;
-import static org.matsim.vis.otfvis.OTFVisConfigGroup.*;
+import static org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 /**
  * For a given agentID this QueryAgentPlan draws a visual representation of the
@@ -204,33 +202,47 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	}
 
 
+	private static final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private static final PositionInfo.LinkBasedBuilder builder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
+
 	public static class Result implements OTFQueryResult {
 
 		private String agentId;
-		private List<Coord> vertex = new ArrayList<>();
-		private List<Color> colors = new ArrayList<>();
+		private final List<Coord> vertex = new ArrayList<>();
+		private final List<Color> colors = new ArrayList<>();
 		private FloatBuffer vert;
-		private List<ActivityInfo> acts = new ArrayList<>();
+		private final List<ActivityInfo> acts = new ArrayList<>();
 		private ByteBuffer cols;
 		private TextRenderer textRenderer;
 
 		public Result() {
 		}
 
-		private void buildRoute( Plan plan, Id<Person> agentId, Network net, Level level, Scenario scenario ) {
-		    List<PlanElement> planElements = plan.getPlanElements();
-		    if (planElements.isEmpty()) {
-		        return;//non-plan agents may do not have a meaningful plan to be shown
-		    }
+		private void buildRoute(Plan plan, Id<Person> agentId, Network net, Level level, Scenario scenario) {
+			List<PlanElement> planElements = plan.getPlanElements();
+			if (planElements.isEmpty()) {
+				return;//non-plan agents may do not have a meaningful plan to be shown
+			}
 			for (PlanElement planElement : planElements) {
 				if (planElement instanceof Activity) {
 					Activity act = (Activity) planElement;
 					Coord coord = act.getCoord();
 					if (coord == null) {
 //						final Id<Link> linkId = act.getLinkId();
-						Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( act, scenario );;
-						Link link = net.getLinks().get( linkId );
-						AgentSnapshotInfo pi = snapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
+						Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity(act, scenario);
+						Link link = net.getLinks().get(linkId);
+						var pi = builder
+								.setPersonId(agentId)
+								.setLinkId(link.getId())
+								.setFromCoord(link.getFromNode().getCoord())
+								.setToCoord(link.getToNode().getCoord())
+								.setLinkLength(link.getLength())
+								.setDistanceOnLink(0.9 * link.getLength())
+								.setLane(0)
+								.build();
+
+
+						//AgentSnapshotInfo pi = snapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
 						coord = new Coord(pi.getEasting(), pi.getNorthing());
 					}
 					addCoord(coord, Color.BLUE );
@@ -274,10 +286,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						Coord to;
 						if (toLink != null) {
 							to = toLink.getToNode().getCoord();
-						} else { 
-							to = this.vertex.get(this.vertex.size()-1);
+						} else {
+							to = this.vertex.get(this.vertex.size() - 1);
 						}
-												
+
 						Coord coord = CoordUtils.getCenter(from, to);
 						addCoord(from, color);
 						addCoord(coord, color);
@@ -285,11 +297,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					}
 				}
 			}
-			
+
 			this.vert = Buffers.newDirectFloatBuffer(vertex.size()*2);
 			this.vert.rewind();
 			for (Coord coord : this.vertex) {
-				Coord transform = OTFServerQuadTree.getOTFTransformation().transform(coord); 
+				Coord transform = OTFServerQuadTree.getOTFTransformation().transform(coord);
 				this.vert.put((float) transform.getX());
 				this.vert.put((float) transform.getY());
 			}
@@ -338,7 +350,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			gl.glEnable(GL2.GL_LINE_SMOOTH);
 			gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 			gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-			gl.glLineWidth(1.f * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+			gl.glLineWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 			gl.glColorPointer(4, GL2.GL_UNSIGNED_BYTE, 0, cols);
 			gl.glVertexPointer(2, GL2.GL_FLOAT, 0, this.vert);
 			gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, this.vertex.size());
@@ -375,14 +387,13 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 			// The size of the whole text box, including the progress bar.
 			// Multiply it by scale so that it is independent of zoom factor.
-			float size = 1.0f * scale;
 
 			GL2 gl = (GL2) drawable.getGL();
 
 			GLU glu = new GLU();
 			gl.glPushMatrix();
 			gl.glTranslatef(activityEntry.east, activityEntry.north, 0f);
-			gl.glScalef(size, size, 1f);
+			gl.glScalef(scale, scale, 1f);
 
 			// Origin (0,0,0) is now the activity location.
 			// That's where the bottom left corner of the text will go.
@@ -469,9 +480,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	private class ActivityInfo implements Serializable {
 
 		private static final long serialVersionUID = 1L;
+		public double finished;
 		float east, north;
 		String name;
-		public double finished;
 
 		ActivityInfo(float east, float north, String name) {
 			this.east = east;
@@ -479,10 +490,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			this.name = name;
 		}
 	}
-
-
-	private static SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private static AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	enum Level { ROUTES, PLANELEMENTS } 
 

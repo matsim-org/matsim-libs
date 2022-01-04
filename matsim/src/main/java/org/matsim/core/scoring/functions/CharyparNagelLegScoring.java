@@ -60,11 +60,25 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	
 	private Set<String> modesAlreadyConsideredForDailyConstants;
 	
+	private final double marginalUtilityOfMoney;
+	
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
 		this.ptModes = ptModes;
 		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney;
+	}
+	
+	/**
+	 * Scoring with person-specific marginal utility of money
+	 */
+	public CharyparNagelLegScoring(final ScoringParameters params, double marginalUtilityOfMoney, Network network, Set<String> ptModes) {
+		this.params = params;
+		this.network = network;
+		this.ptModes = ptModes;
+		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 	}
 
 	/**
@@ -116,7 +130,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 				}
 			}
 			tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
-			tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
+			tmpScore += modeParams.monetaryDistanceCostRate * this.marginalUtilityOfMoney * dist;
 		}
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
@@ -124,7 +138,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		
 		// account for the daily constants
 		if (!modesAlreadyConsideredForDailyConstants.contains(leg.getMode())) {
-			tmpScore += modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * this.params.marginalUtilityOfMoney;
+			tmpScore += modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * this.marginalUtilityOfMoney;
 			modesAlreadyConsideredForDailyConstants.add(leg.getMode());
 		}
 		// yyyy the above will cause problems if we ever decide to differentiate pt mode into bus, tram, train, ...

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates the number of passenger that are in a transit vehicle as
@@ -37,9 +38,9 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
  */
 public class TransitLoadByTime implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private ConcurrentHashMap<Id, VehicleData> vehicleData = new ConcurrentHashMap<Id, VehicleData>();
+	private final ConcurrentHashMap<Id<Vehicle>, VehicleData> vehicleData = new ConcurrentHashMap<>();
 
-	public int getVehicleLoad(final Id vehicleId, final double time) {
+	public int getVehicleLoad(final Id<Vehicle> vehicleId, final double time) {
 		VehicleData vData = getVehicleData(vehicleId, false);
 		if (vData == null) {
 			return 0;
@@ -64,7 +65,7 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 		this.vehicleData.clear();
 	}
 
-	private VehicleData getVehicleData(final Id vehicleId, final boolean createIfMissing) {
+	private VehicleData getVehicleData(final Id<Vehicle> vehicleId, final boolean createIfMissing) {
 		VehicleData vData = this.vehicleData.get(vehicleId);
 		if (vData == null && createIfMissing) {
 			// optimization: only allocate new object when not found
@@ -78,7 +79,7 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 	}
 
 	private static class VehicleData {
-		public final TreeMap<Double, Integer> nOfPassengersByTime = new TreeMap<Double, Integer>(); // Time, nOfPassengers
+		public final TreeMap<Double, Integer> nOfPassengersByTime = new TreeMap<>(); // Time, nOfPassengers
 
 		public VehicleData() {
 		}
@@ -90,10 +91,10 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 				if (prev == null) {
 					this.nOfPassengersByTime.put(time, delta);
 				} else {
-					this.nOfPassengersByTime.put(time, prev.getValue().intValue() + delta);
+					this.nOfPassengersByTime.put(time, prev.getValue() + delta);
 				}
 			} else {
-				this.nOfPassengersByTime.put(time, i.intValue() + delta);
+				this.nOfPassengersByTime.put(time, i + delta);
 			}
 		}
 
@@ -102,7 +103,7 @@ public class TransitLoadByTime implements PersonEntersVehicleEventHandler, Perso
 			if (floor == null) {
 				return 0;
 			}
-			return floor.getValue().intValue();
+			return floor.getValue();
 		}
 
 	}

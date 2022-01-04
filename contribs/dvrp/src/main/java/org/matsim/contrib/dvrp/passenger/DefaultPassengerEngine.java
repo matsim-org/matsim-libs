@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,7 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -44,7 +47,10 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
-public final class DefaultPassengerEngine implements PassengerEngine {
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public final class DefaultPassengerEngine implements PassengerEngine, PassengerRequestRejectedEventHandler {
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
@@ -54,15 +60,19 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	private final Network network;
 	private final PassengerRequestValidator requestValidator;
 
-	private final PassengerHandler passengerHandler;
+	private final InternalPassengerHandling internalPassengerHandling;
 
 	private InternalInterface internalInterface;
 
-	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new ConcurrentHashMap<>();
+	//accessed in doSimStep() and handleDeparture() (no need to sync)
+	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new HashMap<>();
+
+	//accessed in doSimStep() and handleEvent() (potential data races)
+	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
 
 	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
-			PassengerRequestValidator requestValidator, PassengerRequestEventForwarder passengerRequestEventForwarder) {
+			PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.requestCreator = requestCreator;
@@ -70,18 +80,13 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		this.network = network;
 		this.requestValidator = requestValidator;
 
-		passengerHandler = new PassengerHandler(mode, eventsManager);
-		passengerRequestEventForwarder.registerListenerForMode(mode, this);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		passengerHandler.setInternalInterface(internalInterface);
-	}
-
-	public String getMode() {
-		return mode;
+		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
 
 	@Override
@@ -90,6 +95,13 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 	@Override
 	public void doSimStep(double time) {
+		while (!rejectedRequestsEvents.isEmpty()) {
+			MobsimPassengerAgent passenger = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
+			//not much else can be done for immediate requests
+			//set the passenger agent to abort - the event will be thrown by the QSim
+			passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+			internalInterface.arrangeNextAgentState(passenger);
+		}
 	}
 
 	@Override
@@ -108,15 +120,19 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
-		PassengerRequest request = requestCreator.createRequest(passengerHandler.createRequestId(), passenger.getId(),
-				route, getLink(fromLinkId), getLink(toLinkId), now, now);
+		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 		validateAndSubmitRequest(passenger, request, now);
 		return true;
 	}
 
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passenger);
-		if (passengerHandler.validateRequest(request, requestValidator, now)) {
+		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
+			//need to synchronise to address cases where requestSubmitted() may:
+			// - be called from outside DepartureHandlers
+			// - interfere with VrpOptimizer.nextTask()
+			// - impact VrpAgentLogic.computeNextAction()
 			synchronized (optimizer) {
 				//optimizer can also reject request if cannot handle it
 				// (async operation, notification comes via the events channel)
@@ -132,49 +148,40 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	}
 
 	@Override
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
-		boolean pickedUp = passengerHandler.tryPickUpPassenger(driver, activePassengers.get(request.getId()), now);
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(request.getId()),
+				request.getId(), now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
 
 	@Override
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		passengerHandler.dropOffPassenger(driver, activePassengers.remove(request.getId()), now);
+		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(request.getId()), request.getId(),
+				now);
 	}
 
 	@Override
-	public void notifyPassengerRequestRejected(PassengerRequestRejectedEvent event) {
-		MobsimPassengerAgent passenger = activePassengers.remove(event.getRequestId());
-		//not much else can be done for immediate requests
-		//set the passenger agent to abort - the event will be thrown by the QSim
-		passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
-		internalInterface.arrangeNextAgentState(passenger);
-	}
-
-	@Override
-	public void notifyPassengerRequestScheduled(PassengerRequestScheduledEvent event) {
-		//nothing needed here
+	public void handleEvent(PassengerRequestRejectedEvent event) {
+		if (event.getMode().equals(mode)) {
+			rejectedRequestsEvents.add(event);
+		}
 	}
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
-		return new ModalProviders.AbstractProvider<>(mode) {
+		return new ModalProviders.AbstractProvider<>(mode, DvrpModes::mode) {
 			@Inject
 			private EventsManager eventsManager;
 
 			@Inject
 			private MobsimTimer mobsimTimer;
 
-			@Inject
-			private PassengerRequestEventForwarder passengerRequestEventForwarder;
-
 			@Override
 			public DefaultPassengerEngine get() {
 				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
-						passengerRequestEventForwarder);
+						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}

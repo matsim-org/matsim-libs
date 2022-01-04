@@ -28,11 +28,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
 import javax.inject.Inject;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.log4j.Logger;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Activity;
@@ -134,17 +133,17 @@ public class PHbyModeCalculator {
             for (Map.Entry<Integer,Map<String,TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
-                	TravelTimeAndWaitTime travelTimeAndWaitTime = e.getValue().getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0));
-                    csvPrinter.print(travelTimeAndWaitTime.travelTime / 3600.0);
-                    csvPrinter.print(travelTimeAndWaitTime.waitTime / 3600.0);
-                }
+					TravelTimeAndWaitTime travelTimeAndWaitTime = e.getValue().getOrDefault(mode, new TravelTimeAndWaitTime(0.0, 0.0));
+					csvPrinter.print((int) Math.round(travelTimeAndWaitTime.travelTime / 3600.0));
+					csvPrinter.print((int) Math.round(travelTimeAndWaitTime.waitTime / 3600.0));
+				}
                 csvPrinter.println();
             }
 
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+			Logger.getLogger(getClass()).error("Could not write PH Modestats.");
+		}
         if (writePng){
             String[] categories = new String[phtPerIteration.size()];
             int i = 0;

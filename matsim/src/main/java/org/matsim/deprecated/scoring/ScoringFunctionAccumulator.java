@@ -96,7 +96,7 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 	
-	private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
+	private static final  Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
@@ -129,6 +129,11 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
 		}
+	}
+
+	@Override
+	public void addScore(double amount) {
+		// unsupported in deprecated class
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
-        private static Logger log = Logger.getLogger(DriversActivityScoring.class);
+        private static final  Logger log = Logger.getLogger(DriversActivityScoring.class);
 
         private double score;
         private double timeParameter = 0.008;
@@ -138,7 +138,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
-        private static Logger log = Logger.getLogger(DriversLegScoring.class);
+        private static final  Logger log = Logger.getLogger(DriversLegScoring.class);
 
         private double score = 0.0;
         private final Network network;
@@ -221,7 +221,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
-        private static Logger log = Logger.getLogger(TollScoring.class);
+        private static final  Logger log = Logger.getLogger(TollScoring.class);
 
         private double score = 0.;
         private Carrier carrier;

@@ -19,13 +19,17 @@
 
 package org.matsim.contrib.zone;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import com.google.common.base.Preconditions;
+
 public class SquareGrid {
-	private final Network network;
+	public static final double EPSILON = 1;
+
 	private final double cellSize;
 
 	private double minX;
@@ -38,25 +42,24 @@ public class SquareGrid {
 
 	private Zone[] zones;
 
-	public SquareGrid(Network network, double cellSize) {
-		this.network = network;
+	public SquareGrid(Collection<? extends Node> nodes, double cellSize) {
+		Preconditions.checkArgument(!nodes.isEmpty(), "Cannot create SquareGrid if no nodes");
 		this.cellSize = cellSize;
 
-		initBounds();
+		initBounds(nodes);
 
 		cols = (int)Math.ceil((maxX - minX) / cellSize);
 		rows = (int)Math.ceil((maxY - minY) / cellSize);
-
-		initZones();
+		zones = new Zone[rows * cols];
 	}
 
 	// This method's content has been copied from NetworkImpl
-	private void initBounds() {
+	private void initBounds(Collection<? extends Node> nodes) {
 		minX = Double.POSITIVE_INFINITY;
 		minY = Double.POSITIVE_INFINITY;
 		maxX = Double.NEGATIVE_INFINITY;
 		maxY = Double.NEGATIVE_INFINITY;
-		for (Node n : network.getNodes().values()) {
+		for (Node n : nodes) {
 			if (n.getCoord().getX() < minX) {
 				minX = n.getCoord().getX();
 			}
@@ -70,34 +73,43 @@ public class SquareGrid {
 				maxY = n.getCoord().getY();
 			}
 		}
-		minX -= 1.0;// TODO use epsilon instead
-		minY -= 1.0;
-		maxX += 1.0;
-		maxY += 1.0;
+		minX -= EPSILON;
+		minY -= EPSILON;
+		maxX += EPSILON;
+		maxY += EPSILON;
 		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
 	}
 
-	private void initZones() {
-		zones = new Zone[rows * cols];
-		double x0 = minX + cellSize / 2;
-		double y0 = minY + cellSize / 2;
-
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < cols; c++) {
-				int idx = r * cols + c;
-				Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
-				zones[idx] = new Zone(Id.create(idx, Zone.class), "square", centroid);
-			}
-		}
-	}
-
-	public Zone[] getZones() {
-		return zones;
-	}
-
 	public Zone getZone(Coord coord) {
-		int r = (int)((coord.getY() - minY) / cellSize);// == Math.floor
-		int c = (int)((coord.getX() - minX) / cellSize);// == Math.floor
-		return zones[r * cols + c];
+		return zones[getIndex(coord)];
+	}
+
+	public Zone getOrCreateZone(Coord coord) {
+		int index = getIndex(coord);
+		Zone zone = zones[index];
+		if (zone == null) {
+			double x0 = minX + cellSize / 2;
+			double y0 = minY + cellSize / 2;
+			int r = bin(coord.getY(), minY);
+			int c = bin(coord.getX(), minX);
+			Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
+			zone = new Zone(Id.create(index, Zone.class), "square", centroid);
+			zones[index] = zone;
+		}
+		return zone;
+	}
+
+	private int getIndex(Coord coord) {
+		Preconditions.checkArgument(coord.getX() >= minX, "Coord.x less than minX");
+		Preconditions.checkArgument(coord.getX() <= maxX, "Coord.x greater than maxX");
+		Preconditions.checkArgument(coord.getY() >= minY, "Coord.y less than minY");
+		Preconditions.checkArgument(coord.getY() <= maxY, "Coord.y greater than maxY");
+		int r = bin(coord.getY(), minY);
+		int c = bin(coord.getX(), minX);
+		return r * cols + c;
+	}
+
+	private int bin(double coord, double minCoord) {
+		return (int)((coord - minCoord) / cellSize);
 	}
 }

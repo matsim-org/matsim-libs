@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 /**
  * @author michalm
@@ -62,7 +62,8 @@ public class Depots {
 				null /* already at a depot*/ :
 				links.stream()
 						.min(Comparator.comparing(
-								l -> DistanceUtils.calculateSquaredDistance(currentLink.getCoord(), l.getCoord())))
+								l -> DistanceUtils.calculateSquaredDistance(currentLink.getToNode().getCoord(),
+										l.getFromNode().getCoord())))
 						.get();
 	}
 }

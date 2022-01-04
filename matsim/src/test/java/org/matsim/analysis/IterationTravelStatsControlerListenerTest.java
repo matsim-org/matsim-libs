@@ -8,10 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Assert;
@@ -32,9 +28,11 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ExperiencedPlansModule;
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -46,9 +44,11 @@ public class IterationTravelStatsControlerListenerTest {
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	Config config = ConfigUtils.createConfig();
 	
-	private static int person;
-	private static int first_act_x;
-	private static int first_act_y;
+	private int person;
+	private int executed_score;
+	private int first_act_x;
+	private int first_act_y;
+	private int first_act_type;
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -101,13 +101,16 @@ public class IterationTravelStatsControlerListenerTest {
 	private void performTest(Scenario scenario, String outputDirectory) {
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		ShutdownEvent shutdownEvent = new ShutdownEvent(null, false);
+		ShutdownEvent shutdownEvent = new ShutdownEvent(null, false, 0);
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
 			public void install() {
 				install(new IterationTravelStatsModule());
 				install(new ScenarioByInstanceModule(scenario));
-				install(new ExperiencedPlansModule());
+				install(new StandaloneExperiencedPlansModule());
+				// an AnalysisMainModeIdentifier must be bound to avoid injection creation errors. TripRouterModule should do this. Check thereby that TripRouterModule still does that by installing TripRouterModule instead of binding AnalysisMainModeIdentifier directly
+				install(new TripRouterModule());
+				install(new TimeInterpretationModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
 				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
@@ -116,26 +119,14 @@ public class IterationTravelStatsControlerListenerTest {
 		});
 		IterationTravelStatsControlerListener ltcl = injector.getInstance(IterationTravelStatsControlerListener.class);
 		ltcl.notifyShutdown(shutdownEvent);
-		Map<Id<Person>, List<String>> firstActivity = identifyFirstActivityLocation(scenario);
-		readAndValidateValues(firstActivity);
+		readAndValidateValues(scenario);
 	}
 	
-	private Map<Id<Person>, List<String>> identifyFirstActivityLocation(Scenario scenario) {
-		Map<Id<Person>, List<String>> firstActivity = new HashMap<Id<Person>, List<String>>();
-		 for (Person p : scenario.getPopulation().getPersons().values()) {
-			Id<Person> id = p.getId();
-			List<String> coordinates = new ArrayList<>();
-			 Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
-			 String x = Double.toString(firstAct.getCoord().getX());
-			 String y = Double.toString(firstAct.getCoord().getY());
-			 coordinates.add(x);
-			 coordinates.add(y);
-			 firstActivity.put(id, coordinates);
-		 }
-		 return firstActivity;
+	private Activity identifyFirstActivity(Person person) {
+		return (Activity) person.getSelectedPlan().getPlanElements().get(0);
 	}
 	
-	private void readAndValidateValues(Map<Id<Person>, List<String>> firstActivity) {
+	private void readAndValidateValues(Scenario scenario) {
 
 		String file = utils.getOutputDirectory() + "/output_persons.csv.gz";
 		BufferedReader br;
@@ -155,10 +146,15 @@ public class IterationTravelStatsControlerListenerTest {
 					Double y = (first_act_y > 0) ? Double.valueOf(column[first_act_y]) : 0;
 					Id<Person> personId = Id.create(column[person], Person.class);
 
-					Assert.assertEquals("x coordinate does not match", Double.valueOf(firstActivity.get(personId).get(0)), x,
-							0);
-					Assert.assertEquals("y coordinate does not match", Double.valueOf(firstActivity.get(personId).get(1)), y,
-							0);
+					Person personInScenario = scenario.getPopulation().getPersons().get(personId);
+					Activity firstActivity = identifyFirstActivity(personInScenario);
+
+					Assert.assertEquals("wrong score", personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("x coordinate does not match", firstActivity.getCoord().getX(), x,
+							MatsimTestUtils.EPSILON);
+					Assert.assertEquals("y coordinate does not match", firstActivity.getCoord().getY(), y,
+							MatsimTestUtils.EPSILON);
+					Assert.assertEquals("type of first activity does not match", firstActivity.getType(), column[first_act_type]);
 
 					break;
 			}
@@ -170,7 +166,7 @@ public class IterationTravelStatsControlerListenerTest {
 	
 	}
 	
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {
@@ -181,12 +177,20 @@ public class IterationTravelStatsControlerListenerTest {
 				person = i;
 				break;
 
+			case "executed_score":
+				executed_score = i;
+				break;
+
 			case "first_act_x":
 				first_act_x = i;
 				break;
 				
 			case "first_act_y":
 				first_act_y = i;
+				break;
+
+			case "first_act_type":
+				first_act_type = i;
 				break;
 
 			}

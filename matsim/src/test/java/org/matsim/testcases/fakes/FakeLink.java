@@ -164,13 +164,8 @@ public class FakeLink implements Link {
 	}
 
 	@Override
-	public double getFlowCapacityPerSec() {
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
-	public double getFlowCapacityPerSec(double time) {
-		throw new RuntimeException("not implemented") ;
+	public double getCapacityPeriod() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

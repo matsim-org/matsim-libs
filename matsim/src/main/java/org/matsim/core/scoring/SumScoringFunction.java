@@ -54,6 +54,10 @@ public final class SumScoringFunction implements ScoringFunction {
 		void addMoney(final double amount);
 	}
 
+	public interface ScoreScoring extends BasicScoring {
+		void addScore(final double amount);
+	}
+
 	public interface AgentStuckScoring extends BasicScoring {
 		void agentStuck(final double time);
 	}
@@ -73,11 +77,12 @@ public final class SumScoringFunction implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 
-	private static Logger log = Logger.getLogger(SumScoringFunction.class);
+	private static final  Logger log = Logger.getLogger(SumScoringFunction.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
+	private ArrayList<ScoreScoring> scoreScoringFunctions = new ArrayList<>();
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<>();
 	private ArrayList<TripScoring> tripScoringFunctions = new ArrayList<>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
@@ -121,6 +126,13 @@ public final class SumScoringFunction implements ScoringFunction {
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : this.moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
+		}
+	}
+
+	@Override
+	public void addScore(double amount) {
+		for (ScoreScoring scoreScoringFunction : this.scoreScoringFunctions) {
+			scoreScoringFunction.addScore(amount);
 		}
 	}
 
@@ -187,6 +199,10 @@ public final class SumScoringFunction implements ScoringFunction {
 
 		if (scoringFunction instanceof MoneyScoring) {
 			this.moneyScoringFunctions.add((MoneyScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof ScoreScoring) {
+			this.scoreScoringFunctions.add((ScoreScoring) scoringFunction);
 		}
 
 		if (scoringFunction instanceof ArbitraryEventScoring) {

@@ -62,9 +62,9 @@ public final class EventsReaderTXT {
 			int typeIndex = Integer.parseInt(type);
 			// (switch does not work with integer input. kai, mar'18)
 			if (typeIndex == ActivityEnd.ordinal()) {
-				e = new ActivityEndEvent(time, Id.createPersonId(vehicleId), linkId, null, null);
+				e = new ActivityEndEvent(time, Id.createPersonId(vehicleId), linkId, null, null, null);
 			} else if (typeIndex == PersonDeparture.ordinal()) {
-				e = new PersonDepartureEvent(time, Id.createPersonId(vehicleId), linkId, "car");
+				e = new PersonDepartureEvent(time, Id.createPersonId(vehicleId), linkId, "car", "car");
 			} else if (typeIndex == VehicleEntersTraffic.ordinal()) {
 				e = new VehicleEntersTrafficEvent(time, Id.createPersonId(vehicleId), linkId, vehicleId, "car", 0);
 			} else if (typeIndex == LinkLeave.ordinal()) {

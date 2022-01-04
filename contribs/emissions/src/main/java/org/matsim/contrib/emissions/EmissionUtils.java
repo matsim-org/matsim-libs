@@ -60,28 +60,25 @@ public final class EmissionUtils {
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
-	/*package-private*/ static void setHbefaRoadType(Link link, String type) {
+	public static void setHbefaRoadType(Link link, String type) {
 		if (type != null) {
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	/*package-private*/ static String getHbefaRoadType(Link link) {
+	public static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
 	public static Map<Pollutant, Double> sumUpEmissions(Map<Pollutant, Double> warmEmissions, Map<Pollutant, Double> coldEmissions) {
 
-		Map<Pollutant, Double> pollutant2sumOfEmissions =
-				Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
-						.collect(Collectors.toMap(
-								Entry::getKey, // The key
-								Entry::getValue, // The value
-								Double::sum
-								)
-						);
-
-		return pollutant2sumOfEmissions;
+		return Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
+				.collect(Collectors.toMap(
+						Entry::getKey, // The key
+						Entry::getValue, // The value
+						Double::sum
+						)
+				);
 	}
 
 	public static <T> Map<Id<T>, Map<Pollutant, Double>> sumUpEmissionsPerId(
@@ -93,7 +90,7 @@ public final class EmissionUtils {
 		if (coldEmissions == null)
 			return warmEmissions;
 
-		Map<Id<T>, Map<Pollutant, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
+		return warmEmissions.entrySet().stream().map(entry -> {
 			Id<T> id = entry.getKey();
 			Map<Pollutant, Double> warmEm = entry.getValue();
 			Map<Pollutant, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
@@ -101,8 +98,6 @@ public final class EmissionUtils {
 			Map<Pollutant, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
 			return new Tuple<>(id, totalPollutantCounts);
 		}).collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
-
-		return totalEmissions;
 	}
 
 	public static Map<Id<Person>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
@@ -128,8 +123,7 @@ public final class EmissionUtils {
 	}
 
 	private static Set<String> getAllPollutants(Map<Id<Person>, SortedMap<String, Double>> totalEmissions) {
-		Set<String> pollutants = totalEmissions.values().stream().flatMap(m -> m.keySet().stream()).collect(Collectors.toSet());
-		return pollutants;
+		return totalEmissions.values().stream().flatMap(m -> m.keySet().stream()).collect(Collectors.toSet());
 	}
 
 	public static Map<Id<Link>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
@@ -201,8 +195,8 @@ public final class EmissionUtils {
 
 		Gbl.assertNotNull(vehicleType);
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
-//		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
-		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
+		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
+
 		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -227,10 +221,10 @@ public final class EmissionUtils {
 
 		avgHbefaWarmTable.forEach((warmEmissionFactorKey, emissionFactor) -> {
 			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(warmEmissionFactorKey);
-			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
+			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getTrafficSituation();
 			double speed = emissionFactor.getSpeed();
 
-			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>( HbefaTrafficSituation.class ));
+			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>(HbefaTrafficSituation.class));
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
 
@@ -268,6 +262,7 @@ public final class EmissionUtils {
 
 				break;
 			case fromVehicleTypeDescription:
+				// (v1 but hbefa vehicle description is in vehicle type description (Amit's version))
 
 				if ( VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() ) != null ) {
 					// information has already been moved to correct location
@@ -298,7 +293,7 @@ public final class EmissionUtils {
 				}
 
 				// delete at old location:
-				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() + substring + EmissionSpecificationMarker.END_EMISSIONS.toString();
+				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS + substring + EmissionSpecificationMarker.END_EMISSIONS;
 				String result2 = vehicleType.getDescription().replace( oldString, "" );
 				vehicleType.setDescription( result2 ) ;
 
@@ -316,19 +311,17 @@ public final class EmissionUtils {
 
 	private static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
-		EngineInformation engineInfo = vehicleType.getEngineInformation();;
-		StringBuilder strb = new StringBuilder();
-		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaTechnology( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaSizeClass( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
-		return strb.toString() ;
+		EngineInformation engineInfo = vehicleType.getEngineInformation();
+		return VehicleUtils.getHbefaVehicleCategory(engineInfo) +
+				";" +
+				VehicleUtils.getHbefaTechnology(engineInfo) +
+				";" +
+				VehicleUtils.getHbefaSizeClass(engineInfo) +
+				";" +
+				VehicleUtils.getHbefaEmissionsConcept(engineInfo);
 	}
 
-	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+	public static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
 		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
@@ -346,6 +339,27 @@ public final class EmissionUtils {
 		}
 		return hbefaVehicleCategory;
 	}
+
+	public static String mapHbefaVehicleCategory2String(HbefaVehicleCategory category) {
+
+		switch (category) {
+			case COACH:
+				return "coach";
+			case HEAVY_GOODS_VEHICLE:
+					return "HGV";
+			case LIGHT_COMMERCIAL_VEHICLE:
+				return "LCV";
+			case MOTORCYCLE:
+				return "motorcycle";
+			case PASSENGER_CAR:
+				return "pass. car";
+			case URBAN_BUS:
+				return "urban bus";
+			default:
+				throw new RuntimeException("Could not transform category to string: " + category);
+		}
+	}
+
         static Pollutant getPollutant( String pollutantString ){
 		// for the time being, we just manually add alternative spellings here, and map them all to the established enums.  One option to make this
 		// configurable would be to add corresponding maps into the emissions config, in the sense of

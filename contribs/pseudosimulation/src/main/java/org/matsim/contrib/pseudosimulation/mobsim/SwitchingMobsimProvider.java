@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.QSimProvider;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -46,6 +47,7 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
     @Inject private MobSimSwitcher mobSimSwitcher;
     @Inject private PSimProvider pSimProvider;
     @Inject private QSimProvider qsimProvider;
+    @Inject private TimeInterpretation timeInterpretation;
 
 
     @Override
@@ -53,7 +55,7 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
         String mobsim = config.controler().getMobsim();
         if (mobSimSwitcher.isQSimIteration()) {
             if (mobsim.equals("jdeqsim")) {
-                return new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, eventsManager);
+                return new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, eventsManager, timeInterpretation);
             } else {
             	return qsimProvider.get();
             }

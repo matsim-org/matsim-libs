@@ -30,11 +30,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.infrastructure.ChargerImpl;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
 
@@ -91,15 +88,13 @@ public class VariableSpeedChargingTest {
 				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
 				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
 				.build();
-		ChargerSpecification chargerSpecification = ImmutableChargerSpecification.newBuilder()
+		ChargerSpecification charger = ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))
 				.chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 				.linkId(Id.createLinkId("link_id"))
 				.plugPower(EvUnits.kW_to_W(chargerPower_kW))
 				.plugCount(1)
 				.build();
-		Charger charger = ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
-				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
 
 		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification,
 				ev -> (link, travelTime, linkEnterTime) -> {

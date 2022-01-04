@@ -66,9 +66,10 @@ final class HbefaVehicleAttributes {
 	/**
 	 * @return {@value #EM_CONCEPT_CMT}
 	 */
-	public String getHbefaEmConcept(){
+	public String getHbefaEmConcept() {
 		return this.hbefaEmConcept;
 	}
+
 	/**
 	 * @param hbefaEmConcept - {@value #EM_CONCEPT_CMT}
 	 */
@@ -76,36 +77,32 @@ final class HbefaVehicleAttributes {
 		this.hbefaEmConcept = hbefaEmConcept;
 	}
 
-	/* need to implement the "equals" method in order to be able to construct an "equal" key
-	 later on (e.g. from data available in the simulation)*/
 	@Override
-	public boolean equals(Object obj) {
-	        if(this == obj) {
-	              return true;
-	         }
-	         if (!(obj instanceof HbefaVehicleAttributes)) {
-	                return false; 
-	         }
-	         HbefaVehicleAttributes key = (HbefaVehicleAttributes) obj;
-	         return
-	            hbefaTechnology.equals(key.getHbefaTechnology())
-	         && hbefaSizeClass.equals(key.getHbefaSizeClass())
-	         && hbefaEmConcept.equals(key.getHbefaEmConcept());
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		HbefaVehicleAttributes that = (HbefaVehicleAttributes) o;
+
+		if (!hbefaTechnology.equals(that.hbefaTechnology)) return false;
+		if (!hbefaSizeClass.equals(that.hbefaSizeClass)) return false;
+		return hbefaEmConcept.equals(that.hbefaEmConcept);
 	}
 
-	// if "equals" is implemented, "hashCode also needs to be implemented
 	@Override
-	public int hashCode(){
-		return toString().hashCode();
+	public int hashCode() {
+		int result = hbefaTechnology.hashCode();
+		result = 31 * result + hbefaSizeClass.hashCode();
+		result = 31 * result + hbefaEmConcept.hashCode();
+		return result;
 	}
 
-	// needed for "hashCode" method
 	@Override
-	public String toString(){
+	public String toString() {
 		return
-		  hbefaTechnology + "; "
-		+ hbefaSizeClass + "; "
-		+ hbefaEmConcept;
+				hbefaTechnology + "; "
+						+ hbefaSizeClass + "; "
+						+ hbefaEmConcept;
 	}
 
 	public boolean isDetailed() {

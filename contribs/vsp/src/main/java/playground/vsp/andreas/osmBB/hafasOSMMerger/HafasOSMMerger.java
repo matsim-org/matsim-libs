@@ -20,7 +20,7 @@ import playground.vsp.andreas.mzilske.bvg09.HafasReader;
 
 public class HafasOSMMerger {
 
-	private static Logger log = Logger.getLogger(HafasOSMMerger.class);
+	private static final Logger log = Logger.getLogger(HafasOSMMerger.class);
 
 	static final String hafasAlldat = "D:/Berlin/BVG/berlin-bvg09/urdaten/BVG-Fahrplan_2008/Daten/1_Mo-Do/";
 	static final String hafasTransitSchedule = "e:/_out/ts/hafas_transitSchedule.xml";

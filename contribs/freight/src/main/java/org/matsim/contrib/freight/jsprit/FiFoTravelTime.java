@@ -60,7 +60,7 @@ public class FiFoTravelTime implements TravelTime {
 		return speed;
 	}
 	
-	private double getTimeBin(double currentTime){
+	private int getTimeBin(double currentTime){
 		return (int)currentTime/binSize;
 	}
 

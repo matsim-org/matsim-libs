@@ -2,30 +2,23 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
   <artifactId>pseudosimulation</artifactId>
   <!-- <version>deterministic-psim</version> -->
   <name>pseudosimulation</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
       <artifactId>common</artifactId>
-      <version>13.0-SNAPSHOT</version>
+      <version>14.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
-      <artifactId>eventsBasedPTRouter</artifactId>
-      <version>13.0-SNAPSHOT</version>
+      <artifactId>events-based-pt-router</artifactId>
+      <version>14.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -36,12 +29,6 @@
       <groupId>colt</groupId>
       <artifactId>colt</artifactId>
       <version>1.2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.matsim</groupId>
-      <artifactId>matsim-examples</artifactId>
-      <version>13.0-SNAPSHOT</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

@@ -54,7 +54,7 @@ public abstract class BuildingEnergyRunnerMain {
 
 	private static final Logger log = Logger
 			.getLogger(BuildingEnergyRunnerMain.class);
-	private static int LENGTH = 2; 
+	private static final  int LENGTH = 2;
 
 	/**
 	 * 

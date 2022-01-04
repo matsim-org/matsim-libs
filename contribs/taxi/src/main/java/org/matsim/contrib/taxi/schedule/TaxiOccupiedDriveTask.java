@@ -22,10 +22,10 @@ package org.matsim.contrib.taxi.schedule;
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
-public class TaxiOccupiedDriveTask extends DriveTask {
+public class TaxiOccupiedDriveTask extends DefaultDriveTask {
 	public static final TaxiTaskType TYPE = new TaxiTaskType(OCCUPIED_DRIVE);
 
 	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {

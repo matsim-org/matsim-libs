@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>13.0-SNAPSHOT</version>
+		<version>14.0-SNAPSHOT</version>
 	</parent>
 	<build>
 		<plugins>
@@ -21,9 +21,6 @@
 						work otherwise... -->
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 	<modelVersion>4.0.0</modelVersion>
@@ -38,13 +35,73 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
-			<artifactId>gluegen-rt-main</artifactId>
-			<version>2.3.2</version>
+			<artifactId>gluegen-rt</artifactId>
+			<version>2.4.0-matsim-1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-macosx-universal</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-linux-i586</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-windows-i586</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-windows-amd64</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-linux-amd64</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.jogamp.jogl</groupId>
-			<artifactId>jogl-all-main</artifactId>
-			<version>2.3.2</version>
+			<artifactId>jogl-all</artifactId>
+			<version>2.4.0-matsim-1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-macosx-universal</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-linux-i586</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-windows-i586</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-windows-amd64</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all</artifactId>
+			<version>2.4.0-matsim-1</version>
+			<classifier>natives-linux-amd64</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.jxmapviewer</groupId>
@@ -54,7 +111,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>13.0-SNAPSHOT</version>
+			<version>14.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

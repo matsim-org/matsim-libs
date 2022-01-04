@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,9 +30,9 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PKMbyModeCalculatorTest {
 
-	private static int car;
-	private static int pt;
-	private static int walk;
+	private int car;
+	private int pt;
+	private int walk;
 	HashMap<String, Double> modeCalc = new HashMap<String, Double>();
 	Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
@@ -217,9 +216,9 @@ public class PKMbyModeCalculatorTest {
 					Double ptStat = (pt > 0) ? Double.valueOf(column[pt]) : 0;
 					Double walkStat = (walk > 0) ? Double.valueOf(column[walk]) : 0;
 
-					Assert.assertEquals("Car stats score does not match", (totalCar / 1000), carStat, 0);
-					Assert.assertEquals("PT stats score does not match", (totalPt / 1000), ptStat, 0);
-					Assert.assertEquals("Walk stats score does not match", (totalWalk / 1000), walkStat, 0);
+					Assert.assertEquals("Car stats score does not match", Math.round((totalCar / 1000)), carStat, 0);
+					Assert.assertEquals("PT stats score does not match", Math.round((totalPt / 1000)), ptStat, 0);
+					Assert.assertEquals("Walk stats score does not match", Math.round((totalWalk / 1000)), walkStat, 0);
 					break;
 				}
 				iteration++;
@@ -232,7 +231,7 @@ public class PKMbyModeCalculatorTest {
 	}
 
 	/************ Determining the columns of the output file ************/
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

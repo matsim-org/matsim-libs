@@ -60,6 +60,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -100,14 +101,16 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	private final TripRouter tripRouter;
 	private InternalInterface internalInterface;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
-	PreplanningEngine(TripRouter tripRouter, Scenario scenario) {
+	PreplanningEngine(TripRouter tripRouter, Scenario scenario, TimeInterpretation timeInterpretation) {
 		this.tripRouter = tripRouter;
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities();
 		this.network = scenario.getNetwork();
 		this.scenario = scenario;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -127,7 +130,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface);
+		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface, timeInterpretation);
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), editTrips);
 		this.internalInterface = internalInterface;
 	}
@@ -287,7 +290,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
 		Gbl.assertNotNull(drtTrip);
 
-		final double expectedEndTimeOfOriginActivity = PopulationUtils.decideOnActivityEndTime( drtTrip.getOriginActivity(), now, this.scenario.getConfig() ).seconds();
+		final double expectedEndTimeOfOriginActivity = timeInterpretation.decideOnActivityEndTime( drtTrip.getOriginActivity(), now ).seconds();
 
 		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
 								 .setFromActivity( drtTrip.getOriginActivity() )
@@ -346,7 +349,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			Facility toFacility = tripInfo.getPickupLocation();
 			double departureTime = tripInfo.getExpectedBoardingTime() - 900.; // always depart 15min before pickup
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
-					toFacility, departureTime, null);
+					toFacility, departureTime, null, inputTrip.getTripAttributes());
 			;
 			// not sure if this works for walk, but it should ...
 
@@ -384,7 +387,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			}
 			double departureTime = tripInfo.getExpectedBoardingTime() + expectedTravelTime;
 			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.walk, fromFacility,
-					toFacility, departureTime, null);
+					toFacility, departureTime, null, inputTrip.getOriginActivity().getAttributes());
 
 			result.addAll(planElements);
 		}

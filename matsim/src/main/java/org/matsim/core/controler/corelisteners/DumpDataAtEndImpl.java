@@ -133,15 +133,15 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpCounts();
 
 		if (!event.isUnexpected() && this.vspConfig.isWritingOutputEvents() && (this.controlerConfigGroup.getWriteEventsInterval()!=0)) {
-			dumpOutputEvents();
+			dumpOutputEvents(event.getIteration());
 		}
-		dumpOutputTrips();
-        dumpOutputLegs();
-		dumpExperiencedPlans() ;
+		dumpOutputTrips(event.getIteration());
+        dumpOutputLegs(event.getIteration());
+		dumpExperiencedPlans(event.getIteration()) ;
 
 	}
 
-	private void dumpOutputEvents() {
+	private void dumpOutputEvents(int iteration) {
 		for (ControlerConfigGroup.EventsFileFormat format : this.controlerConfigGroup.getEventsFileFormats()) {
 			try {
 				Controler.DefaultFiles file;
@@ -160,7 +160,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				}
 
 				File toFile = new File(this.controlerIO.getOutputFilename(file));
-				File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), file));
+				File fromFile = new File(this.controlerIO.getIterationFilename(iteration, file));
 				try {
 					Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 				} catch (IOException e) {
@@ -174,10 +174,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		}
 	}
 
-	private void dumpOutputTrips() {
+	private void dumpOutputTrips(int iteration) {
 		try {
 			File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.tripscsv));
-			File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.tripscsv));
+			File fromFile = new File(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.tripscsv));
 			try {
 				Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 			} catch (IOException e) {
@@ -189,10 +189,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		}
 	}
 
-    private void dumpOutputLegs() {
+    private void dumpOutputLegs(int iteration) {
         try {
             File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.legscsv));
-            File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.legscsv));
+            File fromFile = new File(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.legscsv));
             try {
                 Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
             } catch (IOException e) {
@@ -204,11 +204,11 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
         }
     }
 
-	private void dumpExperiencedPlans() {
+	private void dumpExperiencedPlans(int iteration) {
 		if (this.config.planCalcScore().isWriteExperiencedPlans() ) {
 			try {
 				File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPlans));
-				File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.experiencedPlans));
+				File fromFile = new File(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPlans));
 				try {
 					Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
 				} catch (IOException e) {

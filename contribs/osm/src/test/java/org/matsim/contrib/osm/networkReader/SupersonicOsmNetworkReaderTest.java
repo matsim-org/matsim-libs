@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -210,7 +211,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
-		assertEquals(50 / 3.6 * 0.5, link.getFreespeed(), 0);
+		assertEquals(50 / 3.6 * LinkProperties.DEFAULT_FREESPEED_FACTOR, link.getFreespeed(), 0);
 	}
 
 	@Test
@@ -654,5 +655,47 @@ public class SupersonicOsmNetworkReaderTest {
 		org.matsim.api.core.v01.network.Node node8 = network.getNodes().get(Id.createNodeId(7));
 		assertEquals(1, node8.getInLinks().size());
 		assertEquals(1, node8.getOutLinks().size());
+	}
+
+	@Test
+	public void simplifiedLinksWithPreservedOriginalGeometry() {
+
+		var file = Paths.get(matsimTestUtils.getOutputDirectory() + "file.osm.bbf");
+		var osmData = Utils.createSingleLink(List.of(new Tag(OsmTags.HIGHWAY, OsmTags.LIVING_STREET)));
+		Utils.writeOsmData(osmData, file);
+
+		var network = new SupersonicOsmNetworkReader.Builder()
+				.setCoordinateTransformation(transformation)
+				.setStoreOriginalGeometry(true)
+				.build()
+				.read(file);
+
+		assertEquals(2, network.getLinks().size());
+		assertTrue(network.getLinks().containsKey(Id.createLinkId("10002f")));
+		assertTrue(network.getLinks().containsKey(Id.createLinkId("10002r")));
+
+		var forwardLink = network.getLinks().get(Id.createLinkId("10002f"));
+		assertOriginalGeometryOnLink(forwardLink, osmData.getNodes(), true);
+
+		var reverseLink = network.getLinks().get(Id.createLinkId("10002r"));
+		assertOriginalGeometryOnLink(reverseLink, osmData.getNodes(), false);
+
+	}
+
+	private void assertOriginalGeometryOnLink(Link link, List<OsmNode> osmNodes, boolean isForward) {
+		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM));
+		var originalGeometry = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(osmNodes.size(), originalGeometry.size());
+
+		for (var i = 0; i != osmNodes.size() ; i++) {
+			var osmNode = osmNodes.get(i);
+			// if forward link traverse forward, otherwise the nodes should be reversed compared to original geometry
+			var actualNode = isForward ? originalGeometry.get(i) : originalGeometry.get(originalGeometry.size() - 1 - i);
+
+			assertEquals(osmNode.getId(), Long.parseLong(actualNode.getId().toString()));
+			assertEquals(osmNode.getLongitude(), actualNode.getCoord().getX(), 0.0000000001);
+			assertEquals(osmNode.getLatitude(), actualNode.getCoord().getY(), 0.000000001);
+		}
 	}
 }

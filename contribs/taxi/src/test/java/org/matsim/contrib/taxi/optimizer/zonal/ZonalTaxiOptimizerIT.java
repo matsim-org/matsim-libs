@@ -46,6 +46,7 @@ public class ZonalTaxiOptimizerIT {
 		ZonalSystemParams zsParams = new ZonalSystemParams();
 		zsParams.setZonesShpFile("zones/zones.shp");
 		zsParams.setZonesXmlFile("zones/zones.xml");
+		zsParams.setExpansionDistance(3000);
 		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
 		params.addParameterSet(rbParams);
 		params.addParameterSet(zsParams);

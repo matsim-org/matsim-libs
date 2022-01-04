@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * GeometryUtilsTest.java
@@ -19,13 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
 package org.matsim.core.utils.geometry;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -43,6 +36,10 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author kainagel
  *
@@ -51,7 +48,6 @@ public class GeometryUtilsTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	@SuppressWarnings("static-method")
 	@Test
 	public final void testIntersectingLinks() {
 		
@@ -65,12 +61,11 @@ public class GeometryUtilsTest {
 
 			List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
 
-			List<Id<Link>> expecteds = new ArrayList<>() ;
-			expecteds.add( Id.createLinkId(1) ) ;
+			List<Id<Link>> expectedLinkIds = List.of(Id.createLinkId(1));
 
-			Assert.assertEquals(expecteds.size(), results.size()) ;
-			for ( int ii=0 ; ii<expecteds.size() ; ii++ ) {
-				Assert.assertEquals( "wrong link id;", expecteds.get(ii), results.get(ii).getId() ) ;
+			Assert.assertEquals(expectedLinkIds.size(), results.size()) ;
+			for ( int ii=0 ; ii<expectedLinkIds.size() ; ii++ ) {
+				Assert.assertEquals( "wrong link id", expectedLinkIds.get(ii), results.get(ii).getId() ) ;
 			}
 		}
 		{
@@ -79,16 +74,16 @@ public class GeometryUtilsTest {
 
 			List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
 
-			List<Id<Link>> expecteds = new ArrayList<>() ;
-			expecteds.add( Id.createLinkId(2) ) ;
-			expecteds.add( Id.createLinkId(3) ) ;
-			expecteds.add( Id.createLinkId(4) ) ;
-			expecteds.add( Id.createLinkId(5) ) ;
-			expecteds.add( Id.createLinkId(6) ) ;
+			Set<Id<Link>> intersectingLinkIds = new HashSet<>();
+			for (Link link : results) {
+				intersectingLinkIds.add(link.getId());
+			}
 
-			Assert.assertEquals(expecteds.size(), results.size()) ;
-			for ( int ii=0 ; ii<expecteds.size() ; ii++ ) {
-				Assert.assertEquals( expecteds.get(ii), results.get(ii).getId() ) ;
+			List<Id<Link>> expectedIds = List.of(Id.createLinkId(2), Id.createLinkId(3), Id.createLinkId(4), Id.createLinkId(5), Id.createLinkId(6));
+
+			Assert.assertEquals(expectedIds.size(), results.size());
+			for (Id<Link> id : expectedIds) {
+				Assert.assertTrue("expected link " + id, intersectingLinkIds.contains(id));
 			}
 		}
 		

@@ -23,7 +23,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.VehicleType;
 
@@ -39,7 +40,7 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addModalComponent(VrpAgentSource.class, new ModalProviders.AbstractProvider<>(getMode()) {
+		addModalComponent(VrpAgentSource.class, new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Inject
 			private QSim qSim;
 
@@ -50,7 +51,8 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 			@Override
 			public VrpAgentSource get() {
 				return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
-						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim, vehicleType);
+						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), getMode(), qSim,
+						vehicleType);
 			}
 		});
 	}

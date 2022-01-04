@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils;
@@ -49,14 +50,14 @@ public interface ScoringFunction {
 	 * especially to "wrap" it "around".
 	 * @param activity
 	 */
-    public void handleActivity(Activity activity);
+    void handleActivity(Activity activity);
 
     /**
      * Tells the scoring function about a Leg. Will contain complete route
      * information for network routes (as you would expect in a Plan), but
      * only a GenericRoute for everything else, especially transit.
      */
-    public void handleLeg(Leg leg);
+    void handleLeg(Leg leg);
 
 	/**
 	 * Tells the scoring function that the agent got stuck in the simulation and
@@ -67,7 +68,7 @@ public interface ScoringFunction {
 	 * @param time The time at which the agent got stuck and was removed from the
 	 * simulation.
 	 */
-	public void agentStuck(final double time);
+	void agentStuck(final double time);
 
 	/**
 	 * Adds the specified amount of utility to the agent's score. This is mostly
@@ -76,23 +77,32 @@ public interface ScoringFunction {
 	 *
 	 * @param amount amount to be added to the agent's score
 	 */
-	public void addMoney(final double amount);
+	void addMoney(final double amount);
+
+	/**
+	 * Adds the specified amount of utility to the agent's score. This is mostly
+	 * used for handling {@link PersonScoreEvent}s, allowing other parts of the
+	 * code to influence an agent's score.
+	 *
+	 * @param amount amount to be added to the agent's score
+	 */
+	void addScore(final double amount);
 
 	/**
 	 * Tells the scoring function that no more information will be given to it
 	 * and that the final score should be calculated.  But the score must <b>not</b>
 	 * be written to the plan!
 	 */
-	public void finish();
+	void finish();
 
 	/**
 	 * Returns the score for this plan.
 
 	 * @return the score
 	 */
-	public double getScore();
+	double getScore();
 
-	public void handleEvent( Event event ) ;
+	void handleEvent( Event event ) ;
 	
 	default void handleTrip( TripStructureUtils.Trip trip ) {
 		// empty default implementation, since older implementations of the interface

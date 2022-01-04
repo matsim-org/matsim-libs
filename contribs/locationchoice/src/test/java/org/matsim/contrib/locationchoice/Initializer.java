@@ -33,6 +33,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestCase;
 
 public class Initializer {
@@ -74,7 +75,7 @@ public class Initializer {
 
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(
 				scenario.getConfig().planCalcScore());
-		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get());
+		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get(), TimeInterpretation.create(scenario.getConfig()));
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
 		scenario.getPopulation().getPersons().values().forEach(pp4s::run);
 

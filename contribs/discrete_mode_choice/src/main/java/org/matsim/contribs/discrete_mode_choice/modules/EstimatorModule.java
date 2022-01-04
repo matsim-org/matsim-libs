@@ -17,9 +17,9 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.contribs.discrete_mode_choice.modules.config.MATSimTripScoringConfigGroup;
 import org.matsim.contribs.discrete_mode_choice.modules.utils.ScheduleWaitingTimeEstimatorModule;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.config.TransitConfigGroup;
 
@@ -88,14 +88,14 @@ public class EstimatorModule extends AbstractDiscreteModeChoiceExtension {
 
 	@Provides
 	@Singleton
-	public UniformTripEstimator provideNullTripEstimator(TimeInterpreter.Factory timeInterpreterFactory) {
-		return new UniformTripEstimator(timeInterpreterFactory);
+	public UniformTripEstimator provideNullTripEstimator(TimeInterpretation timeInterpretation) {
+		return new UniformTripEstimator(timeInterpretation);
 	}
 
 	@Provides
 	@Singleton
-	public UniformTourEstimator proideNullTourEstimator(TimeInterpreter.Factory timeInterpreterFactory) {
-		return new UniformTourEstimator(timeInterpreterFactory);
+	public UniformTourEstimator proideNullTourEstimator(TimeInterpretation timeInterpretation) {
+		return new UniformTourEstimator(timeInterpretation);
 	}
 
 	@Provides
@@ -108,23 +108,23 @@ public class EstimatorModule extends AbstractDiscreteModeChoiceExtension {
 	public MATSimTripScoringEstimator provideMATSimTripScoringEstimator(ActivityFacilities facilities,
 			TripRouter tripRouter, PTWaitingTimeEstimator waitingTimeEstimator,
 			ScoringParametersForPerson scoringParametersForPerson, DiscreteModeChoiceConfigGroup dmcConfig,
-			TimeInterpreter.Factory timeInterpreterFactory) {
+			TimeInterpretation timeInterpretation) {
 		MATSimTripScoringConfigGroup scoringConfig = dmcConfig.getMATSimTripScoringConfigGroup();
 		return new MATSimTripScoringEstimator(facilities, tripRouter, waitingTimeEstimator, scoringParametersForPerson,
-				timeInterpreterFactory, scoringConfig.getPtLegModes());
+				timeInterpretation, scoringConfig.getPtLegModes());
 	}
 
 	@Provides
 	public MATSimDayScoringEstimator provideMATSimDayScoringEstimator(MATSimTripScoringEstimator tripEstimator,
 			ScoringParametersForPerson scoringParametersForPerson, DiscreteModeChoiceConfigGroup dmcConfig,
-			TimeInterpreter.Factory timeInterpreterFactory) {
+			TimeInterpretation timeInterpretation) {
 		return new MATSimDayScoringEstimator(new CachedTripEstimator(tripEstimator, dmcConfig.getCachedModes()),
-				scoringParametersForPerson, timeInterpreterFactory);
+				scoringParametersForPerson, timeInterpretation);
 	}
 
 	@Provides
 	public CumulativeTourEstimator provideCumulativeTourEstimator(TripEstimator tripEstimator,
-			TimeInterpreter.Factory timeInterpreterFactory) {
-		return new CumulativeTourEstimator(tripEstimator, timeInterpreterFactory);
+			TimeInterpretation timeInterpretation) {
+		return new CumulativeTourEstimator(tripEstimator, timeInterpretation);
 	}
 }

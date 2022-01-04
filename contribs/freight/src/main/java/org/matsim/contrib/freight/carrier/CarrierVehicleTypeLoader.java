@@ -14,7 +14,7 @@ import org.matsim.vehicles.VehicleType;
  */
 public class CarrierVehicleTypeLoader {
 	
-	private static Logger logger = Logger.getLogger(CarrierVehicleTypeLoader.class);
+	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeLoader.class);
 	
 	private Carriers carriers;
 
@@ -38,9 +38,9 @@ public class CarrierVehicleTypeLoader {
 			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles().values()){
 				Id<org.matsim.vehicles.VehicleType> typeId = v.getVehicleTypeId();
 				if(typeId != null){
-					if(types.getVehicleTypes().containsKey(typeId)){
-						VehicleType vehicleType = types.getVehicleTypes().get(typeId );
-						v.setType(vehicleType );
+					VehicleType vehicleType = types.getVehicleTypes().get(typeId);
+					if(vehicleType != null){
+						v.setType(vehicleType);
 						Collection<VehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
 						if(!vTypes.contains(vehicleType)){
 							vTypes.add(vehicleType);

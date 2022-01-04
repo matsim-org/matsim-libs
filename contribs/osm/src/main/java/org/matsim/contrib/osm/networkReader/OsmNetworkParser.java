@@ -134,7 +134,7 @@ class OsmNetworkParser {
 	private List<ProcessedOsmWay> testWhetherReferencingLinksAreInFilter(Coord coord, List<ProcessedOsmWay> waysThatReferenceNode) {
 
 		return waysThatReferenceNode.stream()
-				.filter(way -> linkFilter.test(coord, way.getLinkProperties().hierachyLevel))
+				.filter(way -> linkFilter.test(coord, way.getLinkProperties().hierarchyLevel))
 				.collect(Collectors.toList());
 	}
 }

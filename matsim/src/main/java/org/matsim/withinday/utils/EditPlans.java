@@ -264,12 +264,12 @@ public final class EditPlans {
 	//		}
 	//		return false ;
 	//	}
-	public Activity findRealActAfter(MobsimAgent agent, int index) {
+	public static Activity findRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ; 
 	}
-	public int findIndexOfRealActAfter(MobsimAgent agent, int index) {
+	public static int findIndexOfRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
@@ -284,7 +284,7 @@ public final class EditPlans {
 		}
 		return theIndex ;
 	}
-	public Activity findRealActBefore(MobsimAgent agent, int index) {
+	public static Activity findRealActBefore(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 

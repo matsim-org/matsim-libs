@@ -55,6 +55,10 @@ public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 	public void addMoney(final double amount) {
 	}
 
+	@Override
+	public void addScore(final double amount) {
+	}
+
 
 	@Override
 	public void finish() {

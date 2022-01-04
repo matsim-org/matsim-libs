@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkFactory;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -23,20 +22,19 @@ import java.util.function.Predicate;
  */
 public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
-	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 	private static final double BIKE_PCU = 0.25;
-	private static Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
+	private static final Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
 			OsmTags.TRUNK, OsmTags.TRUNK_LINK));
-	private static Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
+	private static final Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
 			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS));
 
-	private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
+	private final SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
 	public OsmBicycleReader(OsmNetworkParser parser,
 							Predicate<Long> preserveNodeWithId,
 							BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-							SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated) {
-		super(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, (link, tags, direction) -> handleLink(link, tags, direction, afterLinkCreated));
+							AfterLinkCreated afterLinkCreated, double freeSpeedFactor, double adjustCapacityLength, boolean storeOriginalGeometry) {
+		super(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, (link, tags, direction) -> handleLink(link, tags, direction, afterLinkCreated), freeSpeedFactor, adjustCapacityLength, storeOriginalGeometry);
 		this.afterLinkCreated = afterLinkCreated;
 	}
 
@@ -49,9 +47,6 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		setSmoothness(link, tags);
 		setCycleWay(link, tags);
 		setRestrictions(link, tags);
-
-		// do infrastructure factor
-		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
 
 		outfacingCallback.accept(link, tags, direction);
 	}
@@ -91,13 +86,13 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 	}
 
 	@Override
-	Collection<Link> createLinks(WaySegment segment, NetworkFactory factory) {
+	Collection<Link> createLinks(WaySegment segment) {
 
-		Collection<Link> links = super.createLinks(segment, factory);
+		Collection<Link> links = super.createLinks(segment);
 
 		if (links.size() == 1 && isReverseCycleWay(segment.getTags())) {
 			Link link = links.iterator().next();
-			Link reverseLink = createReverseBicycleLink(link, factory);
+			Link reverseLink = createReverseBicycleLink(link);
 			links.add(reverseLink);
 
 			// test whether the reverse link is actually reverse relative to the segment
@@ -107,10 +102,10 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		return links;
 	}
 
-	private Link createReverseBicycleLink(Link forwardLink, NetworkFactory factory) {
+	private Link createReverseBicycleLink(Link forwardLink) {
 
 		String linkId = forwardLink.getId().toString() + "_bike-reverse";
-		Link result = factory.createLink(Id.createLinkId(linkId), forwardLink.getToNode(), forwardLink.getFromNode());
+		Link result = getNetworkFactory().createLink(Id.createLinkId(linkId), forwardLink.getToNode(), forwardLink.getFromNode());
 		result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
 
 		result.setCapacity(1500 * BIKE_PCU);
@@ -134,8 +129,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 	public static class Builder extends AbstractBuilder<OsmBicycleReader> {
 
-		@Override
-		OsmBicycleReader createInstance() {
+		public Builder() {
 			addOverridingLinkProperties(OsmTags.TRACK, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.CYCLEWAY, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.SERVICE, new LinkProperties(9, 1, 10 / 3.6, 100 * BIKE_PCU, false));
@@ -143,9 +137,12 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 			addOverridingLinkProperties(OsmTags.PEDESTRIAN, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.PATH, new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.STEPS, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false));
+		}
 
+		@Override
+		OsmBicycleReader createInstance() {
 			OsmNetworkParser parser = new OsmNetworkParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
-			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated);
+			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated, freeSpeedFactor, adjustCapacityLength, storeOriginalGeometry);
 		}
 	}
 }

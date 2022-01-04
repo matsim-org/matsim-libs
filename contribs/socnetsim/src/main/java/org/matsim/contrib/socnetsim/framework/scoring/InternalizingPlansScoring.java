@@ -147,7 +147,7 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener,
 
 	@Override
 	public void notifyIterationStarts( final IterationStartsEvent event ) {
-		this.eventsToScore.beginIteration( event.getIteration() );
+		this.eventsToScore.beginIteration( event.getIteration(), event.isLastIteration() );
 	}
 
 	public interface InternalizationSettings {

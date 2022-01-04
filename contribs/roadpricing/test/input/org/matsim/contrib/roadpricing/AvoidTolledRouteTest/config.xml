@@ -17,6 +17,7 @@
 	<module name="controler">
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
+		<param name="overwriteFiles" value="overwriteExistingFiles" />
 	</module>
 	
 	<module name="strategy">

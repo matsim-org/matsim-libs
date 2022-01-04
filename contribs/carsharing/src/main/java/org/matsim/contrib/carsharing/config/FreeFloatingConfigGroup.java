@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.carsharing.config;
 
+import java.util.Map;
+
 import org.matsim.core.config.ReflectiveConfigGroup;
 /** 
  * @author balac
@@ -26,143 +28,60 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	
-	public static final String GROUP_NAME = "FreeFloating";
-		
-	private String travelingFreeFloating = null;
+	public static final String GROUP_NAME = "FreeFloating";	
 	
-	private String constantFreeFloating = null;
-	
-	private String vehiclelocationsInputFile = null;
+	private static final String PARAM_SEARCH_DISTANCE = "searchDistanceFreefloating";
+	private static final String PARAM_AREAS = "areasFreefloating";
+	private static final String PARAM_USE_FREEFLOATING = "useFreeFloating";
 
 	private String areasInputFile = null;
 	
-	private String timeFeeFreeFloating = null;
+	private boolean useFreeFloating = false;	
 	
-	private String timeParkingFeeFreeFloating = null;
-	
-	private String distanceFeeFreeFloating = null;
-	
-	private boolean useFeeFreeFloating = false;	
-	
-	private String specialTimeStart = null; //in seconds
-	
-	private String specialTimeEnd = null;  //in seconds
-	
-	private String specialTimeFee = null;
-
+	private double searchDistance = 500.0;
 	
 	public FreeFloatingConfigGroup() {
 		super(GROUP_NAME);
 	}
 	
-	@StringGetter( "travelingFreeFloating" )
-	public String getUtilityOfTravelling() {
-		return this.travelingFreeFloating;
+	@StringGetter( PARAM_SEARCH_DISTANCE )
+	public double getsearchDistance() {
+		return this.searchDistance;
 	}
 
-	@StringSetter( "travelingFreeFloating" )
-	public void setUtilityOfTravelling(final String travelingFreeFloating) {
-		this.travelingFreeFloating = travelingFreeFloating;
-	}
+	@StringSetter( PARAM_SEARCH_DISTANCE )
+	public void setsearchDistance(final String searchDistance) {
+		this.searchDistance = Double.parseDouble(searchDistance);
+	}		
 
-	@StringGetter( "constantFreeFloating" )
-	public String constantFreeFloating() {
-		return this.constantFreeFloating;
-	}
-
-	@StringSetter( "constantFreeFloating" )
-	public void setConstantFreeFloating(final String constantFreeFloating) {
-		this.constantFreeFloating = constantFreeFloating;
-	}
-	
-	@StringGetter( "vehiclelocationsFreefloating" )
-	public String getvehiclelocations() {
-		return this.vehiclelocationsInputFile;
-	}
-
-	@StringSetter( "vehiclelocationsFreefloating" )
-	public void setvehiclelocations(final String vehiclelocationsInputFile) {
-		this.vehiclelocationsInputFile = vehiclelocationsInputFile;
-	}
-
-	@StringGetter( "areasFreefloating" )
+	@StringGetter( PARAM_AREAS )
 	public String getAreas() {
 		return this.areasInputFile;
 	}
 
-	@StringSetter( "areasFreefloating" )
+	@StringSetter( PARAM_AREAS )
 	public void setAreas(final String areasInputFile) {
 		this.areasInputFile = areasInputFile;
 	}
-
-	@StringGetter( "timeFeeFreeFloating" )
-	public String timeFeeFreeFloating() {
-		return this.timeFeeFreeFloating;
-	}
-
-	@StringSetter( "timeFeeFreeFloating" )
-	public void setTimeFeeFreeFloating(final String timeFeeFreeFloating) {
-		this.timeFeeFreeFloating = timeFeeFreeFloating;
-	}
 	
-	@StringGetter( "timeParkingFeeFreeFloating" )
-	public String timeParkingFeeFreeFloating() {
-		return this.timeParkingFeeFreeFloating;
-	}
-
-	@StringSetter( "timeParkingFeeFreeFloating" )
-	public void setTimeParkingFeeFreeFloating(final String timeParkingFeeFreeFloating) {
-		this.timeParkingFeeFreeFloating = timeParkingFeeFreeFloating;
-	}
-	
-	@StringGetter( "distanceFeeFreeFloating" )
-	public String distanceFeeFreeFloating() {
-		return this.distanceFeeFreeFloating;
-	}
-
-	@StringSetter( "distanceFeeFreeFloating" )
-	public void setDistanceFeeFreeFloating(final String distanceFeeFreeFloating) {
-		this.distanceFeeFreeFloating = distanceFeeFreeFloating;
-	}
-	
-	@StringGetter( "useFreeFloating" )
+	@StringGetter( PARAM_USE_FREEFLOATING )
 	public boolean useFeeFreeFloating() {
-		return this.useFeeFreeFloating;
+		return this.useFreeFloating;
 	}
 
-	@StringSetter( "useFreeFloating" )
-	public void setUseFeeFreeFloating(final boolean useFeeFreeFloating) {
-		this.useFeeFreeFloating = useFeeFreeFloating;
+	@StringSetter( PARAM_USE_FREEFLOATING )
+	public void setUseFeeFreeFloating(final boolean useFreeFloating) {
+		this.useFreeFloating = useFreeFloating;
 	}
 	
-	@StringGetter( "specialTimeStart" )
-	public String specialTimeStart() {
-		return this.specialTimeStart;
-	}
-
-	@StringSetter( "specialTimeStart" )
-	public void setSpecialTimeStart(final String specialTimeStart) {
-		this.specialTimeStart = specialTimeStart;
-	}
-	
-	@StringGetter( "specialTimeEnd" )
-	public String specialTimeEnd() {
-		return this.specialTimeEnd;
-	}
-
-	@StringSetter( "specialTimeEnd" )
-	public void setSpecialTimeEnd(final String specialTimeEnd) {
-		this.specialTimeEnd = specialTimeEnd;
-	}
-	
-	@StringGetter( "specialTimeFee" )
-	public String specialTimeFee() {
-		return this.specialTimeFee;
-	}
-
-	@StringSetter( "specialTimeFee" )
-	public void setSpecialTimeFee(final String specialTimeFee) {
-		this.specialTimeFee = specialTimeFee;
-	}
+	 @Override
+     public Map<String, String> getComments() {
+         Map<String, String> map = super.getComments();
+         map.put(PARAM_AREAS, "The path to the input file containg the service are of the freefloating service. If not defined the whole study area will be considered eligile for free-floating carsharing.");
+         map.put(PARAM_SEARCH_DISTANCE, "Defines the search radius for free-floating vehicles. Default is 500 meters.");
+         map.put(PARAM_USE_FREEFLOATING, "Defines if the free-floating carsharing should be a mode alternative. Default is false.");
+          
+         return map;
+     }
 	
 }

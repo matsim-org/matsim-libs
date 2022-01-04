@@ -174,7 +174,12 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 						 Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins,
 						 Collection<Id<? extends BasicLocation>> subsetOfNodes, ProgressBar progressBar) {
 
-		AccessibilityContributionCalculator calculator = calculators.get(mode).duplicate();
+		AccessibilityContributionCalculator calculator;
+		if (acg.isUseParallelization()) {
+			calculator = calculators.get(mode).duplicate();
+		} else {
+			calculator = calculators.get(mode);
+		}
 
 		// Go through all nodes that have a measuring point assigned
 		for (Id<? extends BasicLocation> fromNodeId : subsetOfNodes) {
@@ -215,6 +220,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
 		// Write header
+		writer.writeField(Labels.ID);
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
 		writer.writeField(Labels.TIME);
@@ -230,6 +236,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		// Write data
 		for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
 			ActivityFacility facility = tuple.getFirst();
+			writer.writeField(facility.getId().toString());
 			writer.writeField(facility.getCoord().getX());
 			writer.writeField(facility.getCoord().getY());
 			writer.writeField(tuple.getSecond());

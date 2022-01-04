@@ -57,6 +57,7 @@ public final class EventsToScore {
 	private boolean finished = false;
 
 	private int iteration = -1 ;
+	private boolean isLastIteration = false;
 
 	@Inject
 	private EventsToScore(ControlerListenerManagerImpl controlerListenerManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
@@ -69,7 +70,7 @@ public final class EventsToScore {
 	public static EventsToScore createWithScoreUpdating(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
-				new ExperiencedPlansModule(),
+				new StandaloneExperiencedPlansModule(false),
 				new AbstractModule() {
 					@Override
 					public void install() {
@@ -89,7 +90,7 @@ public final class EventsToScore {
 	public static EventsToScore createWithoutScoreUpdating(Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
-				new ExperiencedPlansModule(),
+				new StandaloneExperiencedPlansModule(false),
 				new AbstractModule() {
 					@Override
 					public void install() {
@@ -106,9 +107,10 @@ public final class EventsToScore {
 		return injector.getInstance(EventsToScore.class);
 	}
 
-	public void beginIteration(int iteration) {
+	public void beginIteration(int iteration, boolean isLastIteration) {
 		this.iteration = iteration;
-		this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
+		this.isLastIteration = isLastIteration;
+		this.controlerListenerManager.fireControlerIterationStartsEvent(iteration, isLastIteration);
 	}
 
 	/**
@@ -119,7 +121,7 @@ public final class EventsToScore {
 		if (iteration == -1) {
 			throw new RuntimeException("Please initialize me before the iteration starts.");
 		}
-		controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+		controlerListenerManager.fireControlerAfterMobsimEvent(iteration, isLastIteration);
 		scoringFunctionsForPopulation.finishScoringFunctions();
 		newScoreAssigner.assignNewScores(this.iteration, scoringFunctionsForPopulation, population);
 		finished = true;

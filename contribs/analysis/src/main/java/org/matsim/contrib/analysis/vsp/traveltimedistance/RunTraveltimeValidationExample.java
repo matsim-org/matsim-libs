@@ -24,6 +24,7 @@ package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -33,6 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,8 +56,7 @@ public class RunTraveltimeValidationExample {
   	<li>A MATSim Events file</li>
   	<li>A MATSim Network file</li>
   	<li>EPSG-Code of your coordinate system</li>
-  	<li>HERE Maps APP ID, see here.com</li>
-  	<li>HERE Maps APP code, see here.com</li>
+  	<li>HERE Maps API Key, to be requested on here.com</li>
 	<li>Output folder location</li>
 	<li>The date to validate travel times for, format: YYYY-MM-DD</li>
 
@@ -64,18 +65,17 @@ public class RunTraveltimeValidationExample {
 	</ol>
 	 *  
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		String plans = args[0];
 		String events = args[1];
 		String network = args [2];
 		String epsg = args[3];
-		String appId = args[4];
-		String appCode = args[5];
+		String apiKey = args[4];
+		String outputfolder = args[5];
+		String date = args[6];
 		Integer tripsToValidate = null;
-		String outputfolder = args[6];
-		String date = args[7];
-		if (args.length>8){
-			tripsToValidate = Integer.parseInt(args[8]);
+		if (args.length>7){
+			tripsToValidate = Integer.parseInt(args[7]);
 		}
 
         Set<Id<Person>> populationIds = new HashSet<>();
@@ -89,12 +89,12 @@ public class RunTraveltimeValidationExample {
             }
         });
         spr.readFile(plans);
+        System.out.println("populationId Size is " + populationIds.size());
 
 
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);
-		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, appId, appCode, date, transformation);
-        //Setting this to true will write out the raw JSON files for each calculated route
-        validator.setWriteDetailedFiles(false);
+		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, TransportMode.car, apiKey, date, transformation, false);
+        //Setting "writeDetailedFiles" to true will write out the raw JSON files for each calculated route
 		TravelTimeValidationRunner runner;
 		if (tripsToValidate != null){
             runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events, outputfolder, validator, tripsToValidate);

@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
@@ -74,6 +75,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 	private final Network intersectionSimplifiedRoadNetwork;
 	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
+	private final NetworkConfigGroup networkConfigGroup;
 
 	private Geometry include;
 	private Geometry exclude;
@@ -87,12 +89,12 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 
 	private NetworkCalcTopoType networkCalcTopoType;
 	
-	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup){
-		return createPStops(network, pConfigGroup, null);
+	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup, NetworkConfigGroup networkConfigGroup) {
+		return createPStops(network, pConfigGroup, null, networkConfigGroup);
 	}
 
-	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
-		CreatePStopsOnJunctionApproachesAndBetweenJunctions cS = new CreatePStopsOnJunctionApproachesAndBetweenJunctions(network, pConfigGroup, realTransitSchedule);
+	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule, NetworkConfigGroup networkConfigGroup) {
+		CreatePStopsOnJunctionApproachesAndBetweenJunctions cS = new CreatePStopsOnJunctionApproachesAndBetweenJunctions(network, pConfigGroup, realTransitSchedule, networkConfigGroup);
 		cS.run();
 		return cS.getTransitSchedule();
 	}
@@ -112,9 +114,10 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 	 * @param pConfigGroup
 	 * @param realTransitSchedule
 	 */
-    private CreatePStopsOnJunctionApproachesAndBetweenJunctions(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
+    private CreatePStopsOnJunctionApproachesAndBetweenJunctions(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule, NetworkConfigGroup networkConfigGroup) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
+		this.networkConfigGroup = networkConfigGroup;
 		this.factory = new GeometryFactory();
 		
 		this.linkId2StopFacilityMap = new LinkedHashMap<>();
@@ -290,7 +293,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 	/* Generate a simplified network to determine stop locations (the simplified network will not be used in simulation) */
 	private Network generateIntersectionSimplifiedNetwork(double pmin, int epsilon) {
 		// Extract road network
-		NetworkFilterManager nfmCar = new NetworkFilterManager(net);
+		NetworkFilterManager nfmCar = new NetworkFilterManager(net, networkConfigGroup);
 		nfmCar.addLinkFilter(new NetworkLinkFilter() {
 			
 			@Override
@@ -302,7 +305,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 		Network roadNetwork = nfmCar.applyFilters();
 		
 		// Remove low capacity links
-		NetworkFilterManager nfm = new NetworkFilterManager(roadNetwork);
+		NetworkFilterManager nfm = new NetworkFilterManager(roadNetwork, networkConfigGroup);
 		nfm.addLinkFilter(new NetworkLinkFilter() {
 			
 			@Override

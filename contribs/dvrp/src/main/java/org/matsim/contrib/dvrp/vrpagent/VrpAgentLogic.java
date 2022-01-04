@@ -41,17 +41,19 @@ public final class VrpAgentLogic implements DynAgentLogic {
 		DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now);
 	}
 
-	private final EventsManager eventsManager;
 	private final VrpOptimizer optimizer;
 	private final DynActionCreator dynActionCreator;
 	private final DvrpVehicle vehicle;
+	private final String dvrpMode;
+	private final EventsManager eventsManager;
 	private DynAgent agent;
 
 	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, DvrpVehicle vehicle,
-			EventsManager eventsManager) {
+			String dvrpMode, EventsManager eventsManager) {
 		this.optimizer = optimizer;
 		this.dynActionCreator = dynActionCreator;
 		this.vehicle = vehicle;
+		this.dvrpMode = dvrpMode;
 		this.eventsManager = eventsManager;
 	}
 
@@ -83,11 +85,11 @@ public final class VrpAgentLogic implements DynAgentLogic {
 
 				case STARTED:
 					Task task = schedule.getCurrentTask();
-					eventsManager.processEvent(
-							new TaskEndedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
+					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					break;
 
 				case PLANNED:
+					//TODO schedule started event ?
 					break;
 
 				default:
@@ -96,14 +98,15 @@ public final class VrpAgentLogic implements DynAgentLogic {
 
 			optimizer.nextTask(vehicle);
 
-			switch (schedule.getStatus()) {
+			switch (schedule.getStatus()) {// refresh status
 				case STARTED:
 					Task task = schedule.getCurrentTask();
 					eventsManager.processEvent(
-							new TaskStartedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
+							new TaskStartedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					return dynActionCreator.createAction(agent, vehicle, now);
 
 				case COMPLETED:
+					//TODO schedule ended event?
 					return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
 
 				default:

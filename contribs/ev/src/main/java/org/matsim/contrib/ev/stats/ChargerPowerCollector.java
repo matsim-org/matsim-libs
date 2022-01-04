@@ -29,8 +29,6 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.MobsimScopeEventHandler;
-import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.charging.ChargingEndEvent;
 import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
 import org.matsim.contrib.ev.charging.ChargingStartEvent;
@@ -39,6 +37,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
@@ -53,11 +52,9 @@ public class ChargerPowerCollector
 	private final List<ChargingLogEntry> logList = new ArrayList<>();
 
 	@Inject
-	public ChargerPowerCollector(ElectricFleet fleet, ChargingInfrastructure chargingInfrastructure,
-			MobsimScopeEventHandling events) {
+	public ChargerPowerCollector(ElectricFleet fleet, ChargingInfrastructure chargingInfrastructure) {
 		this.fleet = fleet;
 		this.chargingInfrastructure = chargingInfrastructure;
-		events.addMobsimScopeHandler(this);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
@@ -15,6 +16,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -227,6 +230,30 @@ public class OsmBicycleReaderTest {
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.car));
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 		assertPresentAndEqual(reverse, OsmTags.SURFACE, surface);
+	}
+
+	@Test
+	public void test_builderDoesntOverrideLinkProperties() {
+
+		var osmFile = Paths.get(testUtils.getOutputDirectory()).resolve("osm-data.osm.pbf");
+
+		// this yields a motorway and a tertiary link
+		var osmData = Utils.createTwoIntersectingLinksWithDifferentLevels();
+		Utils.writeOsmData(osmData, osmFile);
+
+		var network = new OsmBicycleReader.Builder()
+				// we only want the motorway
+				.setLinkProperties(new ConcurrentHashMap<>(Map.of(OsmTags.MOTORWAY, LinkProperties.createMotorway())))
+				.setCoordinateTransformation(Utils.transformation)
+				.build()
+				.read(osmFile);
+
+		// we expect one linke and it should be only the motorway link
+		assertEquals(1, network.getLinks().size());
+
+		for (Link link : network.getLinks().values()) {
+			assertPresentAndEqual(link, NetworkUtils.TYPE ,OsmTags.MOTORWAY);
+		}
 	}
 
 	private void assertPresentAndEqual(Link link, String tag, String expected) {

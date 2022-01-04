@@ -182,8 +182,11 @@ public class RouteUtils {
 		}
 		return length ;
 	}
-
-	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
+	@Deprecated // network argument is not needed; please inline.  kai, sep'20
+	public static NetworkRoute createNetworkRoute( List<Id<Link>> routeLinkIds, Network network ) {
+		return createNetworkRoute( routeLinkIds );
+	}
+	public static NetworkRoute createNetworkRoute( List<Id<Link>> routeLinkIds ) {
 		Id<Link> startLinkId = routeLinkIds.get(0);
 		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<>(0);
 		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);

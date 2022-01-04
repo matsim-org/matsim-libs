@@ -38,7 +38,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 		double getTollAmount(Cost cost, Link link);
 	}
 	
-	static class CordonCalc implements TollCalculator {
+	static class LinkCalc implements TollCalculator {
 
 		
 		@Override
@@ -117,18 +117,19 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 */
 	@SuppressWarnings("WeakerAccess")
 	public void addPricingScheme(Id<org.matsim.vehicles.VehicleType> vehicleTypeId, RoadPricingScheme pricingScheme){
-		if(!schemes.containsKey(vehicleTypeId)){
-			schemes.put(vehicleTypeId, new ArrayList<>());
-		}
-		schemes.get(vehicleTypeId).add(pricingScheme);
+		Collection<RoadPricingScheme> list = schemes.computeIfAbsent(vehicleTypeId, k -> new ArrayList<>());
+		list.add(pricingScheme);
 		if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON)){
-			calculators.put(pricingScheme.getType(), new CordonCalc());
+			throw new RuntimeException("the matsim cordon toll implementation no longer exists; link pricing is probably what you want");
+		}
+		else if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_LINK)){
+			calculators.put(pricingScheme.getType(), new LinkCalc() );
 		}
 		else if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE)){
 			calculators.put(pricingScheme.getType(), new DistanceCalc());
 		}
         else throw new IllegalStateException("toll type specification missing. if you use xml add specification to root node like this\n"
-            + "<roadpricing type=\"cordon\" name=\"cordon\"> if it is a cordon toll and \n<roadpricing type=\"distance\" name=\"distance\"> if it is a distance toll");
+            + "<roadpricing type=\"cordon\" name=\"link\"> if it is a link toll and \n<roadpricing type=\"distance\" name=\"distance\"> if it is a distance toll");
 	}
 	
 	/**

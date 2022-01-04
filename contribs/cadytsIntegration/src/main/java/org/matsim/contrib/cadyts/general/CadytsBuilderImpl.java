@@ -39,7 +39,7 @@ import java.util.Map;
  * @author mrieser
  */
 public final class CadytsBuilderImpl {
-	private static Logger log = Logger.getLogger( CadytsBuilderImpl.class ) ;
+	private static final  Logger log = Logger.getLogger( CadytsBuilderImpl.class );
 
 	private CadytsBuilderImpl(){} // do not instantiate
 

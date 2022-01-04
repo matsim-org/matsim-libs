@@ -27,13 +27,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
-import javax.inject.Inject;
 
 /**
  * @author cdobler
@@ -50,6 +49,7 @@ public final class ParallelEventsManager implements EventsManager {
 	private final int numOfThreads;
 	private final ExceptionHandler uncaughtExceptionHandler;
 	private int iteration = 0;
+	private boolean init = false;
 	private final BlockingQueue<EventArray> eventQueue;
 
 	private final int eventsQueueSize;
@@ -79,7 +79,7 @@ public final class ParallelEventsManager implements EventsManager {
 		this.syncOnTimeSteps = syncOnTimeSteps;
 		this.oneThreadPerHandler = oneThreadPerHandler;
 		this.numOfThreads = numOfThreads;
-		this.eventsHandlers = new ArrayList<EventHandler>();
+		this.eventsHandlers = new ArrayList<>();
 		this.eventsArraySize = syncOnTimeSteps ? 512 : 32768;
 		this.eventsQueueSize = eventsQueueSize;
 		this.eventQueue = new ArrayBlockingQueue<>(eventsQueueSize);
@@ -127,6 +127,7 @@ public final class ParallelEventsManager implements EventsManager {
 		this.distributor.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 		this.distributor.setName("EventsDistributor");
 		this.distributor.start();
+		this.init = true;
 	}
 
 	private void teardown() {
@@ -138,24 +139,41 @@ public final class ParallelEventsManager implements EventsManager {
 			distributor.interrupt();
 			distributor.join();
 		} catch (InterruptedException e) {
-			throw new RuntimeException("Exception while waiting on join..." + e.getMessage());
+			throw new RuntimeException("Exception while waiting on join...", e);
 		}
+		this.init = false;
 
 	}
 
 	@Override
 	public void processEvent(final Event event) {
+		if (!init) throw new IllegalStateException(".initProcessing() has to be called before processing events!");
+
 		EventArray array = new EventArray(1);
 		array.add(event);
-		this.eventQueue.add(array);
+		try {
+			this.eventQueue.put(array);
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Exception while adding event.", e);
+		}
 	}
 
+	@Override
 	public void processEvents(final EventArray events) {
-		this.eventQueue.add(events);
+		if (!init) throw new IllegalStateException(".initProcessing() has to be called before processing events!");
+
+		try {
+			this.eventQueue.put(events);
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Exception while adding event.", e);
+		}
 	}
 
 	@Override
 	public void addHandler(final EventHandler handler) {
+		if (init)
+			throw new IllegalStateException("Handlers can not be added after .initProcessing() was called!");
+
 		// this will be used the next time we start an iteration
 		this.eventsHandlers.add(handler);
 	}

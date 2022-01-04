@@ -27,21 +27,8 @@ import org.matsim.core.controler.MatsimServices;
  *
  * @author dgrether
  */
-public final class IterationEndsEvent extends ControlerEvent {
-
-	/**
-	 * The iteration number
-	 */
-	private final int iteration;
-
-	public IterationEndsEvent(final MatsimServices controler, final int iteration) {
-		super(controler);
-		this.iteration = iteration;
-	}
-	/**
-	 * @return the number of the finished iteration
-	 */
-	public int getIteration() {
-		return this.iteration;
+public final class IterationEndsEvent extends AbstractIterationEvent {
+	public IterationEndsEvent(MatsimServices services, int iteration, boolean isLastIteration) {
+		super(services, iteration, isLastIteration);
 	}
 }

@@ -55,7 +55,6 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);
 	
 	private final EventsManager eventsManager;
-	private final int lastIteration;
 	private List<EventWriter> eventWriters = new LinkedList<>();
 
 	private int writeEventsInterval;
@@ -73,7 +72,6 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 			final OutputDirectoryHierarchy controlerIO) {
 		this.eventsManager = eventsManager;
 		this.writeEventsInterval = config.getWriteEventsInterval();
-		this.lastIteration = config.getLastIteration() ;
 		this.eventsFileFormats = config.getEventsFileFormats();
 		this.controlerIO = controlerIO;
 		this.writeMoreUntilIteration = config.getWriteEventsUntilIteration() ;
@@ -86,7 +84,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 		final boolean regularWriteEvents = writingEventsAtAll && ( event.getIteration()>0 && event.getIteration() % writeEventsInterval == 0 ) ;
 		// (w/o the "writingEventsAtAll && ..." this is a division by zero when writeEventsInterval=0. kai, apr'18)
 		final boolean earlyIteration = event.getIteration() <= writeMoreUntilIteration ;
-		final boolean lastIteration = event.getIteration()==this.lastIteration ;
+		final boolean lastIteration = event.isLastIteration();
 		if (writingEventsAtAll && (regularWriteEvents||earlyIteration || lastIteration ) ) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {

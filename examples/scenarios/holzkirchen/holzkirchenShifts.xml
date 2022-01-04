@@ -1,0 +1,92 @@
+<shifts>
+    <shift id="0" start="14400" end="45000">
+        <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
+    </shift>
+    <shift id="1" start="14400" end="45000">
+        <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
+    </shift>
+    <shift id="2" start="14400" end="45000">
+        <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
+    </shift>
+    <shift id="3" start="14400" end="45000">
+        <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
+    </shift>
+    <shift id="4" start="14400" end="45000">
+        <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
+    </shift>
+    <shift id="5" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="6" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="7" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="8" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="9" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="10" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="11" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="12" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="13" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="14" start="21600" end="52200">
+        <break earliestStart="36000.0" latestEnd="39600.0" duration="1800.0"/>
+    </shift>
+    <shift id="15" start="50400" end="81000">
+        <break earliestStart="64800.0" latestEnd="68400.0" duration="1800.0"/>
+    </shift>
+    <shift id="16" start="50400" end="81000">
+        <break earliestStart="64800.0" latestEnd="68400.0" duration="1800.0"/>
+    </shift>
+    <shift id="17" start="50400" end="81000">
+        <break earliestStart="64800.0" latestEnd="68400.0" duration="1800.0"/>
+    </shift>
+    <shift id="18" start="50400" end="81000">
+        <break earliestStart="64800.0" latestEnd="68400.0" duration="1800.0"/>
+    </shift>
+    <shift id="19" start="50400" end="81000">
+        <break earliestStart="64800.0" latestEnd="68400.0" duration="1800.0"/>
+    </shift>
+    <shift id="20" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="21" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="22" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="23" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="24" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="25" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="26" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="27" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="28" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+    <shift id="29" start="57600" end="86400">
+        <break earliestStart="72000.0" latestEnd="75600.0" duration="1800.0"/>
+    </shift>
+</shifts>

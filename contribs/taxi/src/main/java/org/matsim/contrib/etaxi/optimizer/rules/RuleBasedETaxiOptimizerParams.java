@@ -19,15 +19,15 @@
 
 package org.matsim.contrib.etaxi.optimizer.rules;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Positive;
 
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.core.config.ConfigGroup;
 
 public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerParams {
-	public static final String SET_NAME = RuleBasedETaxiOptimizer.class.getName();
+	public static final String SET_NAME = "RuleBasedETaxiOptimizer";
 
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
 	static final String MIN_RELATIVE_SOC_EXP = "Taxis with SOC below this level are considered undercharged"
@@ -69,7 +69,7 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 		super.addParameterSet(set);
 	}
 
-	RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
+	public RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
 		return ruleBasedTaxiOptimizerParams;
 	}
 

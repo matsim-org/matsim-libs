@@ -25,6 +25,7 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 /**
  * Created by amit on 16.05.17.
@@ -44,6 +45,7 @@ public class PrepareForSimUtils {
                         install(new TravelDisutilityModule());
                         install(new TravelTimeCalculatorModule());
                         install(new DefaultPrepareForSimModule());
+                        install(new TimeInterpretationModule());
                     }
                 });
         return injector.getInstance(PrepareForSim.class);

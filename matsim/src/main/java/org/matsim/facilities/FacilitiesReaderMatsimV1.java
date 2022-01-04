@@ -44,7 +44,7 @@ import org.xml.sax.Attributes;
  * @author balmermi
  */
 final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
-    private static Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
+    private static final  Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";

@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Memory-optimized map, backed by two simple arrays, for storing a <b>small</b> number of entries.
+ * Memory-optimized map, backed by a simple array, for storing a <b>small</b> number of entries.
  * Many operations (like {@link #get(Object)}) have a runtime of <code>O(n)</code>, so this map implementation
  * should only be used to store a small number of elements in it. But for small number of elements,
  * this implementation performs very well, especially because of its very low memory overhead.

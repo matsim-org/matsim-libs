@@ -12,6 +12,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [accessibility](accessibility/README.md) | Measuring accessibility in policy evaluation
 | accidents |
 | [analysis](analysis/README.md) |  Collection of matsim analysis tools
+| [application](application/README.md) | Build MATSim scenarios with preparation and analysis pipelines
 | [av](av/README.md) | Automated (autonomous) vehicle contrib
 | bicycle |
 | [cadytsIntegration](cadytsIntegration/README.md) | Calibration of dynamics traffic simulations
@@ -41,5 +42,6 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [roadpricing](roadpricing/README.md) | Functionality to simulate different road-pricing scenarios in MATSim
 | [signals](signals/README.md) | Simulate traffic lights microscopically
 | [socnetsim](socnetsim/README.md) | Social network simulation
+| [sumo](sumo/README.md) | Converter and integrations for [SUMO](https://sumo.dlr.de/])
 | [taxi](taxi/README.md) | Taxi service functionality
 | vsp |

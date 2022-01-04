@@ -23,7 +23,7 @@ package org.matsim.contrib.dvrp.fleet;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.util.SpecificationContainer;
+import org.matsim.contrib.common.collections.SpecificationContainer;
 
 /**
  * @author Michal Maciejewski (michalm)

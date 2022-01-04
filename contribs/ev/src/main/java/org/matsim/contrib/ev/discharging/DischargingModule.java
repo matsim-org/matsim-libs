@@ -39,7 +39,10 @@ public class DischargingModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				this.bind(DriveDischargingHandler.class).asEagerSingleton();
+				addMobsimScopeEventHandlerBinding().to(DriveDischargingHandler.class);
+
 				this.bind(AuxDischargingHandler.class).asEagerSingleton();
+				addMobsimScopeEventHandlerBinding().to(AuxDischargingHandler.class);
 				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 
 				//by default, no vehicle will be AUX-discharged when not moving

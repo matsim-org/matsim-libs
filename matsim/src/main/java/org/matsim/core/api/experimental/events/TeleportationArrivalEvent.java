@@ -19,12 +19,12 @@
 
 package org.matsim.core.api.experimental.events;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
-
-import java.util.Map;
 
 /**
  * This is similar to the VehicleArrival and PersonArrival events.
@@ -46,28 +46,32 @@ public final class TeleportationArrivalEvent extends Event implements HasPersonI
         super(time);
         this.agentId = agentId;
         this.distance = distance;
-        this.mode = mode;
-    }
+		this.mode = mode;
+	}
 
-    public Id<Person> getPersonId() {
-    	return agentId;
-    }
-    
-    public double getDistance() {
-    	return distance;
-    }
-    
-    @Override
-    public String getEventType() {
-        return EVENT_TYPE;
-    }
+	public Id<Person> getPersonId() {
+		return agentId;
+	}
 
-    @Override
-    public Map<String, String> getAttributes() {
-        Map<String, String> attributes = super.getAttributes();
-//        attributes.put(ATTRIBUTE_PERSON, agentId.toString()); // done in super-class
-        attributes.put(ATTRIBUTE_DISTANCE, Double.toString(distance));
-        attributes.put(ATTRIBUTE_MODE, mode);
+	public double getDistance() {
+		return distance;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attributes = super.getAttributes();
+		//        attributes.put(ATTRIBUTE_PERSON, agentId.toString()); // done in super-class
+		attributes.put(ATTRIBUTE_DISTANCE, Double.toString(distance));
+		attributes.put(ATTRIBUTE_MODE, mode);
         return attributes;
     }
 }

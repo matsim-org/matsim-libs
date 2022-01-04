@@ -48,7 +48,7 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testDeparturesMiscModes() {
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -63,15 +63,15 @@ public class LegHistogramTest extends MatsimTestCase {
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTimeUndefined();
 		LegHistogram histo = new LegHistogram(5*60);
-		histo.handleEvent(new PersonDepartureEvent(7*3600, person1Id, linkId, leg.getMode()));
-		histo.handleEvent(new PersonDepartureEvent(7*3600 + 6*60, person2Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600, person1Id, linkId, leg.getMode(), leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600 + 6*60, person2Id, linkId, leg.getMode(), leg.getMode()));
 		leg.setMode(TransportMode.bike);
-		histo.handleEvent(new PersonDepartureEvent(7*3600 + 6*60, person1Id, linkId, leg.getMode()));
-		histo.handleEvent(new PersonDepartureEvent(7*3600 + 10*60, person2Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600 + 6*60, person1Id, linkId, leg.getMode(), leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600 + 10*60, person2Id, linkId, leg.getMode(), leg.getMode()));
 		leg.setMode("undefined");
-		histo.handleEvent(new PersonDepartureEvent(7*3600 + 10*60, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600 + 10*60, person1Id, linkId, leg.getMode(), leg.getMode()));
 		leg.setMode("undefined");
-		histo.handleEvent(new PersonDepartureEvent(7*3600 + 16*60, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600 + 16*60, person1Id, linkId, leg.getMode(), leg.getMode()));
 
 		int[] carDepartures = histo.getDepartures(TransportMode.car);
 		int[] bikeDepartures = histo.getDepartures(TransportMode.bike);
@@ -100,8 +100,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * do not lead to an exception.
 	 */
 	public void testNofBins() {
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -118,13 +118,13 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		assertEquals(11, histo.getDepartures().length);
 
-		histo.handleEvent(new PersonDepartureEvent(2700, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(2700, person1Id, linkId, leg.getMode(), leg.getMode()));
 		histo.handleEvent(new PersonArrivalEvent(2999, person1Id, linkId, leg.getMode()));
 		leg.setMode("train");
-		histo.handleEvent(new PersonDepartureEvent(3000, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(3000, person1Id, linkId, leg.getMode(), leg.getMode()));
 		histo.handleEvent(new PersonArrivalEvent(3001, person1Id, linkId, leg.getMode()));
 		leg.setMode("bus");
-		histo.handleEvent(new PersonDepartureEvent(3600, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(3600, person1Id, linkId, leg.getMode(), leg.getMode()));
 		histo.handleEvent(new PersonArrivalEvent(7200, person1Id, linkId, leg.getMode()));
 
 		assertEquals(1, histo.getDepartures(TransportMode.car)[9]);
@@ -140,8 +140,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	}
 
 	public void testReset() {
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
@@ -156,10 +156,10 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		LegHistogram histo = new LegHistogram(5*60);
 
-		histo.handleEvent(new PersonDepartureEvent(7*3600, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(7*3600, person1Id, linkId, leg.getMode(), leg.getMode()));
 		histo.handleEvent(new PersonArrivalEvent(7*3600 + 6*60, person1Id, linkId, leg.getMode()));
 		leg.setMode("train");
-		histo.handleEvent(new PersonDepartureEvent(8*3600, person1Id, linkId, leg.getMode()));
+		histo.handleEvent(new PersonDepartureEvent(8*3600, person1Id, linkId, leg.getMode(), leg.getMode()));
 		histo.handleEvent(new PersonArrivalEvent(8*3600 + 11*60, person1Id, linkId, leg.getMode()));
 
 		Set<String> modes = histo.getLegModes();
