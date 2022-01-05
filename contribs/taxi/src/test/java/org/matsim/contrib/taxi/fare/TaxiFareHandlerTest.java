@@ -105,8 +105,8 @@ public class TaxiFareHandlerTest {
 	}
 
 	private Network createNetwork() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node n1 = NetworkUtils.createNode(Id.createNodeId(1), new Coord(0, 0));
+		Network network = NetworkUtils.createNetwork();
+        Node n1 = NetworkUtils.createNode(Id.createNodeId(1), new Coord(0, 0));
 		Node n2 = NetworkUtils.createNode(Id.createNodeId(2), new Coord(2000, 0));
 		Node n3 = NetworkUtils.createNode(Id.createNodeId(3), new Coord(2000, 2000));
 		Node n4 = NetworkUtils.createNode(Id.createNodeId(4), new Coord(2100, 2000));

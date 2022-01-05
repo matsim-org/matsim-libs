@@ -40,8 +40,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 public class TravelTimeMatricesTest {
 	@Test
 	public void travelTimeMatrix() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
+		Network network = NetworkUtils.createNetwork();
+        Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 		Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), nodeA, nodeB, 150, 15, 20, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), nodeB, nodeA, 300, 15, 40, 1);
@@ -60,8 +60,8 @@ public class TravelTimeMatricesTest {
 
 	@Test
 	public void travelTimeSparseMatrix() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
-		Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
+        Network network = NetworkUtils.createNetwork();
+        Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 		Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 		Node nodeC = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), new Coord(-150, -150));
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), nodeA, nodeB, 150, 15, 20, 1);

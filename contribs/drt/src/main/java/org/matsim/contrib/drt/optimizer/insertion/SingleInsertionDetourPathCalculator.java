@@ -85,7 +85,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 	}
 
 	@Override
-	public DetourData<PathData> calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
+	public DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
@@ -121,8 +121,8 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 								latestDropoffTime)));
 
 		try {
-			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
-					pathsFromDropoffFuture.get(), PathData.EMPTY);
+			return new DetourPathDataCache(pathsToPickupFuture.get(), pathsFromPickupFuture.get(),
+					pathsToDropoffFuture.get(), pathsFromDropoffFuture.get(), PathData.EMPTY);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}

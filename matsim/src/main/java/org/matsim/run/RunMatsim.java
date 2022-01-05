@@ -23,19 +23,21 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 /**
- * This is currently only a substitute to the full Controler. 
+ * This is currently only a substitute to the full Controler.
+ *
+ * This class is deprecated. Use {@link org.matsim.core.controler.Controler} instead
  *
  * @author mrieser
  */
-public class Controler {
+public class RunMatsim {
 
 	private final org.matsim.core.controler.Controler controler;
 	
-	public Controler(final String[] args) {
+	public RunMatsim(final String[] args) {
 		this.controler = new org.matsim.core.controler.Controler(args);
 	}
 	
-	public Controler(final String configFilename) {
+	public RunMatsim(final String configFilename) {
 		this.controler = new org.matsim.core.controler.Controler(configFilename);
 	}
 	
@@ -55,6 +57,6 @@ public class Controler {
 	}
 	
 	public  static void main(String[] args) {
-		new Controler(args).run();
+		new RunMatsim(args).run();
 	}
 }

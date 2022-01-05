@@ -187,7 +187,7 @@ public class SpeedyGraphTest {
              *   (5)==================(6)
              */
 
-            this.network = NetworkUtils.createTimeInvariantNetwork();
+            this.network = NetworkUtils.createNetwork();
             NetworkFactory nf = this.network.getFactory();
 
             this.node1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 1000));

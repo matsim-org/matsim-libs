@@ -305,8 +305,8 @@ public class TeleAtlas2Network {
 //		str = str.trim();
 //		args = str.split(" ");
 
-		network = NetworkUtils.createTimeInvariantNetwork();
-		parseArguments(args);
+		network = NetworkUtils.createNetwork();
+        parseArguments(args);
 		convert();
 		// TODO balmermi: more options
 		// transform // -t WGS84toCH1903LV03

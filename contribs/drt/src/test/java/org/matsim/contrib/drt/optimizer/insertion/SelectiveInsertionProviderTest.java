@@ -23,7 +23,8 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,8 +35,8 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -71,37 +72,24 @@ public class SelectiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var insertion1 = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
-		var insertion2 = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
+		var insertionWithDetourData = new InsertionWithDetourData<>(new Insertion(vehicleEntry, null, null),
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN));
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(
-				List.of(insertionWithDetourData(insertion1), insertionWithDetourData(insertion2)));
-
-		//init restrictiveDetourTimeEstimator
-		DetourTimeEstimator restrictiveDetourTimeEstimator = (from, to) -> 987.;
+				List.of(insertionWithDetourData));
 
 		//mock initialInsertionFinder
-		var selectedInsertion = oneSelected ? Optional.of(insertion1) : Optional.<Insertion>empty();
-		var selectedInsertionWithDetourData = selectedInsertion.map(
-				new DetourData<>(l -> 987., l -> 987., l -> 987., l -> 987., 0.)::createInsertionWithDetourData);
+		var selectedInsertion = oneSelected ?
+				Optional.of(insertionWithDetourData) :
+				Optional.<InsertionWithDetourData<Double>>empty();
 		when(initialInsertionFinder.findBestInsertion(eq(request),
-				argThat(argument -> argument.map(InsertionWithDetourData::getInsertion)
-						.collect(toSet())
-						.equals(Set.of(insertion1, insertion2)))))//
-				.thenReturn(selectedInsertionWithDetourData);
+				argThat(argument -> argument.collect(toSet()).equals(Set.of(insertionWithDetourData)))))//
+				.thenReturn(selectedInsertion);
 
 		//test insertionProvider
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder, insertionGenerator,
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(
-				selectedInsertion.stream().collect(toList()));
-	}
-
-	private InsertionGenerator.InsertionPoint insertionPoint() {
-		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
-	}
-
-	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
-		return new InsertionWithDetourData<>(insertion, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+				selectedInsertion.stream().map(InsertionWithDetourData::getInsertion).collect(toList()));
 	}
 }

@@ -118,7 +118,7 @@ public class EquiDistAgentSnapshotInfoBuilderTest {
                 Id.createLinkId(1),
                 NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
                 NetworkUtils.createNode(Id.createNodeId(2), toCoord),
-                NetworkUtils.createTimeInvariantNetwork(),
+                NetworkUtils.createNetwork(),
                 linkLength,
                 freespeed,
                 linkCapacity,

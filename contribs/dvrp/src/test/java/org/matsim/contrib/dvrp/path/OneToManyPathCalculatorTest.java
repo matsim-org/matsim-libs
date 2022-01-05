@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableList;
  * @author Michal Maciejewski (michalm)
  */
 public class OneToManyPathCalculatorTest {
-	private final Network network = NetworkUtils.createTimeInvariantNetwork();
+	private final Network network = NetworkUtils.createNetwork();
 
 	private final Node nodeA = createAndAddNode("A", new Coord(0, 0));
 	private final Node nodeB = createAndAddNode("B", new Coord(150, 0));
