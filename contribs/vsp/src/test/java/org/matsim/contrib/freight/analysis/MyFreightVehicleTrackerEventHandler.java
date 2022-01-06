@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
  class MyFreightVehicleTrackerEventHandler implements ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
@@ -40,6 +41,16 @@ import org.matsim.vehicles.Vehicles;
 		 this.network = network;
 		 this.carriers = carriers;
 		 this.vehicles = vehicles;
+		 this.init();
+	 }
+
+	 private void init() {
+		 for (Vehicle vehicle : vehicles.getVehicles().values()) {
+			 String vehicleIdString = vehicle.getId().toString();
+			 if (vehicle.getId().toString().contains("freight")) {
+				 vehicleTracking.addTracker(vehicle);
+			 }
+		 }
 	 }
 
 	 @Override
@@ -52,7 +63,7 @@ import org.matsim.vehicles.Vehicles;
 	 // link events are used to calculate vehicle travel time and distance
 	 @Override
 	 public void handleEvent(LinkEnterEvent linkEnterEvent) {
-		 vehicleTracking.trackLinkEnterEvent(linkEnterEvent);
+	 	vehicleTracking.trackLinkEnterEvent(linkEnterEvent);
 	 }
 
 	 @Override
@@ -68,10 +79,10 @@ import org.matsim.vehicles.Vehicles;
 
 	 @Override
 	 public void handleEvent(PersonLeavesVehicleEvent event) {
-		 vehicleTracking.registerVehicleLeave(event);
+	 	vehicleTracking.registerVehicleLeave(event);
 	 }
 
 	 public FreightAnalysisVehicleTracking getVehicleTracking() {
-		 return vehicleTracking;
+	 	return vehicleTracking;
 	 }
  }
