@@ -12,6 +12,7 @@ import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraRequest;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraStop;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraVehicle;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraStop.StopType;
+import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -22,11 +23,8 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.StayTaskEndTimeCalculator;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -40,10 +38,10 @@ import com.google.common.base.Verify;
  * Alonso-Mora algorithm into a DVRP schedule for a vehicle. Optionally,
  * operational tasks are extracted from the current vehicle plan and inserted
  * back in after reconstructing the pickups and dropoffs.
- * 
+ *
  * Note that RouteTracker pre-computes everything that is scheduled here exactly
  * by the second if free-flow conditions are imposed.
- * 
+ *
  * @author sebhoerl
  */
 public class DefaultAlonsoMoraScheduler implements AlonsoMoraScheduler {
@@ -442,6 +440,13 @@ public class DefaultAlonsoMoraScheduler implements AlonsoMoraScheduler {
 
 		if (currentTask instanceof DrtStayTask) {
 			currentTask.setEndTime(Math.max(currentTask.getEndTime(), vehicle.getVehicle().getServiceEndTime()));
+		}else if(currentTask instanceof WaitForShiftStayTask)  {
+			if(currentTask.getEndTime() == now) {
+				//if the shift just started, re-create the stay task
+				StayTask stayTask = taskFactory.createStayTask(dvrpVehicle, currentTask.getEndTime(),
+						Math.max(currentTask.getEndTime(), vehicle.getVehicle().getServiceEndTime()), currentLink);
+				schedule.addTask(stayTask);
+			}
 		} else {
 			StayTask stayTask = taskFactory.createStayTask(dvrpVehicle, currentTask.getEndTime(),
 					Math.max(currentTask.getEndTime(), vehicle.getVehicle().getServiceEndTime()), currentLink);

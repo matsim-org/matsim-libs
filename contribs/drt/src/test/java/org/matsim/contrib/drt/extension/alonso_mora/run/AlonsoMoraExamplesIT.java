@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup;
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigurator;
 import org.matsim.contrib.drt.extension.alonso_mora.MultiModeAlonsoMoraConfigGroup;
+import org.matsim.contrib.drt.extension.alonso_mora.shifts.ShiftAlonsoMoraModule;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.*;
 import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtModeModule;
@@ -222,14 +223,15 @@ public class AlonsoMoraExamplesIT {
 		});
 
 		AlonsoMoraConfigurator.configure(controller, amConfig.getMode());
+		controller.addOverridingQSimModule(new ShiftAlonsoMoraModule(drtConfig, shiftDrtConfigGroup));
 		controller.run();
 
 		var expectedStats = Stats.newBuilder() //
-				.rejectionRate(0.2) //
-				.rejections(78) //
-				.waitAverage(215.88) //
-				.inVehicleTravelTimeMean(347.02) //
-				.totalTravelTimeMean(562.9) //
+				.rejectionRate(0.85) //
+				.rejections(329) //
+				.waitAverage(276.39) //
+				.inVehicleTravelTimeMean(391.73) //
+				.totalTravelTimeMean(668.12) //
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
