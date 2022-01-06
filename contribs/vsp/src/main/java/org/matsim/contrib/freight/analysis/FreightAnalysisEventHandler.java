@@ -187,7 +187,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 	// ##################################################
 	// ########         Export methods           ########
-    // ##################################################
+	// ##################################################
 
 	// Export vehicle Statistics to single TSV
 //	public void exportVehicleInfo(String path){
