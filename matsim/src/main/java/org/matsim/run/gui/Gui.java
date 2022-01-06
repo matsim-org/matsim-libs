@@ -27,7 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.run.Controler;
+import org.matsim.run.RunMatsim;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -566,7 +566,7 @@ public class Gui extends JFrame {
 
 	public static void main(String[] args) {
 		Preconditions.checkArgument(args.length < 2);
-		Gui.show("MATSim", Controler.class, args.length == 1 ? new File(args[0]) : null);
+		Gui.show("MATSim", RunMatsim.class, args.length == 1 ? new File(args[0]) : null);
 	}
 
 	// Is it a problem to make the following available to the outside?  If so, why?  Would it

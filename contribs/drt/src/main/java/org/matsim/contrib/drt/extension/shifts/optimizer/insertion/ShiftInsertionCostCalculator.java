@@ -3,6 +3,9 @@ package org.matsim.contrib.drt.extension.shifts.optimizer.insertion;
 import java.util.List;
 import java.util.function.ToDoubleFunction;
 
+import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
+import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
@@ -16,9 +19,6 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
-import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -56,8 +56,8 @@ public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
-		if (!checkShiftTimeConstraintsForScheduledRequests(insertion.getInsertion(), detourTimeInfo.pickupTimeLoss,
-				detourTimeInfo.getTotalTimeLoss())) {
+		if (!checkShiftTimeConstraintsForScheduledRequests(insertion.getInsertion(),
+				detourTimeInfo.pickupDetourInfo.pickupTimeLoss, detourTimeInfo.getTotalTimeLoss())) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 		return defaultInsertionCostCalculator.calculate(drtRequest, insertion);

@@ -19,15 +19,15 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import static org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
-
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -49,10 +49,13 @@ final class DrtLeg {
 	final double unsharedTimeEstimate_m;
 	final double arrivalTime;
 	final double fare;
-
-	DrtLeg(PerformedRequestEventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
+	final double latestDepartureTime;
+	final double latestArrivalTime;
+	
+	DrtLeg(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
 		Preconditions.checkArgument(sequence.isCompleted());
 		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
+		PersonDepartureEvent departedEvent = sequence.getDeparted().get();
 		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();
 		this.request = submittedEvent.getRequestId();
 		this.departureTime = submittedEvent.getTime();
@@ -62,11 +65,13 @@ final class DrtLeg {
 		this.fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
 		this.toLink = submittedEvent.getToLinkId();
 		this.toCoord = linkProvider.apply(toLink).getToNode().getCoord();
-		this.waitTime = pickedUpEvent.getTime() - submittedEvent.getTime();
+		this.waitTime = pickedUpEvent.getTime() - departedEvent.getTime();
 		this.unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
 		this.arrivalTime = sequence.getDroppedOff().get().getTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
 		this.fare = sequence.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+		this.latestDepartureTime = sequence.getSubmitted().getLatestPickupTime();
+		this.latestArrivalTime = sequence.getSubmitted().getLatestDropoffTime();
 	}
 }

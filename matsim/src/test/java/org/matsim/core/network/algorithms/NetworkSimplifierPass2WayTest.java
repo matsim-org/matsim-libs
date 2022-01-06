@@ -132,7 +132,7 @@ public class NetworkSimplifierPass2WayTest {
     }
 
     private Network reshuffleNodesAndReturnNetwork(List<Node> nodes) {
-        Network network = NetworkUtils.createTimeInvariantNetwork();
+        Network network = NetworkUtils.createNetwork();
         Collections.shuffle(nodes);
         for (Node n : nodes) {
             System.out.println("Adding node "+ n.getId());

@@ -43,7 +43,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
  * @author Michal Maciejewski (michalm)
  */
 public class SpeedyMultiSourceALTBackwardTest {
-	private final Network network = NetworkUtils.createTimeInvariantNetwork();
+	private final Network network = NetworkUtils.createNetwork();
 
 	// single-direction links (from right to left, e.g. B->A, but not A->B)
 	//

@@ -40,13 +40,13 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.PerformedRequestEventSequence;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
-import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -106,7 +106,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		List<DrtLeg> legs = drtEventSequenceCollector.getPerformedRequestSequences()
 				.values()
 				.stream()
-				.filter(PerformedRequestEventSequence::isCompleted)
+				.filter(EventSequence::isCompleted)
 				.map(sequence -> new DrtLeg(sequence, network.getLinks()::get))
 				.sorted(Comparator.comparing(leg -> leg.departureTime))
 				.collect(toList());
@@ -169,7 +169,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					"travelTime",//
 					"travelDistance_m",//
 					"directTravelDistance_m",//
-					"fareForLeg");
+					"fareForLeg", //
+					"latestDepartureTime", //
+					"latestArrivalTime");
 
 			DrtLegsAnalyser.collection2Text(legs, filename(event, "drt_legs", ".csv"), header, leg -> String.join(";",//
 					(Double)leg.departureTime + "",//
@@ -186,14 +188,17 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					(leg.arrivalTime - leg.departureTime - leg.waitTime) + "",//
 					format.format(drtVehicleStats.getTravelDistances().get(leg.request)),//
 					format.format(leg.unsharedDistanceEstimate_m),//
-					format.format(leg.fare)));
+					format.format(leg.fare), //
+					format.format(leg.latestDepartureTime), //
+					format.format(leg.latestArrivalTime)));
 		}
 		DrtLegsAnalyser.writeVehicleDistances(drtVehicleStats.getVehicleStates(),
 				filename(event, "vehicleDistanceStats", ".csv"));
 		DrtLegsAnalyser.analyseDetours(network, legs, drtVehicleStats.getTravelDistances(), drtCfg,
 				filename(event, "drt_detours"), createGraphs);
 		DrtLegsAnalyser.analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs);
-
+		DrtLegsAnalyser.analyseConstraints(filename(event, "constraints"), legs, createGraphs);
+		
 		double endTime = qSimCfg.getEndTime()
 				.orElseGet(() -> legs.isEmpty() ?
 						qSimCfg.getStartTime().orElse(0) :
@@ -251,7 +256,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv")) {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
-				bw.write("runId;iteration;");
+				bw.write("runId;iteration");
 				for (int i = 0; i <= maxcap; i++) {
 					bw.write(";" + i + " pax distance_m");
 				}
@@ -265,16 +270,16 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	}
 
 	public void writeAndPlotWaitTimeEstimateComparison(
-			Collection<PerformedRequestEventSequence> performedRequestEventSequences, String plotFileName,
+			Collection<EventSequence> performedRequestEventSequences, String plotFileName,
 			String textFileName, boolean createChart) {
 		try (var bw = IOUtils.getBufferedWriter(textFileName)) {
 			XYSeries times = new XYSeries("waittimes", true, true);
 
 			bw.append(line("RequestId", "actualWaitTime", "estimatedWaitTime", "deviate"));
-			for (PerformedRequestEventSequence seq : performedRequestEventSequences) {
+			for (EventSequence seq : performedRequestEventSequences) {
 				if (seq.getPickedUp().isPresent()) {
 					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-					double estimatedWaitTime = seq.getScheduled().getPickupTime() - seq.getSubmitted().getTime();
+					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getTime();
 					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime,
 							actualWaitTime - estimatedWaitTime));
 					times.add(actualWaitTime, estimatedWaitTime);

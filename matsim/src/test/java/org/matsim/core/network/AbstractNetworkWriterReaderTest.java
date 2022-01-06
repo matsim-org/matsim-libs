@@ -137,7 +137,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	public void testNodes_IdSpecialCharacters() {
-		Network network1 = NetworkUtils.createTimeInvariantNetwork();
+		Network network1 = NetworkUtils.createNetwork();
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
 		Node nodeB1 = nf.createNode(Id.create("B & 1 <b>\"'bb", Node.class), new Coord(100, 200));
@@ -155,7 +155,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	public void testLinks_IdSpecialCharacters() {
-		Network network1 = NetworkUtils.createTimeInvariantNetwork();
+		Network network1 = NetworkUtils.createNetwork();
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("A & 1 <a>\"'aa", Node.class), new Coord(100, 200));
 		Node nodeB1 = nf.createNode(Id.create("B & 1 <b>\"'bb", Node.class), new Coord(100, 200));
@@ -183,7 +183,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	public void testNetwork_NameSpecialCharacters() {
-		Network network1 = NetworkUtils.createTimeInvariantNetwork();
+		Network network1 = NetworkUtils.createNetwork();
 		network1.setName("Special & characters < are > in \" this ' name.");
 		NetworkFactory nf = network1.getFactory();
 		Node nodeA1 = nf.createNode(Id.create("1", Node.class), new Coord(100, 200));
@@ -204,7 +204,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
-		Network network1 = NetworkUtils.createTimeInvariantNetwork();
+		Network network1 = NetworkUtils.createNetwork();
 		Node n1 = NetworkUtils.createAndAddNode(network1, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode(network1, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = n1;
@@ -237,7 +237,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	private void doTestNodes(List<Node> nodes, final String filename) {
-		Network network1 = NetworkUtils.createTimeInvariantNetwork();
+		Network network1 = NetworkUtils.createNetwork();
 		for(Node n : nodes){
 			network1.addNode(n);
 		}

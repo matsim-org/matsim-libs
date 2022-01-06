@@ -260,7 +260,7 @@ public class IntersectionSimplifierTest {
 	 *                                                                         26
 	 */
 	private Network buildComplexIntersection() {
-		Network network = NetworkUtils.createTimeInvariantNetwork();
+		Network network = NetworkUtils.createNetwork();
 
 		/* Left cluster */
 		Node n01 = NetworkUtils.createAndAddNode(network, Id.createNodeId( 1), CoordUtils.createCoord(  0.0,  85.0));

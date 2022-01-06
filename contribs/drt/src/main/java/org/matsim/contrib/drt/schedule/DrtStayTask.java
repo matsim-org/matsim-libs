@@ -22,12 +22,12 @@ package org.matsim.contrib.drt.schedule;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 /**
  * @author michalm
  */
-public class DrtStayTask extends StayTask {
+public class DrtStayTask extends DefaultStayTask {
 	public static final DrtTaskType TYPE = new DrtTaskType(STAY);
 
 	public DrtStayTask(double beginTime, double endTime, Link link) {

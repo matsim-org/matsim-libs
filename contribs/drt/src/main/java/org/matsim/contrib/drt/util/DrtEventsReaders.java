@@ -25,14 +25,14 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.util.DvrpEventsReaders;
-import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
@@ -40,8 +40,8 @@ import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
 import com.google.common.collect.ImmutableMap;
 
 public final class DrtEventsReaders {
-	public static final Map<String, DrtTaskType> TASK_TYPE_MAP = List.of(DrtDriveTask.TYPE, DrtStopTask.TYPE,
-			DrtStayTask.TYPE, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, EDrtChargingTask.TYPE)
+	public static final Map<String, DrtTaskType> TASK_TYPE_MAP = List.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE,
+					DrtStayTask.TYPE, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, EDrtChargingTask.TYPE)
 			.stream()
 			.collect(toImmutableMap(DrtTaskType::name, type -> type));
 

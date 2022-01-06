@@ -1,14 +1,15 @@
 package org.matsim.contrib.drt.extension.shifts.fleet;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
-
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
  * @author nkuehnel, fzwick / MOIA
@@ -52,6 +53,11 @@ public class DefaultShiftDvrpVehicle implements ShiftDvrpVehicle {
 	@Override
 	public Schedule getSchedule() {
 		return vehicle.getSchedule();
+	}
+
+	@Override
+	public DvrpVehicleSpecification getSpecification() {
+		return vehicle.getSpecification();
 	}
 
 	@Override

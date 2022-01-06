@@ -40,8 +40,8 @@ public interface CostCalculationStrategy {
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (detourTimeInfo.departureTime > request.getLatestStartTime()
-					|| detourTimeInfo.arrivalTime > request.getLatestArrivalTime()) {
+			if (detourTimeInfo.pickupDetourInfo.departureTime > request.getLatestStartTime()
+					|| detourTimeInfo.dropoffDetourInfo.arrivalTime > request.getLatestArrivalTime()) {
 				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
 				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 			}
@@ -60,8 +60,10 @@ public interface CostCalculationStrategy {
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			double waitTimeViolation = Math.max(0, detourTimeInfo.departureTime - request.getLatestStartTime());
-			double travelTimeViolation = Math.max(0, detourTimeInfo.arrivalTime - request.getLatestArrivalTime());
+			double waitTimeViolation = Math.max(0,
+					detourTimeInfo.pickupDetourInfo.departureTime - request.getLatestStartTime());
+			double travelTimeViolation = Math.max(0,
+					detourTimeInfo.dropoffDetourInfo.arrivalTime - request.getLatestArrivalTime());
 			return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
 					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
 					+ totalTimeLoss;

@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
 import javax.annotation.Nullable;
@@ -84,7 +83,7 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 		var insertion1 = insertion.getInsertion();
 		var vEntry = insertion1.vehicleEntry;
 
-		if (vEntry.getSlackTime(insertion1.pickup.index) < detourTimeInfo.pickupTimeLoss
+		if (vEntry.getSlackTime(insertion1.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
 				|| vEntry.getSlackTime(insertion1.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
