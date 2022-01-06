@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -33,18 +34,18 @@ import org.apache.log4j.Logger;
 public final class DetourDataLogging {
 	private static final Logger log = Logger.getLogger(DetourDataLogging.class);
 
-	public static void printoutEstimatedTimes(InsertionWithDetourData<Double> data) {
+	public static void printoutEstimatedTimes(InsertionDetourData<Double> data) {
 		printoutDetour(data, Objects::toString);
 	}
 
-	public static void printoutPathTimes(InsertionWithDetourData<PathData> data) {
+	public static void printoutPathTimes(InsertionDetourData<PathData> data) {
 		printoutDetour(data, pd -> String.valueOf(pd == null ? null : pd.getTravelTime()));
 	}
 
-	public static <D> void printoutDetour(InsertionWithDetourData<D> data, Function<D, String> toString) {
-		log.info("toPickup=" + toString.apply(data.getDetourToPickup()));
-		log.info("fromPickup=" + toString.apply(data.getDetourFromPickup()));
-		log.info("toDropoff=" + toString.apply(data.getDetourToDropoff()));
-		log.info("fromDropoff=" + toString.apply(data.getDetourFromDropoff()));
+	public static <D> void printoutDetour(InsertionDetourData<D> data, Function<D, String> toString) {
+		log.info("toPickup=" + toString.apply(data.detourToPickup));
+		log.info("fromPickup=" + toString.apply(data.detourFromPickup));
+		log.info("toDropoff=" + toString.apply(data.detourToDropoff));
+		log.info("fromDropoff=" + toString.apply(data.detourFromDropoff));
 	}
 }
