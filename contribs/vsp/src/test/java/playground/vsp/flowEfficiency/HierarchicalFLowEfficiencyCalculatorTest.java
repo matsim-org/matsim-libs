@@ -156,18 +156,18 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 							.build());
 				}
 				bindModal(FleetSpecification.class).toInstance(fleet);
+
+				//it is important to bind dvrp vehicle type after installing drt modules (since we use overriding)
+				//whenver MATSim does not allow for overriding any more (which is planned for rather far away future), this script will need to get adjusted.
+				bindModal(VehicleType.class).toInstance(dvrpVehType);
 			}
 		});
 
 		handler = new FlowEfficiencyHandler();
 
-		//it is important to bind dvrp vehicle type after installing drt modules (since we use overriding)
-		//whenver MATSim does not allow for overriding any more (which is planned for rather far away future), this script will need to get adjusted.
-		controler.addOverridingModule(new AbstractModule() {
+	controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
-						.toInstance(dvrpVehType);
 				addEventHandlerBinding().toInstance(handler);
 			}
 		});
