@@ -20,18 +20,19 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
-import java.net.URL;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
+import java.net.URL;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -96,5 +97,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 				getter -> new FleetControlerListener(getMode(), getter.get(OutputDirectoryHierarchy.class),
 						getter.getModal(FleetSpecification.class)))).in(Singleton.class);
 		addControlerListenerBinding().to(modalKey(FleetControlerListener.class));
+
+		bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
 	}
 }

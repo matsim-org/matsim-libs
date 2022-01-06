@@ -66,6 +66,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Singleton;
 
 import junit.framework.Assert;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author Sebastian Hörl (sebhoerl)
@@ -290,6 +292,8 @@ public class DiversionTest {
 			bindModal(Fleet.class).toProvider(modalProvider(getter -> {
 				return Fleets.createDefaultFleet(fleetSpecification, getter.getModal(Network.class).getLinks()::get);
 			})).in(Singleton.class);
+
+			bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
 
 			install(new VrpAgentSourceQSimModule(getMode()));
 

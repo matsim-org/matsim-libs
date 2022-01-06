@@ -44,15 +44,11 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 			@Inject
 			private QSim qSim;
 
-			@Inject
-			@Named(DVRP_VEHICLE_TYPE)
-			private VehicleType vehicleType;
-
 			@Override
 			public VrpAgentSource get() {
 				return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
 						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), getMode(), qSim,
-						vehicleType);
+						getModalInstance(VehicleType.class));
 			}
 		});
 	}
