@@ -85,7 +85,7 @@ public class RunFreightAnalysisIT {
 		File vehiclesFile = new File(inputPath + "/output_allVehicles.xml.gz");
 		File eventsFile = new File(inputPath + "/output_events.xml.gz");
 
-		Network network = NetworkUtils.readTimeInvariantNetwork(networkFile.getAbsolutePath());
+		Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers).readFile(carrierFile.getAbsolutePath());
@@ -210,7 +210,7 @@ public class RunFreightAnalysisIT {
 		File vehiclesFile = new File(inputPath + "/output_allVehicles.xml.gz");
 		File eventsFile = new File(inputPath + "/output_events.xml.gz");
 
-		Network network = NetworkUtils.readTimeInvariantNetwork(networkFile.getAbsolutePath());
+		Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers).readFile(carrierFile.getAbsolutePath());
