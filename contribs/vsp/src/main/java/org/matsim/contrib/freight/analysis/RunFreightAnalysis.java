@@ -48,7 +48,7 @@ public class RunFreightAnalysis {
         this.outputPath = outputPath;
     }
 
-    void runAnalysis(){
+    public void runAnalysis(){
        File networkFile = new File(inputPath + "/output_network.xml.gz");
        File carrierFile = new File(inputPath + "/output_carriers.xml");
        File vehiclesFile = new File(inputPath + "/output_allVehicles.xml.gz");
