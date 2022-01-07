@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.schedule;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -41,8 +42,8 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-														 Link link, double latestArrivalTime, OperationFacility facility) {
-        return new ShiftChangeoverTaskImpl(beginTime, endTime, link, latestArrivalTime, facility);
+														 Link link, DrtShift shift, OperationFacility facility) {
+        return new ShiftChangeoverTaskImpl(beginTime, endTime, link, shift, facility);
     }
 
     @Override
