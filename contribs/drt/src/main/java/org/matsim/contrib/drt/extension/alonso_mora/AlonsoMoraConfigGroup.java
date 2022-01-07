@@ -210,6 +210,22 @@ public class AlonsoMoraConfigGroup extends ReflectiveConfigGroup {
 		this.insertionStartOccupancy = value;
 	}
 
+	private final static String CANDIDATE_VEHICLES_PER_REQUEST = "candidateVehiclesPerRequest";
+	private final static String CANDIDATE_VEHICLES_PER_REQUEST_COMMENT = "Limits the number of request-vehicle combinations that are explored when building the trip graph (III.C in paper). If set to 0, no limit is imposed.";
+
+	@PositiveOrZero
+	private int candidateVehiclesPerRequest = 0;
+
+	@StringGetter(CANDIDATE_VEHICLES_PER_REQUEST)
+	public int getCandidateVehiclesPerRequest() {
+		return candidateVehiclesPerRequest;
+	}
+
+	@StringSetter(CANDIDATE_VEHICLES_PER_REQUEST)
+	public void setCandidateVehiclesPerRequest(int value) {
+		this.candidateVehiclesPerRequest = value;
+	}
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
@@ -231,6 +247,7 @@ public class AlonsoMoraConfigGroup extends ReflectiveConfigGroup {
 		comments.put(VIOLATION_FACTOR, VIOLATION_FACTOR_COMMENT);
 		comments.put(VIOLATION_OFFSET, VIOLATION_OFFSET_COMMENT);
 		comments.put(PREFER_NON_VIOLATION, PREFER_NON_VIOLATION_COMMENT);
+		comments.put(CANDIDATE_VEHICLES_PER_REQUEST, CANDIDATE_VEHICLES_PER_REQUEST_COMMENT);
 		return comments;
 	}
 

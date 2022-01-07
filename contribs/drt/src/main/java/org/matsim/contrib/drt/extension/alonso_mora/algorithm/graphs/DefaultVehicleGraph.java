@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraRequest;
+import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraStop.StopType;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraTrip;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraVehicle;
-import org.matsim.contrib.drt.extension.alonso_mora.algorithm.AlonsoMoraStop.StopType;
 import org.matsim.contrib.drt.extension.alonso_mora.algorithm.function.AlonsoMoraFunction;
 
 import com.google.common.base.Verify;
@@ -51,31 +51,37 @@ public class DefaultVehicleGraph implements VehicleGraph {
 
 	@Override
 	public void addRequest(AlonsoMoraRequest request, double now) {
-		Verify.verify(requests.add(request), "Request is already registered");
 		Optional<AlonsoMoraFunction.Result> unpooledResult = function.calculateRoute(Arrays.asList(request), vehicle,
 				now);
 
 		if (unpooledResult.isPresent()) {
-			trips.get(0).add(new AlonsoMoraTrip(vehicle, Arrays.asList(request), unpooledResult.get()));
-			List<AlonsoMoraTrip> currentLevelTrips = new LinkedList<>();
+			addRequest(request, now, unpooledResult.get());
+		}
+	}
 
-			for (AlonsoMoraRequest pairableRequest : requestGraph.getShareableRequests(request)) {
-				if (requests.contains(pairableRequest)) {
-					Optional<AlonsoMoraFunction.Result> pairedResult = function
-							.calculateRoute(Arrays.asList(request, pairableRequest), vehicle, now);
+	@Override
+	public void addRequest(AlonsoMoraRequest request, double now, AlonsoMoraFunction.Result unpooledResult) {
+		Verify.verify(requests.add(request), "Request is already registered");
 
-					if (pairedResult.isPresent()) {
-						AlonsoMoraTrip trip = new AlonsoMoraTrip(vehicle, Arrays.asList(request, pairableRequest),
-								pairedResult.get());
-						trips.get(1).add(trip);
-						currentLevelTrips.add(trip);
-					}
+		trips.get(0).add(new AlonsoMoraTrip(vehicle, Arrays.asList(request), unpooledResult));
+		List<AlonsoMoraTrip> currentLevelTrips = new LinkedList<>();
+
+		for (AlonsoMoraRequest pairableRequest : requestGraph.getShareableRequests(request)) {
+			if (requests.contains(pairableRequest)) {
+				Optional<AlonsoMoraFunction.Result> pairedResult = function
+						.calculateRoute(Arrays.asList(request, pairableRequest), vehicle, now);
+
+				if (pairedResult.isPresent()) {
+					AlonsoMoraTrip trip = new AlonsoMoraTrip(vehicle, Arrays.asList(request, pairableRequest),
+							pairedResult.get());
+					trips.get(1).add(trip);
+					currentLevelTrips.add(trip);
 				}
 			}
+		}
 
-			if (currentLevelTrips.size() > 0) {
-				constructTrips(currentLevelTrips, 2, now);
-			}
+		if (currentLevelTrips.size() > 0) {
+			constructTrips(currentLevelTrips, 2, now);
 		}
 	}
 
@@ -173,7 +179,7 @@ public class DefaultVehicleGraph implements VehicleGraph {
 			if (first.get(u) != second.get(u)) {
 				return false;
 			}
-		}	
+		}
 
 		return true;
 	}

@@ -312,24 +312,17 @@ public class DefaultAlonsoMoraFunction implements AlonsoMoraFunction {
 			}
 
 			boolean hasViolations = totalViolations > 0.0;
-
-			if (preferNonViolation && hasViolations && !bestHasViolations) {
-				isValid = false;
-			}
-
-			if (isValid && partialObjective > bestObjective) {
-				// We already know that there is a better solution
-
-				// But we counteract if we want to override violating solutiosn with
-				// non-violating ones, regardless of the objective value
-				boolean givePrecedence = preferNonViolation && !hasViolations && bestHasViolations;
-
-				if (!givePrecedence) {
-					isValid = false;
+			
+			if (partialObjective > bestObjective) {
+				boolean initiallyValid = isValid;
+				isValid = false; // Per default invalid because worse than the one we know
+				
+				if (initiallyValid && preferNonViolation && bestHasViolations && !hasViolations) {
+					isValid = true; // Special case: We prefer non-violating solutions even if objective is worse
 				}
 			}
 
-			if (isValid && requests.size() > 0) {
+			if (isValid && !onlyDropoff) {
 				double lastDepartureTime = tracker.getDepartureTime(stops.size() - 1);
 
 				if (lastDepartureTime > vehicle.getVehicle().getServiceEndTime()) {

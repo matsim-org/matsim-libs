@@ -46,11 +46,11 @@ public class CalculateTravelTimes {
 	static public void main(String[] args) throws ConfigurationException {
 		CommandLine cmd = new CommandLine.Builder(args) //
 				.requireOptions("population-path", "network-path", "output-path") //
-				.allowOptions("hour", "sampling-rate", "initial-speed") //
+				.allowOptions("hour", "sampling-rate", "initial-speed", "threads") //
 				.build();
 
 		Optional<Integer> hour = cmd.getOption("hour").map(Integer::parseInt);
-		double initialSpeed = cmd.getOption("initial-speed").map(Double::parseDouble).orElse(20.0 / 3.6);
+		double initialSpeed = cmd.getOption("initial-speed").map(Double::parseDouble).orElse(50.0 / 3.6);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(cmd.getOptionStrict("network-path"));
@@ -58,7 +58,6 @@ public class CalculateTravelTimes {
 
 		/* Prepare node indices */
 		List<Node> nodes = new ArrayList<>(scenario.getNetwork().getNodes().values());
-		List<Integer> nodeWeights = new ArrayList<>(Collections.nCopies(nodes.size(), 0));
 
 		int maximumIndex = nodes.stream().mapToInt(node -> node.getId().index()).max().getAsInt();
 		List<Integer> id2index = new ArrayList<>(Collections.nCopies(maximumIndex + 1, -1));
@@ -109,10 +108,6 @@ public class CalculateTravelTimes {
 					meanTravelTimes[originIndex][destinationIndex] += leg.getTravelTime().seconds();
 
 					numberOfTrips++;
-				}
-
-				if (((int) (departureTime / 3600.0)) % 24 == 0) {
-					nodeWeights.set(originIndex, nodeWeights.get(originIndex) + 1);
 				}
 			}
 
@@ -165,7 +160,8 @@ public class CalculateTravelTimes {
 
 		LeastCostPathCalculatorFactory routerFactory = new DijkstraFactory();
 
-		int numberOfThreads = Runtime.getRuntime().availableProcessors();
+		int numberOfThreads = cmd.getOption("threads").map(Integer::parseInt)
+				.orElse(Runtime.getRuntime().availableProcessors());
 		ForkJoinPool pool = new ForkJoinPool(numberOfThreads);
 
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -243,7 +239,7 @@ public class CalculateTravelTimes {
 
 					if (lastTime.get() + 1e10 < System.nanoTime()) {
 						lastTime.set(System.nanoTime());
-						logger.info("         " + currentCount.get() + "/" + trips.size());
+						logger.info("         " + currentCount.get() + "/" + relevantLinks.size());
 					}
 				});
 			}).join();
@@ -287,7 +283,7 @@ public class CalculateTravelTimes {
 					break;
 				} else {
 					// Revert (not covered in pseudo code)
-					
+
 					if (true) {
 						for (Link link : relevantLinks) {
 							double offset = (Double) link.getAttributes().getAttribute("offset");
@@ -346,12 +342,6 @@ public class CalculateTravelTimes {
 		// Will be done in the simulation, here we have now a realistic speed for every
 		// link in the network.
 
-		/* Write node weights */
-
-		for (int u = 0; u < nodes.size(); u++) {
-			nodes.get(u).getAttributes().putAttribute("weight", nodeWeights.get(u));
-		}
-
 		new NetworkWriter(scenario.getNetwork()).write(cmd.getOptionStrict("output-path"));
 	}
 
@@ -394,6 +384,7 @@ public class CalculateTravelTimes {
 						logger.info("            " + currentCount.get() + "/" + trips.size());
 					}
 				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
 				}
 			});
 		}).join();
