@@ -66,9 +66,6 @@ public final class DvrpModule extends AbstractModule {
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
-		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
-				.toInstance(VehicleUtils.getDefaultVehicleType());
-
 		install(dvrpTravelTimeEstimationModule);
 
 		//lazily initialised:

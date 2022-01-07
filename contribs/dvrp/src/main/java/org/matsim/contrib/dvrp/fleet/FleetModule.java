@@ -26,16 +26,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -43,6 +41,7 @@ import com.google.inject.name.Names;
 public class FleetModule extends AbstractDvrpModeModule {
 	private final URL fleetSpecificationUrl;
 	private final boolean updateVehicleStartLinkToLastLink;
+	private final VehicleType vehicleType;
 
 	public FleetModule(String mode, URL fleetSpecificationUrl) {
 		this(mode, fleetSpecificationUrl, false);
@@ -52,6 +51,16 @@ public class FleetModule extends AbstractDvrpModeModule {
 		super(mode);
 		this.fleetSpecificationUrl = fleetSpecificationUrl;
 		this.updateVehicleStartLinkToLastLink = updateVehicleStartLinkToLastLink;
+
+		vehicleType = VehicleUtils.getDefaultVehicleType();
+	}
+
+	public FleetModule(String mode, URL fleetSpecificationUrl, VehicleType vehicleType) {
+		super(mode);
+		this.fleetSpecificationUrl = fleetSpecificationUrl;
+		this.vehicleType = vehicleType;
+
+		updateVehicleStartLinkToLastLink = false;
 	}
 
 	@Override
@@ -101,7 +110,6 @@ public class FleetModule extends AbstractDvrpModeModule {
 						getter.getModal(FleetSpecification.class)))).in(Singleton.class);
 		addControlerListenerBinding().to(modalKey(FleetControlerListener.class));
 
-		bindModal(VehicleType.class).to(
-				Key.get(VehicleType.class, Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE)));
+		bindModal(VehicleType.class).toInstance(vehicleType);
 	}
 }
