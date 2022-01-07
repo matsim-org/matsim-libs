@@ -5,11 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -27,6 +29,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class ConvertDemand {
@@ -55,6 +58,26 @@ public class ConvertDemand {
 		PopulationFactory factory = population.getFactory();
 		Network network = scenario.getNetwork();
 
+		List<String> accessibleTypes = Arrays.asList("primary", "secondary", "tertiary", "residential", "unclassified",
+				"living_street", "road");
+
+		double[] dimensions = NetworkUtils.getBoundingBox(network.getNodes().values());
+		QuadTree<List<Link>> spatialIndex = new QuadTree<>(dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
+
+		for (Node node : network.getNodes().values()) {
+			List<Link> candidates = new LinkedList<>();
+
+			for (Link link : node.getInLinks().values()) {
+				if (accessibleTypes.contains(link.getAttributes().getAttribute("type"))) {
+					candidates.add(link);
+				}
+			}
+
+			if (candidates.size() > 0) {
+				spatialIndex.put(node.getCoord().getX(), node.getCoord().getY(), candidates);
+			}
+		}
+
 		int tripIndex = 0;
 
 		Random random = new Random(0);
@@ -81,18 +104,18 @@ public class ConvertDemand {
 				Coord originCoord = new Coord(originX, originY);
 				Coord destinationCoord = new Coord(destinationX, destinationY);
 
-				Node originNode = NetworkUtils.getNearestNode(network, originCoord);
-				Node destinationNode = NetworkUtils.getNearestNode(network, destinationCoord);
+				List<Link> originCandidates = spatialIndex.getClosest(originX, originY);
+				List<Link> destinationCandidates = spatialIndex.getClosest(destinationX, destinationY);
 
-				double originDistance = CoordUtils.calcEuclideanDistance(originCoord, originNode.getCoord());
+				double originDistance = CoordUtils.calcEuclideanDistance(originCoord, new Coord(originX, originY));
 				double destinationDistance = CoordUtils.calcEuclideanDistance(destinationCoord,
-						destinationNode.getCoord());
+						new Coord(destinationX, destinationY));
 
 				if (originDistance < 100 && destinationDistance < 100) {
-					Link originLink = originNode.getInLinks().values().iterator().next();
-					Link destinationLink = destinationNode.getOutLinks().values().iterator().next();
+					Link originLink = originCandidates.get(random.nextInt(originCandidates.size()));
+					Link destinationLink = destinationCandidates.get(random.nextInt(destinationCandidates.size()));
 
-					if (originNode != destinationNode && originLink != destinationLink) {
+					if (originLink != destinationLink) {
 						if (random.nextDouble() <= samplingRate) {
 							Person person = factory.createPerson(Id.createPersonId(tripIndex));
 							population.addPerson(person);

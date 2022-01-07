@@ -24,8 +24,11 @@ class InformationCollector {
 		solverInformation.add(new SolverInformation(simulationTime,
 				1e-9 * (information.assignmentEndTime - information.assignmentStartTime), information.solutionStatus));
 		graphInformation
-				.add(new GraphInformation(simulationTime, information.requestGraphSize, information.vehicleGraphSize));
-		rebalancingInformation.add(new RebalancingInformation(simulationTime, information.numberOfRelocations));
+				.add(new GraphInformation(simulationTime, information.requestGraphSize, information.vehicleGraphSize,
+						1e-9 * (information.requestGraphEndTime - information.requestGraphStartTime),
+						1e-9 * (information.vehicleGraphsEndTime - information.vehicleGraphsStartTime)));
+		rebalancingInformation.add(new RebalancingInformation(simulationTime, information.numberOfRelocations,
+				1e-9 * (information.relocationEndTime - information.relocationStartTime)));
 		occupancyInformation.add(new OccupancyInformation(simulationTime, information.occupiedVehiclesByPassengers,
 				information.occupiedVehiclesByRequests));
 	}
@@ -63,10 +66,12 @@ class InformationCollector {
 	public class RebalancingInformation {
 		public final double simulationTime;
 		public final int rebalancingDirectives;
+		public final double rebalancingTime;
 
-		public RebalancingInformation(double simulationTime, int rebalancingDirectives) {
+		public RebalancingInformation(double simulationTime, int rebalancingDirectives, double rebalancingTime) {
 			this.simulationTime = simulationTime;
 			this.rebalancingDirectives = rebalancingDirectives;
+			this.rebalancingTime = rebalancingTime;
 		}
 	}
 
@@ -74,11 +79,16 @@ class InformationCollector {
 		public final double simulationTime;
 		public final int requestGraphSize;
 		public final int tripGraphSize;
+		public final double requestGraphTime;
+		public final double tripGraphTime;
 
-		public GraphInformation(double simulationTime, int requestGraphSize, int tripGraphSize) {
+		public GraphInformation(double simulationTime, int requestGraphSize, int tripGraphSize, double requestGraphTime,
+				double tripGraphTime) {
 			this.simulationTime = simulationTime;
 			this.requestGraphSize = requestGraphSize;
 			this.tripGraphSize = tripGraphSize;
+			this.requestGraphTime = requestGraphTime;
+			this.tripGraphTime = tripGraphTime;
 		}
 	}
 

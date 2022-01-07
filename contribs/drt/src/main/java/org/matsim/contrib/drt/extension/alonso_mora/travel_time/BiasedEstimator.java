@@ -3,6 +3,8 @@ package org.matsim.contrib.drt.extension.alonso_mora.travel_time;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 
+import com.google.inject.Singleton;
+
 /**
  * This is a custom implementation of the TravelTimeEstimator which allows to
  * add a constant or linear bias to the values estimated by another estimator.
@@ -38,7 +40,7 @@ public class BiasedEstimator implements TravelTimeEstimator {
 				bindModal(BiasedEstimator.class).toProvider(modalProvider(getter -> {
 					TravelTimeEstimator delegate = getter.getModal(implementation);
 					return new BiasedEstimator(delegate, linearBias, constantBias);
-				}));
+				})).in(Singleton.class);
 
 				bindModal(TravelTimeEstimator.class).to(modalKey(BiasedEstimator.class));
 			}

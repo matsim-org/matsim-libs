@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.alonso_mora.algorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,7 +15,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.alonso_mora.AlonsoMoraConfigGroup;
@@ -319,6 +322,42 @@ public class AlonsoMoraAlgorithm {
 					});
 		}).join();
 
+		/*
+		 * Pre-filter for request-vehicle assignments as described in III.C in
+		 * Supplementary Material. The Trip-Request-Vehicle graph can get quite large,
+		 * so the authors propose to limit the graph building procedure to only the top
+		 * 30 candidate vehicles per request. Below, we perform a graph building *per
+		 * vehicle* so the only thing we can do is to find those top N vehicles per
+		 * request already in advance as we cannot do this in parallel otherwise. This
+		 * is an optional feature to reduce the size of the trip-vehicle graph.
+		 */
+
+		final Map<AlonsoMoraVehicle, Map<AlonsoMoraRequest, AlonsoMoraFunction.Result>> topMatchings;
+
+		if (settings.candidateVehiclesPerRequest > 0) {
+			topMatchings = forkJoinPool.submit(() -> {
+				return Stream.concat(queuedRequests.parallelStream(), assignedRequests.parallelStream()) //
+						.flatMap(request -> {
+							return vehicleGraphs.keySet().parallelStream() //
+									.filter(vehicle -> vehicle.getVehicle().getSchedule().getStatus()
+											.equals(ScheduleStatus.STARTED)) //
+									.map(vehicle -> {
+										return Pair.of(Pair.of(request, vehicle),
+												function.calculateRoute(Arrays.asList(request), vehicle, now));
+									})//
+									.filter(result -> result.getRight().isPresent()) //
+									.map(pair -> Pair.of(pair.getLeft(), pair.getRight().get())).sorted((a, b) -> {
+										return Double.compare(a.getRight().getCost(), b.getRight().getCost());
+									}) //
+									.limit(settings.candidateVehiclesPerRequest);
+						}) //
+						.collect(Collectors.groupingBy(p -> p.getLeft().getRight(),
+								Collectors.toMap(p -> p.getLeft().getLeft(), p -> p.getRight())));
+			}).join();
+		} else {
+			topMatchings = null;
+		}
+
 		// Fill the graphs
 		forkJoinPool.submit(() -> {
 			vehicleGraphs.entrySet().parallelStream() //
@@ -326,12 +365,24 @@ public class AlonsoMoraAlgorithm {
 					.forEach(item -> {
 						VehicleGraph vehicleGraph = item.getValue();
 
-						for (AlonsoMoraRequest request : queuedRequests) {
-							vehicleGraph.addRequest(request, now);
-						}
+						if (topMatchings == null) {
+							for (AlonsoMoraRequest request : queuedRequests) {
+								vehicleGraph.addRequest(request, now);
+							}
 
-						for (AlonsoMoraRequest request : assignedRequests) {
-							vehicleGraph.addRequest(request, now);
+							for (AlonsoMoraRequest request : assignedRequests) {
+								vehicleGraph.addRequest(request, now);
+							}
+						} else {
+							Map<AlonsoMoraRequest, AlonsoMoraFunction.Result> vehicleMatchings = topMatchings
+									.get(item.getKey());
+
+							if (vehicleMatchings != null) {
+								for (Map.Entry<AlonsoMoraRequest, AlonsoMoraFunction.Result> matching : vehicleMatchings
+										.entrySet()) {
+									vehicleGraph.addRequest(matching.getKey(), now, matching.getValue());
+								}
+							}
 						}
 
 						if (settings.preserveVehicleAssignments) {
@@ -562,7 +613,11 @@ public class AlonsoMoraAlgorithm {
 		 * performing the DVRP scheduling
 		 */
 
-		for (Relocation trip : rebalancingSolver.solve(trips)) {
+		information.relocationStartTime = System.nanoTime();
+		Collection<Relocation> relocations = rebalancingSolver.solve(trips);
+		information.relocationEndTime = System.nanoTime();
+
+		for (Relocation trip : relocations) {
 			trip.vehicle.setRoute(
 					Collections.singletonList(new AlonsoMoraStop(StopType.Relocation, trip.destination, null)));
 			scheduler.schedule(trip.vehicle, now);
@@ -674,6 +729,7 @@ public class AlonsoMoraAlgorithm {
 		final double relocationInterval;
 		final boolean allowBareReassignment;
 		final double loggingInterval;
+		final int candidateVehiclesPerRequest;
 
 		public AlgorithmSettings(AlonsoMoraConfigGroup config) {
 			this.useBindingRelocations = config.getUseBindingRelocations();
@@ -684,6 +740,7 @@ public class AlonsoMoraAlgorithm {
 			this.relocationInterval = config.getRelocationInterval();
 			this.allowBareReassignment = config.getCongestionMitigationParameters().getAllowBareReassignment();
 			this.loggingInterval = config.getLoggingInterval();
+			this.candidateVehiclesPerRequest = config.getCandidateVehiclesPerRequest();
 		}
 	}
 
@@ -695,6 +752,9 @@ public class AlonsoMoraAlgorithm {
 
 		public long assignmentStartTime;
 		public long assignmentEndTime;
+
+		public long relocationStartTime;
+		public long relocationEndTime;
 
 		public long requestGraphStartTime;
 		public long requestGraphEndTime;

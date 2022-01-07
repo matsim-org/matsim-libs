@@ -95,6 +95,7 @@ class AnalysisListener implements IterationEndsListener {
 				JFreeChart chart = ChartFactory.createTimeSeriesChart("Assignment problem solution", "Time",
 						"Solution time [s]", dataSet);
 				ChartSaveUtils.saveAsPNG(chart, path.toString(), 1500, 1000);
+
 			} catch (ParseException e) {
 				throw new IllegalStateException(e);
 			}
@@ -136,6 +137,45 @@ class AnalysisListener implements IterationEndsListener {
 				JFreeChart chart = ChartFactory.createTimeSeriesChart("Alonso-Mora dynamics", "Time", "Items", dataSet);
 				ChartSaveUtils.saveAsPNG(chart, path.toString(), 1500, 1000);
 			} catch (ParseException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		{ // Solution information
+			try {
+				BufferedWriter writer = IOUtils.getBufferedWriter(
+						outputHierarchy.getIterationFilename(event.getIteration(), "am_runtime.csv"));
+
+				writer.write(String.join(";", Arrays.asList( //
+						"simulation_time", //
+						"request_graph_size", //
+						"request_graph_time", //
+						"trip_graph_size", //
+						"trip_graph_time", //
+						"assignment_time", //
+						"assignment_status", //
+						"relocation_time" //
+				)) + "\n");
+
+				for (int i = 0; i < solverData.size(); i++) {
+					SolverInformation solver = solverData.get(i);
+					GraphInformation graph = graphInformation.get(i);
+					RebalancingInformation rebalancing = rebalancingInformation.get(i);
+
+					writer.write(String.join(";", Arrays.asList( //
+							String.valueOf(solver.simulationTime), //
+							String.valueOf(graph.requestGraphSize), //
+							String.valueOf(graph.requestGraphTime), //
+							String.valueOf(graph.tripGraphSize), //
+							String.valueOf(graph.tripGraphTime), //
+							String.valueOf(solver.solutionTime), //
+							String.valueOf(solver.status), //
+							String.valueOf(rebalancing.rebalancingTime) //
+					)) + "\n");
+				}
+
+				writer.close();
+			} catch (IOException e) {
 				throw new IllegalStateException(e);
 			}
 		}
