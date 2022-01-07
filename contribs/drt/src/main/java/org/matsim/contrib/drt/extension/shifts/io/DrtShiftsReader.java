@@ -22,7 +22,7 @@ public class DrtShiftsReader extends MatsimXmlParser {
     public static final String ID = "id";
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
-    public static final String OPERATION_FACILITY_ID = "operation_facility_id";
+    public static final String OPERATION_FACILITY_ID = "operationFacilityId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
