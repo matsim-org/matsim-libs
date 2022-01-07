@@ -6,8 +6,10 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
@@ -168,7 +170,7 @@ public class EShiftTaskScheduler {
         ShiftBreakTask dropoffStopTask;
 		ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
         if (charge(breakFacility, ev)) {
-            final Charger charger = chargingInfrastructure.getChargers().get(breakFacility.getCharger());
+            final Charger charger = chargingInfrastructure.getChargers().get(breakFacility.getCharger().orElseThrow());
             ChargingStrategy strategy = charger.getLogic().getChargingStrategy();
 
             if (strategy.isChargingCompleted(ev)) {
@@ -198,13 +200,18 @@ public class EShiftTaskScheduler {
     }
 
     private boolean charge(OperationFacility breakFacility, ElectricVehicle electricVehicle) {
-        if (chargingInfrastructure != null && chargingInfrastructure.getChargers().containsKey(breakFacility.getCharger())) {
-            final Charger charger = chargingInfrastructure.getChargers().get(breakFacility.getCharger());
-			if(charger.getLogic().getChargingStrategy().isChargingCompleted(electricVehicle)) {
-				return false;
+        if (chargingInfrastructure != null) {
+			Optional<Id<Charger>> chargerId = breakFacility.getCharger();
+			if(chargerId.isPresent()) {
+				if (chargingInfrastructure.getChargers().containsKey(chargerId.get())) {
+					final Charger charger = chargingInfrastructure.getChargers().get(chargerId.get());
+					if (charger.getLogic().getChargingStrategy().isChargingCompleted(electricVehicle)) {
+						return false;
+					}
+					return ChargingEstimations.estimateMaxWaitTimeForNextVehicle(charger) < 5 * 60;
+				}
 			}
-            return ChargingEstimations.estimateMaxWaitTimeForNextVehicle(charger) < 5 * 60;
-        }
+		}
         return false;
     }
 
@@ -300,7 +307,7 @@ public class EShiftTaskScheduler {
 		ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
 		if (charge(breakFacility, ev)) {
 
-			final Charger charger = chargingInfrastructure.getChargers().get(breakFacility.getCharger());
+			final Charger charger = chargingInfrastructure.getChargers().get(breakFacility.getCharger().orElseThrow());
 			ChargingStrategy strategy = charger.getLogic().getChargingStrategy();
 
             if (strategy.isChargingCompleted(ev)

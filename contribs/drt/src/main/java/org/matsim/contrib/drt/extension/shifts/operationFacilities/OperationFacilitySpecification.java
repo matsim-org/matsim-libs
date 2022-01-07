@@ -6,6 +6,8 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
+import java.util.Optional;
+
 /**
  * @author nkuehnel / MOIA
  */
@@ -13,7 +15,7 @@ public interface OperationFacilitySpecification extends Identifiable<OperationFa
 
 	int getCapacity();
 
-	Id<Charger> getCharger();
+	Optional<Id<Charger>> getCharger();
 
 	OperationFacilityType getType();
 

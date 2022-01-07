@@ -154,8 +154,13 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 								final Task currentTask = vehicle.getSchedule().getCurrentTask();
 								if (currentTask instanceof EDrtWaitForShiftStayTask
 										&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
+									Optional<Id<Charger>> chargerId = ((WaitForShiftStayTask) currentTask).getFacility().getCharger();
+									if(chargerId.isEmpty()) {
+										//facility does not have a charger
+										continue;
+									}
 									final Charger charger = chargingInfrastructure.getChargers()
-											.get(((WaitForShiftStayTask) currentTask).getFacility().getCharger());
+											.get(chargerId.get());
 									if (!charger.getLogic().getChargingStrategy().isChargingCompleted(electricVehicle)) {
 										final double waitTime = ChargingEstimations
 												.estimateMaxWaitTimeForNextVehicle(charger);
