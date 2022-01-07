@@ -26,7 +26,7 @@ public interface DrtShiftDispatcher {
 
     OperationFacility decideOnBreak(ShiftEntry activeShift);
 
-    void endShift(ShiftDvrpVehicle vehicle, Id<Link> id);
+    void endShift(ShiftDvrpVehicle vehicle, Id<Link> id, Id<OperationFacility> operationFacilityId);
 
     void endBreak(ShiftDvrpVehicle vehicle, ShiftBreakTask task);
 

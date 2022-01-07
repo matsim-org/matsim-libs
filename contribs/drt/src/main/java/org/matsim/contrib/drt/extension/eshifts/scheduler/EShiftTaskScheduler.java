@@ -306,17 +306,17 @@ public class EShiftTaskScheduler {
             if (strategy.isChargingCompleted(ev)
                     || ((ChargingWithAssignmentLogic) charger.getLogic()).getAssignedVehicles().contains(ev)) {
                 dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
-                        endTime, link, shift.getEndTime(), breakFacility);
+                        endTime, link, shift, breakFacility);
             } else {
 				double energyCharge = ((BatteryCharging) ev.getChargingPower()).calcEnergyCharged(charger.getSpecification(), endTime - startTime);
 				double totalEnergy = -energyCharge;
                 ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(ev);
                 dropoffStopTask = ((ShiftEDrtTaskFactoryImpl) taskFactory).createChargingShiftChangeoverTask(vehicle,
-                        startTime, endTime, link, charger, totalEnergy, shift.getEndTime(), breakFacility);
+                        startTime, endTime, link, charger, totalEnergy, shift, breakFacility);
             }
         } else {
             dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
-                    endTime, link, shift.getEndTime(), breakFacility);
+                    endTime, link, shift, breakFacility);
         }
         schedule.addTask(dropoffStopTask);
         schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, vehicle.getServiceEndTime(),
@@ -371,7 +371,7 @@ public class EShiftTaskScheduler {
         // append SHIFT_CHANGEOVER task
         final double endTime = Math.max(shift.getEndTime(), vrpPath.getArrivalTime()) + shiftConfig.getChangeoverDuration();
         ShiftChangeOverTask dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, Math.max(shift.getEndTime(), vrpPath.getArrivalTime()),
-                endTime, vrpPath.getToLink(), shift.getEndTime(), facility);
+                endTime, vrpPath.getToLink(), shift, facility);
         schedule.addTask(dropoffStopTask);
 
         schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, vehicle.getServiceEndTime(),

@@ -363,10 +363,10 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
                     schedule.removeTask(task);
                 }
                 final double arrivalTime = vrpPath.getArrivalTime();
-                final double beginTime = ((ShiftChangeOverTask) nextStopTask).getShiftEndTime();
-                if (arrivalTime <= beginTime) {
+                final double shiftEndTime = ((ShiftChangeOverTask) nextStopTask).getShift().getEndTime();
+                if (arrivalTime <= shiftEndTime) {
                     DrtStayTask stayWaitShiftEndTask = taskFactory.createStayTask(vehicleEntry.vehicle, arrivalTime,
-                            beginTime, nextStopTask.getLink());
+                            shiftEndTime, nextStopTask.getLink());
                     schedule.addTask(tasks.indexOf(nextStopTask), stayWaitShiftEndTask);
                 }
             } else {

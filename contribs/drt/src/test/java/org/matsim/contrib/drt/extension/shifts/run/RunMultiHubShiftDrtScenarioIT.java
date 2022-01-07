@@ -1,52 +1,40 @@
-package org.matsim.contrib.drt.extension.eshifts.run;
+package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.drt.extension.eshifts.charging.ChargingWithBreaksAndAssignmentLogic;
-import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.charging.*;
-import org.matsim.contrib.ev.temperature.TemperatureService;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-public class RunEShiftDrtScenarioIT {
-
-	private static final double MAX_RELATIVE_SOC = 0.9;// charge up to 80% SOC
-	private static final double MIN_RELATIVE_SOC = 0.15;// send to chargers vehicles below 20% SOC
-	private static final double TEMPERATURE = 20;// oC
+public class RunMultiHubShiftDrtScenarioIT {
 
 	@Test
 	public void test() {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 
-		String fleetFile =  "holzkirchenFleet.xml";
-		String plansFile =  "holzkirchenPlans.xml.gz";
-		String networkFile =  "holzkirchenNetwork.xml.gz";
-		String opFacilitiesFile =  "holzkirchenOperationFacilities.xml";
-		String shiftsFile =  "holzkirchenShifts.xml";
-		String chargersFile =  "holzkirchenChargers.xml";
-		String evsFile =  "holzkirchenElectricFleet.xml";
+		String fleetFile = "holzkirchenMultiHubFleet.xml";
+		String plansFile = "holzkirchenPlans.xml.gz";
+		String networkFile = "holzkirchenNetwork.xml.gz";
+		String opFacilitiesFile = "holzkirchenMultiHubOperationFacilities.xml";
+		String shiftsFile = "holzkirchenMultiHubShifts.xml";
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
 				.setMaxTravelTimeAlpha(1.5)
@@ -127,46 +115,14 @@ public class RunEShiftDrtScenarioIT {
 		config.controler().setWriteEventsInterval(1);
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
+		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
 
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
 		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
 		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
 		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
 
-		//e shifts
-		shiftDrtConfigGroup.setShiftAssignmentBatteryThreshold(0.6);
-		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
-
-		final EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.setChargersFile(chargersFile);
-		evConfigGroup.setMinimumChargeTime(0);
-		evConfigGroup.setVehiclesFile(evsFile);
-		evConfigGroup.setTimeProfiles(true);
-		config.addModule(evConfigGroup);
-
-
-		final Controler run = EvShiftDrtControlerCreator.createControler(config, false);
-
-		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-			run.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
-				@Override
-				public void install() {
-					bind(ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				}
-			});
-		}
-
-		run.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithBreaksAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
-				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
-				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
-			}
-		});
+		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();
 	}
 }
