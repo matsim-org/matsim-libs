@@ -179,8 +179,7 @@ public class DefaultPassengerEngineTest {
 						//supply
 						addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 						bindModal(Fleet.class).toInstance(fleet);
-						bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
-								.toInstance(VehicleUtils.getDefaultVehicleType());
+						bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
 						bindModal(VrpOptimizer.class).to(optimizerClass).asEagerSingleton();
 						bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class)
 								.asEagerSingleton();

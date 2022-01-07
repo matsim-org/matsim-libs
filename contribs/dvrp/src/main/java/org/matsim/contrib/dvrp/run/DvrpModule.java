@@ -43,8 +43,7 @@ import com.google.inject.name.Names;
 /**
  * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects.
  * <p>
- * Some of the initialised objects will become modal at some point in the future. E.g. VehicleType or TravelTime
- * are likely to be provided separately per each mode in the future.
+ * Some of the initialised objects will become modal at some point in the future.
  *
  * @author michalm
  */
