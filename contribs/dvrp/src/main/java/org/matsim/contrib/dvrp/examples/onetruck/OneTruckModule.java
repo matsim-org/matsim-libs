@@ -57,9 +57,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		install(new DvrpModeRoutingNetworkModule(getMode(), false));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 
-		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
-				.toInstance(createTruckType());
-		install(new FleetModule(getMode(), fleetSpecificationUrl));
+		install(new FleetModule(getMode(), fleetSpecificationUrl, createTruckType()));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -80,5 +78,4 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		truckType.getCapacity().setSeats(1);
 		return truckType;
 	}
-
 }
