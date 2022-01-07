@@ -58,7 +58,7 @@ final class DrtLeg {
 		PersonDepartureEvent departedEvent = sequence.getDeparted().get();
 		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();
 		this.request = submittedEvent.getRequestId();
-		this.departureTime = submittedEvent.getTime();
+		this.departureTime = departedEvent.getTime();
 		this.person = submittedEvent.getPersonId();
 		this.vehicle = pickedUpEvent.getVehicleId();
 		this.fromLinkId = submittedEvent.getFromLinkId();
