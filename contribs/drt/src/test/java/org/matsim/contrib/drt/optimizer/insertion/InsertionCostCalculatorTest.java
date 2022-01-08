@@ -66,8 +66,8 @@ public class InsertionCostCalculatorTest {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator<D>(
 				new CostCalculationStrategy.RejectSoftConstraintViolations(), detourTimeCalculator);
 		var insertionWithDetourData = new InsertionWithDetourData<D>(insertion, null, detourTimeInfo);
-		when(detourTimeCalculator.calculateDetourTimeInfo(insertionWithDetourData.getInsertion(),
-				insertionWithDetourData.getDetourData())).thenReturn(detourTimeInfo);
+		when(detourTimeCalculator.calculateDetourTimeInfo(insertionWithDetourData.insertion,
+				insertionWithDetourData.detourData)).thenReturn(detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData)).isEqualTo(expectedCost);
 	}
 

@@ -313,10 +313,10 @@ public class InsertionGeneratorTest {
 
 		for (int i = 0; i < expectedInsertions.length; i++) {
 			//TODO we do not compare insertion.detourTimeInfo
-			assertThat(actualInsertions.get(i).getInsertion()).usingRecursiveComparison()
-					.isEqualTo(expectedInsertions[i].getInsertion());
-			assertThat(actualInsertions.get(i).getDetourData()).usingRecursiveComparison()
-					.isEqualTo(expectedInsertions[i].getDetourData());
+			assertThat(actualInsertions.get(i).insertion).usingRecursiveComparison()
+					.isEqualTo(expectedInsertions[i].insertion);
+			assertThat(actualInsertions.get(i).detourData).usingRecursiveComparison()
+					.isEqualTo(expectedInsertions[i].detourData);
 		}
 	}
 

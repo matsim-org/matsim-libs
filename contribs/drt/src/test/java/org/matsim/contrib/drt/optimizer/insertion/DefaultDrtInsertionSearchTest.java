@@ -77,7 +77,7 @@ public class DefaultDrtInsertionSearchTest {
 		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
 		var insertionWithPathData = new InsertionWithDetourData<>(insertion, insertionPathData, detourTimeInfo);
 		when(bestInsertionFinder.findBestInsertion(eq(request),
-				argThat(argument -> argument.map(InsertionWithDetourData::getInsertion)
+				argThat(argument -> argument.map(insertionWithDetourData -> insertionWithDetourData.insertion)
 						.collect(toSet())
 						.equals(Set.of(insertion))))).thenReturn(Optional.of(insertionWithPathData));
 

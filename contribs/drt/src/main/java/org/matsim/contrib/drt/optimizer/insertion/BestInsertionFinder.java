@@ -51,7 +51,7 @@ public class BestInsertionFinder<D> {
 
 	static <D> Comparator<InsertionWithCost<D>> createInsertionWithCostComparator() {
 		return Comparator.<InsertionWithCost<D>>comparingDouble(insertionWithCost -> insertionWithCost.cost)
-				.thenComparing(insertion -> insertion.insertionWithDetourData.getInsertion(), INSERTION_COMPARATOR);
+				.thenComparing(insertion -> insertion.insertionWithDetourData.insertion, INSERTION_COMPARATOR);
 	}
 
 	private final Comparator<InsertionWithCost<D>> comparator = createInsertionWithCostComparator();

@@ -184,8 +184,8 @@ public class InsertionDetourTimeCalculatorTest {
 
 		var detourTimeCalculator = new InsertionDetourTimeCalculator<>(STOP_DURATION, Double::doubleValue,
 				replacedDriveTimeEstimates::get);
-		var actualDetourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.getInsertion(),
-				insertion.getDetourData());
+		var actualDetourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion,
+				insertion.detourData);
 
 		double departureTime = start.getDepartureTime() + detour.detourToPickup + STOP_DURATION;
 		double pickupTimeLoss = detour.detourToPickup + STOP_DURATION + detour.detourFromPickup
@@ -199,8 +199,7 @@ public class InsertionDetourTimeCalculatorTest {
 
 	private void assertDetourTimeInfo(InsertionWithDetourData<Double> insertion, DetourTimeInfo expected) {
 		var detourTimeCalculator = new InsertionDetourTimeCalculator<>(STOP_DURATION, Double::doubleValue, null);
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.getInsertion(),
-				insertion.getDetourData());
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion, insertion.detourData);
 		assertThat(detourTimeInfo).usingRecursiveComparison().isEqualTo(expected);
 	}
 

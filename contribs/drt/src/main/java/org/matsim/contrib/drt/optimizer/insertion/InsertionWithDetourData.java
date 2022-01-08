@@ -76,34 +76,21 @@ public class InsertionWithDetourData<D> {
 		}
 	}
 
-	private final Insertion insertion;
-	private final InsertionDetourData<D> insertionDetourData;
-	private final DetourTimeInfo detourTimeInfo;
+	public final Insertion insertion;
+	public final InsertionDetourData<D> detourData;
+	public final DetourTimeInfo detourTimeInfo;
 
-	InsertionWithDetourData(Insertion insertion, InsertionDetourData<D> insertionDetourData,
-			DetourTimeInfo detourTimeInfo) {
+	InsertionWithDetourData(Insertion insertion, InsertionDetourData<D> detourData, DetourTimeInfo detourTimeInfo) {
 		this.insertion = insertion;
-		this.insertionDetourData = insertionDetourData;
+		this.detourData = detourData;
 		this.detourTimeInfo = detourTimeInfo;
-	}
-
-	public Insertion getInsertion() {
-		return insertion;
-	}
-
-	public InsertionDetourData<D> getDetourData() {
-		return insertionDetourData;
-	}
-
-	public DetourTimeInfo getDetourTimeInfo() {
-		return detourTimeInfo;
 	}
 
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("insertion", insertion)
-				.add("insertionDetourData", insertionDetourData)
+				.add("insertionDetourData", detourData)
 				.add("detourTimeInfo", detourTimeInfo)
 				.toString();
 	}
