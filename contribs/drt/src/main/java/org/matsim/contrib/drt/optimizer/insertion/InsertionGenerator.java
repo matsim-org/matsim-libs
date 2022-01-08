@@ -125,9 +125,12 @@ public class InsertionGenerator {
 	}
 
 	private final DetourTime detourTime;
+	private final InsertionDetourTimeCalculator<Double> detourTimeCalculator;
 
-	public InsertionGenerator(DetourTimeEstimator detourTimeEstimator) {
+	public InsertionGenerator(double stopDuration, DetourTimeEstimator detourTimeEstimator) {
 		detourTime = new DetourTime(detourTimeEstimator);
+		detourTimeCalculator = new InsertionDetourTimeCalculator<>(stopDuration, Double::doubleValue,
+				detourTimeEstimator);
 	}
 
 	public List<InsertionWithDetourData<Double>> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
@@ -196,6 +199,8 @@ public class InsertionGenerator {
 		double toDropoff = detourTime.calcToDropoffTime(insertion, request);
 		double fromDropoff = detourTime.calcFromDropoffTime(insertion, request);
 		var insertionDetourData = new InsertionDetourData<>(toPickup, fromPickup, toDropoff, fromDropoff);
-		return new InsertionWithDetourData<>(insertion, insertionDetourData);
+
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData);
+		return new InsertionWithDetourData<>(insertion, insertionDetourData, detourTimeInfo);
 	}
 }

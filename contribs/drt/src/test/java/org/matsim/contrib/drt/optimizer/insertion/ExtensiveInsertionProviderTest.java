@@ -44,7 +44,7 @@ public class ExtensiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(null),
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(120, null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
@@ -100,6 +100,6 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
 		return new InsertionWithDetourData<>(insertion,
-				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN));
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN), null);
 	}
 }

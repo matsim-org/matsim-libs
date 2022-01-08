@@ -45,7 +45,7 @@ public class InsertionCostCalculatorTest {
 	@Test
 	public void testCalculate() {
 		VehicleEntry entry = entry(new double[] { 20, 50 });
-		var insertion = new InsertionWithDetourData<>(insertion(entry, 0, 1), null);
+		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
 		assertCalculate(insertion, new DetourTimeInfo(0, 0, 11, 22), 11 + 22);
@@ -60,14 +60,15 @@ public class InsertionCostCalculatorTest {
 		assertCalculate(insertion, new DetourTimeInfo(0, 0, 20, 31), INFEASIBLE_SOLUTION_COST);
 	}
 
-	private <D> void assertCalculate(InsertionWithDetourData<D> insertion, DetourTimeInfo detourTimeInfo,
-			double expectedCost) {
+	private <D> void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost) {
 		@SuppressWarnings("unchecked")
 		var detourTimeCalculator = (InsertionDetourTimeCalculator<D>)mock(InsertionDetourTimeCalculator.class);
-		var insertionCostCalculator = new DefaultInsertionCostCalculator<>(
+		var insertionCostCalculator = new DefaultInsertionCostCalculator<D>(
 				new CostCalculationStrategy.RejectSoftConstraintViolations(), detourTimeCalculator);
-		when(detourTimeCalculator.calculateDetourTimeInfo(insertion)).thenReturn(detourTimeInfo);
-		assertThat(insertionCostCalculator.calculate(drtRequest, insertion)).isEqualTo(expectedCost);
+		var insertionWithDetourData = new InsertionWithDetourData<D>(insertion, null, detourTimeInfo);
+		when(detourTimeCalculator.calculateDetourTimeInfo(insertionWithDetourData.getInsertion(),
+				insertionWithDetourData.getDetourData())).thenReturn(detourTimeInfo);
+		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData)).isEqualTo(expectedCost);
 	}
 
 	private VehicleEntry entry(double[] slackTimes) {
@@ -79,8 +80,7 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private Insertion insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx) {
-		return new Insertion(entry,
-				new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null),
+		return new Insertion(entry, new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null),
 				new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null));
 	}
 }

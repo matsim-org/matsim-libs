@@ -49,17 +49,18 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 				insertionParams.getRestrictiveBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
 		var restrictiveCostCalculator = insertionCostCalculatorFactory.create(Double::doubleValue,
 				restrictiveDetourTimeEstimator);
-		return new SelectiveInsertionProvider(restrictiveDetourTimeEstimator, forkJoinPool, restrictiveCostCalculator);
+		return new SelectiveInsertionProvider(drtCfg, restrictiveDetourTimeEstimator, forkJoinPool,
+				restrictiveCostCalculator);
 	}
 
 	private final BestInsertionFinder<Double> initialInsertionFinder;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
-	public SelectiveInsertionProvider(DetourTimeEstimator restrictiveTimeEstimator, ForkJoinPool forkJoinPool,
-			InsertionCostCalculator<Double> restrictiveCostCalculator) {
-		this(new BestInsertionFinder<>(restrictiveCostCalculator), new InsertionGenerator(restrictiveTimeEstimator),
-				forkJoinPool);
+	public SelectiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator restrictiveTimeEstimator,
+			ForkJoinPool forkJoinPool, InsertionCostCalculator<Double> restrictiveCostCalculator) {
+		this(new BestInsertionFinder<>(restrictiveCostCalculator),
+				new InsertionGenerator(drtCfg.getStopDuration(), restrictiveTimeEstimator), forkJoinPool);
 	}
 
 	@VisibleForTesting

@@ -7,7 +7,11 @@ import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -29,17 +33,15 @@ public class InsertionDetourTimeCalculator<D> {
 		this.replacedDriveTimeEstimator = replacedDriveTimeEstimator;
 	}
 
-	public DetourTimeInfo calculateDetourTimeInfo(InsertionWithDetourData<D> insertionWithDetourData) {
-		var insertion = insertionWithDetourData.getInsertion();
+	public DetourTimeInfo calculateDetourTimeInfo(Insertion insertion, InsertionDetourData<D> detourData) {
 		InsertionPoint pickup = insertion.pickup;
 		InsertionPoint dropoff = insertion.dropoff;
 		if (pickup.index == dropoff.index) {
 			//handle the pickup->dropoff case separately
-			return calculateDetourTimeInfoForIfPickupToDropoffDetour(insertionWithDetourData);
+			return calculateDetourTimeInfoForIfPickupToDropoffDetour(insertion, detourData);
 		}
 
 		VehicleEntry vEntry = insertion.vehicleEntry;
-		var detourData = insertionWithDetourData.getDetourData();
 
 		final double departureTime;
 		final double pickupTimeLoss;
@@ -74,12 +76,10 @@ public class InsertionDetourTimeCalculator<D> {
 		return new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss);
 	}
 
-	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(
-			InsertionWithDetourData<D> insertionWithDetourData) {
-		var insertion = insertionWithDetourData.getInsertion();
+	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(Insertion insertion,
+			InsertionDetourData<D> detourData) {
 		VehicleEntry vEntry = insertion.vehicleEntry;
 		InsertionPoint pickup = insertion.pickup;
-		var detourData = insertionWithDetourData.getDetourData();
 
 		final double toPickupTT;
 		final double additionalPickupStopDuration;
@@ -138,6 +138,14 @@ public class InsertionDetourTimeCalculator<D> {
 			this.departureTime = departureTime;
 			this.pickupTimeLoss = pickupTimeLoss;
 		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("departureTime", departureTime)
+					.add("pickupTimeLoss", pickupTimeLoss)
+					.toString();
+		}
 	}
 
 	public static class DropoffDetourInfo {
@@ -149,6 +157,14 @@ public class InsertionDetourTimeCalculator<D> {
 		public DropoffDetourInfo(double arrivalTime, double dropoffTimeLoss) {
 			this.arrivalTime = arrivalTime;
 			this.dropoffTimeLoss = dropoffTimeLoss;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("arrivalTime", arrivalTime)
+					.add("dropoffTimeLoss", dropoffTimeLoss)
+					.toString();
 		}
 	}
 
@@ -171,6 +187,14 @@ public class InsertionDetourTimeCalculator<D> {
 		// (this is the amount of extra time the vehicle will operate if this insertion is applied)
 		public double getTotalTimeLoss() {
 			return pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("pickupDetourInfo", pickupDetourInfo)
+					.add("dropoffDetourInfo", dropoffDetourInfo)
+					.toString();
 		}
 	}
 }

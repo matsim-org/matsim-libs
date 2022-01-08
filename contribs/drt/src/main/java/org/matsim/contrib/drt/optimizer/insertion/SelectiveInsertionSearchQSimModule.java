@@ -62,7 +62,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
 			InsertionCostCalculator<PathData> zeroCostInsertionCostCalculator = (drtRequest, insertion) -> 0;
 			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
-					zeroCostInsertionCostCalculator);
+					zeroCostInsertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();
 
 		addModalComponent(SingleInsertionDetourPathCalculator.class,
