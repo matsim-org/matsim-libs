@@ -76,13 +76,11 @@ public class ExtensiveInsertionProviderTest {
 						insertionWithDetourData(infeasibleInsertion)));
 
 		//mock admissibleCostCalculator
-		@SuppressWarnings("unchecked")
-		var admissibleCostCalculator = (InsertionCostCalculator<Double>)mock(InsertionCostCalculator.class);
-		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.insertion == feasibleInsertion))).thenReturn(1.);
-		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.insertion == infeasibleInsertion)))//
-				.thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
+		var admissibleCostCalculator = (InsertionCostCalculator)mock(InsertionCostCalculator.class);
+		when(admissibleCostCalculator.calculate(eq(request), argThat(argument -> argument == feasibleInsertion),
+				any())).thenReturn(1.);
+		when(admissibleCostCalculator.calculate(eq(request), argThat(argument -> argument == infeasibleInsertion),
+				any())).thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
 		//test insertionProvider
 		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);

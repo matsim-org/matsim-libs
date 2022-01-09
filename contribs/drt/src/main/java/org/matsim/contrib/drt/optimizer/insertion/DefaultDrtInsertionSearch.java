@@ -44,7 +44,7 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			InsertionCostCalculator<PathData> insertionCostCalculator, double stopDuration) {
+			InsertionCostCalculator insertionCostCalculator, double stopDuration) {
 		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(insertionCostCalculator),
 				new InsertionDetourTimeCalculator<>(stopDuration, PathData::getTravelTime, null));
 	}

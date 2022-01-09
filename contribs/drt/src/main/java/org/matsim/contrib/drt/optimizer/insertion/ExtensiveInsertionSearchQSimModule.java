@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -50,11 +49,10 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 	protected void configureQSim() {
 		bindModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 		}).toProvider(modalProvider(getter -> {
-			var insertionCostCalculatorFactory = getter.getModal(InsertionCostCalculatorFactory.class);
-			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
+			var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
+			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculator,
 					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			var insertionCostCalculator = insertionCostCalculatorFactory.create(PathData::getTravelTime, null);
 			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
 					insertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();

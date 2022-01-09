@@ -1,7 +1,9 @@
 package org.matsim.contrib.drt.extension.shifts.optimizer.insertion;
 
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+
 import java.util.List;
-import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
@@ -10,13 +12,8 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -24,48 +21,28 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 /**
  * @author nkuehnel / MOIA
  */
-public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
+public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
-	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy) {
-		return new InsertionCostCalculatorFactory() {
-			@Override
-			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
-					DetourTimeEstimator replacedDriveTimeEstimator) {
-				return new ShiftInsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, detourTime,
-						replacedDriveTimeEstimator);
-			}
-		};
-	}
-
-	private final InsertionCostCalculator<D> defaultInsertionCostCalculator;
-	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
+	private final InsertionCostCalculator defaultInsertionCostCalculator;
 	private final MobsimTimer timer;
 
-	public ShiftInsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
-			DetourTimeEstimator replacedDriveTimeEstimator) {
+	public ShiftInsertionCostCalculator(MobsimTimer timer,
+			CostCalculationStrategy costCalculationStrategy) {
 		this.timer = timer;
-		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator<>(drtConfig, costCalculationStrategy,
-				detourTime, replacedDriveTimeEstimator);
-		detourTimeCalculator = new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
-				replacedDriveTimeEstimator);
+		defaultInsertionCostCalculator = new DefaultInsertionCostCalculator(costCalculationStrategy);
 	}
 
 	@Override
-	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
-		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion,
-				insertion.detourData);
-		if (!checkShiftTimeConstraintsForScheduledRequests(insertion.insertion,
+	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
+		if (!checkShiftTimeConstraintsForScheduledRequests(insertion,
 				detourTimeInfo.pickupDetourInfo.pickupTimeLoss, detourTimeInfo.getTotalTimeLoss())) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
-		return defaultInsertionCostCalculator.calculate(drtRequest, insertion);
+		return defaultInsertionCostCalculator.calculate(drtRequest, insertion, detourTimeInfo);
 	}
 
-	boolean checkShiftTimeConstraintsForScheduledRequests(InsertionGenerator.Insertion insertion,
-			double pickupDetourTimeLoss, double totalTimeLoss) {
+	boolean checkShiftTimeConstraintsForScheduledRequests(Insertion insertion, double pickupDetourTimeLoss,
+			double totalTimeLoss) {
 		VehicleEntry vEntry = insertion.vehicleEntry;
 		final int pickupIdx = insertion.pickup.index;
 		final int dropoffIdx = insertion.dropoff.index;

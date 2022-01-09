@@ -23,8 +23,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -65,14 +63,11 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private <D> void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost) {
-		@SuppressWarnings("unchecked")
-		var detourTimeCalculator = (InsertionDetourTimeCalculator<D>)mock(InsertionDetourTimeCalculator.class);
-		var insertionCostCalculator = new DefaultInsertionCostCalculator<D>(
-				new CostCalculationStrategy.RejectSoftConstraintViolations(), detourTimeCalculator);
+		var insertionCostCalculator = new DefaultInsertionCostCalculator(
+				new CostCalculationStrategy.RejectSoftConstraintViolations());
 		var insertionWithDetourData = new InsertionWithDetourData<D>(insertion, null, detourTimeInfo);
-		when(detourTimeCalculator.calculateDetourTimeInfo(insertionWithDetourData.insertion,
-				insertionWithDetourData.detourData)).thenReturn(detourTimeInfo);
-		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData)).isEqualTo(expectedCost);
+		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData.insertion,
+				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);
 	}
 
 	private VehicleEntry entry(double[] slackTimes) {

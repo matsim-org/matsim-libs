@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
@@ -52,19 +52,17 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -104,9 +102,8 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						}), getter.getModal(DrtRequestInsertionRetryQueue.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
-		bindModal(InsertionCostCalculatorFactory.class).toProvider(modalProvider(
-				getter -> DefaultInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
-						getter.getModal(CostCalculationStrategy.class))));
+		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
@@ -138,8 +135,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
-								getter.get(MobsimTimer.class),
-								getter.getModal(TravelTime.class),
+								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
