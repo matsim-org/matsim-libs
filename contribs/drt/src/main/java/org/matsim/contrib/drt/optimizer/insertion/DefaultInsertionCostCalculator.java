@@ -28,11 +28,6 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
-
-	public static InsertionCostCalculatorFactory createFactory(CostCalculationStrategy costCalculationStrategy) {
-		return () -> new DefaultInsertionCostCalculator(costCalculationStrategy);
-	}
-
 	private final CostCalculationStrategy costCalculationStrategy;
 
 	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {

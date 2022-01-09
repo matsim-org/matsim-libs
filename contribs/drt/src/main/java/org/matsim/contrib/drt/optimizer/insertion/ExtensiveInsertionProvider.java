@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -42,13 +41,12 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class ExtensiveInsertionProvider implements InsertionProvider {
 	public static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg,
-			InsertionCostCalculatorFactory insertionCostCalculatorFactory, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
+			InsertionCostCalculator insertionCostCalculator, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
 			TravelTime travelTime, ForkJoinPool forkJoinPool) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var admissibleTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
 				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
-		var admissibleCostCalculator = insertionCostCalculatorFactory.create();
-		return new ExtensiveInsertionProvider(drtCfg, admissibleTimeEstimator, forkJoinPool, admissibleCostCalculator);
+		return new ExtensiveInsertionProvider(drtCfg, admissibleTimeEstimator, forkJoinPool, insertionCostCalculator);
 	}
 
 	private final ExtensiveInsertionSearchParams insertionParams;

@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -50,8 +49,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 	protected void configureQSim() {
 		bindModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 		}).toProvider(modalProvider(getter -> {
-			var insertionCostCalculatorFactory = getter.getModal(InsertionCostCalculatorFactory.class);
-			var provider = SelectiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
+			var provider = SelectiveInsertionProvider.create(drtCfg, getter.getModal(InsertionCostCalculator.class),
 					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
 			// Use 0 as the cost for the selected insertion:

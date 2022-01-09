@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.InsertionCostCalculatorFactory;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
@@ -102,9 +102,8 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						}), getter.getModal(DrtRequestInsertionRetryQueue.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
-		bindModal(InsertionCostCalculatorFactory.class).toProvider(modalProvider(
-				getter -> DefaultInsertionCostCalculator.createFactory(
-						getter.getModal(CostCalculationStrategy.class))));
+		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
+				getter -> new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))));
 
 		install(getInsertionSearchQSimModule(drtCfg));
 

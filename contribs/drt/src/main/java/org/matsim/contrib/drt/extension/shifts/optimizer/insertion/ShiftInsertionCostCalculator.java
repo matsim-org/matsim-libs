@@ -23,11 +23,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
-	public static InsertionCostCalculatorFactory createFactory(MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy) {
-		return () -> new ShiftInsertionCostCalculator(timer, costCalculationStrategy);
-	}
-
 	private final InsertionCostCalculator defaultInsertionCostCalculator;
 	private final MobsimTimer timer;
 
