@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,16 +48,20 @@ public class InsertionCostCalculatorTest {
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(0, 0, 11, 22), 11 + 22);
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 11), new DropoffDetourInfo(0, 22)),
+				11 + 22);
 
 		//feasible solution - longest possible pickup and dropoff time losses
-		assertCalculate(insertion, new DetourTimeInfo(0, 0, 20, 30), 20 + 30);
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 30)),
+				20 + 30);
 
 		//infeasible solution - time constraints at stop 0
-		assertCalculate(insertion, new DetourTimeInfo(0, 0, 21, 29), INFEASIBLE_SOLUTION_COST);
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 21), new DropoffDetourInfo(0, 29)),
+				INFEASIBLE_SOLUTION_COST);
 
 		//infeasible solution - vehicle time constraints
-		assertCalculate(insertion, new DetourTimeInfo(0, 0, 20, 31), INFEASIBLE_SOLUTION_COST);
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 31)),
+				INFEASIBLE_SOLUTION_COST);
 	}
 
 	private <D> void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost) {

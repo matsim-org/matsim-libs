@@ -73,7 +73,8 @@ public class InsertionDetourTimeCalculator<D> {
 			arrivalTime = dropoff.previousWaypoint.getDepartureTime() + pickupTimeLoss + toDropoffTT;
 		}
 
-		return new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss);
+		return new DetourTimeInfo(new PickupDetourInfo(departureTime, pickupTimeLoss),
+							new DropoffDetourInfo(arrivalTime, dropoffTimeLoss));
 	}
 
 	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(Insertion insertion,
@@ -101,7 +102,8 @@ public class InsertionDetourTimeCalculator<D> {
 		double departureTime = pickup.previousWaypoint.getDepartureTime() + toPickupTT + additionalPickupStopDuration;
 		double arrivalTime = departureTime + fromPickupToDropoffTT;
 
-		return new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss);
+		return new DetourTimeInfo(new PickupDetourInfo(departureTime, pickupTimeLoss),
+							new DropoffDetourInfo(arrivalTime, dropoffTimeLoss));
 	}
 
 	private double calcAdditionalPickupStopDurationIfSameLinkAsPrevious(VehicleEntry vEntry, int pickupIdx) {
@@ -176,11 +178,6 @@ public class InsertionDetourTimeCalculator<D> {
 		public DetourTimeInfo(PickupDetourInfo pickupDetourInfo, DropoffDetourInfo dropoffDetourInfo) {
 			this.pickupDetourInfo = pickupDetourInfo;
 			this.dropoffDetourInfo = dropoffDetourInfo;
-		}
-
-		public DetourTimeInfo(double departureTime, double arrivalTime, double pickupTimeLoss, double dropoffTimeLoss) {
-			this(new PickupDetourInfo(departureTime, pickupTimeLoss),
-					new DropoffDetourInfo(arrivalTime, dropoffTimeLoss));
 		}
 
 		// TOTAL time delay of each stop placed after the dropoff insertion point
