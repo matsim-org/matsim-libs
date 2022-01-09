@@ -54,7 +54,7 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculatorFactory,
 					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			var insertionCostCalculator = insertionCostCalculatorFactory.create(PathData::getTravelTime, null);
+			var insertionCostCalculator = insertionCostCalculatorFactory.create();
 			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
 					insertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();

@@ -55,18 +55,18 @@ public class BestInsertionFinder<D> {
 	}
 
 	private final Comparator<InsertionWithCost<D>> comparator = createInsertionWithCostComparator();
-	private final InsertionCostCalculator<D> costCalculator;
+	private final InsertionCostCalculator costCalculator;
 
-	public BestInsertionFinder(InsertionCostCalculator<D> costCalculator) {
+	public BestInsertionFinder(InsertionCostCalculator costCalculator) {
 		this.costCalculator = costCalculator;
 	}
 
 	public Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest,
 			Stream<InsertionWithDetourData<D>> insertions) {
 		return insertions.map(
-						insertion -> new InsertionWithCost<>(insertion, costCalculator.calculate(drtRequest, insertion)))
+						i -> new InsertionWithCost<>(i, costCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
 				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
 				.min(comparator)
-				.map(insertionWithCost -> insertionWithCost.insertionWithDetourData);
+				.map(iWithCost -> iWithCost.insertionWithDetourData);
 	}
 }

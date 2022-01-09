@@ -101,7 +101,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.InsertionCostCalculatorFactory.class).toProvider(modalProvider(
-				getter -> ShiftInsertionCostCalculator.createFactory(drtCfg, getter.get(MobsimTimer.class),
+				getter -> ShiftInsertionCostCalculator.createFactory(getter.get(MobsimTimer.class),
 						getter.getModal(CostCalculationStrategy.class))));
 
 		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(drtCfg));

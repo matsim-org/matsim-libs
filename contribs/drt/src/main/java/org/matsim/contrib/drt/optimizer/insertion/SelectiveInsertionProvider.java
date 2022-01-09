@@ -47,8 +47,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
 				insertionParams.getRestrictiveBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
-		var restrictiveCostCalculator = insertionCostCalculatorFactory.create(Double::doubleValue,
-				restrictiveDetourTimeEstimator);
+		var restrictiveCostCalculator = insertionCostCalculatorFactory.create();
 		return new SelectiveInsertionProvider(drtCfg, restrictiveDetourTimeEstimator, forkJoinPool,
 				restrictiveCostCalculator);
 	}
@@ -58,7 +57,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 	private final ForkJoinPool forkJoinPool;
 
 	public SelectiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator restrictiveTimeEstimator,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator<Double> restrictiveCostCalculator) {
+			ForkJoinPool forkJoinPool, InsertionCostCalculator restrictiveCostCalculator) {
 		this(new BestInsertionFinder<>(restrictiveCostCalculator),
 				new InsertionGenerator(drtCfg.getStopDuration(), restrictiveTimeEstimator), forkJoinPool);
 	}

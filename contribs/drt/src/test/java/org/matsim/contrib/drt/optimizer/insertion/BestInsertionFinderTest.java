@@ -44,8 +44,7 @@ public class BestInsertionFinderTest {
 	// if min costs equal, use the Id/idx comparator
 
 	private final DrtRequest request = mock(DrtRequest.class);
-	@SuppressWarnings("unchecked")
-	private final InsertionCostCalculator<Double> insertionCostCalculator = mock(InsertionCostCalculator.class);
+	private final InsertionCostCalculator insertionCostCalculator = mock(InsertionCostCalculator.class);
 	private final BestInsertionFinder<Double> bestInsertionFinder = new BestInsertionFinder<>(insertionCostCalculator);
 
 	@Test
@@ -55,17 +54,17 @@ public class BestInsertionFinderTest {
 
 	@Test
 	public void noFeasibleInsertions_empty() {
-		when(insertionCostCalculator.calculate(eq(request), any())).thenReturn(INFEASIBLE_SOLUTION_COST);
+		when(insertionCostCalculator.calculate(eq(request), any(), any())).thenReturn(INFEASIBLE_SOLUTION_COST);
 
-		assertThat(findBestInsertion(insertion(), insertion())).isEmpty();
+		assertThat(findBestInsertion(insertion("v1", 0, 0), insertion("v1", 0, 1))).isEmpty();
 	}
 
 	@Test
 	public void oneFeasibleInsertion_oneInfeasibleInsertion_chooseFeasible() {
-		var feasibleInsertion = insertion();
+		var feasibleInsertion = insertion("v1", 0, 0);
 		whenInsertionThenCost(feasibleInsertion, 12345);
 
-		var infeasibleInsertion = insertion();
+		var infeasibleInsertion = insertion("v1", 0, 1);
 		whenInsertionThenCost(infeasibleInsertion, INFEASIBLE_SOLUTION_COST);
 
 		assertThat(findBestInsertion(feasibleInsertion, infeasibleInsertion)).hasValue(feasibleInsertion);
@@ -74,10 +73,10 @@ public class BestInsertionFinderTest {
 
 	@Test
 	public void twoFeasibleInsertions_chooseBetter() {
-		var insertion1 = insertion();
+		var insertion1 = insertion("v1", 0, 0);
 		whenInsertionThenCost(insertion1, 123);
 
-		var insertion2 = insertion();
+		var insertion2 = insertion("v1", 0, 1);
 		whenInsertionThenCost(insertion2, 9999);
 
 		assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
@@ -126,12 +125,8 @@ public class BestInsertionFinderTest {
 	}
 
 	private void whenInsertionThenCost(InsertionWithDetourData<Double> insertion, double cost) {
-		when(insertionCostCalculator.calculate(eq(request), eq(insertion))).thenReturn(cost);
-	}
-
-	@SuppressWarnings("unchecked")
-	private InsertionWithDetourData<Double> insertion() {
-		return (InsertionWithDetourData<Double>)mock(InsertionWithDetourData.class);
+		when(insertionCostCalculator.calculate(eq(request), eq(insertion.insertion),
+				eq(insertion.detourTimeInfo))).thenReturn(cost);
 	}
 
 	private InsertionWithDetourData<Double> insertion(String vehicleId, int pickupIdx, int dropoffIdx) {
