@@ -40,7 +40,7 @@ class KNearestInsertionsAtEndFilter {
 		var filteredInsertions = new ArrayList<InsertionGenerator.Insertion>(insertions.size());
 
 		for (var insertionWithDetourData : insertions) {
-			var insertion = insertionWithDetourData.getInsertion();
+			var insertion = insertionWithDetourData.insertion;
 			VehicleEntry vEntry = insertion.vehicleEntry;
 			var pickup = insertion.pickup;
 			if (!vEntry.isAfterLastStop(pickup.index)) {
@@ -51,13 +51,13 @@ class KNearestInsertionsAtEndFilter {
 				// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles
 				// (timeToPickup is underestimated by this factor)
 				double timeDistance = departureTime
-						+ admissibleBeelineSpeedFactor * insertionWithDetourData.getDetourData().detourToPickup;
+						+ admissibleBeelineSpeedFactor * insertionWithDetourData.detourData.detourToPickup;
 				nearestInsertionsAtEnd.add(new InsertionWithCost<>(insertionWithDetourData, timeDistance));
 			}
 		}
 
 		nearestInsertionsAtEnd.kSmallestElements()
-				.forEach(i -> filteredInsertions.add(i.insertionWithDetourData.getInsertion()));
+				.forEach(i -> filteredInsertions.add(i.insertionWithDetourData.insertion));
 
 		return filteredInsertions;
 	}

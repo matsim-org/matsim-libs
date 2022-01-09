@@ -55,8 +55,9 @@ public class ShiftInsertionCostCalculator<D> implements InsertionCostCalculator<
 	@Override
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
-		if (!checkShiftTimeConstraintsForScheduledRequests(insertion.getInsertion(),
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion,
+				insertion.detourData);
+		if (!checkShiftTimeConstraintsForScheduledRequests(insertion.insertion,
 				detourTimeInfo.pickupDetourInfo.pickupTimeLoss, detourTimeInfo.getTotalTimeLoss())) {
 			return INFEASIBLE_SOLUTION_COST;
 		}

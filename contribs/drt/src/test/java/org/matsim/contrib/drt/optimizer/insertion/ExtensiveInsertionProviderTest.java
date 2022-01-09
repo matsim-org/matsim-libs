@@ -44,7 +44,7 @@ public class ExtensiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(null),
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(120, null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
@@ -79,9 +79,9 @@ public class ExtensiveInsertionProviderTest {
 		@SuppressWarnings("unchecked")
 		var admissibleCostCalculator = (InsertionCostCalculator<Double>)mock(InsertionCostCalculator.class);
 		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == feasibleInsertion))).thenReturn(1.);
+				argThat(argument -> argument.insertion == feasibleInsertion))).thenReturn(1.);
 		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == infeasibleInsertion)))//
+				argThat(argument -> argument.insertion == infeasibleInsertion)))//
 				.thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
 		//test insertionProvider
@@ -100,6 +100,6 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
 		return new InsertionWithDetourData<>(insertion,
-				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN));
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN), null);
 	}
 }

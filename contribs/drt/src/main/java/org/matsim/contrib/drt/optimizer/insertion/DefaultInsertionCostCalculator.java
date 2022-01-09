@@ -77,10 +77,9 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 	@Override
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion, insertion.detourData);
 
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
-
-		var insertion1 = insertion.getInsertion();
+		var insertion1 = insertion.insertion;
 		var vEntry = insertion1.vehicleEntry;
 
 		if (vEntry.getSlackTime(insertion1.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss

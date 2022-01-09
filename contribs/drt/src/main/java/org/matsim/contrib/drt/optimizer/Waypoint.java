@@ -32,6 +32,8 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -76,6 +78,16 @@ public interface Waypoint {
 		public int getOutgoingOccupancy() {
 			return occupancy;
 		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("task", task)
+					.add("link", link)
+					.add("time", time)
+					.add("occupancy", occupancy)
+					.toString();
+		}
 	}
 
 	class End implements Waypoint {
@@ -116,6 +128,11 @@ public interface Waypoint {
 		@Override
 		public int getOutgoingOccupancy() {
 			throw new UnsupportedOperationException("End is the terminal waypoint");
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("link", link).add("arrivalTime", arrivalTime).toString();
 		}
 	}
 
@@ -218,6 +235,11 @@ public interface Waypoint {
 		public int getOutgoingOccupancy() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("request", request).toString();
+		}
 	}
 
 	class Dropoff implements Waypoint {
@@ -245,6 +267,11 @@ public interface Waypoint {
 		@Override
 		public int getOutgoingOccupancy() {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("request", request).toString();
 		}
 	}
 }

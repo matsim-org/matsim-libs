@@ -60,7 +60,7 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 	public ExtensiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator admissibleTimeEstimator,
 			ForkJoinPool forkJoinPool, InsertionCostCalculator<Double> admissibleCostCalculator) {
 		this((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(), admissibleCostCalculator,
-				new InsertionGenerator(admissibleTimeEstimator), forkJoinPool);
+				new InsertionGenerator(drtCfg.getStopDuration(), admissibleTimeEstimator), forkJoinPool);
 	}
 
 	@VisibleForTesting

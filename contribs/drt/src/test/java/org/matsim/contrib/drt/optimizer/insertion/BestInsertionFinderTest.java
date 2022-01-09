@@ -143,6 +143,6 @@ public class BestInsertionFinderTest {
 		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
 
 		return new InsertionWithDetourData<>(
-				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion), null);
+				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion), null, null);
 	}
 }
