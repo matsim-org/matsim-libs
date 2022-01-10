@@ -19,21 +19,16 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.function.ToDoubleFunction;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
-public interface InsertionCostCalculator<D> {
-
-	interface InsertionCostCalculatorFactory {
-		<D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
-				DetourTimeEstimator replacedDriveTimeEstimator);
-	}
-
+public interface InsertionCostCalculator {
 	double INFEASIBLE_SOLUTION_COST = Double.POSITIVE_INFINITY;
 
-	double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion);
+	double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo);
 }

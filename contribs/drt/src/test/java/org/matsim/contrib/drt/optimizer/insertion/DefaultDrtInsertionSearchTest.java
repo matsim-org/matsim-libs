@@ -28,19 +28,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
@@ -49,62 +45,45 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 public class DefaultDrtInsertionSearchTest {
 	@Test
 	public void findBestInsertion_noInsertionsProvided() {
-		var insertionCostCalculator = new DefaultInsertionCostCalculator<>(new DrtConfigGroup(), null,
-				PathData::getTravelTime, null);
-		var insertionSearch = new DefaultDrtInsertionSearch(mock(InsertionProvider.class), null,
-				insertionCostCalculator);
+		var insertionSearch = new DefaultDrtInsertionSearch(mock(InsertionProvider.class), null, null, null);
 		assertThat(insertionSearch.findBestInsertion(null, List.of())).isEmpty();
 	}
 
 	@Test
-	public void findBestInsertion_twoInsertionsProvided() {
-		var beforePickupLink = mock(Link.class);
-		var afterPickupLink = mock(Link.class);
-		var beforeDropoffLink = mock(Link.class);
-		var afterDropoffLink = mock(Link.class);
-
+	public void findBestInsertion_oneInsertionsProvided() {
 		var request = DrtRequest.newBuilder().build();
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		//mock insertionProvider
-		var selectedInsertion = new Insertion(vehicleEntry, insertionPoint(beforePickupLink, afterPickupLink),
-				insertionPoint(beforeDropoffLink, afterDropoffLink));
-		var discardedInsertion = new Insertion(vehicleEntry, insertionPoint(beforePickupLink, afterPickupLink),
-				insertionPoint(beforeDropoffLink, afterDropoffLink));
-		var filteredInsertions = List.of(selectedInsertion, discardedInsertion);
+		var insertion = mock(Insertion.class);
+		var allInsertions = List.of(insertion);
 		var insertionProvider = mock(InsertionProvider.class);
-		when(insertionProvider.getInsertions(eq(request), eq(List.of(vehicleEntry)))).thenReturn(filteredInsertions);
+		when(insertionProvider.getInsertions(eq(request), eq(List.of(vehicleEntry)))).thenReturn(allInsertions);
 
 		//mock detourPathCalculator
-		var detourData = new DetourPathDataCache(Map.of(beforePickupLink, mock(PathData.class)),
-				Map.of(afterPickupLink, mock(PathData.class)), Map.of(beforeDropoffLink, mock(PathData.class)),
-				Map.of(afterDropoffLink, mock(PathData.class)), PathData.EMPTY);
+		var pathData = mock(DetourPathDataCache.class);
 		var detourPathCalculator = mock(DetourPathCalculator.class);
-		when(detourPathCalculator.calculatePaths(eq(request), eq(filteredInsertions))).thenReturn(detourData);
+		when(detourPathCalculator.calculatePaths(eq(request), eq(allInsertions))).thenReturn(pathData);
+		var insertionPathData = new InsertionDetourData<PathData>(null, null, null, null);
+		when(pathData.createInsertionDetourData(eq(insertion))).thenReturn(insertionPathData);
+
+		//mock detourTimeCalculator
+		var detourTimeCalculator = (InsertionDetourTimeCalculator<PathData>)mock(InsertionDetourTimeCalculator.class);
+		var detourTimeInfo = new InsertionDetourTimeCalculator.DetourTimeInfo(null, null);
+		when(detourTimeCalculator.calculateDetourTimeInfo(eq(insertion), eq(insertionPathData))).thenReturn(
+				detourTimeInfo);
 
 		//mock bestInsertionFinder
-		var selectedInsertionWithPathData = new InsertionWithDetourData<>(selectedInsertion,
-				detourData.createInsertionDetourData(selectedInsertion));
-		@SuppressWarnings("unchecked")
 		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
+		var insertionWithPathData = new InsertionWithDetourData<>(insertion, insertionPathData, detourTimeInfo);
 		when(bestInsertionFinder.findBestInsertion(eq(request),
-				argThat(argument -> argument.map(InsertionWithDetourData::getInsertion)
+				argThat(argument -> argument.map(insertionWithDetourData -> insertionWithDetourData.insertion)
 						.collect(toSet())
-						.equals(Set.of(selectedInsertion, discardedInsertion))))).thenReturn(
-				Optional.of(selectedInsertionWithPathData));
+						.equals(Set.of(insertion))))).thenReturn(Optional.of(insertionWithPathData));
 
 		//test insertion search
 		var insertionSearch = new DefaultDrtInsertionSearch(insertionProvider, detourPathCalculator,
-				bestInsertionFinder);
-		assertThat(insertionSearch.findBestInsertion(request, List.of(vehicleEntry))).hasValue(
-				selectedInsertionWithPathData);
-	}
-
-	private InsertionPoint insertionPoint(Link previousLink, Link nextLink) {
-		var previousWaypoint = mock(Waypoint.class);
-		when(previousWaypoint.getLink()).thenReturn(previousLink);
-		var nextWaypoint = mock(Waypoint.class);
-		when(nextWaypoint.getLink()).thenReturn(nextLink);
-		return new InsertionPoint(-1, previousWaypoint, null, nextWaypoint);
+				bestInsertionFinder, detourTimeCalculator);
+		assertThat(insertionSearch.findBestInsertion(request, List.of(vehicleEntry))).hasValue(insertionWithPathData);
 	}
 }

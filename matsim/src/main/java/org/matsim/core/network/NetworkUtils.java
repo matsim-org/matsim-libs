@@ -643,6 +643,7 @@ public final class NetworkUtils {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
 
+	public static final String ALLOWED_SPEED = "allowed_speed";
 	public static final String TYPE="type" ;
 	public static void setType( Link link , String type ) {
 //		if ( link instanceof LinkImpl ) {

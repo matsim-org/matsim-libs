@@ -40,18 +40,22 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 
 	private final InsertionProvider insertionProvider;
 	private final DetourPathCalculator detourPathCalculator;
+	private final InsertionDetourTimeCalculator<PathData> detourTimeCalculator;
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			InsertionCostCalculator<PathData> insertionCostCalculator) {
-		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(insertionCostCalculator));
+			InsertionCostCalculator insertionCostCalculator, double stopDuration) {
+		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(insertionCostCalculator),
+				new InsertionDetourTimeCalculator<>(stopDuration, PathData::getTravelTime, null));
 	}
 
 	@VisibleForTesting
 	DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			BestInsertionFinder<PathData> bestInsertionFinder) {
+			BestInsertionFinder<PathData> bestInsertionFinder,
+			InsertionDetourTimeCalculator<PathData> detourTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
+		this.detourTimeCalculator = detourTimeCalculator;
 		this.bestInsertionFinder = bestInsertionFinder;
 	}
 
@@ -64,7 +68,10 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 		}
 
 		DetourPathDataCache pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
-		return bestInsertionFinder.findBestInsertion(drtRequest,
-				insertions.stream().map(i -> new InsertionWithDetourData<>(i, pathData.createInsertionDetourData(i))));
+		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
+			var insertionDetourData = pathData.createInsertionDetourData(i);
+			return new InsertionWithDetourData<>(i, insertionDetourData,
+					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData));
+		}));
 	}
 }

@@ -88,13 +88,13 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertionWithDetourData) {
-		var insertion = insertionWithDetourData.getInsertion();
+		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.pickup.index;
 		int dropoffIdx = insertion.dropoff.index;
-		var detourData = insertionWithDetourData.getDetourData();
+		var detourData = insertionWithDetourData.detourData;
 
 		ScheduleStatus scheduleStatus = schedule.getStatus();
 		Task currentTask = scheduleStatus == ScheduleStatus.PLANNED ? null : schedule.getCurrentTask();
@@ -234,13 +234,13 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertionWithDetourData,
 			DrtStopTask pickupTask) {
-		var insertion = insertionWithDetourData.getInsertion();
+		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.pickup.index;
 		int dropoffIdx = insertion.dropoff.index;
-		var detourData = insertionWithDetourData.getDetourData();
+		var detourData = insertionWithDetourData.detourData;
 
 		Task driveToDropoffTask;
 		if (pickupIdx == dropoffIdx) { // no drive to dropoff

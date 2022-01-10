@@ -19,47 +19,19 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.function.ToDoubleFunction;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
-import javax.annotation.Nullable;
-
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author michalm
  */
-public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculator<D> {
-
-	public static InsertionCostCalculatorFactory createFactory(DrtConfigGroup drtCfg, MobsimTimer timer,
-			CostCalculationStrategy costCalculationStrategy) {
-		return new InsertionCostCalculatorFactory() {
-			@Override
-			public <D> InsertionCostCalculator<D> create(ToDoubleFunction<D> detourTime,
-					DetourTimeEstimator replacedDriveTimeEstimator) {
-				return new DefaultInsertionCostCalculator<>(drtCfg, costCalculationStrategy, detourTime,
-						replacedDriveTimeEstimator);
-			}
-		};
-	}
-
+public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
-	private final InsertionDetourTimeCalculator<D> detourTimeCalculator;
 
-	public DefaultInsertionCostCalculator(DrtConfigGroup drtConfig, CostCalculationStrategy costCalculationStrategy,
-			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
-		this(costCalculationStrategy, new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
-				replacedDriveTimeEstimator));
-	}
-
-	@VisibleForTesting
-	DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
-			InsertionDetourTimeCalculator<D> detourTimeCalculator) {
+	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
 		this.costCalculationStrategy = costCalculationStrategy;
-		this.detourTimeCalculator = detourTimeCalculator;
 	}
 
 	/**
@@ -75,19 +47,14 @@ public class DefaultInsertionCostCalculator<D> implements InsertionCostCalculato
 	 * @return cost of insertion (INFEASIBLE_SOLUTION_COST represents an infeasible insertion)
 	 */
 	@Override
-	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
-		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
+	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
+		var vEntry = insertion.vehicleEntry;
 
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
-
-		var insertion1 = insertion.getInsertion();
-		var vEntry = insertion1.vehicleEntry;
-
-		if (vEntry.getSlackTime(insertion1.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
-				|| vEntry.getSlackTime(insertion1.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
+		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
+				|| vEntry.getSlackTime(insertion.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
-		return costCalculationStrategy.calcCost(drtRequest, insertion1, detourTimeInfo);
+		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
 	}
 }

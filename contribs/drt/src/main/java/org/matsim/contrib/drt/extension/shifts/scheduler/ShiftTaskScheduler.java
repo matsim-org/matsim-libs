@@ -255,7 +255,7 @@ public class ShiftTaskScheduler {
                                    double startTime, double endTime, Link link) {
         Schedule schedule = vehicle.getSchedule();
         ShiftChangeOverTask dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
-                    endTime, link, shift.getEndTime(), breakFacility);
+                    endTime, link, shift, breakFacility);
         schedule.addTask(dropoffStopTask);
         schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, vehicle.getServiceEndTime(),
                 link, breakFacility));
@@ -309,7 +309,7 @@ public class ShiftTaskScheduler {
         // append SHIFT_CHANGEOVER task
         final double endTime = Math.max(shift.getEndTime(), vrpPath.getArrivalTime()) + shiftConfig.getChangeoverDuration();
         ShiftChangeOverTask dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, Math.max(shift.getEndTime(), vrpPath.getArrivalTime()),
-                endTime, vrpPath.getToLink(), shift.getEndTime(), facility);
+                endTime, vrpPath.getToLink(), shift, facility);
         schedule.addTask(dropoffStopTask);
 
         schedule.addTask(taskFactory.createWaitForShiftStayTask(vehicle, endTime, vehicle.getServiceEndTime(),
