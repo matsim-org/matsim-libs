@@ -232,7 +232,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
             if (edge.name != null)
                 link.getAttributes().putAttribute("name", edge.name);
 
-            link.getAttributes().putAttribute("type", edge.type);
+            link.getAttributes().putAttribute(NetworkUtils.TYPE, edge.type);
 
             link.setNumberOfLanes(edge.lanes.size());
             Set<String> modes = Sets.newHashSet(TransportMode.car, TransportMode.ride);
@@ -274,7 +274,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 }
             }
 
-            link.getAttributes().putAttribute("allowed_speed", speed);
+            link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, speed);
 
             if (prop == null) {
                 log.warn("Skipping unknown link type: {}", type.highway);
