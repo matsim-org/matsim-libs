@@ -154,22 +154,22 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assert.assertEquals(83271, (long) data.counts.get("car"));
-		Assert.assertEquals(31125, (long) data.counts.get("walk"));
-		Assert.assertEquals(86, (long) data.counts.get("bike"));
-		Assert.assertEquals(19086, (long) data.counts.get("pt"));
+		Assert.assertEquals(83845, (long) data.counts.get("car"));
+		Assert.assertEquals(32063, (long) data.counts.get("walk"));
+		Assert.assertEquals(77, (long) data.counts.get("bike"));
+		Assert.assertEquals(19154, (long) data.counts.get("pt"));
 
 		Assert.assertEquals(62, (long) data.pickupCounts.get("wheels"));
 		Assert.assertEquals(2, (long) data.pickupCounts.get("mobility"));
-		Assert.assertEquals(24, (long) data.pickupCounts.get("velib"));
+		Assert.assertEquals(15, (long) data.pickupCounts.get("velib"));
 
 		Assert.assertEquals(62, (long) data.dropoffCounts.get("wheels"));
 		Assert.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
-		Assert.assertEquals(24, (long) data.dropoffCounts.get("velib"));
+		Assert.assertEquals(15, (long) data.dropoffCounts.get("velib"));
 
-		Assert.assertEquals(1537, (long) data.failedPickupCounts.get("wheels"));
+		Assert.assertEquals(1536, (long) data.failedPickupCounts.get("wheels"));
 		Assert.assertEquals(1, (long) data.failedPickupCounts.get("mobility"));
-		Assert.assertEquals(50, (long) data.failedPickupCounts.get("velib"));
+		Assert.assertEquals(13, (long) data.failedPickupCounts.get("velib"));
 
 		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
 		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));
