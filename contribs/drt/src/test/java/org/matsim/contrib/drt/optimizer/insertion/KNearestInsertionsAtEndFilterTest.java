@@ -30,6 +30,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
@@ -60,8 +63,8 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertion1 = insertion(vehicleEntry, 0, 11);
 		var insertion2 = insertion(vehicleEntry, 0, 22);
 
-		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactlyInAnyOrder(insertion1.getInsertion(),
-				insertion2.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactlyInAnyOrder(insertion1.insertion,
+				insertion2.insertion);
 	}
 
 	@Test
@@ -75,8 +78,8 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertion2 = insertion(vehicleEntry2, 0, 61);
 
 		//insertion1 is better
-		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
-		assertThat(filterOneInsertionAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.insertion);
+		assertThat(filterOneInsertionAtEnd(insertion2, insertion1)).containsExactly(insertion1.insertion);
 	}
 
 	@Test
@@ -90,8 +93,8 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertion2 = insertion(vehicleEntry2, 0, 60);
 
 		//take the first
-		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
-		assertThat(filterOneInsertionAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.insertion);
+		assertThat(filterOneInsertionAtEnd(insertion2, insertion1)).containsExactly(insertion1.insertion);
 	}
 
 	@Test
@@ -102,14 +105,15 @@ public class KNearestInsertionsAtEndFilterTest {
 
 		//insertionAtEnd always returned last
 		assertThat(filterOneInsertionAtEnd(insertionAfterStart, insertionAtEnd)).containsExactlyInAnyOrder(
-				insertionAfterStart.getInsertion(), insertionAtEnd.getInsertion());
+				insertionAfterStart.insertion, insertionAtEnd.insertion);
 	}
 
 	private InsertionWithDetourData<Double> insertion(VehicleEntry vehicleEntry, int pickupIdx,
 			double toPickupDetourTime) {
-		return new InsertionWithDetourData<>(new InsertionGenerator.Insertion(vehicleEntry,
-				new InsertionGenerator.InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
-						vehicleEntry.getWaypoint(pickupIdx + 1)), null), toPickupDetourTime, null, null, null);
+		return new InsertionWithDetourData<>(new Insertion(vehicleEntry,
+				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
+						vehicleEntry.getWaypoint(pickupIdx + 1)), null),
+				new InsertionDetourData<>(toPickupDetourTime, null, null, null), null);
 	}
 
 	private Waypoint.Start start(double endTime) {
@@ -127,7 +131,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@SafeVarargs
-	private List<InsertionGenerator.Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
+	private List<Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
 		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(1, 1, List.of(insertions));
 	}
 }

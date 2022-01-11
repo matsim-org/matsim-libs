@@ -47,7 +47,7 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 									breakSpec.getEarliestBreakStartTime(),
 									breakSpec.getLatestBreakEndTime(),
 									breakSpec.getDuration());
-							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(), shiftBreak);
+							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(), spec.getOperationFacilityId().orElse(null), shiftBreak);
 						})
 						.collect(ImmutableMap.toImmutableMap(DrtShift::getId, s -> s));
 				return () -> shifts;
@@ -63,7 +63,7 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 						.stream()
 						.map(spec -> (OperationFacility) new OperationFacilityImpl(
 								spec.getId(), spec.getLinkId(), spec.getCoord(),
-								spec.getCapacity(), spec.getCharger(), spec.getType()
+								spec.getCapacity(), spec.getCharger().orElse(null), spec.getType()
 						))
 						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
 				return () -> operationFacilities;

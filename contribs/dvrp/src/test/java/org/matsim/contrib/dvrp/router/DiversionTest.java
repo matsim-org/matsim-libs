@@ -62,6 +62,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import com.google.inject.Singleton;
 
@@ -290,6 +292,8 @@ public class DiversionTest {
 			bindModal(Fleet.class).toProvider(modalProvider(getter -> {
 				return Fleets.createDefaultFleet(fleetSpecification, getter.getModal(Network.class).getLinks()::get);
 			})).in(Singleton.class);
+
+			bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
 
 			install(new VrpAgentSourceQSimModule(getMode()));
 

@@ -35,7 +35,11 @@ public class ShiftDrtOptimizer implements DrtOptimizer {
 
 
         if(task instanceof ShiftChangeOverTask) {
-            dispatcher.endShift((ShiftDvrpVehicle) vehicle, ((ShiftChangeOverTask) task).getLink().getId());
+			dispatcher.endShift(
+					(ShiftDvrpVehicle) vehicle,
+					((ShiftChangeOverTask) task).getLink().getId(),
+					((ShiftChangeOverTask) task).getFacility().getId()
+			);
         } else if(task instanceof ShiftBreakTask) {
             dispatcher.startBreak((ShiftDvrpVehicle) vehicle, ((ShiftBreakTask) task).getFacility().getLinkId());
         }

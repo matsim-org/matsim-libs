@@ -1,6 +1,9 @@
 package org.matsim.contrib.drt.extension.shifts.shift;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+
+import java.util.Optional;
 
 /**
  * @author nkuehnel, fzwick / MOIA
@@ -11,16 +14,19 @@ public class DrtShiftImpl implements DrtShift {
 
 	private double start;
 	private double end;
+	private Id<OperationFacility> operationFacilityId;
 
 	private DrtShiftBreak shiftBreak;
 
 	private boolean started = false;
 	private boolean ended = false;
 
-	public DrtShiftImpl(Id<DrtShift> id, double start, double end, DrtShiftBreak shiftBreak) {
+	public DrtShiftImpl(Id<DrtShift> id, double start, double end, Id<OperationFacility> operationFacilityId,
+						DrtShiftBreak shiftBreak) {
 		this.id = id;
 		this.start = start;
 		this.end = end;
+		this.operationFacilityId = operationFacilityId;
 		this.shiftBreak = shiftBreak;
 	}
 
@@ -65,6 +71,11 @@ public class DrtShiftImpl implements DrtShift {
 		} else {
 			throw new IllegalStateException("Shift already ended!");
 		}
+	}
+
+	@Override
+	public Optional<Id<OperationFacility>> getOperationFacilityId() {
+		return Optional.ofNullable(operationFacilityId);
 	}
 
 	@Override

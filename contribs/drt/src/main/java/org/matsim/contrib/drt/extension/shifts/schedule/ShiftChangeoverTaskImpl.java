@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.shifts.schedule;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 
 /**
@@ -10,18 +11,18 @@ import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
  */
 public class ShiftChangeoverTaskImpl extends DefaultDrtStopTask implements ShiftChangeOverTask {
 
-	private final double shiftEndTime;
+	private final DrtShift shift;
 	private final OperationFacility facility;
 
-	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, double shiftEndTime, OperationFacility facility) {
+	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, DrtShift shift, OperationFacility facility) {
 		super(beginTime, endTime, link);
-		this.shiftEndTime = shiftEndTime;
+		this.shift = shift;
 		this.facility = facility;
 	}
 
 	@Override
-	public double getShiftEndTime() {
-		return shiftEndTime;
+	public DrtShift getShift() {
+		return shift;
 	}
 
 	@Override

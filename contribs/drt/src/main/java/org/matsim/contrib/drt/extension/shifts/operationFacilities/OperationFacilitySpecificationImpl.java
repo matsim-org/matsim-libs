@@ -5,6 +5,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
+import java.util.Optional;
+
 /**
  * @author nkuehnel / MOIA
  */
@@ -47,8 +49,8 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 	}
 
 	@Override
-	public Id<Charger> getCharger() {
-		return chargerId;
+	public Optional<Id<Charger>> getCharger() {
+		return Optional.ofNullable(chargerId);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.eshifts.schedule;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -54,8 +55,8 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-														 Link link, double latestArrivalTime, OperationFacility facility) {
-        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, latestArrivalTime, 0, null, facility);
+														 Link link, DrtShift shift, OperationFacility facility) {
+        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, 0, null, facility);
     }
 
     @Override
@@ -79,8 +80,8 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     public ShiftChangeOverTask createChargingShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
                                                                  Link link, Charger charger, double totalEnergy,
-                                                                 double latestArrivalTime, OperationFacility facility) {
+                                                                 DrtShift shift, OperationFacility facility) {
         ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy);
-        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, latestArrivalTime, totalEnergy, chargingTask, facility);
+        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, totalEnergy, chargingTask, facility);
     }
 }

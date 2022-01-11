@@ -6,6 +6,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.facilities.Facility;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -21,7 +22,7 @@ public interface OperationFacility extends Identifiable<OperationFacility>, Faci
 
     boolean deregisterVehicle(Id<DvrpVehicle> id);
 
-    Id<Charger> getCharger();
+    Optional<Id<Charger>> getCharger();
 
     OperationFacilityType getType();
 

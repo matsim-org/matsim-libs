@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -43,7 +44,7 @@ public class ExtensiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(null),
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(120, null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
@@ -75,13 +76,11 @@ public class ExtensiveInsertionProviderTest {
 						insertionWithDetourData(infeasibleInsertion)));
 
 		//mock admissibleCostCalculator
-		@SuppressWarnings("unchecked")
-		var admissibleCostCalculator = (InsertionCostCalculator<Double>)mock(InsertionCostCalculator.class);
-		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == feasibleInsertion))).thenReturn(1.);
-		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == infeasibleInsertion)))//
-				.thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
+		var admissibleCostCalculator = (InsertionCostCalculator)mock(InsertionCostCalculator.class);
+		when(admissibleCostCalculator.calculate(eq(request), argThat(argument -> argument == feasibleInsertion),
+				any())).thenReturn(1.);
+		when(admissibleCostCalculator.calculate(eq(request), argThat(argument -> argument == infeasibleInsertion),
+				any())).thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
 		//test insertionProvider
 		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
@@ -98,6 +97,7 @@ public class ExtensiveInsertionProviderTest {
 	}
 
 	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
-		return new InsertionWithDetourData<>(insertion, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+		return new InsertionWithDetourData<>(insertion,
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN), null);
 	}
 }
