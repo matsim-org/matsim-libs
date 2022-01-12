@@ -131,7 +131,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			}
 		} else {
 			InsertionWithDetourData<PathData> insertion = best.get();
-			var vehicle = insertion.getInsertion().vehicleEntry.vehicle;
+			var vehicle = insertion.insertion.vehicleEntry.vehicle;
 			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
 
 			VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);

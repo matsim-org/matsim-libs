@@ -105,6 +105,10 @@
 		<node id="(9,7)" x="9000.0" y="7000.0" />
 		<node id="(9,8)" x="9000.0" y="8000.0" />
 		<node id="(9,9)" x="9000.0" y="9000.0" />
+		<!--		Two dummy nodes to hopefully improve the initial view of otfvis.  If this is not enough, we will have to add links to/from these-->
+		<!--		nodes.  kai, jan'22-->
+		<node id="dummy1" x="-1000" y="-1000" />
+		<node id="dummy2" x="10000" y="10000" />
 	</nodes>
 
 <!-- ====================================================================== -->

@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 
 import com.google.common.base.MoreObjects;
 
@@ -76,27 +76,22 @@ public class InsertionWithDetourData<D> {
 		}
 	}
 
-	private final Insertion insertion;
-	private final InsertionDetourData<D> insertionDetourData;
+	public final Insertion insertion;
+	public final InsertionDetourData<D> detourData;
+	public final DetourTimeInfo detourTimeInfo;
 
-	InsertionWithDetourData(Insertion insertion, InsertionDetourData<D> insertionDetourData) {
+	InsertionWithDetourData(Insertion insertion, InsertionDetourData<D> detourData, DetourTimeInfo detourTimeInfo) {
 		this.insertion = insertion;
-		this.insertionDetourData = insertionDetourData;
-	}
-
-	public Insertion getInsertion() {
-		return insertion;
-	}
-
-	public InsertionDetourData<D> getDetourData() {
-		return insertionDetourData;
+		this.detourData = detourData;
+		this.detourTimeInfo = detourTimeInfo;
 	}
 
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("insertion", insertion)
-				.add("insertionDetourData", insertionDetourData)
+				.add("insertionDetourData", detourData)
+				.add("detourTimeInfo", detourTimeInfo)
 				.toString();
 	}
 }

@@ -165,6 +165,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(60 / 3.6, link.getFreespeed(), 0);
+		assertEquals(link.getFreespeed(), (double) link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED), 0);
 	}
 
 	@Test
@@ -188,6 +189,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(60 * 1.609344 / 3.6, link.getFreespeed(), 0);
+		assertEquals(link.getFreespeed(), (double) link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED), 0);
 	}
 
 	@Test
@@ -211,7 +213,10 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
+		// the freespeed of the link should be reduced by the speed factor
 		assertEquals(50 / 3.6 * LinkProperties.DEFAULT_FREESPEED_FACTOR, link.getFreespeed(), 0);
+		// the original max speed should be stored as is
+		assertEquals(50 / 3.6, (double) link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED), 0);
 	}
 
 	@Test
@@ -236,6 +241,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(LinkProperties.createMotorway().freespeed, link.getFreespeed(), 0);
+		assertEquals(link.getFreespeed(), (double) link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED), 0);
 	}
 
 	@Test
@@ -261,6 +267,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(LinkProperties.createTertiary().freespeed, link.getFreespeed(), 0);
+		assertEquals(link.getFreespeed(), (double) link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED), 0);
 	}
 
 	@Test
@@ -288,6 +295,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		// the freespeed for 'urban' links (links without a speed tag and shorter than 300m) freespeed is reduced depending on the length of the link
 		assertTrue(LinkProperties.createTertiary().freespeed > link.getFreespeed());
+		assertEquals(link.getFreespeed(), (double) link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED), 0);
 	}
 
 	@Test

@@ -65,7 +65,9 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
             atts.add(createTuple(X_COORD, facility.getCoord().getX()));
             atts.add(createTuple(Y_COORD, facility.getCoord().getY()));
             atts.add(createTuple(CAPACITY, facility.getCapacity()));
-            atts.add(createTuple(CHARGER_ID, facility.getCharger().toString()));
+			if(facility.getCharger().isPresent()) {
+				atts.add(createTuple(CHARGER_ID, facility.getCharger().get().toString()));
+			}
             atts.add(createTuple(TYPE, facility.getType().toString()));
             this.writeStartTag(FACILITY_NAME, atts, true);
         }

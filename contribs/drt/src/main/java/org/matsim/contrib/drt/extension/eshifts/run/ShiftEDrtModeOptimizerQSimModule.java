@@ -10,6 +10,7 @@ import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImp
 import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShifts;
@@ -49,7 +50,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
 				getter -> new EDrtShiftDispatcherImpl(getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class), getter.getModal(OperationFacilityFinder.class),
+						getter.get(MobsimTimer.class), getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(EShiftTaskScheduler.class), getter.getModal(Network.class),
 						getter.getModal(ChargingInfrastructure.class), getter.get(EventsManager.class), shiftConfigGroup))
 		).asEagerSingleton();

@@ -256,6 +256,7 @@ public class SupersonicOsmNetworkReader {
         link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), properties, adjustCapacityLength) * link.getNumberOfLanes());
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
         link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
+        link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, getMaxSpeed(segment.getTags(), link.getLength(), properties));
         if (storeOriginalGeometry && segment.getNodesForSegment().size() > 2)
             // this is optional functionality. Also, the first and last nodeforsegment are the from and to node of the simplified link
             // it makes only sense to store more geometry information if there are intermediate nodes.
@@ -294,6 +295,14 @@ public class SupersonicOsmNetworkReader {
         if (tags.containsKey(OsmTags.MAXSPEED)) {
             double maxSpeed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
             return LinkProperties.calculateSpeedIfSpeedTag(maxSpeed, freeSpeedFactor);
+        } else {
+            return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
+        }
+    }
+
+    private double getMaxSpeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
+        if (tags.containsKey(OsmTags.MAXSPEED)) {
+            return parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
         } else {
             return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
         }

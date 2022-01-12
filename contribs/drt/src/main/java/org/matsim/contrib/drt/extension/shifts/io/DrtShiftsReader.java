@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.shifts.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.shifts.shift.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -21,6 +22,7 @@ public class DrtShiftsReader extends MatsimXmlParser {
     public static final String ID = "id";
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
+    public static final String OPERATION_FACILITY_ID = "operationFacilityId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
@@ -46,6 +48,10 @@ public class DrtShiftsReader extends MatsimXmlParser {
 				builder.id(Id.create( atts.getValue(ID), DrtShift.class ));
 				builder.start(Double.parseDouble(atts.getValue(START_TIME)));
 				builder.end(Double.parseDouble(atts.getValue(END_TIME)));
+				String operationFacilityId = atts.getValue(OPERATION_FACILITY_ID);
+				if(operationFacilityId != null) {
+					builder.operationFacility(Id.create(operationFacilityId, OperationFacility.class));
+				}
                 currentBuilder = builder;
                 break;
             case BREAK_NAME:
