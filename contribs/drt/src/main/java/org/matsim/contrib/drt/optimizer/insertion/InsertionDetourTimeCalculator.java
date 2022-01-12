@@ -34,17 +34,17 @@ public class InsertionDetourTimeCalculator<D> {
 	}
 
 	public DetourTimeInfo calculateDetourTimeInfo(Insertion insertion, InsertionDetourData<D> detourData) {
-		if (insertion.pickup.index == insertion.dropoff.index) {
-			//handle the pickup->dropoff case separately
-			return calculateDetourTimeInfoForIfPickupToDropoffDetour(insertion, detourData);
-		}
-
 		var pickupDetourInfo = calcPickupDetourInfo(insertion, detourData);
 		var dropoffDetourInfo = calcDropoffDetourInfo(insertion, detourData, pickupDetourInfo);
 		return new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo);
 	}
 
-	private PickupDetourInfo calcPickupDetourInfo(Insertion insertion, InsertionDetourData<D> detourData) {
+	public PickupDetourInfo calcPickupDetourInfo(Insertion insertion, InsertionDetourData<D> detourData) {
+		if (insertion.pickup.index == insertion.dropoff.index) {
+			//handle the pickup->dropoff case separately
+			return calcPickupDetourInfoIfPickupToDropoffDetour(insertion, detourData);
+		}
+
 		InsertionPoint pickup = insertion.pickup;
 		VehicleEntry vEntry = insertion.vehicleEntry;
 
@@ -65,8 +65,13 @@ public class InsertionDetourTimeCalculator<D> {
 		return new PickupDetourInfo(departureTime, pickupTimeLoss);
 	}
 
-	private DropoffDetourInfo calcDropoffDetourInfo(Insertion insertion, InsertionDetourData<D> detourData,
+	public DropoffDetourInfo calcDropoffDetourInfo(Insertion insertion, InsertionDetourData<D> detourData,
 			PickupDetourInfo pickupDetourInfo) {
+		if (insertion.pickup.index == insertion.dropoff.index) {
+			//handle the pickup->dropoff case separately
+			return calcDropoffDetourInfoIfPickupToDropoffDetour(insertion, detourData, pickupDetourInfo);
+		}
+
 		InsertionPoint dropoff = insertion.dropoff;
 		VehicleEntry vEntry = insertion.vehicleEntry;
 
@@ -85,13 +90,6 @@ public class InsertionDetourTimeCalculator<D> {
 				+ pickupDetourInfo.pickupTimeLoss
 				+ toDropoffTT;
 		return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
-	}
-
-	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(Insertion insertion,
-			InsertionDetourData<D> detourData) {
-		var pickupDetourInfo = calcPickupDetourInfoIfPickupToDropoffDetour(insertion, detourData);
-		var dropoffDetourInfo = calcDropoffDetourInfoIfPickupToDropoffDetour(insertion, detourData, pickupDetourInfo);
-		return new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo);
 	}
 
 	private PickupDetourInfo calcPickupDetourInfoIfPickupToDropoffDetour(Insertion insertion,
