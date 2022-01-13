@@ -127,16 +127,30 @@ class PenaltyCalculator {
 	}
 	
 	/**
-	 * Creates a dummy calculator with one timebin and a spatial binsize of 100km. It returns a constant value on
+	 * Creates a dummy calculator with one timebin and a spatial binsize of 100km. It returns 3600s (1h) on
 	 * every request by using {@linkplain PenaltyCalculator.DummyPenaltyFunction} as function.
 	 * 
 	 * @return The created dummy calculator
 	 */
-	public static PenaltyCalculator getDummyCalculator() {
+	public static PenaltyCalculator getDummyHourCalculator() {
 		TLongIntMap[] cars = new TLongIntMap[1];
 		cars[0] = new TLongIntHashMap();
 		PenaltyCalculator penaltyCalculator = new PenaltyCalculator(cars, 1, new HectareMapper(100000));
-		penaltyCalculator.setPenaltyFunction(new DummyPenaltyFunction());
+		penaltyCalculator.setPenaltyFunction(new DummyPenaltyFunction(3600));
+		return penaltyCalculator;
+	}
+	
+	/**
+	 * Creates a dummy calculator with one timebin and a spatial binsize of 100km. It returns 0 on
+	 * every request by using {@linkplain PenaltyCalculator.DummyPenaltyFunction} as function.
+	 * 
+	 * @return The created dummy calculator
+	 */
+	public static PenaltyCalculator getDummyZeroCalculator() {
+		TLongIntMap[] cars = new TLongIntMap[1];
+		cars[0] = new TLongIntHashMap();
+		PenaltyCalculator penaltyCalculator = new PenaltyCalculator(cars, 1, new HectareMapper(100000));
+		penaltyCalculator.setPenaltyFunction(new DummyPenaltyFunction(0));
 		return penaltyCalculator;
 	}
 	
@@ -152,12 +166,16 @@ class PenaltyCalculator {
 	}
 	
 	/**
-	 * Always returns 3600s (1h) regardless of how many entities there are in the space-time-bin.
+	 * Always returns a fixed time regardless of how many entities there are in the space-time-bin.
 	 */
 	public static class DummyPenaltyFunction implements PenaltyFunction {
+		private final int time;
+		public DummyPenaltyFunction(int time) {
+			this.time = time;
+		}
 		@Override
 		public double calculatePenalty(int numberOfCars) {
-			return 3600;
+			return time;
 		}
 	}
 }

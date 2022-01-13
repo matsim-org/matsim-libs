@@ -28,7 +28,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  * Before the mobsim, gets the current {@linkplain PenaltyCalculator} from the provided {@linkplain PenaltyGenerator} and
  * resets that latter so it can - theoretically - gather information during the new iteration. However, it is your own
  * responsibility to feed it with data. The penalty for each space-time-gridcell with non-zero penalty is dumped for each
- * iteration. In the zeroth iteration, {@linkplain PenaltyCalculator#getDummyCalculator()} is used to calculate the penalties.
+ * iteration. In the zeroth iteration, {@linkplain PenaltyCalculator#getDummyHourCalculator()} is used to calculate the penalties.
  * 
  * @author tkohl / Senozon
  *
@@ -41,6 +41,7 @@ class CarEgressWalkObserver implements BeforeMobsimListener {
 	
 	private final PenaltyGenerator penaltyGenerator;
 	private final PenaltyFunction penaltyFunction;
+	private final PenaltyCalculator iter0PenaltyCalculator;
 	
 	private PenaltyCalculator penaltyCalculator;
 	
@@ -49,16 +50,17 @@ class CarEgressWalkObserver implements BeforeMobsimListener {
 	 * 
 	 * @param penaltyGenerator
 	 */
-	public CarEgressWalkObserver(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction) {
+	public CarEgressWalkObserver(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction, PenaltyCalculator iter0PenaltyCalculator) {
 		this.penaltyGenerator = penaltyGenerator;
 		this.penaltyFunction = penaltyFunction;
+		this.iter0PenaltyCalculator = iter0PenaltyCalculator;
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// update the Penalties to the result of the last iteration
 		if (event.getIteration() == 0) {
-			this.penaltyCalculator = PenaltyCalculator.getDummyCalculator();
+			this.penaltyCalculator = iter0PenaltyCalculator;
 		} else {
 			this.penaltyCalculator = this.penaltyGenerator.generatePenaltyCalculator();
 			this.penaltyCalculator.setPenaltyFunction(this.penaltyFunction);

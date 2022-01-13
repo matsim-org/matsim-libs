@@ -58,22 +58,13 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 	private final Iter0Method iter0Method;
 	
 	/**
-	 * Sets the class up with the {@linkplain PenaltyCalculator.DefaultPenaltyFunction} and the specified {@linkplain PenaltyGenerator}.
-	 * 
-	 * @param penaltyGenerator
-	 */
-	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator) {
-		this(penaltyGenerator, new PenaltyCalculator.DefaultPenaltyFunction(), Iter0Method.hourPenalty);
-	}
-	
-	/**
 	 * Sets the class up with the specified {@linkplain PenaltyGenerator} and {@linkplain PenaltyFunction}.
 	 * 
 	 * @param penaltyGenerator
 	 * @param penaltyFunction
 	 */
-	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction, Iter0Method iter0Method) {
-		this.observer = new CarEgressWalkObserver(penaltyGenerator, penaltyFunction);
+	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction, CarEgressWalkObserver observer, Iter0Method iter0Method) {
+		this.observer = observer;
 		this.iter0Method = iter0Method;
 	}
 
@@ -89,6 +80,7 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 		if (event.getIteration() == 0) {
 			switch (this.iter0Method) {
 			case hourPenalty:
+			case estimateFromPlans:
 				this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), false);
 				break;
 			case noPenalty:
@@ -96,8 +88,6 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 			case takeFromAttributes:
 				this.changeEgressTimesByAttribute(event.getServices().getScenario().getPopulation().getPersons().values(), false);
 				break;
-			case estimateFromPlans:
-				throw new RuntimeException("not implemented yet");
 			}
 		} else {
 			this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), false);
@@ -113,16 +103,16 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 		// a different penalty next iteration.
 		if (event.getIteration() == 0) {
 			switch (this.iter0Method) {
-			case hourPenalty:
-				this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
-				break;
 			case noPenalty:
+			case hourPenalty:
+			case estimateFromPlans:
+				this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
 				break;
 			case takeFromAttributes:
 				this.changeEgressTimesByAttribute(event.getServices().getScenario().getPopulation().getPersons().values(), true);
 				break;
-			case estimateFromPlans:
-				throw new RuntimeException("not implemented yet");
+			default:
+				throw new RuntimeException("Unknown iter0 mode");
 			}
 		} else {
 			this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
