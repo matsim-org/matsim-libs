@@ -331,13 +331,15 @@ public class EShiftTaskScheduler {
     }
 
     public void startShift(ShiftDvrpVehicle vehicle, double now, DrtShift shift) {
-        Schedule schedule = vehicle.getSchedule();
-        DrtStayTask stayTask = (DrtStayTask) schedule.getCurrentTask();
-        if (stayTask instanceof WaitForShiftStayTask) {
-            ((WaitForShiftStayTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
-            stayTask.setEndTime(now);
-            schedule.addTask(taskFactory.createStayTask(vehicle, now, shift.getEndTime(), stayTask.getLink()));
-        }
+		Schedule schedule = vehicle.getSchedule();
+		StayTask stayTask = (StayTask) schedule.getCurrentTask();
+		if (stayTask instanceof WaitForShiftStayTask) {
+			((WaitForShiftStayTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
+			stayTask.setEndTime(now);
+			schedule.addTask(taskFactory.createStayTask(vehicle, now, shift.getEndTime(), stayTask.getLink()));
+		} else {
+			throw new IllegalStateException("Vehicle cannot start shift during task:" + stayTask.getTaskType().name());
+		}
     }
 
     public boolean updateShiftChange(ShiftDvrpVehicle vehicle, Link link, DrtShift shift,

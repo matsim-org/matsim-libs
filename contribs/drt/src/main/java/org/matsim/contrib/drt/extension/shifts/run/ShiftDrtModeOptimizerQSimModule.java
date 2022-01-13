@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcherImpl;
+import org.matsim.contrib.drt.extension.shifts.fleet.DefaultShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.NearestOperationFacilityWithCapacityFinder;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityFinder;
@@ -35,14 +36,19 @@ import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
@@ -120,5 +126,17 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						new DrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),
 								getter.get(DvrpConfigGroup.class))))
 		).asEagerSingleton();
+
+
+		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+			@Override
+			public Fleet get() {
+				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
+				Network network = getModalInstance(Network.class);
+				return Fleets.createCustomFleet(fleetSpecification,
+						s -> new DefaultShiftDvrpVehicle(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId()))));
+
+			}
+		}).asEagerSingleton();
 	}
 }
