@@ -177,10 +177,15 @@ public class InsertionGenerator {
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 				fromPickupTT, true);
 
+		int j = i;
+		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
+			j++; // skip insertion: i -> pickup -> dropoff -> i+1
+		}
+
 		boolean recalculated = false;
 
 		int stopCount = vEntry.stops.size();
-		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
+		for (; j < stopCount; j++) {// insertions up to before last stop
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 			if (j == i + 1) {
 				//calculate it once for all j > i
@@ -190,6 +195,10 @@ public class InsertionGenerator {
 				pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 						fromPickupTT, false);
 				recalculated = true;
+
+				if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
+					return; // skip all insertions: i -> pickup -> dropoff
+				}
 			}
 
 			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
@@ -197,8 +206,9 @@ public class InsertionGenerator {
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (request.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
-						insertions.add(createInsertionWithDetourData(request, vEntry, pickupInsertion, toPickupTT,
-								fromPickupTT, pickupDetourInfo, j));
+						addInsertion(insertions,
+								createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT,
+										pickupDetourInfo, j));
 					}
 
 					return;// stop iterating -- cannot insert dropoff after node j
@@ -206,8 +216,9 @@ public class InsertionGenerator {
 			}
 
 			if (request.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
-				insertions.add(createInsertionWithDetourData(request, vEntry, pickupInsertion, toPickupTT, fromPickupTT,
-						pickupDetourInfo, j));
+				addInsertion(insertions,
+						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+								j));
 			}
 			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
@@ -219,10 +230,21 @@ public class InsertionGenerator {
 					pickupInsertion.nextWaypoint.getLink());
 			pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 					fromPickupTT, false);
+
+			if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
+				return; // skip insertion: i -> pickup -> dropoff -> end
+			}
 		}
 
-		insertions.add(createInsertionWithDetourData(request, vEntry, pickupInsertion, toPickupTT, fromPickupTT,
-				pickupDetourInfo, stopCount));
+		addInsertion(insertions,
+				createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+						stopCount));
+	}
+
+	private void addInsertion(List<InsertionWithDetourData> insertions, InsertionWithDetourData insertion) {
+		if (insertion != null) {
+			insertions.add(insertion);
+		}
 	}
 
 	private Waypoint.Stop currentStop(VehicleEntry entry, int insertionIdx) {
@@ -234,8 +256,7 @@ public class InsertionGenerator {
 	}
 
 	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
-			InsertionPoint pickupInsertion, double toPickupTT, double fromPickupTT, PickupDetourInfo pickupDetourInfo,
-			int dropoffIdx) {
+			InsertionPoint pickupInsertion, double fromPickupTT, PickupDetourInfo pickupDetourInfo, int dropoffIdx) {
 		var dropoffInsertion = createDropoffInsertion(request, vehicleEntry, pickupInsertion, dropoffIdx);
 		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion);
 
@@ -248,6 +269,12 @@ public class InsertionGenerator {
 
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
 				pickupDetourInfo);
+
+		if (vehicleEntry.getSlackTime(dropoffIdx)
+				< pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss) {
+			return null; // skip this dropoff insertion
+		}
+
 		return new InsertionWithDetourData(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
 	}
 }

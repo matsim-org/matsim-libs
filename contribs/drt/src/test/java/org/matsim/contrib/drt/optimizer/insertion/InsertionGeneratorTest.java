@@ -25,6 +25,7 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalc
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -365,6 +366,8 @@ public class InsertionGeneratorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null);
+		var slackTimes = new double[stops.length + 1];
+		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes);
 	}
 }
