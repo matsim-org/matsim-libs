@@ -153,7 +153,7 @@ public class RunEShiftDrtScenarioIT {
 				@Override
 				public void install() {
 					bind(ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+							new ShiftEDrtVehicleDataEntryFactory.ShiftEDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC));
 				}
 			});
 		}

@@ -38,18 +38,18 @@ public class ShiftEDrtVehicleDataEntryFactory implements VehicleEntry.EntryFacto
     }
 
     public static class ShiftEDrtVehicleDataEntryFactoryProvider implements Provider<ShiftEDrtVehicleDataEntryFactory> {
-        private final double minimumRelativeSoc;
+		private final DrtConfigGroup drtCfg;
+		private final double minimumRelativeSoc;
 
-        @Inject
-        private Config config;
 
-        public ShiftEDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
+        public ShiftEDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+			this.drtCfg = drtCfg;
             this.minimumRelativeSoc = minimumRelativeSoc;
         }
 
         @Override
         public ShiftEDrtVehicleDataEntryFactory get() {
-            return new ShiftEDrtVehicleDataEntryFactory(DrtConfigGroup.getSingleModeDrtConfig(config), minimumRelativeSoc);
+            return new ShiftEDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
         }
     }
 }
