@@ -23,7 +23,7 @@ public class SharingUtils {
 	static public final String STATION_ID_ATTRIBUTE = "sharing:stationId";
 	static public final String SERVICE_ID_ATTRIBUTE = "sharing:service";
 
-	static public final String MODE_PREFIX = "sharing:";
+	static public final String MODE_PREFIX = "sharing_";
 
 	static public final double INTERACTION_DURATION = 60.0;
 

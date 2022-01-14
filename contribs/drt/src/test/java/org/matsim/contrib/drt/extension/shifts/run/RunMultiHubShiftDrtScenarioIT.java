@@ -115,7 +115,7 @@ public class RunMultiHubShiftDrtScenarioIT {
 		config.controler().setWriteEventsInterval(1);
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
+		config.controler().setOutputDirectory("test/output/holzkirchen_shifts_multiHub");
 
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
 		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
