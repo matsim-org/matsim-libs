@@ -4,12 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sharing.io.SharingServiceSpecification;
 import org.matsim.contrib.sharing.io.SharingStationSpecification;
 import org.matsim.contrib.sharing.io.SharingVehicleSpecification;
@@ -22,6 +25,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import com.google.common.base.Verify;
 
 public class StationBasedService implements SharingService {
+	private static final Logger LOG = LogManager.getLogger(StationBasedService.class);
 	private final Id<SharingService> serviceId;
 	private final double maximumDistance;
 
@@ -30,6 +34,7 @@ public class StationBasedService implements SharingService {
 	private final IdSet<SharingVehicle> activeRentals = new IdSet<>(SharingVehicle.class);
 	private final IdMap<SharingVehicle, SharingVehicle> vehicles = new IdMap<>(SharingVehicle.class);
 	private final IdMap<SharingStation, SharingStation> stations = new IdMap<>(SharingStation.class);
+	private final IdMap<Person, SharingVehicle> reservations = new IdMap<>(Person.class);
 
 	private final QuadTree<SharingVehicle> availableVehicles;
 	private final QuadTree<SharingStation> availableStations;
@@ -38,7 +43,7 @@ public class StationBasedService implements SharingService {
 	private final Map<Id<SharingVehicle>, SharingStation> vehicleStationMap = new HashMap<>();
 
 	public StationBasedService(Id<SharingService> serviceId, SharingServiceSpecification specification, Network network,
-			double maximumDistance) {
+							   double maximumDistance) {
 		this.network = network;
 
 		this.maximumDistance = maximumDistance;
@@ -158,4 +163,31 @@ public class StationBasedService implements SharingService {
 	public IdMap<SharingStation, SharingStation> getStations() {
 		return stations; // TODO: Make this unmodifiable
 	}
+
+	// Remove the vehicle to be not anymore available for other bookings
+	@Override
+	public void reserveVehicle(MobsimAgent agent,SharingVehicle vehicle) {
+		Coord coord = vehicle.getLink().getCoord();
+		availableVehicles.remove(coord.getX(), coord.getY(), vehicle);
+		reservations.put(agent.getId(), vehicle);
+		LOG.debug("Reserve vehicle {} from agent {}",vehicle.getId().toString(), agent.getId().toString());
+	}
+
+	@Override
+	public SharingVehicle hasReservationElseNull(MobsimAgent agent)
+	{
+		return reservations.get(agent.getId());
+	}
+
+	@Override
+	public void releaseReservation(MobsimAgent agent) {
+		SharingVehicle v = this.reservations.remove(agent.getId());
+		if(v!=null)
+		{
+			Coord coord = v.getLink().getCoord();
+			availableVehicles.put(coord.getX(), coord.getY(), v);
+			LOG.debug("Release vehicle {} from agent {}",v.getId().toString(), agent.getId().toString());
+		}
+	}
+
 }

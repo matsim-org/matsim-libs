@@ -40,7 +40,7 @@ public class RunIT {
 	@Test
 	public final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
-		URL vehiclesUrl = RunIT.class.getResource("shared_vehicles.xml");
+
 
 		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
 		config.controler().setLastIteration(2);
@@ -63,7 +63,8 @@ public class RunIT {
 		serviceConfig.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfig.setServiceInputFile(vehiclesUrl.toURI().getPath());
+		URL vehiclesUrl_mobility = RunIT.class.getResource("shared_vehicles_mobility.xml");
+		serviceConfig.setServiceInputFile(vehiclesUrl_mobility.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfig.setMode("car");
@@ -86,7 +87,8 @@ public class RunIT {
 		serviceConfigBike.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfigBike.setServiceInputFile(vehiclesUrl.toURI().getPath());
+		URL vehiclesUrl_velib = RunIT.class.getResource("shared_vehicles_velib.xml");
+		serviceConfigBike.setServiceInputFile(vehiclesUrl_velib.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfigBike.setMode("bike");
@@ -109,7 +111,8 @@ public class RunIT {
 		serviceConfigBikeFF.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfigBikeFF.setServiceInputFile(vehiclesUrl.toURI().getPath());
+		URL vehiclesUrl_wheels = RunIT.class.getResource("shared_vehicles_wheels.xml");
+		serviceConfigBikeFF.setServiceInputFile(vehiclesUrl_wheels.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfigBikeFF.setMode("bike");
@@ -154,22 +157,22 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assert.assertEquals(83845, (long) data.counts.get("car"));
-		Assert.assertEquals(32063, (long) data.counts.get("walk"));
-		Assert.assertEquals(77, (long) data.counts.get("bike"));
-		Assert.assertEquals(19154, (long) data.counts.get("pt"));
+		Assert.assertEquals(82689, (long) data.counts.get("car"));
+		Assert.assertEquals(29890, (long) data.counts.get("walk"));
+		Assert.assertEquals(30, (long) data.counts.get("bike"));
+		Assert.assertEquals(19115, (long) data.counts.get("pt"));
 
-		Assert.assertEquals(62, (long) data.pickupCounts.get("wheels"));
+		Assert.assertEquals(21, (long) data.pickupCounts.get("wheels"));
 		Assert.assertEquals(2, (long) data.pickupCounts.get("mobility"));
-		Assert.assertEquals(15, (long) data.pickupCounts.get("velib"));
+		Assert.assertEquals(9, (long) data.pickupCounts.get("velib"));
 
-		Assert.assertEquals(62, (long) data.dropoffCounts.get("wheels"));
+		Assert.assertEquals(21, (long) data.dropoffCounts.get("wheels"));
 		Assert.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
-		Assert.assertEquals(15, (long) data.dropoffCounts.get("velib"));
+		Assert.assertEquals(9, (long) data.dropoffCounts.get("velib"));
 
-		Assert.assertEquals(1536, (long) data.failedPickupCounts.get("wheels"));
-		Assert.assertEquals(1, (long) data.failedPickupCounts.get("mobility"));
-		Assert.assertEquals(13, (long) data.failedPickupCounts.get("velib"));
+		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels",0L));
+		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility",0L));
+		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib",0L));
 
 		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
 		Assert.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));

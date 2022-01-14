@@ -8,17 +8,23 @@ import org.matsim.contrib.sharing.routing.InteractionPoint;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public interface SharingService {
-	public Id<SharingService> getId();
+	Id<SharingService> getId();
 
-	public IdMap<SharingVehicle, SharingVehicle> getVehicles();
+	IdMap<SharingVehicle, SharingVehicle> getVehicles();
 
-	public IdMap<SharingStation, SharingStation> getStations();
+	IdMap<SharingStation, SharingStation> getStations();
 
-	public void pickupVehicle(SharingVehicle vehicle, MobsimAgent agent);
+	void pickupVehicle(SharingVehicle vehicle, MobsimAgent agent);
 
-	public void dropoffVehicle(SharingVehicle vehicle, MobsimAgent agent);
+	void reserveVehicle(MobsimAgent agent,SharingVehicle vehicle);
 
-	public Optional<VehicleInteractionPoint> findClosestVehicle(MobsimAgent agent);
+	void dropoffVehicle(SharingVehicle vehicle, MobsimAgent agent);
 
-	public InteractionPoint findClosestDropoffLocation(SharingVehicle vehicle, MobsimAgent agent);
+	Optional<VehicleInteractionPoint> findClosestVehicle(MobsimAgent agent);
+
+	InteractionPoint findClosestDropoffLocation(SharingVehicle vehicle, MobsimAgent agent);
+
+	SharingVehicle hasReservationElseNull(MobsimAgent agent);
+
+	void releaseReservation(MobsimAgent agent);
 }

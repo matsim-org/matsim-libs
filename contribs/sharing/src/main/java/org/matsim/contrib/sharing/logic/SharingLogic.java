@@ -4,16 +4,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.sharing.routing.InteractionPoint;
 import org.matsim.contrib.sharing.service.SharingService;
 import org.matsim.contrib.sharing.service.SharingUtils;
@@ -27,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
@@ -34,10 +39,13 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Verify;
 
+
 public class SharingLogic {
+	private static final Logger LOG = LogManager.getLogger(SharingLogic.class);
 	private final IdMap<Person, SharingVehicle> activeVehicles = new IdMap<>(Person.class);
 
 	private final RoutingModule accessEgressRoutingModule;
@@ -51,8 +59,8 @@ public class SharingLogic {
 	private final SharingService service;
 
 	public SharingLogic(SharingService service, RoutingModule accessEgressRoutingModule,
-			RoutingModule mainModeRoutingModule, Scenario scenario, EventsManager eventsManager,
-			TimeInterpretation timeInterpretation) {
+						RoutingModule mainModeRoutingModule, Scenario scenario, EventsManager eventsManager,
+						TimeInterpretation timeInterpretation) {
 		this.service = service;
 		this.eventsManager = eventsManager;
 
@@ -122,6 +130,10 @@ public class SharingLogic {
 			// Insert new plan elements
 			plan.getPlanElements().addAll(bookingActivityIndex + 1, updatedElements);
 
+			Leg leg = ((Leg) mainElements.get(0));
+
+			setVehicle(plan,leg, closestVehicleInteraction.get().getVehicle());
+			service.reserveVehicle(agent,closestVehicleInteraction.get().getVehicle());
 			return true;
 		} else {
 			return false;
@@ -130,9 +142,9 @@ public class SharingLogic {
 
 	/**
 	 * Agent tries to pick up a vehicle.
-	 * 
+	 *
 	 * If it returns false, agent needs to abort!
-	 * 
+	 *
 	 * @param agent
 	 */
 	public boolean tryPickupVehicle(double now, MobsimAgent agent) {
@@ -143,8 +155,17 @@ public class SharingLogic {
 		Activity pickupActivity = (Activity) plan.getPlanElements().get(pickupActivityIndex);
 		Verify.verify(pickupActivity.getType().equals(SharingUtils.PICKUP_ACTIVITY));
 
-		// Find closest vehicle and hope it is at the current station / link
-		Optional<VehicleInteractionPoint> selectedVehicleInteraction = service.findClosestVehicle(agent);
+		SharingVehicle reservedVehicle = service.hasReservationElseNull(agent);
+
+		Optional<VehicleInteractionPoint> selectedVehicleInteraction;
+
+		if(reservedVehicle!= null )
+		{
+			selectedVehicleInteraction = Optional.of(VehicleInteractionPoint.of(reservedVehicle));
+		} else {
+			// Find closest vehicle and hope it is at the current station / link
+			selectedVehicleInteraction = service.findClosestVehicle(agent);
+		}
 
 		if (selectedVehicleInteraction.isPresent()) {
 			Id<Link> vehicleLinkId = selectedVehicleInteraction.get().getLinkId();
@@ -173,8 +194,10 @@ public class SharingLogic {
 				int dropoffActivityIndex = findDropoffActivityIndex(pickupActivityIndex, plan);
 				Activity dropoffActivity = (Activity) plan.getPlanElements().get(dropoffActivityIndex);
 
-				if (dropoffActivity.getLinkId().equals(vehicleLinkId))
+				if (dropoffActivity.getLinkId().equals(vehicleLinkId)) {
+					service.releaseReservation(agent); // Release if pickup fails
 					return false;
+				}
 
 				plan.getPlanElements().subList(pickupActivityIndex + 1, dropoffActivityIndex).clear();
 
@@ -197,21 +220,44 @@ public class SharingLogic {
 						now, agent);
 				updatedElements.addAll(mainElements);
 
+				Leg leg = ((Leg) mainElements.get(0));
+
+				setVehicle(plan, leg, selectedVehicleInteraction.get().getVehicle());
+
 				// Insert new plan elements
 				plan.getPlanElements().addAll(pickupActivityIndex + 1, updatedElements);
 			}
 
 			return true;
 		} else {
+			service.releaseReservation(agent); // Release if pickup fails
 			return false;
 		}
 	}
 
 	/**
+	 * Set the planned vehicle into the NetworkRoute
+	 * @param plan
+	 * @param leg
+	 * @param vehicle
+	 */
+	private void setVehicle(Plan plan, Leg leg, SharingVehicle vehicle)
+	{
+		Route route =  leg.getRoute();
+		if(route instanceof NetworkRoute)
+		{
+			Id<Vehicle> assignedId = Id.createVehicleId(vehicle.getId().toString());
+			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+			networkRoute.setVehicleId(assignedId);
+		}
+
+	}
+
+	/**
 	 * Agent tries to drop off a vehicle.
-	 * 
+	 *
 	 * If it returns false, agent needs to abort!
-	 * 
+	 *
 	 * @param agent
 	 */
 	public void tryDropoffVehicle(double now, MobsimAgent agent) {
@@ -255,6 +301,9 @@ public class SharingLogic {
 					closestDropoffInteraction.getLinkId(), now, agent);
 			updatedElements.addAll(mainElements);
 			now = timeInterpretation.decideOnElementsEndTime(mainElements, now).seconds();
+
+			Leg leg = ((Leg) mainElements.get(0));
+			setVehicle(plan,leg,vehicle);
 
 			// 2) Dropoff activity
 			Activity updatedPickupActivity = createDropoffActivity(now, closestDropoffInteraction);
@@ -300,7 +349,7 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeAccessEgressStage(Id<Link> originId, Id<Link> destinationId,
-			double departureTime, MobsimAgent agent) {
+															   double departureTime, MobsimAgent agent) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 
@@ -309,7 +358,7 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeMainStage(Id<Link> originId, Id<Link> destinationId, double departureTime,
-			MobsimAgent agent) {
+													   MobsimAgent agent) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 
