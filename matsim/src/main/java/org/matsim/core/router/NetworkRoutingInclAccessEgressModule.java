@@ -137,6 +137,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
+		//TODO this is the line we might substitute with checking the plan for the last leg with mode==this.mode and then set accessActLink = lastLink of that leg
+		//if no previous link can be found, then just go on with business as usual
+
 		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, filteredNetwork);
 
 		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, filteredNetwork);
