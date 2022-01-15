@@ -260,8 +260,10 @@ public class MatsimJspritFactory {
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(
 				Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
 				Id.create(vehicle.getStartLocation().getId(), Link.class));
-		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
-		vehicleBuilder.setType(carrierVehicleType);
+
+//		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+//		vehicleBuilder.setType(carrierVehicleType);
+		vehicleBuilder.setType((VehicleType) vehicle.getType().getUserData()); //Read in store MATSimVehicleType... Attention: This will not take care for any chances during the jsprit run
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
 		vehicleBuilder.setLatestEnd(vehicle.getLatestArrival());
 		CarrierVehicle carrierVehicle = vehicleBuilder.build();
@@ -347,6 +349,10 @@ public class MatsimJspritFactory {
 		}
 		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
+
+		//KMT Jan22 Store MATSimVehType here
+		typeBuilder.setUserData(carrierVehicleType);
+
 		return typeBuilder.build();
 	}
 
