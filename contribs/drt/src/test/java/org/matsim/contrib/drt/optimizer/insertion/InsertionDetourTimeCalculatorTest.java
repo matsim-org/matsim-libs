@@ -70,7 +70,7 @@ public class InsertionDetourTimeCalculatorTest {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
 		Waypoint.Start start = start(new DefaultDrtStopTask(20, 20 + STOP_DURATION, fromLink), STOP_DURATION, fromLink);
 		VehicleEntry entry = entry(start);
-		var detour = new InsertionDetourData<>(null, 15., null, 0.);//toPickup/Dropoff unused
+		var detour = new InsertionDetourData<>(0., 15., null, 0.);//toPickup/Dropoff unused
 		var insertion = insertion(entry, 0, 0, detour);
 
 		double departureTime = start.getDepartureTime();
@@ -140,7 +140,7 @@ public class InsertionDetourTimeCalculatorTest {
 		Waypoint.Stop stop0 = stop(10, toLink);
 		Waypoint.Stop stop1 = stop(200, link("stop1"));
 		VehicleEntry entry = entry(start, stop0, stop1);
-		var detour = new InsertionDetourData<Double>(null, null, null, null);//all unused
+		var detour = new InsertionDetourData<>(0., 0., 0., 0.);//all unused
 		var insertion = insertion(entry, 0, 1, detour);
 
 		double departureTime = start.getDepartureTime() + STOP_DURATION;
@@ -157,7 +157,7 @@ public class InsertionDetourTimeCalculatorTest {
 		Waypoint.Stop stop0 = stop(10, fromLink);
 		Waypoint.Stop stop1 = stop(200, toLink);
 		VehicleEntry entry = entry(start, stop0, stop1);
-		var detour = new InsertionDetourData<Double>(null, null, null, null);//all unused
+		var detour = new InsertionDetourData<>(0., 0., 0., 0.);//all unused
 		var insertion = insertion(entry, 1, 2, detour);
 
 		double departureTime = stop0.getDepartureTime();

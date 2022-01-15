@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -74,9 +73,8 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(new Insertion(drtRequest, entry, 0, 0),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 0),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -86,15 +84,14 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(new Insertion(drtRequest, entry, 0, 0),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 0),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),//
-				insertion(new Insertion(drtRequest, entry, 0, 1),//
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 1),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_TO_DROPOFF, 0.), null),
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -105,9 +102,8 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after stop
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -118,24 +114,23 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(new Insertion(drtRequest, entry, 0, 0),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 0),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),//
-				insertion(new Insertion(drtRequest, entry, 0, 1),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 1),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_TO_DROPOFF, TIME_FROM_DROPOFF),
 						null),//
-				insertion(new Insertion(drtRequest, entry, 0, 2),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 2),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_TO_DROPOFF, 0.), null),
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),//
-				insertion(new Insertion(drtRequest, entry, 1, 2),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 2),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_TO_DROPOFF, 0.), null),
 				//pickup after stop 1
-				insertion(new Insertion(drtRequest, entry, 2, 2),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 2, 2),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -146,14 +141,13 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(new Insertion(drtRequest, entry, 0, 0),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 0),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(new Insertion(drtRequest, entry, 2, 2),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 2, 2),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -165,15 +159,14 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),//
-				insertion(new Insertion(drtRequest, entry, 1, 2),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 2),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_TO_DROPOFF, 0.), null),
 				//pickup after stop 1
-				insertion(new Insertion(drtRequest, entry, 2, 2),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 2, 2),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -186,9 +179,8 @@ public class InsertionGeneratorTest {
 				//no pickup after start
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(new Insertion(drtRequest, entry, 2, 2),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 2, 2),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -200,21 +192,20 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 		assertInsertions(drtRequest, entry,
 				//pickup after start
-				insertion(new Insertion(drtRequest, entry, 0, 0),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 0),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),//
-				insertion(new Insertion(drtRequest, entry, 0, 1),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 1),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_TO_DROPOFF, TIME_FROM_DROPOFF),
 						null),
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(new Insertion(drtRequest, entry, 3, 3),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 3, 3),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -227,14 +218,13 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after start
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY,
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP,
 								TIME_FROM_DROPOFF), null),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(new Insertion(drtRequest, entry, 3, 3),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 3, 3),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -245,8 +235,8 @@ public class InsertionGeneratorTest {
 		assertInsertions(drtRequest, entry,
 				//no pickup after start (pickup is exactly at stop0)
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(0., TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.), null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(0., TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -256,12 +246,11 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertions(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(new Insertion(drtRequest, entry, 0, 1),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 1),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, 0., 0.), null),
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 1, 1),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 1, 1),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	@Test
@@ -274,12 +263,11 @@ public class InsertionGeneratorTest {
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertions(drtRequest, entry,
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(new Insertion(drtRequest, entry, 0, 1),
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 0, 1),
 						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, 0., TIME_FROM_DROPOFF), null),
 				//pickup after stop 0
-				insertion(new Insertion(drtRequest, entry, 2, 2),
-						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, Double.POSITIVE_INFINITY, 0.),
-						null));
+				new InsertionWithDetourData<>(new Insertion(drtRequest, entry, 2, 2),
+						new InsertionDetourData<>(TIME_TO_PICKUP, TIME_FROM_PICKUP, TIME_FROM_PICKUP, 0.), null));
 	}
 
 	private Link link(String id) {
@@ -318,11 +306,6 @@ public class InsertionGeneratorTest {
 			assertThat(actualInsertions.get(i).detourData).usingRecursiveComparison()
 					.isEqualTo(expectedInsertions[i].detourData);
 		}
-	}
-
-	private InsertionWithDetourData<Double> insertion(Insertion insertion, InsertionDetourData<Double> detourData,
-			DetourTimeInfo detourTimeInfo) {
-		return new InsertionWithDetourData<>(insertion, detourData, detourTimeInfo);
 	}
 
 	private Waypoint.Stop stop(double beginTime, Link link, int outgoingOccupancy) {
