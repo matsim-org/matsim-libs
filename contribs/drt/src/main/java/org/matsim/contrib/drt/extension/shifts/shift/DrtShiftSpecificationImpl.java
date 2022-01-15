@@ -35,8 +35,8 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	}
 
 	@Override
-	public DrtShiftBreakSpecification getBreak() {
-		return shiftBreak;
+	public Optional<DrtShiftBreakSpecification> getBreak() {
+		return Optional.ofNullable(shiftBreak);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		builder.id = copy.getId();
 		builder.start = copy.getStartTime();
 		builder.end = copy.getEndTime();
-		builder.shiftBreak = copy.getBreak();
+		builder.shiftBreak = copy.getBreak().orElse(null);
 		return builder;
 	}
 

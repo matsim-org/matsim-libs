@@ -68,7 +68,7 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     public void handleEvent(DrtShiftBreakEndedEvent event) {
         final Double start = shift2BreakStartTime.get(event.getShiftId());
         double duration = event.getTime() - start;
-        final DrtShiftBreakSpecification drtShift = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak();
+        final DrtShiftBreakSpecification drtShift = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
         double plannedDuration = drtShift.getDuration();
         shift2plannedVsActualBreakDuration.put(event.getShiftId(), new Tuple<>(plannedDuration, duration));
     }

@@ -15,7 +15,7 @@ public interface DrtShift extends Identifiable<DrtShift> {
 
 	double getEndTime();
 
-	DrtShiftBreak getBreak();
+	Optional<DrtShiftBreak> getBreak();
 
 	boolean isStarted();
 

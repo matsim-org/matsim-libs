@@ -100,7 +100,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (chargingInfrastructure != null) {
             resetCharger();
         }
-
+		shiftTaskScheduler.initSchedules();
         createQueues();
     }
 
@@ -192,7 +192,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
                     shiftTaskScheduler.relocateForBreak(activeShift.vehicle, breakFacility, shift);
                     eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), shift.getId(),
                             activeShift.vehicle.getId(), breakFacility.getLinkId(),
-                            shift.getBreak().getScheduledLatestArrival()));
+                            shift.getBreak().orElseThrow().getScheduledLatestArrival()));
                 }
             }
         }
@@ -625,7 +625,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private boolean shiftNeedsBreak(DrtShift shift, double timeStep) {
-        return shift.getBreak() != null && shift.getBreak().getEarliestBreakStartTime() == timeStep
-                && !shift.getBreak().isScheduled();
+        return shift.getBreak().isPresent() && shift.getBreak().get().getEarliestBreakStartTime() == timeStep
+                && !shift.getBreak().get().isScheduled();
     }
 }
