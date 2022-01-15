@@ -15,7 +15,7 @@ public interface DrtShiftSpecification extends Identifiable<DrtShift> {
 
 	double getEndTime();
 
-	DrtShiftBreakSpecification getBreak();
+	Optional<DrtShiftBreakSpecification> getBreak();
 
 	Optional<Id<OperationFacility>> getOperationFacilityId();
 }
