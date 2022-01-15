@@ -30,9 +30,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
@@ -47,7 +48,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	public void k0_atEndInsertionsNotReturned() {
 		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
 		var insertion = insertion(vehicleEntry, 1, 10);
-		var filteredInsertions = KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(0, 1, List.of(insertion));
+		var filteredInsertions = KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(0, List.of(insertion));
 		assertThat(filteredInsertions).isEmpty();
 	}
 
@@ -69,13 +70,11 @@ public class KNearestInsertionsAtEndFilterTest {
 
 	@Test
 	public void onlyAtEndInsertions_theEarliestReturned() {
-		// estimated arrival time: 100 + 10 = 110
 		var vehicleEntry1 = vehicleEntry("v1", start(0), stop(100));
-		var insertion1 = insertion(vehicleEntry1, 1, 10);
+		var insertion1 = insertion(vehicleEntry1, 1, 110);
 
-		// estimated arrival time: 50 + 61 = 111
 		var vehicleEntry2 = vehicleEntry("v2", start(50));
-		var insertion2 = insertion(vehicleEntry2, 0, 61);
+		var insertion2 = insertion(vehicleEntry2, 0, 111);
 
 		//insertion1 is better
 		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.insertion);
@@ -84,13 +83,11 @@ public class KNearestInsertionsAtEndFilterTest {
 
 	@Test
 	public void onlyAtEndInsertions_equalArrivalTime_useVehicleIdAsTieBreaker() {
-		// estimated arrival time: 100 + 10 = 110
 		var vehicleEntry1 = vehicleEntry("v1", start(0), stop(100));
-		var insertion1 = insertion(vehicleEntry1, 1, 10);
+		var insertion1 = insertion(vehicleEntry1, 1, 110);
 
-		// estimated arrival time: 50 + 60 = 110
 		var vehicleEntry2 = vehicleEntry("v2", start(50));
-		var insertion2 = insertion(vehicleEntry2, 0, 60);
+		var insertion2 = insertion(vehicleEntry2, 0, 110);
 
 		//take the first
 		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.insertion);
@@ -109,11 +106,11 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	private InsertionWithDetourData<Double> insertion(VehicleEntry vehicleEntry, int pickupIdx,
-			double toPickupDetourTime) {
+			double pickupDepartureTime) {
 		return new InsertionWithDetourData<>(new Insertion(vehicleEntry,
 				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
-						vehicleEntry.getWaypoint(pickupIdx + 1)), null),
-				new InsertionDetourData<>(toPickupDetourTime, null, null, null), null);
+						vehicleEntry.getWaypoint(pickupIdx + 1)), null), null,
+				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, Double.NaN), null));
 	}
 
 	private Waypoint.Start start(double endTime) {
@@ -132,6 +129,6 @@ public class KNearestInsertionsAtEndFilterTest {
 
 	@SafeVarargs
 	private List<Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
-		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(1, 1, List.of(insertions));
+		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(1, List.of(insertions));
 	}
 }

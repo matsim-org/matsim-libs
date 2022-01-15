@@ -88,6 +88,6 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 		}
 
 		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.getNearestInsertionsAtEndLimit(),
-				insertionParams.getAdmissibleBeelineSpeedFactor(), preFilteredInsertions);
+				preFilteredInsertions);
 	}
 }

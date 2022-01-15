@@ -26,7 +26,6 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.base.MoreObjects;
@@ -247,11 +246,9 @@ public class InsertionGenerator {
 		double fromDropoffTT = dropoffIdx == vehicleEntry.stops.size() ?
 				0 :
 				detourTimeEstimator.estimateTime(request.getToLink(), dropoffInsertion.nextWaypoint.getLink());
-		var insertionDetourData = new InsertionDetourData<>(toPickupTT, fromPickupTT, toDropoffTT, fromDropoffTT);
 
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
 				pickupDetourInfo);
-		return new InsertionWithDetourData<>(insertion, insertionDetourData,
-				new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
+		return new InsertionWithDetourData<>(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
 	}
 }

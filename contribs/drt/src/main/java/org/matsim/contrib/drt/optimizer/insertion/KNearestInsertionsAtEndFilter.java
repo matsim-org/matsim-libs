@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 /**
  * "Insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride
@@ -33,26 +34,19 @@ import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionW
  * @author michalm
  */
 class KNearestInsertionsAtEndFilter {
-	static List<InsertionGenerator.Insertion> filterInsertionsAtEnd(int k, double admissibleBeelineSpeedFactor,
-			List<InsertionWithDetourData<Double>> insertions) {
+	static List<Insertion> filterInsertionsAtEnd(int k, List<InsertionWithDetourData<Double>> insertions) {
 		var nearestInsertionsAtEnd = new PartialSort<InsertionWithCost<Double>>(k,
 				BestInsertionFinder.createInsertionWithCostComparator());
-		var filteredInsertions = new ArrayList<InsertionGenerator.Insertion>(insertions.size());
+		var filteredInsertions = new ArrayList<Insertion>(insertions.size());
 
-		for (var insertionWithDetourData : insertions) {
-			var insertion = insertionWithDetourData.insertion;
+		for (var i : insertions) {
+			var insertion = i.insertion;
 			VehicleEntry vEntry = insertion.vehicleEntry;
 			var pickup = insertion.pickup;
 			if (!vEntry.isAfterLastStop(pickup.index)) {
 				filteredInsertions.add(insertion);
 			} else if (k > 0) {
-				double departureTime = pickup.previousWaypoint.getDepartureTime();
-
-				// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles
-				// (timeToPickup is underestimated by this factor)
-				double timeDistance = departureTime
-						+ admissibleBeelineSpeedFactor * insertionWithDetourData.detourData.detourToPickup;
-				nearestInsertionsAtEnd.add(new InsertionWithCost<>(insertionWithDetourData, timeDistance));
+				nearestInsertionsAtEnd.add(new InsertionWithCost<>(i, i.detourTimeInfo.pickupDetourInfo.departureTime));
 			}
 		}
 

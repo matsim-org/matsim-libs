@@ -98,6 +98,8 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
 		return new InsertionWithDetourData<>(insertion,
-				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN), null);
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN),
+				new InsertionDetourTimeCalculator.DetourTimeInfo(
+						new InsertionDetourTimeCalculator.PickupDetourInfo(11, Double.NaN), null));
 	}
 }
