@@ -26,7 +26,6 @@ import java.util.Optional;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -40,18 +39,18 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch {
 
 	private final InsertionProvider insertionProvider;
 	private final DetourPathCalculator detourPathCalculator;
-	private final InsertionDetourTimeCalculator<PathData> detourTimeCalculator;
+	private final InsertionDetourTimeCalculator detourTimeCalculator;
 	private final BestInsertionFinder bestInsertionFinder;
 
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
 			InsertionCostCalculator insertionCostCalculator, double stopDuration) {
 		this(insertionProvider, detourPathCalculator, new BestInsertionFinder(insertionCostCalculator),
-				new InsertionDetourTimeCalculator<>(stopDuration, PathData::getTravelTime, null));
+				new InsertionDetourTimeCalculator(stopDuration, null));
 	}
 
 	@VisibleForTesting
 	DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			BestInsertionFinder bestInsertionFinder, InsertionDetourTimeCalculator<PathData> detourTimeCalculator) {
+			BestInsertionFinder bestInsertionFinder, InsertionDetourTimeCalculator detourTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.detourTimeCalculator = detourTimeCalculator;

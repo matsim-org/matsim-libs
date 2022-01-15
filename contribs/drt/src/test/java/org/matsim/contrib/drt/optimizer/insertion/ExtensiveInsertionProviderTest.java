@@ -21,6 +21,8 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -98,7 +100,6 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionWithDetourData insertionWithDetourData(Insertion insertion) {
 		return new InsertionWithDetourData(insertion, new InsertionDetourData(null, null, null, null),
-				new InsertionDetourTimeCalculator.DetourTimeInfo(
-						new InsertionDetourTimeCalculator.PickupDetourInfo(11, Double.NaN), null));
+				new DetourTimeInfo(new PickupDetourInfo(11, Double.NaN), null));
 	}
 }

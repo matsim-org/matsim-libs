@@ -2,8 +2,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
-import java.util.function.ToDoubleFunction;
-
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -16,9 +14,8 @@ import com.google.common.base.MoreObjects;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class InsertionDetourTimeCalculator<D> {
+public class InsertionDetourTimeCalculator {
 	private final double stopDuration;
-	private final ToDoubleFunction<D> detourTime;
 
 	// If the detour data uses approximated detour times (e.g. beeline or matrix-based), provide the same estimator for
 	// replaced drives to avoid systematic errors
@@ -26,10 +23,9 @@ public class InsertionDetourTimeCalculator<D> {
 	@Nullable
 	private final DetourTimeEstimator replacedDriveTimeEstimator;
 
-	public InsertionDetourTimeCalculator(double stopDuration, ToDoubleFunction<D> detourTime,
+	public InsertionDetourTimeCalculator(double stopDuration,
 			@Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
 		this.stopDuration = stopDuration;
-		this.detourTime = detourTime;
 		this.replacedDriveTimeEstimator = replacedDriveTimeEstimator;
 	}
 

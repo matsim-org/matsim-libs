@@ -138,12 +138,11 @@ public class InsertionGenerator {
 	}
 
 	private final DetourTimeEstimator detourTimeEstimator;
-	private final InsertionDetourTimeCalculator<Double> detourTimeCalculator;
+	private final InsertionDetourTimeCalculator detourTimeCalculator;
 
 	public InsertionGenerator(double stopDuration, DetourTimeEstimator detourTimeEstimator) {
 		this.detourTimeEstimator = detourTimeEstimator;
-		detourTimeCalculator = new InsertionDetourTimeCalculator<>(stopDuration, Double::doubleValue,
-				detourTimeEstimator);
+		detourTimeCalculator = new InsertionDetourTimeCalculator(stopDuration, detourTimeEstimator);
 	}
 
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {

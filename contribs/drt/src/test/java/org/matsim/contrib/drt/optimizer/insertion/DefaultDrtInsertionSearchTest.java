@@ -34,10 +34,10 @@ import java.util.Set;
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -68,8 +68,8 @@ public class DefaultDrtInsertionSearchTest {
 		when(pathData.createInsertionDetourData(eq(insertion))).thenReturn(insertionPathData);
 
 		//mock detourTimeCalculator
-		var detourTimeCalculator = (InsertionDetourTimeCalculator<PathData>)mock(InsertionDetourTimeCalculator.class);
-		var detourTimeInfo = new InsertionDetourTimeCalculator.DetourTimeInfo(null, null);
+		var detourTimeCalculator = mock(InsertionDetourTimeCalculator.class);
+		var detourTimeInfo = new DetourTimeInfo(null, null);
 		when(detourTimeCalculator.calculateDetourTimeInfo(eq(insertion), eq(insertionPathData))).thenReturn(
 				detourTimeInfo);
 
