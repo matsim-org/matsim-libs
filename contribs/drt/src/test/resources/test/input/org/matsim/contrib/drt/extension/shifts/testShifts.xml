@@ -6,6 +6,5 @@
         <break earliestStart="29200.0" latestEnd="32800.0" duration="3600.0"/>
     </shift>
     <shift id="33" start="22400" end="53000">
-        <break earliestStart="29600.0" latestEnd="33200.0" duration="1800.0"/>
     </shift>
 </shifts>

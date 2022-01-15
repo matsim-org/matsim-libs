@@ -21,6 +21,7 @@ import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
+import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
@@ -122,7 +123,7 @@ public class ShiftTaskScheduler {
             }
 
             double startTime = path.getArrivalTime();
-            double endTime = startTime + shift.getBreak().getDuration();
+            double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
             double relocationDuration = path.getDepartureTime() + path.getTravelTime();
             relocateForBreakImpl(vehicle, startTime, endTime, relocationDuration, toLink, shift, breakFacility);
 
@@ -153,7 +154,7 @@ public class ShiftTaskScheduler {
                     //add drive to break location
                     schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE)); // add RELOCATE
                     double startTime = path.getArrivalTime();
-                    double endTime = startTime + shift.getBreak().getDuration();
+                    double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
                     double relocationDuration = path.getDepartureTime() + path.getTravelTime();
 
                     relocateForBreakImpl(vehicle, startTime, endTime, relocationDuration, toLink, shift, breakFacility);
@@ -168,7 +169,7 @@ public class ShiftTaskScheduler {
                     startTime = task.getBeginTime();
                     schedule.removeLastTask();
                 }
-                double endTime = startTime + shift.getBreak().getDuration();
+                double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
                 double relocationDuration = 0;
                 relocateForBreakImpl(vehicle, startTime, endTime, relocationDuration, toLink, shift, breakFacility);
             }
@@ -182,8 +183,9 @@ public class ShiftTaskScheduler {
 
         // append SHIFT_BREAK task
 
-        ShiftBreakTask dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
-                    endTime, link, shift.getBreak(), breakFacility);
+		DrtShiftBreak shiftBreak = shift.getBreak().orElseThrow();
+		ShiftBreakTask dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
+                    endTime, link, shiftBreak, breakFacility);
 
         schedule.addTask(dropoffStopTask);
 
@@ -191,9 +193,9 @@ public class ShiftTaskScheduler {
                 link));
 
         double latestDetourArrival = relocationDuration * 1.5 + 10;
-        final double latestTimeConstraintArrival = shift.getBreak().getLatestBreakEndTime() - shift.getBreak().getDuration();
+        final double latestTimeConstraintArrival = shiftBreak.getLatestBreakEndTime() - shiftBreak.getDuration();
 
-        shift.getBreak().schedule(Math.min(latestDetourArrival, latestTimeConstraintArrival));
+		shiftBreak.schedule(Math.min(latestDetourArrival, latestTimeConstraintArrival));
     }
 
     public void relocateForShiftChange(DvrpVehicle vehicle, Link link, DrtShift shift, OperationFacility breakFacility) {
