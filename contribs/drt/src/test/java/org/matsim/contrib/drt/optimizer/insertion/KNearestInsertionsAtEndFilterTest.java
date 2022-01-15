@@ -105,9 +105,8 @@ public class KNearestInsertionsAtEndFilterTest {
 				insertionAfterStart.insertion, insertionAtEnd.insertion);
 	}
 
-	private InsertionWithDetourData<Double> insertion(VehicleEntry vehicleEntry, int pickupIdx,
-			double pickupDepartureTime) {
-		return new InsertionWithDetourData<>(new Insertion(vehicleEntry,
+	private InsertionWithDetourData insertion(VehicleEntry vehicleEntry, int pickupIdx, double pickupDepartureTime) {
+		return new InsertionWithDetourData(new Insertion(vehicleEntry,
 				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
 						vehicleEntry.getWaypoint(pickupIdx + 1)), null), null,
 				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, Double.NaN), null));
@@ -127,8 +126,7 @@ public class KNearestInsertionsAtEndFilterTest {
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null);
 	}
 
-	@SafeVarargs
-	private List<Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
+	private List<Insertion> filterOneInsertionAtEnd(InsertionWithDetourData... insertions) {
 		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(1, List.of(insertions));
 	}
 }

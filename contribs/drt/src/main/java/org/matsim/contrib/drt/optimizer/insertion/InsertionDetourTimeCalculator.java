@@ -33,16 +33,16 @@ public class InsertionDetourTimeCalculator<D> {
 		this.replacedDriveTimeEstimator = replacedDriveTimeEstimator;
 	}
 
-	public DetourTimeInfo calculateDetourTimeInfo(Insertion insertion, InsertionDetourData<D> detourData) {
+	public DetourTimeInfo calculateDetourTimeInfo(Insertion insertion, InsertionDetourData detourData) {
 		var followedByDropoff = insertion.pickup.index == insertion.dropoff.index;
 
-		double toPickupTT = detourTime.applyAsDouble(detourData.detourToPickup);
-		double fromPickupTT = detourTime.applyAsDouble(detourData.detourFromPickup);
+		double toPickupTT = detourData.detourToPickup.getTravelTime();
+		double fromPickupTT = detourData.detourFromPickup.getTravelTime();
 		var pickupDetourInfo = calcPickupDetourInfo(insertion.vehicleEntry, insertion.pickup, toPickupTT, fromPickupTT,
 				followedByDropoff);
 
-		double toDropoffTT = followedByDropoff ? fromPickupTT : detourTime.applyAsDouble(detourData.detourToDropoff);
-		double fromDropoffTT = detourTime.applyAsDouble(detourData.detourFromDropoff);
+		double toDropoffTT = followedByDropoff ? fromPickupTT : detourData.detourToDropoff.getTravelTime();
+		double fromDropoffTT = detourData.detourFromDropoff.getTravelTime();
 		var dropoffDetourInfo = calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT, pickupDetourInfo);
 
 		return new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo);

@@ -23,42 +23,44 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 import com.google.common.base.MoreObjects;
 
 /**
  * @author michalm
  */
-public class InsertionWithDetourData<D> {
-	public static class InsertionDetourData<D> {
+public class InsertionWithDetourData {
+	public static class InsertionDetourData {
 		/**
 		 * Detour necessary to get from start or the preceding stop to pickup.
 		 * <p>
 		 * If pickup is inserted at the (existing) previous stop -> no detour.
 		 */
-		public final D detourToPickup;
+		public final PathData detourToPickup;
 		/**
 		 * Detour necessary to get from pickup to the next stop or 0 if appended at the end.
 		 * <p>
 		 * IMPORTANT: At this point the dropoff location is not taken into account !!!
 		 * "zero" detour if pickup inserted at the end of schedule !!!
 		 */
-		public final D detourFromPickup;
+		public final PathData detourFromPickup;
 		/**
 		 * Detour necessary to get from the preceding stop (could be a stop of the corresponding pickup) to dropoff.
 		 * <p>
 		 * If dropoff is inserted at the (existing) previous stop -> no detour.
 		 * If dropoff inserted directly after pickup -> detour from pickup
 		 */
-		public final D detourToDropoff;
+		public final PathData detourToDropoff;
 		/**
 		 * Detour necessary to get from dropoff to the next stop or no detour if appended at the end.
 		 * <p>
 		 * "zero" detour if dropoff inserted at the end of schedule
 		 */
-		public final D detourFromDropoff;
+		public final PathData detourFromDropoff;
 
-		public InsertionDetourData(D detourToPickup, D detourFromPickup, D detourToDropoff, D detourFromDropoff) {
+		public InsertionDetourData(PathData detourToPickup, PathData detourFromPickup, PathData detourToDropoff,
+				PathData detourFromDropoff) {
 			this.detourToPickup = detourToPickup;
 			this.detourFromPickup = detourFromPickup;
 			this.detourToDropoff = detourToDropoff;
@@ -77,10 +79,10 @@ public class InsertionWithDetourData<D> {
 	}
 
 	public final Insertion insertion;
-	public final InsertionDetourData<D> detourData;
+	public final InsertionDetourData detourData;
 	public final DetourTimeInfo detourTimeInfo;
 
-	InsertionWithDetourData(Insertion insertion, InsertionDetourData<D> detourData, DetourTimeInfo detourTimeInfo) {
+	InsertionWithDetourData(Insertion insertion, InsertionDetourData detourData, DetourTimeInfo detourTimeInfo) {
 		this.insertion = insertion;
 		this.detourData = detourData;
 		this.detourTimeInfo = detourTimeInfo;

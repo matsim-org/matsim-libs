@@ -64,7 +64,7 @@ public class DefaultDrtInsertionSearchTest {
 		var pathData = mock(DetourPathDataCache.class);
 		var detourPathCalculator = mock(DetourPathCalculator.class);
 		when(detourPathCalculator.calculatePaths(eq(request), eq(allInsertions))).thenReturn(pathData);
-		var insertionPathData = new InsertionDetourData<PathData>(null, null, null, null);
+		var insertionPathData = new InsertionDetourData(null, null, null, null);
 		when(pathData.createInsertionDetourData(eq(insertion))).thenReturn(insertionPathData);
 
 		//mock detourTimeCalculator
@@ -74,8 +74,8 @@ public class DefaultDrtInsertionSearchTest {
 				detourTimeInfo);
 
 		//mock bestInsertionFinder
-		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
-		var insertionWithPathData = new InsertionWithDetourData<>(insertion, insertionPathData, detourTimeInfo);
+		var bestInsertionFinder = (BestInsertionFinder)mock(BestInsertionFinder.class);
+		var insertionWithPathData = new InsertionWithDetourData(insertion, insertionPathData, detourTimeInfo);
 		when(bestInsertionFinder.findBestInsertion(eq(request),
 				argThat(argument -> argument.map(insertionWithDetourData -> insertionWithDetourData.insertion)
 						.collect(toSet())

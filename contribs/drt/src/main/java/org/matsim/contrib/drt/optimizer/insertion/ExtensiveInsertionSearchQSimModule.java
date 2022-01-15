@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
@@ -31,8 +30,6 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.TypeLiteral;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -47,8 +44,7 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
-		bindModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
-		}).toProvider(modalProvider(getter -> {
+		bindModal(DrtInsertionSearch.class).toProvider(modalProvider(getter -> {
 			var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
 			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculator,
 					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),

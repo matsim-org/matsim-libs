@@ -34,9 +34,8 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
  * @author michalm
  */
 class KNearestInsertionsAtEndFilter {
-	static List<Insertion> filterInsertionsAtEnd(int k, List<InsertionWithDetourData<Double>> insertions) {
-		var nearestInsertionsAtEnd = new PartialSort<InsertionWithCost<Double>>(k,
-				BestInsertionFinder.createInsertionWithCostComparator());
+	static List<Insertion> filterInsertionsAtEnd(int k, List<InsertionWithDetourData> insertions) {
+		var nearestInsertionsAtEnd = new PartialSort<>(k, BestInsertionFinder.INSERTION_WITH_COST_COMPARATOR);
 		var filteredInsertions = new ArrayList<Insertion>(insertions.size());
 
 		for (var i : insertions) {
@@ -46,7 +45,7 @@ class KNearestInsertionsAtEndFilter {
 			if (!vEntry.isAfterLastStop(pickup.index)) {
 				filteredInsertions.add(insertion);
 			} else if (k > 0) {
-				nearestInsertionsAtEnd.add(new InsertionWithCost<>(i, i.detourTimeInfo.pickupDetourInfo.departureTime));
+				nearestInsertionsAtEnd.add(new InsertionWithCost(i, i.detourTimeInfo.pickupDetourInfo.departureTime));
 			}
 		}
 

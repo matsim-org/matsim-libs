@@ -33,7 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
+public final class DefaultDrtInsertionSearch implements DrtInsertionSearch {
 	public interface InsertionProvider {
 		List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries);
 	}
@@ -41,18 +41,17 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 	private final InsertionProvider insertionProvider;
 	private final DetourPathCalculator detourPathCalculator;
 	private final InsertionDetourTimeCalculator<PathData> detourTimeCalculator;
-	private final BestInsertionFinder<PathData> bestInsertionFinder;
+	private final BestInsertionFinder bestInsertionFinder;
 
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
 			InsertionCostCalculator insertionCostCalculator, double stopDuration) {
-		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(insertionCostCalculator),
+		this(insertionProvider, detourPathCalculator, new BestInsertionFinder(insertionCostCalculator),
 				new InsertionDetourTimeCalculator<>(stopDuration, PathData::getTravelTime, null));
 	}
 
 	@VisibleForTesting
 	DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			BestInsertionFinder<PathData> bestInsertionFinder,
-			InsertionDetourTimeCalculator<PathData> detourTimeCalculator) {
+			BestInsertionFinder bestInsertionFinder, InsertionDetourTimeCalculator<PathData> detourTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.detourTimeCalculator = detourTimeCalculator;
@@ -60,7 +59,7 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 	}
 
 	@Override
-	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
+	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
 			Collection<VehicleEntry> vehicleEntries) {
 		var insertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
 		if (insertions.isEmpty()) {
@@ -70,7 +69,7 @@ public final class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathD
 		DetourPathDataCache pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
 		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
 			var insertionDetourData = pathData.createInsertionDetourData(i);
-			return new InsertionWithDetourData<>(i, insertionDetourData,
+			return new InsertionWithDetourData(i, insertionDetourData,
 					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData));
 		}));
 	}

@@ -146,9 +146,9 @@ public class InsertionGenerator {
 				detourTimeEstimator);
 	}
 
-	public List<InsertionWithDetourData<Double>> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
+	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
 		int stopCount = vEntry.stops.size();
-		List<InsertionWithDetourData<Double>> insertions = new ArrayList<>();
+		List<InsertionWithDetourData> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
@@ -169,7 +169,7 @@ public class InsertionGenerator {
 	}
 
 	private void generateDropoffInsertions(DrtRequest request, VehicleEntry vEntry, int i,
-			List<InsertionWithDetourData<Double>> insertions) {
+			List<InsertionWithDetourData> insertions) {
 		var pickupInsertion = createPickupInsertion(request, vEntry, i, true);
 		double toPickupTT = detourTimeEstimator.estimateTime(pickupInsertion.previousWaypoint.getLink(),
 				request.getFromLink());
@@ -234,7 +234,7 @@ public class InsertionGenerator {
 		return entry.stops.get(insertionIdx);
 	}
 
-	private InsertionWithDetourData<Double> createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
+	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
 			InsertionPoint pickupInsertion, double toPickupTT, double fromPickupTT, PickupDetourInfo pickupDetourInfo,
 			int dropoffIdx) {
 		var dropoffInsertion = createDropoffInsertion(request, vehicleEntry, pickupInsertion, dropoffIdx);
@@ -249,6 +249,6 @@ public class InsertionGenerator {
 
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
 				pickupDetourInfo);
-		return new InsertionWithDetourData<>(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
+		return new InsertionWithDetourData(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
 	}
 }

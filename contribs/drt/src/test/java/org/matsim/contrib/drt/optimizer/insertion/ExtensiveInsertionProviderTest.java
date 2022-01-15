@@ -96,9 +96,8 @@ public class ExtensiveInsertionProviderTest {
 		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
 	}
 
-	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
-		return new InsertionWithDetourData<>(insertion,
-				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN),
+	private InsertionWithDetourData insertionWithDetourData(Insertion insertion) {
+		return new InsertionWithDetourData(insertion, new InsertionDetourData(null, null, null, null),
 				new InsertionDetourTimeCalculator.DetourTimeInfo(
 						new InsertionDetourTimeCalculator.PickupDetourInfo(11, Double.NaN), null));
 	}

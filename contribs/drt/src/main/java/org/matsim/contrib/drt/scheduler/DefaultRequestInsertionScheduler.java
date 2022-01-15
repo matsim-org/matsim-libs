@@ -36,7 +36,6 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -81,13 +80,13 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	@Override
-	public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+	public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData insertion) {
 		var pickupTask = insertPickup(request, insertion);
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
 		return new PickupDropoffTaskPair(pickupTask, dropoffTask);
 	}
 
-	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertionWithDetourData) {
+	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData insertionWithDetourData) {
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
@@ -232,7 +231,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		return pickupStopTask;
 	}
 
-	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertionWithDetourData,
+	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData insertionWithDetourData,
 			DrtStopTask pickupTask) {
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;

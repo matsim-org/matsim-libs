@@ -78,7 +78,7 @@ public class InsertionGeneratorTest {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0); //no stops => must be empty
 		VehicleEntry entry = entry(start);
 
-		var insertions = new ArrayList<InsertionWithDetourData<Double>>();
+		var insertions = new ArrayList<InsertionWithDetourData>();
 		{//00
 			var insertion = new Insertion(drtRequest, entry, 0, 0);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
@@ -95,7 +95,7 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 0);//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0);
 
-		var insertions = new ArrayList<InsertionWithDetourData<Double>>();
+		var insertions = new ArrayList<InsertionWithDetourData>();
 		{//00
 			var insertion = new Insertion(drtRequest, entry, 0, 0);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
@@ -128,7 +128,7 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop0 = stop(start.time + TIME_REPLACED_DRIVE, link("stop0"), 0);//drop off 4 pax
 		VehicleEntry entry = entry(start, stop0);
 
-		var insertions = new ArrayList<InsertionWithDetourData<Double>>();
+		var insertions = new ArrayList<InsertionWithDetourData>();
 		{//11
 			var insertion = new Insertion(drtRequest, entry, 1, 1);
 			var pickup = new PickupDetourInfo(stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
@@ -146,7 +146,7 @@ public class InsertionGeneratorTest {
 		Waypoint.Stop stop1 = stop(stop0.getDepartureTime() + TIME_REPLACED_DRIVE, link("stop1"), 0);//drop off 1 pax
 		VehicleEntry entry = entry(start, stop0, stop1);
 
-		var insertions = new ArrayList<InsertionWithDetourData<Double>>();
+		var insertions = new ArrayList<InsertionWithDetourData>();
 		{//00
 			var insertion = new Insertion(drtRequest, entry, 0, 0);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
@@ -315,13 +315,13 @@ public class InsertionGeneratorTest {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
-	private InsertionWithDetourData<Double> insertion(Insertion insertion, PickupDetourInfo pickupDetourInfo,
+	private InsertionWithDetourData insertion(Insertion insertion, PickupDetourInfo pickupDetourInfo,
 			DropoffDetourInfo dropoffDetourInfo) {
-		return new InsertionWithDetourData<>(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
+		return new InsertionWithDetourData(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
 	}
 
 	private void assertInsertionsWithDetour(DrtRequest drtRequest, VehicleEntry entry,
-			List<InsertionWithDetourData<Double>> expectedInsertions) {
+			List<InsertionWithDetourData> expectedInsertions) {
 		int stopCount = entry.stops.size();
 		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
