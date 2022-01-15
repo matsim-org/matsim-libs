@@ -46,7 +46,6 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.fakes.FakeLink;
 import org.mockito.ArgumentCaptor;
@@ -74,7 +73,7 @@ public class DefaultUnplannedRequestInserterTest {
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				new DrtRequestInsertionRetryParams());//retry OFF, empty queue
-		DrtInsertionSearch<PathData> insertionSearch = null;//should not be used
+		DrtInsertionSearch insertionSearch = null;//should not be used
 		RequestInsertionScheduler insertionScheduler = null;//should not be used
 
 		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
@@ -89,7 +88,7 @@ public class DefaultUnplannedRequestInserterTest {
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				new DrtRequestInsertionRetryParams());//retry OFF, empty queue
-		DrtInsertionSearch<PathData> insertionSearch = //
+		DrtInsertionSearch insertionSearch = //
 				(drtRequest, vEntries) -> drtRequest == request1 && vEntries.isEmpty() ?
 						Optional.empty() :
 						fail("Undefined");
@@ -124,7 +123,7 @@ public class DefaultUnplannedRequestInserterTest {
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				new DrtRequestInsertionRetryParams().setMaxRequestAge(Double.POSITIVE_INFINITY)
 						.setRetryInterval(retryInterval));//retry ON, empty queue
-		DrtInsertionSearch<PathData> insertionSearch = //
+		DrtInsertionSearch insertionSearch = //
 				(drtRequest, vEntries) -> drtRequest == request1 && vEntries.isEmpty() ?
 						Optional.empty() :
 						fail("Undefined");
@@ -162,7 +161,7 @@ public class DefaultUnplannedRequestInserterTest {
 						.setRetryInterval(retryInterval));//retry ON
 		var oldRequest = request("r0", "from0", "to0");
 		retryQueue.tryAddFailedRequest(oldRequest, now - retryInterval);// will be retried at time 15
-		DrtInsertionSearch<PathData> insertionSearch = (drtRequest, vEntries) -> Optional.empty();
+		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> Optional.empty();
 
 		RequestInsertionScheduler insertionScheduler = null;//should not be used
 
@@ -202,8 +201,8 @@ public class DefaultUnplannedRequestInserterTest {
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				new DrtRequestInsertionRetryParams());//retry OFF, empty queue
 
-		DrtInsertionSearch<PathData> insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
-				Optional.of(new InsertionWithDetourData<PathData>(
+		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
+				Optional.of(new InsertionWithDetourData(
 						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null, null)) :
 				fail("request1 expected");
 
@@ -269,7 +268,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 	private DefaultUnplannedRequestInserter newInserter(Fleet fleet, double now,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
-			DrtInsertionSearch<PathData> insertionSearch, RequestInsertionScheduler insertionScheduler) {
+			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
 				vehicleEntryFactory, insertionRetryQueue, rule.forkJoinPool, insertionSearch);
 	}

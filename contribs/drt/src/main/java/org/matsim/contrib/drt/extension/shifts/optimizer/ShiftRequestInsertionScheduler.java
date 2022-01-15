@@ -5,15 +5,10 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.shifts.schedule.OperationalStop;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftDrtTaskFactory;
@@ -26,9 +21,7 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -39,7 +32,6 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.Facility;
 
 /**
  * @author nkuehnel / MOIA
@@ -69,13 +61,13 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
 
 
     @Override
-    public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData<OneToManyPathSearch.PathData> insertion) {
+    public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData insertion) {
         var pickupTask = insertPickup(request, insertion);
         var dropoffTask = insertDropoff(request, insertion, pickupTask);
         return new PickupDropoffTaskPair(pickupTask, dropoffTask);
     }
 
-    private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData<OneToManyPathSearch.PathData> insertionWithDetourData) {
+    private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData insertionWithDetourData) {
 		var insertion = insertionWithDetourData.insertion;
         VehicleEntry vehicleEntry = insertion.vehicleEntry;
         Schedule schedule = vehicleEntry.vehicle.getSchedule();
@@ -252,7 +244,7 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
         return pickupStopTask;
     }
 
-    private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData<OneToManyPathSearch.PathData> insertionWithDetourData,
+    private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData insertionWithDetourData,
                                       DrtStopTask pickupTask) {
 		var insertion = insertionWithDetourData.insertion;
         VehicleEntry vehicleEntry = insertion.vehicleEntry;

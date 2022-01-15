@@ -45,7 +45,7 @@ public class BestInsertionFinderTest {
 
 	private final DrtRequest request = mock(DrtRequest.class);
 	private final InsertionCostCalculator insertionCostCalculator = mock(InsertionCostCalculator.class);
-	private final BestInsertionFinder<Double> bestInsertionFinder = new BestInsertionFinder<>(insertionCostCalculator);
+	private final BestInsertionFinder bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
 
 	@Test
 	public void noInsertions_empty() {
@@ -120,16 +120,16 @@ public class BestInsertionFinderTest {
 	}
 
 	@SafeVarargs
-	private Optional<InsertionWithDetourData<Double>> findBestInsertion(InsertionWithDetourData<Double>... insertions) {
+	private Optional<InsertionWithDetourData> findBestInsertion(InsertionWithDetourData... insertions) {
 		return bestInsertionFinder.findBestInsertion(request, Arrays.stream(insertions));
 	}
 
-	private void whenInsertionThenCost(InsertionWithDetourData<Double> insertion, double cost) {
+	private void whenInsertionThenCost(InsertionWithDetourData insertion, double cost) {
 		when(insertionCostCalculator.calculate(eq(request), eq(insertion.insertion),
 				eq(insertion.detourTimeInfo))).thenReturn(cost);
 	}
 
-	private InsertionWithDetourData<Double> insertion(String vehicleId, int pickupIdx, int dropoffIdx) {
+	private InsertionWithDetourData insertion(String vehicleId, int pickupIdx, int dropoffIdx) {
 		var vehicle = mock(DvrpVehicle.class);
 		when(vehicle.getId()).thenReturn(Id.create(vehicleId, DvrpVehicle.class));
 		var vehicleEntry = new VehicleEntry(vehicle, null, null, null);
@@ -137,7 +137,7 @@ public class BestInsertionFinderTest {
 		var pickupInsertion = new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null);
 		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
 
-		return new InsertionWithDetourData<>(
+		return new InsertionWithDetourData(
 				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion), null, null);
 	}
 }

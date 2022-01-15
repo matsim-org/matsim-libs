@@ -33,12 +33,12 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 /**
  * @author michalm
  */
-public class BestInsertionFinder<D> {
-	static class InsertionWithCost<D> {
-		final InsertionWithDetourData<D> insertionWithDetourData;
+public class BestInsertionFinder {
+	static class InsertionWithCost {
+		final InsertionWithDetourData insertionWithDetourData;
 		final double cost;
 
-		InsertionWithCost(InsertionWithDetourData<D> insertionWithDetourData, double cost) {
+		InsertionWithCost(InsertionWithDetourData insertionWithDetourData, double cost) {
 			this.insertionWithDetourData = insertionWithDetourData;
 			this.cost = cost;
 		}
@@ -49,24 +49,22 @@ public class BestInsertionFinder<D> {
 					.thenComparingInt(insertion -> insertion.pickup.index)
 					.thenComparingInt(insertion -> insertion.dropoff.index);
 
-	static <D> Comparator<InsertionWithCost<D>> createInsertionWithCostComparator() {
-		return Comparator.<InsertionWithCost<D>>comparingDouble(insertionWithCost -> insertionWithCost.cost)
-				.thenComparing(insertion -> insertion.insertionWithDetourData.insertion, INSERTION_COMPARATOR);
-	}
+	static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
+			Comparator.<InsertionWithCost>comparingDouble(insertionWithCost -> insertionWithCost.cost)
+					.thenComparing(insertion -> insertion.insertionWithDetourData.insertion, INSERTION_COMPARATOR);
 
-	private final Comparator<InsertionWithCost<D>> comparator = createInsertionWithCostComparator();
 	private final InsertionCostCalculator costCalculator;
 
 	public BestInsertionFinder(InsertionCostCalculator costCalculator) {
 		this.costCalculator = costCalculator;
 	}
 
-	public Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest,
-			Stream<InsertionWithDetourData<D>> insertions) {
+	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
+			Stream<InsertionWithDetourData> insertions) {
 		return insertions.map(
-						i -> new InsertionWithCost<>(i, costCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
+						i -> new InsertionWithCost(i, costCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
 				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
-				.min(comparator)
+				.min(INSERTION_WITH_COST_COMPARATOR)
 				.map(iWithCost -> iWithCost.insertionWithDetourData);
 	}
 }
