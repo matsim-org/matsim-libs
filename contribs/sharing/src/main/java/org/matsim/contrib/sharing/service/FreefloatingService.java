@@ -54,7 +54,6 @@ public class FreefloatingService implements SharingService {
 
 	@Override
 	public void pickupVehicle(SharingVehicle vehicle, MobsimAgent agent) {
-
 		Verify.verify(!activeRentals.contains(vehicle.getId()));
 		activeRentals.add(vehicle.getId());
 

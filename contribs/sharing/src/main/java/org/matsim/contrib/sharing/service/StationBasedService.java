@@ -43,7 +43,7 @@ public class StationBasedService implements SharingService {
 	private final Map<Id<SharingVehicle>, SharingStation> vehicleStationMap = new HashMap<>();
 
 	public StationBasedService(Id<SharingService> serviceId, SharingServiceSpecification specification, Network network,
-							   double maximumDistance) {
+			double maximumDistance) {
 		this.network = network;
 
 		this.maximumDistance = maximumDistance;

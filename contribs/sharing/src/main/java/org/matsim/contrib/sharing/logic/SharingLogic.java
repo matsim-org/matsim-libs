@@ -43,7 +43,6 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Verify;
 
-
 public class SharingLogic {
 	private static final Logger LOG = LogManager.getLogger(SharingLogic.class);
 	private final IdMap<Person, SharingVehicle> activeVehicles = new IdMap<>(Person.class);
@@ -59,8 +58,8 @@ public class SharingLogic {
 	private final SharingService service;
 
 	public SharingLogic(SharingService service, RoutingModule accessEgressRoutingModule,
-						RoutingModule mainModeRoutingModule, Scenario scenario, EventsManager eventsManager,
-						TimeInterpretation timeInterpretation) {
+			RoutingModule mainModeRoutingModule, Scenario scenario, EventsManager eventsManager,
+			TimeInterpretation timeInterpretation) {
 		this.service = service;
 		this.eventsManager = eventsManager;
 
@@ -349,7 +348,7 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeAccessEgressStage(Id<Link> originId, Id<Link> destinationId,
-															   double departureTime, MobsimAgent agent) {
+			double departureTime, MobsimAgent agent) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 
@@ -358,7 +357,7 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeMainStage(Id<Link> originId, Id<Link> destinationId, double departureTime,
-													   MobsimAgent agent) {
+			MobsimAgent agent) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 

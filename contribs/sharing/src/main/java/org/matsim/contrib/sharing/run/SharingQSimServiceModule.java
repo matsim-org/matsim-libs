@@ -79,14 +79,14 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 		})).in(Singleton.class);
 
 		switch (serviceConfig.getServiceScheme()) {
-			case Freefloating:
-				bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
-				break;
-			case StationBased:
-				bindModal(SharingService.class).to(modalKey(StationBasedService.class));
-				break;
-			default:
-				throw new IllegalStateException();
+		case Freefloating:
+			bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
+			break;
+		case StationBased:
+			bindModal(SharingService.class).to(modalKey(StationBasedService.class));
+			break;
+		default:
+			throw new IllegalStateException();
 		}
 	}
 }
