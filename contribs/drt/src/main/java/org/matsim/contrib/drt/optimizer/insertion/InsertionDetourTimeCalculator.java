@@ -34,19 +34,26 @@ public class InsertionDetourTimeCalculator<D> {
 	}
 
 	public DetourTimeInfo calculateDetourTimeInfo(Insertion insertion, InsertionDetourData<D> detourData) {
-		if (insertion.pickup.index == insertion.dropoff.index) {
-			//handle the pickup->dropoff case separately
-			return calculateDetourTimeInfoForIfPickupToDropoffDetour(insertion, detourData);
-		}
+		var followedByDropoff = insertion.pickup.index == insertion.dropoff.index;
 
-		var pickupDetourInfo = calcPickupDetourInfo(insertion, detourData);
-		var dropoffDetourInfo = calcDropoffDetourInfo(insertion, detourData, pickupDetourInfo);
+		double toPickupTT = detourTime.applyAsDouble(detourData.detourToPickup);
+		double fromPickupTT = detourTime.applyAsDouble(detourData.detourFromPickup);
+		var pickupDetourInfo = calcPickupDetourInfo(insertion.vehicleEntry, insertion.pickup, toPickupTT, fromPickupTT,
+				followedByDropoff);
+
+		double toDropoffTT = followedByDropoff ? fromPickupTT : detourTime.applyAsDouble(detourData.detourToDropoff);
+		double fromDropoffTT = detourTime.applyAsDouble(detourData.detourFromDropoff);
+		var dropoffDetourInfo = calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT, pickupDetourInfo);
+
 		return new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo);
 	}
 
-	private PickupDetourInfo calcPickupDetourInfo(Insertion insertion, InsertionDetourData<D> detourData) {
-		InsertionPoint pickup = insertion.pickup;
-		VehicleEntry vEntry = insertion.vehicleEntry;
+	public PickupDetourInfo calcPickupDetourInfo(VehicleEntry vEntry, InsertionPoint pickup, double toPickupTT,
+			double fromPickupTT, boolean followedByDropoff) {
+		if (followedByDropoff) {
+			//handle the pickup->dropoff case separately
+			return calcPickupDetourInfoIfPickupToDropoffDetour(vEntry, pickup, toPickupTT, fromPickupTT);
+		}
 
 		double toPickupDepartureTime = pickup.previousWaypoint.getDepartureTime();
 		if (pickup.newWaypoint.getLink() == pickup.previousWaypoint.getLink()) {
@@ -57,16 +64,19 @@ public class InsertionDetourTimeCalculator<D> {
 			return new PickupDetourInfo(departureTime, pickupTimeLoss);
 		}
 
-		double toPickupTT = detourTime.applyAsDouble(detourData.detourToPickup);
-		double fromPickupTT = detourTime.applyAsDouble(detourData.detourFromPickup);
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
 		double pickupTimeLoss = toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
 		double departureTime = toPickupDepartureTime + toPickupTT + stopDuration;
 		return new PickupDetourInfo(departureTime, pickupTimeLoss);
 	}
 
-	private DropoffDetourInfo calcDropoffDetourInfo(Insertion insertion, InsertionDetourData<D> detourData,
+	public DropoffDetourInfo calcDropoffDetourInfo(Insertion insertion, double toDropoffTT, double fromDropoffTT,
 			PickupDetourInfo pickupDetourInfo) {
+		if (insertion.pickup.index == insertion.dropoff.index) {
+			//handle the pickup->dropoff case separately
+			return calcDropoffDetourInfoIfPickupToDropoffDetour(toDropoffTT, fromDropoffTT, pickupDetourInfo);
+		}
+
 		InsertionPoint dropoff = insertion.dropoff;
 		VehicleEntry vEntry = insertion.vehicleEntry;
 
@@ -77,8 +87,6 @@ public class InsertionDetourTimeCalculator<D> {
 			return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
 		}
 
-		double toDropoffTT = detourTime.applyAsDouble(detourData.detourToDropoff);
-		double fromDropoffTT = detourTime.applyAsDouble(detourData.detourFromDropoff);
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, dropoff.index);
 		double dropoffTimeLoss = toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
 		double arrivalTime = dropoff.previousWaypoint.getDepartureTime()
@@ -87,41 +95,25 @@ public class InsertionDetourTimeCalculator<D> {
 		return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
 	}
 
-	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(Insertion insertion,
-			InsertionDetourData<D> detourData) {
-		var pickupDetourInfo = calcPickupDetourInfoIfPickupToDropoffDetour(insertion, detourData);
-		var dropoffDetourInfo = calcDropoffDetourInfoIfPickupToDropoffDetour(insertion, detourData, pickupDetourInfo);
-		return new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo);
-	}
-
-	private PickupDetourInfo calcPickupDetourInfoIfPickupToDropoffDetour(Insertion insertion,
-			InsertionDetourData<D> detourData) {
-		VehicleEntry vEntry = insertion.vehicleEntry;
-		InsertionPoint pickup = insertion.pickup;
-
-		final double toPickupTT;
+	private PickupDetourInfo calcPickupDetourInfoIfPickupToDropoffDetour(VehicleEntry vEntry, InsertionPoint pickup,
+			double toPickupTT, double fromPickupTT) {
 		final double additionalPickupStopDuration;
 		if (pickup.newWaypoint.getLink() == pickup.previousWaypoint.getLink()) {
 			// no drive to pickup, but possible additional stop duration
-			toPickupTT = 0;
 			additionalPickupStopDuration = calcAdditionalPickupStopDurationIfSameLinkAsPrevious(vEntry, pickup.index);
 		} else {
-			toPickupTT = detourTime.applyAsDouble(detourData.detourToPickup);
 			additionalPickupStopDuration = stopDuration;
 		}
 
-		double fromPickupToDropoffTT = detourTime.applyAsDouble(detourData.detourFromPickup);
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
 
-		double pickupTimeLoss = toPickupTT + additionalPickupStopDuration + fromPickupToDropoffTT - replacedDriveTT;
+		double pickupTimeLoss = toPickupTT + additionalPickupStopDuration + fromPickupTT - replacedDriveTT;
 		double departureTime = pickup.previousWaypoint.getDepartureTime() + toPickupTT + additionalPickupStopDuration;
 		return new PickupDetourInfo(departureTime, pickupTimeLoss);
 	}
 
-	private DropoffDetourInfo calcDropoffDetourInfoIfPickupToDropoffDetour(Insertion insertion,
-			InsertionDetourData<D> detourData, PickupDetourInfo pickupDetourInfo) {
-		double fromPickupToDropoffTT = detourTime.applyAsDouble(detourData.detourFromPickup);
-		double fromDropoffTT = detourTime.applyAsDouble(detourData.detourFromDropoff);
+	private DropoffDetourInfo calcDropoffDetourInfoIfPickupToDropoffDetour(double fromPickupToDropoffTT,
+			double fromDropoffTT, PickupDetourInfo pickupDetourInfo) {
 		double dropoffTimeLoss = stopDuration + fromDropoffTT;
 		double arrivalTime = pickupDetourInfo.departureTime + fromPickupToDropoffTT;
 		return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
