@@ -65,23 +65,8 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
 		this.shiftBreakNetwork = shiftBreakNetwork;
-		initSchedules();
 	}
 
-    public void initSchedules() {
-        final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = shiftBreakNetwork.getDrtOperationFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
-        for (DvrpVehicle veh : fleet.getVehicles().values()) {
-            try {
-                final OperationFacility operationFacility = facilitiesByLink.get(veh.getStartLink().getId()).stream().findFirst().orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));
-                veh.getSchedule()
-                        .addTask(taskFactory.createWaitForShiftStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
-                                veh.getStartLink(), operationFacility));
-                operationFacility.register(veh.getId());
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        }
-    }
 
     @Override
     public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData<OneToManyPathSearch.PathData> insertion) {

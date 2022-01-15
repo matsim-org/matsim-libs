@@ -84,6 +84,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.eventsManager = eventsManager;
         this.configGroup = configGroup;
 
+		shiftTaskScheduler.initSchedules();
         createQueues();
     }
 

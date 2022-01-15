@@ -100,7 +100,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (chargingInfrastructure != null) {
             resetCharger();
         }
-
+		shiftTaskScheduler.initSchedules();
         createQueues();
     }
 

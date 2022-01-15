@@ -4,12 +4,17 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.shifts.schedule.ShiftChangeOverTask;
@@ -21,6 +26,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -34,6 +40,7 @@ import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.facilities.Facility;
 
 /**
  * @author nkuehnel / MOIA
@@ -51,17 +58,37 @@ public class ShiftTaskScheduler {
     private final LeastCostPathCalculator router;
 
     private final ShiftDrtConfigGroup shiftConfig;
+	private final OperationFacilities operationFacilities;
+	private final Fleet fleet;
 
-    private final Network network;
+	private final Network network;
 
 	public ShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-			MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftDrtConfigGroup shiftConfig) {
+							  MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftDrtConfigGroup shiftConfig,
+							  OperationFacilities operationFacilities, Fleet fleet) {
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
 		this.network = network;
 		this.shiftConfig = shiftConfig;
+		this.operationFacilities = operationFacilities;
+		this.fleet = fleet;
 		this.router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+	}
+
+	public void initSchedules() {
+		final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = operationFacilities.getDrtOperationFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
+			try {
+				final OperationFacility operationFacility = facilitiesByLink.get(veh.getStartLink().getId()).stream().findFirst().orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));
+				veh.getSchedule()
+						.addTask(taskFactory.createWaitForShiftStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
+								veh.getStartLink(), operationFacility));
+				operationFacility.register(veh.getId());
+			} catch (Throwable throwable) {
+				throwable.printStackTrace();
+			}
+		}
 	}
 
     public void relocateForBreak(ShiftDvrpVehicle vehicle, OperationFacility breakFacility, DrtShift shift) {
