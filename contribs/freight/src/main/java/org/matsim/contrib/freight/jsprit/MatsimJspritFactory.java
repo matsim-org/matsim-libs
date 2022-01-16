@@ -261,9 +261,14 @@ public class MatsimJspritFactory {
 				Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
 				Id.create(vehicle.getStartLocation().getId(), Link.class));
 
-//		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
-//		vehicleBuilder.setType(carrierVehicleType);
-		vehicleBuilder.setType((VehicleType) vehicle.getType().getUserData()); //Read in store MATSimVehicleType... Attention: This will not take care for any chances during the jsprit run
+		if (vehicle.getType().getUserData() != null){
+			log.info("Use the (MATSim) vehicleType that was stored inside the (jsprit) vehicleType during the jsprit run but never interacted with jsprit. ");
+			vehicleBuilder.setType((VehicleType) vehicle.getType().getUserData()); //Read in store MATSimVehicleType... Attention: This will not take care for any changes during the jsprit run
+		} else {
+			log.info("There was no (MATSim) vehicleType stored inside the (jsprit) vehicleType. -> create one from the available data of the (jsprit) vehicle type");
+			VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+			vehicleBuilder.setType(carrierVehicleType);
+		}
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
 		vehicleBuilder.setLatestEnd(vehicle.getLatestArrival());
 		CarrierVehicle carrierVehicle = vehicleBuilder.build();
