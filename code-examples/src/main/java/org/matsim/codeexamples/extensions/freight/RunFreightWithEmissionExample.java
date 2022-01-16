@@ -30,6 +30,7 @@ import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
@@ -67,8 +68,13 @@ public class RunFreightWithEmissionExample {
 		freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml");
 
 		//emission setting
-//		EmissionsConfigGroup emissionsConfigGroup = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
-
+		EmissionsConfigGroup emissionsConfigGroup = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+		emissionsConfigGroup.setDetailedWarmEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_HOT_HGV_2020detailed.csv").getFile());
+		emissionsConfigGroup.setDetailedColdEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "coldTableExcept_LCV_PassCar_AllZero.csv").getFile());
+		emissionsConfigGroup.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_HOT_vehcat_2020average.txt").getFile()); //has only limited entries for HGV.... is herer, because file is needed :(
+		emissionsConfigGroup.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_ColdStart_vehcat_2020average.txt").getFile());
+		emissionsConfigGroup.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+		emissionsConfigGroup.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);
 
 		// load scenario (this is not loading the freight material):
 		Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -119,6 +125,14 @@ public class RunFreightWithEmissionExample {
 		//MATSim configuration:
 		final Controler controler = new Controler( scenario ) ;
 		Freight.configure( controler );
+
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+			}
+		});
 
 		// otfvis (if you want to use):
 //		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
