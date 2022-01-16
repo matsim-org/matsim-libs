@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.scheduler;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -39,6 +38,5 @@ public interface RequestInsertionScheduler {
 		}
 	}
 
-	PickupDropoffTaskPair scheduleRequest(DrtRequest request,
-			InsertionWithDetourData<OneToManyPathSearch.PathData> insertion);
+	PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData insertion);
 }
