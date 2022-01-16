@@ -218,11 +218,13 @@ public class FreightUtils {
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class);
 
-		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
-		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );
-		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
+
+		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
+		new CarrierPlanXmlReader( carriers, vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile() ) );
+
+//		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**

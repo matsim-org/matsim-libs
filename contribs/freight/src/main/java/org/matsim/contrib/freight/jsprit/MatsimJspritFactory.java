@@ -256,11 +256,13 @@ public class MatsimJspritFactory {
 	 * @see CarrierVehicle, Vehicle
 	 */
 	static CarrierVehicle createCarrierVehicle(Vehicle vehicle) {
+		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+
 		String vehicleId = vehicle.getId();
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(
 				Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
-				Id.create(vehicle.getStartLocation().getId(), Link.class));
-		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+				Id.create(vehicle.getStartLocation().getId(), Link.class), carrierVehicleType );
+
 		vehicleBuilder.setType(carrierVehicleType);
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
 		vehicleBuilder.setLatestEnd(vehicle.getLatestArrival());

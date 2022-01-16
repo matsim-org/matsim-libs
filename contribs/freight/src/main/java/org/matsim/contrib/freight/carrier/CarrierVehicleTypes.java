@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * VehicleTypeContainer mapping all vehicleTypes.
@@ -32,6 +33,8 @@ public class CarrierVehicleTypes {
 	public CarrierVehicleTypes() {
 		super();
 		this.vehicleTypes = new HashMap<>();
+//		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class ) );
+//		this.vehicleTypes.put( defaultVehicleType.getId(), defaultVehicleType );
 	}
 
 	public Map<Id<VehicleType>, VehicleType> getVehicleTypes() {

@@ -77,8 +77,11 @@ public class EquilWithCarrierWithPassIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+
 		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
-		new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		new CarrierPlanXmlReader( carriers, carrierVehicleTypes ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		final String idString = "foo";
 		addDummyVehicleType( carriers, idString );
 

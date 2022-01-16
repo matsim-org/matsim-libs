@@ -10,6 +10,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -91,15 +92,18 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	private double currentLegTransTime;
 
 	private double currentLegDepTime;
+	private final CarrierVehicleTypes carrierVehicleTypes;
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
 	 *
 	 * @param carriers which is a map that stores carriers
+	 * @param vehicleType
 	 */
-	public CarrierPlanReaderV1(Carriers carriers) {
+	public CarrierPlanReaderV1( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super();
 		this.carriers = carriers;
+		this.carrierVehicleTypes = carrierVehicleTypes;
 		this.setValidating(false);
 	}
 
@@ -173,15 +177,22 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				String linkId = atts.getValue( LINKID );
 				String startTime = atts.getValue( VEHICLESTART );
 				String endTime = atts.getValue( VEHICLEEND );
+
 				String typeId = atts.getValue( "typeId" );
 				if( typeId == null ){
 					logger.warn( "no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)" );
 					typeId = "default";
 				}
+
+				VehicleType vehicleType = carrierVehicleTypes.getVehicleTypes().get( Id.create( typeId, VehicleType.class ) );
+				if ( vehicleType==null ) {
+					throw new RuntimeException( "VehicleTypeId=" + typeId + " is missing" );
+				}
+
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
-					  Id.create( linkId, Link.class ) );
-				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
-				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ) );
+					  Id.create( linkId, Link.class ), vehicleType );
+//				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
+//				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ) );
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();
