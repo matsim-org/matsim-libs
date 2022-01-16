@@ -177,62 +177,55 @@ public class InsertionGenerator {
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 				fromPickupTT, true);
 
-		int j = i;
-		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
-			j++; // skip insertion: i -> pickup -> dropoff -> i+1
-		}
-
-		boolean recalculated = false;
-
 		int stopCount = vEntry.stops.size();
-		for (; j < stopCount; j++) {// insertions up to before last stop
-			// i -> pickup -> i+1 && j -> dropoff -> j+1
-			if (j == i + 1) {
-				//calculate it once for all j > i
-				pickupInsertion = createPickupInsertion(request, vEntry, i, false);
-				fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(),
-						pickupInsertion.nextWaypoint.getLink());
-				pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
-						fromPickupTT, false);
-				recalculated = true;
-
-				if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
-					return; // skip all insertions: i -> pickup -> dropoff
-				}
-			}
-
-			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
-				Waypoint.Stop currentStop = currentStop(vEntry, j);
-				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
-					if (request.getToLink() == currentStop.task.getLink()) {
-						//special case -- we can insert dropoff exactly at node j
-						addInsertion(insertions,
-								createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT,
-										pickupDetourInfo, j));
-					}
-
-					return;// stop iterating -- cannot insert dropoff after node j
-				}
-			}
-
-			if (request.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
+		// i == j
+		if (vEntry.getSlackTime(i) >= pickupDetourInfo.pickupTimeLoss) {
+			// insertion: i -> pickup -> dropoff -> i+1 (only if time slack allows)
+			int j = i;
+			if (i == stopCount || request.getToLink() != nextStop(vEntry,
+					j).task.getLink()) { // next stop at different link
+				//do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 				addInsertion(insertions,
 						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 								j));
 			}
-			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
-		// insertion after last stop
-		if (!recalculated && i < stopCount) {
-			pickupInsertion = createPickupInsertion(request, vEntry, i, false);
-			fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(),
-					pickupInsertion.nextWaypoint.getLink());
-			pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
-					fromPickupTT, false);
+		if (i == stopCount) {
+			// insertion after last stop
+			return;
+		}
 
-			if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
-				return; // skip insertion: i -> pickup -> dropoff -> end
+		//calculate it once for all j > i
+		pickupInsertion = createPickupInsertion(request, vEntry, i, false);
+		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink());
+		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
+				false);
+
+		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
+			return; // skip all insertions: i -> pickup -> dropoff
+		}
+
+		for (int j = i + 1; j < stopCount; j++) {// insertions up to before last stop
+			// i -> pickup -> i+1 && j -> dropoff -> j+1
+			// check the capacity constraints if i < j (already validated for `i == j`)
+			Waypoint.Stop currentStop = currentStop(vEntry, j);
+			if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
+				if (request.getToLink() == currentStop.task.getLink()) {
+					//special case -- we can insert dropoff exactly at node j
+					addInsertion(insertions,
+							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT,
+									pickupDetourInfo, j));
+				}
+
+				return;// stop iterating -- cannot insert dropoff after node j
+			}
+
+			if (request.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
+				//do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
+				addInsertion(insertions,
+						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+								j));
 			}
 		}
 
