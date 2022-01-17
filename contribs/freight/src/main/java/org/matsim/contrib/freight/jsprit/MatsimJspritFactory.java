@@ -256,7 +256,14 @@ public class MatsimJspritFactory {
 	 * @see CarrierVehicle, Vehicle
 	 */
 	static CarrierVehicle createCarrierVehicle(Vehicle vehicle) {
-		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+		VehicleType carrierVehicleType;
+		if (vehicle.getType().getUserData() != null){
+			log.info("Use the (MATSim) vehicleType that was stored inside the (jsprit) vehicleType during the jsprit run but never interacted with jsprit. ");
+			carrierVehicleType = (VehicleType) vehicle.getType().getUserData(); //Read in store MATSimVehicleType... Attention: This will not take care for any changes during the jsprit run
+		} else {
+			log.info("There was no (MATSim) vehicleType stored inside the (jsprit) vehicleType. -> create one from the available data of the (jsprit) vehicle type");
+			carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+		}
 
 		String vehicleId = vehicle.getId();
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(
@@ -349,6 +356,10 @@ public class MatsimJspritFactory {
 		}
 		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
+
+		//KMT Jan22 Store MATSimVehType here
+		typeBuilder.setUserData(carrierVehicleType);
+
 		return typeBuilder.build();
 	}
 
