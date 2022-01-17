@@ -72,7 +72,7 @@ import org.matsim.vehicles.VehicleUtils;
  *         Extend the functionality for the use of shipments
  * @author kturner
  */
-public class MatsimJspritFactory {
+public final class MatsimJspritFactory {
 
 	private static final  Logger log = Logger.getLogger(MatsimJspritFactory.class);
 
@@ -220,7 +220,7 @@ public class MatsimJspritFactory {
 	 * @return jsprit vehicle
 	 * @see Vehicle, CarrierVehicle
 	 */
-	static Vehicle createVehicle(CarrierVehicle carrierVehicle, Coord locationCoord) {
+	static com.graphhopper.jsprit.core.problem.vehicle.Vehicle createVehicle(org.matsim.contrib.freight.carrier.CarrierVehicle carrierVehicle, Coord locationCoord) {
 		Location.Builder vehicleLocationBuilder = Location.Builder.newInstance();
 		vehicleLocationBuilder.setId(carrierVehicle.getLocation().toString());
 		if (locationCoord != null) {
@@ -255,7 +255,7 @@ public class MatsimJspritFactory {
 	 * @return carrierVehicle
 	 * @see CarrierVehicle, Vehicle
 	 */
-	static CarrierVehicle createCarrierVehicle(Vehicle vehicle) {
+	static org.matsim.contrib.freight.carrier.CarrierVehicle createCarrierVehicle(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 		VehicleType carrierVehicleType;
 		if (vehicle.getType().getUserData() != null){
 			log.info("Use the (MATSim) vehicleType that was stored inside the (jsprit) vehicleType during the jsprit run but never interacted with jsprit. ");
@@ -264,6 +264,7 @@ public class MatsimJspritFactory {
 			log.info("There was no (MATSim) vehicleType stored inside the (jsprit) vehicleType. -> create one from the available data of the (jsprit) vehicle type");
 			carrierVehicleType = createCarrierVehicleType(vehicle.getType());
 		}
+		// yyyy
 
 		String vehicleId = vehicle.getId();
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(
@@ -370,7 +371,10 @@ public class MatsimJspritFactory {
 	 * @return ScheduledTour
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
-	public static ScheduledTour createTour(VehicleRoute route) {
+	static ScheduledTour createTour(VehicleRoute route) {
+		// have made this non-public for the time being since it is nowhere used within the freight contrib, and we might want to add the
+		// vehicle types as argument.  If this is publicly used, please move back to public.  kai, jan'22
+
 		if (route.getDepartureTime() != route.getStart().getEndTime())
 			throw new AssertionError("at this point route.getDepartureTime and route.getStart().getEndTime() must be equal");
 

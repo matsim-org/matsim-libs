@@ -129,6 +129,7 @@ public class FreightUtils {
 					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
 			log.info("routing plan for carrier " + carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
