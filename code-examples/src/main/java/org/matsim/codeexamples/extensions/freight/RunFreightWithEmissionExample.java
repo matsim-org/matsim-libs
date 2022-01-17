@@ -68,10 +68,14 @@ public class RunFreightWithEmissionExample {
 
 		//emission setting
 		EmissionsConfigGroup emissionsConfigGroup = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
-		emissionsConfigGroup.setDetailedWarmEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_HOT_HGV_2020detailed.csv").getFile());
-		emissionsConfigGroup.setDetailedColdEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "coldTableExcept_LCV_PassCar_AllZero.csv").getFile());
-		emissionsConfigGroup.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_HOT_vehcat_2020average.txt").getFile()); //has only limited entries for HGV.... is here, because file is needed :(
-		emissionsConfigGroup.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_ColdStart_vehcat_2020average.txt").getFile());
+//		emissionsConfigGroup.setDetailedWarmEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_HOT_HGV_2020detailed.csv").getFile());
+//		emissionsConfigGroup.setDetailedColdEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "coldTableExcept_LCV_PassCar_AllZero.csv").getFile());
+//		emissionsConfigGroup.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_HOT_vehcat_2020average.txt").getFile()); //has only limited entries for HGV.... is here, because file is needed :(
+//		emissionsConfigGroup.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("emissions-sampleScenario"), "sample_41_EFA_ColdStart_vehcat_2020average.txt").getFile());
+		emissionsConfigGroup.setDetailedWarmEmissionFactorsFile("../emissions-sampleScenario/sample_41_EFA_HOT_HGV_2020detailed.csv");
+		emissionsConfigGroup.setDetailedColdEmissionFactorsFile("../emissions-sampleScenario/coldTableExcept_LCV_PassCar_AllZero.csv");
+		emissionsConfigGroup.setAverageWarmEmissionFactorsFile("../emissions-sampleScenario/sample_41_EFA_HOT_vehcat_2020average.txt"); //has only limited entries for HGV.... is here, because file is needed :(
+		emissionsConfigGroup.setAverageColdEmissionFactorsFile("../emissions-sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.txt");
 		emissionsConfigGroup.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		emissionsConfigGroup.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);
 
