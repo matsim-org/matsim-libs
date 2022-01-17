@@ -59,11 +59,13 @@ final class RunPassengerAlongWithCarriers {
 		}
 
 		Controler controler = new Controler(scenario);
-		final Carriers carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readURL( IOUtils.extendUrl(url, "vehicleTypes.xml" ) );
+
+		final Carriers carriers = new Carriers();
+		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
+
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);

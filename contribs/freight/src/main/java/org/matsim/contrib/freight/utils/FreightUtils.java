@@ -129,6 +129,7 @@ public class FreightUtils {
 					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
 			log.info("routing plan for carrier " + carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
@@ -218,11 +219,13 @@ public class FreightUtils {
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class);
 
-		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
-		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );
-		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
+
+		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
+		new CarrierPlanXmlReader( carriers, vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile() ) );
+
+//		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**

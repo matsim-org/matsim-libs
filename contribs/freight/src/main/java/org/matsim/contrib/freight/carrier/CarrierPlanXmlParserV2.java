@@ -22,7 +22,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.*;
-import org.matsim.vehicles.EngineInformation.FuelType;
 import org.xml.sax.Attributes;
 
 class CarrierPlanXmlParserV2 extends MatsimXmlParser {
@@ -66,6 +65,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	private Double currentScore;
 	private boolean selected;
 	private Carriers carriers;
+	private final CarrierVehicleTypes carrierVehicleTypes;
 	private double currentLegTransTime;
 	private double currentLegDepTime;
 	private Builder capabilityBuilder;
@@ -85,10 +85,12 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
 	 *
 	 * @param carriers which is a map that stores carriers
+	 * @param carrierVehicleTypes
 	 */
-	CarrierPlanXmlParserV2( Carriers carriers ) {
+	CarrierPlanXmlParserV2( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super();
 		this.carriers = carriers;
+		this.carrierVehicleTypes = carrierVehicleTypes;
 	}
 
 	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
@@ -221,17 +223,25 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 		//vehicle
 		else if (name.equals(VEHICLES)) {
-			vehicles = new HashMap<String, CarrierVehicle>();
+			vehicles = new HashMap<>();
 		}
 		else if (name.equals(VEHICLE)) {
+
 			String vId = atts.getValue(ID);
 			if(vId == null) throw new IllegalStateException("vehicleId is missing.");
+
 			String depotLinkId = atts.getValue("depotLinkId");
 			if(depotLinkId == null) throw new IllegalStateException("depotLinkId of vehicle is missing.");
-			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class));
+
 			String typeId = atts.getValue("typeId");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 //			VehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
+			VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get( Id.create( typeId, VehicleType.class ) );
+			if ( vehicleType==null ) {
+				throw new RuntimeException( "vehicleTypeId=" + typeId + " is missing." );
+			}
+
+			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType );
 			vehicleBuilder.setTypeId(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
 //			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
 			String startTime = atts.getValue(VEHICLESTART);

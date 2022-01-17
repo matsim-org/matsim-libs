@@ -2,6 +2,7 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -24,17 +25,17 @@ public class CarrierVehicle implements Vehicle {
 	 * @return CarrierVehicle
 	 * @see CarrierVehicle
 	 */
-	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
-		return new CarrierVehicle(vehicleId, locationId);
+	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType carrierVehicleType ){
+		return new Builder( vehicleId, locationId, carrierVehicleType ).build();
 	}
-	@Deprecated // refactoring device, please inline
-	public Id<Vehicle> getVehicleId(){
-		return getId() ;
-	}
-	@Deprecated // refactoring device, please inline
-	public void setVehicleType( VehicleType collectionType ){
-		setType( collectionType );
-	}
+//	@Deprecated // refactoring device, please inline
+//	public Id<Vehicle> getVehicleId(){
+//		return getId() ;
+//	}
+//	@Deprecated // refactoring device, please inline
+//	public void setVehicleType( VehicleType collectionType ){
+//		setType( collectionType );
+//	}
 
 	/**
 	 * Builder to build vehicles.
@@ -51,33 +52,35 @@ public class CarrierVehicle implements Vehicle {
 		 * 
 		 * @param vehicleId
 		 * @param locationId
+		 * @param vehicleType
 		 * @return a new vehicle builder
 		 */
-		public static Builder newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
-			return new Builder(vehicleId,locationId);
+		public static Builder newInstance( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
+			return new Builder(vehicleId,locationId, vehicleType );
 		}
 		
-		private Id<Link> locationId;
-		private Id<Vehicle> vehicleId;
-		private VehicleType type;
+		private final Id<Link> locationId;
+		private final Id<Vehicle> vehicleId;
+		private final VehicleType type;
 		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 		
 		
-		public Builder(Id<Vehicle> vehicleId, Id<Link> locationId){
+		public Builder( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
 			this.locationId = locationId;
 			this.vehicleId = vehicleId;
+			this.type = vehicleType;
 		}
 		
 		public Builder setType( VehicleType type ){
-			this.type=type;
+//			this.type=type;
 			return this;
 		}
 		
 		
 		public Builder setTypeId(Id<org.matsim.vehicles.VehicleType> typeId ){
-			this.typeId = typeId;
+//			this.typeId = typeId;
 			return this;
 		}
 		
@@ -93,6 +96,7 @@ public class CarrierVehicle implements Vehicle {
 		}
 		
 		public CarrierVehicle build(){
+			Gbl.assertNotNull( this.type );
 			return new CarrierVehicle(this);
 		}
 	}
@@ -101,15 +105,15 @@ public class CarrierVehicle implements Vehicle {
 
 	private final Id<Vehicle> vehicleId;
 	
-	private Id<org.matsim.vehicles.VehicleType> typeId;
+//	private Id<org.matsim.vehicles.VehicleType> typeId;
 
 	private VehicleType vehicleType;
 
 	private final Attributes attributes = new Attributes();
 
-	private double earliestStartTime;
+	private final double earliestStartTime;
 
-	private double latestEndTime;
+	private final double latestEndTime;
 
 	private CarrierVehicle(final Id<Vehicle> vehicleId, final Id<Link> location) {
 		this.vehicleId = vehicleId;
@@ -124,7 +128,7 @@ public class CarrierVehicle implements Vehicle {
 		vehicleType = builder.type;
 		earliestStartTime = builder.earliestStart;
 		latestEndTime = builder.latestEnd;
-		typeId = builder.typeId;
+//		typeId = builder.typeId;
 	}
 
 	public Id<Link> getLocation() {
@@ -150,13 +154,13 @@ public class CarrierVehicle implements Vehicle {
 	}
 
 
-	/**
-	 * @deprecated -- set in builder and do not change afterwards.  kai, nov'20
-	 */
-	public CarrierVehicle setType( VehicleType vehicleType ) {
-		this.vehicleType = vehicleType;
-		return this;
-	}
+//	/**
+//	 * @deprecated -- set in builder and do not change afterwards.  kai, nov'20
+//	 */
+//	public CarrierVehicle setType( VehicleType vehicleType ) {
+//		this.vehicleType = vehicleType;
+//		return this;
+//	}
 
 	/**
 	 * Returns the earliest time a vehicle can be deployed (and thus can departure from its origin).
@@ -182,7 +186,8 @@ public class CarrierVehicle implements Vehicle {
 
 	
 	public Id<org.matsim.vehicles.VehicleType> getVehicleTypeId() {
-		return typeId;
+//		return typeId;
+		return vehicleType.getId();
 	}
 
 }

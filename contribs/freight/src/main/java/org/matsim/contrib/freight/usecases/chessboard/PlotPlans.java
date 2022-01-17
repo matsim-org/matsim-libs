@@ -25,13 +25,13 @@ final class PlotPlans {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9.xml");
 
+        CarrierVehicleTypes types = new CarrierVehicleTypes();
+        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
 
         final Carriers carriers = new Carriers();
 //		new CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
-        new CarrierPlanXmlReader(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
+        new CarrierPlanXmlReader(carriers, types ).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
 
-        CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1",Carrier.class));

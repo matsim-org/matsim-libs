@@ -33,7 +33,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 public class MatsimTransformerTest {
 
@@ -358,7 +357,7 @@ public class MatsimTransformerTest {
 
 	private CarrierVehicle getMatsimVehicle(String VehicleId, String locationId, VehicleType matsimType) {
 		return CarrierVehicle.Builder
-				.newInstance(Id.create(VehicleId, org.matsim.vehicles.Vehicle.class), Id.create(locationId, Link.class))
+				.newInstance(Id.create(VehicleId, org.matsim.vehicles.Vehicle.class), Id.create(locationId, Link.class), matsimType )
 				.setEarliestStart(10.0).setLatestEnd(20.0).setType(matsimType).build();
 	}
 
