@@ -33,7 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -64,7 +63,7 @@ public class RunFreightWithEmissionExample {
 
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-		freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml");
+		freightConfigGroup.setCarriersFile( "singleCarrierWithoutRoutes.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml");
 
 		//emission setting
@@ -83,7 +82,7 @@ public class RunFreightWithEmissionExample {
 		FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		// how to set the capacity of the "light" vehicle type to "1":
-		FreightUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 3 );
+//		FreightUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
 
 		//prepare network for emission calculation
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -125,7 +124,6 @@ public class RunFreightWithEmissionExample {
 		//MATSim configuration:
 		final Controler controler = new Controler( scenario ) ;
 		Freight.configure( controler );
-
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
