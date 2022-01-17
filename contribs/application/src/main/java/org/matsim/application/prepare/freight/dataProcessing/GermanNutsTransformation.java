@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class GermanNutsTransformation {
     private static final String OLD_SHAPE_FILE = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/to-put-on-public-svn/raw-data/NUTS3/NUTS3_2010_DE.shp";
-    private static final String SHAPE_FILE_2021 = "/Users/luchengqi/Desktop/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp";
+    private static final String SHAPE_FILE_2021 = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp";
 
     private final Map<String, String> nuts2006To2021Mapping = new HashMap<>();
     private static int counter = 0;
@@ -50,7 +50,7 @@ public class GermanNutsTransformation {
                 nuts2006To2021Mapping.put(oldNutsId, oldNutsName); // NUTS region remains the same (mapping to itself)
             } else {
                 counter++;
-                System.out.println("NUTS region has changed for " + oldNutsName + " (NUTS ID 2006 =" + oldNutsId + ")");
+                System.out.println("NUTS region has changed for " + oldNutsName);
                 // Use geometry to decide new NUTS region
                 Geometry geometry = (Geometry) feature2006.getDefaultGeometry();
                 Point centroid = geometry.getCentroid();
@@ -60,7 +60,9 @@ public class GermanNutsTransformation {
                     if (geometry2021Candidate.contains(MGC.coordinate2Point(MGC.coord2Coordinate(coord)))) {
                         String nutsId2021 = feature2021.getAttribute("NUTS_ID").toString();
                         nuts2006To2021Mapping.put(oldNutsId, nutsId2021);
+                        System.out.println("Old NUTS ID:" + oldNutsId + " Old NUTS name = " + feature2006.getAttribute("NUTS_NAME"));
                         System.out.println("New NUTS ID: " + nutsId2021 + " New NUTS name = " + feature2021.getAttribute("NUTS_NAME"));
+                        System.out.println("=====================================================");
                     }
                 }
             }
@@ -79,6 +81,7 @@ public class GermanNutsTransformation {
         GermanNutsTransformation germanNutsTransformation = new GermanNutsTransformation();
         Map<String, String> transformationMap = germanNutsTransformation.getNuts2006To2021Mapping();
         System.out.println("Mapping results:" + transformationMap.size() + " mapping is calculated");
-        System.out.println("There are " + getCounter() + " NUTS regions that has been changed from 2006 version to 2021 version");
+        System.out.println("There are " + getCounter() + " NUTS regions that has been changed from 2006 version to 2021 version. " +
+                "Manual inspection and modification is needed");
     }
 }
