@@ -50,8 +50,8 @@ public class CarrierUtilsTest {
 	public void testAddAndGetVehicleToCarrier() {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"));
-		carrierVehicle.setType(VehicleUtils.getDefaultVehicleType());
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),VehicleUtils.getDefaultVehicleType());
+//		carrierVehicle.setType(VehicleUtils.getDefaultVehicleType());
 
 		//add Vehicle
 		CarrierUtils.addCarrierVehicle(carrier, carrierVehicle);

@@ -34,10 +34,10 @@ import java.util.Set;
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -64,18 +64,18 @@ public class DefaultDrtInsertionSearchTest {
 		var pathData = mock(DetourPathDataCache.class);
 		var detourPathCalculator = mock(DetourPathCalculator.class);
 		when(detourPathCalculator.calculatePaths(eq(request), eq(allInsertions))).thenReturn(pathData);
-		var insertionPathData = new InsertionDetourData<PathData>(null, null, null, null);
+		var insertionPathData = new InsertionDetourData(null, null, null, null);
 		when(pathData.createInsertionDetourData(eq(insertion))).thenReturn(insertionPathData);
 
 		//mock detourTimeCalculator
-		var detourTimeCalculator = (InsertionDetourTimeCalculator<PathData>)mock(InsertionDetourTimeCalculator.class);
-		var detourTimeInfo = new InsertionDetourTimeCalculator.DetourTimeInfo(null, null);
+		var detourTimeCalculator = mock(InsertionDetourTimeCalculator.class);
+		var detourTimeInfo = new DetourTimeInfo(null, null);
 		when(detourTimeCalculator.calculateDetourTimeInfo(eq(insertion), eq(insertionPathData))).thenReturn(
 				detourTimeInfo);
 
 		//mock bestInsertionFinder
-		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
-		var insertionWithPathData = new InsertionWithDetourData<>(insertion, insertionPathData, detourTimeInfo);
+		var bestInsertionFinder = (BestInsertionFinder)mock(BestInsertionFinder.class);
+		var insertionWithPathData = new InsertionWithDetourData(insertion, insertionPathData, detourTimeInfo);
 		when(bestInsertionFinder.findBestInsertion(eq(request),
 				argThat(argument -> argument.map(insertionWithDetourData -> insertionWithDetourData.insertion)
 						.collect(toSet())

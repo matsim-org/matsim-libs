@@ -163,10 +163,10 @@ final class FreightScenarioCreator {
     }
 
     private static CarrierVehicle createLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
-        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_"+id.toString()+"_lightVehicle_" + depot) ,Vehicle.class), homeId);
+        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_"+id.toString()+"_lightVehicle_" + depot) ,Vehicle.class), homeId, createLightType() );
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
-        vBuilder.setType(createLightType());
+//        vBuilder.setType(createLightType());
         return vBuilder.build();
     }
 
@@ -180,10 +180,10 @@ final class FreightScenarioCreator {
     }
 
     private static CarrierVehicle createHeavyVehicle(Id<?> id, Id<Link> homeId, String depot) {
-        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create("carrier_" + id.toString() + "_heavyVehicle_" + depot, Vehicle.class), homeId);
+        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create("carrier_" + id.toString() + "_heavyVehicle_" + depot, Vehicle.class), homeId, createHeavyType() );
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
-        vBuilder.setType(createHeavyType());
+//        vBuilder.setType(createHeavyType());
         return vBuilder.build();
     }
 

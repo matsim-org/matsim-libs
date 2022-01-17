@@ -34,27 +34,27 @@ public class CarrierVehicleTypeLoader {
 	 * @param types
 	 */
 	public void loadVehicleTypes(CarrierVehicleTypes types){
-		for(Carrier c : carriers.getCarriers().values()){
-			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles().values()){
-				Id<org.matsim.vehicles.VehicleType> typeId = v.getVehicleTypeId();
-				if(typeId != null){
-					VehicleType vehicleType = types.getVehicleTypes().get(typeId);
-					if(vehicleType != null){
-						v.setType(vehicleType);
-						Collection<VehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
-						if(!vTypes.contains(vehicleType)){
-							vTypes.add(vehicleType);
-						}
-					}
-					else{
-						throw new IllegalStateException("cannot assign all vehicleTypes, since vehicleType to typeId \"" + typeId + "\" is missing.");
-					}
-				}
-				else{
-					logger.warn("vehicleTypeId is missing, thus no vehicleType can be assigned.");
-				}
-			}
-		}
+//		for(Carrier c : carriers.getCarriers().values()){
+//			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles().values()){
+//				Id<org.matsim.vehicles.VehicleType> typeId = v.getVehicleTypeId();
+//				if(typeId != null){
+//					VehicleType vehicleType = types.getVehicleTypes().get(typeId);
+//					if(vehicleType != null){
+//						v.setType(vehicleType);
+//						Collection<VehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
+//						if(!vTypes.contains(vehicleType)){
+//							vTypes.add(vehicleType);
+//						}
+//					}
+//					else{
+//						throw new IllegalStateException("cannot assign all vehicleTypes, since vehicleType to typeId \"" + typeId + "\" is missing.");
+//					}
+//				}
+//				else{
+//					logger.warn("vehicleTypeId is missing, thus no vehicleType can be assigned.");
+//				}
+//			}
+//		}
 	}
 
 }

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -26,9 +25,13 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( this.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquils.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquils.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
@@ -80,9 +83,13 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 	
 	@Test
 	public void test_whenReadingCarrierWithFiniteFleet_itSetsFleetSizeCorrectly(){
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( this.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleet.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleet.xml" );
 		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
 	}
 	
@@ -175,7 +182,11 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 
 		InputStream is = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		new CarrierPlanXmlReader(carriers).readStream(is);
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( this.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+		// yyyy should rather construct in code.  kai, jan'22
+
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readStream(is );
 
 		Assert.assertEquals(1, carriers.getCarriers().size());
 	}

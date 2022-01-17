@@ -39,7 +39,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -61,11 +60,11 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 
 	private final ForkJoinPool forkJoinPool;
-	private final DrtInsertionSearch<PathData> insertionSearch;
+	private final DrtInsertionSearch insertionSearch;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
+			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
 				insertionRetryQueue, forkJoinPool, insertionSearch);
@@ -75,7 +74,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
 			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool,
-			DrtInsertionSearch<PathData> insertionSearch) {
+			DrtInsertionSearch insertionSearch) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
@@ -115,7 +114,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 	private void scheduleUnplannedRequest(DrtRequest req, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
 			double now) {
-		Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req,
+		Optional<InsertionWithDetourData> best = insertionSearch.findBestInsertion(req,
 				Collections.unmodifiableCollection(vehicleEntries.values()));
 		if (best.isEmpty()) {
 			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
@@ -130,7 +129,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 						+ req.getFromLink().getId());
 			}
 		} else {
-			InsertionWithDetourData<PathData> insertion = best.get();
+			InsertionWithDetourData insertion = best.get();
 			var vehicle = insertion.insertion.vehicleEntry.vehicle;
 			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
 

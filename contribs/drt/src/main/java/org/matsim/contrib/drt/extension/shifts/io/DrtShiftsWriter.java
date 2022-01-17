@@ -72,8 +72,8 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
             this.writeStartTag(SHIFT_NAME, atts);
 
             //Write break, if present
-            if (shift.getBreak() != null) {
-                final DrtShiftBreakSpecification shiftBreak = shift.getBreak();
+            if (shift.getBreak().isPresent()) {
+                final DrtShiftBreakSpecification shiftBreak = shift.getBreak().orElseThrow();
                 atts.clear();
                 atts.add(createTuple(EARLIEST_BREAK_START_TIME, shiftBreak.getEarliestBreakStartTime()));
                 atts.add(createTuple(LATEST_BREAK_END_TIME, shiftBreak.getLatestBreakEndTime()));

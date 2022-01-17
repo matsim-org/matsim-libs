@@ -24,9 +24,9 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	private final CarriersPlanReader reader;
 
-	public CarrierPlanXmlReader( final Carriers carriers ) {
+	public CarrierPlanXmlReader( final Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefiniton_v2.0.xsd is online
-		this.reader = new CarriersPlanReader( carriers ) ;
+		this.reader = new CarriersPlanReader( carriers, carrierVehicleTypes ) ;
 	}
 
 	@Override
@@ -75,12 +75,14 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	private static final class CarriersPlanReader extends MatsimXmlParser {
 		private final Carriers carriers;
+		private final CarrierVehicleTypes carrierVehicleTypes;
 
 		private MatsimXmlParser delegate = null;
 
-		CarriersPlanReader(Carriers carriers) {
+		CarriersPlanReader( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 			this.carriers = carriers ;
 //			this.setValidating(false);          //remove later, when having an idea, how to handle "Missing DOCTYPE" Error.
+			this.carrierVehicleTypes = carrierVehicleTypes;
 		}
 
 		@Override
@@ -91,13 +93,13 @@ public class CarrierPlanXmlReader implements MatsimReader {
 				log.info("Found following schemeLocation in carriers definition file: " + str);
 				if (str == null){
 					log.warn("No validation information found. Using ReaderV2 instead.");
-					delegate = new CarrierPlanXmlParserV2( carriers ) ;
+					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes ) ;
 				} else if ( str.contains( "carriersDefinitons_v1.0.xsd" ) ){
 					log.info("Found carriersDefinitons_v1.0.xsd. Using CarrierPlanReaderV1.");
-					delegate = new CarrierPlanReaderV1(carriers);
+					delegate = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
 				} else if ( str.contains( "carriersDefinitions_v2.0.xsd" ) ) { //This is the current one - but no validation file existing, kmt aug19
 					log.warn("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
-					delegate = new CarrierPlanXmlParserV2( carriers );
+					delegate = new CarrierPlanXmlParserV2( carriers, carrierVehicleTypes );
 				} else {
 					throw new RuntimeException("no reader found for " + str ) ;
 				}

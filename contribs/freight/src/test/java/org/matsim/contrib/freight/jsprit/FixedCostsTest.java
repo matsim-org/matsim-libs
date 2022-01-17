@@ -93,7 +93,8 @@ public class FixedCostsTest extends MatsimTestCase {
 			carrierVehType_A.setMaximumVelocity( 10 );
 			vehicleTypes.getVehicleTypes().put( carrierVehType_A.getId(), carrierVehType_A );
 		}
-		CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_A.getId()).build();
+		CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)"),
+				carrierVehType_A ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType_A.getId() ).build();
 
 		//only fixed costs, no variable costs
 		final Id<VehicleType> vehicleTypeId1 = Id.create( "gridType_B", VehicleType.class );
@@ -107,7 +108,8 @@ public class FixedCostsTest extends MatsimTestCase {
 			carrierVehType_B.setMaximumVelocity( 10. );
 			vehicleTypes.getVehicleTypes().put( carrierVehType_B.getId(), carrierVehType_B );
 		}
-		CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_B.getId()).build();
+		CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)"),
+				carrierVehType_B ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType_B.getId() ).build();
 
 		//carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
 		CarrierCapabilities cc1 = CarrierCapabilities.Builder.newInstance()

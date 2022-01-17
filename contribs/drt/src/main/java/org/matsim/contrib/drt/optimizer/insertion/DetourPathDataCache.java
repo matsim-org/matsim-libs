@@ -48,7 +48,7 @@ public class DetourPathDataCache {
 		this.zeroDetour = zeroDetour;
 	}
 
-	public InsertionDetourData<PathData> createInsertionDetourData(Insertion insertion) {
+	public InsertionDetourData createInsertionDetourData(Insertion insertion) {
 		PathData toPickup = detourToPickup.get(insertion.pickup.previousWaypoint.getLink());
 		PathData fromPickup = detourFromPickup.get(insertion.pickup.nextWaypoint.getLink());
 		PathData toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
@@ -57,6 +57,6 @@ public class DetourPathDataCache {
 		PathData fromDropoff = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
 				zeroDetour :
 				detourFromDropoff.get(insertion.dropoff.nextWaypoint.getLink());
-		return new InsertionDetourData<>(toPickup, fromPickup, toDropoff, fromDropoff);
+		return new InsertionDetourData(toPickup, fromPickup, toDropoff, fromDropoff);
 	}
 }

@@ -12,11 +12,11 @@ public class DrtShiftImpl implements DrtShift {
 
 	private final Id<DrtShift> id;
 
-	private double start;
-	private double end;
-	private Id<OperationFacility> operationFacilityId;
+	private final double start;
+	private final double end;
+	private final Id<OperationFacility> operationFacilityId;
 
-	private DrtShiftBreak shiftBreak;
+	private final DrtShiftBreak shiftBreak;
 
 	private boolean started = false;
 	private boolean ended = false;
@@ -41,8 +41,8 @@ public class DrtShiftImpl implements DrtShift {
 	}
 
 	@Override
-	public DrtShiftBreak getBreak() {
-		return shiftBreak;
+	public Optional<DrtShiftBreak> getBreak() {
+		return Optional.ofNullable(shiftBreak);
 	}
 
 	@Override
