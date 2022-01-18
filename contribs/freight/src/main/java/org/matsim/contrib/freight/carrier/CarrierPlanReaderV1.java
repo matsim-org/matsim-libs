@@ -40,7 +40,6 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	private static final String ACTIVITY = "act";
 	private static final String TYPE = "type";
 	private static final String SHIPMENT_ID = "shipmentId";
-	private static final String START = "start";
 	private static final String VEHICLE = "vehicle";
 	private static final String VEHICLES = "vehicles";
 	private static final String VEHICLE_EARLIEST_START = "earliestStart";
@@ -57,7 +56,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	private Collection<ScheduledTour> scheduledTours = null;
 	private Double currentScore;
 	private boolean selected;
-	private Carriers carriers;
+	private final Carriers carriers;
 	private double currentLegTransTime;
 	private double currentLegDepTime;
 	private final CarrierVehicleTypes carrierVehicleTypes;
@@ -166,12 +165,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if(selected == null ) {
 					this.selected = false;
 				}
-				else if(selected.equals("true")){
-					this.selected = true;
-				}
-				else{
-					this.selected = false;
-				}
+				else this.selected = selected.equals("true");
 				scheduledTours = new ArrayList<>();
 				break ;
 			}
