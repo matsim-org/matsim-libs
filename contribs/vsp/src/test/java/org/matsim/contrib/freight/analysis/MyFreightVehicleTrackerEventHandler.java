@@ -28,7 +28,7 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
- class MyFreightVehicleTrackerEventHandler implements ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+  class MyFreightVehicleTrackerEventHandler implements ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	 private final Vehicles vehicles;
 	 private final Network network;
 	 private final Carriers carriers;
