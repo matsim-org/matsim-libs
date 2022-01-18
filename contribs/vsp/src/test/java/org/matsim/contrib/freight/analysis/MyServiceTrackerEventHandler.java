@@ -14,7 +14,7 @@ import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandle
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-public class MyServiceTrackerEventHandler implements ActivityStartEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
+ class MyServiceTrackerEventHandler implements ActivityStartEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
     private final Vehicles vehicles;
     private final Network network;
     private final Carriers carriers;

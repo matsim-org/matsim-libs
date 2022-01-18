@@ -78,7 +78,7 @@ public class RunFreightAnalysisIT {
 	}
 
 	@Test
-	public void runTest(){
+	public void runVehicleTrackerTest(){
 		final String inputPath = testUtils.getClassInputDirectory();
 		File networkFile = new File(inputPath + "/output_network.xml.gz");
 		File carrierFile = new File(inputPath + "/output_carriers.xml");
