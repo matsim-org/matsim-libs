@@ -45,8 +45,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	public static final String START = "start";
 	public static final String VEHICLE = "vehicle";
 	public static final String VEHICLES = "vehicles";
-	private static final String VEHICLESTART = "earliestStart";
-	private static final String VEHICLEEND = "latestEnd";
+	private static final String VEHICLE_EARLIEST_START = "earliestStart";
+	private static final String VEHICLE_LATEST_END = "latestEnd";
 	private static final String VEHICLE_TYPES_MSG = "It used to be possible to have vehicle types both in the plans file, and in a separate file.  The " +
 										  "first option is no longer possible." ;
 	private static final String ATTRIBUTES = "attributes";
@@ -70,12 +70,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	private double currentLegDepTime;
 	private Builder capabilityBuilder;
 
-//	private Map<Id<org.matsim.vehicles.VehicleType>, VehicleType> vehicleTypeMap = new HashMap<>();
-
 	private double currentStartTime;
 
 	private Map<Id<CarrierService>, CarrierService> serviceMap;
-//	private VehicleType vehicleType;
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
@@ -168,7 +165,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			currentShipment = shipmentBuilder.build();
 			currentShipments.put(atts.getValue(ID), currentShipment);
 			CarrierUtils.addShipment(currentCarrier, currentShipment);
-//			currentCarrier.getShipments().put(shipment.getId(), shipment);
 		}
 
 		//capabilities
@@ -187,38 +183,12 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		//vehicle-type
 		else if(name.equals("vehicleType")){
 			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
-//			String typeIdAsString = atts.getValue("id");
-//			if(typeIdAsString == null) throw new IllegalStateException("vehicleTypeId is missing.");
-//			final Id<VehicleType> typeId = Id.create( typeIdAsString, VehicleType.class );
-////			this.vehicleTypeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( typeId );
-//			this.vehicleType = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
 		else if(name.equals("engineInformation")){
 			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
-////			EngineInformation engineInfo = new EngineInformation();
-//			EngineInformation engineInfo = this.vehicleType.getEngineInformation();;
-//			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
-//			engineInfo.setFuelConsumption(Double.parseDouble(atts.getValue("gasConsumption")));
-////			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
 		}
 		else if(name.equals("costInformation")){
 			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
-//			String fix = atts.getValue("fix");
-//			String perMeter = atts.getValue("perMeter");
-//			String perSecond = atts.getValue("perSecond");
-//			CostInformation costInformation = this.vehicleType.getCostInformation() ;
-//			if(fix != null){
-////				this.vehicleTypeBuilder.setFixCost(Double.parseDouble(fix));
-//				costInformation.setFixedCost( Double.parseDouble( fix ) ) ;
-//			}
-//			if(perMeter != null){
-////				this.vehicleTypeBuilder.setCostPerDistanceUnit(Double.parseDouble(perMeter));
-//				costInformation.setCostsPerMeter( Double.parseDouble( perMeter ) ) ;
-//			}
-//			if(perSecond != null){
-////				this.vehicleTypeBuilder.setCostPerTimeUnit(Double.parseDouble(perSecond));
-//				costInformation.setCostsPerSecond( Double.parseDouble( perSecond ) ) ;
-//			}
 		}
 
 		//vehicle
@@ -235,7 +205,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 			String typeId = atts.getValue("typeId");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-//			VehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
 			VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get( Id.create( typeId, VehicleType.class ) );
 			if ( vehicleType==null ) {
 				throw new RuntimeException( "vehicleTypeId=" + typeId + " is missing." );
@@ -243,10 +212,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType );
 			vehicleBuilder.setTypeId(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
-//			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
-			String startTime = atts.getValue(VEHICLESTART);
+			String startTime = atts.getValue(VEHICLE_EARLIEST_START);
 			if(startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
-			String endTime = atts.getValue(VEHICLEEND);
+			String endTime = atts.getValue(VEHICLE_LATEST_END);
 			if(endTime != null) vehicleBuilder.setLatestEnd(parseTimeToDouble(endTime));
 
 			CarrierVehicle vehicle = vehicleBuilder.build();
@@ -344,14 +312,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		if(name.equals("capabilities")){
 			currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
 		}
-//		else if(name.equals("capacity")){
-//			if(content == null) throw new IllegalStateException("vehicle-capacity is missing.");
-//			vehicleTypeBuilder.setCapacityWeightInTons(Integer.parseInt(content ) );
-//		}
+
 		else if(name.equals("vehicleType")){
-////			VehicleType type = vehicleType.build();
-//			vehicleTypeMap.put(vehicleType.getId(),vehicleType);
-//			capabilityBuilder.addType(vehicleType);
 			throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.") ;
 		}
 		else if (name.equals("route")) {
@@ -414,7 +376,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		} else {
 			return Double.parseDouble(timeString);
 		}
-
 	}
 
 	private int getInt(String value) {
