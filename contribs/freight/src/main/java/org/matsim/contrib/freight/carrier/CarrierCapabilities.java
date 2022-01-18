@@ -25,10 +25,10 @@ public class CarrierCapabilities {
 	}
 	
 	public static class Builder {
-		
+
 		public static Builder newInstance(){ return new Builder(); }
 		
-		private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
+		private Collection<VehicleType> vehicleTypes = new ArrayList<>();
 
 		private Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
 		
@@ -83,7 +83,7 @@ public class CarrierCapabilities {
 	
 	private Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = new LinkedHashMap<>();
 	
-	private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
+	private Collection<VehicleType> vehicleTypes = new ArrayList<>();
 	
 	
 	/**
