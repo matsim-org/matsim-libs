@@ -24,13 +24,12 @@ public class Carriers {
 	}
 
 	private void makeMap(Collection<Carrier> carriers) {
-		for (Carrier c : carriers) {
-			this.carriers.put(c.getId(), c);
+		for (Carrier carrier : carriers) {
+			this.carriers.put(carrier.getId(), carrier);
 		}
 	}
 
 	public Carriers() {
-
 	}
 
 	public Map<Id<Carrier>, Carrier> getCarriers() {
