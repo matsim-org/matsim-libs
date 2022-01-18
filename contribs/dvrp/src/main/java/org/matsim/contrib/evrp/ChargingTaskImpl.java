@@ -22,7 +22,8 @@ package org.matsim.contrib.evrp;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -30,7 +31,7 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 /**
  * @author michalm
  */
-public class ChargingTaskImpl extends StayTask implements ChargingTask {
+public class ChargingTaskImpl extends DefaultStayTask implements ChargingTask {
 	private final ChargingWithAssignmentLogic chargingLogic;
 	private final ElectricVehicle ev;
 	private Double chargingStartedTime;

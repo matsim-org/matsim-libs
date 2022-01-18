@@ -44,7 +44,7 @@ public class Stitcher {
 
 	private Network network;
 
-	private Network networkForThisRoute = NetworkUtils.createTimeInvariantNetwork();
+	private Network networkForThisRoute = NetworkUtils.createNetwork();
 
 	private LinkedList<Id<Node>> forwardStops = new LinkedList<>();
 

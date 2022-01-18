@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -98,6 +99,7 @@ public class ExtensiveInsertionProviderTest {
 	}
 
 	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
-		return new InsertionWithDetourData<>(insertion, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+		return new InsertionWithDetourData<>(insertion,
+				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN));
 	}
 }

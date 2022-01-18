@@ -45,6 +45,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 
@@ -71,7 +72,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);
 	private final SingleInsertionDetourPathCalculator detourPathCalculator = new SingleInsertionDetourPathCalculator(
-			null, null, null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
+			null, new FreeSpeedTravelTime(), null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
 
 	@After
 	public void after() {
@@ -90,12 +91,12 @@ public class SingleInsertionDetourPathCalculatorTest {
 		var insertion = new Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertPathData(insertionWithDetourData.getDetourToPickup(), pathToPickup, pickupLink);
-		assertPathData(insertionWithDetourData.getDetourFromPickup(), pathFromPickup, afterPickupLink);
-		assertPathData(insertionWithDetourData.getDetourToDropoff(), pathToDropoff, dropoffLink);
-		assertPathData(insertionWithDetourData.getDetourFromDropoff(), pathFromDropoff, afterDropoffLink);
+		assertPathData(insertionWithDetourData.detourToPickup, pathToPickup, pickupLink);
+		assertPathData(insertionWithDetourData.detourFromPickup, pathFromPickup, afterPickupLink);
+		assertPathData(insertionWithDetourData.detourToDropoff, pathToDropoff, dropoffLink);
+		assertPathData(insertionWithDetourData.detourFromDropoff, pathFromDropoff, afterDropoffLink);
 	}
 
 	@Test
@@ -110,14 +111,14 @@ public class SingleInsertionDetourPathCalculatorTest {
 		var insertion = new Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertPathData(insertionWithDetourData.getDetourToPickup(), pathToPickup, pickupLink);
-		assertPathData(insertionWithDetourData.getDetourFromPickup(), pathFromPickup, afterPickupLink);
+		assertPathData(insertionWithDetourData.detourToPickup, pathToPickup, pickupLink);
+		assertPathData(insertionWithDetourData.detourFromPickup, pathFromPickup, afterPickupLink);
 		//this path data should not be used and is null
-		assertThat(insertionWithDetourData.getDetourToDropoff()).isNull();
+		assertThat(insertionWithDetourData.detourToDropoff).isNull();
 		//this path data is of zero duration
-		assertThat(insertionWithDetourData.getDetourFromDropoff().getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourFromDropoff.getTravelTime()).isZero();
 	}
 
 	@Test
@@ -127,12 +128,12 @@ public class SingleInsertionDetourPathCalculatorTest {
 		var insertion = new Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertThat(insertionWithDetourData.getDetourToPickup().getTravelTime()).isZero();
-		assertThat(insertionWithDetourData.getDetourFromPickup().getTravelTime()).isZero();
-		assertThat(insertionWithDetourData.getDetourToDropoff().getTravelTime()).isZero();
-		assertThat(insertionWithDetourData.getDetourFromDropoff().getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourToPickup.getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourFromPickup.getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourToDropoff.getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourFromDropoff.getTravelTime()).isZero();
 	}
 
 	private Path mockCalcLeastCostPath(Link fromLink, Link toLink, double startTimeArg, double pathTravelTime) {
@@ -146,7 +147,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 	private void assertPathData(PathData pathData, Path inputPath, Link toLink) {
 		assertThat(pathData.getTravelTime()).isEqualTo(
-				inputPath.travelTime + FIRST_LINK_TT + getLastLinkTT(toLink, Double.NaN));
+				inputPath.travelTime + FIRST_LINK_TT + getLastLinkTT(new FreeSpeedTravelTime(), toLink, Double.NaN));
 	}
 
 	private Link link(String id) {

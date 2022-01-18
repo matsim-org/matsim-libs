@@ -132,7 +132,7 @@ public class BestDispatchFinder {
 			Link link = destinationToLink.apply(loc);
 
 			if (departure.link == link) {
-				return new Dispatch<>(veh, loc, VrpPaths.createZeroLengthPath(departure.link, departure.time));
+				return new Dispatch<>(veh, loc, VrpPaths.createZeroLengthPath(departure.link, departure.time, false));
 			}
 
 			Id<Node> locNodeId = link.getFromNode().getId();

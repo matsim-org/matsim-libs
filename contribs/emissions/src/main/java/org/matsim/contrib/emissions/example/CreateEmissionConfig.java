@@ -38,7 +38,10 @@ import org.matsim.core.controler.MatsimServices;
  * 
  * @author benjamin, julia
  *
+ * @deprecated -- has not been maintained and should in consequence be phased out.  kai, nov'21
+ *
  */
+@Deprecated // has not been maintained and should in consequence be phased out.  kai, nov'21
 public final class CreateEmissionConfig {
 
 		private static final String inputPath = "./test/input/org/matsim/contrib/emissions/";
@@ -126,7 +129,7 @@ public final class CreateEmissionConfig {
 
 			ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+//	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 

@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vehicles.Vehicles;
 
@@ -64,8 +63,8 @@ public class FleetModule extends AbstractDvrpModeModule {
 				new FleetReader(fleetSpecification).parse(fleetSpecificationUrl);
 				return fleetSpecification;
 			}).asEagerSingleton();
-		} else if (getConfig().qsim().getVehiclesSource() == QSimConfigGroup.VehiclesSource.fromVehiclesData) {
-			bind(FleetSpecification.class).toProvider(new Provider<>() {
+		} else {
+			bindModal(FleetSpecification.class).toProvider(new Provider<>() {
 				@Inject
 				private Vehicles vehicles;
 

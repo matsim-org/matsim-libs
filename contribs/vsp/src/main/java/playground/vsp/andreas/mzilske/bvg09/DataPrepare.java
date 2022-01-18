@@ -135,8 +135,8 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		this.pseudoNetwork = NetworkUtils.createTimeInvariantNetwork();
-		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.pseudoNetwork, "tr_").createNetwork();
+		this.pseudoNetwork = NetworkUtils.createNetwork();
+        new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.pseudoNetwork, "tr_").createNetwork();
 	}
 
 	protected void mergeNetworks() {

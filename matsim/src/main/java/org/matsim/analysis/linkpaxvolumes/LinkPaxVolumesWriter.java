@@ -32,20 +32,20 @@ import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-class LinkPaxVolumesWriter {
+public class LinkPaxVolumesWriter {
     private final LinkPaxVolumesAnalysis linkPaxVolumesAnalysis;
     private final Network network;
     private final String columnSeparator;
     private final int numberOfHours;
 
-    LinkPaxVolumesWriter(LinkPaxVolumesAnalysis linkPaxVolumesAnalysis, Network network, String sep) {
+    public LinkPaxVolumesWriter(LinkPaxVolumesAnalysis linkPaxVolumesAnalysis, Network network, String sep) {
         this.linkPaxVolumesAnalysis = linkPaxVolumesAnalysis;
         this.network = network;
         this.columnSeparator = sep;
         this.numberOfHours = linkPaxVolumesAnalysis.getNumberOfHours();
     }
 
-    void writeLinkVehicleAndPaxVolumesAllPerDayCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesAllPerDayCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
 
@@ -65,7 +65,7 @@ class LinkPaxVolumesWriter {
         }
     }
 
-    void writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesPerNetworkModePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<String> networkModesSorted = new TreeSet(linkPaxVolumesAnalysis.getNetworkModes());
@@ -100,7 +100,7 @@ class LinkPaxVolumesWriter {
      * Please note that the same vehicle is counted for each passenger mode it is serving here. E.g. a pt vehicle
      * will be counted with the driver's passenger mode and with the passenger's passenger mode, i.e. multiple times.
      */
-    void writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesPerPassengerModePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<String> passengerModesSorted = new TreeSet(linkPaxVolumesAnalysis.getPassengerModes());
@@ -131,7 +131,7 @@ class LinkPaxVolumesWriter {
         }
     }
 
-    void writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(String fileName) {
+    public void writeLinkVehicleAndPaxVolumesPerVehicleTypePerHourCsv(String fileName) {
         // have results sorted
         SortedSet<Id<Link>> linkIdsSorted = new TreeSet(network.getLinks().keySet());
         SortedSet<Id<VehicleType>> vehicleIdsSorted = new TreeSet(linkPaxVolumesAnalysis.getVehicleTypes());

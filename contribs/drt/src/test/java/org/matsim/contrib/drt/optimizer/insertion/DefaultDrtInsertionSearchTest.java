@@ -42,7 +42,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPo
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -77,14 +76,15 @@ public class DefaultDrtInsertionSearchTest {
 		when(insertionProvider.getInsertions(eq(request), eq(List.of(vehicleEntry)))).thenReturn(filteredInsertions);
 
 		//mock detourPathCalculator
-		var detourData = new DetourData<>(Map.of(beforePickupLink, mock(PathData.class)),
+		var detourData = new DetourPathDataCache(Map.of(beforePickupLink, mock(PathData.class)),
 				Map.of(afterPickupLink, mock(PathData.class)), Map.of(beforeDropoffLink, mock(PathData.class)),
 				Map.of(afterDropoffLink, mock(PathData.class)), PathData.EMPTY);
 		var detourPathCalculator = mock(DetourPathCalculator.class);
 		when(detourPathCalculator.calculatePaths(eq(request), eq(filteredInsertions))).thenReturn(detourData);
 
 		//mock bestInsertionFinder
-		var selectedInsertionWithPathData = detourData.createInsertionWithDetourData(selectedInsertion);
+		var selectedInsertionWithPathData = new InsertionWithDetourData<>(selectedInsertion,
+				detourData.createInsertionDetourData(selectedInsertion));
 		@SuppressWarnings("unchecked")
 		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
 		when(bestInsertionFinder.findBestInsertion(eq(request),

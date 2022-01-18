@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.av.maxspeed;
+package org.matsim.contrib.dvrp.trafficmonitoring;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,13 +38,18 @@ import org.matsim.vehicles.VehicleType;
  */
 public class QSimFreeSpeedTravelTimeWithMaxSpeedLimit implements TravelTime {
 	private final double timeStepSize;
+	//FIXME use vehicle max speed (currently impossible, because the vehicle passed to path search is often null)
 	private final double maxSpeed;
 
 	@Inject
 	public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(QSimConfigGroup qsimCfg,
 			@Named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE) VehicleType vehicleType) {
-		this.timeStepSize = qsimCfg.getTimeStepSize();
-		this.maxSpeed = vehicleType.getMaximumVelocity();
+		this(qsimCfg.getTimeStepSize(), vehicleType.getMaximumVelocity());
+	}
+
+	public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(double timeStepSize, double maxSpeed) {
+		this.timeStepSize = timeStepSize;
+		this.maxSpeed = maxSpeed;
 	}
 
 	@Override

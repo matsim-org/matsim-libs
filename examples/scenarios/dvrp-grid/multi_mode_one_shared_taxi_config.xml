@@ -10,52 +10,33 @@
 	<module name="multiModeDrt">
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
-			<param name="mode" value="drt_A"/>
+			<param name="mode" value="drt_conventional"/>
 			<param name="stopDuration" value="60"/>
 			<param name="maxWaitTime" value="900"/>
 			<param name="maxTravelTimeAlpha" value="1.3"/>
 			<param name="maxTravelTimeBeta" value="600"/>
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
-			<param name="vehiclesFile" value="one_shared_taxi_vehicles_A.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
-			<parameterset type="drtfare" >
-				<param name="basefare" value="1.0" />
-				<param name="dailySubscriptionFee" value="5.0" />
-				<param name="distanceFare_m" value="0.001" />
+			<parameterset type="drtfare">
+				<param name="basefare" value="1.0"/>
+				<param name="dailySubscriptionFee" value="5.0"/>
+				<param name="distanceFare_m" value="0.001"/>
 			</parameterset>
 		</parameterset>
 
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
-			<param name="mode" value="drt_B"/>
+			<param name="mode" value="drt_autonomous"/>
 			<param name="stopDuration" value="60"/>
 			<param name="maxWaitTime" value="900"/>
 			<param name="maxTravelTimeAlpha" value="1.3"/>
 			<param name="maxTravelTimeBeta" value="600"/>
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
-			<param name="vehiclesFile" value="one_shared_taxi_vehicles_B.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
-			<parameterset type="drtfare" >
-				<param name="basefare" value="2.0" />
-				<param name="dailySubscriptionFee" value="0.0" />
-				<param name="distanceFare_m" value="0.001" />
-			</parameterset>
-		</parameterset>
-
-		<parameterset type="drt">
-			<parameterset type="ExtensiveInsertionSearch"/>
-			<param name="mode" value="drt_C"/>
-			<param name="stopDuration" value="60"/>
-			<param name="maxWaitTime" value="900"/>
-			<param name="maxTravelTimeAlpha" value="1.3"/>
-			<param name="maxTravelTimeBeta" value="600"/>
-			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
-			<param name="vehiclesFile" value="one_shared_taxi_vehicles_C.xml"/>
-			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
-			<parameterset type="drtfare" >
-				<param name="basefare" value="0.0" />
-				<param name="dailySubscriptionFee" value="10.0" />
-				<param name="distanceFare_m" value="0.002" />
+			<parameterset type="drtfare">
+				<param name="basefare" value="0.0"/>
+				<param name="dailySubscriptionFee" value="10.0"/>
+				<param name="distanceFare_m" value="0.002"/>
 			</parameterset>
 		</parameterset>
 	</module>
@@ -66,6 +47,10 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="multi_mode_one_shared_taxi_population.xml"/>
+	</module>
+
+	<module name="vehicles">
+		<param name="vehiclesFile" value="one_shared_taxi_matsim_vehicles.xml"/>
 	</module>
 
 	<module name="qsim">
@@ -90,18 +75,14 @@
 		<param name="activityType_0" value="dummy"/>
 		<param name="activityTypicalDuration_0" value="24:00:00"/>
 
-		<param name="activityType_1" value="drt_A interaction"/>
+		<param name="activityType_1" value="drt_conventional interaction"/>
 		<param name="activityTypicalDuration_1" value="00:00:01"/>
 
-		<param name="activityType_2" value="drt_B interaction"/>
+		<param name="activityType_2" value="drt_autonomous interaction"/>
 		<param name="activityTypicalDuration_2" value="00:00:01"/>
 
-		<param name="activityType_3" value="drt_C interaction"/>
-		<param name="activityTypicalDuration_3" value="00:00:01"/>
-
-		<param name="traveling_drt_A" value="-6"/>
-		<param name="traveling_drt_B" value="-6"/>
-		<param name="traveling_drt_C" value="-6"/>
+		<param name="traveling_drt_conventional" value="-6"/>
+		<param name="traveling_drt_autonomous" value="-6"/>
 	</module>
 
 	<module name="strategy">
