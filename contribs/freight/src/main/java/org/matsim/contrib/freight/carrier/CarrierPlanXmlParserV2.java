@@ -322,7 +322,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
 			default:
-				throw new IllegalStateException("Unexpected value: " + name);
+				logger.warn("Unexpected value while reading in. This field will be ignored: " + name);
 		}
 	}
 
