@@ -24,7 +24,7 @@ public interface SharingService {
 
 	InteractionPoint findClosestDropoffLocation(SharingVehicle vehicle, MobsimAgent agent);
 
-	SharingVehicle hasReservationElseNull(MobsimAgent agent);
+	SharingVehicle getReservedVehicle(MobsimAgent agent);
 
 	void releaseReservation(MobsimAgent agent);
 }

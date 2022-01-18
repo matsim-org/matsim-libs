@@ -124,7 +124,7 @@ public class FreefloatingService implements SharingService {
 	}
 
 	@Override
-	public SharingVehicle hasReservationElseNull(MobsimAgent agent)
+	public SharingVehicle getReservedVehicle(MobsimAgent agent)
 	{
 		return reservations.get(agent.getId());
 	}

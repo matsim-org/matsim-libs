@@ -65,10 +65,6 @@ public class SharingUtils {
 		return components -> {
 			for (SharingServiceConfigGroup serviceConfig : sharingConfig.getServices()) {
 				components.addComponent(SharingModes.mode(getServiceMode(serviceConfig)));
-
-				// Add agents source to provide qSim vehicles
-				String name = SharingUtils.getServiceMode(serviceConfig)+ SharingQSimServiceModule.AGENT_SOURCE_SUFFIX;
-				components.addNamedComponent(name);
 			}
 		};
 	}

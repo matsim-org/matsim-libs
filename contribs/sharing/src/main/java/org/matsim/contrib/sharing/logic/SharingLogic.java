@@ -1,8 +1,6 @@
 package org.matsim.contrib.sharing.logic;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -131,7 +129,7 @@ public class SharingLogic {
 
 			Leg leg = ((Leg) mainElements.get(0));
 
-			setVehicle(plan,leg, closestVehicleInteraction.get().getVehicle());
+			setVehicle(plan,mainElements, closestVehicleInteraction.get().getVehicle());
 			service.reserveVehicle(agent,closestVehicleInteraction.get().getVehicle());
 			return true;
 		} else {
@@ -154,7 +152,7 @@ public class SharingLogic {
 		Activity pickupActivity = (Activity) plan.getPlanElements().get(pickupActivityIndex);
 		Verify.verify(pickupActivity.getType().equals(SharingUtils.PICKUP_ACTIVITY));
 
-		SharingVehicle reservedVehicle = service.hasReservationElseNull(agent);
+		SharingVehicle reservedVehicle = service.getReservedVehicle(agent);
 
 		Optional<VehicleInteractionPoint> selectedVehicleInteraction;
 
@@ -221,7 +219,7 @@ public class SharingLogic {
 
 				Leg leg = ((Leg) mainElements.get(0));
 
-				setVehicle(plan, leg, selectedVehicleInteraction.get().getVehicle());
+				setVehicle(plan, mainElements, selectedVehicleInteraction.get().getVehicle());
 
 				// Insert new plan elements
 				plan.getPlanElements().addAll(pickupActivityIndex + 1, updatedElements);
@@ -237,18 +235,39 @@ public class SharingLogic {
 	/**
 	 * Set the planned vehicle into the NetworkRoute
 	 * @param plan
-	 * @param leg
+	 * @param planElements
 	 * @param vehicle
 	 */
-	private void setVehicle(Plan plan, Leg leg, SharingVehicle vehicle)
+	private void setVehicle(Plan plan, List<? extends PlanElement> planElements, SharingVehicle vehicle)
 	{
-		Route route =  leg.getRoute();
-		if(route instanceof NetworkRoute)
+		Set<Id<Vehicle>> vehicleIds = new HashSet<>();
+
+		for (PlanElement pe : planElements)
 		{
-			Id<Vehicle> assignedId = Id.createVehicleId(vehicle.getId().toString());
-			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-			networkRoute.setVehicleId(assignedId);
+
+			if(vehicleIds.size()>1)
+			{
+				throw new IllegalStateException("Tried to modify more than one vehicleId. Current code supports only non-vehicular access and egress modes");
+			}
+
+			if (pe instanceof Leg)
+			{
+				Leg currentLeg =  (Leg) pe;
+				Route route =  currentLeg.getRoute();
+
+				if(route instanceof NetworkRoute)
+				{
+					Id<Vehicle> assignedId = Id.createVehicleId(vehicle.getId().toString());
+					NetworkRoute networkRoute = (NetworkRoute) currentLeg.getRoute();
+					vehicleIds.add(networkRoute.getVehicleId());
+					networkRoute.setVehicleId(assignedId);
+				}
+
+			}
 		}
+
+
+
 
 	}
 
@@ -301,8 +320,7 @@ public class SharingLogic {
 			updatedElements.addAll(mainElements);
 			now = timeInterpretation.decideOnElementsEndTime(mainElements, now).seconds();
 
-			Leg leg = ((Leg) mainElements.get(0));
-			setVehicle(plan,leg,vehicle);
+			setVehicle(plan,mainElements,vehicle);
 
 			// 2) Dropoff activity
 			Activity updatedPickupActivity = createDropoffActivity(now, closestDropoffInteraction);

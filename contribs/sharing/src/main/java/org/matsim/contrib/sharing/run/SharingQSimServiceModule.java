@@ -12,6 +12,7 @@ import org.matsim.contrib.sharing.service.SharingService;
 import org.matsim.contrib.sharing.service.SharingUtils;
 import org.matsim.contrib.sharing.service.StationBasedService;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.router.RoutingModule;
@@ -60,15 +61,14 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 		})).in(Singleton.class);
 
 
-		String agentSource = SharingUtils.getServiceMode(serviceConfig)+AGENT_SOURCE_SUFFIX;
-		addQSimComponentBinding(agentSource).toProvider(modalProvider(getter -> {
+		addModalComponent(AgentSource.class, modalProvider(getter -> {
 
 			QSim qsim = getter.get(QSim.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
 			return new SharingVehicleSource(qsim, specification);
 
-		})).in(Singleton.class);
+		}));
 
 		bindModal(StationBasedService.class).toProvider(modalProvider(getter -> {
 			Network network = getter.get(Network.class);
