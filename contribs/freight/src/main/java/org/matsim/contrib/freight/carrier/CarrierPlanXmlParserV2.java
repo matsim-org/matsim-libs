@@ -64,7 +64,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	private Collection<ScheduledTour> scheduledTours = null;
 	private Double currentScore;
 	private boolean selected;
-	private Carriers carriers;
+	private final Carriers carriers;
 	private final CarrierVehicleTypes carrierVehicleTypes;
 	private double currentLegTransTime;
 	private double currentLegDepTime;
@@ -125,7 +125,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				if (capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
 				String startString = atts.getValue("earliestStart");
 				double start = parseTimeToDouble(startString);
-				double end = Double.MAX_VALUE;
+				double end;
 				String endString = atts.getValue("latestEnd");
 				end = parseTimeToDouble(endString);
 				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
@@ -139,7 +139,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 			//shipments
 			case SHIPMENTS:
-				currentShipments = new HashMap<String, CarrierShipment>();
+				currentShipments = new HashMap<>();
 				break;
 			case SHIPMENT: {
 				String idString = atts.getValue("id");
@@ -234,9 +234,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				if (score != null) currentScore = parseTimeToDouble(score);
 				String selected = atts.getValue("selected");
 				if (selected == null) this.selected = false;
-				else if (selected.equals("true")) this.selected = true;
-				else this.selected = false;
-				scheduledTours = new ArrayList<ScheduledTour>();
+				else this.selected = selected.equals("true");
+				scheduledTours = new ArrayList<>();
 				break;
 			case "tour":
 				String vehicleId = atts.getValue("vehicleId");
@@ -322,6 +321,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			case ATTRIBUTE:
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + name);
 		}
 	}
 
