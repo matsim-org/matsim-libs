@@ -16,19 +16,21 @@ import java.util.List;
 import java.util.Map;
 
 public class GermanNutsTransformation {
-    private static final String OLD_SHAPE_FILE = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/to-put-on-public-svn/raw-data/NUTS3/NUTS3_2010_DE.shp";
-    private static final String SHAPE_FILE_2021 = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp";
+    private final String german2006shp;
+    private final String nuts2021shp;
 
     private final Map<String, String> nuts2006To2021Mapping = new HashMap<>();
     private static int counter = 0;
 
-    GermanNutsTransformation() {
+    GermanNutsTransformation(String german2006shp, String nuts2021shp) {
+        this.german2006shp = german2006shp;
+        this.nuts2021shp = nuts2021shp;
         generateTransformationMap();
     }
 
     private void generateTransformationMap() {
-        ShpOptions oldShapeFile = new ShpOptions(Path.of(OLD_SHAPE_FILE), "EPSG:5677", StandardCharsets.UTF_8);
-        ShpOptions shapeFile2021 = new ShpOptions(Path.of(SHAPE_FILE_2021), "EPSG:4326", StandardCharsets.UTF_8);
+        ShpOptions oldShapeFile = new ShpOptions(Path.of(german2006shp), "EPSG:5677", StandardCharsets.UTF_8);
+        ShpOptions shapeFile2021 = new ShpOptions(Path.of(nuts2021shp), "EPSG:4326", StandardCharsets.UTF_8);
         CoordinateTransformation ct = new GeotoolsTransformation("EPSG:5677", "EPSG:4326");
 
         List<SimpleFeature> featuresNuts2021 = shapeFile2021.readFeatures();
@@ -78,8 +80,11 @@ public class GermanNutsTransformation {
     }
 
     public static void main(String[] args) {
-        GermanNutsTransformation germanNutsTransformation = new GermanNutsTransformation();
+        String german2006shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/to-put-on-public-svn/raw-data/NUTS3/NUTS3_2010_DE.shp";
+        String nuts2021shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp";
+        GermanNutsTransformation germanNutsTransformation = new GermanNutsTransformation(german2006shp, nuts2021shp);
         Map<String, String> transformationMap = germanNutsTransformation.getNuts2006To2021Mapping();
+
         System.out.println("Mapping results:" + transformationMap.size() + " mapping is calculated");
         System.out.println("There are " + getCounter() + " NUTS regions that has been changed from 2006 version to 2021 version. " +
                 "Manual inspection and modification is needed");
