@@ -152,15 +152,15 @@ public class SharingLogic {
 		Activity pickupActivity = (Activity) plan.getPlanElements().get(pickupActivityIndex);
 		Verify.verify(pickupActivity.getType().equals(SharingUtils.PICKUP_ACTIVITY));
 
-		SharingVehicle reservedVehicle = service.getReservedVehicle(agent);
+		Optional<SharingVehicle> reservedVehicle = service.getReservedVehicle(agent);
 
 		Optional<VehicleInteractionPoint> selectedVehicleInteraction;
 
-		if(reservedVehicle!= null )
+		if(reservedVehicle.isPresent())
 		{
-			selectedVehicleInteraction = Optional.of(VehicleInteractionPoint.of(reservedVehicle));
+			selectedVehicleInteraction = Optional.of(VehicleInteractionPoint.of(reservedVehicle.get()));
 		} else {
-			// Find closest vehicle and hope it is at the current station / link
+			// Find the closest vehicle and hope it is at the current station / link
 			selectedVehicleInteraction = service.findClosestVehicle(agent);
 		}
 

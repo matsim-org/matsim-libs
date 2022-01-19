@@ -174,9 +174,10 @@ public class StationBasedService implements SharingService {
 	}
 
 	@Override
-	public SharingVehicle getReservedVehicle(MobsimAgent agent)
+	public Optional<SharingVehicle> getReservedVehicle(MobsimAgent agent)
 	{
-		return reservations.get(agent.getId());
+		SharingVehicle value = reservations.get(agent.getId());
+		return value == null ? Optional.empty() : Optional.of(value);
 	}
 
 	@Override
