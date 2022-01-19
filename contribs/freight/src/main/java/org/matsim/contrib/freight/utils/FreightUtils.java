@@ -24,6 +24,7 @@ import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmLis
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,7 +60,7 @@ public class FreightUtils {
 	 * This string constant will eventually become private.
 	 */
 	private static final String CARRIERS = "carriers";
-	private static final String CARRIERVEHICLETYPES = "carrierVehicleTypes";
+	private static final String CARRIER_VEHICLE_TYPES = "carrierVehicleTypes";
 	private static final Logger log = Logger.getLogger(FreightUtils.class);
 
 	private static final String ATTR_SKILLS = "skills";
@@ -168,7 +169,7 @@ public class FreightUtils {
 			if (carrier.getServices().size() > 0) {
 				createShipmentsFromServices(carrierWS, carrier);
 			}
-			carrierWS.setCarrierCapabilities(carrier.getCarrierCapabilities()); // vehicles and other carrierCapabilites
+			carrierWS.setCarrierCapabilities(carrier.getCarrierCapabilities()); // vehicles and other carrierCapabilities
 			carriersWithShipments.addCarrier(carrierWS);
 		}
 		return carriersWithShipments;
@@ -177,9 +178,11 @@ public class FreightUtils {
 	/**
 	 * @deprecated -- please inline.  Reason: move syntax closer to how it is done in {@link ConfigUtils}.
 	 */
+	@Deprecated
 	public static Carriers getOrCreateCarriers(Scenario scenario){
 		return addOrGetCarriers( scenario );
 	}
+
 	public static Carriers addOrGetCarriers( Scenario scenario ) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
 		// controler is started, it is better to fail if the carriers are not found.
@@ -203,10 +206,10 @@ public class FreightUtils {
 	}
 
 	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
-		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement(CARRIERVEHICLETYPES);
+		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 		if (types == null) {
 			types = new CarrierVehicleTypes();
-			scenario.addScenarioElement(CARRIERVEHICLETYPES, types);
+			scenario.addScenarioElement(CARRIER_VEHICLE_TYPES, types);
 		}
 		return types;
 	}
@@ -236,7 +239,7 @@ public class FreightUtils {
 	 * @param carrier
 	 */
 	private void copyDeliveries(Carrier carrierWS, Carrier carrier) {
-		log.error("Coping of Deliveries is NOT implemented yet due to missing CarrierDelivery in freight contrib");
+		throw new NotImplementedException("Coping of Deliveries is NOT implemented yet due to missing CarrierDelivery in freight contrib");
 	}
 
 	/**
@@ -247,7 +250,7 @@ public class FreightUtils {
 	 * @param carrier
 	 */
 	private void copyPickups(Carrier carrierWS, Carrier carrier) {
-		log.error("Coping of Pickup is NOT implemented yet due to missing CarrierPickup in freight contrib");
+		throw new NotImplementedException("Coping of Pickup is NOT implemented yet due to missing CarrierPickup in freight contrib");
 	}
 
 	/**
@@ -273,7 +276,7 @@ public class FreightUtils {
 	 * @param carrier   the already existing carrier
 	 */
 	private static void createShipmentsFromServices(Carrier carrierWS, Carrier carrier) {
-		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsdeliveredFrom = new TreeMap<>();
+		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsDeliveredFrom = new TreeMap<>();
 		try {
 			carrier.getSelectedPlan();
 		} catch (Exception e) {
@@ -290,7 +293,7 @@ public class FreightUtils {
 			for (TourElement te : tour.getTour().getTourElements()) {
 				if (te instanceof ServiceActivity) {
 					ServiceActivity act = (ServiceActivity) te;
-					depotServiceIsdeliveredFrom.put(act.getService().getId(), depotForTour);
+					depotServiceIsDeliveredFrom.put(act.getService().getId(), depotForTour);
 				}
 			}
 		}
@@ -298,13 +301,13 @@ public class FreightUtils {
 			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 					.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
-							depotServiceIsdeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
+							depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getLocationLinkId(),
 							carrierService.getCapacityDemand())
 					.setDeliveryServiceTime(carrierService.getServiceDuration())
 					// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 					// have now time for that. Maybe change it later, kmt sep18
 					.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
-					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// limited to end of delivery timeWindow (pickup later as latest delivery is not usefull)
+					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// Limited to end of delivery timeWindow (pickup later than latest delivery is not useful).
 					.build();
 			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}
@@ -506,12 +509,12 @@ public class FreightUtils {
 	private static void setSkills(Attributes attributes, Set<String> skills) {
 		if (skills.size() != 0) {
 			Iterator<String> skillIterator = skills.iterator();
-			String skillString = skillIterator.next();
+			StringBuilder skillString = new StringBuilder(skillIterator.next());
 			while (skillIterator.hasNext()) {
-				skillString += ",";
-				skillString += skillIterator.next();
+				skillString.append(",");
+				skillString.append(skillIterator.next());
 			}
-			attributes.putAttribute(ATTR_SKILLS, skillString);
+			attributes.putAttribute(ATTR_SKILLS, skillString.toString());
 		}
 	}
 }

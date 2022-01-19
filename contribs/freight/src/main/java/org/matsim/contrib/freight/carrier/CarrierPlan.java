@@ -13,20 +13,12 @@ import org.matsim.api.core.v01.population.BasicPlan;
 public class CarrierPlan implements BasicPlan {
 
 	private final Carrier carrier;
-	
 	private final Collection<ScheduledTour> scheduledTours;
-
 	private Double score = null;
 
 	@Override
 	public String toString() {
-		StringBuilder strb = new StringBuilder(  ) ;
-		strb.append( "carrierPlan=[carrierId=" ).append( carrier.getId() ).append("][score=").append( score ).append( "][#tours=").append( scheduledTours.size() ).append( "]" ) ;
-//		for( ScheduledTour tour : scheduledTours ){
-//			strb.append( tour.toString() ) ;
-//		}
-//		strb.append( "]" ) ;
-		return strb.toString() ;
+		return "carrierPlan=[carrierId=" + carrier.getId() + "][score=" + score + "][#tours=" + scheduledTours.size() + "]";
 	}
 
 	public CarrierPlan(final Carrier carrier, final Collection<ScheduledTour> scheduledTours) {
