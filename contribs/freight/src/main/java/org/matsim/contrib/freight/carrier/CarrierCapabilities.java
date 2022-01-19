@@ -28,11 +28,11 @@ public class CarrierCapabilities {
 
 		public static Builder newInstance(){ return new Builder(); }
 		
-		private Collection<VehicleType> vehicleTypes = new ArrayList<>();
+		private final Collection<VehicleType> vehicleTypes = new ArrayList<>();
 
-		private Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
+		private final Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
 		
-		private Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
+		private final Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
 		
 		private FleetSize fleetSize = FleetSize.FINITE;
 		
