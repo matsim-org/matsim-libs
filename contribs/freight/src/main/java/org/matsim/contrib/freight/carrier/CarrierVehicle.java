@@ -51,7 +51,7 @@ public class CarrierVehicle implements Vehicle {
 		 * @return a new vehicle builder
 		 */
 		public static Builder newInstance( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
-			return new Builder(vehicleId,locationId, vehicleType );
+			return new Builder(vehicleId, locationId, vehicleType );
 		}
 		
 		private final Id<Link> locationId;
