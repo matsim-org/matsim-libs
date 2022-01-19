@@ -28,7 +28,7 @@ public class CarrierVehicleTypes {
 		return types;
 	}
 	
-	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
+	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 
 	public CarrierVehicleTypes() {
 		super();

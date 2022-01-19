@@ -14,8 +14,8 @@ public final class CarrierService implements Attributable {
 			return new Builder(id,locationLinkId);
 		}
 		
-		private Id<CarrierService> id;
-		private Id<Link> locationLinkId;
+		private final Id<CarrierService> id;
+		private final Id<Link> locationLinkId;
 		private String name = "service";
 		
 		private double serviceTime = 0.0;
@@ -82,7 +82,7 @@ public final class CarrierService implements Attributable {
 
 	private final int demand;
 
-	private Attributes attributes = new Attributes();
+	private final Attributes attributes = new Attributes();
 
 	private CarrierService(Builder builder){
 		id = builder.id;
@@ -154,11 +154,8 @@ public final class CarrierService implements Attributable {
 			return false;
 		CarrierService other = (CarrierService) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+			return other.id == null;
+		} else return id.equals(other.id);
 	}
 
 	

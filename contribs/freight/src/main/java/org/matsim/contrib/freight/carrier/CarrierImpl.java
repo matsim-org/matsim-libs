@@ -20,18 +20,13 @@ public final class CarrierImpl implements Carrier {
 	public static Carrier newInstance( Id<Carrier> carrierId ){
 		return CarrierUtils.createCarrier( carrierId ) ;
 	}
+
 	private final Id<Carrier> id;
-
 	private final List<CarrierPlan> plans;
-
 	private final Map<Id<CarrierShipment>, CarrierShipment> shipments;
-
 	private final Map<Id<CarrierService>, CarrierService> services;
-
 	private CarrierCapabilities carrierCapabilities;
-	
 	private CarrierPlan selectedPlan;
-
 	private final Attributes attributes = new Attributes();
 
 	CarrierImpl( final Id<Carrier> id ) {
@@ -48,10 +43,6 @@ public final class CarrierImpl implements Carrier {
 		return id;
 	}
 
-//	@Override
-//	public Id getDepotLinkId() {
-//		return depotLinkId;
-//	}
 
 	@Override
 	public List<CarrierPlan> getPlans() {
@@ -120,7 +111,5 @@ public final class CarrierImpl implements Carrier {
 	public Attributes getAttributes() {
 		return attributes;
 	}
-
-
 
 }
