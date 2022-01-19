@@ -16,23 +16,20 @@ import java.util.List;
 import java.util.Map;
 
 public class GermanNutsTransformation {
-    private final String german2006shp;
-    private final String nuts2021shp;
+    private final ShpOptions oldShapeFile;
+    private final ShpOptions shapeFile2021;
 
     private final Map<String, String> nuts2006To2021Mapping = new HashMap<>();
     private static int counter = 0;
 
-    GermanNutsTransformation(String german2006shp, String nuts2021shp) {
-        this.german2006shp = german2006shp;
-        this.nuts2021shp = nuts2021shp;
+    GermanNutsTransformation(ShpOptions german2006shp, ShpOptions nuts2021shp) {
+        this.oldShapeFile = german2006shp;
+        this.shapeFile2021 = nuts2021shp;
         generateTransformationMap();
     }
 
     private void generateTransformationMap() {
-        ShpOptions oldShapeFile = new ShpOptions(Path.of(german2006shp), "EPSG:5677", StandardCharsets.UTF_8);
-        ShpOptions shapeFile2021 = new ShpOptions(Path.of(nuts2021shp), "EPSG:4326", StandardCharsets.UTF_8);
         CoordinateTransformation ct = new GeotoolsTransformation("EPSG:5677", "EPSG:4326");
-
         List<SimpleFeature> featuresNuts2021 = shapeFile2021.readFeatures();
         Map<String, SimpleFeature> germanNuts2021Lv3Features = new HashMap<>();
         for (SimpleFeature feature : featuresNuts2021) {
@@ -49,7 +46,7 @@ public class GermanNutsTransformation {
             String oldNutsName = (String) feature2006.getAttribute("NUTS_NAME");
             if (germanNuts2021Lv3Features.containsKey(oldNutsId) &&
                     germanNuts2021Lv3Features.get(oldNutsId).getAttribute("NUTS_NAME").toString().equals(oldNutsName)) {
-                nuts2006To2021Mapping.put(oldNutsId, oldNutsName); // NUTS region remains the same (mapping to itself)
+                nuts2006To2021Mapping.put(oldNutsId, oldNutsId); // NUTS region remains the same (mapping to itself)
             } else {
                 counter++;
                 System.out.println("NUTS region has changed for " + oldNutsName);
@@ -82,7 +79,9 @@ public class GermanNutsTransformation {
     public static void main(String[] args) {
         String german2006shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/to-put-on-public-svn/raw-data/NUTS3/NUTS3_2010_DE.shp";
         String nuts2021shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp";
-        GermanNutsTransformation germanNutsTransformation = new GermanNutsTransformation(german2006shp, nuts2021shp);
+        ShpOptions oldShapeFile = new ShpOptions(Path.of(german2006shp), "EPSG:5677", StandardCharsets.UTF_8);
+        ShpOptions shapeFile2021 = new ShpOptions(Path.of(nuts2021shp), "EPSG:4326", StandardCharsets.UTF_8);
+        GermanNutsTransformation germanNutsTransformation = new GermanNutsTransformation(oldShapeFile, shapeFile2021);
         Map<String, String> transformationMap = germanNutsTransformation.getNuts2006To2021Mapping();
 
         System.out.println("Mapping results:" + transformationMap.size() + " mapping is calculated");

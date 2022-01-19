@@ -53,7 +53,7 @@ public class GenerateLookupTable implements MATSimAppCommand {
 
         // Read german lookup table
         Map<String, String> german2006To2021Transformation =
-                new GermanNutsTransformation(german2006shp.toString(), nuts2021shp.toString()).getNuts2006To2021Mapping();
+                new GermanNutsTransformation(german2006shp, nuts2021shp).getNuts2006To2021Mapping();
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(germanTable, StandardCharsets.UTF_8),
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
@@ -81,9 +81,8 @@ public class GenerateLookupTable implements MATSimAppCommand {
         List<SimpleFeature> featuresNuts2021 = nuts2021shp.readFeatures();
         CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(output.toString()), CSVFormat.TDF);
         tsvWriter.printRecord("verkehrszelle", "name", "NUTS_2006", "NUTS_2021", "NUTS_2021_name", "coord_x", "coord_y");
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(input, StandardCharsets.UTF_8),
+        try (CSVParser parser = new CSVParser(Files.newBufferedReader(input, StandardCharsets.ISO_8859_1),
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
-
             List<String[]> incompleteCellLists = new ArrayList<>();
             for (CSVRecord record : parser) {
                 String verkerhszelle = record.get(0);
