@@ -57,6 +57,10 @@ public class SharingVehicleEvent extends Event implements HasLinkId {
 		return serviceId;
 	}
 
+	public Id<SharingVehicle> getSharingVehicleId() {
+		return vehicleId;
+	}
+
 	public Optional<Id<SharingStation>> getStationId() {
 		return stationId;
 	}
