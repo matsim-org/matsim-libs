@@ -10,7 +10,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -18,7 +17,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
 
 /**
@@ -30,67 +28,36 @@ import org.xml.sax.Attributes;
 class CarrierPlanReaderV1 extends MatsimXmlParser {
 
 	private static final Logger logger = Logger.getLogger(CarrierPlanReaderV1.class);
-
 	private static final String CARRIERS = "carriers";
-
 	private static final String CARRIER = "carrier";
-
-	private static final String LINKID = "linkId";
-
+	private static final String LINK_ID = "linkId";
 	private static final String SHIPMENTS = "shipments";
-
 	private static final String SHIPMENT = "shipment";
-
 	private static final String ID = "id";
-
 	private static final String FROM = "from";
-
 	private static final String TO = "to";
-
 	private static final String SIZE = "size";
-
 	private static final String ACTIVITY = "act";
-
 	private static final String TYPE = "type";
-
-	private static final String SHIPMENTID = "shipmentId";
-
-	private static final String START = "start";
-
+	private static final String SHIPMENT_ID = "shipmentId";
 	private static final String VEHICLE = "vehicle";
-
 	private static final String VEHICLES = "vehicles";
-
-	private static final String VEHICLESTART = "earliestStart";
-
-	private static final String VEHICLEEND = "latestEnd";
+	private static final String VEHICLE_EARLIEST_START = "earliestStart";
+	private static final String VEHICLE_LATEST_END = "latestEnd";
 
 	private Carrier currentCarrier = null;
-
 	private CarrierVehicle currentVehicle = null;
-
 	private Tour.Builder currentTourBuilder = null;
-
 	private Double currentStartTime = null;
-
 	private Id<Link> previousActLoc = null;
-
 	private String previousRouteContent;
-
 	private Map<String, CarrierShipment> currentShipments = null;
-
 	private Map<String, CarrierVehicle> vehicles = null;
-
 	private Collection<ScheduledTour> scheduledTours = null;
-
 	private Double currentScore;
-
 	private boolean selected;
-
-	private Carriers carriers;
-
+	private final Carriers carriers;
 	private double currentLegTransTime;
-
 	private double currentLegDepTime;
 	private final CarrierVehicleTypes carrierVehicleTypes;
 
@@ -98,7 +65,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
 	 *
 	 * @param carriers which is a map that stores carriers
-	 * @param vehicleType
+	 * @param carrierVehicleTypes
 	 */
 	public CarrierPlanReaderV1( Carriers carriers, CarrierVehicleTypes carrierVehicleTypes ) {
 		super();
@@ -107,26 +74,11 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 		this.setValidating(false);
 	}
 
-	//	/**
-	//	 * Reads a xml-file that contains carriers and their plans.
-	//	 *
-	//	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
-	//	 *
-	//	 * @param filename
-	//	 */
-	//	public void read(String filename) {
-	//		logger.info("read carrier plans");
-	//		this.setValidating(false);
-	//		read(filename);
-	//		logger.info("done");
-	//
-	//	}
-
 	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
+	public void startTag(String name, Attributes attributes, Stack<String> context) {
 		switch( name ){
 			case CARRIER:{
-				String id = atts.getValue( ID );
+				String id = attributes.getValue( ID );
 				currentCarrier = CarrierUtils.createCarrier( Id.create( id, Carrier.class ) );
 				break;
 			}
@@ -135,16 +87,16 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				break;
 			}
 			case SHIPMENT:{
-				String id = atts.getValue( ID );
-				String from = atts.getValue( FROM );
-				String to = atts.getValue( TO );
-				int size = getInt( atts.getValue( SIZE ) );
-				String startPickup = atts.getValue( "startPickup" );
-				String endPickup = atts.getValue( "endPickup" );
-				String startDelivery = atts.getValue( "startDelivery" );
-				String endDelivery = atts.getValue( "endDelivery" );
-				String pickupServiceTime = atts.getValue( "pickupServiceTime" );
-				String deliveryServiceTime = atts.getValue( "deliveryServiceTime" );
+				String id = attributes.getValue( ID );
+				String from = attributes.getValue( FROM );
+				String to = attributes.getValue( TO );
+				int size = getInt( attributes.getValue( SIZE ) );
+				String startPickup = attributes.getValue( "startPickup" );
+				String endPickup = attributes.getValue( "endPickup" );
+				String startDelivery = attributes.getValue( "startDelivery" );
+				String endDelivery = attributes.getValue( "endDelivery" );
+				String pickupServiceTime = attributes.getValue( "pickupServiceTime" );
+				String deliveryServiceTime = attributes.getValue( "deliveryServiceTime" );
 				CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance( Id.create( id, CarrierShipment.class ),
 					  Id.create( from, Link.class ), Id.create( to, Link.class ), size );
 				if( startPickup == null ){
@@ -162,7 +114,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if( pickupServiceTime != null ) shipmentBuilder.setPickupServiceTime( getDouble( pickupServiceTime ) );
 				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryServiceTime( getDouble( deliveryServiceTime ) );
 				CarrierShipment shipment = shipmentBuilder.build();
-				currentShipments.put( atts.getValue( ID ), shipment );
+				currentShipments.put( attributes.getValue( ID ), shipment );
 				CarrierUtils.addShipment(currentCarrier, shipment);
 //				currentCarrier.getShipments().put( shipment.getId(), shipment );
 				break ;
@@ -173,12 +125,12 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				break;
 			}
 			case VEHICLE:{
-				String vId = atts.getValue( ID );
-				String linkId = atts.getValue( LINKID );
-				String startTime = atts.getValue( VEHICLESTART );
-				String endTime = atts.getValue( VEHICLEEND );
+				String vId = attributes.getValue( ID );
+				String linkId = attributes.getValue(LINK_ID);
+				String startTime = attributes.getValue(VEHICLE_EARLIEST_START);
+				String endTime = attributes.getValue(VEHICLE_LATEST_END);
 
-				String typeId = atts.getValue( "typeId" );
+				String typeId = attributes.getValue( "typeId" );
 				if( typeId == null ){
 					logger.warn( "no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)" );
 					typeId = "default";
@@ -196,57 +148,51 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();
-//				currentCarrier.getCarrierCapabilities().getCarrierVehicles().put( vehicle.getId(), vehicle );
 				CarrierUtils.addCarrierVehicle(currentCarrier, vehicle);
 				vehicles.put( vId, vehicle );
 				break;
 			}
 			case "plan":
 			{
-				String score = atts.getValue("score");
+				String score = attributes.getValue("score");
 				if(score != null){
 					currentScore = getDouble(score);
 				}
 				else{
 					currentScore = null;
 				}
-				String selected = atts.getValue("selected");
+				String selected = attributes.getValue("selected");
 				if(selected == null ) {
 					this.selected = false;
 				}
-				else if(selected.equals("true")){
-					this.selected = true;
-				}
-				else{
-					this.selected = false;
-				}
+				else this.selected = selected.equals("true");
 				scheduledTours = new ArrayList<>();
 				break ;
 			}
 			case "tour":
 			{
-				String vehicleId = atts.getValue("vehicleId");
+				String vehicleId = attributes.getValue("vehicleId");
 				currentVehicle = vehicles.get(vehicleId);
 				currentTourBuilder = Tour.Builder.newInstance();
 				break ;
 			}
 			case "leg":
 			{
-				currentLegDepTime = getDouble(atts.getValue("dep_time"));
-				currentLegTransTime = getDouble(atts.getValue("transp_time"));
+				currentLegDepTime = getDouble(attributes.getValue("dep_time"));
+				currentLegTransTime = getDouble(attributes.getValue("transp_time"));
 				break ;
 			}
 			case ACTIVITY:
 			{
-				switch( atts.getValue( TYPE ) ){
+				switch( attributes.getValue( TYPE ) ){
 					case "start":
-						currentStartTime = getDouble( atts.getValue( "end_time" ) );
+						currentStartTime = getDouble( attributes.getValue( "end_time" ) );
 						previousActLoc = currentVehicle.getLocation();
 						currentTourBuilder.scheduleStart( currentVehicle.getLocation(),
 							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 					case "pickup":{
-						String id = atts.getValue( SHIPMENTID );
+						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get( id );
 						finishLeg( s.getFrom() );
 						currentTourBuilder.schedulePickup( s );
@@ -254,7 +200,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 						break;
 					}
 					case "delivery":{
-						String id = atts.getValue( SHIPMENTID );
+						String id = attributes.getValue(SHIPMENT_ID);
 						CarrierShipment s = currentShipments.get( id );
 						finishLeg( s.getTo() );
 						currentTourBuilder.scheduleDelivery( s );

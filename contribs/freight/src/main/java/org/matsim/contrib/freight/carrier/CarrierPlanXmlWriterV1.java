@@ -19,7 +19,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * A writer that writes carriers and their plans in an xml-file.
+ * A writer that writes carriers and their plans in a xml-file.
  * 
  * @author sschroeder
  *
@@ -29,12 +29,9 @@ import org.matsim.core.utils.misc.Time;
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
 	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
-
-	private Collection<Carrier> carriers;
-
+	private final Collection<Carrier> carriers;
 	private int idCounter = 0;
-
-	private Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<CarrierShipment, Id<Shipment>>();
+	private final Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();
 
 	/**
 	 * Constructs the writer with the carriers to be written.

@@ -8,7 +8,7 @@ import org.matsim.core.utils.misc.Time;
  * Q: What happens/should happen if the time window is not sufficient to unload, or
  * the vehicle arrives after the time window?
  * <p></p>
- * A: First, I (=sschroeder) interpret time-window as period of time where an
+ * A: First, I (=sschroeder) interpret time-window as period of time when an
  * (un)loading operation can start (which does not mean that it has to be
  * finished by the end of the time window). This is - I guess - in line with
  * most OR literature dealing with time-windows. There are 3 options to deal
