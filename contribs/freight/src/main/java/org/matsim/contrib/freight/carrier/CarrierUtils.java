@@ -17,7 +17,7 @@ public class CarrierUtils{
 	}
 
 	/**
-	 * Adds an carrierVehicle to the CarrierCapabilites of the Carrier.
+	 * Adds an carrierVehicle to the CarrierCapabilities of the Carrier.
 	 * @param carrier
 	 * @param carrierVehicle
 	 */
