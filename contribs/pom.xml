@@ -203,9 +203,14 @@
 			<name>Java.net repository</name>
 			<url>http://download.java.net/maven/2</url>
 		</repository>
+        <!-- <repository>
+            <id>matsim</id>
+            <url>http://dl.bintray.com/matsim/matsim</url>
+        </repository> -->
+        
 		<repository>
 			<id>matsim</id>
-			<url>http://dl.bintray.com/matsim/matsim</url>
+			<url>https://repo.matsim.org/repository/matsim</url>
 		</repository>
 		<repository>
 			<id>ch.sbb</id>

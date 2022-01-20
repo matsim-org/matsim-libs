@@ -300,10 +300,15 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
-        <repository>
+        <!-- <repository>
             <id>matsim</id>
             <url>http://dl.bintray.com/matsim/matsim</url>
-        </repository>
+        </repository> -->
+        
+		<repository>
+			<id>matsim</id>
+			<url>https://repo.matsim.org/repository/matsim</url>
+		</repository>
 	<repository>
 	  <!-- For MATSim snapshots: -->
 	  <id>ojo-snapshots</id>
