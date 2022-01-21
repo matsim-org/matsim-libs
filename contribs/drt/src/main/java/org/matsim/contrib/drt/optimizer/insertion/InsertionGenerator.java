@@ -182,9 +182,9 @@ public class InsertionGenerator {
 		if (vEntry.getSlackTime(i) >= pickupDetourInfo.pickupTimeLoss) {
 			// insertion: i -> pickup -> dropoff -> i+1 (only if time slack allows)
 			int j = i;
-			if (i == stopCount || request.getToLink() != nextStop(vEntry,
-					j).task.getLink()) { // next stop at different link
-				//do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
+			if (i == stopCount || request.getToLink() != nextStop(vEntry, j).task.getLink()) {
+				// next stop at different link
+				// otherwise, do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 				addInsertion(insertions,
 						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
 								j));
