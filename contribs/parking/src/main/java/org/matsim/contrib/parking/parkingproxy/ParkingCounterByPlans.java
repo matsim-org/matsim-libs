@@ -86,14 +86,14 @@ class ParkingCounterByPlans implements IterationStartsListener, PenaltyGenerator
 		for (Person p : pop.getPersons().values()) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
 				carCounter.handleArrival(
-						(int) walkActPair.leg.getDepartureTime(),
+						(int) walkActPair.leg.getDepartureTime().seconds(),
 						network.getLinks().get(walkActPair.act.getLinkId()).getToNode().getCoord(),
 						carWeight
 						);
 			}
 			for (LegActPair walkActPair : this.egressFinder.findAccessWalks(p.getSelectedPlan())) {
 				carCounter.handleDeparture(
-						(int) (walkActPair.leg.getDepartureTime() + walkActPair.leg.getTravelTime()),
+						(int) (walkActPair.leg.getDepartureTime().seconds() + walkActPair.leg.getTravelTime().seconds()),
 						network.getLinks().get(walkActPair.act.getLinkId()).getToNode().getCoord(),
 						carWeight
 						);

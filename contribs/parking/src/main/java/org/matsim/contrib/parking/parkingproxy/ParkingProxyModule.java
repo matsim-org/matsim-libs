@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
 
 /**
@@ -56,7 +55,7 @@ public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModul
 		ParkingProxyConfigGroup parkingConfig = ConfigUtils.addOrGetModule(getConfig(), ParkingProxyConfigGroup.class );
 		
 		Collection<Tuple<Coord, Integer>> initialLoad = calculateInitialLoad(parkingConfig);
-		int qsimEndTime = Time.isUndefinedTime(getConfig().qsim().getEndTime()) ? 30*3600 : (int)getConfig().qsim().getEndTime();
+		int qsimEndTime = (int) getConfig().qsim().getEndTime().orElse(30*3600);
 		MovingEntityCounter carCounter = new MovingEntityCounter(
 				initialLoad, 
 				parkingConfig.getTimeBinSize(), 
