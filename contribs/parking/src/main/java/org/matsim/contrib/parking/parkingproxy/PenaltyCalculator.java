@@ -19,13 +19,13 @@
 package org.matsim.contrib.parking.parkingproxy;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.map.TLongIntMap;
@@ -103,8 +103,8 @@ class PenaltyCalculator {
 	 * 
 	 * @param outputfile The file in which to write
 	 */
-	public void dump(File outputfile) {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputfile))) {
+	public void dump(URL outputfile) {
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputfile)) {
 			writer.write("x;y;t;penalty");
 			writer.newLine();
 			for (int tbin = 0; tbin < numberOfEntities.length; tbin++) {

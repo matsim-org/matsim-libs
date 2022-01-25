@@ -18,11 +18,10 @@
 
 package org.matsim.contrib.parking.parkingproxy;
 
-import java.io.File;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Before the mobsim, gets the current {@linkplain PenaltyCalculator} from the provided {@linkplain PenaltyGenerator} and
@@ -68,7 +67,7 @@ class CarEgressWalkObserver implements BeforeMobsimListener {
 		}
 		event.getServices().getControlerIO().createIterationDirectory(event.getIteration());
 		String file = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), OUTFILE_PENALTIES);
-		this.penaltyCalculator.dump(new File(file));
+		this.penaltyCalculator.dump(IOUtils.getFileUrl(file));
 	}
 	
 	/*package*/ PenaltyCalculator getPenaltyCalculator() {
