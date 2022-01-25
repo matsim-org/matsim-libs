@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author nagel
  *
  */
-public class TransitStopFacilityLookUp implements LookUpItemFromId<TransitStopFacility> {
+class TransitStopFacilityLookUp implements LookUpItemFromId<TransitStopFacility> {
 	
 	private TransitSchedule schedule;
 

@@ -40,16 +40,14 @@ public class TaxiOptimizerTests {
 		final boolean vehicleDiversion;
 		final double pickupDuration;
 		final double dropoffDuration;
-		final double AStarEuclideanOverdoFactor;
 		final boolean onlineVehicleTracker;
 
 		private TaxiConfigVariant(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration,
-				double dropoffDuration, double AStarEuclideanOverdoFactor, boolean onlineVehicleTracker) {
+				double dropoffDuration, boolean onlineVehicleTracker) {
 			this.destinationKnown = destinationKnown;
 			this.vehicleDiversion = vehicleDiversion;
 			this.pickupDuration = pickupDuration;
 			this.dropoffDuration = dropoffDuration;
-			this.AStarEuclideanOverdoFactor = AStarEuclideanOverdoFactor;
 			this.onlineVehicleTracker = onlineVehicleTracker;
 		}
 
@@ -58,7 +56,6 @@ public class TaxiOptimizerTests {
 			taxiCfg.setVehicleDiversion(vehicleDiversion);
 			taxiCfg.setPickupDuration(pickupDuration);
 			taxiCfg.setDropoffDuration(dropoffDuration);
-			taxiCfg.setAStarEuclideanOverdoFactor(AStarEuclideanOverdoFactor);
 			taxiCfg.setOnlineVehicleTracker(onlineVehicleTracker);
 		}
 	}
@@ -67,17 +64,17 @@ public class TaxiOptimizerTests {
 		List<TaxiConfigVariant> variants = new ArrayList<>();
 
 		// onlineVehicleTracker == false ==> vehicleDiversion == false
-		variants.add(new TaxiConfigVariant(false, false, 120, 60, 1.5, false));
-		variants.add(new TaxiConfigVariant(true, false, 1, 1, 1.5, false));
+		variants.add(new TaxiConfigVariant(false, false, 120, 60, false));
+		variants.add(new TaxiConfigVariant(true, false, 1, 1, false));
 
 		if (diversionSupported) {
 			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, true, 1, 1, 1.5, true));
-			variants.add(new TaxiConfigVariant(true, true, 120, 60, 1.5, true));
+			variants.add(new TaxiConfigVariant(false, true, 1, 1, true));
+			variants.add(new TaxiConfigVariant(true, true, 120, 60, true));
 		} else {
 			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, false, 1, 1, 1.5, true));
-			variants.add(new TaxiConfigVariant(true, false, 120, 60, 1.5, true));
+			variants.add(new TaxiConfigVariant(false, false, 1, 1, true));
+			variants.add(new TaxiConfigVariant(true, false, 120, 60, true));
 		}
 
 		return variants;

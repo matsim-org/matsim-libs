@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import org.apache.log4j.Logger;
@@ -10,14 +31,14 @@ import java.util.List;
 
 public class CarrierUtils{
 
-	private static Logger log = Logger.getLogger(CarrierUtils.class);
+	private static final  Logger log = Logger.getLogger(CarrierUtils.class);
 
 	public static Carrier createCarrier( Id<Carrier> id ){
 		return new CarrierImpl(id);
 	}
 
 	/**
-	 * Adds an carrierVehicle to the CarrierCapabilites of the Carrier.
+	 * Adds an carrierVehicle to the CarrierCapabilities of the Carrier.
 	 * @param carrier
 	 * @param carrierVehicle
 	 */
@@ -26,8 +47,9 @@ public class CarrierUtils{
 	}
 
 	public static CarrierVehicle getCarrierVehicle(Carrier carrier, Id<Vehicle> vehicleId){
-		if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-			return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+		CarrierVehicle veh = carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+		if(veh != null){
+			return veh;
 		}
 		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing in Carrier: " + carrier.getId()));
 		return null;
@@ -43,10 +65,11 @@ public class CarrierUtils{
 	}
 
 	public static CarrierService getService(Carrier carrier, Id<CarrierService> serviceId){
-		if(carrier.getServices().containsKey(serviceId)){
-			return carrier.getServices().get(serviceId);
+		CarrierService service = carrier.getServices().get(serviceId);
+		if(service != null){
+			return service;
 		}
-		log.error("Service with Id does not exists", new IllegalStateException("Serice with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Service with Id does not exists", new IllegalStateException("Service with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 
@@ -60,17 +83,18 @@ public class CarrierUtils{
 	}
 
 	public static CarrierShipment getShipment(Carrier carrier, Id<CarrierShipment> serviceId){
-		if(carrier.getShipments().containsKey(serviceId)){
-			return carrier.getShipments().get(serviceId);
+		CarrierShipment shipment = carrier.getShipments().get(serviceId);
+		if(shipment != null){
+			return shipment;
 		}
-		log.error("Shipment with Id does not exists", new IllegalStateException("Serice with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Shipment with Id does not exists", new IllegalStateException("Shipment with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 	
 	
 
 	public static CarrierPlan copyPlan( CarrierPlan plan2copy ) {
-		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
+		List<ScheduledTour> tours = new ArrayList<>();
 		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
 			double depTime = sTour.getDeparture();
 			CarrierVehicle vehicle = sTour.getVehicle();
@@ -100,8 +124,14 @@ public class CarrierUtils{
 	private static final String JSPRIT_ITERATIONS="jspritIterations" ;
 	public static int getJspritIterations( Carrier carrier ) {
 		Integer result = (Integer) carrier.getAttributes().getAttribute( JSPRIT_ITERATIONS );
-		return (int) result ;
+		if (result == null){
+			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
+			return Integer.MIN_VALUE;
+		} else {
+			return result ;
+		}
 	}
+
 	public static void setJspritIterations( Carrier carrier, int jspritIterations ) {
 		carrier.getAttributes().putAttribute( JSPRIT_ITERATIONS , jspritIterations ) ;
 	}

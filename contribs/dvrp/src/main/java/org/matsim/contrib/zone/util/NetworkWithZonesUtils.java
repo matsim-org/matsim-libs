@@ -19,10 +19,12 @@
 
 package org.matsim.contrib.zone.util;
 
-import java.util.HashMap;
+import static java.util.stream.Collectors.toMap;
+
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,22 +33,16 @@ import org.matsim.contrib.zone.Zone;
 public class NetworkWithZonesUtils {
 	// if CRSs of the network and zones are different, zoneFinder should convert between CRSs
 	public static Map<Id<Link>, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder) {
-		Map<Id<Link>, Zone> linkToZone = new HashMap<>();
-
-		for (Link l : network.getLinks().values()) {
-			linkToZone.put(l.getId(), zoneFinder.findZone(l.getToNode().getCoord()));
-		}
-
-		return linkToZone;
+		return network.getLinks()
+				.values()
+				.stream()
+				.collect(toMap(Identifiable::getId, l -> zoneFinder.findZone(l.getToNode().getCoord())));
 	}
 
 	public static Map<Id<Node>, Zone> createNodeToZoneMap(Network network, ZoneFinder zoneFinder) {
-		Map<Id<Node>, Zone> nodeToZone = new HashMap<>();
-
-		for (Node n : network.getNodes().values()) {
-			nodeToZone.put(n.getId(), zoneFinder.findZone(n.getCoord()));
-		}
-
-		return nodeToZone;
+		return network.getNodes()
+				.values()
+				.stream()
+				.collect(toMap(Identifiable::getId, n -> zoneFinder.findZone(n.getCoord())));
 	}
 }

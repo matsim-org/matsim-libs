@@ -19,6 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,16 +61,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -117,7 +118,9 @@ public final class QLinkTest extends MatsimTestCase {
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
 
 		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
-		p.addPlan(PopulationUtils.createPlan());
+		Plan plan = PopulationUtils.createPlan();
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("type", Id.createLinkId("0")));
+		p.addPlan(plan);
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		
 		f.qlink1.getAcceptingQLane().addFromUpstream(v);
@@ -128,7 +131,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 
 	private static PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, QSim simulation) {
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), simulation);
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), simulation, simulation.getChildInjector().getInstance(TimeInterpretation.class));
 		simulation.insertAgentIntoMobsim(agent); 
 		return agent;
 	}
@@ -211,7 +214,9 @@ public final class QLinkTest extends MatsimTestCase {
 
 		QVehicle veh = new QVehicleImpl(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
-		p.addPlan(PopulationUtils.createPlan());
+		Plan plan = PopulationUtils.createPlan();
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("type", Id.createLinkId("0")));
+		p.addPlan(plan);
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
@@ -270,7 +275,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		driver.endActivityAndComputeNextState(0);
-		f.queueNetwork.simEngine.ii.arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue
+		f.queueNetwork.simEngine.getNetsimInternalInterface().arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue
 		assertTrue(f.qlink1.isNotOfferingVehicle()); // veh not in buffer
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // veh not on lane
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1)); // veh _should_ be on link (in waiting list)

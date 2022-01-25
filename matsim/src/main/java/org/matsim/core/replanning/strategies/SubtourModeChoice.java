@@ -19,17 +19,19 @@
 
 package org.matsim.core.replanning.strategies;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 public class SubtourModeChoice implements Provider<PlanStrategy> {
 
@@ -37,13 +39,15 @@ public class SubtourModeChoice implements Provider<PlanStrategy> {
 	@Inject private GlobalConfigGroup globalConfigGroup;
 	@Inject private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
 	@Inject private ActivityFacilities facilities;
+	@Inject private PermissibleModesCalculator permissibleModesCalculator;
+	@Inject private TimeInterpretation timeInterpretation;
 
-    @Override
+	@Override
 	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new org.matsim.core.replanning.modules.SubtourModeChoice(tripRouterProvider, globalConfigGroup, subtourModeChoiceConfigGroup));
-		strategy.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup));
-		return strategy;
+		PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<>());
+		builder.addStrategyModule(new org.matsim.core.replanning.modules.SubtourModeChoice(globalConfigGroup, subtourModeChoiceConfigGroup, permissibleModesCalculator));
+		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+		return builder.build();
 	}
 
 }

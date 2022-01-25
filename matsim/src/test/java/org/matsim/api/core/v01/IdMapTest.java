@@ -5,15 +5,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -451,6 +444,106 @@ public class IdMapTest {
 		Assert.assertEquals(id4, array[2]);
 		Assert.assertEquals(id5, array[3]);
 
+	}
+
+	@Test
+	public void testEqualsAndHashCode() {
+		Id<Person> id1 = Id.create(1, Person.class);
+		Id<Person> id2 = Id.create(2, Person.class);
+		Id<Person> id3 = Id.create(3, Person.class);
+		Id<Person> id4 = Id.create(4, Person.class);
+		Id<Person> id5 = Id.create(5, Person.class);
+		Id<Person> id6 = Id.create(6, Person.class);
+
+		IdMap<Person, String> mapA = new IdMap<>(Person.class, 4);
+		IdMap<Person, String> mapB = new IdMap<>(Person.class, 4);
+		IdMap<Person, String> mapC = new IdMap<>(Person.class, 10);
+
+		Assert.assertEquals(mapA, mapA);
+		Assert.assertEquals(mapA, mapB);
+		Assert.assertEquals(mapA, mapC);
+		Assert.assertEquals(mapA.hashCode(), mapB.hashCode());
+		Assert.assertEquals(mapA.hashCode(), mapC.hashCode());
+
+		mapA.put(id1, "one");
+		mapB.put(id1, "one");
+
+		Assert.assertEquals(mapA, mapA);
+		Assert.assertEquals(mapA, mapB);
+		Assert.assertNotEquals(mapA, mapC);
+		Assert.assertEquals(mapA.hashCode(), mapB.hashCode());
+		Assert.assertNotEquals(mapA.hashCode(), mapC.hashCode());
+
+		mapC.put(id1, "one");
+
+		Assert.assertEquals(mapA, mapC);
+		Assert.assertEquals(mapA.hashCode(), mapC.hashCode());
+
+		mapA.put(id2, "two");
+		mapB.put(id3, "three");
+
+		Assert.assertNotEquals(mapA, mapB);
+		Assert.assertNotEquals(mapA.hashCode(), mapB.hashCode());
+
+		mapA.put(id3, "three");
+		mapB.put(id2, "two");
+
+		Assert.assertEquals(mapA, mapB);
+		Assert.assertEquals(mapA.hashCode(), mapB.hashCode());
+
+		mapA.put(id4, "four");
+		mapA.put(id5, "five");
+		mapA.put(id6, "six");
+		mapA.remove(id4, "four");
+		mapA.remove(id5, "five");
+		mapA.remove(id6, "six");
+
+		Assert.assertEquals(mapA, mapB);
+		Assert.assertEquals(mapA.hashCode(), mapB.hashCode());
+
+		Assert.assertEquals(mapA.entrySet(), mapB.entrySet());
+		Assert.assertEquals(mapA.entrySet().hashCode(), mapB.entrySet().hashCode());
+		Assert.assertEquals(mapA.keySet(), mapB.keySet());
+		Assert.assertEquals(mapA.keySet().hashCode(), mapB.keySet().hashCode());
+
+		mapA.put(id4, "four");
+		mapB.put(id4, "DifferentFour");
+
+		Assert.assertNotEquals(mapA, mapB);
+		Assert.assertNotEquals(mapA.hashCode(), mapB.hashCode());
+
+		Assert.assertNotEquals(mapA.entrySet(), mapB.entrySet());
+		Assert.assertNotEquals(mapA.entrySet().hashCode(), mapB.entrySet().hashCode());
+		Assert.assertEquals(mapA.keySet(), mapB.keySet());
+		Assert.assertEquals(mapA.keySet().hashCode(), mapB.keySet().hashCode());
+
+		HashMap<Id<Person>, String> hMapA = new HashMap<Id<Person>, String>(mapA);
+
+		// The commented out tests will fail right now because the hashCode of IdImpl is based on the id, not the index
+		Assert.assertEquals(hMapA, mapA);
+//		Assert.assertEquals(hMapA.hashCode(), mapA.hashCode());
+		Assert.assertEquals(hMapA.entrySet(), mapA.entrySet());
+//		Assert.assertEquals(hMapA.entrySet().hashCode(), mapA.entrySet().hashCode());
+		Assert.assertEquals(hMapA.keySet(), mapA.keySet());
+//		Assert.assertEquals(hMapA.keySet().hashCode(), mapA.keySet().hashCode());
+		Assert.assertNotEquals(hMapA, mapB);
+		Assert.assertNotEquals(hMapA.hashCode(), mapB.hashCode());
+		Assert.assertNotEquals(hMapA.entrySet(), mapB.entrySet());
+		Assert.assertNotEquals(hMapA.entrySet().hashCode(), mapB.entrySet().hashCode());
+		Assert.assertEquals(hMapA.keySet(), mapB.keySet());
+//		Assert.assertEquals(hMapA.keySet().hashCode(), mapB.keySet().hashCode());
+
+		// Best way I could think of to explicitly test the equals() of Entry (i.e. not inside the EntrySet)
+		Iterator<Entry<Id<Person>, String>> iter = mapA.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<Id<Person>, String> e = iter.next();
+			if (e.getKey() != id4) {
+				Assert.assertTrue(mapB.entrySet().contains(e));
+			} else {
+				Assert.assertFalse(mapB.entrySet().contains(e));
+			}
+			Assert.assertTrue(hMapA.entrySet().contains(e));
+		}
 	}
 
 }

@@ -47,11 +47,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "globalDefaultsType", propOrder = {
     "amberTimeGreen"
 })
-public class XMLGlobalDefaultsType
-    extends XMLAmberTimesType
-{
+public final class XMLGlobalDefaultsType extends XMLAmberTimesType {
 
-    protected XMLGlobalDefaultsType.XMLAmberTimeGreen amberTimeGreen;
+    private XMLGlobalDefaultsType.XMLAmberTimeGreen amberTimeGreen;
 
     /**
      * Gets the value of the amberTimeGreen property.

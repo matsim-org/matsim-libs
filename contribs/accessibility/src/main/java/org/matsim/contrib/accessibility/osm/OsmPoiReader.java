@@ -23,11 +23,6 @@
  */
 package org.matsim.contrib.accessibility.osm;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,6 +48,11 @@ import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dziemke
@@ -190,7 +190,7 @@ public class OsmPoiReader {
 		}
 
 		@Override
-		public void release() {
+		public void close() {
 		}
 
 		/**
@@ -241,5 +241,6 @@ public class OsmPoiReader {
 		@Override
 		public void initialize(Map<String, Object> metaData) {
 		}
+
 	}
 }

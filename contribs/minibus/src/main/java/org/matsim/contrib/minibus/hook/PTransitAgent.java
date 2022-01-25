@@ -32,7 +32,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -51,24 +52,24 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 
 	private final TransitSchedule transitSchedule;
 
-	public static PTransitAgent createTransitAgent(Person p, Netsim simulation) {
-        return new PTransitAgent(p, simulation);
+	public static PTransitAgent createTransitAgent(Person p, Netsim simulation, TimeInterpretation timeInterpretation) {
+        return new PTransitAgent(p, simulation, timeInterpretation);
 	}
 
-	private PTransitAgent(final Person p, final Netsim simulation) {
-		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
+	private PTransitAgent(final Person p, final Netsim simulation, TimeInterpretation timeInterpretation) {
+		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation, timeInterpretation);
         this.transitSchedule = simulation.getScenario().getTransitSchedule();
 	}
 
 	@Override
 	public boolean getExitAtStop(final TransitStopFacility stop) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
 	@Override
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) getCurrentLeg().getRoute();
 		
 		if(containsId(stopsToCome, route.getEgressStopId())){
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
@@ -110,8 +111,10 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 			
 			TransitRoute transitRouteOffered = this.transitSchedule.getTransitLines().get(line.getId()).getRoutes().get(transitRoute.getId());
 
-			double travelTimePlanned = getArrivalOffsetFromRoute(transitRoutePlanned, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
-			double travelTimeOffered = getArrivalOffsetFromRoute(transitRouteOffered, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRouteOffered, route.getAccessStopId());
+			double travelTimePlanned = getTravelTimeFromAccessStopToEgressStop(
+					transitRoutePlanned, route.getAccessStopId(), route.getEgressStopId());
+			double travelTimeOffered = getTravelTimeFromAccessStopToEgressStop(
+					transitRouteOffered, route.getAccessStopId(), route.getEgressStopId());
 			
 			if (travelTimeOffered <= travelTimePlanned) {
 				// transit route offered is faster the the one planned - enter
@@ -122,30 +125,31 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return false;
 	}
 
-	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> egressStopId) {
-		for (TransitRouteStop routeStop : transitRoute.getStops()) {
-			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
-				return routeStop.getArrivalOffset();
-			}
-		}
-
-		log.error("Stop " + egressStopId + " not found in route " + transitRoute.getId());
-		// returning what???
-		return -1.0;
-	}
-	
-	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> accessStopId) {
+	/*
+	 * This is currently rather an "getTravelTimeFromFirstOccurenceOfAccessStopToFirstFollowingOccurenceOfEgressStop",
+	 * it could still give wrong results if the access stop and the egress stop are served in that order multiple times.
+	 * Still for looping lines that is much better than just taking the first occurence of the egress stop.
+	 */
+	private double getTravelTimeFromAccessStopToEgressStop(
+			TransitRoute transitRoute, Id<TransitStopFacility> accessStopId, Id<TransitStopFacility> egressStopId) {
+		double lastAccessStopDepartureOffset = Double.NEGATIVE_INFINITY;
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
-				return routeStop.getDepartureOffset();
+				// this is overwritten if the vehicle passes multiple times the access stop before stopping at the
+				// egress stop. The code in getEnterTransitRoute claims to exclude the case that the agent boards a
+				// vehicle if it passes the access stop another time before reaching the next time the egress stop.
+				// So assume this case is excluded before entering this piece of code.
+				lastAccessStopDepartureOffset = routeStop.getDepartureOffset().seconds();
+			} else if (lastAccessStopDepartureOffset > -10000.0 && egressStopId.equals(routeStop.getStopFacility().getId())) {
+				return routeStop.getArrivalOffset().seconds() - lastAccessStopDepartureOffset;
 			}
 		}
-
-		log.error("Stop " + accessStopId + " not found in route " + transitRoute.getId());
-		// returning what???
-		return -1.0;
+		log.error("Sequence access stop " + accessStopId.toString() + " -> egress stop " +
+				egressStopId.toString() + " not found in TransitRoute " + transitRoute.getId().toString() +
+				". Did not find access stop or egress stop is not served after passing the access stop. This should not happen.");
+		throw new RuntimeException("Sequence access stop " + accessStopId.toString() + " -> egress stop " +
+				 egressStopId.toString() + " not found in TransitRoute " + transitRoute.getId().toString() + ".");
 	}
-
 
 	private Leg getCurrentLeg() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
@@ -169,7 +173,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	@Override
 	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = getCurrentLeg();
-		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+		if (!(leg.getRoute() instanceof TransitPassengerRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
@@ -177,7 +181,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
             return route.getAccessStopId();
 		}
 	}
@@ -185,7 +189,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	@Override
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		Leg leg = getCurrentLeg();
-		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+		if (!(leg.getRoute() instanceof TransitPassengerRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
@@ -193,7 +197,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 			return route.getEgressStopId();
 		}
 	}

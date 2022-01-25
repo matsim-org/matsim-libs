@@ -1,21 +1,20 @@
 // This software is released into the Public Domain.  See copying.txt for details.
 package playground.vsp.andreas.mzilske.osm;
 
+import org.openstreetmap.osmosis.core.OsmosisRuntimeException;
+import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
+import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+import org.openstreetmap.osmosis.xml.common.CompressionActivator;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
-import org.openstreetmap.osmosis.core.OsmosisRuntimeException;
-import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
-import org.openstreetmap.osmosis.core.task.v0_6.Sink;
-import org.openstreetmap.osmosis.xml.common.CompressionActivator;
-import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 
 
 /**
@@ -27,7 +26,7 @@ import org.openstreetmap.osmosis.xml.common.CompressionMethod;
  */
 public class JOSMTolerantFastXMLReader implements RunnableSource {
 		
-		private static Logger log = Logger.getLogger(JOSMTolerantFastXMLReader.class.getName());
+		private static final Logger log = Logger.getLogger(JOSMTolerantFastXMLReader.class.getName());
 		
 		private Sink sink;
 		private final File file;
@@ -97,7 +96,7 @@ public class JOSMTolerantFastXMLReader implements RunnableSource {
 			} catch (Exception e) {
 				throw new OsmosisRuntimeException("Unable to read XML file " + file + ".", e);
 			} finally {
-				sink.release();
+				sink.close();
 				
 				if (inputStream != null) {
 					try {

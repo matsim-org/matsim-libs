@@ -950,6 +950,32 @@ public class JointTripRemoverAlgorithmTest {
 			}
 		}
 	}
+	private static void print( JointTrip trips ) {
+		{
+			StringBuilder msg = new StringBuilder();
+			msg.append( "driverLegs=" ) ;
+			for( Leg leg : trips.getDriverLegs() ){
+				msg.append( "| " ).append( leg.getMode() ).append( " |" );
+			}
+			log.info( msg.toString() );
+		}
+		{
+			log.info(  "passengerLeg=" + trips.getPassengerLeg().getMode() );
+		}
+	}
+	private static void print( JointPlan plans ){
+		for( Plan plan : plans.getIndividualPlans().values() ){
+			StringBuilder msg = new StringBuilder();
+			for( PlanElement planElement : plan.getPlanElements() ){
+				if ( planElement instanceof Activity ){
+					msg.append( "| " ).append( ((Activity) planElement).getType() ).append( " |" );
+				} else if ( planElement instanceof Leg ) {
+					msg.append( "| " ).append( ((Leg) planElement).getMode() ).append( " |" );
+				}
+			}
+			log.info( msg.toString() );
+		}
+	}
 
 	private void assertChainsMatch(
 			final String fixtureName,

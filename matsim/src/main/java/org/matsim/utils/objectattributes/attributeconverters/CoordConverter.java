@@ -25,6 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
+import java.util.Locale;
+
 public class CoordConverter implements AttributeConverter<Coord> {
 	private final Logger log = Logger.getLogger(CoordConverter.class);
 
@@ -44,7 +46,7 @@ public class CoordConverter implements AttributeConverter<Coord> {
 		}
 		Coord c = (Coord)o;
 		
-		return String.format("(%.2f;%.2f)", c.getX(), c.getY());
+		return String.format("(%s;%s)", Double.toString(c.getX()), Double.toString(c.getY()));
 	}
 
 }

@@ -19,8 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
+import java.io.InputStream;
+import java.net.URL;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -34,19 +42,11 @@ import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.SchemaFactory;
-import java.io.InputStream;
-import java.net.URL;
-
 /**
  * @author dgrether
  * @author jbischoff
  */
-public class SignalGroupsReader20 implements MatsimReader {
+public final class SignalGroupsReader20 implements MatsimReader {
 
 	private SignalGroupsData signalGroupsData;
 	private SignalGroupsDataFactory factory;

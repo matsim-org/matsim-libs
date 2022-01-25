@@ -40,7 +40,7 @@ import org.matsim.pt.counts.SimpleWriter;
  * This is a modified copy of CountsComparisonAlgorithm, in order to realize the same functionality
  * for pt counts.
  */
-public final class CadytsPtCountsComparisonAlgorithm {
+final class CadytsPtCountsComparisonAlgorithm {
 	/**
 	 * The StopAttributes of the simulation
 	 */
@@ -68,7 +68,7 @@ public final class CadytsPtCountsComparisonAlgorithm {
 
 	StringBuffer content = new StringBuffer();
 
-	public CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzerI oa, final Counts<? extends Identifiable> counts, final Network network, final double countsScaleFactor) {
+	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzerI oa, final Counts<? extends Identifiable> counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();

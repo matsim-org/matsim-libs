@@ -31,14 +31,14 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class SignalGroupsDataImpl implements SignalGroupsData {
+public final class SignalGroupsDataImpl implements SignalGroupsData {
 
 	private Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> signalGroupsDataBySystemId = new TreeMap<>();
 	
 	private SignalGroupsDataFactory factory;
 	
 	public SignalGroupsDataImpl(){
-		this.factory=new SignalGroupsDataFactoryImpl();
+		this.factory = new SignalGroupsDataFactoryImpl();
 	}
 	
 	@Override

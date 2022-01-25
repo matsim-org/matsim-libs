@@ -27,13 +27,13 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
  */
 public class DrtTaskFactoryImpl implements DrtTaskFactory {
 	@Override
-	public DrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path) {
-		return new DrtDriveTask(path);
+	public DrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType taskType) {
+		return new DrtDriveTask(path, taskType);
 	}
 
 	@Override
 	public DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return new DrtStopTask(beginTime, endTime, link);
+		return new DefaultDrtStopTask(beginTime, endTime, link);
 	}
 
 	@Override

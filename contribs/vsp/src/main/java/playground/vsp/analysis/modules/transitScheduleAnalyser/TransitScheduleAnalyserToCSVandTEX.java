@@ -95,7 +95,7 @@ public class TransitScheduleAnalyserToCSVandTEX {
 //				Get tourlength time
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				List<TransitRouteStop> transitstopsList = route.getStops();
-				Double tourlengthTimeDouble = transitstopsList.get(transitstopsList.size()-1).getArrivalOffset()- transitstopsList.get(0).getDepartureOffset();
+				Double tourlengthTimeDouble = transitstopsList.get(transitstopsList.size()-1).getArrivalOffset().seconds()- transitstopsList.get(0).getDepartureOffset().seconds();
 				String tourlengthTime = Time.writeTime(tourlengthTimeDouble);
 				
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	

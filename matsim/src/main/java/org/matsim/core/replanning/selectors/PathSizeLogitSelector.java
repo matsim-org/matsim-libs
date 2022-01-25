@@ -31,12 +31,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-
-import javax.inject.Inject;
 
 /**
  * select an existing Plan according to the Path Size Logit (e.g. Frejinger, E. and Bierlaire, M.: Capturing Correlation
@@ -92,7 +89,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					currentEndTime = leg.getDepartureTime();
+					currentEndTime = leg.getDepartureTime().seconds();
 
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					// (yyyy this will fail when the route is not a network route.  kai, oct'12)
@@ -119,7 +116,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					double currentTime = leg.getDepartureTime();
+					double currentTime = leg.getDepartureTime().seconds();
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					for (Id<Link> linkId : route.getLinkIds()){
 						double denominator = 0;

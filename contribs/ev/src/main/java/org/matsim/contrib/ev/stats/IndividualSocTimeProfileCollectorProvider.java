@@ -19,20 +19,23 @@
 
 package org.matsim.contrib.ev.stats;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -56,17 +59,14 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 		int columns = Math.min(evFleet.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
-		List<ElectricVehicle> allEvs = new ArrayList<>();
-		allEvs.addAll(evFleet.getElectricVehicles().values());
-		Collections.shuffle(allEvs);
+		List<ElectricVehicle> allEvs = new ArrayList<>(evFleet.getElectricVehicles().values());
 		List<ElectricVehicle> selectedEvs = allEvs.stream().limit(columns).collect(Collectors.toList());
 
-		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
+		ImmutableList<String> header = selectedEvs.stream().map(ev -> ev.getId() + "").collect(toImmutableList());
 
-		return TimeProfiles.createProfileCalculator(header, () -> {
-			return selectedEvs.stream().map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))/*in [kWh]*/
-					.toArray(Double[]::new);
-		});
+		return TimeProfiles.createProfileCalculator(header, () -> selectedEvs.stream()
+				.collect(toImmutableMap(ev -> ev.getId() + "",
+						ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))));/*in [kWh]*/
 	}
 
 }

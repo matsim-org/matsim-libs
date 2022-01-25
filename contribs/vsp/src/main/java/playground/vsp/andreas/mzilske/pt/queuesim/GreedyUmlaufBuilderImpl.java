@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
@@ -21,21 +23,24 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
-	
+import com.google.inject.Inject;
+
+public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
+	private static final Logger log = Logger.getLogger( GreedyUmlaufBuilderImpl.class );
+
 	public class UmlaufKey {
 		
-		private Id<TransitLine> lineId;
-		private Id<TransitStopFacility> stopFacilityId;
-		private double lastArrivalTime;
-		private Id<Umlauf> umlaufId;
+		private final Id<TransitLine> lineId;
+		private final Id<TransitStopFacility> stopFacilityId;
+		private final double lastArrivalTime;
+		private final Id<Umlauf> umlaufId;
 		
 
-		public Id<Umlauf> getUmlaufId() {
+		Id<Umlauf> getUmlaufId() {
 			return umlaufId;
 		}
 
-		public UmlaufKey(Id<TransitLine> lineId, Id<TransitStopFacility> stopFacilityId, double lastArrivalTime, Id<Umlauf> umlaufId) {
+		UmlaufKey( Id<TransitLine> lineId, Id<TransitStopFacility> stopFacilityId, double lastArrivalTime, Id<Umlauf> umlaufId ) {
 			super();
 			this.lineId = lineId;
 			this.stopFacilityId = stopFacilityId;
@@ -51,7 +56,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			return stopFacilityId;
 		}
 
-		public double getLastArrivalTime() {
+		double getLastArrivalTime() {
 			return lastArrivalTime;
 		}
 		
@@ -96,18 +101,24 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		
 	};
 	
-	private Collection<TransitLine> transitLines;
-	private SortedMap<UmlaufKey,Umlauf> umlaeufe = new TreeMap<UmlaufKey,Umlauf>(umlaufKeyComparator);
+	private final Collection<TransitLine> transitLines;
+	private final SortedMap<UmlaufKey,Umlauf> umlaeufe = new TreeMap<UmlaufKey,Umlauf>(umlaufKeyComparator);
 	private ArrayList<UmlaufStueck> umlaufStuecke;
 
-	private UmlaufInterpolator interpolator;
+	private final UmlaufInterpolator interpolator;
 
 	public GreedyUmlaufBuilderImpl(UmlaufInterpolator interpolator, Collection<TransitLine> transitLines) {
 		this.interpolator = interpolator;
 		this.transitLines = transitLines;
 	}
+
+	@Inject
+	GreedyUmlaufBuilderImpl( Scenario scenario ) {
+		interpolator = new UmlaufInterpolator( scenario.getNetwork(), scenario.getConfig().planCalcScore() );
+		this.transitLines = scenario.getTransitSchedule().getTransitLines().values();
+	}
 	
-	public boolean canBuild() {
+	private static boolean canBuild() {
 		return true;
 	}
 	
@@ -131,34 +142,34 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		return umlaeufe.values();
 	}
 	
-	private double getLastArrivalTime(Umlauf umlauf) {
+	private static double getLastArrivalTime( Umlauf umlauf ) {
 		TransitRouteStop previousStop = getLastStop(umlauf);
 		double previousDepartureTime = getLastDeparture(umlauf).getDepartureTime();
-		double arrivalOffset = previousStop.getArrivalOffset();
+		double arrivalOffset = previousStop.getArrivalOffset().seconds();
 		double previousArrivalTime = previousDepartureTime + arrivalOffset;			
 		return previousArrivalTime;
 	}
 
-	private Departure getLastDeparture(Umlauf umlauf) {
+	private static Departure getLastDeparture( Umlauf umlauf ) {
 		return getLastUmlaufStueck(umlauf).getDeparture();
 	}
 
-	private TransitRouteStop getLastStop(Umlauf umlauf) {
+	private static TransitRouteStop getLastStop( Umlauf umlauf ) {
 		UmlaufStueckI lastUmlaufStueck = getLastUmlaufStueck(umlauf);
 		return getLastStop(lastUmlaufStueck);
 	}
 
-	private TransitRouteStop getLastStop(UmlaufStueckI umlaufStueck) {
+	private static TransitRouteStop getLastStop( UmlaufStueckI umlaufStueck ) {
 		List<TransitRouteStop> stops = umlaufStueck.getRoute().getStops();
 		TransitRouteStop previousStop = stops.get(stops.size() - 1);
 		return previousStop;
 	}
 
-	private UmlaufStueckI getLastUmlaufStueck(Umlauf umlauf) {
+	private static UmlaufStueckI getLastUmlaufStueck( Umlauf umlauf ) {
 		return umlauf.getUmlaufStuecke().get(umlauf.getUmlaufStuecke().size() - 1);
 	}
 
-	private String getLastStopPostAreaId(Umlauf umlauf) {
+	private static String getLastStopPostAreaId( Umlauf umlauf ) {
 		return getLastStop(umlauf).getStopFacility().getStopAreaId().toString();
 	}
 
@@ -171,20 +182,16 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		Id<TransitLine> lineId = umlaufStueck.getLine().getId();
 		UmlaufKey earliestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), 0.0, Id.create(0, Umlauf.class));
 		UmlaufKey latestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
-		log("Looking between " + earliestAtPoint + " and " + latestAtPoint);
+		log.info("Looking between " + earliestAtPoint + " and " + latestAtPoint);
 		SortedMap<UmlaufKey,Umlauf> fittingUmlaeufe = umlaeufe.subMap(earliestAtPoint, latestAtPoint);
 		Umlauf fittingUmlauf;
 		if (fittingUmlaeufe.isEmpty()) {
 			fittingUmlauf = null;
 		} else {
 			fittingUmlauf = fittingUmlaeufe.get(fittingUmlaeufe.firstKey());
-			log("Found " + getKey(fittingUmlauf));
+			log.info("Found " + getKey(fittingUmlauf));
 		}
 		return fittingUmlauf;
-	}
-
-	private void log(String string) {
-		System.out.println(string);
 	}
 
 	private void createUmlaufStuecke() {

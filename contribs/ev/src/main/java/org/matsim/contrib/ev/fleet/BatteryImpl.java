@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 public class BatteryImpl implements Battery {
@@ -45,5 +46,10 @@ public class BatteryImpl implements Battery {
 	public void setSoc(double soc) {
 		Preconditions.checkArgument(soc >= 0 && soc <= capacity, "SoC outside allowed range: %s", soc);
 		this.soc = soc;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("soc", soc).toString();
 	}
 }

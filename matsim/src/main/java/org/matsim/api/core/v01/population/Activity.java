@@ -23,17 +23,19 @@ package org.matsim.api.core.v01.population;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 
 /**
  * Specifies the kind of activity an agent performs during its day.
- * 
  */
 public interface Activity extends PlanElement {
 
-	public double getEndTime();
+	public OptionalTime getEndTime();
 
 	public void setEndTime(final double seconds);
+
+	public void setEndTimeUndefined();
 
 	public String getType();
 
@@ -47,16 +49,20 @@ public interface Activity extends PlanElement {
 	 */
 	public Coord getCoord();
 
-	public double getStartTime();
+	public OptionalTime getStartTime();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	public void setStartTime(double seconds);
-	
-	public double getMaximumDuration() ;
+
+	public void setStartTimeUndefined();
+
+	public OptionalTime getMaximumDuration();
 	
 	public void setMaximumDuration(double seconds) ;
+
+	public void setMaximumDurationUndefined();
 
 	/**
 	 * @return the if of the link to which the activity is attached.  This may start as null, but

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -57,7 +56,6 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " + "anyway ... This warning is suppressed after the first 10 warnings.") ;
 			expectedLinkWarnCount++;
 		}
-		Gbl.assertNotNull(newLinkId);
 		this.basicPlanAgentDelegate.setCurrentLinkId( newLinkId ) ;
 		this.basicPlanAgentDelegate.incCurrentLinkIndex();
 		this.cachedNextLinkId = null; //reset cached nextLink

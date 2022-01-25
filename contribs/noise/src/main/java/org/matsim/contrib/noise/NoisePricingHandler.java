@@ -57,7 +57,7 @@ class NoisePricingHandler implements NoiseEventCausedHandler {
 		double amount = this.noiseContext.getNoiseParams().getNoiseTollFactor() * event.getAmount() * (-1);
 		this.amountSum = this.amountSum + amount;
 		
-		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "noisePricing", null);
 		this.events.processEvent(moneyEvent);
 		
 		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getLinkEnteringTime(), "noise");

@@ -88,15 +88,13 @@ import org.matsim.jaxb.Adapter1;
     "offset",
     "signalGroupSettings"
 })
-public class XMLSignalPlanType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalPlanType extends XMLMatsimObjectType {
 
-    protected XMLSignalPlanType.XMLStart start;
-    protected XMLSignalPlanType.XMLStop stop;
-    protected XMLSignalPlanType.XMLCycleTime cycleTime;
-    protected XMLSignalPlanType.XMLOffset offset;
-    protected List<XMLSignalGroupSettingsType> signalGroupSettings;
+    private XMLSignalPlanType.XMLStart start;
+    private XMLSignalPlanType.XMLStop stop;
+    private XMLSignalPlanType.XMLCycleTime cycleTime;
+    private XMLSignalPlanType.XMLOffset offset;
+    private List<XMLSignalGroupSettingsType> signalGroupSettings;
 
     /**
      * Gets the value of the start property.

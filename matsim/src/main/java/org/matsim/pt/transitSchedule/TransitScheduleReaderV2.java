@@ -57,7 +57,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class TransitScheduleReaderV2 extends MatsimXmlParser {
-	private static Logger log = Logger.getLogger(TransitScheduleReaderV2.class);
+	private static final  Logger log = Logger.getLogger(TransitScheduleReaderV2.class);
 
 	private final String externalInputCRS;
 	private final String targetCRS;
@@ -164,17 +164,17 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));
 			}
-			TempStop stop = new TempStop(facility);
+			TransitRouteStopImpl.Builder stopBuilder = new TransitRouteStopImpl.Builder().stop(facility);
 			String arrival = atts.getValue(Constants.ARRIVAL_OFFSET);
 			String departure = atts.getValue(Constants.DEPARTURE_OFFSET);
 			if (arrival != null) {
-				stop.arrival = Time.parseTime(arrival);
+				Time.parseOptionalTime(arrival).ifDefined(stopBuilder::arrivalOffset);
 			}
 			if (departure != null) {
-				stop.departure = Time.parseTime(departure);
+				Time.parseOptionalTime(departure).ifDefined(stopBuilder::departureOffset);
 			}
-			stop.awaitDeparture = Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE));
-			this.currentTransitRoute.stops.add(stop);
+			stopBuilder.awaitDepartureTime(Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE)));
+			this.currentTransitRoute.stopBuilders.add(stopBuilder);
 		} else if (Constants.RELATION.equals(name)) {
 			Id<TransitStopFacility> fromStop = Id.create(atts.getValue(Constants.FROM_STOP), TransitStopFacility.class);
 			Id<TransitStopFacility> toStop = Id.create(atts.getValue(Constants.TO_STOP), TransitStopFacility.class);
@@ -201,12 +201,8 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		} else if (Constants.DEPARTURE.equals(name)) {
 			this.currentDeparture = null;
 		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
-			List<TransitRouteStop> stops = new ArrayList<>(this.currentTransitRoute.stops.size());
-			for (TempStop tStop : this.currentTransitRoute.stops) {
-				TransitRouteStopImpl routeStop = new TransitRouteStopImpl(tStop.stop, tStop.arrival, tStop.departure);
-				stops.add(routeStop);
-				routeStop.setAwaitDepartureTime(tStop.awaitDeparture);
-			}
+			List<TransitRouteStop> stops = new ArrayList<>(this.currentTransitRoute.stopBuilders.size());
+			this.currentTransitRoute.stopBuilders.forEach(stopBuilder -> stops.add(stopBuilder.build()));
 			NetworkRoute route = null;
 			if (this.currentRouteProfile.firstLinkId != null) {
 				if (this.currentRouteProfile.lastLinkId == null) {
@@ -249,22 +245,11 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		protected final org.matsim.utils.objectattributes.attributable.Attributes attributes = new org.matsim.utils.objectattributes.attributable.Attributes();
 		protected String description = null;
 		protected Map<Id<Departure>, Departure> departures = new LinkedHashMap<>();
-		/*package*/ List<TempStop> stops = new ArrayList<>();
+		/*package*/ List<TransitRouteStopImpl.Builder> stopBuilders = new ArrayList<>();
 		/*package*/ String mode = null;
 
 		protected TempTransitRoute(final Id<TransitRoute> id) {
 			this.id = id;
-		}
-	}
-
-	private static class TempStop {
-		protected final TransitStopFacility stop;
-		protected double departure = Time.UNDEFINED_TIME;
-		protected double arrival = Time.UNDEFINED_TIME;
-		protected boolean awaitDeparture = false;
-
-		protected TempStop(final TransitStopFacility stop) {
-			this.stop = stop;
 		}
 	}
 

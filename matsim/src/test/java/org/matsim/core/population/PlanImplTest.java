@@ -20,9 +20,7 @@
 
 package org.matsim.core.population;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -39,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -216,7 +213,7 @@ public class PlanImplTest {
 	@Test
 	public void testCopyPlan_NetworkRoute() {
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord(2000, 0));
 		final Node fromNode = node1;
@@ -241,13 +238,13 @@ public class PlanImplTest {
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof NetworkRoute);
-		assertEquals(98.76, route2.getTravelTime(), 1e-8);
+		assertEquals(98.76, route2.getTravelTime().seconds(), 1e-8);
 	}
 
 	@Test
 	public void testCopyPlan_GenericRoute() {
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord(2000, 0));
 		final Node fromNode = node1;
@@ -272,7 +269,7 @@ public class PlanImplTest {
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 //		assertTrue(route2 instanceof GenericRouteImpl);
-		assertEquals(98.76, route2.getTravelTime(), 1e-8);
+		assertEquals(98.76, route2.getTravelTime().seconds(), 1e-8);
 	}
 
 	/**

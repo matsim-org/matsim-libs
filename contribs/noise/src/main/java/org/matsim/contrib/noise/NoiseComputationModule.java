@@ -20,6 +20,7 @@
 package org.matsim.contrib.noise;
 
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -34,9 +35,45 @@ public final class NoiseComputationModule extends AbstractModule {
 	@Override
 	public void install() {
 
+		final Multibinder<NoiseVehicleType> noiseVehicleTypeMultibinder = Multibinder.newSetBinder(this.binder(), NoiseVehicleType.class);
+
+
+
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
-		this.bind(NoiseContext.class).in( Singleton.class );
+		this.bind(NoiseContext.class).to(NoiseContextImpl.class).in( Singleton.class );
+		this.bind(BarrierContext.class).in(Singleton.class);
+		this.bind(ShieldingContext.class).in(Singleton.class);
+		this.bind(ReflectionContext.class).in(Singleton.class);
+
+		switch (noiseParameters.getNoiseComputationMethod()) {
+			case RLS90:
+				this.bind(NoiseEmission.class).to(RLS90NoiseEmission.class);
+				this.bind(NoiseImmission.class).to(RLS90NoiseImmission.class);
+				this.bind(NoiseVehicleIdentifier.class).to(RLS90NoiseVehicleIdentifier.class);
+				this.bind(ShieldingCorrection.class).to(RLS90ShieldingCorrection.class);
+				for(RLS90VehicleType type: RLS90VehicleType.values()) {
+					noiseVehicleTypeMultibinder.addBinding().toInstance(type);
+				}
+				break;
+			case RLS19:
+				this.bind(NoiseEmission.class).to(RLS19NoiseEmission.class);
+				this.bind(NoiseImmission.class).to(RLS19NoiseImmission.class);
+				this.bind(NoiseVehicleIdentifier.class).to(RLS19NoiseVehicleIdentifier.class);
+				this.bind(ShieldingCorrection.class).to(RLS19ShieldingCorrection.class);
+				for(RLS19VehicleType type: RLS19VehicleType.values()) {
+					noiseVehicleTypeMultibinder.addBinding().toInstance(type);
+				}
+				this.bind(RoadSurfaceContext.class).in(Singleton.class);
+				this.bind(IntersectionContext.class).in(Singleton.class);
+				this.bind(DEMContext.class).to(DEMContextImpl.class).in(Singleton.class);
+
+				break;
+			default:
+				throw new IllegalStateException("Unrecognized noise computation method: " + noiseParameters.getNoiseComputationMethod());
+		}
+
+		this.bind(NoiseDamageCalculation.class).in(Singleton.class);
 
 		this.bind(NoiseTimeTracker.class).in(Singleton.class); // needed!
 		this.addEventHandlerBinding().to(NoiseTimeTracker.class);

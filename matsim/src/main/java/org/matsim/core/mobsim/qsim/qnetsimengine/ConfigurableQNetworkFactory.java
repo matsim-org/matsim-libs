@@ -20,6 +20,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
+import java.util.Optional;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,14 +30,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-
-import java.util.Optional;
 
 
 /**
@@ -71,7 +71,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 		if (!Double.isNaN(network.getEffectiveLaneWidth())) {
 			linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator);
 	}
 	@Override
@@ -95,7 +95,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 
 	@Override
 	public QNodeI createNetsimNode( final Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context);
+		QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context, qsimConfig);
 
 		turnAcceptanceLogic.ifPresent(builder::setTurnAcceptanceLogic);
 

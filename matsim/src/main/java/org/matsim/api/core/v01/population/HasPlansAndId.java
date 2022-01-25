@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface HasPlansAndId<T extends BasicPlan, I> extends Identifiable<I> /*, Attributable*/ {
+public interface HasPlansAndId<T extends BasicPlan, I> extends Identifiable<I>, Attributable {
 
 	// I added "Attributable".  Does not feel like it keeps the interface minimal.  However, the subpopulation attribute comes from it, which is used
 	// rather centrally in the StrategyManager stuff, which is the place for which this interface exists.  Also so far wasn't totally systematic there

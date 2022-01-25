@@ -30,7 +30,7 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
  * @author dgrether
  *
  */
-public class SignalGroupStateChangeTracker implements SignalGroupStateChangedEventHandler{
+final class SignalGroupStateChangeTracker implements SignalGroupStateChangedEventHandler{
 
 	private List<SignalGroupStateChangedEvent> signalGroupEvents = new ArrayList<SignalGroupStateChangedEvent>();
 	

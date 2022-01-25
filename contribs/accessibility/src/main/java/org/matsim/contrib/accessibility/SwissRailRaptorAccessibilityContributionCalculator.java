@@ -22,7 +22,6 @@ import ch.sbb.matsim.routing.pt.raptor.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -32,6 +31,7 @@ import org.matsim.facilities.*;
 import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author dziemke
  */
-public class SwissRailRaptorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
+class SwissRailRaptorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
 	private SwissRailRaptor raptor;
 	private String mode;
@@ -65,17 +65,13 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
 
 		RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
 		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-		this.raptorData = SwissRailRaptorData.create(schedule, raptorConfig, ptNetwork);
+			this.raptorData = SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
 
-		DefaultRaptorParametersForPerson parametersForPerson = new DefaultRaptorParametersForPerson(scenario.getConfig());
-		DefaultRaptorStopFinder defaultRaptorStopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-		LeastCostRaptorRouteSelector routeSelector = new LeastCostRaptorRouteSelector();
-
-		this.raptor = new SwissRailRaptor(raptorData, parametersForPerson, routeSelector, defaultRaptorStopFinder);
+		this.raptor = new SwissRailRaptor.Builder(raptorData, scenario.getConfig()).build();
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.scenario = scenario;
 
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		this.betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 
 		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
@@ -119,10 +115,10 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
                 aggregatedOpportunities.put(opportunity.getId(), jco);
             }
             if (acg.isUseOpportunityWeights()) {
-                if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
-                    throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
+                if (opportunity.getAttributes().getAttribute( Labels.WEIGHT ) == null) {
+                    throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + Labels.WEIGHT + ".");
                 } else {
-                    double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
+                    double weight = Double.parseDouble(opportunity.getAttributes().getAttribute( Labels.WEIGHT ).toString() );
                     jco.addObject(opportunity.getId(), 1. * Math.pow(weight, acg.getWeightExponent()));
                 }
             } else {
@@ -144,7 +140,7 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
             Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
         double expSum = 0.;
 
-        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null);
+        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null, new Attributes());
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
             //compute direct walk costs

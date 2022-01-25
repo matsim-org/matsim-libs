@@ -11,8 +11,8 @@ public class SupersonicOsmNetworkReaderBuilderTest {
 	@Test
 	public void testPublicApi() {
 
-		SupersonicOsmNetworkReader reader = SupersonicOsmNetworkReader.builder()
-				.coordinateTransformation(new IdentityTransformation())
+		SupersonicOsmNetworkReader reader = new SupersonicOsmNetworkReader.Builder()
+				.setCoordinateTransformation(new IdentityTransformation())
 				.build();
 
 		assertNotNull(reader);

@@ -37,6 +37,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
 
 /**
@@ -51,6 +52,8 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 	@Override
 	public void install() {
 		if (getConfig().travelTimeCalculator().getSeparateModes()) {
+			// (this is the default)
+
 			if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
 				throw new RuntimeException("separate modes together with link2link routing currently not implemented. doesn't look difficult, "
 						+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16") ;
@@ -66,9 +69,15 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 				addTravelTimeBinding(mode).toProvider(new Provider<TravelTime>() {
 					@Inject Injector injector;
 					@Override public TravelTime get() {
-						return injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named(mode))).getLinkTravelTimes();
+						return injector.getInstance( Key.get( TravelTimeCalculator.class, Names.named( mode ) ) ).getLinkTravelTimes();
 					}
-				});
+
+					// the following is not there yet (leads to NPE).  Presumably, the collection into the underlying multi-binder is
+					// done later, and until then it is only available per annotation (as above)? kai, nov'19
+//					@Inject Map<String,TravelTime> travelTimes ;
+//					@Override public TravelTime get() { return travelTimes.get( mode ) ; }
+				}).in( Singleton.class );
+				// (This used to be without "Singleton".  I think that with Singleton it makes more sense, but don't know ramifications. kai, nov'19)
 
 			}
 		} else {

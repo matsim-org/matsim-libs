@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,7 +46,6 @@ import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -116,7 +116,7 @@ public final class EditRoutes {
 		Vehicle vehicle = null ;
 		Node startNode = fromLink.getToNode() ;
 		Node endNode = toLink.getFromNode() ;
-		double starttime = leg.getDepartureTime() ;
+		double starttime = leg.getDepartureTime().seconds();
 		Path path = pathCalculator.calcLeastCostPath(startNode, endNode, starttime, person, vehicle) ;
 
 		if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
@@ -150,7 +150,7 @@ public final class EditRoutes {
 	 */
 	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
 	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
-	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter) {
+	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter, Activity fromActivity) {
 		// TripRouter variant; everything else uses the PathCalculator
 		
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -159,7 +159,8 @@ public final class EditRoutes {
 		Facility fromFacility = new LinkWrapperFacility(fromLink);
 		Facility toFacility = new LinkWrapperFacility(toLink);
 
-		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility,
+				leg.getDepartureTime().seconds(), person, fromActivity.getAttributes());
 
 		if (planElements.size() != 1) {
 			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
@@ -168,7 +169,7 @@ public final class EditRoutes {
 
 		Leg newLeg = (Leg) planElements.get(0);
 
-		leg.setTravelTime(newLeg.getTravelTime());
+		leg.setTravelTime(newLeg.getTravelTime().seconds());
 		leg.setRoute(newLeg.getRoute());
 
 		return true;

@@ -28,29 +28,33 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
@@ -58,16 +62,8 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -98,11 +94,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEndRescheduler {
+public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
-	/** time since last "info" */
+	/**
+	 * time since last "info"
+	 */
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;
@@ -121,7 +119,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private WithinDayEngine withindayEngine = null;
 
 	private final Date realWorldStarttime = new Date();
-	private double stopTime = 100 * 3600;
+	private double stopTime; // initialised in initSimTimer()
 	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
@@ -133,7 +131,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	// for detailed run time analysis
 	public static boolean analyzeRunTimes = false;
-	private long startTime = 0;
+	private long startClockTime = 0;
 	private long qSimInternalTime = 0;
 	private final Map<MobsimEngine, AtomicLong> mobsimEngineRunTimes;
 	private ActivityEngine activityEngine;
@@ -190,9 +188,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	};
 
-	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
+	private final Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
-	private Injector childInjector;
+	private final Injector childInjector;
 //	private QVehicleFactory qVehicleFactory;
 	
 	@Override
@@ -320,13 +318,23 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			throw new RuntimeException( "vehicle with ID " + veh.getId() + " exists twice. Aborting ..." ) ;
 		}
 		this.vehicles.put( veh.getId(), veh ) ;
+
+		final Vehicles allvehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
+		VehicleType vehType = veh.getVehicle().getType();
+		if ( !allvehicles.getVehicleTypes().containsKey( vehType.getId() ) ) {
+			allvehicles.addVehicleType( veh.getVehicle().getType() );
+		}
+		if ( !allvehicles.getVehicles().containsKey( veh.getVehicle().getId() ) ) {
+			allvehicles.addVehicle( veh.getVehicle() );
+		}
+		// yy one might want to check if the types/vehicles here are the same as in previous iterations. kai/kai, jan'20
 	}
 	
 	public Map<Id<Vehicle>,MobsimVehicle> getVehicles() {
 		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
 
-	void cleanupSim() {
+	private void cleanupSim() {
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
 		boolean gotException = false;
@@ -337,6 +345,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			}
 			catch (Exception e) {
 				log.error("got exception while cleaning up", e);
+				gotException=true;
 			}
 		}
 
@@ -348,8 +357,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 				log.info(entry.getKey().getClass().toString() + " cpu time (nanos): " + entry.getValue().get());				
 			}
 			log.info("");
-			if ( this.netEngine instanceof QNetsimEngine ) {
-				((QNetsimEngine)this.netEngine).printEngineRunTimes();
+			if ( this.netEngine instanceof QNetsimEngineI ) {
+				((QNetsimEngineI)this.netEngine).printEngineRunTimes();
 				// (yy should somehow be in afterSim()).
 			}
 		}
@@ -361,58 +370,60 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 * @return true if the simulation needs to continue
 	 */
 	/*package*/ boolean doSimStep() {
-		if (analyzeRunTimes) this.startTime = System.nanoTime();
+		if (analyzeRunTimes) this.startClockTime = System.nanoTime();
 
 		final double now = this.getSimTimer().getTimeOfDay();
 
 		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(now);
 		
-		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startTime;
+		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startClockTime;
 		
 		/*
 		 * The WithinDayEngine has to perform its replannings before
 		 * the other engines simulate the sim step.
 		 */
 		if (this.withindayEngine != null) {
-			if (analyzeRunTimes) startTime = System.nanoTime();
+			if (analyzeRunTimes) startClockTime = System.nanoTime();
 			this.withindayEngine.doSimStep(now);
-			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(this.withindayEngine).addAndGet(System.nanoTime() - this.startTime);
+			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(this.withindayEngine).addAndGet(System.nanoTime() - this.startClockTime);
 		}
 
 		// "added" engines
 		for (MobsimEngine mobsimEngine : this.mobsimEngines) {
-			if (analyzeRunTimes) this.startTime = System.nanoTime();
-			
+			if (analyzeRunTimes) this.startClockTime = System.nanoTime();
+
 			// withindayEngine.doSimStep(time) has already been called
 			if (mobsimEngine == this.withindayEngine) continue;
 
 			mobsimEngine.doSimStep(now);
-			
-			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startTime);
+
+			if (analyzeRunTimes)
+				this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startClockTime);
 		}
 
-		if (analyzeRunTimes) this.startTime = System.nanoTime();
-		
+		if (analyzeRunTimes) this.startClockTime = System.nanoTime();
+
 		// console printout:
 		this.printSimLog(now);
-		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > now));
+
+		// trigger the after sim step listeners before finishing the events processing of this sim step.
+		// this gives after sim step listeners like snapshot generator the opportunity to generate events
+		// for the current time step.
 		this.events.afterSimStep(now);
 		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
 
+
 		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
-		if ( qsimConfigGroup.getSimEndtimeInterpretation()==EndtimeInterpretation.onlyUseEndtime ) {
-			if ( now > qsimConfigGroup.getEndTime() ) {
-				doContinue = false ;
-			} else {
-				doContinue = true ;
-			}
+		boolean doContinue = (this.agentCounter.isLiving() && (this.stopTime > now));
+		if (qsimConfigGroup.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime) {
+			doContinue = now <= qsimConfigGroup.getEndTime().seconds();
 		}
 
 		if (doContinue) {
 			this.simTimer.incrementTime();
 		}
-		
-		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startTime;
+
+		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startClockTime;
 
 		return doContinue;
 	}
@@ -423,6 +434,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 		this.agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
+		if ( agent instanceof HasPerson ){
+			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
+			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
+				allpersons.addPerson( ((HasPerson) agent).getPerson() );
+			}
+		}
 	}
 
 	private void arrangeNextAgentAction(final MobsimAgent agent) {
@@ -466,7 +483,15 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		double now = this.getSimTimer().getTimeOfDay();
 		Id<Link> linkId = agent.getCurrentLinkId();
 		Gbl.assertIf( linkId!=null );
-		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode()));
+		
+		String routingMode = null;
+		
+		if (agent instanceof PlanAgent) {
+			Leg currentLeg = (Leg) ((PlanAgent) agent).getCurrentPlanElement();
+			routingMode = TripStructureUtils.getRoutingMode(currentLeg);
+		}
+		
+		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode(), routingMode));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if (departureHandler.handleDeparture(now, agent, linkId)) {
@@ -484,12 +509,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private void initSimTimer() {
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().qsim();
-		Double configuredStartTime = qSimConfigGroup.getStartTime();
-		this.stopTime = qSimConfigGroup.getEndTime();
-		if (configuredStartTime == Time.UNDEFINED_TIME) {
-			configuredStartTime = 0.0;
-		}
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) {
+		double configuredStartTime = qSimConfigGroup.getStartTime().orElse(0);
+		this.stopTime = qSimConfigGroup.getEndTime().orElse(Double.MAX_VALUE);
+		if (this.stopTime == 0) {
 			this.stopTime = Double.MAX_VALUE;
 		}
 
@@ -633,8 +655,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	@Inject
-	void addQueueSimulationListeners(Set<MobsimListener> listeners) {
+	@Inject void addQueueSimulationListeners(Set<MobsimListener> listeners) {
+		// I think that "injecting a method" means that the method is called at some point, pulling the method arguments out of injection.  In
+		// consequence, it is assumed that a "Set<MobsimListener>" was bound before, and is used here.  I think that the results of
+		// multibinding will be provided in several ways, one of them as this kind of set.  Thus, the working assumption is that the
+		// <MobsimListener> multibinder that is constructed in AbstractModule is retrieved here.  kai, sep'20
+		
 		for (MobsimListener listener : listeners) {
 			this.listenerManager.addQueueSimulationListener(listener);
 		}

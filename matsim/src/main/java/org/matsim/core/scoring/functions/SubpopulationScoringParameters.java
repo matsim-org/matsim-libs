@@ -39,7 +39,6 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
-	private final String subpopulationAttributeName;
 	private final Map<String, ScoringParameters> params = new HashMap<>();
 	private final Population population;
 
@@ -48,7 +47,6 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 		this.config = planCalcScoreConfigGroup;
 		this.scConfig = scenarioConfigGroup;
 		this.transitConfigGroup = transitConfigGroup;
-		this.subpopulationAttributeName = plansConfigGroup.getSubpopulationAttributeName();
 		this.population = population ;
 	}
 
@@ -58,7 +56,8 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 
 	@Override
 	public ScoringParameters getScoringParameters(Person person) {
-		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person, subpopulationAttributeName) ;
+//		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person, subpopulationAttributeName) ;
+		final String subpopulation = PopulationUtils.getSubpopulation( person );
 
 		if (!this.params.containsKey(subpopulation)) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
@@ -78,7 +77,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 				transitActivityParams.setClosingTime(0.) ;
 				ActivityUtilityParameters.Builder modeParamsBuilder = new ActivityUtilityParameters.Builder(transitActivityParams);
 				modeParamsBuilder.setScoreAtAll(false);
-				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder);
+				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
 			}
 
 			this.params.put(

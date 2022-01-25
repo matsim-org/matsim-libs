@@ -19,19 +19,23 @@
  * *********************************************************************** */
 package org.matsim.contrib.minibus.performance;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-
-import java.util.List;
 
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
@@ -94,7 +98,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 								toFacility( trip.getOriginActivity() ),
 								toFacility( trip.getDestinationActivity() ),
 								calcEndOfActivity( trip.getOriginActivity() , plan ),
-								plan.getPerson() );
+								plan.getPerson(), trip.getTripAttributes() );
 
 					TripRouter.insertTrip(
 							plan, 
@@ -129,7 +133,8 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private static double calcEndOfActivity(
 			final Activity activity,
 			final Plan plan) {
-		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
+		if (activity.getEndTime().isDefined())
+			return activity.getEndTime().seconds();
 
 		// no sufficient information in the activity...
 		// do it the long way.
@@ -151,27 +156,25 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final PlanElement pe) {
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
-			if (endTime != Time.UNDEFINED_TIME) {
+			OptionalTime startTime = act.getStartTime();
+			OptionalTime dur = act.getMaximumDuration();
+			if (act.getEndTime().isDefined()) {
 				// use fromAct.endTime as time for routing
-				return endTime;
+				return act.getEndTime().seconds();
 			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+			else if (startTime.isDefined() && dur.isDefined()) {
 				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
+				return startTime.seconds() + dur.seconds();
 			}
-			else if (dur != Time.UNDEFINED_TIME) {
+			else if (dur.isDefined()) {
 				// use last used time + fromAct.duration as time for routing
-				return now + dur;
+				return now + dur.seconds();
 			}
 			else {
 				throw new RuntimeException("activity has neither end-time nor duration." + act);
 			}
 		}
-		double tt = ((Leg) pe).getTravelTime();
-		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
+		return now + ((Leg)pe).getTravelTime().orElse(0);
 	}	
 }
 

@@ -84,7 +84,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 
 	private void startActivity( final ActivityStartEvent event ) {
 		if ( !event.getActType().equals( activityType ) ) {
-			assert currentNCoparticipants == 0 : currentNCoparticipants;
+			//assert currentNCoparticipants == 0 : currentNCoparticipants;
 			return;
 		}
 

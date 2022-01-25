@@ -21,8 +21,8 @@ package org.matsim.core.controler.corelisteners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -53,9 +53,8 @@ import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
@@ -107,6 +106,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private Lanes lanes;
 
 	@Inject
+	private Scenario scenario;
+
+	@Inject
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
@@ -131,32 +133,82 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpCounts();
 
 		if (!event.isUnexpected() && this.vspConfig.isWritingOutputEvents() && (this.controlerConfigGroup.getWriteEventsInterval()!=0)) {
-			dumpOutputEvents();
+			dumpOutputEvents(event.getIteration());
 		}
-		
-		dumpExperiencedPlans() ;
+		dumpOutputTrips(event.getIteration());
+        dumpOutputLegs(event.getIteration());
+		dumpExperiencedPlans(event.getIteration()) ;
+
 	}
 
-	private void dumpOutputEvents() {
-		try {
-			File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.events));
-			File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.events));
+	private void dumpOutputEvents(int iteration) {
+		for (ControlerConfigGroup.EventsFileFormat format : this.controlerConfigGroup.getEventsFileFormats()) {
 			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
+				Controler.DefaultFiles file;
+				switch (format) {
+					case xml:
+						file = Controler.DefaultFiles.events;
+						break;
+					case pb:
+						file = Controler.DefaultFiles.eventsPb;
+						break;
+					case json:
+						file = Controler.DefaultFiles.eventsJson;
+						break;
+					default:
+						continue;
+				}
+
+				File toFile = new File(this.controlerIO.getOutputFilename(file));
+				File fromFile = new File(this.controlerIO.getIterationFilename(iteration, file));
+				try {
+					Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			} catch (Exception ee) {
+				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+						+ "generated in the final iteration");
+			}
+
+		}
+	}
+
+	private void dumpOutputTrips(int iteration) {
+		try {
+			File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.tripscsv));
+			File fromFile = new File(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.tripscsv));
+			try {
+				Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration" );
+		} catch (Exception ee) {
+			Logger.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
+					+ "generated in the final iteration");
 		}
 	}
 
-	private void dumpExperiencedPlans() {
+    private void dumpOutputLegs(int iteration) {
+        try {
+            File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.legscsv));
+            File fromFile = new File(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.legscsv));
+            try {
+                Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        } catch (Exception ee) {
+            Logger.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
+                    + "generated in the final iteration");
+        }
+    }
+
+	private void dumpExperiencedPlans(int iteration) {
 		if (this.config.planCalcScore().isWriteExperiencedPlans() ) {
 			try {
 				File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPlans));
-				File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.experiencedPlans));
+				File fromFile = new File(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPlans));
 				try {
 					Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
 				} catch (IOException e) {
@@ -196,7 +248,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpLanes() {
 		try {
-			new LanesWriter(this.lanes).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.lanes));
+			if ( this.lanes!=null && !this.lanes.getLanesToLinkAssignments().isEmpty() ){
+				new LanesWriter( this.lanes ).write( this.controlerIO.getOutputFilename( Controler.DefaultFiles.lanes ) );
+			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing lanes.", ee);
 		}
@@ -213,6 +267,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpVehicles() {
 		try {
 			new MatsimVehicleWriter(this.vehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.vehicles));
+			Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
+			if ( allVehicles!=null && !allVehicles.getVehicleTypes().isEmpty() ){
+				new MatsimVehicleWriter( allVehicles ).writeFile( this.controlerIO.getOutputFilename( Controler.DefaultFiles.allVehicles ) );
+			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing vehicles.", ee);
 		}

@@ -21,14 +21,13 @@
 
  package org.matsim.core.scoring;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
-
-import java.util.ArrayList;
 
 public final class SumScoringFunction implements ScoringFunction {
 
@@ -55,6 +54,10 @@ public final class SumScoringFunction implements ScoringFunction {
 		void addMoney(final double amount);
 	}
 
+	public interface ScoreScoring extends BasicScoring {
+		void addScore(final double amount);
+	}
+
 	public interface AgentStuckScoring extends BasicScoring {
 		void agentStuck(final double time);
 	}
@@ -74,11 +77,12 @@ public final class SumScoringFunction implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 
-	private static Logger log = Logger.getLogger(SumScoringFunction.class);
+	private static final  Logger log = Logger.getLogger(SumScoringFunction.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
+	private ArrayList<ScoreScoring> scoreScoringFunctions = new ArrayList<>();
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<>();
 	private ArrayList<TripScoring> tripScoringFunctions = new ArrayList<>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
@@ -86,23 +90,21 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-		double startTime = activity.getStartTime();
-		double endTime = activity.getEndTime();
-		if (Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+		if (activity.getStartTime().isUndefined() && activity.getEndTime().isDefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+		} else if (activity.getStartTime().isDefined() && activity.getEndTime().isDefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && Time.isUndefinedTime(endTime)) {
+		} else if (activity.getStartTime().isDefined() && activity.getEndTime().isUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}
 		} else {
-			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen. Activity="
-			+ activity );
+			throw new RuntimeException(
+					"Trying to score an activity without start or end time. Should not happen. Activity=" + activity);
 		}
 	}
 
@@ -124,6 +126,13 @@ public final class SumScoringFunction implements ScoringFunction {
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : this.moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
+		}
+	}
+
+	@Override
+	public void addScore(double amount) {
+		for (ScoreScoring scoreScoringFunction : this.scoreScoringFunctions) {
+			scoreScoringFunction.addScore(amount);
 		}
 	}
 
@@ -190,6 +199,10 @@ public final class SumScoringFunction implements ScoringFunction {
 
 		if (scoringFunction instanceof MoneyScoring) {
 			this.moneyScoringFunctions.add((MoneyScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof ScoreScoring) {
+			this.scoreScoringFunctions.add((ScoreScoring) scoringFunction);
 		}
 
 		if (scoringFunction instanceof ArbitraryEventScoring) {

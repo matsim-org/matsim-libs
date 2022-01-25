@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public interface HasLinkId {
 
+	String ATTRIBUTE_LINK = "link";
 	Id<Link> getLinkId();
 
 }

@@ -33,21 +33,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.utils.misc.Time;
 
-public class ActivityEngineDefaultImpl implements ActivityEngine {
+class ActivityEngineDefaultImpl implements ActivityEngine {
 	private static final Logger log = Logger.getLogger( ActivityEngineDefaultImpl.class ) ;
 
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
+
 	@Inject
-	public ActivityEngineDefaultImpl( EventsManager eventsManager ) {
+	ActivityEngineDefaultImpl( EventsManager eventsManager ) {
 		this.eventsManager = eventsManager;
 	}
 
-	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
-		this.eventsManager = eventsManager;
-	}
+//	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
+//		this.eventsManager = eventsManager;
+//	}
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
@@ -59,12 +58,12 @@ public class ActivityEngineDefaultImpl implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	private static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double activityEndTime) {
+		AgentEntry( MobsimAgent agent, double activityEndTime ) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
-		final MobsimAgent agent;
-		final double activityEndTime;
+		private final MobsimAgent agent;
+		private final double activityEndTime;
 	}
 
 	private InternalInterface internalInterface;
@@ -117,7 +116,7 @@ public class ActivityEngineDefaultImpl implements ActivityEngine {
 	public void afterSim() {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
-			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
+			if (entry.activityEndTime != Double.POSITIVE_INFINITY) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));

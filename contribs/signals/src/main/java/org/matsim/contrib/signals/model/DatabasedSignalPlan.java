@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 
 
 /**
  * @author dgrether
  *
  */
-public class DatabasedSignalPlan implements SignalPlan {
+public final class DatabasedSignalPlan implements SignalPlan {
 //	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
 	
 	private SignalPlanData data;

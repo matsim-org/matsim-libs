@@ -52,6 +52,7 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -308,7 +309,7 @@ public class MultiModalControlerListenerTest {
 		Logger.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
 		Logger.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
 		Logger.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			Assert.assertEquals(
 					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
 					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);

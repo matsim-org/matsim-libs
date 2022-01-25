@@ -19,29 +19,28 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
+import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
-import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerRequests;
+import org.matsim.contrib.dvrp.passenger.RequestQueue;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -55,21 +54,20 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final Integer rebalancingInterval;
 	private final Fleet fleet;
 	private final DrtScheduleInquiry scheduleInquiry;
-	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
 	private final DepotFinder depotFinder;
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
+	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 
-	private final Collection<DrtRequest> unplannedRequests = new TreeSet<DrtRequest>(
-			PassengerRequests.ABSOLUTE_COMPARATOR);
-	private boolean requiresReoptimization = false;
+	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
-			DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
-			UnplannedRequestInserter requestInserter) {
+			ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
+			UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -79,20 +77,24 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
-		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
-				.map(MinCostFlowRebalancingParams::getInterval)
-				.orElse(null);
+		this.insertionRetryQueue = insertionRetryQueue;
+
+		rebalancingInterval = drtCfg.getRebalancingParams().map(RebalancingParams::getInterval).orElse(null);
+		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
+				drtCfg.getAdvanceRequestPlanningHorizon());
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization) {
+		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
+
+		if (!unplannedRequests.getSchedulableRequests().isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(
+				e.getSimulationTime())) {
 			for (DvrpVehicle v : fleet.getVehicles().values()) {
 				scheduleTimingUpdater.updateTimings(v);
 			}
 
-			requestInserter.scheduleUnplannedRequests(unplannedRequests);
-			requiresReoptimization = false;
+			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 		}
 
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
@@ -122,8 +124,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((DrtRequest)request);
-		requiresReoptimization = true;
+		unplannedRequests.addRequest((DrtRequest)request);
 	}
 
 	@Override

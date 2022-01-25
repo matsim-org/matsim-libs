@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -134,7 +135,22 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			final Plan plan,
 			final Leg leg,
 			final Set<String> stageActivityTypes) {
-		for ( Trip t : TripStructureUtils.getTrips( plan , stageActivityTypes ) ) {
+
+//		for ( Trip t : TripStructureUtils.getTrips( plan , stageActivityTypes::contains ) ) {
+		// the above is what I found.  it seems that Gregor, when he removed the general stage activity types, _added_ the stage activity types from
+		// here to the default ones..  Since I didn't find that useful, I removed that behavior.  So now we have to do something better:
+		Predicate<String> isStageActivityType = new Predicate<String>(){
+			@Override public boolean test( String s ){
+				if ( TripStructureUtils.isStageActivityType( s ) ){
+					return true;
+				}
+				if ( stageActivityTypes.contains( s ) ){
+					return true;
+				}
+				return false ;
+			}
+		};
+		for ( Trip t : TripStructureUtils.getTrips( plan, isStageActivityType ) ) {
 			if ( t.getTripElements().contains( leg ) ) return t;
 		}
 		throw new RuntimeException( plan.getPlanElements() +" doesn't contain "+leg );

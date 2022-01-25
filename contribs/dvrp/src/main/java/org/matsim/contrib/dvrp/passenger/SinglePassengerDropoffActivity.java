@@ -24,17 +24,17 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 
 public class SinglePassengerDropoffActivity extends FirstLastSimStepDynActivity {
-	private final PassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
 	private final PassengerRequest request;
 
 	private final double departureTime;
 
-	public SinglePassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
+	public SinglePassengerDropoffActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask dropoffTask,
 			PassengerRequest request, String activityType) {
 		super(activityType);
 
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.request = request;
 
@@ -48,6 +48,6 @@ public class SinglePassengerDropoffActivity extends FirstLastSimStepDynActivity 
 
 	@Override
 	protected void afterLastStep(double now) {
-		passengerEngine.dropOffPassenger(driver, request, now);
+		passengerHandler.dropOffPassenger(driver, request, now);
 	}
 }

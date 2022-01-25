@@ -29,7 +29,6 @@ import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
@@ -38,12 +37,10 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private static final Logger log = Logger.getLogger(DrtRequestCreator.class);
 	private final String mode;
 	private final EventsManager eventsManager;
-	private final MobsimTimer timer;
 
-	public DrtRequestCreator(String mode, EventsManager eventsManager, MobsimTimer timer) {
+	public DrtRequestCreator(String mode, EventsManager eventsManager) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
-		this.timer = timer;
 	}
 
 	@Override
@@ -51,14 +48,23 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 			double departureTime, double submissionTime) {
 		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
-		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
+		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
 
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passengerId, fromLink.getId(),
-						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
+				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerId, fromLink.getId(), toLink.getId(),
+						drtRoute.getDirectRideTime(), drtRoute.getDistance(), latestDepartureTime, latestArrivalTime));
 
-		DrtRequest request = new DrtRequest(id, passengerId, mode, fromLink, toLink, departureTime, latestDepartureTime,
-				latestArrivalTime, submissionTime);
+		DrtRequest request = DrtRequest.newBuilder()
+				.id(id)
+				.passengerId(passengerId)
+				.mode(mode)
+				.fromLink(fromLink)
+				.toLink(toLink)
+				.earliestStartTime(departureTime)
+				.latestStartTime(latestDepartureTime)
+				.latestArrivalTime(latestArrivalTime)
+				.submissionTime(submissionTime)
+				.build();
 
 		log.debug(route);
 		log.debug(request);

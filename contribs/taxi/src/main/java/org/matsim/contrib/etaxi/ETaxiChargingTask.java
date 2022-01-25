@@ -19,19 +19,16 @@
 
 package org.matsim.contrib.etaxi;
 
-import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
+import org.matsim.contrib.evrp.ChargingTaskImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 
-public class ETaxiChargingTask extends ChargingTaskImpl implements TaxiTask {
+public class ETaxiChargingTask extends ChargingTaskImpl {
+	public static final TaxiTaskType TYPE = new TaxiTaskType("CHARGING", null);
+
 	public ETaxiChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev,
 			double totalEnergy) {
-		super(beginTime, endTime, charger, ev, totalEnergy);
-	}
-
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.STAY;
+		super(TYPE, beginTime, endTime, charger, ev, totalEnergy);
 	}
 }

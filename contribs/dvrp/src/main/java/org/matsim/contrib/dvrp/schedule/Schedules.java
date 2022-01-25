@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 public class Schedules {
-	public static final Comparator<Task> TASK_SCHEDULE_IDX_COMPARATOR = (t1, t2) -> t1.getTaskIdx() - t2.getTaskIdx();
+	public static final Comparator<Task> TASK_SCHEDULE_IDX_COMPARATOR = Comparator.comparingInt(Task::getTaskIdx);
 
 	public static Task getFirstTask(Schedule schedule) {
 		return schedule.getTasks().get(0);

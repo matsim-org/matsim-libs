@@ -43,7 +43,6 @@ import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
@@ -66,9 +65,6 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 	private Map<Id<Link>, LinkSensor> linkIdSensorMap = new HashMap<>();
 
 	private Map<Id<Link>, Map<Id<Lane>, LaneSensor>> linkIdLaneIdSensorMap = new HashMap<>();
-	
-	@Deprecated // not tested
-	private Map<Id<Link>, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<>();
 
 	private Network network;
 	private Lanes laneDefinitions = null;
@@ -192,33 +188,6 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 		this.linkIdSensorMap.get(linkId).registerAverageVehiclesPerSecondToMonitor(lookBackTime, timeBucketCollectionDuration);
 	}
 
-	@Deprecated //not tested
-	private void registerCarsAtDistancePerSecondMonitoring(Id<Link> linkId, Double distanceMeter){
-		double firstDistanceMeter = distanceMeter;
-		Link link = this.network.getLinks().get(linkId);
-		double secondDistanceMeter = distanceMeter -  2 * link.getFreespeed();
-		//TODO could also exceed link length
-		if (secondDistanceMeter < 0.0){
-			firstDistanceMeter = 2* link.getFreespeed();
-			secondDistanceMeter = 0.0;
-		}
-		Tuple<Double, Double> tuple = new Tuple<Double, Double>(firstDistanceMeter, secondDistanceMeter);
-		log.error("Link " + linkId + " first pos: " + tuple.getFirst() + " second pos: " + tuple.getSecond() + " length " + link.getLength());
-		this.linkFirstSecondDistanceMeterMap.put(link.getId(), tuple);
-		this.registerNumberOfCarsInDistanceMonitoring(linkId, firstDistanceMeter);
-		this.registerNumberOfCarsInDistanceMonitoring(linkId, secondDistanceMeter);
-	}
-	
-	@Deprecated //not tested
-	private int getNumberOfCarsAtDistancePerSecond(Id<Link> linkId, Double distanceMeter, double timeSeconds){
-		Tuple<Double, Double> tuple = this.linkFirstSecondDistanceMeterMap.get(linkId);
-		int numberOfCarsFirstDetector = this.getNumberOfCarsInDistance(linkId, tuple.getFirst(), timeSeconds);
-		int numberOfCarsSecondDetector = this.getNumberOfCarsInDistance(linkId, tuple.getSecond(), timeSeconds);
-		log.error("Link " + linkId + " first pos: " + tuple.getFirst() + " second pos: " + tuple.getSecond());
-		log.error("NumberOfCars SecondDetector: " + numberOfCarsSecondDetector + " first detector: " + numberOfCarsFirstDetector);
-		return numberOfCarsFirstDetector - numberOfCarsSecondDetector  ;
-	}
-
 	public int getNumberOfCarsOnLink(Id<Link> linkId){
 		if (!this.linkIdSensorMap.containsKey(linkId)){
 			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
@@ -301,7 +270,6 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 	public void reset(int iteration) {
 		this.linkIdSensorMap.clear();
 		this.linkIdLaneIdSensorMap.clear();
-		this.linkFirstSecondDistanceMeterMap.clear();
 	}
 
 	@Override

@@ -19,27 +19,24 @@
 
 package org.matsim.contrib.dvrp.examples.onetruck;
 
+import static org.matsim.contrib.dvrp.examples.onetruck.OneTruckOptimizer.OneTruckTaskType;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 /**
  * @author michalm
  */
-public class OneTruckServeTask extends StayTaskImpl {
+public class OneTruckServeTask extends DefaultStayTask {
 	private final OneTruckRequest request;
-	private final boolean isPickup;// pickup or delivery
 
-	public OneTruckServeTask(double beginTime, double endTime, Link link, boolean isPickup, OneTruckRequest request) {
-		super(beginTime, endTime, link, isPickup ? "pickup" : "delivery");
+	public OneTruckServeTask(OneTruckTaskType taskType, double beginTime, double endTime, Link link,
+			OneTruckRequest request) {
+		super(taskType, beginTime, endTime, link);
 		this.request = request;
-		this.isPickup = isPickup;
 	}
 
 	public OneTruckRequest getRequest() {
 		return request;
-	}
-
-	public boolean isPickup() {
-		return isPickup;
 	}
 }

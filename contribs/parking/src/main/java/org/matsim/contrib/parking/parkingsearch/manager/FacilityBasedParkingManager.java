@@ -54,7 +54,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		this.network = scenario.getNetwork();
 		parkingFacilities = scenario.getActivityFacilities()
 				.getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
-		Logger.getLogger(getClass()).info(parkingFacilities);
+		Logger.getLogger(getClass()).info(parkingFacilities.toString());
 
 		for (ActivityFacility fac : this.parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();

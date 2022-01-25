@@ -19,8 +19,11 @@
 
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URL;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,18 +36,19 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -63,17 +67,18 @@ public class ScheduleReconstructionIT {
 
 	@Test
 	public void testOneTaxiReconstruction() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+				"one_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
 	@Test
 	public void testMielecReconstruction() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void runReconstruction(URL configUrl) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
@@ -86,7 +91,7 @@ public class ScheduleReconstructionIT {
 			@Override
 			public void install() {
 				bindModal(ScheduleReconstructor.class).toProvider(
-						new ModalProviders.AbstractProvider<ScheduleReconstructor>(taxiCfg.getMode()) {
+						new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
 							@Inject
 							private EventsManager eventsManager;
 
@@ -102,8 +107,7 @@ public class ScheduleReconstructionIT {
 					protected void configureQSim() {
 						addModalQSimComponentBinding().toProvider(modalProvider(
 								getter -> (MobsimBeforeCleanupListener)(e -> assertScheduleReconstructor(
-										getter.getModal(ScheduleReconstructor.class), getter.getModal(Fleet.class),
-										getter.getModal(SubmittedTaxiRequestsCollector.class)))));
+										getter.getModal(ScheduleReconstructor.class), getter.getModal(Fleet.class)))));
 					}
 				});
 			}
@@ -112,12 +116,22 @@ public class ScheduleReconstructionIT {
 
 	}
 
-	private void assertScheduleReconstructor(ScheduleReconstructor scheduleReconstructor, Fleet fleet,
-			SubmittedTaxiRequestsCollector requestCollector) {
+	private void assertScheduleReconstructor(ScheduleReconstructor scheduleReconstructor, Fleet fleet) {
 		Assert.assertNotEquals(fleet, scheduleReconstructor.getFleet());
 		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.getFleet().getVehicles().values());
-		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
-				scheduleReconstructor.taxiRequests.values());
+		var collectedRequests = fleet.getVehicles()
+				.values()
+				.stream()
+				.map(DvrpVehicle::getSchedule)
+				.flatMap(Schedule::tasks)
+				.filter(TaxiTaskBaseType.PICKUP::isBaseTypeOf)
+				.map(t -> ((TaxiPickupTask)t).getRequest())
+				.collect(toList());
+		compareRequests(sortRequests(collectedRequests), sortRequests(scheduleReconstructor.taxiRequests.values()));
+	}
+
+	private List<TaxiRequest> sortRequests(Collection<? extends TaxiRequest> requestMap) {
+		return requestMap.stream().sorted(Comparator.comparing(TaxiRequest::getId)).collect(toList());
 	}
 
 	private void compareVehicles(Collection<? extends DvrpVehicle> originalVehs,
@@ -159,18 +173,19 @@ public class ScheduleReconstructionIT {
 			Assert.assertEquals(o.getBeginTime(), r.getBeginTime(), 0);
 			Assert.assertEquals(o.getEndTime(), r.getEndTime(), 0);
 			Assert.assertEquals(o.getTaskIdx(), r.getTaskIdx());
-			Assert.assertEquals(((TaxiTask)o).getTaxiTaskType(), ((TaxiTask)r).getTaxiTaskType());
+			Assert.assertEquals(o.getTaskType(), r.getTaskType());
 
 			Assert.assertEquals(TaskStatus.PERFORMED, o.getStatus());
 			Assert.assertEquals(TaskStatus.PLANNED, r.getStatus());
 		}
 	}
 
-	private void compareRequests(Collection<TaxiRequest> originalReqs, Collection<TaxiRequest> reconstructedReqs) {
+	private void compareRequests(Collection<? extends TaxiRequest> originalReqs,
+			Collection<? extends TaxiRequest> reconstructedReqs) {
 		Assert.assertNotEquals(originalReqs, reconstructedReqs);
 		Assert.assertEquals(originalReqs.size(), reconstructedReqs.size());
 
-		Iterator<TaxiRequest> rIter = reconstructedReqs.iterator();
+		Iterator<? extends TaxiRequest> rIter = reconstructedReqs.iterator();
 		for (TaxiRequest o : originalReqs) {
 			TaxiRequest r = rIter.next();
 

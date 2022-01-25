@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.Coord;
@@ -5,14 +26,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {
 
-	private Activity act;
+	private final Activity act;
 	
-	private TimeWindow timeWindow;
+	private final TimeWindow timeWindow;
 	
 	public FreightActivity(Activity act, TimeWindow timeWindow) {
 		super();
@@ -25,13 +47,18 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getEndTime() {
+	public OptionalTime getEndTime() {
 		return act.getEndTime();
 	}
 
 	@Override
 	public void setEndTime(double seconds) {
 		act.setEndTime(seconds);
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
+		act.setEndTimeUndefined();
 	}
 
 	@Override
@@ -50,7 +77,7 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getStartTime() {
+	public OptionalTime getStartTime() {
 		return act.getStartTime();
 	}
 
@@ -60,13 +87,23 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getMaximumDuration() {
+	public void setStartTimeUndefined() {
+		act.setStartTimeUndefined();
+	}
+
+	@Override
+	public OptionalTime getMaximumDuration() {
 		return act.getMaximumDuration();
 	}
 
 	@Override
 	public void setMaximumDuration(double seconds) {
 		act.setMaximumDuration(seconds);
+	}
+
+	@Override
+	public void setMaximumDurationUndefined() {
+		act.setMaximumDurationUndefined();
 	}
 
 	@Override

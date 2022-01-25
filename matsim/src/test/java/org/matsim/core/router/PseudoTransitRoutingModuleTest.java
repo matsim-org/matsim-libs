@@ -51,6 +51,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class PseudoTransitRoutingModuleTest {
 
@@ -76,7 +77,7 @@ public class PseudoTransitRoutingModuleTest {
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(400.0, tt, 1e-8);
-			Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
@@ -87,7 +88,7 @@ public class PseudoTransitRoutingModuleTest {
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(600.0, tt, 1e-8);
-			Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
 			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
@@ -114,11 +115,11 @@ public class PseudoTransitRoutingModuleTest {
 			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
 			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
-			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
+			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new Attributes()) ;
 			Gbl.assertIf( result.size()==1);
 			Leg newLeg = (Leg) result.get(0) ;
-			
-			Assert.assertEquals(800.0, newLeg.getTravelTime(), 1e-8);
+
+			Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
 //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}

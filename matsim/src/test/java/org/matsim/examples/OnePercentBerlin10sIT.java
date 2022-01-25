@@ -82,8 +82,9 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		writer.closeFile();
 
 		System.out.println("reffile: " + referenceEventsFileName);
-		assertTrue("different event files", EventsFileComparator.compareAndReturnInt(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
-		
+		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+
 	}
 
 	public void testOnePercent10sQSimTryEndTimeThenDuration() {
@@ -124,8 +125,9 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 		writer.closeFile();
 
-		assertTrue("different event files", EventsFileComparator.compareAndReturnInt(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
-		
+		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+
 	}
 
 }

@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
@@ -37,14 +38,16 @@ public class VrpAgentSource implements AgentSource {
 	private final DynActionCreator nextActionCreator;
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
+	private final String dvrpMode;
 	private final QSim qSim;
 	private final VehicleType vehicleType;
 
-	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim,
-			VehicleType vehicleType) {
+	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, String dvrpMode,
+			QSim qSim, VehicleType vehicleType) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
+		this.dvrpMode = dvrpMode;
 		this.qSim = qSim;
 		this.vehicleType = vehicleType;
 	}
@@ -53,15 +56,18 @@ public class VrpAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		VehiclesFactory vehicleFactory = this.qSim.getScenario().getVehicles().getFactory();
 
-		for (DvrpVehicle vrpVeh : fleet.getVehicles().values()) {
-			Id<DvrpVehicle> id = vrpVeh.getId();
-			Id<Link> startLinkId = vrpVeh.getStartLink().getId();
+		for (DvrpVehicle dvrpVehicle : fleet.getVehicles().values()) {
+			Id<DvrpVehicle> id = dvrpVehicle.getId();
+			Id<Link> startLinkId = dvrpVehicle.getStartLink().getId();
 
-			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
+			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
+					qSim.getEventsManager());
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
 					vrpAgentLogic);
-			QVehicle mobsimVehicle = new QVehicleImpl(
-					vehicleFactory.createVehicle(Id.create(id, org.matsim.vehicles.Vehicle.class), vehicleType));
+			Vehicle matsimVehicle = dvrpVehicle.getSpecification()
+					.getMatsimVehicle()
+					.orElse(vehicleFactory.createVehicle(Id.create(id, Vehicle.class), vehicleType));
+			QVehicle mobsimVehicle = new QVehicleImpl(matsimVehicle);
 			vrpAgent.setVehicle(mobsimVehicle);
 			mobsimVehicle.setDriver(vrpAgent);
 

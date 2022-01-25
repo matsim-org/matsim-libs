@@ -26,16 +26,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.router.StageActivityTypeIdentifier;
-import org.matsim.core.utils.misc.Time;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -50,9 +50,11 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 		Logger.getLogger(SynchronizeCoTravelerPlansAlgorithm.class);
 
 	private final Set<String> stageTypes;
+	private final TimeInterpretation timeInterpretation;
 
-	public SynchronizeCoTravelerPlansAlgorithm() {
+	public SynchronizeCoTravelerPlansAlgorithm(TimeInterpretation timeInterpretation) {
 		this.stageTypes = JointActingTypes.JOINT_STAGE_ACTS;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -87,20 +89,17 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			if ( pe instanceof Activity && 
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
-				((Activity) pe).setMaximumDuration( Time.UNDEFINED_TIME );
+				((Activity) pe).setMaximumDurationUndefined();
 				((Activity) pe).setEndTime( now > 0 ? now : 0 );
 				return;
 			}
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final Route route = leg.getRoute();
+				final OptionalTime legDur = timeInterpretation.decideOnLegTravelTime(leg);
 
-				final double legDur = route != null && route.getTravelTime() != Time.UNDEFINED_TIME ?
-					route.getTravelTime() : leg.getTravelTime();
-
-				if ( legDur != Time.UNDEFINED_TIME ) {
-					now -= legDur;
+				if ( legDur.isDefined()) {
+					now -= legDur.seconds();
 				}
 				else {
 					log.warn( "no time in leg "+leg );
@@ -129,20 +128,16 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			if ( pe instanceof Activity &&
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
-				final double endTime = ((Activity) pe).getEndTime();
-				if ( endTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "undefined end time" );
-				return endTime + tt;
+				final OptionalTime endTime = ((Activity)pe).getEndTime();
+				return endTime.seconds() + tt;
 			}
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final Route route = leg.getRoute();
+				final OptionalTime legDur = timeInterpretation.decideOnLegTravelTime(leg);
 
-				final double legDur = route != null && route.getTravelTime() != Time.UNDEFINED_TIME ?
-					route.getTravelTime() : leg.getTravelTime();
-
-				if ( legDur != Time.UNDEFINED_TIME ) {
-					tt += legDur;
+				if ( legDur.isDefined()) {
+					tt += legDur.seconds();
 				}
 				else {
 					log.warn( "no time in leg "+leg );

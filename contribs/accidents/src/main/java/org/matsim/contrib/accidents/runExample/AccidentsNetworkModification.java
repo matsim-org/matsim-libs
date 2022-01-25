@@ -20,12 +20,15 @@
 package org.matsim.contrib.accidents.runExample;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
+import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.locationtech.jts.geom.Coordinate;
@@ -35,6 +38,7 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accidents.AccidentsConfigGroup;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -55,22 +59,25 @@ public class AccidentsNetworkModification {
 		this.scenario = scenario;
 	}
 	
-	public void setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String placesOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) {
+	public Network setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) throws MalformedURLException, IOException {
 		
 		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 		
 		Map<String, SimpleFeature> landUseFeaturesBB = new HashMap<>();
 		Map<String, String> landUseDataBB = new HashMap<>();
 
-		Map<String, SimpleFeature> popDensityFeatures = new HashMap<>();
-		Map<String, Double> popDensityData = new HashMap<>();
 		
 		log.info("Initializing all link-specific information...");
 						
 		if (landuseOsmFile == null) {
 			log.warn("Landuse shape file is null. Using default values...");
 		} else {
-			SimpleFeatureSource ftsLandUseBB = ShapeFileReader.readDataFile(landuseOsmFile);		
+			SimpleFeatureSource ftsLandUseBB;
+			if (!landuseOsmFile.startsWith("http")) {
+				ftsLandUseBB = ShapeFileReader.readDataFile(landuseOsmFile);		
+			} else {
+				ftsLandUseBB = FileDataStoreFinder.getDataStore(new URL(landuseOsmFile)).getFeatureSource();
+			}		
 			try (SimpleFeatureIterator itLandUseBB = ftsLandUseBB.getFeatures().features()) {
 				while (itLandUseBB.hasNext()) {
 					SimpleFeature ftLandUseBB = itLandUseBB.next();
@@ -88,26 +95,6 @@ public class AccidentsNetworkModification {
 			}
 		}
 		
-		if (placesOsmFile == null) {
-			log.warn("Places shape file is null. Using default values...");
-		} else {
-			SimpleFeatureSource ftsPlaces = ShapeFileReader.readDataFile(placesOsmFile);
-			try (SimpleFeatureIterator itPlaces = ftsPlaces.getFeatures().features()){
-				while (itPlaces.hasNext()){
-					SimpleFeature ftPlaces = itPlaces.next();
-					String osmId = ftPlaces.getAttribute("osm_id").toString();
-					double popDensity = Double.parseDouble(ftPlaces.getAttribute("pop_dens").toString());
-					popDensityFeatures.put(osmId, ftPlaces);
-					popDensityData.put(osmId, popDensity);
-				}
-				itPlaces.close();
-				DataStore ds = (DataStore) ftsPlaces.getDataStore();
-				ds.dispose();
-				log.info("Reading shp file for population density... Done.");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 
 		int linkCounter = 0;
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
@@ -117,7 +104,7 @@ public class AccidentsNetworkModification {
 			}
 			linkCounter++;			
 			
-			link.getAttributes().putAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName(), AccidentsConfigGroup.AccidentsComputationMethod.BVWP);
+			link.getAttributes().putAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName(), AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString());
 							
 			ArrayList<Integer> bvwpRoadType = new ArrayList<>();
 			
@@ -179,6 +166,7 @@ public class AccidentsNetworkModification {
 			link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, bvwpRoadType.get(0) + "," + bvwpRoadType.get(1) + "," + bvwpRoadType.get(2));
 		}
 		log.info("Initializing all link-specific information... Done.");
+		return scenario.getNetwork();
 	}
 	
 	private String getOSMLandUseFeatureBBId(Link link, Map<String, SimpleFeature> landUseFeaturesBB, String osmCRS) {

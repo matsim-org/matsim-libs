@@ -45,7 +45,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 /**
  * @author dziemke
  */
-public class VoronoiGeometryUtils {
+class VoronoiGeometryUtils {
 	private final static Logger LOG = Logger.getLogger(VoronoiGeometryUtils.class);
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();

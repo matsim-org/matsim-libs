@@ -19,21 +19,18 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.EMPTY_DRIVE;
+
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 
-public class TaxiEmptyDriveTask extends DriveTaskImpl implements TaxiTask {
-	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
-		super(path);
-	}
+import com.google.common.base.Preconditions;
 
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.EMPTY_DRIVE;
-	}
+public class TaxiEmptyDriveTask extends DefaultDriveTask {
+	public static final TaxiTaskType TYPE = new TaxiTaskType(EMPTY_DRIVE);
 
-	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	public TaxiEmptyDriveTask(VrpPathWithTravelData path, TaxiTaskType taskType) {
+		super(taskType, path);
+		Preconditions.checkArgument(taskType.getBaseType().get() == EMPTY_DRIVE);
 	}
 }

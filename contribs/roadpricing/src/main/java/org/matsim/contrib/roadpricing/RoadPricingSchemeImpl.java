@@ -20,7 +20,12 @@
 
 package org.matsim.contrib.roadpricing;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
 public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	// currently needs to be public. kai, sep'14
 
-	private static Logger log = Logger.getLogger(RoadPricingSchemeImpl.class);
+	private static final Logger log = Logger.getLogger(RoadPricingSchemeImpl.class);
 
 	private Map<Id<Link>, List<Cost>> linkIds;
 

@@ -54,7 +54,6 @@ public class OnlyTimeDependentTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
-		return this.travelTime.getLinkTravelTime(link, Time.UNDEFINED_TIME, null, null);
+		return link.getLength() / link.getFreespeed();
 	}
-	
 }

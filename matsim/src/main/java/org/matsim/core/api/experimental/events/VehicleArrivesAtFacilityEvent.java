@@ -42,7 +42,7 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 
 	private final Id<Vehicle> vehicleId;
 	private final Id<TransitStopFacility> facilityId;
-	private final double delay;
+	private double delay;
 
 	public VehicleArrivesAtFacilityEvent(final double time, final Id<Vehicle> vehicleId, 
 			final Id<TransitStopFacility> facilityId, double delay) {
@@ -51,7 +51,13 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 		this.facilityId = facilityId;
 		this.delay = delay;
 	}
-	
+
+	/*
+	 * Why is this getter deprecated? There is no obvious and simple alternative way to find the delay. The only
+	 * alternative seems to be to try to indentify the transitLine, transitRoute and departure and its TransitRouteStop.
+	 * That is cumbersome and not even a unique value (imagine the vehicle serves the same stop multiple times).
+	 * vsp-gleich april'21
+	 */
 	@Deprecated
 	public double getDelay() {
 		return this.delay;
@@ -68,6 +74,10 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	public void setDelay(double delay) {
+		this.delay = delay;
 	}
 
 	@Override

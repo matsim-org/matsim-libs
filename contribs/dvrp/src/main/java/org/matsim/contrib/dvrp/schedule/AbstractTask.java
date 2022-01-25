@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -32,15 +33,23 @@ public abstract class AbstractTask implements Task {
 	TaskStatus status;
 	// ==== END: fields managed by ScheduleImpl
 
+	private final TaskType taskType;
+
 	private double beginTime;
 	private double endTime;
 
 	private TaskTracker taskTracker;
 
-	public AbstractTask(double beginTime, double endTime) {
+	AbstractTask(TaskType taskType, double beginTime, double endTime) {
 		Preconditions.checkArgument(beginTime <= endTime, "beginTime=%s; endTime=%s", beginTime, endTime);
+		this.taskType = Preconditions.checkNotNull(taskType);
 		this.beginTime = beginTime;
 		this.endTime = endTime;
+	}
+
+	@Override
+	public final TaskType getTaskType() {
+		return taskType;
 	}
 
 	@Override
@@ -89,7 +98,14 @@ public abstract class AbstractTask implements Task {
 		this.taskTracker = taskTracker;
 	}
 
-	protected String commonToString() {
-		return " [" + beginTime + " : " + endTime + "]";
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("taskType", taskType)
+				.add("taskIdx", taskIdx)
+				.add("status", status)
+				.add("beginTime", beginTime)
+				.add("endTime", endTime)
+				.toString();
 	}
 }

@@ -20,7 +20,7 @@
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
@@ -38,27 +38,27 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
  * @author thibautd
  */
 public class TourModeUnifierAlgorithm implements PlanAlgorithm {
-	private final Set<String> stages; // formerly StageActivityTypes
+	private final Predicate<String> isStageActivity; // formerly StageActivityTypes
 	private final SubtourModeIdentifier modeIdentifier;
 
 	public TourModeUnifierAlgorithm(
-			final Set<String> stages,
+			final Predicate<String> isStageActivity,
 			final MainModeIdentifier modeIdentifier) {
-		this( stages,
+		this( isStageActivity,
 				new SubtourFirstModeIdentifier(
 					modeIdentifier ) );
 	}
 
 	public TourModeUnifierAlgorithm(
-			final Set<String> stages,
+			final Predicate<String> isStageActivity,
 			final SubtourModeIdentifier modeIdentifier) {
-		this.stages = stages;
+		this.isStageActivity = isStageActivity;
 		this.modeIdentifier = modeIdentifier;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		for ( Subtour subtour : TripStructureUtils.getSubtours( plan , stages ) ) {
+		for ( Subtour subtour : TripStructureUtils.getSubtours( plan , isStageActivity ) ) {
 			// not clear what we should do with open tours
 			if ( !subtour.isClosed() ) continue;
 			// only consider "root" tours: tours without (closed) parent

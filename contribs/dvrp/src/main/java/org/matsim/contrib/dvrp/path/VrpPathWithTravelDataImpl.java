@@ -91,4 +91,9 @@ public class VrpPathWithTravelDataImpl implements VrpPathWithTravelData {
 	public Iterator<Link> iterator() {
 		return Iterators.forArray(links);
 	}
+
+	@Override
+	public VrpPathWithTravelData withDepartureTime(double newDepartureTime) {
+		return new VrpPathWithTravelDataImpl(newDepartureTime, travelTime, links, linkTTs);
+	}
 }

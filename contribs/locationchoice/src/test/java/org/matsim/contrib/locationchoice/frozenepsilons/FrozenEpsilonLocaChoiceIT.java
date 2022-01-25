@@ -1,7 +1,17 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import static org.junit.Assert.*;
+import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.ApproximationLevel;
+import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -23,6 +33,7 @@ import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -54,19 +65,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
-import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
-import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
-import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.ApproximationLevel;
-import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
@@ -86,6 +86,8 @@ public class FrozenEpsilonLocaChoiceIT{
 	 * For Maven, the surefire-plugin can be configured to run each test individually in a separate JVM which
 	 * solves this problem, but I don't know how to solve this in IntelliJ or Eclipse.
 	 * -mrieser/2019Sept26
+	 *
+	 * Confirmed: This tests fails when called AFTER BestReplyIT, michalm/mar'20
 	 */
 	@Test
 	public void testLocationChoiceJan2013() {
@@ -94,16 +96,17 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+                {
+                        FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class );
 
-		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class );;
+                        dccg.setAlgorithm( bestResponse );
+                        // yy I don't think that this is honoured anywhere in the way this is plugged together here.  kai, mar'19
 
-		dccg.setAlgorithm( bestResponse );
-		// yy I don't think that this is honoured anywhere in the way this is plugged together here.  kai, mar'19
-
-		dccg.setEpsilonScaleFactors("100.0");
-		dccg.setRandomSeed(4711);
-		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
-
+                        dccg.setEpsilonScaleFactors( "100.0" );
+                        dccg.setRandomSeed( 4711 );
+                        dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
+                }
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config );
@@ -153,7 +156,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		System.err.println( " newWork: " + newWork ) ;
@@ -411,16 +414,16 @@ public class FrozenEpsilonLocaChoiceIT{
 						}
 						// Note that the following "check" method is deliberately a bit imprecise (see implementation), since we are only interested in the
 						// (approximate) distribution.  kai, mar'19
-						check( 684, cnt[0] );
-						check( 380, cnt[1] ) ;
-						check( 408, cnt[2] ) ;
-						check( 304, cnt[3] ) ;
-						check( 122, cnt[4] ) ;
-						check( 66, cnt[5] ) ;
-						check( 16, cnt[6] ) ;
-						check( 18, cnt[7] ) ;
-						check( 8, cnt[8] ) ;
-
+						check( 1104, cnt[0] );
+						check( 474, cnt[1] );
+						check( 264, cnt[2] );
+						check( 96, cnt[3] );
+						check( 34, cnt[4] );
+						check( 22, cnt[5] );
+						check( 4, cnt[6] );
+						check( 0, cnt[7] );
+						check( 0, cnt[8] );
+						check( 2, cnt[9] );
 					}
 
 					void check( double val, double actual ){

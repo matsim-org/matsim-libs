@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -43,20 +43,20 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 
 	private final TravelDisutility delegate;
 	private final DecongestionInfo info;
-	private final double sigma;
 	private final double timeBinSize;
 	private final double marginalUtilityOfMoney;
+	private final double sigma;
 
-	TollTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma, DecongestionInfo info) {
+	TollTimeDistanceTravelDisutility( final TravelTime timeCalculator, Config config, DecongestionInfo info ) {
 		this.info = info;
-		this.marginalUtilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		this.sigma = sigma;
-		
-		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup );
-		builder.setSigma(sigma);
-		this.delegate = builder.createTravelDisutility(timeCalculator);
+		this.marginalUtilityOfMoney = config.planCalcScore().getMarginalUtilityOfMoney();
+
+		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config );
+                this.delegate = builder.createTravelDisutility(timeCalculator);
 
 		this.timeBinSize = info.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+
+		this.sigma = config.plansCalcRoute().getRoutingRandomness();
 		
 		log.info("Using the toll-adjusted travel disutility (improved version) in the decongestion package.");
 	}

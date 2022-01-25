@@ -238,7 +238,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		final List<Subchain> potentialSubchains = new ArrayList<Subchain>();
 
 		Trip accessTrip = null;
-		for ( Trip trip : TripStructureUtils.getTrips( plan , stageActivityTypes ) ) {
+		for ( Trip trip : TripStructureUtils.getTrips( plan , stageActivityTypes::contains ) ) {
 			if ( accessTrip != null ) {
 				assert accessTrip.getDestinationActivity() == trip.getOriginActivity() : accessTrip.getDestinationActivity()+" != "+trip.getOriginActivity();
 				potentialSubchains.add(

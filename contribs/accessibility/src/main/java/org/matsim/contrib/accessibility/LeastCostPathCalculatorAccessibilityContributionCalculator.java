@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -17,7 +16,7 @@ import java.util.Map;
 /**
  * @author thibautd, michaz
  */
-public final class LeastCostPathCalculatorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
+final class LeastCostPathCalculatorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private final LeastCostPathCalculator leastCostPathCalculator;
 	private final PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	private Node fromNode;

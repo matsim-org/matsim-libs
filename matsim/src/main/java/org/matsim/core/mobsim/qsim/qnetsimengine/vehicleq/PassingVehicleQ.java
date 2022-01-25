@@ -21,7 +21,11 @@
 
  package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
 
-import java.util.*;
+import java.util.AbstractQueue;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 

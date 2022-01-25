@@ -21,9 +21,8 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-
-import javax.validation.constraints.PositiveOrZero;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -70,8 +69,14 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private int numberOfThreads = 2;
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String NUMBER_OF_THREADS_CMT = "\"global\" number of threads.  "
-							     + "This number is used, e.g., for replanning, but NOT in the mobsim.  "
-							     + "This can typically be set to as many cores as you have available, or possibly even slightly more.";
+			+ "This number is used, e.g., for replanning, but NOT in QSim.  "
+			+ "This can typically be set to as many cores as you have available, or possibly even slightly more.";
+
+    private static final String DEFAULT_DELIMITER = "defaultDelimiter";
+    private static final String DEFAULT_DELIMITER_CMT = "Default Delimiter for CSV files. May not be recognized by all writers.";
+    @NotBlank
+    private String defaultDelimiter = ";";
+
 	/**
 	 * @return {@link #NUMBER_OF_THREADS_CMT}
 	 */
@@ -110,4 +115,13 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		this.insistingOnDeprecatedConfigVersion = val ;
 	}
 
+    @StringGetter(DEFAULT_DELIMITER)
+    public String getDefaultDelimiter() {
+        return defaultDelimiter;
+    }
+
+    @StringSetter(DEFAULT_DELIMITER)
+    public void setDefaultDelimiter(String defaultDelimiter) {
+        this.defaultDelimiter = defaultDelimiter;
+    }
 }

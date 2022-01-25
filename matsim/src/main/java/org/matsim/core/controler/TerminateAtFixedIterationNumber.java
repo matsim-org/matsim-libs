@@ -19,14 +19,13 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
-
-import org.matsim.core.config.groups.ControlerConfigGroup;
+package org.matsim.core.controler;
 
 import javax.inject.Inject;
 
-class TerminateAtFixedIterationNumber implements TerminationCriterion {
+import org.matsim.core.config.groups.ControlerConfigGroup;
 
+class TerminateAtFixedIterationNumber implements TerminationCriterion {
 	private final int lastIteration;
 
 	@Inject
@@ -35,8 +34,13 @@ class TerminateAtFixedIterationNumber implements TerminationCriterion {
 	}
 
 	@Override
-	public boolean continueIterations(int iteration) {
-		return (iteration <= lastIteration);
+	public boolean mayTerminateAfterIteration(int iteration) {
+		return iteration >= lastIteration;
+	}
+
+	@Override
+	public boolean doTerminate(int iteration) {
+		return iteration >= lastIteration;
 	}
 
 }

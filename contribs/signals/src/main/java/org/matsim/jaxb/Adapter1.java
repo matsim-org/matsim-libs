@@ -10,10 +10,7 @@ package org.matsim.jaxb;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class Adapter1
-    extends XmlAdapter<String, Integer>
-{
-
+public final class Adapter1 extends XmlAdapter<String, Integer> {
 
     public Integer unmarshal(String value) {
         return (javax.xml.bind.DatatypeConverter.parseInt(value));

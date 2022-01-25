@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -61,7 +61,7 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 	@Override
 	public Trip findTrip(Leg prevLeg, double earliestDepartureTime_s) {
 
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) prevLeg.getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) prevLeg.getRoute();
 		TransitLine line = this.transitLines.get(route.getLineId());
 		TransitRoute transitRoute = line.getRoutes().get(route.getRouteId());
 
@@ -71,7 +71,7 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 		return new Trip(null, accessTime_s, egressTime_s);
 	}
 
-	private double findTransitTravelTime(ExperimentalTransitRoute route, double prevEndTime) {
+	private double findTransitTravelTime(TransitPassengerRoute route, double prevEndTime) {
 		double travelTime = 0;
 		double prevStopTime = prevEndTime;
 		TransitRouteImpl transitRoute = (TransitRouteImpl) transitLines.get(route.getLineId()).getRoutes()

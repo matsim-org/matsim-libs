@@ -21,6 +21,10 @@ package org.matsim.contrib.ev.example;/*
  * created by jbischoff, 19.03.2019
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,10 +46,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Runs a sample EV run using a vehicle consumption model designed at LTH in Lund which takes the speed and the slope of a link into account.
@@ -100,6 +100,7 @@ public class RunEvExamplewithLTHConsumptionModel {
 					@Override
 					protected void configureQSim() {
 						bind(VehicleChargingHandler.class).asEagerSingleton();
+						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
 					}
 				});
 			}

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -54,7 +54,7 @@ public class TransitPerformanceFromPSimSpecificImplementation implements Transit
 	@Override
 	public Trip findTrip(Leg prevLeg, double earliestDepartureTime_s) {
 
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) prevLeg.getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) prevLeg.getRoute();
 		Id accessStopId = route.getAccessStopId();
 		Id egressStopId = route.getEgressStopId();
 

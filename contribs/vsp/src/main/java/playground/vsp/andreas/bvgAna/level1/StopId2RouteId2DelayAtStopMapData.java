@@ -47,8 +47,8 @@ public class StopId2RouteId2DelayAtStopMapData {
 	}
 	
 	public void addDepartureEvent(VehicleDepartsAtFacilityEvent departureEvent){
-		this.plannedDepartures.add(new Double(departureEvent.getTime() - departureEvent.getDelay()));
-		this.realizedDepartures.add(new Double(departureEvent.getTime()));
+		this.plannedDepartures.add(departureEvent.getTime() - departureEvent.getDelay());
+		this.realizedDepartures.add(departureEvent.getTime());
 	}
 	
 	public ArrayList<Double> getPlannedDepartures() {

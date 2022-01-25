@@ -76,6 +76,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -106,6 +107,8 @@ public class CreateAutomatedFDTest {
 	private final Map<Id<Person>,String> person2Mode = new HashMap<>();
 
 	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1};")
+	// the convention is that the output of the method marked by "@Parameters" is taken as input to the constructor
+	// before running each test. kai, jul'16
 	public static Collection<Object[]> createFds() {
 		int combos = LinkDynamics.values().length * TrafficDynamics.values().length ;
 		Object [][] combos2run = new Object [combos][2]; // #ld x #td x #params
@@ -118,8 +121,6 @@ public class CreateAutomatedFDTest {
 		}
 		return Arrays.asList(combos2run);
 		
-		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
-		// before running each test. kai, jul'16
 	}
 
 	@Test
@@ -150,7 +151,7 @@ public class CreateAutomatedFDTest {
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
-	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 
 	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
@@ -319,13 +320,13 @@ public class CreateAutomatedFDTest {
 		}
 	}
 	
-	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
+	class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
-		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
-		private static final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
-		private static final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
-		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
-		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+		private final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
+		private final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
+		private final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
+		private final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
 
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
@@ -439,7 +440,7 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public Double getExpectedTravelTime() {
+		public OptionalTime getExpectedTravelTime() {
 			throw new RuntimeException("not implemented");
 		}
 

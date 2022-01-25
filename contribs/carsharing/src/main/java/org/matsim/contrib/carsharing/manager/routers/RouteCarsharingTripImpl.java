@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -53,8 +54,6 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
 	private final String[] egressCSLegs = { "egress_walk_ow", "egress_walk_tw", "egress_walk_ff" };
 
-	private final String[] csInteraction = { "ow_interaction", "tw_interaction", "ff_interaction" };
-
 	@Override
 	public List<PlanElement> routeCarsharingTrip(Plan plan, Leg legToBeRouted, double time, CSVehicle vehicle,
 			Link vehicleLinkLocation, Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle) {
@@ -84,8 +83,8 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
 			if (!keepTheCarForLaterUse) {
 
-				Activity activityE = scenario.getPopulation().getFactory()
-						.createActivityFromLinkId(csInteraction[index], parkingLocation.getId());
+				Activity activityE = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
+						parkingLocation.getId(), mainMode);
 				activityE.setMaximumDuration(0);
 
 				trip.add(activityE);
@@ -99,8 +98,8 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 			trip.add(RouterUtils.createWalkLeg(scenario.getPopulation().getFactory(), currentLink, vehicleLinkLocation,
 					accessCSLegs[index], time));
 
-			Activity activityS = scenario.getPopulation().getFactory().createActivityFromLinkId(csInteraction[index],
-					vehicleLinkLocation.getId());
+			Activity activityS = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
+					vehicleLinkLocation.getId(), mainMode);
 			activityS.setMaximumDuration(0);
 
 			trip.add(activityS);
@@ -111,8 +110,8 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 						this.networkFF.getLinks().get(vehicleLinkLocation.getId()),
 						this.networkFF.getLinks().get(parkingLocation.getId()), carsharingVehicleLegs[index], ffVehId,
 						time));
-				Activity activityE = scenario.getPopulation().getFactory()
-						.createActivityFromLinkId(csInteraction[index], parkingLocation.getId());
+				Activity activityE = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
+						parkingLocation.getId(), mainMode);
 				activityE.setMaximumDuration(0);
 
 				trip.add(activityE);

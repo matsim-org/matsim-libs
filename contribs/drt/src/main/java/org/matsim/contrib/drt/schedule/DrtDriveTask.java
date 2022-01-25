@@ -19,19 +19,18 @@
 
 package org.matsim.contrib.drt.schedule;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 
 /**
  * @author michalm
  */
-public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
-	public DrtDriveTask(VrpPathWithTravelData path) {
-		super(path);
-	}
+public class DrtDriveTask extends DefaultDriveTask {
+	public static final DrtTaskType TYPE = new DrtTaskType(DRIVE);
 
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.DRIVE;
+	public DrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType) {
+		super(taskType, path);
 	}
 }

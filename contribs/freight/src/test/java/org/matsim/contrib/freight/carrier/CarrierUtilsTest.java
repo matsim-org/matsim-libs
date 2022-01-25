@@ -50,8 +50,8 @@ public class CarrierUtilsTest {
 	public void testAddAndGetVehicleToCarrier() {
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"));
-		carrierVehicle.setType(VehicleUtils.getDefaultVehicleType());
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),VehicleUtils.getDefaultVehicleType());
+//		carrierVehicle.setType(VehicleUtils.getDefaultVehicleType());
 
 		//add Vehicle
 		CarrierUtils.addCarrierVehicle(carrier, carrierVehicle);
@@ -108,6 +108,16 @@ public class CarrierUtilsTest {
 		Assert.assertEquals(service1.getId(), carrierShipment1b.getId());
 		Assert.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getFrom());
 		Assert.assertEquals(20, carrierShipment1b.getSize(), EPSILON);
+	}
+
+	@Test
+	public void testGetSetJspritIteration(){
+		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
+		//jspirtIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
+		Assert.assertEquals(Integer.MIN_VALUE, CarrierUtils.getJspritIterations(carrier) );
+
+		CarrierUtils.setJspritIterations(carrier, 125);
+		Assert.assertEquals(125, CarrierUtils.getJspritIterations(carrier) );
 	}
 	
 }

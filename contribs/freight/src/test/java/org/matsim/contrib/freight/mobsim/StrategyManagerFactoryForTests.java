@@ -44,17 +44,16 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
         @Override
         public double getLinkTravelDisutility(final Link link,
                                               final double time, final Person person, final Vehicle vehicle) {
-            double genCosts = link.getLength() * cost_per_m
-                    + travelTime.getLinkTravelTime(link, time, null, null) * cost_per_s;
-            // double genCosts = travelTime.getLinkTravelTime(link,
-            // time)*cost_per_s;
-            return genCosts;
+            return disutility(link.getLength(),  travelTime.getLinkTravelTime(link, time, null, null));
         }
 
         @Override
         public double getLinkMinimumTravelDisutility(Link link) {
-            return getLinkTravelDisutility(link, Time.UNDEFINED_TIME, null,
-                    null);
+            return disutility(link.getLength(),  link.getLength() / link.getFreespeed());
+        }
+
+        private double disutility(double distance, double time) {
+            return distance * cost_per_m + time * cost_per_s;
         }
     }
 

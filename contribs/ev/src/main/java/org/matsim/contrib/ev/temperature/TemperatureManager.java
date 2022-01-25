@@ -44,8 +44,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
 
 public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimInitializedListener {
-	private Queue<TemperatureChange> temperatureChanges = new LinkedList<>();
-	private List<TemperatureChange> temperatureChangeList = new ArrayList<>();
+	private final Queue<TemperatureChange> temperatureChanges = new LinkedList<>();
+	private final List<TemperatureChange> temperatureChangeList = new ArrayList<>();
 
 	private final EventsManager events;
 
@@ -86,10 +86,10 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 		temperatureChanges.addAll(temperatureChangeList);
 	}
 
-	class TemperatureChange implements Comparable<TemperatureChange> {
-		Double time;
-		double temperature;
-		Id<Link> linkId;
+	static class TemperatureChange implements Comparable<TemperatureChange> {
+		final Double time;
+		final double temperature;
+		final Id<Link> linkId;
 
 		public TemperatureChange(double time, double temperature, Id<Link> linkId) {
 			this.time = time;

@@ -22,7 +22,7 @@ package org.matsim.contrib.dynagent;
 import java.util.function.DoubleSupplier;
 
 /**
- * endTime is not subject to change
+ * endTime may be subject to change (when computed with DoubleSupplier)
  *
  * @author michalm
  */

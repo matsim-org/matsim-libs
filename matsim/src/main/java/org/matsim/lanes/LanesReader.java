@@ -152,7 +152,7 @@ public final class LanesReader implements MatsimReader {
 						// the attribute was read as String. This is inconsistent with the way attributes are read normally,
 						// and I cannot see a use for it, so I just ignored the attribute, as is done in other readers.
 						// td, apr 18
-						if (attribute != null) lane.getAttributes().putAttribute(att.getKey(), attribute);
+						if (attribute != null) lane.getAttributes().putAttribute(att.getName(), attribute);
 					}
 				}
 

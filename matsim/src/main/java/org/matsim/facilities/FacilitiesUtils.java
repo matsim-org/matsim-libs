@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.router.LinkWrapperFacilityWithSpecificCoord;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -160,6 +161,9 @@ public class FacilitiesUtils {
 
 	public static Facility wrapLink( final Link link ) {
 		return new LinkWrapperFacility( link ) ;
+	}
+	public static Facility wrapLinkAndCoord(final Link link, final Coord coord){
+		return new LinkWrapperFacilityWithSpecificCoord(link,coord);
 	}
 
 	/**

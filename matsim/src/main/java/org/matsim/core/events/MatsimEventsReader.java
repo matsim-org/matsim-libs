@@ -28,9 +28,11 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.events.EventsReaderXMLv1.CustomEventMapper;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -46,10 +48,14 @@ public final class MatsimEventsReader implements MatsimReader {
 	private final static Logger log = Logger.getLogger(MatsimEventsReader.class);
 	private final EventsManager events;
 
-	private final Map<String, CustomEventMapper> map = new LinkedHashMap<>(  ) ;
+	private final Map<String, CustomEventMapper> customEventMappers = new LinkedHashMap<>();
 
-	public void addCustomEventMapper( String eventType, CustomEventMapper mapper ) {
-		map.put( eventType, mapper ) ;
+	public interface CustomEventMapper {
+		Event apply(GenericEvent event);
+	}
+
+	public void addCustomEventMapper(String eventType, CustomEventMapper mapper) {
+		this.customEventMappers.put(eventType, mapper);
 	}
 
 	/**
@@ -69,8 +75,12 @@ public final class MatsimEventsReader implements MatsimReader {
 	@Override
 	public void readFile(final String filename) {
 		String lcFilename = filename.toLowerCase(Locale.ROOT);
-		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
-			new XmlEventsReader(this.events, map ).readFile(filename );
+		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz") || lcFilename.endsWith(".xml.zst") || lcFilename.endsWith(".xml.lz4")) {
+			new XmlEventsReader(this.events, this.customEventMappers).readFile(filename );
+		} else if (lcFilename.endsWith(".ndjson") || lcFilename.endsWith(".ndjson.gz") || lcFilename.endsWith(".ndjson.zst")) {
+			EventsReaderJson reader = new EventsReaderJson(this.events);
+			customEventMappers.forEach(reader::addCustomEventMapper);
+			reader.parse(filename);
 		} else if (lcFilename.endsWith(".txt") || lcFilename.endsWith(".txt.gz")) {
 			throw new RuntimeException("text events are no longer supported. Please use MATSim 0.6.1 or earlier to read text events.");
 		} else {
@@ -78,13 +88,36 @@ public final class MatsimEventsReader implements MatsimReader {
 		}
 	}
 
+	@Deprecated // use readStream(InputStream, EventsFileFormat)
 	public void readStream(final InputStream stream) {
-		new XmlEventsReader(this.events, map ).parse(stream );
+		new XmlEventsReader(this.events, this.customEventMappers).parse(stream );
+	}
+
+	public void readStream(final InputStream stream, final ControlerConfigGroup.EventsFileFormat format) {
+		switch (format) {
+			case xml:
+				new XmlEventsReader(this.events, this.customEventMappers).parse(stream);
+				break;
+			case pb:
+				throw new UnsupportedOperationException(
+						"PB (Protobuf) is currently not supported to read from a stream");
+			case json:
+				EventsReaderJson reader = new EventsReaderJson(this.events);
+				customEventMappers.forEach(reader::addCustomEventMapper);
+				reader.parse(stream);
+				break;
+		}
 	}
 
 	@Override
 	public void readURL( final URL url ) {
-		new XmlEventsReader( this.events, map ).readURL( url );
+		if (url.getFile().contains(".xml")) {
+			new XmlEventsReader( this.events, this.customEventMappers).readURL( url );
+		} else if (url.getFile().contains(".ndjson")) {
+			EventsReaderJson reader = new EventsReaderJson(this.events);
+			customEventMappers.forEach(reader::addCustomEventMapper);
+			reader.parse(url);
+		}
 	}
 
 	private static class XmlEventsReader extends MatsimXmlParser {
@@ -129,9 +162,7 @@ public final class MatsimEventsReader implements MatsimReader {
 			// Currently the only events-type is v1
 			if (EVENTS_V1.equals(doctype)) {
 				this.delegate = new EventsReaderXMLv1(this.events);
-				for( Map.Entry<String, CustomEventMapper> entry : map.entrySet() ){
-					this.delegate.addCustomEventMapper( entry.getKey(),entry.getValue() );
-				}
+				map.forEach(delegate::addCustomEventMapper);
 				log.info("using events_v1-reader.");
 			} else {
 				throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

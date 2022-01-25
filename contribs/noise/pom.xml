@@ -3,31 +3,54 @@
     <parent>
         <groupId>org.matsim</groupId>
         <artifactId>contrib</artifactId>
-        <version>12.0-SNAPSHOT</version>
+        <version>14.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim.contrib</groupId>
     <artifactId>noise</artifactId>
     <name>noise</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>analysis</artifactId>
-            <version>12.0-SNAPSHOT</version>
+            <version>14.0-SNAPSHOT</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
-			<version>21.1</version>
+            <version>${geotools.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-coverage</artifactId>
+            <version>${geotools.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geotiff</artifactId>
+            <version>${geotools.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-xml</artifactId>
+			<version>0.47</version>
+			<exclusions>
+				<!-- needed to compile in IntelliJ with Eclipse compiler -->
+				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
     </dependencies>
 </project>

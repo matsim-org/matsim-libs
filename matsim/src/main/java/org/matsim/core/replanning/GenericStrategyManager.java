@@ -72,18 +72,18 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 
 	private PlanSelector<PL, AG> removalPlanSelector = new GenericWorstPlanForRemovalSelector<>();
 
-	private String subpopulationAttributeName = null;
+//	private String subpopulationAttributeName = null;
 	
 	public GenericStrategyManager() {
 	}
 
-	/**
-	 * @param name the name of the subpopulation attribute
-	 * in the person's object attributes.
-	 */
-	public final void setSubpopulationAttributeName(final String name) {
-		this.subpopulationAttributeName = name;
-	}
+//	/**
+//	 * @param name the name of the subpopulation attribute
+//	 * in the person's object attributes.
+//	 */
+//	public final void setSubpopulationAttributeName(final String name) {
+//		this.subpopulationAttributeName = name;
+//	}
 
 	/**
 	 * Adds a strategy to this manager with the specified weight. This weight
@@ -203,10 +203,11 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 			}
 
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
-			String subpopName = null;
-			if (this.subpopulationAttributeName != null) {
-				subpopName = (String) PopulationUtils.getPersonAttribute( person, this.subpopulationAttributeName) ;
-			}
+//			String subpopName = null;
+//			if (this.subpopulationAttributeName != null) {
+//				subpopName = (String) PopulationUtils.getPersonAttribute( person, this.subpopulationAttributeName) ;
+//			}
+			String subpopName = PopulationUtils.getSubpopulation( person );
 			GenericPlanStrategy<PL, AG> strategy = this.chooseStrategy(person, subpopName);
 
 			if (strategy==null) {

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ScoringFunctionsForPopulationStressIT.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring;
+package org.matsim.core.scoring;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -72,8 +71,8 @@ public class ScoringFunctionsForPopulationStressIT {
 				scenario.getPopulation(),
 				throwingScoringFunctionFactory
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0);
-		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
+		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
 		scoringFunctionsForPopulation.finishScoringFunctions();
 	}
 
@@ -103,6 +102,11 @@ public class ScoringFunctionsForPopulationStressIT {
 				
 				@Override
 				public void addMoney(double amount) {
+					throw new RuntimeException();
+				}
+
+				@Override
+				public void addScore(double amount) {
 					throw new RuntimeException();
 				}
 
@@ -184,6 +188,11 @@ public class ScoringFunctionsForPopulationStressIT {
 					}
 
 					@Override
+					public void addScore(double amount) {
+						delegateFunction.addScore(amount);
+					}
+
+					@Override
 					public void finish() {
 						delegateFunction.finish();
 					}
@@ -202,8 +211,6 @@ public class ScoringFunctionsForPopulationStressIT {
 		};
 		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
 		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
-		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
-		events.addHandler(e2legsActs);
 
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
 				controlerListenerManager,
@@ -213,15 +220,14 @@ public class ScoringFunctionsForPopulationStressIT {
 				scenario.getPopulation(),
 				scoringFunctionFactory
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0);
+		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
-			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
-			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
-			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
-			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
-			events.processEvent(new PersonArrivalEvent(i*200+200, personId, Id.createLinkId(0), "car"));
-			events.afterSimStep(i*200+200);
+			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator", null));
+			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work", null));
+			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work", null));
+			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car", "car"));
+			events.processEvent(new PersonArrivalEvent(i*200+190, personId, Id.createLinkId(0), "car"));
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
@@ -316,6 +322,16 @@ public class ScoringFunctionsForPopulationStressIT {
 					}
 
 					@Override
+					public void addScore(double amount) {
+						try {
+							Thread.sleep(MatsimRandom.getRandom().nextInt(1000));
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						delegateFunction.addScore(amount);
+					}
+
+					@Override
 					public void finish() {
 						try {
 							Thread.sleep(MatsimRandom.getRandom().nextInt(1000));
@@ -351,14 +367,14 @@ public class ScoringFunctionsForPopulationStressIT {
 				scenario.getPopulation(),
 				scoringFunctionFactory
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0);
+		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
-			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
+			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
-			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
+			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car", "car"));
 			events.processEvent(new PersonArrivalEvent(i*200+200, personId, Id.createLinkId(0), "car"));
 		}
 		events.finishProcessing();

@@ -19,10 +19,6 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,9 +41,13 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class NetworkSink implements SinkSource {
 
-	private static Logger log = Logger.getLogger(NetworkSink.class);
+	private static final  Logger log = Logger.getLogger(NetworkSink.class);
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private final CoordinateTransformation transform;
@@ -101,8 +101,8 @@ public class NetworkSink implements SinkSource {
 
 
 	@Override
-	public void release() {
-		sink.release();
+	public void close() {
+		sink.close();
 	}
 
 	private void createLink(final Network network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {

@@ -46,8 +46,8 @@ public final class TransitRouterNetworkWW implements Network {
 
 	private final static Logger log = Logger.getLogger(TransitRouterNetworkWW.class);
 	
-	private final Map<Id<Link>, TransitRouterNetworkLink> links = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
-	private final Map<Id<Node>, TransitRouterNetworkNode> nodes = new LinkedHashMap<Id<Node>, TransitRouterNetworkNode>();
+	private final Map<Id<Link>, TransitRouterNetworkLink> links = new LinkedHashMap<>();
+	private final Map<Id<Node>, TransitRouterNetworkNode> nodes = new LinkedHashMap<>();
 	protected QuadTree<TransitRouterNetworkNode> qtNodes = null;
 
 	private long nextNodeId = 0;
@@ -59,8 +59,8 @@ public final class TransitRouterNetworkWW implements Network {
 		public final TransitRoute route;
 		public final TransitLine line;
 		final Id<Node> id;
-		final Map<Id<Link>, TransitRouterNetworkLink> ingoingLinks = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
-		final Map<Id<Link>, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
+		final Map<Id<Link>, TransitRouterNetworkLink> ingoingLinks = new LinkedHashMap<>();
+		final Map<Id<Link>, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<>();
 
 		public TransitRouterNetworkNode(final Id<Node> id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.id = id;
@@ -174,22 +174,22 @@ public final class TransitRouterNetworkWW implements Network {
 
 		@Override
 		public double getCapacity() {
-			return getCapacity(Time.UNDEFINED_TIME);
-		}
-
-		@Override
-		public double getCapacity(final double time) {
 			return 9999;
 		}
 
 		@Override
+		public double getCapacity(final double time) {
+			return getCapacity();
+		}
+
+		@Override
 		public double getFreespeed() {
-			return getFreespeed(Time.UNDEFINED_TIME);
+			return 10;
 		}
 
 		@Override
 		public double getFreespeed(final double time) {
-			return 10;
+			return getFreespeed();
 		}
 
 		@Override
@@ -199,12 +199,12 @@ public final class TransitRouterNetworkWW implements Network {
 
 		@Override
 		public double getNumberOfLanes() {
-			return getNumberOfLanes(Time.UNDEFINED_TIME);
+			return 1;
 		}
 
 		@Override
 		public double getNumberOfLanes(final double time) {
-			return 1;
+			return getNumberOfLanes();
 		}
 
 		@Override
@@ -266,13 +266,8 @@ public final class TransitRouterNetworkWW implements Network {
 		}
 
 		@Override
-		public double getFlowCapacityPerSec() {
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		public double getFlowCapacityPerSec(double time) {
-			throw new RuntimeException("not implemented") ;
+		public double getCapacityPeriod() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

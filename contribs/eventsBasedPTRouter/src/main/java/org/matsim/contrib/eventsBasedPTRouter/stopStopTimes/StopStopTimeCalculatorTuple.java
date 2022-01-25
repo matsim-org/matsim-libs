@@ -1,5 +1,10 @@
 package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -10,13 +15,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
 	
@@ -28,7 +33,7 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 	
 	//Constructors
 	public StopStopTimeCalculatorTuple(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 	}
 	public StopStopTimeCalculatorTuple(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
@@ -48,7 +53,7 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 						num = 0;
 						numObservations.put(key, num);
 					}
-					scheduledStopStopTimes.put(key, (num*sTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset())/++num);
+					scheduledStopStopTimes.put(key, (num*sTime+route.getStops().get(s+1).getArrivalOffset().seconds()-route.getStops().get(s).getDepartureOffset().seconds())/++num);
 					numObservations.put(key, num);
 				}
 				for(Departure departure:route.getDepartures().values())

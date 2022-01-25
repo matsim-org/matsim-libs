@@ -1,7 +1,9 @@
 package org.matsim.contrib.ev.routing;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -12,6 +14,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -22,9 +25,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
@@ -96,7 +98,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 		log.debug("requesting network routing module with routingMode=" + routingMode + ";\tmode=" + mode);
 
 		// the network refers to the (transport)mode:
-		Network filteredNetwork = null;
+		Network filteredNetwork;
 
 		// Ensure this is not performed concurrently by multiple threads!
 		synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
@@ -106,7 +108,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 				Set<String> modes = new HashSet<>();
 				modes.add(mode);
-				filteredNetwork = NetworkUtils.createNetwork();
+				filteredNetwork = NetworkUtils.createNetwork(config);
 				filter.filter(filteredNetwork, modes);
 				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
 			}
@@ -126,7 +128,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
+		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(AccessEgressType.none)) {
 			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,

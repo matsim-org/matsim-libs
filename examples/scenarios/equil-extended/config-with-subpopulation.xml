@@ -93,7 +93,8 @@
 	<module name="plans" >
 		<param name="inputPersonAttributesFile" value="personAtrributes-with-subpopulation.xml" />
 		<param name="inputPlansFile" value="plans-with-subpopulation.xml" />
-		<param name="subpopulationAttributeName" value="subpopulation" />
+<!--		<param name="subpopulationAttributeName" value="subpopulation" />-->
+<!--		no longer allowed-->
 	</module>
 
 <!-- ====================================================================== -->

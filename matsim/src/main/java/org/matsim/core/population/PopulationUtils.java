@@ -24,7 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -33,10 +40,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -53,10 +68,9 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -71,6 +85,13 @@ public final class PopulationUtils {
 //	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
 	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
 	// try to avoid misleading comment about config context.  kai, dec'18
+
+	/**
+	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
+	 */
+	@Deprecated
+	public static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+
 
 	/**
 	 * Is a namespace, so don't instantiate:
@@ -176,7 +197,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getDepartureTime() {
+		public OptionalTime getDepartureTime() {
 			return this.delegate.getDepartureTime() ;
 		}
 
@@ -186,7 +207,12 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getTravelTime() {
+		public void setDepartureTimeUndefined() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getTravelTime() {
 			return this.delegate.getTravelTime() ;
 		}
 
@@ -194,6 +220,12 @@ public final class PopulationUtils {
 		public void setTravelTime(double seconds) {
 			throw new UnsupportedOperationException() ;
 		}
+
+		@Override
+		public void setTravelTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
 		@Override
 		public String toString() {
 			return this.delegate.toString() ;
@@ -217,12 +249,17 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getEndTime() {
-			return this.delegate.getEndTime() ;
+		public OptionalTime getEndTime() {
+			return this.delegate.getEndTime();
 		}
 
 		@Override
 		public void setEndTime(double seconds) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public void setEndTimeUndefined() {
 			throw new UnsupportedOperationException() ;
 		}
 
@@ -242,7 +279,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getStartTime() {
+		public OptionalTime getStartTime() {
 			return this.delegate.getStartTime() ;
 		}
 
@@ -252,13 +289,23 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getMaximumDuration() {
+		public void setStartTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public OptionalTime getMaximumDuration() {
 			return this.delegate.getMaximumDuration() ;
 		}
 
 		@Override
 		public void setMaximumDuration(double seconds) {
 			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public void setMaximumDurationUndefined() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -400,37 +447,6 @@ public final class PopulationUtils {
 		map.putAll(treeMap);
 	}
 
-	/**
-	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
-	 */
-	@Deprecated // was renamed
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
-		return decideOnActivityEndTime( act, now, config ) ;
-	}
-
-	/**
-	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
-	 */
-	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
-		switch ( config.plans().getActivityDurationInterpretation() ) {
-		case endTimeOnly:
-			return act.getEndTime() ;
-		case tryEndTimeThenDuration:
-			if ( !Time.isUndefinedTime(act.getEndTime()) ) {
-				return act.getEndTime() ;
-			} else if ( !Time.isUndefinedTime(act.getMaximumDuration()) ) {
-				return now + act.getMaximumDuration() ;
-			} else {
-				return Time.getUndefinedTime();
-			}
-		case minOfDurationAndEndTime:
-			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
-		default:
-			break ;
-		}
-		return Time.getUndefinedTime();
-	}
-
 	private static int missingFacilityCnt = 0 ;
 
 	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
@@ -461,7 +477,7 @@ public final class PopulationUtils {
 			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
-	
+
 	@Deprecated // use "decideOnCoord..."
 	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		return computeCoordFromActivity( act, facs, null, config ) ;
@@ -508,7 +524,7 @@ public final class PopulationUtils {
 	 * </ul>
 	 *
 	 */
-	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
+	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network,
 			double sameModeReward, double sameRouteReward ) {
 		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
@@ -563,7 +579,7 @@ public final class PopulationUtils {
 	 * <li> not normalized (for the time being?)
 	 * </ul>
 	 */
-	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
+	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty,
 			double sameActivityLocationPenalty, double actTimeParameter ) {
 		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
@@ -588,18 +604,18 @@ public final class PopulationUtils {
 			}
 
 			// activity location
-			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
+			if ( act1.getCoord().equals( act2.getCoord() ) ){
 				simil += sameActivityLocationPenalty ;
 			}
 
 			// activity end times
-			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
+			if ( act1.getEndTime().isUndefined() && act2.getEndTime().isUndefined()){
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
 				// both activities have an end time, comparing the end times
 
 				// 300/ln(2) means a penalty of 0.5 for 300 sec difference
-				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
+				double delta = Math.abs(act1.getEndTime().seconds() - act2.getEndTime().seconds()) ;
 				simil += actTimeParameter * Math.exp( - delta/(300/Math.log(2)) ) ;
 			}
 
@@ -632,7 +648,7 @@ public final class PopulationUtils {
 	/**
 	 * The InputStream which comes from this method must be properly
 	 * resource-managed, i.e. always be closed.
-	 * 
+	 *
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
 	@SuppressWarnings("resource")
@@ -796,13 +812,19 @@ public final class PopulationUtils {
 		return act ;
 	}
 
+	public static Activity createStageActivityFromCoordLinkIdAndModePrefix(final Coord interactionCoord, final Id<Link> interactionLink, String modePrefix ) {
+		Activity act = createActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
+		act.setMaximumDuration(0.0);
+		return act;
+	}
+
 
 	// --- static copy methods:
 
 	/** loads a copy of an existing plan, but keeps the person reference
-	 * 
+	 *
 	 * @param in a plan who's data will be loaded into this plan
-	 * @param out 
+	 * @param out
 	 **/
 	public static void copyFromTo(final Plan in, Plan out) {
 		out.getPlanElements().clear();
@@ -823,8 +845,8 @@ public final class PopulationUtils {
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
 		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
-		out.setDepartureTime(in.getDepartureTime());
-		out.setTravelTime(in.getTravelTime());
+		in.getDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
+		in.getTravelTime().ifDefinedOrElse(out::setTravelTime, out::setTravelTimeUndefined);
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
@@ -835,14 +857,14 @@ public final class PopulationUtils {
 		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
 		// (we don't want to copy the coord ref, but rather the contents!)
 		newAct.setCoord(coord);
-		newAct.setType( act.getType() );
+		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
-		newAct.setStartTime(act.getStartTime());
-		newAct.setEndTime(act.getEndTime());
-		newAct.setMaximumDuration(act.getMaximumDuration());
+		act.getStartTime().ifDefinedOrElse(newAct::setStartTime, newAct::setStartTimeUndefined);
+		act.getEndTime().ifDefinedOrElse(newAct::setEndTime, newAct::setEndTimeUndefined);
+		act.getMaximumDuration().ifDefinedOrElse(newAct::setMaximumDuration, newAct::setMaximumDurationUndefined);
 		newAct.setFacilityId(act.getFacilityId());
 
-		AttributesUtils.copyAttributesFromTo( act , newAct );
+		AttributesUtils.copyAttributesFromTo(act, newAct);
 	}
 
 	// --- copy factories:
@@ -859,7 +881,7 @@ public final class PopulationUtils {
 
 	/**
 	 * Makes a deep copy of this leg, however only when the Leg has a route which is
-	 * instance of Route or BasicRoute. Other route instances are not considered. 
+	 * instance of Route or BasicRoute. Other route instances are not considered.
 	 * </p>
 	 * <ul>
 	 * <li> Is the statement about the route still correct?  kai, jun'16
@@ -938,8 +960,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.getUndefinedTime());
-				next_leg.setTravelTime(Time.getUndefinedTime());
+				next_leg.setDepartureTimeUndefined();
+				next_leg.setTravelTimeUndefined();
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -968,8 +990,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.getUndefinedTime());
-				prev_leg.setTravelTime(Time.getUndefinedTime());
+				prev_leg.setDepartureTimeUndefined();
+				prev_leg.setTravelTimeUndefined();
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg
@@ -1016,11 +1038,11 @@ public final class PopulationUtils {
 	public static void printPlansCount(StreamingPopulationReader reader) {
 		reader.printPlansCount() ;
 	}
-	
+
 	public static void writePopulation( Population population, String filename ) {
-		new PopulationWriter( population).write( filename ); 
+		new PopulationWriter( population).write( filename );
 	}
-	
+
 	public static Id<Link> decideOnLinkIdForActivity( Activity act, Scenario sc ) {
 		if ( act.getFacilityId() !=null ) {
 			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
@@ -1061,13 +1083,7 @@ public final class PopulationUtils {
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
 		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
-	public static double decideOnTravelTimeForLeg( Leg leg ) {
-		if ( leg.getRoute()!=null ) {
-			return leg.getRoute().getTravelTime() ;
-		} else {
-			return leg.getTravelTime() ;
-		}
-	}
+
 	public static void sampleDown( Population pop, double sample ) {
 		final Random rnd = MatsimRandom.getLocalInstance();;
 		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;
@@ -1099,7 +1115,7 @@ public final class PopulationUtils {
 		}
 		return null;
 	}
-	public static void putPersonAttribute( Person person, String key, Object value ) {
+	public static void putPersonAttribute( HasPlansAndId<?,?> person, String key, Object value ) {
 		person.getAttributes().putAttribute( key, value ) ;
 	}
 	public static Object removePersonAttribute( Person person, String key ) {
@@ -1110,5 +1126,42 @@ public final class PopulationUtils {
 		//population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
 		person.getAttributes().clear();
 	}
+
+        public static String getSubpopulation( HasPlansAndId<?,?> person ){
+		return (String) getPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME );
+        }
+        public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
+		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
+	}
+
+	public static Population getOrCreateAllpersons( Scenario  scenario ) {
+		Population map = (Population) scenario.getScenarioElement( "allpersons" );
+		if ( map==null ) {
+			log.info( "adding scenario element for allpersons container" );
+			map = new PopulationImpl( scenario.getPopulation().getFactory() );
+			scenario.addScenarioElement("allpersons" , map);
+		}
+		return map;
+	}
+	private static int tryStdCnt = 5;
+	private static int tryTrnCnt = 5;
+	public static Person findPerson( Id<Person> personId, Scenario scenario ) {
+		Person person = getOrCreateAllpersons( scenario ).getPersons().get( personId );
+		if ( person==null ) {
+			if ( tryStdCnt>0){
+				tryStdCnt--;
+				log.info( "personId=" + personId + " not in allPersons; trying standard vehicles container ..." );
+				if ( tryStdCnt==0 ) {
+					log.info( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			person = scenario.getPopulation().getPersons().get(  personId );
+		}
+		if ( person==null ) {
+			log.info( "unable to find person for personId=" + personId + "; will return null") ;
+		}
+		return person ;
+	}
+
 
 }

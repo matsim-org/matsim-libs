@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -47,8 +49,6 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Random;
-
 /**
  * @author thibautd
  */
@@ -74,23 +74,26 @@ public class CharyparNagelLegScoringPtChangeTest {
 
 		// "simulate"
 		final EventsManager events = EventsUtils.createEventsManager();
-		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
+		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime().seconds(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
 		scoring1.handleEvent( endFirstAct );
 		scoring2.handleEvent( endFirstAct );
 
-		final Event departure = new PersonDepartureEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+		final Event departure = new PersonDepartureEvent(leg.getDepartureTime().seconds(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode(), leg.getMode());
 		scoring1.handleEvent( departure );
 		scoring2.handleEvent( departure );
 
-		final Event enterVehicle = new PersonEntersVehicleEvent(leg.getDepartureTime() + 100, Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
+		final Event enterVehicle = new PersonEntersVehicleEvent(
+				leg.getDepartureTime().seconds() + 100, Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
 		scoring1.handleEvent( enterVehicle );
 		scoring2.handleEvent( enterVehicle );
 
-		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
+		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
 		scoring1.handleEvent( leaveVehicle );
 		scoring2.handleEvent( leaveVehicle );
 
-		final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+		final Event arrival = new PersonArrivalEvent(
+				leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
 		scoring1.handleEvent( arrival );
 		scoring2.handleEvent( arrival );
 

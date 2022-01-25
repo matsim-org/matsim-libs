@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class WeightedRandomSelection<T> {
-	private List<Entry<T>> entryList = new ArrayList<>();
+	private final List<Entry<T>> entryList = new ArrayList<>();
 	private double totalWeight = 0;
-	private UniformRandom uniform;
+	private final UniformRandom uniform;
 
 	public WeightedRandomSelection() {
 		this(RandomUtils.getGlobalUniform());
@@ -46,7 +46,7 @@ public class WeightedRandomSelection<T> {
 			throw new ArithmeticException("Total weight is infinite");
 		}
 
-		entryList.add(new Entry<T>(obj, totalWeight));
+		entryList.add(new Entry<>(obj, totalWeight));
 	}
 
 	public T select() {

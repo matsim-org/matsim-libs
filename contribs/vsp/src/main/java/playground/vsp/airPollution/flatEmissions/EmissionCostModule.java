@@ -22,8 +22,7 @@ package playground.vsp.airPollution.flatEmissions;
 import java.util.Map;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 
 
@@ -34,13 +33,13 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 public class EmissionCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionCostModule.class);
 	
-	private final double emissionCostFactor;
+	private final double emissionCostFactor = 1.;
 	private boolean considerCO2Costs = false;
 
 	@Inject
 	public EmissionCostModule( EmissionsConfigGroup emissionsConfigGroup ) {
-		this.emissionCostFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
-		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
+//		this.emissionCostFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
+//		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
 
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		
@@ -51,15 +50,16 @@ public class EmissionCostModule {
 		}
 	}
 
-	public double calculateWarmEmissionCosts(Map<String, Double> warmEmissions) {
+	public double calculateWarmEmissionCosts( Map<Pollutant, Double> warmEmissions ) {
 		double warmEmissionCosts = 0.0;
 		
-		for(String wp : warmEmissions.keySet()){
+		for( Pollutant wp : warmEmissions.keySet()){
 //			if ( true ) {
 //				throw new RuntimeException("typed emissions are no longer there; need to hedge against changing headers in the input file.  kai, dec'18") ;
 //			}
 
-			if(wp.equals(WarmPollutant.CO2_TOTAL.getText()) && ! considerCO2Costs) {
+			//		return key;
+			if(wp.equals( Pollutant.CO2_TOTAL ) && ! considerCO2Costs) {
 				// do nothing
 			} else {
 				double costFactor = EmissionCostFactors.getCostFactor(wp.toString());
@@ -69,10 +69,10 @@ public class EmissionCostModule {
 		return this.emissionCostFactor * warmEmissionCosts;
 	}
 	
-	public double calculateColdEmissionCosts(Map<String, Double> coldEmissions) {
+	public double calculateColdEmissionCosts( Map<Pollutant, Double> coldEmissions ) {
 		double coldEmissionCosts = 0.0;
 		
-		for(String cp : coldEmissions.keySet()){
+		for( Pollutant cp : coldEmissions.keySet()){
 			double costFactor = EmissionCostFactors.getCostFactor(cp.toString());
 			coldEmissionCosts += costFactor * coldEmissions.get(cp);
 		}

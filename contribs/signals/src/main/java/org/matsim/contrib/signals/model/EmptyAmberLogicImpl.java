@@ -32,10 +32,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author dgrether
  *
  */
-public class EmptyAmberLogicImpl implements AmberLogic {
-
-	public EmptyAmberLogicImpl() {
-	}
+final class EmptyAmberLogicImpl implements AmberLogic {
 
 	@Override
 	public Set<SignalGroupStateChangeRequest> processDropping(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {

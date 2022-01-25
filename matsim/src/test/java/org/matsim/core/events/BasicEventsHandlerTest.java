@@ -39,9 +39,10 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);
+		events.initProcessing();
 
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node from = node1;
 		final Node to = node2;
@@ -50,6 +51,7 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		Link link1 = NetworkUtils.createLink(Id.create(1, Link.class), from, to, network1, 1000.0, 10.0, 3600.0, (double) 0);
 
 		events.processEvent(new LinkEnterEvent(8.0*3600, Id.create("veh", Vehicle.class), link1.getId()));
+		events.finishProcessing();
 		assertEquals("expected number of handled events wrong.", 1, handler.counter);
 	}
 

@@ -21,6 +21,10 @@
 
  package org.matsim.core.mobsim.qsim;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -34,7 +38,11 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -43,6 +51,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.NetworkRoutingModule;
@@ -54,9 +63,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 public class NetsimRoutingConsistencyTest {
 		@Test
@@ -160,7 +166,7 @@ public class NetsimRoutingConsistencyTest {
 
 			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					VehicleUtils.getDefaultVehicleType());
-			VehicleUtils.insertVehicleIdIntoAttributes(person, TransportMode.car, vehicle.getId());
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
 			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
 			scenario.getVehicles().addVehicle(vehicle);
 
@@ -173,7 +179,7 @@ public class NetsimRoutingConsistencyTest {
 					router);
 
 			Leg leg = (Leg) routingModule
-					.calcRoute(new LinkWrapperFacility(link12), new LinkWrapperFacility(link45), 0.0, person).get(0);
+					.calcRoute(DefaultRoutingRequest.withoutAttributes(new LinkWrapperFacility(link12), new LinkWrapperFacility(link45), 0.0, person)).get(0);
 
 			plan.addActivity(startActivity);
 			plan.addLeg(leg);
@@ -190,7 +196,7 @@ public class NetsimRoutingConsistencyTest {
 					.run();
 
 			double netsimTravelTime = listener.arrivalTime - listener.departureTime;
-			double routingTravelTime = leg.getTravelTime();
+			double routingTravelTime = leg.getTravelTime().seconds();
 
 			// Travel times are rounded up in the Netsim, so we knowingly add an additional
 			// +1s per link
@@ -278,7 +284,7 @@ public class NetsimRoutingConsistencyTest {
 			controler.run();
 
 			double netsimTravelTime = listener.arrivalTime - listener.departureTime;
-			double routingTravelTime = ((Leg) plan.getPlanElements().get(1)).getTravelTime();
+			double routingTravelTime = ((Leg)plan.getPlanElements().get(1)).getTravelTime().seconds();
 
 			// Travel times are rounded up in the Netsim, so we knowingly add an additional
 			// +1s per link

@@ -1,10 +1,30 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.controler;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -20,7 +40,8 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.utils.misc.Time;
+
+import com.google.inject.Inject;
 
 /*
  * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
@@ -34,7 +55,7 @@ import org.matsim.core.utils.misc.Time;
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
 
-	private static Logger logger = Logger.getLogger(WithinDayActivityReScheduling.class);
+	private static final  Logger logger = Logger.getLogger(WithinDayActivityReScheduling.class);
 	
 	private FreightAgentSource freightAgentSource;
 	
@@ -73,7 +94,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 				double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
 //				logger.info("[agentId="+ agentId + "][currentTime="+Time.writeTime(time)+"][actDuration="+plannedActivity.getDuration()+
 //						"[timeWindow="+ plannedActivity.getTimeWindow() + "][plannedActEnd="+ Time.writeTime(act.getEndTime()) + "][newActEnd="+Time.writeTime(newEndTime)+"]");
-				act.setMaximumDuration(Time.UNDEFINED_TIME);
+				act.setMaximumDurationUndefined();
 				act.setEndTime(newEndTime);
 //				WithinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
 				WithinDayAgentUtils.resetCaches( mobsimAgent );

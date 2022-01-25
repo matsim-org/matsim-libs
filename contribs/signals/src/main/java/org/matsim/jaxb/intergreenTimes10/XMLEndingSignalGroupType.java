@@ -51,12 +51,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "endingSignalGroupType", propOrder = {
     "beginningSignalGroup"
 })
-public class XMLEndingSignalGroupType
-    extends XMLIdRefType
-{
+public final class XMLEndingSignalGroupType extends XMLIdRefType {
 
     @XmlElement(required = true)
-    protected List<XMLEndingSignalGroupType.XMLBeginningSignalGroup> beginningSignalGroup;
+    private List<XMLEndingSignalGroupType.XMLBeginningSignalGroup> beginningSignalGroup;
 
     /**
      * Gets the value of the beginningSignalGroup property.

@@ -235,6 +235,7 @@ public class CORINELandCoverCoordsModifier {
             }
             personCounter++;
         }
+
         LOG.info("Finished processing.");
     }
 
@@ -283,4 +284,9 @@ public class CORINELandCoverCoordsModifier {
         config.plans().setInputFile(plansFile);
         return ScenarioUtils.loadScenario(config).getPopulation();
     }
+
+    public Population getPopulation(){
+        return this.population;
+    }
+
 }

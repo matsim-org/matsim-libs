@@ -19,24 +19,18 @@
 
 package org.matsim.contrib.drt.schedule;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 /**
  * @author michalm
  */
-public class DrtStayTask extends StayTaskImpl implements DrtTask {
+public class DrtStayTask extends DefaultStayTask {
+	public static final DrtTaskType TYPE = new DrtTaskType(STAY);
+
 	public DrtStayTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
-	}
-
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.STAY;
-	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+		super(TYPE, beginTime, endTime, link);
 	}
 }

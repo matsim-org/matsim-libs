@@ -19,10 +19,12 @@
 
 package org.matsim.contrib.util.chart;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jfree.data.general.DatasetChangeEvent;
-import org.jfree.data.xy.*;
+import org.jfree.data.xy.AbstractXYDataset;
+import org.jfree.data.xy.XYDataset;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -36,8 +38,8 @@ public class CoordDataset extends AbstractXYDataset implements XYDataset {
 		Coord getCoord(int item);
 	}
 
-	private List<Comparable<String>> seriesKeys;
-	private List<CoordSource> seriesList;
+	private final List<Comparable<String>> seriesKeys;
+	private final List<CoordSource> seriesList;
 
 	public CoordDataset() {
 		seriesKeys = new ArrayList<>();
@@ -61,7 +63,7 @@ public class CoordDataset extends AbstractXYDataset implements XYDataset {
 
 	@Override
 	public Number getX(int series, int item) {
-		return new Double(getXValue(series, item));
+		return getXValue(series, item);
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class CoordDataset extends AbstractXYDataset implements XYDataset {
 
 	@Override
 	public Number getY(int series, int item) {
-		return new Double(getYValue(series, item));
+		return getYValue(series, item);
 	}
 
 	@Override

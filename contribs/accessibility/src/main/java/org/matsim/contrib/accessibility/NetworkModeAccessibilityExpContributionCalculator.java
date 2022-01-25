@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -19,6 +20,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,7 +30,7 @@ import java.util.Set;
 /**
  * @author thibautd, dziemke
  */
- public final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final String mode;
@@ -38,6 +40,7 @@ import java.util.Set;
 
 	private final TravelDisutility travelDisutility;
 	private final PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private final NetworkConfigGroup networkConfigGroup;
 
 	private Network subNetwork;
 
@@ -45,13 +48,14 @@ import java.util.Set;
 	private double walkSpeed_m_s;
 
 	private Node fromNode = null;
-	private LeastCostPathTreeExtended lcpt;
+	private LeastCostPathTree lcpt;
 	//private final DijkstraTree dijkstraTree;
 	//private final MultiNodePathCalculator multiNodePathCalculator;
 	//private ImaginaryNode aggregatedToNodes;
 
-	Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
-    Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
+	private Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
+
 
 
 	public NetworkModeAccessibilityExpContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
@@ -64,9 +68,11 @@ import java.util.Set;
 		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
+		networkConfigGroup = scenario.getConfig().network();
 
 		RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, scheme);
+//		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, scheme);
+		this.lcpt = new LeastCostPathTree(travelTime, travelDisutility);
 		//this.dijkstraTree = new DijkstraTree(network, travelDisutility, travelTime);
 		//FastMultiNodeDijkstraFactory fastMultiNodeDijkstraFactory = new FastMultiNodeDijkstraFactory(true);
 		//this.multiNodePathCalculator = (MultiNodePathCalculator) fastMultiNodeDijkstraFactory.createPathCalculator(network, travelDisutility, travelTime);
@@ -81,7 +87,7 @@ import java.util.Set;
 	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 		LOG.warn("Initializing calculator for mode " + mode + "...");
 		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
-        subNetwork = NetworkUtils.createNetwork();
+        subNetwork = NetworkUtils.createNetwork(networkConfigGroup);
         Set<String> modeSet = new HashSet<>();
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
         if (mode.equals(Modes4Accessibility.freespeed.name())) {
@@ -90,7 +96,9 @@ import java.util.Set;
         	modeSet.add(mode);
 		}
         filter.filter(subNetwork, modeSet);
-        if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+        if (subNetwork.getNodes().size() == 0) {
+        	throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
+        }
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 
         this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
@@ -101,7 +109,7 @@ import java.util.Set;
 	@Override
 	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
 		this.fromNode = subNetwork.getNodes().get(fromNodeId);
-		this.lcpt.calculateExtended(subNetwork, fromNode, departureTime);
+		this.lcpt.calculate(subNetwork, fromNode, departureTime);
 		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
 		//multiNodePathCalculator.calcLeastCostPath(fromNode, aggregatedToNodes, departureTime, null, null);
 	}
@@ -112,23 +120,27 @@ import java.util.Set;
 			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
 		double expSum = 0.;
 
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+		double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+		// Orthogonal walk to nearest link
+		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
+		// NEW AV MODE
+		//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
+		//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
+		//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+		// END NEW AV MODE
+
+		// Travel on section of first link to first node
+		double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
+		double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
+
+		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
+		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
+
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {
-			Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
 
-			// Orthogonal walk to nearest link
-			Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-			double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
-			double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
 
-			// NEW AV MODE
-			//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
-			//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-			//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-			// END NEW AV MODE
-
-			// Travel on section of first link to first node
-			double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
-			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
 			// Remaining travel on network
 			double congestedCarUtility = -lcpt.getTree().get(((Node) destination.getNearestBasicLocation()).getId()).getCost();
@@ -138,9 +150,7 @@ import java.util.Set;
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
 
-			// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
-			double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-			expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
+				expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
 					+ congestedCarUtilityRoad2Node + congestedCarUtility)) * sumExpVjkWalk;
 		}
 		return expSum;
@@ -156,6 +166,7 @@ import java.util.Set;
 
 	@Override
 	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
+		LOG.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
 		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
 				new NetworkModeAccessibilityExpContributionCalculator(this.mode, this.travelTime, this.travelDisutilityFactory, this.scenario);
 		networkModeAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;

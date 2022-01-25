@@ -33,9 +33,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "linkId")
-public class XMLLinkId
-    extends XMLIdRefType
-{
+final class XMLLinkId extends XMLIdRefType {
 
 
 }

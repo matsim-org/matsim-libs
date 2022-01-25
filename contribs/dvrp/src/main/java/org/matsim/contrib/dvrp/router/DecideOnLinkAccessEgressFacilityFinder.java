@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFind
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -41,7 +42,7 @@ public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacil
 	}
 
 	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
+	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
 		LinkWrapperFacility accessFacility = new LinkWrapperFacility(
 				FacilitiesUtils.decideOnLink(fromFacility, network));
 		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));

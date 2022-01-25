@@ -19,10 +19,6 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -39,6 +35,10 @@ import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactory;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
+
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 public class SimplifyTask implements SinkSource, EntityProcessor {
 
@@ -191,7 +191,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 				sink.process(nodeContainer);
 			}
 		}
-		nodeIterator.release();
+		nodeIterator.close();
 		
 		wayIterator = allWays.iterate();
 		while (wayIterator.hasNext()) {
@@ -206,7 +206,7 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 			}
 			sink.process(wayContainer);
 		}
-		wayIterator.release();
+		wayIterator.close();
 		
 		sink.complete();
 	}
@@ -215,10 +215,10 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void release() {
-		allNodes.release();
-		allWays.release();
-		sink.release();
+	public void close() {
+		allNodes.close();
+		allWays.close();
+		sink.close();
 	}
 
 	/**

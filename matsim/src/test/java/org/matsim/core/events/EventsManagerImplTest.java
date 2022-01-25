@@ -41,7 +41,9 @@ public class EventsManagerImplTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		CountingMyEventHandler handler = new CountingMyEventHandler();
 		manager.addHandler(handler);
+		manager.initProcessing();
 		manager.processEvent(new MyEvent(123.45));
+		manager.finishProcessing();
 		Assert.assertEquals("EventHandler was not called.", 1, handler.counter);
 	}
 
@@ -53,11 +55,14 @@ public class EventsManagerImplTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		CrashingMyEventHandler handler = new CrashingMyEventHandler();
 		manager.addHandler(handler);
+		manager.initProcessing();
 		try {
 			manager.processEvent(new MyEvent(123.45));
+			manager.finishProcessing();
 			Assert.fail("expected exception, but got none.");
 		} catch (final RuntimeException e) {
 			log.info("Catched expected exception.", e);
+
 			Assert.assertEquals(1, handler.counter);
 			Assert.assertTrue(e.getCause() instanceof ArithmeticException);
 		}

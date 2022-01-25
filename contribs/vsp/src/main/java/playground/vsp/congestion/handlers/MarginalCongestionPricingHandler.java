@@ -77,7 +77,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 		double amount = this.factor * event.getDelay() / 3600 * this.vtts_car;
 		this.amountSum = this.amountSum + amount;
 		
-		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount, "congestionPricing", null);
 		this.events.processEvent(moneyEvent);
 		
 		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getEmergenceTime(), "congestion");

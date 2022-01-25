@@ -38,10 +38,10 @@ import javax.xml.bind.annotation.XmlType;
     "facilityId",
     "linkId"
 })
-public class XMLActLocationType {
+final class XMLActLocationType {
 
-    protected XMLFacilityId facilityId;
-    protected XMLLinkId linkId;
+    private XMLFacilityId facilityId;
+    private XMLLinkId linkId;
 
     /**
      * Gets the value of the facilityId property.

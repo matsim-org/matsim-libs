@@ -1,42 +1,41 @@
 package org.matsim.contrib.dvrp.passenger;
 
-import javax.inject.Inject;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType.DEFAULT;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
 
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
+	public enum PassengerEngineType {
+		DEFAULT, WITH_PREBOOKING, TELEPORTING
+	}
+
+	private final PassengerEngineType type;
+
 	public PassengerEngineQSimModule(String mode) {
+		this(mode, DEFAULT);
+	}
+
+	public PassengerEngineQSimModule(String mode, PassengerEngineType type) {
 		super(mode);
+		this.type = type;
 	}
 
 	@Override
 	protected void configureQSim() {
-		addModalComponent(PassengerEngine.class, new ModalProviders.AbstractProvider<PassengerEngine>(getMode()) {
-			@Inject
-			private EventsManager eventsManager;
-
-			@Inject
-			private MobsimTimer mobsimTimer;
-
-			@Inject
-			private PreplanningEngine preplanningEngine;
-
-			@Inject
-			private PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder;
-
-			@Override
-			public PassengerEngine get() {
-				return new PassengerEngine(getMode(), eventsManager, mobsimTimer, preplanningEngine,
-						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
-						passengerRequestEventForwarder);
-			}
-		});
+		bindModal(PassengerHandler.class).to(modalKey(PassengerEngine.class));
+		addMobsimScopeEventHandlerBinding().to(modalKey(PassengerEngine.class));
+		switch (type) {
+			case DEFAULT:
+				addModalComponent(PassengerEngine.class, DefaultPassengerEngine.createProvider(getMode()));
+				return;
+			case WITH_PREBOOKING:
+				addModalComponent(PassengerEngine.class, PassengerEngineWithPrebooking.createProvider(getMode()));
+				return;
+			case TELEPORTING:
+				addModalComponent(PassengerEngine.class, TeleportingPassengerEngine.createProvider(getMode()));
+				return;
+			default:
+				throw new IllegalStateException("Type: " + type + " is not supported");
+		}
 	}
 }

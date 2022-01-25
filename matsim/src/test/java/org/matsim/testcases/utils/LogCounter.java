@@ -19,10 +19,16 @@
 
 package org.matsim.testcases.utils;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.filter.ThresholdFilter;
+import org.matsim.core.controler.Controler;
 
 /**
  * A helper class to be used as logger for counting the number of log-messages per log-level.
@@ -41,7 +47,12 @@ import org.apache.log4j.spi.LoggingEvent;
  *
  * @author mrieser
  */
-public class LogCounter extends AppenderSkeleton {
+public class LogCounter extends AbstractAppender {
+
+	private static final String NAME = "logCounter";
+
+	private final Level level;
+
 	private int cntFATAL = 0;
 	private int cntERROR = 0;
 	private int cntWARN = 0;
@@ -50,28 +61,31 @@ public class LogCounter extends AppenderSkeleton {
 	private int cntTRACE = 0;
 
 	public LogCounter() {
-		this(Level.ALL);
+		super(NAME,
+				ThresholdFilter.createFilter(Level.ALL, Filter.Result.ACCEPT, Filter.Result.ACCEPT),
+				Controler.DEFAULTLOG4JLAYOUT,
+				false,
+				new Property[0]);
+		this.level = Level.ALL;
 	}
 
-	public LogCounter(Level treshold) {
-		this.setThreshold(treshold);
+	public LogCounter(Level threshold) {
+		super(NAME,
+				ThresholdFilter.createFilter(threshold, Filter.Result.ACCEPT, Filter.Result.DENY),
+				Controler.DEFAULTLOG4JLAYOUT,
+				false,
+				new Property[0]);
+		this.level = threshold;
 	}
 
 	@Override
-	protected void append(final LoggingEvent event) {
+	public void append(final LogEvent event) {
 		if (event.getLevel() == Level.FATAL) this.cntFATAL++;
 		if (event.getLevel() == Level.ERROR) this.cntERROR++;
 		if (event.getLevel() == Level.WARN) this.cntWARN++;
 		if (event.getLevel() == Level.INFO) this.cntINFO++;
 		if (event.getLevel() == Level.DEBUG) this.cntDEBUG++;
 		if (event.getLevel() == Level.TRACE) this.cntTRACE++;
-	}
-
-	public void close() {
-	}
-
-	public boolean requiresLayout() {
-		return false;
 	}
 
 	public int getFatalCount() {
@@ -107,11 +121,18 @@ public class LogCounter extends AppenderSkeleton {
 		this.cntTRACE = 0;
 	}
 
-	public void activiate() {
-		Logger.getRootLogger().addAppender(this);
+	public void activate() {
+		this.start();
+		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		ctx.getConfiguration().getRootLogger().addAppender(this, this.level, null);//addLogger("org.apache.logging.log4j", loggerConfig);
+		ctx.updateLoggers();
 	}
 
-	public void deactiviate() {
-		Logger.getRootLogger().removeAppender(this);
+	public void deactivate() {
+		this.stop();
+		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		final Configuration config = ctx.getConfiguration();
+		config.getRootLogger().removeAppender(NAME);
+		ctx.updateLoggers();
 	}
 }

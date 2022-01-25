@@ -52,8 +52,10 @@ public class EventsToScoreTest extends MatsimTestCase {
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
-		e2s.beginIteration(0);
-		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
+		e2s.beginIteration(0, false);
+		events.initProcessing();
+		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator"));
+		events.finishProcessing();
 		e2s.finish();
 		assertEquals(3.4, e2s.getAgentScore(person.getId()));
 	}
@@ -81,11 +83,13 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 		for ( int mockIteration = config.controler().getFirstIteration() ; mockIteration <= config.controler().getLastIteration() ; mockIteration++ ) {
 
-			e2s.beginIteration(mockIteration); ;
+			e2s.beginIteration(mockIteration, false); ;
+			events.initProcessing();
 
 			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
-			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
+			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98, "bribe", "contractor" ));
 			
+			events.finishProcessing();
 			e2s.finish() ;
 			
 			System.out.println( "score: " + person.getSelectedPlan().getScore() ) ;

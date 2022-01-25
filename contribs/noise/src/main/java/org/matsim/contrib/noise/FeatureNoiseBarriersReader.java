@@ -3,9 +3,7 @@ package org.matsim.contrib.noise;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.FeatureCollection;
@@ -14,11 +12,9 @@ import org.geotools.geojson.GeoJSONUtil;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateFilter;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -62,34 +58,57 @@ class FeatureNoiseBarriersReader {
         }
 
         final FeatureIterator features = featureCollection.features();
+        int idCounter = 0;
+        Counter counter = new Counter(" noise barrier #");
         while (features.hasNext()) {
+
+            counter.incCounter();
+
             SimpleFeature feature = (SimpleFeature) features.next();
 
             final Object geometry = feature.getAttribute("geometry");
-            if(!(geometry instanceof  Polygon)) {
-                continue;
-            }
-            Polygon polygon = (Polygon) geometry;
-            polygon.apply(FILTER);
-            Geometry transformedPolygon = null;
-            try {
-                transformedPolygon = JTS.transform(polygon, transform);;
-            } catch (TransformException e) {
-                e.printStackTrace();
-            }
-            transformedPolygon.apply(FILTER);
-            if(!polygon.isValid()) {
-                continue;
-            }
-            Id<NoiseBarrier> id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
-            double height = getHeight(feature);
 
+            Set<Polygon> polygons = new HashSet<>();
 
-            FeatureNoiseBarrierImpl noiseBarrier = new FeatureNoiseBarrierImpl(id, transformedPolygon, height);
-            if (Double.isNaN(polygon.getCentroid().getX()) || Double.isNaN(polygon.getCentroid().getY())) {
-                logger.debug("Noise barrier ignored due to invalid centroid coordinates.");
-            } else {
-                barriers.add(noiseBarrier);
+            if(geometry instanceof  Polygon) {
+                Polygon polygon = (Polygon) geometry;
+                polygons.add(polygon);
+            } else if(geometry instanceof MultiPolygon) {
+                for (int i = 0; i < ((MultiPolygon) geometry).getNumGeometries(); i++) {
+                    polygons.add((Polygon) ((MultiPolygon) geometry).getGeometryN(i));
+                }
+            }
+
+            for(Polygon polygon: polygons) {
+
+                polygon.apply(FILTER);
+                Geometry transformedPolygon = null;
+                try {
+                    transformedPolygon = JTS.transform(polygon, transform);
+                    ;
+                } catch (TransformException e) {
+                    e.printStackTrace();
+                }
+                transformedPolygon.apply(FILTER);
+                if (!polygon.isValid()) {
+                    continue;
+                }
+                Id<NoiseBarrier> id;
+                try {
+                    id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
+                } catch (Exception e) {
+                    id = Id.create(idCounter, NoiseBarrier.class);
+                    idCounter++;
+                }
+
+                double height = getHeight(feature);
+
+                FeatureNoiseBarrierImpl noiseBarrier = new FeatureNoiseBarrierImpl(id, transformedPolygon, height);
+                if (Double.isNaN(polygon.getCentroid().getX()) || Double.isNaN(polygon.getCentroid().getY())) {
+                    logger.debug("Noise barrier ignored due to invalid centroid coordinates.");
+                } else {
+                    barriers.add(noiseBarrier);
+                }
             }
         }
         return barriers;

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -90,10 +91,10 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		FacilityOpeningIntervalCalculator testee =
 				new FacilityOpeningIntervalCalculator(this.facilities);
 
-		double[] openInterval = testee.getOpeningInterval(act);
+		OptionalTime[] openInterval = testee.getOpeningInterval(act);
 
-		assertEquals(6.0 * 3600, openInterval[0], EPSILON);
-		assertEquals(19.0 * 3600, openInterval[1], EPSILON);
+		assertEquals(6.0 * 3600, openInterval[0].seconds(), EPSILON);
+		assertEquals(19.0 * 3600, openInterval[1].seconds(), EPSILON);
 	}
 
 }

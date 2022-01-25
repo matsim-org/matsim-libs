@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
@@ -98,7 +97,7 @@ public interface Link extends BasicLocation, Attributable, Identifiable<Link> {
 	 * This method returns the capacity as set in the xml defining the network. Be aware
 	 * that this capacity is not normalized in time, it depends on the period set
 	 * in the network file (the capperiod attribute).
-	 * @param time the time at which the capacity is requested. Use {@link Time#getUndefinedTime()} to get the default value.
+	 * @param time the time at which the capacity is requested. Use {@link Double#NEGATIVE_INFINITY} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 *
 	 * @see Network#getCapacityPeriod()
@@ -120,8 +119,13 @@ public interface Link extends BasicLocation, Attributable, Identifiable<Link> {
 	 */
 	public Set<String> getAllowedModes();
 
-	double getFlowCapacityPerSec();
+	double getCapacityPeriod();
 
-	double getFlowCapacityPerSec(double time);
+	default double getFlowCapacityPerSec() {
+		return getCapacity() / getCapacityPeriod();
+	}
 
+	default double getFlowCapacityPerSec(double time) {
+		return getCapacity(time) / getCapacityPeriod();
+	}
 }

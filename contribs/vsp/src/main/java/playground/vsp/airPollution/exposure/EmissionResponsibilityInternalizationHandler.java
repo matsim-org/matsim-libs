@@ -68,7 +68,7 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 		double coldEmissionCosts = emissionResponsibilityCostModule.calculateColdEmissionCosts(event.getColdEmissions(), event.getLinkId(), time);
 		double amount2Pay = - coldEmissionCosts;
 		
-		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
+		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "coldEmissionCost", null);
 		eventsManager.processEvent(moneyEvent);
 		
 		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
@@ -82,7 +82,7 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 		double warmEmissionCosts = emissionResponsibilityCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), time);
 		double amount2Pay = - warmEmissionCosts;
 		
-		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
+		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "warmEmissionCost", null);
 		eventsManager.processEvent(moneyEvent);
 		
 		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");

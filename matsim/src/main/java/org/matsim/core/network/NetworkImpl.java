@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -91,8 +89,8 @@ import java.util.*;
 	private boolean locked = false ;
 	private final Attributes attributes = new Attributes();
 
-	NetworkImpl() {
-		this.factory = new NetworkFactoryImpl(this);
+	NetworkImpl(LinkFactory linkFactory) {
+		this.factory = new NetworkFactoryImpl(this, linkFactory);
 	}
 
 	@Override
@@ -108,27 +106,30 @@ import java.util.*;
 					".\nLink is not added to the network.");
 		}
 
-		/* Check if the link's nodes are in the network. */
-		Node fromNode = nodes.get( link.getFromNode().getId() );
-		if (fromNode == null) {
-			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + link.getFromNode().getId() + " has not been added to the network.");
-		}
-		Node toNode = nodes.get(link.getToNode().getId());
-		if (toNode == null) {
-			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + link.getToNode().getId() + " has not been added to the network.");
-		}
+        /* Check if the link's nodes are in the network. */
+        Node fromNode = nodes.get(link.getFromNode().getId());
+        if (fromNode == null) {
+            throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + link.getFromNode().getId() + " has not been added to the network.");
+        }
+        Node toNode = nodes.get(link.getToNode().getId());
+        if (toNode == null) {
+            throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + link.getToNode().getId() + " has not been added to the network.");
+        }
 
-		fromNode.addOutLink(link);
-		toNode.addInLink(link);
-		link.setFromNode(fromNode);
-		link.setToNode(toNode);
+        if (!fromNode.getOutLinks().containsKey(link.getId()))
+            fromNode.addOutLink(link);
+        if (!toNode.getInLinks().containsKey(link.getId()))
+            toNode.addInLink(link);
 
-		links.put(link.getId(), link);
+        link.setFromNode(fromNode);
+        link.setToNode(toNode);
 
-		if (this.linkQuadTree != null) {
-			double linkMinX = Math.min(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
-			double linkMaxX = Math.max(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
-			double linkMinY = Math.min(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
+        links.put(link.getId(), link);
+
+        if (this.linkQuadTree != null) {
+            double linkMinX = Math.min(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
+            double linkMaxX = Math.max(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
+            double linkMinY = Math.min(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
 			double linkMaxY = Math.max(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
 			if (Double.isInfinite(this.linkQuadTree.getMinEasting())) {
 				// looks like the quad tree was initialized with infinite bounds, see MATSIM-278.

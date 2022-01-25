@@ -36,7 +36,6 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -255,8 +254,8 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	public static class StopInformation {
 		public short nOfEntering = 0;
 		public short nOfLeaving = 0;
-		public double arrivalTime = Time.getUndefinedTime();
-		public double departureTime = Time.getUndefinedTime();
+		public double arrivalTime = Double.NaN;
+		public double departureTime = Double.NaN;
 	}
 
 }

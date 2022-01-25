@@ -39,14 +39,9 @@ public class DrtConfigs {
 
 	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg,
 			PlansCalcRouteConfigGroup plansCalcRouteCfg) {
-		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)
-				|| drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.serviceAreaBased)
-				|| (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.door2door)
-				&& plansCalcRouteCfg.isInsertingAccessEgressWalk())) {
-			String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(drtCfg.getMode());
-			if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
-				addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
-			}
+		String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(drtCfg.getMode());
+		if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
+			addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
 		}
 	}
 

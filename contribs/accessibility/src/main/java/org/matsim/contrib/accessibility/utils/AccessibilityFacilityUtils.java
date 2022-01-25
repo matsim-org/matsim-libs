@@ -29,7 +29,11 @@ import org.matsim.contrib.accessibility.FacilityTypes;
 /**
  * @author dziemke
  */
-public class AccessibilityFacilityUtils {
+public final class AccessibilityFacilityUtils {
+	// used from outside
+
+	private AccessibilityFacilityUtils(){} // do not instantiate
+
 	// Activites in SrV		
 	// eigener Arbeitsplatz
 	// anderer Dienstort/-weg
@@ -55,6 +59,8 @@ public class AccessibilityFacilityUtils {
 	 * @see <a href="http://wiki.openstreetmap.org/wiki/Key:amenity">OpenStreetMap: Amenity</a>
 	 * **/
 	public static Map<String, String> buildOsmAmenityToMatsimTypeMap(){
+		// yyyy intellij says that what follows here is identical with something in OSMKeyForLeisure.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		// "subsistence" section in osm wiki
 		map.put("bar", FacilityTypes.LEISURE);
@@ -165,6 +171,8 @@ public class AccessibilityFacilityUtils {
 	}
 	
 	public static Map<String, String> buildOsmAmenityToMatsimTypeMapV2(){
+		// yyyy intellij says that what follows here is identical with something in OSMKeyForLeisure.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		// "subsistence" section in osm wiki
 		map.put("bar", FacilityTypes.LEISURE);
@@ -335,6 +343,8 @@ public class AccessibilityFacilityUtils {
 	}	
 	
 	public static Map<String, String> buildOsmLeisureToMatsimTypeMap(){
+		// yyyy intellij says that what follows here is identical with something in RunCombinedOsmReaderCottbus.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		map.put("adult_gaming_centre", FacilityTypes.LEISURE);
 		map.put("amusement_arcade", FacilityTypes.LEISURE);
@@ -369,6 +379,8 @@ public class AccessibilityFacilityUtils {
 	
 	// New version with some updated leisure types, 2018-12-12
 	public static Map<String, String> buildOsmLeisureToMatsimTypeMapV2(){
+		// yyyy intellij says that what follows here is identical with something in OSMKeyForLeisure.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		map.put("adult_gaming_centre", FacilityTypes.LEISURE);
 		map.put("amusement_arcade", FacilityTypes.LEISURE);
@@ -433,6 +445,8 @@ public class AccessibilityFacilityUtils {
 	}
 	
 	public static Map<String, String> buildOsmTourismToMatsimTypeMap(){
+		// yyyy intellij says that what follows here is identical with something in RunCombinedOSMReaderCottbus.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		map.put("alpine_hut", FacilityTypes.LEISURE);
 		map.put("apartment", FacilityTypes.IGNORE);
@@ -457,6 +471,8 @@ public class AccessibilityFacilityUtils {
 	
 	// New version with some updated tourism types, 2018-12-12
 	public static Map<String, String> buildOsmTourismToMatsimTypeMapV2(){
+		// yyyy intellij says that what follows here is identical with something in OSMKeyForLeisure.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		map.put("alpine_hut", FacilityTypes.LEISURE);
 		map.put("apartment", FacilityTypes.IGNORE);
@@ -813,6 +829,8 @@ public class AccessibilityFacilityUtils {
 	
 	// TODO Revise, dz, dec'18
 	public static Map<String, String> buildOsmBuildingToMatsimTypeMap(){
+		// yyyy intellij says that what follows here is identical with something in RunCombinedOSMReaderCottbus.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		// see http://wiki.openstreetmap.org/wiki/DE:Key:building
 		// building types where nobody lives and works or where only
@@ -881,6 +899,8 @@ public class AccessibilityFacilityUtils {
 	
 	// TODO Revise, dz, dec'18
 	public static Map<String, String> buildOsmLandUseToMatsimTypeMap(){
+		// yyyy intellij says that what follows here is identical with something in RunCombinedOSMReaderCottbus.  kai, feb'20
+
 		Map<String, String> map = new TreeMap<String, String>();
 		// see http://wiki.openstreetmap.org/wiki/DE:Key:landuse
 		// land use types where nobody lives and works or where only
@@ -922,6 +942,8 @@ public class AccessibilityFacilityUtils {
 	}
 	
 	public static List<String> buildUnmannedEntitiesList(){
+		// yyyy intellij says that what follows here is identical with something in RunCombinedOSMReaderCottbus.  kai, feb'20
+
 		List<String> list = new LinkedList<String>();
 		list.add("bicycle_rental");
 		list.add("car_wash");

@@ -37,7 +37,7 @@ public class DeterministicWaitTimeCalculator implements WaitTimeCalculator {
 
 		for (TransitRouteStop stop : route.getStops()) {
 			if (stop.getStopFacility().getId().equals(stopId)) {
-				facilityOffsets.add(stop.getDepartureOffset());
+				facilityOffsets.add(stop.getDepartureOffset().seconds());
 			}
 		}
 

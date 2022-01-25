@@ -29,14 +29,20 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.contrib.signals.controller.AbstractSignalController;
+import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
+import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController.FixedTimeFactory;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.router.util.TravelTime;
@@ -52,16 +58,53 @@ import com.google.inject.Inject;
  * @author tthunig
  *
  */
-public class SimpleResponsiveSignal implements AfterMobsimListener{
+public class SimpleResponsiveSignal extends AbstractSignalController implements AfterMobsimListener {
 
 	private static final Logger LOG = Logger.getLogger(SimpleResponsiveSignal.class);
+	public static final String IDENTIFIER = "SimpleResponsiveSignalControl";
 	
 	// increase this if agents should have "time" (iterations) to react to the changed signal control
 	private static final int INTERVAL = 1;
 	
 	private Map<Id<Link>, Double> link2avgDelay = new HashMap<>();
 	
-	@Inject Scenario scenario;
+	private Scenario scenario;
+	private SignalModelFactory factory;
+
+	private SignalController delegatePlanbasedSignalController;
+	
+	public final static class SimpleResponsiveSignalFactory implements SignalControllerFactory {
+		
+		@Inject ControlerListenerManager manager;
+		@Inject Scenario scenario;
+		@Inject SignalModelFactory factory;
+
+		@Override
+		public SignalController createSignalSystemController(SignalSystem signalSystem) {
+			SimpleResponsiveSignal controller = new SimpleResponsiveSignal();
+			controller.setSignalSystem(signalSystem);
+			controller.setFactory(factory);
+			controller.setScenario(scenario);
+			
+			/* add the responsive signal as a controler listener to be able to listen to 
+			 * AfterMobsimEvents (which provide the TravelTime object): */
+			manager.addControlerListener(controller);
+			
+			return controller;
+		}
+	}
+	
+	private SimpleResponsiveSignal() {
+		super();
+	}
+	
+	void setScenario(Scenario scenario) {
+		this.scenario = scenario;
+	}
+	
+	void setFactory(SignalModelFactory factory) {
+		this.factory = factory;
+	}
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -93,7 +136,10 @@ public class SimpleResponsiveSignal implements AfterMobsimListener{
 		
 	}
 
-	private void updateSignals() {
+	/** 
+	 * create a new signal plan with shifted green times and save it in field signalPlans directly
+	 */
+	private void updateSignals() {		
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		
@@ -114,10 +160,35 @@ public class SimpleResponsiveSignal implements AfterMobsimListener{
 			group2Setting.setOnset(group2Setting.getOnset() + greenTimeShift);
 			LOG.info("SignalGroup1: onset " + group1Setting.getOnset() + ", dropping " + group1Setting.getDropping());
 			LOG.info("SignalGroup2: onset " + group2Setting.getOnset() + ", dropping " + group2Setting.getDropping());
+			/* the new plan needs to be added to the signal control since it was made persistent over the iterations 
+			 * and is not built newly each iteration from the data. theresa, jan'20 */
+			addPlan(this.factory.createSignalPlan(signalPlan));
 		} else {
 			// do nothing
 			LOG.info("Signal control unchanged.");
 		}
+	}
+
+	@Override
+	public void setSignalSystem(SignalSystem signalSystem) {
+		super.setSignalSystem(signalSystem);
+		delegatePlanbasedSignalController = new FixedTimeFactory().createSignalSystemController(signalSystem);
+	}
+
+	@Override
+	public void addPlan(SignalPlan plan) {
+		super.addPlan(plan);
+		delegatePlanbasedSignalController.addPlan(plan);
+	}
+
+	@Override
+	public void updateState(double timeSeconds) {
+		delegatePlanbasedSignalController.updateState(timeSeconds);
+	}
+
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+		delegatePlanbasedSignalController.simulationInitialized(simStartTimeSeconds);
 	}
 
 }

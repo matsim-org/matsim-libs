@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,8 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 /**
  *
@@ -78,13 +76,13 @@ public class AgentId2PlannedDepartureTimeMap {
 						Activity act = (Activity) pE;
 
 						if(!firstActDone){
-							runningTime = act.getEndTime();
+							runningTime = act.getEndTime().seconds();
 							firstActDone = true;
 						} else {
-							if(act.getMaximumDuration() != Time.UNDEFINED_TIME){
-								runningTime += act.getMaximumDuration();
+							if(act.getMaximumDuration().isUndefined()){
+								runningTime += act.getMaximumDuration().seconds();
 							} else {
-								runningTime = act.getEndTime();
+								runningTime = act.getEndTime().seconds();
 							}
 						}
 					}
@@ -95,8 +93,8 @@ public class AgentId2PlannedDepartureTimeMap {
 
 						if(leg.getMode() == TransportMode.pt){
 							// it's the start of a new pt leg, report it
-							if (leg.getRoute() instanceof ExperimentalTransitRoute){
-								ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+							if (leg.getRoute() instanceof TransitPassengerRoute){
+								TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 								plannedDepartureList.add(new Tuple<Id, AgentId2PlannedDepartureTimeMapData>(route.getAccessStopId(), new AgentId2PlannedDepartureTimeMapData(route.getAccessStopId(), runningTime, route.getLineId(), route.getRouteId())));
 							} else if (leg.getRoute() != null) {
 								log.warn("unknown route description found - only know to handle ExperimentalTransitRoute, got " + leg.getRoute().getClass().getCanonicalName());
@@ -104,10 +102,10 @@ public class AgentId2PlannedDepartureTimeMap {
 						}
 
 						// add the legs travel time
-						if(Double.isInfinite(leg.getTravelTime())){
-							log.debug("Infinite travel time founde");
+						if(leg.getTravelTime().isUndefined()){
+							log.debug("Undefined travel time found");
 						} else {
-							runningTime += leg.getTravelTime();
+							runningTime += leg.getTravelTime().seconds();
 						}
 
 					}

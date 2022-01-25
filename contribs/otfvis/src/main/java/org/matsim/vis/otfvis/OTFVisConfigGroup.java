@@ -99,7 +99,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 
 	private static final String COLORING="coloringScheme" ;
 
-	public static enum ColoringScheme { standard, bvg, bvg2, byId, gtfs, taxicab }
+	public static enum ColoringScheme { standard, bvg, bvg2, byId, gtfs, taxicab, infection }
 
     private ColoringScheme coloring = ColoringScheme.standard ;
 

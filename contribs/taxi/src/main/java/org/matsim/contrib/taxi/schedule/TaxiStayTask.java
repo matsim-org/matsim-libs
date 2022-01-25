@@ -19,21 +19,15 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.STAY;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
-public class TaxiStayTask extends StayTaskImpl implements TaxiTask {
+public class TaxiStayTask extends DefaultStayTask {
+	public static final TaxiTaskType TYPE = new TaxiTaskType(STAY);
+
 	public TaxiStayTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
-	}
-
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.STAY;
-	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+		super(TYPE, beginTime, endTime, link);
 	}
 }

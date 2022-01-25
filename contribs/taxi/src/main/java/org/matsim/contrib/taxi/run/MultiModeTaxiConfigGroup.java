@@ -21,8 +21,7 @@
 package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
-
-import javax.validation.Valid;
+import java.util.function.Supplier;
 
 import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
@@ -47,8 +46,15 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
 
+	private final Supplier<TaxiConfigGroup> taxiConfigGroupSupplier;
+
 	public MultiModeTaxiConfigGroup() {
+		this(TaxiConfigGroup::new);
+	}
+
+	public MultiModeTaxiConfigGroup(Supplier<TaxiConfigGroup> taxiConfigGroupSupplier) {
 		super(GROUP_NAME);
+		this.taxiConfigGroupSupplier = taxiConfigGroupSupplier;
 	}
 
 	@Override
@@ -62,14 +68,24 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
-			return new TaxiConfigGroup();
+			return taxiConfigGroupSupplier.get();
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set type: " + type);
 		}
-		throw new IllegalArgumentException(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof TaxiConfigGroup) {
+			super.addParameterSet(set);
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
+		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<@Valid TaxiConfigGroup> getModalElements() {
+	public Collection<TaxiConfigGroup> getModalElements() {
 		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
 	}
 }

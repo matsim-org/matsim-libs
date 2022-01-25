@@ -19,16 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.List;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-import org.matsim.core.utils.misc.Time;
-
-import java.util.List;
-import java.util.Random;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * A time allocation mutator to use with multi-leg routing.
@@ -63,30 +63,30 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		final int nActs = activities.size();
 		// when mutating durations "blindly", avoid creating activities ending before
 		// the previous activity.
-		double lastEndTime = Double.NEGATIVE_INFINITY;
+		OptionalTime lastEndTime = OptionalTime.undefined();
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
-					((Activity) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
+					a.getMaximumDuration().ifDefined(d -> a.setMaximumDuration(mutateTime(d)));
 					break;
 				case MUTATE_END:
-					a.setEndTime( mutateTime( a.getEndTime() ) );
-					if ( a.getEndTime() != Time.UNDEFINED_TIME &&
-							a.getEndTime() < lastEndTime ) {
-						a.setEndTime( lastEndTime );
+					if (a.getEndTime().isDefined()) {
+						a.setEndTime(  mutateTime(a.getEndTime().seconds()));
+						lastEndTime = a.getEndTime();
+					} else if (lastEndTime.isDefined()) {
+						a.setEndTime( lastEndTime.seconds() );
 					}
-					lastEndTime = a.getEndTime();
 					break;
 				case MUTATE_END_AS_DUR:
-					final double oldTime = a.getEndTime();
-					if ( oldTime == Time.UNDEFINED_TIME ) break;
-					final double newTime = mutateTime( oldTime );
+					final OptionalTime oldTime = a.getEndTime();
+					if ( oldTime.isUndefined() ) break;
+					final double newTime = mutateTime( oldTime.seconds() );
 					// doing this so rather than sampling mut directly allows
 					// to avoid negative times
-					final double mut = newTime - oldTime;
+					final double mut = newTime - oldTime.seconds();
 					// shift all times after the mutated time (as if we were working on durations)
 					for ( Activity currAct : activities.subList( activities.indexOf( a ) , nActs ) ) {
-						currAct.setEndTime( currAct.getEndTime() + mut );
+						currAct.setEndTime( currAct.getEndTime().seconds() + mut );
 					}
 					break;
 				default:
@@ -96,13 +96,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	}
 
 	private double mutateTime(final double time) {
-		// do not do anything if time is undefined
-		if ( time == Time.UNDEFINED_TIME ) return time;
-		if ( Double.isNaN( time ) ) throw new IllegalArgumentException( ""+time );
-
 		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
-		assert !Double.isNaN( t ) : t;
-		assert !Double.isInfinite( t ) : t;
 		return t < 0 ? 0 : t;
 	}
 

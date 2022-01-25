@@ -28,9 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
@@ -56,7 +54,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	private final LeastCostPathCalculator pathCalculator;
 	private final PopulationFactory populationFactory;
 	
-	/*package*/ CurrentLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, 
+	/*package*/ CurrentLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface,
 			LeastCostPathCalculator pathCalculator) {
 		super(id, scenario, internalInterface);
 		this.pathCalculator = pathCalculator;
@@ -86,7 +84,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, populationFactory ) ;
 
-		editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time ) ;
+		editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time.seconds() ) ;
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		WithinDayAgentUtils.resetCaches(withinDayAgent);

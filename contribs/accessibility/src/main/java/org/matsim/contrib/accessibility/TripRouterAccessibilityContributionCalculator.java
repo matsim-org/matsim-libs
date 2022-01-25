@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
@@ -29,10 +33,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -41,20 +45,22 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilitiesFactory;
+import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author nagel, dziemke
  */
-public class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
+class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger( TripRouterAccessibilityContributionCalculator.class );
 	private TripRouter tripRouter ;
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private NetworkConfigGroup networkConfigGroup;
 	private Scenario scenario;
 
     Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
@@ -78,6 +84,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 	    this.mode = mode;
 		this.tripRouter = tripRouter;
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
+		this.networkConfigGroup = scenario.getConfig().network();
 		this.scenario = scenario;
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
@@ -93,7 +100,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
     @Override
     public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 		LOG.warn("Initializing calculator for mode " + mode + "...");
-		subNetwork = AccessibilityUtils.createModeSpecificSubNetwork(scenario.getNetwork(), mode);
+		subNetwork = AccessibilityUtils.createModeSpecificSubNetwork(scenario.getNetwork(), mode, networkConfigGroup);
 
 		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
         this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, subNetwork, scenario.getConfig());
@@ -129,7 +136,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 			ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestBasicLocation().getCoord());
 
 			Gbl.assertNotNull(tripRouter);
-			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null);
+			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null, new Attributes());
 
 			double utility = 0.;
 			List<Leg> legs = TripStructureUtils.getLegs(plan);
@@ -149,8 +156,8 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 							"inconsistency in the NetworkRoutingModule is solved.");
 				}
 				utility += (leg.getRoute().getDistance() + endLinkLength) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
-				utility += (leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
-				utility += -(leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
+				utility += (leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
+				utility += -(leg.getRoute().getTravelTime().seconds() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
 			}
 
 			// Utility based on opportunities that are attached to destination node

@@ -20,6 +20,9 @@
 
  package org.matsim.core.scoring;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -31,10 +34,6 @@ import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PopulationUtils;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
@@ -55,8 +54,8 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private IdMap<Person, Activity> activities = new IdMap<>(Person.class);
-    private List<ActivityHandler> activityHandlers = new ArrayList<>();
+    private final IdMap<Person, Activity> activities = new IdMap<>(Person.class);
+    private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
 
@@ -78,6 +77,7 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         if (activity == null) {
             Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
+            firstActivity.setCoord(event.getCoord());
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
@@ -91,6 +91,8 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
+        activity.setCoord( event.getCoord() );
+
         this.activities.put(event.getPersonId(), activity);
     }
 

@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.util.ArrayList;
@@ -10,6 +31,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -42,14 +64,10 @@ public class Tour {
 			
 		}
 
-		private List<TourElement> tourElements = new ArrayList<TourElement>();
-
-		private Set<CarrierShipment> openPickups = new HashSet<CarrierShipment>();
-
+		private final List<TourElement> tourElements = new ArrayList<>();
+		private final Set<CarrierShipment> openPickups = new HashSet<>();
 		private boolean previousElementIsActivity;
-
 		private Start start;
-		
 		private End end;
 		
 		/**
@@ -71,35 +89,31 @@ public class Tour {
 			return this;
 		}
 		
-		public Builder scheduleEnd(Id<Link> endLinkId, TimeWindow timeWindow){
+		public void scheduleEnd(Id<Link> endLinkId, TimeWindow timeWindow){
 			assertLastElementIsLeg();
-			End end = new End(endLinkId, timeWindow);
-			this.end = end;
+			this.end = new End(endLinkId, timeWindow);
 			previousElementIsActivity = true;
-			return this;
 		}
 		
 		/**
 		 * Schedules the end of the tour (in terms of locationId).
 		 * 
 		 * @param endLinkId
-		 * @return the builder
 		 */
-		public Builder scheduleEnd(Id<Link> endLinkId) {
+		public void scheduleEnd(Id<Link> endLinkId) {
 			scheduleEnd(endLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
-			return this;
 		}
 
 		/**
 		 * Adds a leg to the currentTour.
 		 * 
-		 * <p>Consider that a leg follows an activity. Otherwise an exception occurs.
+		 * <p>Consider that a leg follows an activity. Otherwise, an exception occurs.
 		 * 
 		 * @param leg
 		 * @throws IllegalStateException if leg is null or if previous element is not an activity.
 		 */
 		public Builder addLeg(Leg leg) {
-			assertIsNotNull(leg);
+			Gbl.assertNotNull(leg);
 			if (!previousElementIsActivity) {
 				throw new IllegalStateException("cannot add leg, since last tour element is not an activity.");
 			}
@@ -125,25 +139,13 @@ public class Tour {
 		 */
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
-			assertIsNotNull(leg);
-//			if (!previousElementIsActivity) {
-//				throw new RuntimeException(
-//						"cannot add leg, since last tour element is not an activity.");
-//			}
+			Gbl.assertNotNull(leg);
 			tourElements.add(0,leg);
-//			previousElementIsActivity = false;
 			return this;
 		}
 
-		private void assertIsNotNull(Object o) {
-			if (o == null) {
-				throw new IllegalStateException("leg cannot be null");
-			}
-
-		}
-		
 		/**
-		 * Schedules a the pickup of the shipment right at the beginning of the tour.
+		 * Schedules a pickup of the shipment right at the beginning of the tour.
 		 * 
 		 * @param shipment
 		 * @return the builder
@@ -151,7 +153,7 @@ public class Tour {
 		 */
 		@Deprecated
 		public Builder schedulePickupAtBeginning(CarrierShipment shipment) {
-			assertIsNotNull(shipment);
+			Gbl.assertNotNull(shipment);
 			boolean wasNew = openPickups.add(shipment);
 			if (!wasNew) {
 				throw new IllegalStateException("Trying to deliver something which was already picked up.");
@@ -168,12 +170,11 @@ public class Tour {
 		 * 
 		 * 
 		 * @param shipment to be picked up
-		 * @return the builder
 		 * @throws IllegalStateException if shipment is null or if shipment has already been picked up or if last element is not a leg.
 		 */
-		public Builder schedulePickup(CarrierShipment shipment) {
-			assertIsNotNull(shipment);
-			Log.debug("Pickup to get scheduled: " + shipment.toString());
+		public void schedulePickup(CarrierShipment shipment) {
+			Gbl.assertNotNull(shipment);
+			Log.debug("Pickup to get scheduled: " + shipment);
 			boolean wasNew = openPickups.add(shipment);
 			if (!wasNew) {
 				throw new IllegalStateException("Trying to deliver something which was already picked up.");
@@ -182,7 +183,6 @@ public class Tour {
 			Pickup pickup = createPickup(shipment);
 			tourElements.add(pickup);
 			previousElementIsActivity = true;
-			return this;
 		}
 
 		private void assertLastElementIsLeg() {
@@ -196,14 +196,12 @@ public class Tour {
 		 * Schedules a delivery of a shipment, i.e. adds a delivery activity to current tour.
 		 * 
 		 * @param shipment
-		 * @param end_time
-		 * @return the builder
 		 * @throws IllegalStateException if shipment is null or if shipment has not been picked up yet or if last element is not a leg.
 		 */
-		public Builder scheduleDelivery(CarrierShipment shipment) {
-			assertIsNotNull(shipment);
-			Log.debug("Delivery to get scheduled: " + shipment.toString());
-			Log.debug("OpenPickups: " + openPickups.toString());
+		public void scheduleDelivery(CarrierShipment shipment) {
+			Gbl.assertNotNull(shipment);
+			Log.debug("Delivery to get scheduled: " + shipment);
+			Log.debug("OpenPickups: " + openPickups);
 			boolean wasOpen = openPickups.remove(shipment);
 			if (!wasOpen) {
 				throw new IllegalStateException("Trying to deliver something which was not picked up.");
@@ -211,7 +209,6 @@ public class Tour {
 			assertLastElementIsLeg();
 			tourElements.add(createDelivery(shipment));
 			previousElementIsActivity = true;
-			return this;
 		}
 		
 		public Builder scheduleService(CarrierService service){
@@ -270,24 +267,17 @@ public class Tour {
 	}
 	
 	public static abstract class TourElement {
-
 		public abstract TourElement duplicate();
-
-	};
+	}
 
 	public static abstract class TourActivity extends TourElement {
 		// yy why does it make sense to not implement them at this level? kai, oct'19
 
 		public abstract String getActivityType();
-
 		public abstract Id<Link> getLocation();
-
 		public abstract double getDuration();
-
 		public abstract TimeWindow getTimeWindow();
-
 		public abstract void setExpectedArrival(double arrivalTime);
-
 		public abstract double getExpectedArrival();
 
 		@Override public String toString() {
@@ -302,9 +292,7 @@ public class Tour {
 	public static class Leg extends TourElement {
 
 		private Route route;
-
 		private double expTransportTime;
-
 		private double departureTime;
 
 		@Override public String toString() {
@@ -352,8 +340,7 @@ public class Tour {
 	
 	public static class ServiceActivity extends TourActivity {
 
-		private CarrierService service;
-		
+		private final CarrierService service;
 		private double arrTime;
 
 		@Override public String toString() {
@@ -413,9 +400,8 @@ public class Tour {
 
 	public static class Start extends TourActivity {
 
-		private Id<Link> locationLinkId;
-		
-		private TimeWindow timeWindow;
+		private final Id<Link> locationLinkId;
+		private final TimeWindow timeWindow;
 		
 		public Start(Id<Link> locationLinkId, TimeWindow timeWindow) {
 			super();
@@ -467,10 +453,9 @@ public class Tour {
 	}
 	
 	public static class End extends TourActivity {
-		private Id<Link> locationLinkId;
-		
-		private TimeWindow timeWindow;
 
+		private final Id<Link> locationLinkId;
+		private final TimeWindow timeWindow;
 		private double arrTime;
 		
 		public End(Id<Link> locationLinkId, TimeWindow timeWindow) {
@@ -576,7 +561,7 @@ public class Tour {
 			return new Pickup(this);
 		}
 
-	};
+	}
 
 	public static class Delivery extends ShipmentBasedActivity {
 
@@ -633,13 +618,13 @@ public class Tour {
 			return new Delivery(this);
 		}
 
-	};
+	}
 
 	private final List<TourElement> tourElements;
 	
-	private Start start;
+	private final Start start;
 	
-	private End end;
+	private final End end;
 	
 	private Tour(Builder builder){
 		tourElements = builder.tourElements;
@@ -650,7 +635,7 @@ public class Tour {
 	private Tour(Tour tour) {
 		this.start = (Start) tour.start.duplicate();
 		this.end = (End) tour.end.duplicate();
-		List<TourElement> elements = new ArrayList<Tour.TourElement>();
+		List<TourElement> elements = new ArrayList<>();
 		for (TourElement element : tour.getTourElements()) {
 			elements.add(element.duplicate());
 		}

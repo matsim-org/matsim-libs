@@ -33,13 +33,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
+	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
 
 	private final EventsManager eventsManager;
-	private PreplanningEngine preplanningEngine;
-	private ActivityEngine delegate;
+	private final PreplanningEngine preplanningEngine;
+	private final ActivityEngine delegate;
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500,
 			Comparator.comparingDouble((AgentEntry o) -> o.time).thenComparing(o -> o.agent.getId()));
@@ -90,9 +91,12 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public boolean handleActivity(MobsimAgent agent) {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
-		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
-		if (!act.getType().contains("interaction")) {
-			wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
+//		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
+		if ( agent instanceof PlanAgent ) {
+			Activity act = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
+			if (!act.getType().contains("interaction")) {
+				wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
+			}
 		}
 
 		return delegate.handleActivity(agent);
@@ -125,7 +129,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double time, AgentWakeup agentWakeup) {
+		AgentEntry( MobsimAgent agent, double time, AgentWakeup agentWakeup ) {
 			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
 			// general, rather move on a completely general MessageQueue.  kai, mar'19
 
@@ -142,7 +146,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public final static class AgentWakeupEvent extends Event implements HasPersonId {
 		private final Id<Person> personId;
 
-		public AgentWakeupEvent(double now, Id<Person> personId) {
+		AgentWakeupEvent( double now, Id<Person> personId ) {
 			super(now);
 			this.personId = personId;
 		}

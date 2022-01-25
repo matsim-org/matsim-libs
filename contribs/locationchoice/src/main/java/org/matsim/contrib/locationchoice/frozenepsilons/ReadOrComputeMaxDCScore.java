@@ -20,24 +20,25 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
-import org.matsim.core.config.Config;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.*;
 
 class ReadOrComputeMaxDCScore {
 
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
 
-	public static String maxEpsFile = "personsMaxDCScoreUnscaled.xml";
-
-	private Config config;
 	private Scenario scenario;
 	private FrozenTastesConfigGroup dccg;
 	private DestinationChoiceContext lcContext;
@@ -47,7 +48,6 @@ class ReadOrComputeMaxDCScore {
 
 	public ReadOrComputeMaxDCScore(DestinationChoiceContext lcContext) {
 		this.scenario = lcContext.getScenario();
-		this.config = this.scenario.getConfig();
 		this.dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.flexibleTypes = lcContext.getFlexibleTypes();
@@ -56,10 +56,24 @@ class ReadOrComputeMaxDCScore {
 
 	public void readOrCreateMaxDCScore( boolean arekValsRead ) {
 		String maxEpsValuesFileName = this.dccg.getMaxEpsFile();
+		if (existingFlexibleTypeValue()) {
+			log.info("reading MaxDCScore from plans file");
+			return;
+		}
+		log.info("at least one facility value is missing, start crating all values");
 		if (maxEpsValuesFileName != null && arekValsRead) {
-			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {
+				ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 				maxEpsReader.readFile(maxEpsValuesFileName);
+				for (Person p : this.scenario.getPopulation().getPersons().values()) {
+					for (String flexibleType : this.flexibleTypes){
+						double maxType = (Double) personsMaxDCScoreUnscaled.getAttribute(p.getId().toString(), flexibleType);
+						if (maxType != 0) {
+							p.getAttributes().putAttribute(flexibleType, maxType);
+						}
+					}
+				}
+
 				log.info("reading maxEpsilons from file:\n"+ maxEpsValuesFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
@@ -72,6 +86,23 @@ class ReadOrComputeMaxDCScore {
 			log.info("computing maxDCScore");
 			this.computeMaxDCScore();
 		}
+	}
+
+	private boolean existingFlexibleTypeValue() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			List<Activity> activities = TripStructureUtils.getActivities(plan, ExcludeStageActivities);
+			for (String flexibleType : this.flexibleTypes) {
+				for (Activity activity : activities) {
+					if (activity.getType().equals(flexibleType)) {
+						if (person.getAttributes().getAttribute(flexibleType) == null) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private void computeMaxDCScore() {
@@ -97,11 +128,11 @@ class ReadOrComputeMaxDCScore {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			for (String flexibleType : this.flexibleTypes) {
 				double maxType = (Double)person.getCustomAttributes().get(flexibleType);
-				this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
+				if (maxType != 0.0) {
+					person.getAttributes().putAttribute(flexibleType, maxType);
+				}
 			}
 		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);
-		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + maxEpsFile);
 	}
 
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {

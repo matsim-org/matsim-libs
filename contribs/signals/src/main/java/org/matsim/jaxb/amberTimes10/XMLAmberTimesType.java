@@ -65,8 +65,8 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class XMLAmberTimesType {
 
-    protected XMLAmberTimesType.XMLRedAmber redAmber;
-    protected XMLAmberTimesType.XMLAmber amber;
+    private XMLAmberTimesType.XMLRedAmber redAmber;
+    private XMLAmberTimesType.XMLAmber amber;
 
     /**
      * Gets the value of the redAmber property.

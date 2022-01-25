@@ -21,17 +21,26 @@ package org.matsim.examples;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -39,22 +48,6 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author mrieser / Senozon AG
  */
 public class PtTutorialIT {
-
-	private static final class EnterVehicleEventCounter implements BasicEventHandler {
-		private long cnt = 0 ;
-		@Override public void reset(int iteration) {
-			cnt = 0 ;
-		}
-		@Override public void handleEvent( Event event ) {
-			if ( event instanceof PersonEntersVehicleEvent ) {
-				cnt++ ;
-//				System.err.println( event ) ;
-			}
-		}
-		public final long getCnt() {
-			return this.cnt;
-		}
-	}
 
 	private final static Logger log = Logger.getLogger(PtTutorialIT.class);
 	
@@ -65,13 +58,14 @@ public class PtTutorialIT {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		config.controler().setLastIteration(1);
 
-
 		try {
 			Controler controler = new Controler(config);
 			final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
+			final StageActivityDurationChecker stageActivityDurationChecker = new StageActivityDurationChecker();
 			controler.addOverridingModule( new AbstractModule(){
 				@Override public void install() {
-					this.addEventHandlerBinding().toInstance( enterVehicleEventCounter);
+					this.addEventHandlerBinding().toInstance( enterVehicleEventCounter );
+					this.addEventHandlerBinding().toInstance( stageActivityDurationChecker );
 				}
 			});
 			controler.run();
@@ -101,9 +95,11 @@ public class PtTutorialIT {
 		try {
 			Controler controler = new Controler(config);
 			final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
+			final StageActivityDurationChecker stageActivityDurationChecker = new StageActivityDurationChecker();
 			controler.addOverridingModule( new AbstractModule(){
 				@Override public void install() {
-					this.addEventHandlerBinding().toInstance( enterVehicleEventCounter);
+					this.addEventHandlerBinding().toInstance( enterVehicleEventCounter );
+					this.addEventHandlerBinding().toInstance( stageActivityDurationChecker );
 				}
 			});
 			controler.run();
@@ -114,6 +110,48 @@ public class PtTutorialIT {
 			Assert.fail("There shouldn't be any exception, but there was ... :-(");
 		}
 		
+	}
+
+	private static final class EnterVehicleEventCounter implements PersonEntersVehicleEventHandler {
+		private long cnt = 0 ;
+		@Override public void reset(int iteration) {
+			cnt = 0 ;
+		}
+		@Override public void handleEvent( PersonEntersVehicleEvent event ) {
+			cnt++ ;
+		}
+		public final long getCnt() {
+			return this.cnt;
+		}
+	}
+
+	/**
+	 * tests matsim-org/matsim-libs/issues/917
+	 */
+	private static final class StageActivityDurationChecker implements ActivityStartEventHandler, ActivityEndEventHandler {
+		private Map<Id<Person>, ActivityStartEvent> personId2ActivityStartEvent = new HashMap<>();
+
+		@Override public void reset(int iteration) {
+			personId2ActivityStartEvent.clear();
+		}
+		@Override public void handleEvent( ActivityStartEvent event ) {
+			if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) ) {
+				personId2ActivityStartEvent.put(event.getPersonId(), event);
+			}
+		}
+		@Override public void handleEvent( ActivityEndEvent endEvent ) {
+			if (StageActivityTypeIdentifier.isStageActivity(endEvent.getActType()) ) {
+				ActivityStartEvent startEvent = personId2ActivityStartEvent.get(endEvent.getPersonId());
+				Assert.assertEquals("Stage activity should have same type in current ActivityEndEvent and in last ActivityStartEvent, but did not. PersonId " +
+								endEvent.getPersonId() +  ", ActivityStartEvent type: " + startEvent.getActType() +  ", ActivityEndEvent type: " + endEvent.getActType() +
+								", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime(),
+						startEvent.getActType(), endEvent.getActType());
+				Assert.assertEquals("Stage activity should have a duration of 0 seconds, but did not. PersonId " +
+								endEvent.getPersonId() +  ", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime(),
+						0.0, startEvent.getTime() - endEvent.getTime(), MatsimTestUtils.EPSILON);
+				personId2ActivityStartEvent.remove(endEvent.getPersonId());
+			}
+		}
 	}
 	
 }

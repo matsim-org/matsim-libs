@@ -56,6 +56,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -316,7 +317,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		
-		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -324,7 +325,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 				
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
 				tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

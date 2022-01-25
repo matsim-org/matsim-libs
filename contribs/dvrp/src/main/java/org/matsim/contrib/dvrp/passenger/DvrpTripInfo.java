@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.facilities.Facility;
 
@@ -38,16 +38,18 @@ class DvrpTripInfo implements TripInfoWithRequiredBooking {
 	private final Link dropoffLink;
 	private final double departureTime;
 	private final double timeStamp;
-	private final TripInfoRequest originalRequest;
+	private final Request originalRequest;
+	private final Provider provider;
 
-	public DvrpTripInfo( String mode, Link pickupLink, Link dropoffLink, double departureTime, double timeStamp,
-				   TripInfoRequest originalRequest ) {
+	DvrpTripInfo( String mode, Link pickupLink, Link dropoffLink, double departureTime, double timeStamp,
+		      Request originalRequest, Provider provider ) {
 		this.mode = mode;
 		this.pickupLink = pickupLink;
 		this.dropoffLink = dropoffLink;
 		this.departureTime = departureTime;
 		this.timeStamp = timeStamp;
 		this.originalRequest = originalRequest ;
+		this.provider = provider;
 	}
 
 	@Override
@@ -112,7 +114,10 @@ class DvrpTripInfo implements TripInfoWithRequiredBooking {
 	}
 
 	@Override
-	public TripInfoRequest getOriginalRequest(){
+	public Request getOriginalRequest(){
 		return originalRequest;
+	}
+	@Override public void bookTrip( MobsimPassengerAgent agent ) {
+		this.provider.bookTrip( agent, this );
 	}
 }

@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import org.matsim.api.core.v01.Scenario;
@@ -10,6 +31,7 @@ import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.VehicleEmploymentScoring;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -58,17 +80,19 @@ final class RunPassengerAlongWithCarriers {
 		}
 
 		Controler controler = new Controler(scenario);
-		final Carriers carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readURL( IOUtils.extendUrl(url, "vehicleTypes.xml" ) );
+
+		final Carriers carriers = new Carriers();
+		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
+
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
 		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
 
-		CarrierModule carrierController = new CarrierModule(carriers, strategyManagerFactory, scoringFunctionFactory);
+		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
 
 		controler.addOverridingModule(carrierController);
 		prepareFreightOutputDataAndStats(scenario, controler.getEvents(), controler, carriers);
@@ -90,6 +114,7 @@ final class RunPassengerAlongWithCarriers {
 			prepareConfig() ;
 		}
 		scenario = ScenarioUtils.loadScenario( config ) ;
+		FreightUtils.addOrGetCarriers( scenario );
 		return scenario ;
 	}
 
@@ -109,7 +134,7 @@ final class RunPassengerAlongWithCarriers {
 		controler.addControlerListener((IterationEndsListener) event -> {
 			//write plans
 			String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
-			new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+			new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 
 			//write stats
 			freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

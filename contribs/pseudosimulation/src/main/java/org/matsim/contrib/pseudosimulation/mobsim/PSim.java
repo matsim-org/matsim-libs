@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
@@ -82,7 +83,7 @@ public class PSim implements Mobsim {
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes) {
         Logger.getLogger(getClass()).warn("Constructing PSim");
         this.scenario = sc;
-        this.endTime = sc.getConfig().qsim().getEndTime();
+        this.endTime = sc.getConfig().qsim().getEndTime().seconds();
         this.eventManager = eventsManager;
         int numThreads = sc.getConfig().global().getNumberOfThreads() ;
         threads = new SimThread[numThreads];
@@ -162,8 +163,7 @@ public class PSim implements Mobsim {
                     /*
                      * Make sure that the activity does not end before the previous activity.
                      */
-                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.getEndTime() );
-
+                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.getEndTime().orElse(0));
                     if( idx > 0 ){
                         /*
                          * If this is not the first activity, then there must exist a leg before.
@@ -200,17 +200,17 @@ public class PSim implements Mobsim {
                                 travelTime = trip.egressTime_s() - prevEndTime;
                             }
                         } else{
-                            try{
                                 Route route = prevLeg.getRoute();
-                                travelTime = route.getTravelTime();
+                                if (route == null) {
+                                    Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
+                                    continue;
+                                }
+
+                                travelTime = route.getTravelTime().orElse(0);
                                 eventQueue.add( new TeleportationArrivalEvent( prevEndTime + travelTime, personId,
                                         route.getDistance()
-                                        // Double.NaN
+                                        , prevLeg.getMode()
                                 ) );
-                            } catch( NullPointerException e ){
-                                Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
-                                continue;
-                            }
                         }
 
                         travelTime = Math.max( MIN_LEG_DURATION, travelTime );
@@ -221,17 +221,6 @@ public class PSim implements Mobsim {
                          * agent arrives.
                          */
                         actEndTime = Math.max( arrivalTime + MIN_ACT_DURATION, actEndTime );
-                        /*
-                         * If act end time is not specified...
-                         */
-                        if( Double.isInfinite( actEndTime ) ){
-                            // if(transitPerformance!=null){
-                            if( transitEmulator != null ){
-                                //this guy is stuck, will be caught in events handling outside the loop
-                                break;
-                            } else
-                                throw new RuntimeException( "I think this is discuraged." );
-                        }
                         /*
                          * Send arrival and activity start events.
                          */
@@ -249,7 +238,7 @@ public class PSim implements Mobsim {
                         Leg nextLeg = (Leg) elements.get( idx + 1 );
                         ActivityEndEvent endEvent = new ActivityEndEvent( actEndTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
                         eventQueue.add( endEvent );
-                        PersonDepartureEvent departureEvent = new PersonDepartureEvent( actEndTime, personId, act.getLinkId(), nextLeg.getMode() );
+                        PersonDepartureEvent departureEvent = new PersonDepartureEvent( actEndTime, personId, act.getLinkId(), nextLeg.getMode(), TripStructureUtils.getRoutingMode(nextLeg) );
 
                         eventQueue.add( departureEvent );
                     }

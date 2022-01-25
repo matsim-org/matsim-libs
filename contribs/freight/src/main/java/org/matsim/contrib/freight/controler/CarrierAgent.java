@@ -1,27 +1,53 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.controler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.Tour.Delivery;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.*;
 
 /**
  * This keeps track of the carrier during simulation.
@@ -29,7 +55,12 @@ import java.util.*;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler {
+class CarrierAgent
+//		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+//					      LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
+//					      PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler
+{
+	private static final Logger log = Logger.getLogger( CarrierAgent.class );
 
 	/**
 	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
@@ -51,24 +82,37 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		private final ScheduledTour scheduledTour;
 
-		private int activityCounter = 1;
+		private int activityCounter = 0;
 
-		CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
+		private CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
+			log.debug("creating CarrierDriverAgent with driverId=" + driverId );
 			this.driverId = driverId;
 			this.scheduledTour = tour;
-			new HashMap<Integer, CarrierShipment>();
 		}
 
-		/**
-		 * 
-		 * @param event
-		 */
-		public void handleEvent(PersonArrivalEvent event) {
-			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime() );
-			double travelTime = currentLeg.getDepartureTime() + currentLeg.getTravelTime() - currentLeg.getDepartureTime();
+		private void handleAnEvent( Event event ) {
+			if ( event instanceof PersonArrivalEvent ) {
+				handleEvent( (PersonArrivalEvent) event );
+			} else if ( event instanceof PersonDepartureEvent ){
+				handleEvent( (PersonDepartureEvent) event );
+			} else if ( event instanceof LinkEnterEvent ){
+				handleEvent( (LinkEnterEvent) event );
+			} else if ( event instanceof ActivityEndEvent ) {
+				handleEvent( (ActivityEndEvent) event );
+			} else if ( event instanceof ActivityStartEvent ) {
+				handleEvent( (ActivityStartEvent) event );
+			} else {
+				notifyEventHappened( event, null, scheduledTour, driverId, activityCounter );
+			}
+		}
+
+		private void handleEvent( PersonArrivalEvent event ) {
+			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime().seconds());
+			double travelTime = currentLeg.getDepartureTime().seconds()
+					+ currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 			currentLeg.setTravelTime(travelTime);
 			if (currentRoute.size() > 1) {
-				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
+				NetworkRoute networkRoute = RouteUtils.createNetworkRoute( currentRoute );
 				networkRoute.setTravelTime(travelTime);
 				networkRoute.setVehicleId(getVehicle().getId() );
 				currentLeg.setRoute(networkRoute);
@@ -85,78 +129,78 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				genericRoute.setDistance(0.0);
 				currentLeg.setRoute(genericRoute);
 			}
-			scoringFunction.handleLeg(currentLeg);
+			if ( scoringFunction!=null ){
+				scoringFunction.handleLeg( currentLeg );
+			}
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		public void handleEvent(PersonDepartureEvent event) {
+		private void handleEvent( PersonDepartureEvent event ) {
 			Leg leg = PopulationUtils.createLeg(event.getLegMode());
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
-			currentRoute = new ArrayList<Id<Link>>();
+			currentRoute = new ArrayList<>();
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		public void handleEvent(LinkEnterEvent event) {
-            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getId(),event.getLinkId()) );
-            /* why can't we do something like:
-            scoringFunction.handleEvent(event);
-            (causes test failures in playground kturner), Theresa Dec'2015 */
-            currentRoute.add(event.getLinkId());
+		private void handleEvent( LinkEnterEvent event ) {
+			if ( scoringFunction!=null ){
+				scoringFunction.handleEvent( new LinkEnterEvent( event.getTime(), getVehicle().getId(), event.getLinkId() ) );
+			}
+			currentRoute.add(event.getLinkId());
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		public void handleEvent(ActivityEndEvent event) {
+		private void handleEvent( ActivityEndEvent event ) {
 			if (currentActivity == null) {
 				Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
 				currentActivity = firstActivity;
 			}
 			currentActivity.setEndTime(event.getTime());
-			scoringFunction.handleActivity(currentActivity);
-			activityFinished(event.getActType(), event.getTime()); 
+			if ( scoringFunction!=null){
+				scoringFunction.handleActivity( currentActivity );
+			}
+
+			notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
+
+			log.debug("handling activity end event=" + event );
+			if(FreightConstants.START.equals( event.getActType() ) ) {
+				activityCounter += 1;
+				return;
+			}
+			if( FreightConstants.END.equals( event.getActType() )) return;
+			if (FreightConstants.PICKUP.equals( event.getActType() )) {
+				activityCounter += 2;
+			} else if (FreightConstants.DELIVERY.equals( event.getActType() )) {
+				activityCounter += 2;
+			}
+			else{
+				activityCounter += 2;
+			}
 		}
 
-		private TourActivity getTourActivity() {
-			return (TourActivity) this.scheduledTour.getTour().getTourElements().get(activityCounter);
-		}
-
-		public void handleEvent(ActivityStartEvent event) {
+		private void handleEvent( ActivityStartEvent event ) {
 			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			if(event.getActType().equals(FreightConstants.END)){
-				activity.setEndTime(Time.UNDEFINED_TIME);
-				scoringFunction.handleActivity(activity);
+				activity.setEndTimeUndefined();
+				if ( scoringFunction!=null ){
+					scoringFunction.handleActivity( activity );
+				}
 			}
 			else{
 				TourActivity tourActivity = getTourActivity();
-				assert activity.getLinkId().toString().equals(tourActivity.getLocation().toString()) : "linkId of activity is not equal to linkId of tourActivity. This must not be.";
-				FreightActivity freightActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
-				currentActivity = freightActivity; 
+				if (!activity.getLinkId().toString().equals(tourActivity.getLocation().toString()))
+					throw new AssertionError("linkId of activity is not equal to linkId of tourActivity. This must not be.");
+				currentActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
 			}
+			notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
 		}
 
-		/**
-		 * Informs the carrierAgent that an activity has been finished.
-		 * 
-		 * @param activityType
-		 * @param time
-		 */
-		private void activityFinished(String activityType, double time) {
-			if(FreightConstants.START.equals(activityType) || FreightConstants.END.equals(activityType)) return;
-			Tour tour = this.scheduledTour.getTour();
-			if (FreightConstants.PICKUP.equals(activityType)) {
-				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
-				notifyPickup(driverId, tourElement.getShipment(),time);
-				//				logger.info("pickup occured");
-				activityCounter += 2;
-			} else if (FreightConstants.DELIVERY.equals(activityType)) {
-				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
-				notifyDelivery(driverId,tourElement.getShipment(), time);
-				activityCounter += 2;
-			}
-			else{
-				//notify activity ends ??
-				activityCounter += 2;
-			}
+		private TourActivity getTourActivity() {
+			return (TourActivity) this.scheduledTour.getTour().getTourElements().get(activityCounter);
 		}
 
 		CarrierVehicle getVehicle() {
@@ -177,30 +221,34 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private final Id<Carrier> id;
 
+	private CarrierAgentTracker lspTracker;
+
 	private final Carrier carrier;
 
-	private final CarrierAgentTracker tracker;
-
-	private Collection<Id<Person>> driverIds = new ArrayList<>();
+	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
 	private int nextId = 0;
 
-	private Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
+	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-	private Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
+	private ScoringFunction scoringFunction;
 
-	private final ScoringFunction scoringFunction;
-
-	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
-
-	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler) {
-		this.tracker = carrierAgentTracker;
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction ) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
-		assert carrierScoringFunction != null : "scoringFunctionFactory is null. this must not be.";
 		this.scoringFunction = carrierScoringFunction;
-		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
+
+		Gbl.assertNotNull(carrierScoringFunction);
 	}
+
+	public CarrierAgent( CarrierAgentTracker lspCarrierTracker, Carrier carrier ){
+		lspTracker = lspCarrierTracker;
+		this.carrier = carrier;
+		this.id = carrier.getId();
+
+		Gbl.assertNotNull( lspTracker );
+	}
+
 
 	public Id<Carrier> getId() {
 		return id;
@@ -214,12 +262,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	 * @return list of plans
 	 * @see Plan, CarrierPlan
 	 */
-	List<MobSimVehicleRoute> createFreightDriverPlans() {
+	List<Plan> createFreightDriverPlans() {
 		clear();
 		System.out.flush();
 		System.err.flush() ;
-		List<MobSimVehicleRoute> routes = new ArrayList<MobSimVehicleRoute>();
-		//		List<Plan> plans = new ArrayList<Plan>();
+		List<Plan> routes = new ArrayList<>();
 		if (carrier.getSelectedPlan() == null) {
 			return routes;
 		}
@@ -238,11 +285,14 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
 					Route route = tourLeg.getRoute();
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
-					Leg leg = PopulationUtils.createLeg(TransportMode.car);
+					//this returns TransportMode.car if the attribute is null
+					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
+					//TODO we might need to set the route to null if the the mode is a drt mode
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());
-					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime() );
+					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime()
+							.seconds());
 					plan.addLeg(leg);
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
@@ -256,11 +306,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			MobSimVehicleRoute mobsimRoute = new MobSimVehicleRoute(plan, vehicle);
-			routes.add(mobsimRoute);
-			//			plans.add(plan);
+			FreightControlerUtils.putVehicle( plan, vehicle );
+			routes.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
-			driverTourMap.put(driverId, scheduledTour);
 		}
 		return routes;
 	}
@@ -273,19 +321,16 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private void clear() {
 		carrierDriverAgents.clear();
-		driverTourMap.clear();
 		driverIds.clear();
 		nextId = 0;
 	}
 
-	public Collection<Id<Person>> getDriverIds() {
+	Collection<Id<Person>> getDriverIds() {
 		return Collections.unmodifiableCollection(driverIds);
 	}
 
 	private Person createDriverPerson(Id<Person> driverId) {
-		final Id<Person> id = driverId;
-		Person person = PopulationUtils.getFactory().createPerson(id);
-		return person;
+		return PopulationUtils.getFactory().createPerson( driverId );
 	}
 
 	private Id<Person> createDriverId(CarrierVehicle carrierVehicle) {
@@ -295,58 +340,22 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		return id;
 	}
 
-	public void notifyPickup(Id<Person> driverId, CarrierShipment shipment, double time) {
-		tracker.notifyPickedUp(carrier.getId(), driverId, shipment, time);
+	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
+		if ( scoringFunction==null ) {
+			lspTracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);}
 	}
 
-	public void notifyDelivery(Id<Person> driverId, CarrierShipment shipment,
-			double time) {
-		tracker.notifyDelivered(carrier.getId(), driverId, shipment, time);
-	}
-
-	public void scoreSelectedPlan() {
-//		Logger.getLogger(this.getClass()).warn("calling scoreSelectedPlan" ) ;
+	void scoreSelectedPlan() {
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
 		scoringFunction.finish();
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
+	void handleEvent( Event event, Id<Person> driverId ) {
+		getDriver( driverId ).handleAnEvent( event );
 	}
-
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
-	}
-
-
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);
 	}
-
 }

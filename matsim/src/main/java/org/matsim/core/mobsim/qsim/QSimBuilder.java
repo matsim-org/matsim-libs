@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,11 +32,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.AllowsConfiguration;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -70,20 +72,24 @@ import com.google.inject.name.Names;
  * 		.build(scenario, eventsManager);
  * </pre>
  *
- * Note that this is meant for situations where there is no embedding {@link org.matsim.core.controler.Controler}.  When that is
- * there, something like
+ * Note that this is meant for situations where there is no embedding
+ * {@link org.matsim.core.controler.Controler}. When that is there, something
+ * like
+ * 
  * <pre>
- *    controler.addOverridingQSimModule(new AbstractQSimModule() {
- *       @Override protected void configureQSim() {
- *          bind(Xxx.class).to(Yyy.class);
- *       }
- *    });
+ * controler.addOverridingQSimModule(new AbstractQSimModule() {
+ * 	&#64;Override
+ * 	protected void configureQSim() {
+ * 		bind(Xxx.class).to(Yyy.class);
+ * 	}
+ * });
  * </pre>
+ * 
  * should be sufficient.
  *
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
-public class QSimBuilder implements AllowsConfiguration{
+public class QSimBuilder implements AllowsConfiguration {
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
@@ -112,7 +118,7 @@ public class QSimBuilder implements AllowsConfiguration{
 	 * from the {@link StandaloneQSimModule} and derived stages).
 	 */
 	@Override
-	public QSimBuilder addOverridingModule( AbstractModule module ) {
+	public QSimBuilder addOverridingModule(AbstractModule module) {
 		overridingControllerModules.add(module);
 		return this;
 	}
@@ -138,8 +144,10 @@ public class QSimBuilder implements AllowsConfiguration{
 	 * Resets the active QSim components to the standard ones defined by MATSim.
 	 */
 	public QSimBuilder useDefaultComponents() {
-		// yy As an outside user, I find both the naming of this method and its javadoc confusing.  I would say that it is, in fact, _not_ resetting to the
-		// standard ones.  Instead, it is resetting to those coming from the config, whatever they are.  kai, nov'19
+		// yy As an outside user, I find both the naming of this method and its javadoc
+		// confusing. I would say that it is, in fact, _not_ resetting to the
+		// standard ones. Instead, it is resetting to those coming from the config,
+		// whatever they are. kai, nov'19
 
 		components.clear();
 		new StandardQSimComponentConfigurator(config).configure(components);
@@ -149,7 +157,7 @@ public class QSimBuilder implements AllowsConfiguration{
 	/**
 	 * Configures the current active QSim components.
 	 */
-	public QSimBuilder configureQSimComponents( QSimComponentsConfigurator configurator ) {
+	public QSimBuilder configureQSimComponents(QSimComponentsConfigurator configurator) {
 		configurator.configure(components);
 		return this;
 	}
@@ -185,8 +193,12 @@ public class QSimBuilder implements AllowsConfiguration{
 	 * components.
 	 */
 	public QSim build(Scenario scenario, EventsManager eventsManager) {
+		return build(scenario, eventsManager, 0);
+	}
+
+	public QSim build(Scenario scenario, EventsManager eventsManager, int iterationNumber) {
 		// First, load standard QSim module
-		AbstractModule controllerModule = new StandaloneQSimModule(scenario, eventsManager);
+		AbstractModule controllerModule = new StandaloneQSimModule(scenario, eventsManager, () -> iterationNumber);
 
 		// Add all overrides
 		for (AbstractModule override : overridingControllerModules) {
@@ -212,17 +224,21 @@ public class QSimBuilder implements AllowsConfiguration{
 	private static class StandaloneQSimModule extends AbstractModule {
 		private final Scenario scenario;
 		private final EventsManager eventsManager;
+		private final IterationCounter iterationCounter;
 
-		public StandaloneQSimModule(Scenario scenario, EventsManager eventsManager) {
+		public StandaloneQSimModule(Scenario scenario, EventsManager eventsManager, IterationCounter iterationCounter) {
 			this.scenario = scenario;
 			this.eventsManager = eventsManager;
+			this.iterationCounter = iterationCounter;
 		}
 
 		@Override
 		public void install() {
 			install(new ScenarioByInstanceModule(scenario));
 			bind(EventsManager.class).toInstance(eventsManager);
+			bind(IterationCounter.class).toInstance(iterationCounter);
 			install(new QSimModule(false));
+			install(new TimeInterpretationModule());
 		}
 	}
 }

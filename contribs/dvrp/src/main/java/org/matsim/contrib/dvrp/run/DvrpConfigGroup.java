@@ -19,24 +19,28 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import java.net.URL;
 import java.util.Map;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.annotation.Nullable;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
+import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
 import com.google.common.collect.ImmutableSet;
 
-public final class DvrpConfigGroup extends ReflectiveConfigGroup {
+public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final Logger log = Logger.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";
@@ -46,8 +50,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
-	public static final String NETWORK_MODES = "networkModes";
-	static final String NETWORK_MODES_EXP = "Set of modes of which the network will be used for DVRP travel time "
+	private static final String NETWORK_MODES = "networkModes";
+	private static final String NETWORK_MODES_EXP = ""
+			+ "Set of modes of which the network will be used for DVRP travel time "
 			+ "estimation and routing DVRP vehicles. "
 			+ "Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses "
 			+ "travelling only along a specified links or serving a limited area). "
@@ -55,13 +60,13 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 			+ "Empty value \"\" (i.e. empty set of modes) means no network filtering, i.e. "
 			+ "the original scenario.network is used";
 
-	public static final String MOBSIM_MODE = "mobsimMode";
-	static final String MOBSIM_MODE_EXP =
+	private static final String MOBSIM_MODE = "mobsimMode";
+	private static final String MOBSIM_MODE_EXP =
 			"Mode of which the network will be used for throwing events and hence calculating travel times. "
 					+ "Default is car.";
 
-	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
-	static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
+	private static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
+	private static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
 			"Used for OFFLINE estimation of travel times for VrpOptimizer"
 					+ " by means of the exponential moving average."
 					+ " The weighting decrease, alpha, must be in (0,1]."
@@ -69,8 +74,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 					+ " The averaging starts from the initial travel time estimates. If not provided,"
 					+ " the free-speed TTs is used as the initial estimates";
 
-	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
-	static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
+	private static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
+	private static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = ""
+			+ "Used for ONLINE estimation of travel times for VrpOptimizer"
 			+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
 			+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
 			+ " or positive (mixed online-offline estimation)."
@@ -93,6 +99,11 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 
+	private static final String INITIAL_TRAVEL_TIMES_FILE = "initialTravelTimesFile";
+	private static final String INITIAL_TRAVEL_TIMES_FILE_EXP =
+			"File containing the initial link travel time estimates."
+					+ " Ignored if null";
+
 	// used for building route; empty ==> no filtering (routing network equals scenario.network)
 	@NotNull
 	private ImmutableSet<String> networkModes = ImmutableSet.of(TransportMode.car);
@@ -107,8 +118,21 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@PositiveOrZero
 	private double travelTimeEstimationBeta = 0; // [s], 0 ==> only offline TT estimation
 
+	@Nullable
+	private String initialTravelTimesFile = null;
+
+	@Nullable
+	private DvrpTravelTimeMatrixParams travelTimeMatrixParams;
+
 	public DvrpConfigGroup() {
 		super(GROUP_NAME);
+		initSingletonParameterSets();
+	}
+
+	private void initSingletonParameterSets() {
+		//travel time matrix (optional)
+		addDefinition(DvrpTravelTimeMatrixParams.SET_NAME, DvrpTravelTimeMatrixParams::new,
+				() -> travelTimeMatrixParams, params -> travelTimeMatrixParams = (DvrpTravelTimeMatrixParams)params);
 	}
 
 	@Override
@@ -131,6 +155,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 		}
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
+		}
+		if (!config.parallelEventHandling().getSynchronizeOnSimSteps()) {
+			throw new RuntimeException("Synchronization on sim steps is required");
 		}
 	}
 
@@ -160,12 +187,14 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param networkModesString {@value #NETWORK_MODES_EXP}
 	 */
 	@StringSetter(NETWORK_MODES)
-	public void setNetworkModesAsString(String networkModesString) {
+	public DvrpConfigGroup setNetworkModesAsString(String networkModesString) {
 		this.networkModes = ImmutableSet.copyOf(StringUtils.explode(networkModesString, ','));
+		return this;
 	}
 
-	public void setNetworkModes(ImmutableSet<String> networkModes) {
+	public DvrpConfigGroup setNetworkModes(ImmutableSet<String> networkModes) {
 		this.networkModes = networkModes;
+		return this;
 	}
 
 	/**
@@ -180,8 +209,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param networkMode {@value #MOBSIM_MODE_EXP}
 	 */
 	@StringSetter(MOBSIM_MODE)
-	public void setMobsimMode(String networkMode) {
+	public DvrpConfigGroup setMobsimMode(String networkMode) {
 		this.mobsimMode = networkMode;
+		return this;
 	}
 
 	/**
@@ -196,8 +226,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param travelTimeEstimationAlpha {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
-	public void setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
+	public DvrpConfigGroup setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
 		this.travelTimeEstimationAlpha = travelTimeEstimationAlpha;
+		return this;
 	}
 
 	/**
@@ -212,7 +243,37 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param travelTimeEstimationBeta {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
-	public void setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
+	public DvrpConfigGroup setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
 		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
+		return this;
+	}
+
+	public DvrpTravelTimeMatrixParams getTravelTimeMatrixParams() {
+		if (travelTimeMatrixParams == null) {
+			addParameterSet(new DvrpTravelTimeMatrixParams());
+		}
+		return travelTimeMatrixParams;
+	}
+
+	/**
+	 * @return {@value #INITIAL_TRAVEL_TIMES_FILE_EXP}
+	 */
+	@StringGetter(INITIAL_TRAVEL_TIMES_FILE)
+	@Nullable
+	public String getInitialTravelTimesFile() {
+		return initialTravelTimesFile;
+	}
+
+	/**
+	 * @param initialTravelTimesFile {@value #INITIAL_TRAVEL_TIMES_FILE_EXP}
+	 */
+	@StringSetter(INITIAL_TRAVEL_TIMES_FILE)
+	public void setInitialTravelTimesFile(@Nullable String initialTravelTimesFile) {
+		this.initialTravelTimesFile = initialTravelTimesFile;
+	}
+
+	@Nullable
+	public URL getInitialTravelTimesUrl(URL context) {
+		return initialTravelTimesFile == null ? null : ConfigGroup.getInputFileURL(context, initialTravelTimesFile);
 	}
 }

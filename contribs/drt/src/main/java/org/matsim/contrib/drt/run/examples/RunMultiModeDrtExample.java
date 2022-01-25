@@ -22,19 +22,16 @@ package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTimeModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -44,17 +41,20 @@ public class RunMultiModeDrtExample {
 	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
 
-		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(), config.plansCalcRoute());
+		Controler controler = DrtControlerCreator.createControler(config, otfvis);
 
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
+		// max allowed speed for AV
+		double maxSpeed = controler.getScenario()
+				.getVehicles()
+				.getVehicleTypes()
+				.get(Id.create("autonomous_vehicle", VehicleType.class))
+				.getMaximumVelocity();
 
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
+		controler.addOverridingModule(
+				new DvrpModeLimitedMaxSpeedTravelTimeModule("drt_autonomous", config.qsim().getTimeStepSize(),
+						maxSpeed));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

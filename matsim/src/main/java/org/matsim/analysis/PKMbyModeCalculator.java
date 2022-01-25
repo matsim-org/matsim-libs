@@ -20,8 +20,18 @@
 
 package org.matsim.analysis;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.log4j.Logger;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,17 +40,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * analyses passenger kilometer traveled based on experienced plans.
@@ -53,7 +52,6 @@ public class PKMbyModeCalculator {
     private final OutputDirectoryHierarchy controlerIO;
     private final static char DEL = '\t';
     private final static String FILENAME = "pkm_modestats";
-    private final DecimalFormat df = new DecimalFormat();
 
 
     @Inject
@@ -97,14 +95,14 @@ public class PKMbyModeCalculator {
             for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
-                    csvPrinter.print(df.format(e.getValue().getOrDefault(mode,0.0)/1000.0));
+                    csvPrinter.print((int) Math.round(e.getValue().getOrDefault(mode, 0.0) / 1000.0));
                 }
                 csvPrinter.println();
             }
 
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Logger.getLogger(getClass()).error("Could not write PKM Modestats.");
         }
         if (writePng){
             String[] categories = new String[pmtPerIteration.size()];

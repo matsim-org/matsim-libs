@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.PtConstants;
 
 import playground.vsp.parkAndRide.PRConstants;
@@ -77,9 +77,9 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 					// mutate the end time of the first activity
 					act.setEndTime(mutateTime(act.getEndTime()));
 					// calculate resulting duration
-					act.setMaximumDuration(act.getEndTime() - act.getStartTime());
+					act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
 					// move now pointer
-					now += act.getEndTime();
+					now += act.getEndTime().seconds();
 
 				// handle middle activities
 				} else if (act != lastAct) {
@@ -89,10 +89,10 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 					if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().equals(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
 					} else {
 						if (this.useActivityDurations) {
-							if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+							if (act.getMaximumDuration().isDefined()) {
 								// mutate the durations of all 'middle' activities
 								act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
-								now += act.getMaximumDuration();
+								now += act.getMaximumDuration().seconds();
 								// set end time accordingly
 								act.setEndTime(now);
 							} else {
@@ -105,7 +105,7 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 							}
 						}
 						else {
-							if (act.getEndTime() == Time.UNDEFINED_TIME) {
+							if (act.getEndTime().isUndefined()) {
 								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
 							}
 							double newEndTime = mutateTime(act.getEndTime());
@@ -122,8 +122,8 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setMaximumDuration(Time.UNDEFINED_TIME);
-					act.setEndTime(Time.UNDEFINED_TIME);
+					act.setMaximumDurationUndefined();
+					act.setEndTimeUndefined();
 
 				}
 
@@ -133,26 +133,25 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
-					now += leg.getTravelTime();
+				if (leg.getTravelTime().isDefined()) {
+					now += leg.getTravelTime().seconds();
 				}
 				final double arrTime = now;
 				// set planned arrival time accordingly
-				leg.setTravelTime( arrTime - leg.getDepartureTime() );
+				leg.setTravelTime( arrTime - leg.getDepartureTime().seconds());
 			}
 		}
 	}
 
-	private double mutateTime(final double time) {
-		double t = time;
-		if (t != Time.UNDEFINED_TIME) {
-			t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+	private double mutateTime(final OptionalTime time) {
+		if (time.isDefined()) {
+			double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;
+			return t;
 		} else {
-			t = this.random.nextInt(24*3600);
+			return this.random.nextInt(24*3600);
 		}
-		return t;
 	}
 
 	public void setUseActivityDurations(final boolean useActivityDurations) {

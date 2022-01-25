@@ -25,7 +25,9 @@ package org.matsim.core.mobsim;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.events.MobsimScopeEventHandlingModule;
 import org.matsim.core.mobsim.external.ExternalMobsim;
+import org.matsim.core.mobsim.hermes.HermesProvider;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSimModule;
 
@@ -37,13 +39,18 @@ public class DefaultMobsimModule extends AbstractModule {
 //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
         } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.JDEQSim.toString())) {
             bindMobsim().to(JDEQSimulation.class);
-//            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
-        } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null &&
-                ((ExternalMobimConfigGroup) getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME)).getExternalExe() != null) {
+            //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
+        } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.hermes.toString())) {
+            bindMobsim().toProvider(HermesProvider.class);
+        } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null
+                && ((ExternalMobimConfigGroup)getConfig().getModule(
+                ExternalMobimConfigGroup.GROUP_NAME)).getExternalExe() != null) {
             bindMobsim().to(ExternalMobsim.class);
             // since we do not know what the external mobsim does here, we leave it open, which should force the user to fill this with meaning.  ???  kai,
             // nov'19
         }
+
+        install(new MobsimScopeEventHandlingModule());
     }
 //    public interface RelativePositionOfEntryExitOnLink{
 //        double get() ;

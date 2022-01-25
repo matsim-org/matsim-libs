@@ -27,11 +27,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.facilities.Facility;
-
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultRoutingRequest;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
+import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd
@@ -51,17 +52,11 @@ public class DriverRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility, 
-			final double departureTime,
-			final Person person) {
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final double departureTime = request.getDepartureTime();
+		
 		List<? extends PlanElement> trip =
-			carRoutingModule.calcRoute(
-					fromFacility,
-					toFacility, 
-					departureTime,
-					person);
+			carRoutingModule.calcRoute(request);
 
 		if (trip.size() != 1) {
 			throw new RuntimeException( "unexpected trip size for trip "+trip+" for mode "+mode );
@@ -74,7 +69,7 @@ public class DriverRoutingModule implements RoutingModule {
 		DriverRoute dRoute = new DriverRoute( netRoute , Collections.<Id<Person>>emptyList() );
 		leg.setRoute( dRoute );
 		leg.setDepartureTime( departureTime );
-		leg.setTravelTime( dRoute.getTravelTime() );
+		leg.setTravelTime(dRoute.getTravelTime().seconds());
 
 		return Collections.singletonList( leg );
 	}

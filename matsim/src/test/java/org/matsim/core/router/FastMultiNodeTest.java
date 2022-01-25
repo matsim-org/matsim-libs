@@ -53,12 +53,15 @@ public class FastMultiNodeTest {
 	public void testFastMultiNodeDijkstra_OneToOne() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness( 0. );
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory().
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -108,12 +111,15 @@ public class FastMultiNodeTest {
 	public void testFastMultiNodeDijkstra_OneToMany() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness( 0. );
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -196,12 +202,15 @@ public class FastMultiNodeTest {
 	public void testFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness( 0. );
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -311,7 +320,7 @@ public class FastMultiNodeTest {
 	 *                     |
 	 *                     n5
 	 */
-	private void createNetwork(Scenario scenario) {
+	private static void createNetwork( Scenario scenario ) {
 
 		/*
 		 * create nodes

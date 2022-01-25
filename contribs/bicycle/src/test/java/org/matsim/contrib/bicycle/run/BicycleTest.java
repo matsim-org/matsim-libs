@@ -64,7 +64,8 @@ import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.
 /**
  * @author dziemke
  */
-public class BicycleTest {
+public class
+BicycleTest {
 	private static final Logger LOG = Logger.getLogger(BicycleTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -88,7 +89,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -128,7 +130,8 @@ public class BicycleTest {
 			LOG.info( "Checking MATSim events file ..." );
 			final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 			final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-			assertEquals( "Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare( eventsFilenameReference, eventsFilenameNew ));
+			assertEquals( "Different event files.", FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew ));
 		}
 	}
 		
@@ -151,7 +154,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -179,7 +183,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -207,7 +212,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -236,7 +242,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -267,7 +274,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -303,7 +311,8 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew));
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());

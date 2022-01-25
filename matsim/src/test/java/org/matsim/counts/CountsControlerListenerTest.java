@@ -44,6 +44,7 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -370,6 +371,8 @@ public class CountsControlerListenerTest {
 			@Override
 			public void install() {
 				bind(Mobsim.class).to(DummyMobsim2.class);
+				// use single threaded manager because the dummy mobsim doesn't correctly calls EventsManager interface which may fail for parallel implementations
+				bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);
@@ -428,14 +431,14 @@ public class CountsControlerListenerTest {
 			for (int i = 0; i < 100; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car));
+				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car, TransportMode.car));
 				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.car, 1.0));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
 			}
 			for (int i = 100; i < 150; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
+				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk, TransportMode.walk));
 				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.walk, 1.0));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
 			}

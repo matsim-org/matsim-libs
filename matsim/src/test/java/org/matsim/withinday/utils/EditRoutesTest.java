@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.PopulationUtils;
@@ -55,6 +57,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EditRoutesTest extends MatsimTestCase {
@@ -82,7 +86,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -142,7 +146,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		int scndAct = 2 ;
 		int scndCarLeg = 3 ; // 3-->9
 		int thrdAct = 4 ;
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndAct = 6 ;
 			scndCarLeg = 9 ; // 3-->9
@@ -219,7 +223,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		createScenario();
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -267,7 +271,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -291,7 +295,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -311,7 +315,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -332,7 +336,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -351,7 +355,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -370,7 +374,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -389,7 +393,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -408,7 +412,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -429,7 +433,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -541,7 +545,7 @@ private void createSamplePlan() {
 	/*
 	 * run a PlanRouter to create and set routes
 	 */
-	new PlanRouter(tripRouter).run(plan);
+	new PlanRouter(tripRouter, TimeInterpretation.create(scenario.getConfig())).run(plan);
 }
 
 /**
@@ -555,6 +559,7 @@ private void createTripRouter() {
 				@Override
 				public void install() {
 					install(new ScenarioByInstanceModule(scenario));
+					install(new TimeInterpretationModule());
 					addTravelTimeBinding("car").toInstance(new FreeSpeedTravelTime());
 					addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 				}

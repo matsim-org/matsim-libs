@@ -1,9 +1,11 @@
 package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
@@ -19,11 +21,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 @Singleton
 public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, StopStopTimeCalculator {
 	
@@ -37,7 +37,7 @@ public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEvent
 	//Constructors
 	@Inject
 	public StopStopTimeCalculatorImpl(final TransitSchedule transitSchedule, final Config config, EventsManager eventsManager) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 		eventsManager.addHandler(this);
 	}
 	public StopStopTimeCalculatorImpl(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
@@ -46,11 +46,9 @@ public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEvent
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					Map<Id<TransitStopFacility>, StopStopTimeData> map = stopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
-					if(map==null) {
-						map = new HashMap<Id<TransitStopFacility>, StopStopTimeData>(2);
-						stopStopTimes.put(route.getStops().get(s).getStopFacility().getId(), map);
-					}
+					Map<Id<TransitStopFacility>, StopStopTimeData> map = stopStopTimes.computeIfAbsent(
+							route.getStops().get(s).getStopFacility().getId(),
+							k -> new HashMap<>(2));
 					map.put(route.getStops().get(s+1).getStopFacility().getId(), new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
 					Map<Id<TransitStopFacility>, Double> map2 = scheduledStopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
 					Map<Id<TransitStopFacility>, Integer> map3 = numObservations.get(route.getStops().get(s).getStopFacility().getId());
@@ -72,7 +70,7 @@ public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEvent
 							num = 0;
 						}
 					}
-					map2.put(route.getStops().get(s+1).getStopFacility().getId(), stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
+					map2.put(route.getStops().get(s+1).getStopFacility().getId(), stopStopTime+route.getStops().get(s+1).getArrivalOffset().seconds()-route.getStops().get(s).getDepartureOffset().seconds());
 					map3.put(route.getStops().get(s+1).getStopFacility().getId(), ++num);
 				}
 				for(Departure departure:route.getDepartures().values())

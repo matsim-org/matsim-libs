@@ -42,17 +42,18 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
-import org.matsim.contrib.util.StraightLineKnnFinder;
+import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
 /**
@@ -75,7 +76,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final TravelTime travelTime;
 	private final DriveEnergyConsumption.Factory driveConsumptionFactory;
 	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
-	private final String stageActivityType;
+	private final String stageActivityModePrefix;
 	private final String vehicleSuffix;
 	private final EvConfigGroup evConfigGroup;
 
@@ -93,16 +94,19 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		this.chargingInfrastructureSpecification = chargingInfrastructureSpecification;
 		this.driveConsumptionFactory = driveConsumptionFactory;
 		this.auxConsumptionFactory = auxConsumptionFactory;
-		stageActivityType = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
+		stageActivityModePrefix = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
 		this.evConfigGroup = evConfigGroup;
 		this.vehicleSuffix = mode.equals(TransportMode.car) ? "" : "_" + mode;
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility,
-			final double departureTime, final Person person) {
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
 
-		List<? extends PlanElement> basicRoute = delegate.calcRoute(fromFacility, toFacility, departureTime, person);
+		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
 		Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
@@ -135,7 +139,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 				for (Link stopLocation : stopLocations) {
 
 					StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
-							2, l -> l, s -> network.getLinks().get(s.getLinkId()));
+							2, Link::getCoord, s -> network.getLinks().get(s.getLinkId()).getCoord());
 					List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(stopLocation,
 							chargingInfrastructureSpecification.getChargerSpecifications()
 									.values()
@@ -147,21 +151,21 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					if (nexttoFacility.getLinkId().equals(lastFrom.getLinkId())) {
 						continue;
 					}
-					List<? extends PlanElement> routeSegment = delegate.calcRoute(lastFrom, nexttoFacility,
-							lastArrivaltime, person);
+					List<? extends PlanElement> routeSegment = delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, nexttoFacility,
+							lastArrivaltime, person, request.getAttributes()));
 					Leg lastLeg = (Leg)routeSegment.get(0);
-					lastArrivaltime = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
+					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
-					Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
-							selectedChargerLink.getCoord(), selectedChargerLink.getId());
+					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
+							selectedChargerLink.getId(), stageActivityModePrefix);
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
-					lastArrivaltime += chargeAct.getMaximumDuration();
+					lastArrivaltime += chargeAct.getMaximumDuration().seconds();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
 				}
-				stagedRoute.addAll(delegate.calcRoute(lastFrom, toFacility, lastArrivaltime, person));
+				stagedRoute.addAll(delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, toFacility, lastArrivaltime, person, request.getAttributes())));
 
 				return stagedRoute;
 
@@ -181,17 +185,19 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		double lastSoc = pseudoVehicle.getBattery().getSoc();
+		double linkEnterTime = basicLeg.getDepartureTime().seconds();
 		for (Link l : links) {
-			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
+			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime().seconds(), null, null);
 
-			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
-					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
+			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
+					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
 			pseudoVehicle.getBattery().changeSoc(-consumption);
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
 			double consumptionDiff = (lastSoc - currentSoc);
 			lastSoc = currentSoc;
 			consumptions.put(l, consumptionDiff);
+			linkEnterTime += travelT;
 		}
 		return consumptions;
 	}

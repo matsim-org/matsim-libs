@@ -51,7 +51,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.analysis.RouteTimeDiagram;
 import org.matsim.pt.analysis.TransitRouteAccessEgressAnalysis;
 import org.matsim.pt.analysis.VehicleTracker;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -60,7 +60,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
@@ -173,7 +172,7 @@ public class AccessEgressDemo {
 				Activity act1 = pb.createActivityFromLinkId("home", stop.getLinkId());
 				act1.setEndTime(departureTime + j * agentInterval);
 				Leg leg = pb.createLeg(TransportMode.pt);
-				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, tRoute, lastStop));
+				leg.setRoute(new DefaultTransitPassengerRoute(stop, tLine, tRoute, lastStop));
 				Activity act2 = pb.createActivityFromLinkId("work", Id.create(nOfLinks - 1, Link.class));
 
 				population.addPerson(person);

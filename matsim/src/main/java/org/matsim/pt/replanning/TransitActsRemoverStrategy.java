@@ -25,6 +25,10 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.pt.router.TransitActsRemover;
 
+/**
+ * @deprecated -- use {@link org.matsim.core.replanning.modules.TripsToLegsModule}
+ */
+@Deprecated // use TripsToLegsModule
 public class TransitActsRemoverStrategy extends AbstractMultithreadedModule {
 
 	public TransitActsRemoverStrategy(Config config) {

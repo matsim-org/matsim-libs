@@ -51,7 +51,7 @@ final class LaneSensor {
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> distanceMeterCarLocatorMap = null;
 	private double lookBackTime;
 	private LinkedList<AtomicInteger> timeBuckets;
-	private double timeBucketCollectionDuration;
+	private double timeBucketSize;
 	private double currentBucketStartTime;
 	private AtomicInteger currentBucket;
 	private int numOfBucketsNeededForLookback;
@@ -119,46 +119,42 @@ final class LaneSensor {
 	}
 
 	public double getAvgVehiclesPerSecond(double now) {
+		double avgVehPerSecond = 0.;
+
 		if (now > monitoringStartTime) {
 			if (lookBackTime == Double.POSITIVE_INFINITY) {
-				return totalVehicles / ((now - monitoringStartTime)+1);
+				avgVehPerSecond = totalVehicles / (now - monitoringStartTime + 1);
 			} else {
 				updateBucketsUntil(now);
-				//if we have less buckets collected than needed for lookback, we calculate the average only with the buckets we already have.
 				if (timeBuckets.size() > 0) {
-					double avgVehPerSecond = timeBuckets.stream().mapToInt(AtomicInteger::intValue).sum()/(timeBuckets.size() * this.timeBucketCollectionDuration);
-					//if there wasn't any vehicles in the lookback-time but now vehicles are measured, the number of vehicles is expected on the currend, not finished bucket.
-					if (avgVehPerSecond == 0.0 && currentBucket != null && currentBucket.get() > 0) {
-						return currentBucket.get()/((now-currentBucketStartTime)+1);
-					} else {
-						return avgVehPerSecond;
-					}
-				} else if(timeBuckets.size() == 0 && currentBucket != null && currentBucket.get() > 0) {
-					//if there wasn't any vehicles since now but now vehicles are measured, the number of vehicles is expected on the currend, not finished bucket.
-					return currentBucket.get()/((now-currentBucketStartTime)+1);
-				}
-				else {
-					return 0.0;
+					//if we have less buckets collected than needed for lookback, we calculate the average only with the buckets we already have.
+					avgVehPerSecond = timeBuckets.stream().mapToInt(AtomicInteger::intValue).sum()/(timeBuckets.size() * this.timeBucketSize);
+				} 
+				if((timeBuckets.size() == 0 || avgVehPerSecond == 0.0 )
+					&& currentBucket != null && currentBucket.get() > 0) {
+					/* if there hasn't been any vehicle in the lookback-time but in the current bucket vehicles are measured, 
+					 * we take only the current bucket for evaluation 
+					 * (which is not finished and therefore not part of the timeBuckets list): */
+					avgVehPerSecond = currentBucket.get()/(now-currentBucketStartTime + 1);
 				}
 			}
-		} else {
-			return 0.0;
-		}
+		} 
+		return avgVehPerSecond;
 	}
 
     public void registerAverageVehiclesPerSecondToMonitor() {
     	registerAverageVehiclesPerSecondToMonitor(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
-	public void registerAverageVehiclesPerSecondToMonitor(double lookBackTime, double timeBucketCollectionDuration) {
+	public void registerAverageVehiclesPerSecondToMonitor(double lookBackTime, double timeBucketSize) {
 		if (!doAverageVehiclesPerSecondMonitoring) {
 			this.doAverageVehiclesPerSecondMonitoring = true;
 			this.lookBackTime = lookBackTime;
-			this.timeBucketCollectionDuration = timeBucketCollectionDuration;
+			this.timeBucketSize = timeBucketSize;
 			this.timeBuckets = new LinkedList<AtomicInteger>();
 			this.currentBucketStartTime = 0.0;
 			this.currentBucket = new AtomicInteger(0);
-			this.numOfBucketsNeededForLookback = (int) Math.ceil(lookBackTime / timeBucketCollectionDuration);
+			this.numOfBucketsNeededForLookback = (int) Math.ceil(lookBackTime / timeBucketSize);
 		}
 	}
 	
@@ -174,19 +170,18 @@ final class LaneSensor {
 	}
 	
 	/**
-	 * look if:
-	 * - the current bucket should be closed and a new one shpould be created and set as currentBucket
+	 * check if:
+	 * - the current bucket should be closed and a new one should be created and set as currentBucket
 	 * - there are empty buckets, which we need to add to the list, because there wasn't any vehicles in their collection period
-	 * @param time timestamp until wich the bucketqueue should be updated
 	 */
-	private void updateBucketsUntil(double time) {
-		if (time >= currentBucketStartTime + timeBucketCollectionDuration) {
+	private void updateBucketsUntil(double now) {
+		if (now >= currentBucketStartTime + timeBucketSize) {
 			queueFullBucket(currentBucket);
-			currentBucketStartTime += timeBucketCollectionDuration;
-			//look if we need to create some empty buckets which queueing we missed in the meantime because no vehicle came until last update
-			for (double i = currentBucketStartTime; i <= time-this.timeBucketCollectionDuration; i += this.timeBucketCollectionDuration) {
+			currentBucketStartTime += timeBucketSize;
+			// create empty bucket in case there was a time where no vehicles have arrived
+			while (currentBucketStartTime <= now - timeBucketSize) {
 				queueFullBucket(new AtomicInteger(0));
-				currentBucketStartTime += timeBucketCollectionDuration;
+				currentBucketStartTime += timeBucketSize;
 			}
 			currentBucket = new AtomicInteger(0);
 		}

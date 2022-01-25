@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.*;
+
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
@@ -72,8 +74,8 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	CadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<Link> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+	@Inject CadytsContext( Config config, Scenario scenario, @Named(CadytsCarModule.CALIBRATION) Counts<Link> calibrationCounts,
+			       EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
 		this.calibrationCounts = calibrationCounts;
 		this.eventsManager = eventsManager;
@@ -81,18 +83,23 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.controlerIO = controlerIO;
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 
-		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		// addModule() also initializes the config group with the values read from the config file
+		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class);
+		// (also initializes the config group with the values read from the config file)
+
 		cadytsConfig.setWriteAnalysisFile(true);
+		// yyyy not so good to just overwrite config.  kai, feb'20
 
+		if ( cadytsConfig.getCalibratedLinks().isEmpty() ){
+			// found this without the above condition, i.e. it would always set the calibrated links to all links for which there exist counts.
+			// However, the logic for ptCounts is different, and there it would probably make sense to keep the functionality that only some
+			// lines are calibrated.  So, for symmetry, would make sense to also make it functional here.  ????  kai, feb'20
 
-		Set<String> countedLinks = new TreeSet<>();
-		for (Id<Link> id : this.calibrationCounts.getCounts().keySet()) {
-			countedLinks.add(id.toString());
+			Set<String> countedLinks = new TreeSet<>();
+			for( Id<Link> id : this.calibrationCounts.getCounts().keySet() ){
+				countedLinks.add( id.toString() );
+			}
+			cadytsConfig.setCalibratedLinks( countedLinks );
 		}
-
-		cadytsConfig.setCalibratedItems(countedLinks);
-
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
@@ -109,7 +116,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
+		this.calibrator = buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class );
 	}
 
 	@Override

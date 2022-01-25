@@ -165,7 +165,7 @@ public class StuckAgentTest {
 			if (e instanceof PersonStuckEvent) {
 				stuckCnt++;
 				
-				if (e.getTime() < config.qsim().getEndTime()) stuckBeforeSimulationEnd++;
+				if (e.getTime() < config.qsim().getEndTime().seconds()) stuckBeforeSimulationEnd++;
 			}
 		}
 

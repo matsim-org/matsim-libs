@@ -89,8 +89,7 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	public T put(final T value) {
 		return put(value.getId(), value);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	public T put(final Id<S> key, final T value) {
 		for (int i = 0; i < this.data.length; i++) {
@@ -239,7 +238,12 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 
 		@Override
 		public <TT> TT[] toArray(final TT[] a) {
-			return (TT[]) this.data.clone();
+			TT[] dest = a;
+			if (a.length != this.data.length) {
+				dest = Arrays.copyOf(a, this.data.length);
+			}
+			System.arraycopy(this.data, 0, dest, 0, this.data.length);
+			return dest;
 		}
 
 		@Override

@@ -31,14 +31,23 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
  * like the MATSim events, which also originally were interfaces with implementations behind them, and at some point we
  * united this again. kai, feb'17
  * </ul>
- * 
+ *
  * @author michalm
  * @author (of documentation) nagel
  */
 public interface Task {
-	public enum TaskStatus {
-		PLANNED, STARTED, PERFORMED;
+	/**
+	 * TaskType implementations should be immutable.
+	 */
+	interface TaskType {
+		String name();
 	}
+
+	enum TaskStatus {
+		PLANNED, STARTED, PERFORMED
+	}
+
+	TaskType getTaskType();
 
 	TaskStatus getStatus();
 

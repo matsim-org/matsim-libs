@@ -70,7 +70,7 @@ public class PopulationMerger {
 
 	private StreamingPopulationWriter populationWriter;
 	
-	protected static CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+	protected static final  CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 
 
 	public static void main(String[] args) {

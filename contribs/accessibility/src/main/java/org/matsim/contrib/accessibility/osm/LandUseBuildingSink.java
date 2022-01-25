@@ -20,11 +20,6 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -57,10 +52,15 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author dziemke
  */
-public class LandUseBuildingSink implements Sink {
+class LandUseBuildingSink implements Sink {
 	private final Logger log = Logger.getLogger(LandUseBuildingSink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;
@@ -385,7 +385,7 @@ public class LandUseBuildingSink implements Sink {
 	
 
 	@Override
-	public void release() {
+	public void close() {
 	}
 
 	

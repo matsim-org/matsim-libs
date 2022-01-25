@@ -87,6 +87,7 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network, config.transit().getTransitModes() ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
+		sumScoringFunction.addScoringFunction(new ScoreEventScoring());
 		return sumScoringFunction;
 	}
 }

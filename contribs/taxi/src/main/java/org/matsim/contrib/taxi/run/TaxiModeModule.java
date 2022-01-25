@@ -20,19 +20,25 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
+import org.matsim.contrib.taxi.fare.TaxiFareHandler;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.AStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -50,18 +56,21 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 
 		install(new DvrpModeRoutingNetworkModule(getMode(), taxiCfg.isUseModeFilteredSubnetwork()));
+		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new DvrpModeRoutingModule(getMode(),
-				new AStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor())));
+		install(new DvrpModeRoutingModule(getMode(), new SpeedyALTFactory()));
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class).mode(getMode())
-				.objectClass(Fleet.class)
-				.listenerCreator(getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
-						getter.get(IterationCounter.class)))
-				.build());
+		taxiCfg.getTaxiFareParams()
+				.ifPresent(params -> addEventHandlerBinding().toInstance(new TaxiFareHandler(getMode(), params)));
+
+		bindModal(TaxiStatsDumper.class).toProvider(modalProvider(
+				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
+						getter.get(IterationCounter.class), getter.getModal(ExecutedScheduleCollector.class),
+						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+		addControlerListenerBinding().to(modalKey(TaxiStatsDumper.class));
 	}
 }

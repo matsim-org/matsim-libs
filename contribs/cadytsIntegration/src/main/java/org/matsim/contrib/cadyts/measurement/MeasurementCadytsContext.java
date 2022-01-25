@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.buildCalibratorAndAddMeasurements;
+
 public class MeasurementCadytsContext implements CadytsContextI<Measurement>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
 	final static Logger log = Logger.getLogger(MeasurementCadytsContext.class);
@@ -90,7 +92,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 
 		// 1st major Cadyts method is "calibrator.addMesurement"
 		// in this implementation it is called by the "CadytsBuilderImpl", dz 09/15
-		this.calibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(config, this.counts, measurements, Measurement.class) ;
+		this.calibrator = buildCalibratorAndAddMeasurements(config, this.counts, measurements, Measurement.class) ;
 
 		this.measurementListener = new MeasurementListener(scenario, measurements );
 		event.getServices().getEvents().addHandler(measurementListener);

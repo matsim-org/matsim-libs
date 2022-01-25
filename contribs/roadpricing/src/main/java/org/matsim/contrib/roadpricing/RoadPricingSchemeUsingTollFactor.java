@@ -62,7 +62,7 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	private RoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor, Scenario scenario ) {
 
 		// read the road pricing scheme from file
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
 			rpReader.readURL(pricingSchemeFileName);
@@ -74,9 +74,9 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	}
 
-	public static void createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
+	public static RoadPricingSchemeUsingTollFactor createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
 																																			 Scenario scenario ){
-		new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
+		return new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
 		// yy todo: inline constructor. kai, jul'19
 	}
 

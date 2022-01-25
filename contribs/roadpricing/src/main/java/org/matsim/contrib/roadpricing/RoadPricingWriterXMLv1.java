@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Writes a {@link RoadPricingSchemeImpl} to a file according to <code>roadpricing_v1.dtd</code>.
@@ -104,14 +104,10 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		} else {
 			this.writer.write("\t\t\t<cost ");
 		}
-		if (!Time.isUndefinedTime(cost.startTime)) {
+		if (cost.startTime > Double.NEGATIVE_INFINITY) {
 			this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
 		}
-		if (!Time.isUndefinedTime(cost.endTime)
-				&& cost.endTime != Double.POSITIVE_INFINITY
-			// The toll reader converts undefined time to POSITIVE_INFINITY since otherwise it does not make sense.
-			// This, however, means that we need to deal with this here as well.  kai, aug'14
-		) {
+		if (cost.endTime < Double.POSITIVE_INFINITY) {
 			this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
 		}
 		this.writer.write("amount=\"" + cost.amount + "\" />\n");

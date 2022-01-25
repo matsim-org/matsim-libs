@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 
 /**
  * @author thibautd
@@ -99,7 +99,7 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring, Sco
 		if ( Double.isNaN( dist ) ) throw new RuntimeException( "NaN dist with leg "+leg );
 
 		return params.constant +
-			params.marginalUtilityOfTraveling_s * leg.getTravelTime() +
+			params.marginalUtilityOfTraveling_s * leg.getTravelTime().seconds() +
 			params.marginalUtilityOfDistance_m * dist;
 	}
 

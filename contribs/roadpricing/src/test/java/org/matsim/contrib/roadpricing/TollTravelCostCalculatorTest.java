@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -58,6 +59,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -78,7 +80,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;
 		
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		scheme.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		final Id<Link> link5Id = Id.create("5", Link.class);
 		scheme.addLink(link5Id);
@@ -127,7 +129,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -145,7 +147,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 		
 		int carLegIndex = 1 ;
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -212,7 +214,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -227,7 +229,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 		
 		int carLegIndex = 1 ;
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if (! config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -307,8 +309,9 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
-		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
+//		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
+		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
@@ -319,7 +322,7 @@ public class TollTravelCostCalculatorTest {
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
 
 		int carLegIndex = 1 ;
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -408,7 +411,7 @@ public class TollTravelCostCalculatorTest {
 		builder.setTravelTime(travelTime);
 		final Provider<TripRouter> factory = builder.build( scenario );
 		final TripRouter tripRouter = factory.get( );
-		final PersonAlgorithm router = new PlanRouter( tripRouter );
+		final PersonAlgorithm router = new PlanRouter( tripRouter, TimeInterpretation.create(scenario.getConfig()) );
 
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run( p );

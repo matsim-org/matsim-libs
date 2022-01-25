@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -41,18 +42,18 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	// Case (0): comes with coord and linkId.  No problem.
 	// Case (1): comes with linkId but w/o coord.  Coord is (presumably) set in prepareForIterations.
 	// Case (2): comes with coord but w/o linkId.  LinkId is (presumably) set in prepareForIterations.
-	
+
 	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
 	// attribs or (b) ignores them.
 
-	private double endTime = Time.getUndefinedTime();
+	private OptionalTime endTime = OptionalTime.undefined();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
-	private double startTime = Time.getUndefinedTime();
+	private OptionalTime startTime = OptionalTime.undefined();
 
-	private double dur = Time.getUndefinedTime();
+	private OptionalTime dur = OptionalTime.undefined();
 
 	private String type;
 	private Coord coord = null;
@@ -66,20 +67,24 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final double getEndTime() {
+	public final OptionalTime getEndTime() {
 		return this.endTime;
 	}
 
 	@Override
 	public final void setEndTime(final double endTime) {
-		this.endTime = endTime;
+		this.endTime = OptionalTime.defined(endTime);
+	}
+
+	public final void setEndTimeUndefined() {
+		this.endTime = OptionalTime.undefined();
 	}
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	@Override
-	public final double getStartTime() {
+	public final OptionalTime getStartTime() {
 		return this.startTime;
 	}
 
@@ -88,7 +93,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 */
 	@Override
 	public final void setStartTime(final double startTime) {
-		this.startTime = startTime;
+		this.startTime = OptionalTime.defined(startTime);
+	}
+
+	public final void setStartTimeUndefined() {
+		this.startTime = OptionalTime.undefined();
 	}
 
 	@Override
@@ -136,23 +145,41 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final String toString() {
-		return "act [type=" + this.getType() + "]" +
-				"[coord=" + this.getCoord() + "]" +
-				"[linkId=" + this.linkId + "]" +
-				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
-				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
-				"[duration=" + Time.writeTime(this.getMaximumDuration()) + "]" +
-				"[facilityId=" + this.facilityId + "]" ;
+		return "act [type="
+				+ this.getType()
+				+ "]"
+				+ "[coord="
+				+ this.getCoord()
+				+ "]"
+				+ "[linkId="
+				+ this.linkId
+				+ "]"
+				+ "[startTime="
+				+ Time.writeTime(getStartTime())
+				+ "]"
+				+ "[endTime="
+				+ Time.writeTime(endTime)
+				+ "]"
+				+ "[duration="
+				+ Time.writeTime(getMaximumDuration())
+				+ "]"
+				+ "[facilityId="
+				+ this.facilityId + "]" ;
 	}
 
 	@Override
-	public double getMaximumDuration() {
+	public OptionalTime getMaximumDuration() {
 		return this.dur;
 	}
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		this.dur = dur;
+		this.dur = OptionalTime.defined(dur);
+	}
+
+	@Override
+	public void setMaximumDurationUndefined() {
+		this.dur = OptionalTime.undefined();
 	}
 
 	@Override

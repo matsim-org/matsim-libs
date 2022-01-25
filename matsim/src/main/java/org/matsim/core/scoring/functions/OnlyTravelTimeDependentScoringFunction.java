@@ -23,7 +23,6 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -33,9 +32,8 @@ import org.matsim.core.scoring.ScoringFunction;
  */
 public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 	
-	protected double score;
-	protected double startTime;
-	
+	private double score;
+
 	public OnlyTravelTimeDependentScoringFunction() {
 	}
 
@@ -46,9 +44,7 @@ public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 
 	@Override
 	public void handleLeg(Leg leg) {
-		startTime = leg.getDepartureTime();
-		score = score - (leg.getDepartureTime() + leg.getTravelTime() - startTime);
-		startTime = Double.NaN;
+		score -= leg.getTravelTime().seconds();
 	}
 
 	@Override
@@ -57,6 +53,10 @@ public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 
 	@Override
 	public void addMoney(final double amount) {
+	}
+
+	@Override
+	public void addScore(final double amount) {
 	}
 
 

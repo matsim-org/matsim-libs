@@ -22,6 +22,7 @@
  package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 
 public class ActivityTypeOpeningIntervalCalculator implements OpeningIntervalCalculator {
 	private final ScoringParameters params;
@@ -31,7 +32,7 @@ public class ActivityTypeOpeningIntervalCalculator implements OpeningIntervalCal
 	}
 
 	@Override
-	public double[] getOpeningInterval(final Activity act) {
+	public OptionalTime[] getOpeningInterval(final Activity act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -39,13 +40,13 @@ public class ActivityTypeOpeningIntervalCalculator implements OpeningIntervalCal
 					"(module name=\"planCalcScore\" in the config file).");
 		}
 
-		double openingTime = actParams.getOpeningTime();
-		double closingTime = actParams.getClosingTime();
+		OptionalTime openingTime = actParams.getOpeningTime();
+		OptionalTime closingTime = actParams.getClosingTime();
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
 
-		return new double[]{openingTime, closingTime};
+		return new OptionalTime[]{openingTime, closingTime};
 	}
 }

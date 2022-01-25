@@ -21,16 +21,15 @@
 
  package org.matsim.withinday.utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -43,7 +42,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 
 public final class EditPlans {
 	private static final Logger log = Logger.getLogger( EditPlans.class ) ;
-	
+
 	private final QSim mobsim;
 	private final EditTrips editTrips;
 	private final PopulationFactory pf;
@@ -229,7 +228,7 @@ public final class EditPlans {
 	 * Convenience method, clarifying that this can be called without giving the mode.
 	 */
 	public void insertActivity(MobsimAgent agent, int index, Activity activity ) {
-		String mode = TripStructureUtils.identifyMainMode( editTrips.findCurrentTrip(agent).getTripElements() ) ;
+		String mode = TripStructureUtils.identifyMainMode( EditTrips.findCurrentTrip(agent ).getTripElements() ) ;
 		insertActivity( agent, index, activity, mode, mode ) ;
 	}
 
@@ -265,12 +264,12 @@ public final class EditPlans {
 	//		}
 	//		return false ;
 	//	}
-	public Activity findRealActAfter(MobsimAgent agent, int index) {
+	public static Activity findRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ; 
 	}
-	public int findIndexOfRealActAfter(MobsimAgent agent, int index) {
+	public static int findIndexOfRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
@@ -285,7 +284,7 @@ public final class EditPlans {
 		}
 		return theIndex ;
 	}
-	public Activity findRealActBefore(MobsimAgent agent, int index) {
+	public static Activity findRealActBefore(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
@@ -333,7 +332,7 @@ public final class EditPlans {
 			Activity activity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent) ;
 			trip = editTrips.findTripAfterActivity(WithinDayAgentUtils.getModifiablePlan(agent), activity) ;
 		} else {
-			trip = editTrips.findCurrentTrip(agent) ;
+			trip = EditTrips.findCurrentTrip(agent ) ;
 		}
 		return TripStructureUtils.identifyMainMode(trip.getTripElements()) ;
 	}
@@ -362,4 +361,19 @@ public final class EditPlans {
 	public static Integer getCurrentPlanElementIndex( MobsimAgent agent ) {
 		return WithinDayAgentUtils.getCurrentPlanElementIndex( agent ) ;
 	}
+
+	public static List<Leg> findLegsWithModeInFuture( MobsimAgent agent, String mode ) {
+		List<Leg> retVal = new ArrayList<>();
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {
+			PlanElement pe = plan.getPlanElements().get(ii);
+			if (pe instanceof Leg) {
+				if ( Objects.equals(mode, ((Leg)pe).getMode() )) {
+					retVal.add((Leg)pe);
+				}
+			}
+		}
+		return retVal;
+	}
+
 }

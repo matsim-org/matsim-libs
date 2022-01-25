@@ -30,16 +30,15 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.MobsimScopeEventHandler;
-import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 import com.google.inject.Inject;
 
 /**
- * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idle engines,
+ * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idling engines,
  * such as taxis (where heating is on during a stay at a taxi rank), but should not be used with ordinary passenger cars.
  * <p>
  * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
@@ -59,7 +58,7 @@ public class AuxDischargingHandler
 		ElectricVehicle getVehicle(ActivityStartEvent event);
 	}
 
-	private final class VehicleAndLink {
+	private static final class VehicleAndLink {
 		private final ElectricVehicle vehicle;
 		private final Id<Link> linkId;
 
@@ -75,11 +74,9 @@ public class AuxDischargingHandler
 	private final ConcurrentMap<Id<Person>, VehicleAndLink> vehicles = new ConcurrentHashMap<>();
 
 	@Inject
-	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg,
-			MobsimScopeEventHandling events) {
+	public AuxDischargingHandler(VehicleProvider vehicleProvider, EvConfigGroup evCfg) {
 		this.vehicleProvider = vehicleProvider;
 		this.auxDischargeTimeStep = evCfg.getAuxDischargeTimeStep();
-		events.addMobsimScopeHandler(this);
 	}
 
 	@Override

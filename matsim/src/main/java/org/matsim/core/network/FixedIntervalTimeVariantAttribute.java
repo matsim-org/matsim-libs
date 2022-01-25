@@ -19,20 +19,20 @@
 
 package org.matsim.core.network;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.trafficmonitoring.*;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import com.google.common.base.Preconditions;
 
 /**
  * This class follows the rules assumed in {@link TravelTimeCalculator}: The constructor arguments
  * timeSlice and maxTime have the same meaning as there, and the last time bin is open ended.
  */
-final class FixedIntervalTimeVariantAttribute
-implements TimeVariantAttribute
-{
+final class FixedIntervalTimeVariantAttribute implements TimeVariantAttribute {
 	private final int timeSlice;
 	private final int numSlots;
 
@@ -42,26 +42,20 @@ implements TimeVariantAttribute
 	private int eventsCount = 0;
 	private int eventsCountWhenLastRecalc = -1;
 
-
-	public FixedIntervalTimeVariantAttribute(int timeSlice, int maxTime)
-	{
+	public FixedIntervalTimeVariantAttribute(int timeSlice, int maxTime) {
 		this.timeSlice = timeSlice;
 		this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeSlice);
 	}
 
-
 	@Override
-	public boolean isRecalcRequired()
-	{
+	public boolean isRecalcRequired() {
 		return eventsCountWhenLastRecalc != eventsCount;
 	}
 
-
 	//TODO before calling this method we could convert changeEvents into a sequence of non-null changeValues
 	@Override
-	public void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents,
-			ChangeValueGetter valueGetter, double baseValue1)
-	{
+	public void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter,
+			double baseValue1) {
 		this.baseValue = baseValue1;
 
 		if (eventsCount == 0) {
@@ -84,21 +78,23 @@ implements TimeVariantAttribute
 				if (value != null) {
 					numEvent++;
 
-					int toBin = (int) (event.getStartTime() / timeSlice);//exclusive
+					Preconditions.checkArgument(event.getStartTime() >= 0,
+							"The current implementation supports only non-negative change event times");
+					int toBin = (int)(event.getStartTime() / timeSlice);//exclusive
 					Arrays.fill(values, fromBin, toBin, currentValue);
 
-					switch ( value.getType() ) {
-					case ABSOLUTE_IN_SI_UNITS:
-						currentValue = value.getValue();
-						break;
-					case FACTOR:
-						currentValue *= value.getValue();
-						break;
-					case OFFSET_IN_SI_UNITS:
-						currentValue += value.getValue();
-						break;
-					default:
-						throw new RuntimeException( "unknown ChangeType" ) ;
+					switch (value.getType()) {
+						case ABSOLUTE_IN_SI_UNITS:
+							currentValue = value.getValue();
+							break;
+						case FACTOR:
+							currentValue *= value.getValue();
+							break;
+						case OFFSET_IN_SI_UNITS:
+							currentValue += value.getValue();
+							break;
+						default:
+							throw new RuntimeException("unknown ChangeType");
 					}
 					fromBin = toBin;
 				}
@@ -108,34 +104,32 @@ implements TimeVariantAttribute
 		eventsCountWhenLastRecalc = eventsCount;
 
 		if (numEvent != this.eventsCount) {
-			throw new RuntimeException("Expected number of change events (" + (this.eventsCount)
-					+ ") differs from the number of events found (" + numEvent + ")!");
+			throw new RuntimeException("Expected number of change events ("
+					+ (this.eventsCount)
+					+ ") differs from the number of events found ("
+					+ numEvent
+					+ ")!");
 		}
 	}
 
-
 	@Override
-	public double getValue(final double time)
-	{
-		if (Time.isUndefinedTime(time) || eventsCount == 0) {
+	public double getValue(final double time) {
+		Preconditions.checkArgument(!Double.isNaN(time), "NaN time is not supported");
+		if (eventsCount == 0) {
 			return baseValue;
 		}
 
 		int bin = TimeBinUtils.getTimeBinIndex(time, timeSlice, numSlots);
-		return values[bin];
+		return bin < 0 ? baseValue : values[bin];
 	}
 
-
 	@Override
-	public void incChangeEvents()
-	{
+	public void incChangeEvents() {
 		eventsCount++;
 	}
 
-
 	@Override
-	public void clearEvents()
-	{
+	public void clearEvents() {
 		eventsCount = 0;
 		eventsCountWhenLastRecalc = -1;
 		values = null;

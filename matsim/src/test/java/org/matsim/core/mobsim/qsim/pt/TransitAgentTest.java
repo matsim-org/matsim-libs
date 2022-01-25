@@ -44,7 +44,10 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -90,7 +93,7 @@ public class TransitAgentTest extends TestCase {
 		TransitRoute route1a = builder.createTransitRoute(Id.create("1a", TransitRoute.class), null, Arrays.asList(stop1, stop2), TransportMode.pt);
 		TransitRoute route1b = builder.createTransitRoute(Id.create("1b", TransitRoute.class), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
 		TransitRoute route2a = builder.createTransitRoute(Id.create("2a", TransitRoute.class), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
-		leg.setRoute(new ExperimentalTransitRoute(stopFacility1, line1, route1a, stopFacility2));
+		leg.setRoute(new DefaultTransitPassengerRoute(stopFacility1, line1, route1a, stopFacility2));
 		Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
 		plan.addActivity(homeAct);
 		plan.addLeg(leg);
@@ -101,7 +104,7 @@ public class TransitAgentTest extends TestCase {
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 
@@ -136,7 +139,7 @@ public class TransitAgentTest extends TestCase {
 		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 900, (double) 100), false);
 		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1900, (double) 100), false);
 		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
-		leg.setRoute(new ExperimentalTransitRoute(stop1, line1, null, stop2));
+		leg.setRoute(new DefaultTransitPassengerRoute(stop1, line1, null, stop2));
 		Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
 		plan.addActivity(homeAct);
 		plan.addLeg(leg);
@@ -147,7 +150,7 @@ public class TransitAgentTest extends TestCase {
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
 				.useDefaults() //
 				.build(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 

@@ -154,14 +154,14 @@ public class VehicleSourceTest {
 				throw ee;
 			} else {
 				// (expected exception)
-				System.err.println( "" ) ;
-				System.err.println( "The following is an expected exception:" );
-				System.err.println( "" ) ;
-				System.err.println( ee.getMessage() ) ;
-				System.err.println( "" ) ;
-				System.err.println( "(The above was an expected exception.)" );
-				System.err.println( "" ) ;
-				expectedException = true ;
+				System.err.println();
+				System.err.println("The following is an expected exception:");
+				System.err.println();
+				System.err.println(ee.getMessage());
+				System.err.println();
+				System.err.println("(The above was an expected exception.)");
+				System.err.println();
+				expectedException = true;
 			}
 		}
 		if ( providingVehiclesInPerson ) {
@@ -266,24 +266,24 @@ public class VehicleSourceTest {
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					// only vehicle type is necessary
-					if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
 						scenario.getVehicles().addVehicleType(vehTypes[i]);
 					}
 					break;
 				case fromVehiclesData:
 					// vehicle type as well as vehicle info is necessary
-					if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
 						scenario.getVehicles().addVehicleType(vehTypes[i]);
 					}
 
 					Id<Vehicle> vId = VehicleUtils.createVehicleId(p, transportModes[i]);
 					Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
 					scenario.getVehicles().addVehicle(v);
-					VehicleUtils.insertVehicleIdIntoAttributes(p, transportModes[i], vId);
+					VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(transportModes[i], vId));
 
 					break;
-					default:
-						throw new RuntimeException("not implemented yet.");
+				default:
+					throw new RuntimeException("not implemented yet.");
 			}
 		}
 	}

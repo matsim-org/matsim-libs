@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.emissions.analysis;
 
 import org.matsim.api.core.v01.Id;
@@ -7,6 +28,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.Pollutant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +61,11 @@ class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmiss
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
-
-        handleEmissionEvent(event.getTime(), event.getLinkId(), event.getWarmEmissions());
+        Map<Pollutant,Double> map = new HashMap<>() ;
+        for( Map.Entry<Pollutant, Double> entry : event.getWarmEmissions().entrySet() ){
+            map.put( entry.getKey(), entry.getValue() ) ;
+        }
+        handleEmissionEvent(event.getTime(), event.getLinkId(), map );
     }
 
     @Override
@@ -49,15 +74,17 @@ class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmiss
         handleEmissionEvent(event.getTime(), event.getLinkId(), event.getColdEmissions());
     }
 
-    private void handleEmissionEvent(double time, Id<Link> linkId, Map<String, Double> emissions) {
+    private void handleEmissionEvent(double time, Id<Link> linkId, Map<Pollutant, Double> emissions) {
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> currentBin = timeBins.getTimeBin(time);
 
-        if (!currentBin.hasValue())
-            currentBin.setValue(new HashMap<>());
-        if (!currentBin.getValue().containsKey(linkId))
-            currentBin.getValue().put(linkId, new EmissionsByPollutant(new HashMap<>(emissions)));
-        else
-            currentBin.getValue().get(linkId).addEmissions(emissions);
+        if (!currentBin.hasValue()){
+            currentBin.setValue( new HashMap<>() );
+        }
+        if (!currentBin.getValue().containsKey(linkId)){
+            currentBin.getValue().put( linkId, new EmissionsByPollutant( new HashMap<>( emissions ) ) );
+        } else{
+            currentBin.getValue().get( linkId ).addEmissions( emissions );
+        }
     }
 }

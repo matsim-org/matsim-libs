@@ -35,7 +35,7 @@ public class CensusReader {
 	private static final Logger LOG = Logger.getLogger(CensusReader.class);
 	
 	private ObjectAttributes municipalities = new ObjectAttributes();
-	private List<String> municipalitiesList = new ArrayList<>();
+	private List<String> municipalityList = new ArrayList<>();
 	
 	public static void main(String[] args) {
 		String censusFile = "../../shared-svn/studies/countries/de/open_berlin_scenario/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";
@@ -64,7 +64,7 @@ public class CensusReader {
         		// Municipalities have this pattern; counties etc. are not considered
         		if (row[1].length() == 2 && row[2].length() == 1 && row[3].length() == 2 && row[5].length() == 3) {
         			String municipality = row[1] + row[2] + row[3]+ row[5];
-        			municipalitiesList.add(municipality);
+        			municipalityList.add(municipality);
         			LOG.info("municipality = " + municipality);
 
         			Integer population;
@@ -485,7 +485,10 @@ public class CensusReader {
     private Integer simplifyAndParseInteger (String input) {
     	return Integer.parseInt(input.replace("(", "").replace(")", ""));
     }
-    
+
+	public List<String> getMunicipalityList() {
+		return this.municipalityList;
+	}
     
 	public ObjectAttributes getMunicipalities() {
 		return this.municipalities;

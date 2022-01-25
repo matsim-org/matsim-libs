@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeature;
 /**
  * @author dziemke
  */
-public class VoronoiExample {
+class VoronoiExample {
 		
 	public static void main(String[] args) {
 		GeometryFactory geometryFactory = new GeometryFactory();

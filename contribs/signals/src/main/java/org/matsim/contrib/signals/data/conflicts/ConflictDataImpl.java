@@ -30,7 +30,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 /**
  * @author tthunig
  */
-public class ConflictDataImpl implements ConflictData {
+public final class ConflictDataImpl implements ConflictData {
 
 	private ConflictDataFactory factory = new ConflictDataFactoryImpl();
 	

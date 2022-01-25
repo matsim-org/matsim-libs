@@ -40,10 +40,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author mrieser / senozon
@@ -170,7 +176,7 @@ public class PersonPrepareForSimTest {
 	 * them <b>after</b> {@link PrepareForSimImpl} was run (and adapted outdated plans). However, for the time being we do not
 	 * explicitly check for outdated modes and hope that an exception will be thrown during routing of that single leg trip, 
 	 * because no router should be registered for those modes (and wasn't registered before introducing routingMode, besides 
-	 * {@link TransportMode.transit_walk} which was also used for access/egress to pt and transfer between pt and therefore is
+	 * "transit_walk" which was also used for access/egress to pt and transfer between pt and therefore is
 	 * checked explicitly).
 	 */
 	@Test
@@ -241,12 +247,14 @@ public class PersonPrepareForSimTest {
 			Leg leg1 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
 			plan.addLeg(leg1);
-			Activity activity2 = pf.createActivityFromCoord("car interaction", new Coord((double) 0, -10));
+			Activity activity2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10),
+					null, TransportMode.car);
 			plan.addActivity(activity2);
 			Leg leg2 = pf.createLeg(TransportMode.car);
 			TripStructureUtils.setRoutingMode(leg2, TransportMode.car);
 			plan.addLeg(leg2);
-			Activity activity3 = pf.createActivityFromCoord("car interaction", new Coord((double) -10, -10));
+			Activity activity3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -10, -10),
+					null, TransportMode.car);
 			plan.addActivity(activity3);
 			Leg leg3 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg3, TransportMode.car);
@@ -279,52 +287,52 @@ public class PersonPrepareForSimTest {
 			Leg leg1 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg1, TransportMode.pt);
 			plan.addLeg(leg1);
-			Activity activity2 = pf.createActivityFromCoord("walk interaction", new Coord((double) 0, -10));
+			Activity activity2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10), null, TransportMode.walk);
 			plan.addActivity(activity2);
 			Leg leg2 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg2, TransportMode.pt);
 			plan.addLeg(leg2);
-			Activity activity3 = pf.createActivityFromCoord("walk interaction", new Coord((double) 0, -10));
+			Activity activity3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10), null, TransportMode.walk);
 			plan.addActivity(activity3);
 			Leg leg3 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg3, TransportMode.pt);
 			plan.addLeg(leg3);
-			Activity activity4 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
+			Activity activity4 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10), null, TransportMode.drt);
 			plan.addActivity(activity4);
 			Leg leg4 = pf.createLeg(TransportMode.drt);
 			TripStructureUtils.setRoutingMode(leg4, TransportMode.pt);
 			plan.addLeg(leg4);
-			Activity activity5 = pf.createActivityFromCoord("drt interaction", new Coord((double) -10, -10));
+			Activity activity5 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -10, -10), null, TransportMode.drt);
 			plan.addActivity(activity5);
 			Leg leg5 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg5, TransportMode.pt);
 			plan.addLeg(leg5);
-			Activity activity6 = pf.createActivityFromCoord("walk interaction", new Coord((double) -10, -10));
+			Activity activity6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -10, -10), null, TransportMode.walk);
 			plan.addActivity(activity6);
 			Leg leg6 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg6, TransportMode.pt);
 			plan.addLeg(leg6);
-			Activity activity7 = pf.createActivityFromCoord("walk interaction", new Coord((double) -20, -10));
+			Activity activity7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -20, -10), null, TransportMode.walk);
 			plan.addActivity(activity7);
 			Leg leg7 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg7, TransportMode.pt);
 			plan.addLeg(leg7);
-			Activity activity8 = pf.createActivityFromCoord("pt interaction", new Coord((double) -20, -10));
+			Activity activity8 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -20, -10), null, TransportMode.pt);
 			plan.addActivity(activity8);
 			Leg leg8 = pf.createLeg(TransportMode.pt);
 			TripStructureUtils.setRoutingMode(leg8, TransportMode.pt);
 			plan.addLeg(leg8);
-			Activity activity9 = pf.createActivityFromCoord("pt interaction", new Coord((double) 1800, -10));
+			Activity activity9 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 1800, -10), null, TransportMode.pt);
 			plan.addActivity(activity9);
 			Leg leg9 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg9, TransportMode.pt);
 			plan.addLeg(leg9);
-			Activity activity10 = pf.createActivityFromCoord("walk interaction", new Coord((double) 1800, -10));
+			Activity activity10 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 1800, -10), null, TransportMode.walk);
 			plan.addActivity(activity10);
 			Leg leg10 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg10, TransportMode.pt);
 			plan.addLeg(leg10);
-			Activity activity11 = pf.createActivityFromCoord("walk interaction", new Coord((double) 1900, -10));
+			Activity activity11 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 1900, -10), null, TransportMode.walk);
 			plan.addActivity(activity11);
 			Leg leg11 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg11, TransportMode.pt);
@@ -366,12 +374,12 @@ public class PersonPrepareForSimTest {
 			Leg leg1 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg1, TransportMode.pt);
 			plan.addLeg(leg1);
-			Activity activity2 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
+			Activity activity2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10), null, TransportMode.drt);
 			plan.addActivity(activity2);
 			Leg leg2 = pf.createLeg(TransportMode.drt);
 			TripStructureUtils.setRoutingMode(leg2, TransportMode.drt);
 			plan.addLeg(leg2);
-			Activity activity3 = pf.createActivityFromCoord("drt interaction", new Coord((double) -20, -10));
+			Activity activity3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -20, -10), null, TransportMode.drt);
 			plan.addActivity(activity3);
 			Leg leg3 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg3, TransportMode.drt);
@@ -397,12 +405,12 @@ public class PersonPrepareForSimTest {
 			Leg leg1 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
-			Activity activity2 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
+			Activity activity2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10), null, TransportMode.drt);
 			plan.addActivity(activity2);
 			Leg leg2 = pf.createLeg(TransportMode.drt);
 			TripStructureUtils.setRoutingMode(leg2, TransportMode.drt);
 			plan.addLeg(leg2);
-			Activity activity3 = pf.createActivityFromCoord("drt interaction", new Coord((double) -20, -10));
+			Activity activity3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -20, -10), null, TransportMode.drt);
 			plan.addActivity(activity3);
 			Leg leg3 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg3, TransportMode.drt);
@@ -417,6 +425,54 @@ public class PersonPrepareForSimTest {
 				Assert.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
+	}
+
+	@Test
+	public void testReplaceExperimentalTransitRoute() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		createAndAddNetwork(sc);
+		Id<Link> startLink = Id.createLinkId("1");
+		Id<Link> endLink = Id.createLinkId("2");
+		TransitStopFacility stopFacility1 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
+				Id.create("stop1", TransitStopFacility.class),
+				sc.getNetwork().getLinks().get(startLink).getToNode().getCoord(),
+				false);
+		stopFacility1.setLinkId(startLink);
+		sc.getTransitSchedule().addStopFacility(stopFacility1);
+		TransitStopFacility stopFacility2 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
+				Id.create("stop2", TransitStopFacility.class),
+				sc.getNetwork().getLinks().get(endLink).getToNode().getCoord(),
+				false);
+		stopFacility2.setLinkId(endLink);
+		sc.getTransitSchedule().addStopFacility(stopFacility2);
+		Population pop = sc.getPopulation();
+		PopulationFactory pf = pop.getFactory();
+		Person person = pf.createPerson(Id.create("2", Person.class));
+		Plan plan = pf.createPlan();
+		Activity activity1 = pf.createActivityFromLinkId("h", startLink);
+		plan.addActivity(activity1);
+		Leg leg = pf.createLeg(TransportMode.pt);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
+		Id<TransitLine> line = Id.create("line", TransitLine.class);
+		Id<TransitRoute> route = Id.create("route", TransitRoute.class);
+		ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
+				stopFacility1, stopFacility2, line, route);
+		leg.setRoute(experimentalTransitRoute);
+		plan.addLeg(leg);
+		Activity activity2 = pf.createActivityFromLinkId("w", endLink);
+		plan.addActivity(activity2);
+		person.addPlan(plan);
+		pop.addPerson(person);
+
+		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
+
+		Assert.assertEquals(DefaultTransitPassengerRoute.ROUTE_TYPE, leg.getRoute().getRouteType());
+		Assert.assertEquals(startLink, leg.getRoute().getStartLinkId());
+		Assert.assertEquals(endLink, leg.getRoute().getEndLinkId());
+		Assert.assertEquals(stopFacility1.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getAccessStopId());
+		Assert.assertEquals(stopFacility2.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getEgressStopId());
+		Assert.assertEquals(line, ((DefaultTransitPassengerRoute) leg.getRoute()).getLineId());
+		Assert.assertEquals(route, ((DefaultTransitPassengerRoute) leg.getRoute()).getRouteId());
 	}
 
 	private static class DummyRouter implements PlanAlgorithm {

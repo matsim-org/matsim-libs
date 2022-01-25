@@ -63,10 +63,10 @@ import javax.xml.bind.annotation.XmlType;
     "signalSystem"
 })
 @XmlRootElement(name = "amberTimes")
-public class XMLAmberTimes {
+public final class XMLAmberTimes {
 
-    protected XMLGlobalDefaultsType globalDefaults;
-    protected List<XMLAmberTimes.XMLSignalSystem> signalSystem;
+    private XMLGlobalDefaultsType globalDefaults;
+    private List<XMLAmberTimes.XMLSignalSystem> signalSystem;
 
     /**
      * Gets the value of the globalDefaults property.
@@ -235,9 +235,7 @@ public class XMLAmberTimes {
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "")
-        public static class XMLSignal
-            extends XMLAmberTimesType
-        {
+        public static class XMLSignal extends XMLAmberTimesType {
 
             @XmlAttribute(required = true)
             protected String refId;

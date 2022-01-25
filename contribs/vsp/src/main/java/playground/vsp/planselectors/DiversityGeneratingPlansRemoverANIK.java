@@ -31,6 +31,7 @@ import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -164,16 +165,21 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 		Iterator<Activity> it2 = activities2.iterator() ;
 		
 		for ( ; it1.hasNext() && it2.hasNext() ; ) {
-			Activity act1 = it1.next() ;
-			Activity act2 = it2.next() ;
-			
-			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
+			OptionalTime endTime1 = it1.next().getEndTime() ;
+			OptionalTime endTime2 = it2.next().getEndTime() ;
+
+			if ( endTime1.isUndefined() && endTime2.isUndefined()) {
 				// both activities have no end time, no need to compute a similarity penalty
-			} else {
+			} else if (endTime1.isUndefined() ^ endTime2.isUndefined()) {
+				// One of the end times is undefined ->
+				// Those two are not similar. Thus, the whole plan is considered as being not similar.
+				return false;
+			}
+			else {
 				// both activities have an end time, comparing the end times
 				
 				// Calculate the difference of both activities' end times.
-				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
+				double delta = Math.abs(endTime1.seconds() - endTime2.seconds()) ;
 				if (delta <= similarTimeInterval) {
 					// This one is similar. Proceed with the next activity.
 				} else {

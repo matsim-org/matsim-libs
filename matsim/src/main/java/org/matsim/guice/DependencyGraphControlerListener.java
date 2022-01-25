@@ -67,37 +67,38 @@ class DependencyGraphControlerListener implements StartupListener {
 		this.controlerIO = controlerIO;
 	}
 
-	@Override
 	public void notifyStartup(StartupEvent event) {
-		try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
-			MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
-					.setAliasCreator(bindings -> {
-								List<Alias> allAliases = Lists.newArrayList();
-								for (Binding<?> binding : bindings) {
-									if (binding instanceof ProviderBinding) {
-										allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
-												NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
+		if (event.getServices().getConfig().controler().isCreateGraphs()) {
+			try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
+				MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
+						.setAliasCreator(bindings -> {
+									List<Alias> allAliases = Lists.newArrayList();
+									for (Binding<?> binding : bindings) {
+										if (binding instanceof ProviderBinding) {
+											allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
+													NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
+										}
 									}
+									allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
+									allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
+									allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
+									allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
+									allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
+									allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
+									allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
+									allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
+									allAliases.addAll(getMultibinderAliases(AbstractQSimModule.class, bindings));
+									return allAliases;
 								}
-								allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
-								allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
-								allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
-								allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
-								allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
-								allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
-								allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
-								allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
-								allAliases.addAll(getMultibinderAliases(AbstractQSimModule.class, bindings));
-								return allAliases;
-							}
-					), out);
-			grapher.graph(injector);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+						), out);
+				grapher.graph(injector);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
-
-    private static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
+	
+	private static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
 		List<Alias> aliases = Lists.newArrayList();
 		NodeId toId = NodeId.newTypeId(Key.get(Types.setOf(aClass)));
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
@@ -115,7 +116,7 @@ class DependencyGraphControlerListener implements StartupListener {
 		return aliases;
 	}
 
-    private static <K> List<Alias> getMapBinderAliases(Class<K> keyType, Type aClass, Iterable<Binding<?>> bindings) {
+	private static <K> List<Alias> getMapBinderAliases(Class<K> keyType, Type aClass, Iterable<Binding<?>> bindings) {
 		List<Alias> aliases = Lists.newArrayList();
 		NodeId toId = NodeId.newTypeId(Key.get(Types.mapOf(keyType, aClass)));
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);

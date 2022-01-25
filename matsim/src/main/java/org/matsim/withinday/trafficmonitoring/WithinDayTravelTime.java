@@ -68,6 +68,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -336,7 +337,7 @@ public class WithinDayTravelTime implements TravelTime,
 		
 		
 		for (Link link : this.network.getLinks().values()) {
-			double freeSpeedTravelTime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+			double freeSpeedTravelTime = link.getLength() / link.getFreespeed();
 
 			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 			travelTimeInfo.travelTime = freeSpeedTravelTime;
@@ -574,7 +575,7 @@ public class WithinDayTravelTime implements TravelTime,
 		private CyclicBarrier startBarrier = null;
 		private CyclicBarrier endBarrier = null;
 		
-		private double time = Time.UNDEFINED_TIME;
+		private OptionalTime time = OptionalTime.undefined();
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;
 
 		public UpdateMeanTravelTimesRunnable() {
@@ -590,7 +591,7 @@ public class WithinDayTravelTime implements TravelTime,
 		}
 
 		public void setTime(final double t) {
-			time = t;
+			time = OptionalTime.defined(t);
 		}
 
 		public void addTravelTimeInfo(TravelTimeInfo travelTimeInfo) {
@@ -635,7 +636,7 @@ public class WithinDayTravelTime implements TravelTime,
 					Iterator<TravelTimeInfo> iter = activeTravelTimeInfos.iterator();
 					while (iter.hasNext()) {
 						TravelTimeInfo travelTimeInfo = iter.next();
-						calcBinTravelTime(this.time, travelTimeInfo);
+						calcBinTravelTime(this.time.seconds(), travelTimeInfo);
 
 						/*
 						 * If no further trips are stored in the TravelTimeInfo,

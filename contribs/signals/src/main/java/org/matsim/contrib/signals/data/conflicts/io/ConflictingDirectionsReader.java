@@ -37,7 +37,7 @@ import org.xml.sax.Attributes;
 /**
  * @author tthunig
  */
-public class ConflictingDirectionsReader extends MatsimXmlParser {
+public final class ConflictingDirectionsReader extends MatsimXmlParser {
 
 	final static String INTERSECTION = "intersection";
 	final static String SIGNAL_SYSTEM_ID = "signalSystemId";

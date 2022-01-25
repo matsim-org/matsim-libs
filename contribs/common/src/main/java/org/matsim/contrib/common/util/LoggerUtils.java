@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.common.util;
 
-import org.apache.log4j.Appender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 /**
  * Utility functions for logging.
@@ -34,7 +33,7 @@ public class LoggerUtils {
 
 	private static boolean disallowVerbose = true;
 
-	private static PatternLayout defaultLayout;
+	private static Layout defaultLayout;
 
 	/**
 	 * Debugging purpose: Allows to disable the effect of {@link #setVerbose(boolean)}. Use this function to ensure
@@ -54,29 +53,10 @@ public class LoggerUtils {
 	 * Level#WARN}.
 	 */
 	public static void setVerbose(boolean verbose) {
-		if(verbose)
+		if (verbose)
 			Logger.getRootLogger().setLevel(Level.ALL);
-		else if(!verbose && !disallowVerbose){
+		else if (!disallowVerbose){
 			Logger.getRootLogger().setLevel(Level.WARN);
 		}
-			
-	}
-
-	/**
-	 * Remove the line break form the logger pattern. Subsequent writes to stdout are printed to the same line.
-	 */
-	public static void disableNewLine() {
-		Appender appender = Logger.getRootLogger().getAppender("stdout");
-		defaultLayout = (PatternLayout)appender.getLayout();
-		PatternLayout newLayout = new PatternLayout(defaultLayout.getConversionPattern().replace("%n",""));
-		appender.setLayout(newLayout);
-	}
-
-	/**
-	 * Appends a line break to the logger pattern (default behavior).
-	 */
-	public static void enableNewLine() {
-		Appender appender = Logger.getRootLogger().getAppender("stdout");
-		appender.setLayout(defaultLayout);
 	}
 }

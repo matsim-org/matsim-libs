@@ -61,6 +61,7 @@ public class ResumableRunsIT {
 		config.controler().setLastIteration(11);
 		config.controler().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test
+		config.controler().setWritePlansInterval(10);
 
 		// run1
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run1/");

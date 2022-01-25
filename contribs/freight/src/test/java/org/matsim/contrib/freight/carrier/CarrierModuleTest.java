@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -98,7 +96,7 @@ public class CarrierModuleTest {
     @Test
     public void test_ConstructorWithOneParameter(){
 	    // note setUp method!
-        controler.addOverridingModule(new CarrierModule(null));
+        controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -112,7 +110,7 @@ public class CarrierModuleTest {
     @Test
     public void test_ConstructorWithThreeParameters(){
 	    // note setUp method!
-        controler.addOverridingModule(new CarrierModule(null, new StrategyManagerFactoryForTests(),
+        controler.addOverridingModule(new CarrierModule(new StrategyManagerFactoryForTests(),
 		    new DistanceScoringFunctionFactoryForTests()));
         controler.run();
     }

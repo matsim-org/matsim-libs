@@ -20,6 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -33,14 +34,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class TransitRouteStopImpl implements TransitRouteStop {
 
 	private TransitStopFacility stop;
-	private final double departureOffset;
-	private final double arrivalOffset;
+	private final OptionalTime departureOffset;
+	private final OptionalTime arrivalOffset;
 	private boolean awaitDepartureTime = false;
 
-	protected TransitRouteStopImpl(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		this.stop = stop;
-		this.departureOffset = departureDelay;
-		this.arrivalOffset = arrivalDelay;
+	private TransitRouteStopImpl(Builder builder) {
+		stop = builder.stop;
+		departureOffset = builder.departureOffset;
+		arrivalOffset = builder.arrivalOffset;
+		setAwaitDepartureTime(builder.awaitDepartureTime);
 	}
 
 	@Override
@@ -54,12 +56,12 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	}
 
 	@Override
-	public double getDepartureOffset() {
+	public OptionalTime getDepartureOffset() {
 		return this.departureOffset;
 	}
 
 	@Override
-	public double getArrivalOffset() {
+	public OptionalTime getArrivalOffset() {
 		return this.arrivalOffset;
 	}
 
@@ -92,10 +94,10 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 				return false;
 			}
 		}
-		if (this.departureOffset != other.getDepartureOffset()) {
+		if (!this.departureOffset.equals(other.getDepartureOffset())) {
 			return false;
 		} 
-		if (this.arrivalOffset != other.getArrivalOffset()) {
+		if (!this.arrivalOffset.equals(other.getArrivalOffset())) {
 			return false;
 		}
 		if (this.awaitDepartureTime != other.isAwaitDepartureTime()) {
@@ -114,4 +116,54 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		return "[TransitRouteStop stop=" + this.stop.getId() + " offset=" + this.departureOffset +" ]";
 	}
 
+	public static final class Builder implements TransitRouteStop.Builder<Builder> {
+		private TransitStopFacility stop;
+		private OptionalTime departureOffset = OptionalTime.undefined();
+		private OptionalTime arrivalOffset = OptionalTime.undefined();
+		private boolean awaitDepartureTime;
+
+		public Builder() {
+		}
+
+		public Builder(TransitRouteStopImpl copy) {
+			this.stop = copy.getStopFacility();
+			this.departureOffset = copy.getDepartureOffset();
+			this.arrivalOffset = copy.getArrivalOffset();
+			this.awaitDepartureTime = copy.isAwaitDepartureTime();
+		}
+
+		public Builder stop(TransitStopFacility val) {
+			stop = val;
+			return this;
+		}
+
+		public Builder departureOffset(double val) {
+			departureOffset = OptionalTime.defined(val);
+			return this;
+		}
+
+		public Builder arrivalOffset(double val) {
+			arrivalOffset = OptionalTime.defined(val);
+			return this;
+		}
+
+		public Builder departureOffset(OptionalTime val) {
+			departureOffset = val;
+			return this;
+		}
+
+		public Builder arrivalOffset(OptionalTime val) {
+			arrivalOffset = val;
+			return this;
+		}
+
+		public Builder awaitDepartureTime(boolean val) {
+			awaitDepartureTime = val;
+			return this;
+		}
+
+		public TransitRouteStopImpl build() {
+			return new TransitRouteStopImpl(this);
+		}
+	}
 }

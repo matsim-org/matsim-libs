@@ -30,17 +30,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class RecursiveLocationMutator extends AbstractLocationMutator{
 
@@ -50,8 +49,9 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 	private double recursionTravelSpeed = 30.0;
 	private int maxRecursions = 10;
 	private TripRouter router;
+	private final TimeInterpretation timeInterpretation;
 
-	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,
+	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, TimeInterpretation timeInterpretation,
 			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(scenario, quad_trees, facilities_of_type, random);
@@ -59,14 +59,16 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		this.maxRecursions = this.getDccg().getMaxRecursions();
 		this.recursionTravelSpeed = this.getDccg().getTravelSpeed_car();
 		this.router = router;
+		this.timeInterpretation = timeInterpretation;
 	}
 
-	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, Random random) {
+	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, TimeInterpretation timeInterpretation, Random random) {
 		super(scenario, random);
 		this.recursionTravelSpeedChange = this.getDccg().getRecursionTravelSpeedChange();
 		this.maxRecursions = this.getDccg().getMaxRecursions();
 		this.recursionTravelSpeed = this.getDccg().getTravelSpeed_car();
 		this.router = router;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -181,10 +183,28 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
-		leg.setTravelTime( 0.0 - leg.getDepartureTime() );
+		leg.setTravelTime( 0.0 - leg.getDepartureTime().seconds());
 
-		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());
-		return leg.getTravelTime();
+		List<? extends PlanElement> trip = router.calcRoute(
+					leg.getMode(),
+			  FacilitiesUtils.toFacility( fromAct, null ),
+			  FacilitiesUtils.toFacility( toAct, null ),
+				fromAct.getEndTime().seconds(),
+				person, new Attributes() );
+
+		if ( trip.size() != 1 ) {
+			throw new IllegalStateException( "This method can only be used with "+
+					"routing modules returning single legs. Got the following trip "+
+					"for mode "+ leg.getMode()+": "+trip );
+		}
+
+		Leg tripLeg = (Leg) trip.get( 0 );
+		leg.setRoute( tripLeg.getRoute() );
+		leg.setTravelTime(tripLeg.getTravelTime().seconds() );
+		leg.setDepartureTime(tripLeg.getDepartureTime().seconds() );
+
+		timeInterpretation.decideOnLegTravelTime( tripLeg );
+		return leg.getTravelTime().seconds();
 	}
 
 	private List<SubChain> calcActChainsDefinedFixedTypes(final Plan plan) {

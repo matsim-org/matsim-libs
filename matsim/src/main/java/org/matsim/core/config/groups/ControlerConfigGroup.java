@@ -27,20 +27,15 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
 
-	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT}
 
-	public enum EventsFileFormat {xml}
+	public enum EventsFileFormat {xml, pb, json}
 
 	public enum CompressionType {
 		none(""),
@@ -67,13 +62,14 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
+	private static final String WRITE_TRIPS_INTERVAL = "writeTripsInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {qsim, JDEQSim}
+	public enum MobsimType {qsim, JDEQSim, hermes}
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
@@ -89,9 +85,9 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	private Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
 
-	private int writeEventsInterval=10;
-	private int writePlansInterval=10;
-	private Set<String> snapshotFormat = Collections.emptySet();
+	private int writeEventsInterval= 50;
+	private int writePlansInterval= 50;
+	private int writeTripsInterval = 50;
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
@@ -106,19 +102,21 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
-				RoutingAlgorithmType.FastDijkstra + ", " + RoutingAlgorithmType.AStarLandmarks + " or "  + RoutingAlgorithmType.FastAStarLandmarks);
+		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + Arrays.toString(RoutingAlgorithmType.values()));
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
-		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: xml."+IOUtils.NATIVE_NEWLINE+ "\t\t" +
+		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: " + Arrays.toString(EventsFileFormat.values()) + IOUtils.NATIVE_NEWLINE+ "\t\t" +
 				"Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
 				"to a file. `0' disables events writing completely.");
+		map.put(WRITE_TRIPS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations trips CSV are written " +
+                "to a file. `0' disables trips writing completely.");
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
-				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
+                "written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false. If enabled, the router takes travel times needed for turning moves into account."
 		        + " Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled.");
-		map.put(FIRST_ITERATION, "Default=0; "); // TODO: add description
-		map.put(LAST_ITERATION, "Default=1000; "); // TODO: add description
+		map.put(FIRST_ITERATION, "Default=0. First Iteration of a simulation.");
+		map.put(LAST_ITERATION, "Default=1000. Last Iteration of a simulation.");
+
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
@@ -196,6 +194,16 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		return this.runId;
 	}
 
+    @StringGetter(WRITE_TRIPS_INTERVAL)
+    public int getWriteTripsInterval() {
+        return writeTripsInterval;
+    }
+
+    @StringSetter(WRITE_TRIPS_INTERVAL)
+    public void setWriteTripsInterval(int writeTripsInterval) {
+        this.writeTripsInterval = writeTripsInterval;
+    }
+
 	@StringSetter( RUNID )
 	public void setRunId(final String runid) {
 		if (runid == null) {
@@ -219,6 +227,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setLinkToLinkRoutingEnabled(final boolean enabled) {
 		this.linkToLinkRoutingEnabled = enabled;
 	}
+
 
     @StringGetter( EVENTS_FILE_FORMAT )
 	private String getEventsFileFormatAsString() {
@@ -254,42 +263,45 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
 		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
 	}
+	// ---
+	public enum SnapshotFormat { transims, googleearth, otfvis, positionevents }
+	private Set<SnapshotFormat> snapshotFormat = Collections.emptySet();
 
 	@StringSetter( SNAPSHOT_FORMAT )
 	private void setSnapshotFormats( final String value ) {
 		String[] parts = StringUtils.explode(value, ',');
-		Set<String> formats = new HashSet<>();
+		Set<SnapshotFormat> formats = EnumSet.noneOf( SnapshotFormat.class );
 		for (String part : parts) {
 			String trimmed = part.trim();
 			if (trimmed.length() > 0) {
-				formats.add(trimmed);
+				formats.add(SnapshotFormat.valueOf( trimmed ) );
 			}
 		}
 		this.snapshotFormat = formats;
 	}
 
-    @StringGetter( SNAPSHOT_FORMAT )
+	@StringGetter( SNAPSHOT_FORMAT )
 	private String getSnapshotFormatAsString() {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
-		for (String format : this.snapshotFormat) {
+		for (SnapshotFormat format : this.snapshotFormat) {
 			if (!isFirst) {
 				str.append(',');
 			}
-			str.append(format);
+			str.append(format.name());
 			isFirst = false;
 		}
 		return str.toString();
 	}
 
-	public void setSnapshotFormat(final Collection<String> snapshotFormat) {
-		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<>(snapshotFormat));
+	public void setSnapshotFormat(final Collection<SnapshotFormat> snapshotFormat) {
+		this.snapshotFormat = Collections.unmodifiableSet(EnumSet.copyOf( snapshotFormat) );
 	}
 
-	public Collection<String> getSnapshotFormat() {
+	public Collection<SnapshotFormat> getSnapshotFormat() {
 		return this.snapshotFormat;
 	}
-
+	// ---
 	@StringGetter( WRITE_EVENTS_INTERVAL )
 	public int getWriteEventsInterval() {
 		return this.writeEventsInterval;

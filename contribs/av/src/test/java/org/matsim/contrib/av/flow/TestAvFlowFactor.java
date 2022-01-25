@@ -75,7 +75,7 @@ public class TestAvFlowFactor {
 
 	}
 
-	class VehicleTimeCounter implements LinkEnterEventHandler {
+	static class VehicleTimeCounter implements LinkEnterEventHandler {
 		double lastNonAVEnterTime;
 		double lastAVEnterTime;
 

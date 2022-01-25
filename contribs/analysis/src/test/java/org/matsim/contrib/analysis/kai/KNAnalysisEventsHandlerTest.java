@@ -60,8 +60,8 @@ public class KNAnalysisEventsHandlerTest {
 	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
 
 	public static final String BASE_FILE_NAME = "stats_";
-	public static final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
-	public static final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
+	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+	public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
 	private Scenario scenario = null ;
 	private Population population = null ;
@@ -132,27 +132,31 @@ public class KNAnalysisEventsHandlerTest {
 
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
-		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
-		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
-		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
-		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime() );
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
+		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		this.runTest(testee);
 	}

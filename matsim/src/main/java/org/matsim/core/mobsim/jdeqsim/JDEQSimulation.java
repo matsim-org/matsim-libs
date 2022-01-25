@@ -20,19 +20,19 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import java.util.HashMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
-
-import javax.inject.Inject;
-
-import java.util.HashMap;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 
 /**
@@ -47,17 +47,16 @@ public class JDEQSimulation implements Mobsim {
 	private final JDEQSimConfigGroup config;
 	protected Scenario scenario;
 	private final EventsManager events;
-
-	protected final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
-	public JDEQSimulation(final JDEQSimConfigGroup config, final Scenario scenario, final EventsManager events) {
+	public JDEQSimulation(final JDEQSimConfigGroup config, final Scenario scenario, final EventsManager events, final TimeInterpretation timeInterpretation) {
 		Road.setConfig(config);
 		Message.setEventsManager(events);
 		this.config = config;
 		this.scenario = scenario;
 		this.events = events;
-		this.activityDurationInterpretation = this.scenario.getConfig().plans().getActivityDurationInterpretation();
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class JDEQSimulation implements Mobsim {
 		Timer t = new Timer();
 		t.startTimer();
 
-		Scheduler scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime());
+		Scheduler scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime().orElse(Double.MAX_VALUE));
 		Road.setAllRoads(new HashMap<Id<Link>, Road>());
 
 		// initialize network
@@ -77,7 +76,7 @@ public class JDEQSimulation implements Mobsim {
 		}
 
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			new Vehicle(scheduler, person, activityDurationInterpretation); // the vehicle registers itself to the scheduler
+			new Vehicle(scheduler, person, timeInterpretation); // the vehicle registers itself to the scheduler
 		}
 
 		scheduler.startSimulation();

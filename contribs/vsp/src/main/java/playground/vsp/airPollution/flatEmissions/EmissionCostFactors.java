@@ -32,8 +32,8 @@ public enum EmissionCostFactors {
 	// * Adapt to hbefa4 (e.g. PM2.5 vs. PM10; tire emissions).
 	// kai/ihab, dec'19
 	
-	NOX (9600. / (1000. * 1000.)), //EURO_PER_GRAMM_NOX
-	NO2 (0.), // NO2 is included in NOX; we are not separately computing possible additional damages of NO2.  kai/ihab, feb'19
+	NOx (9600. / (1000. * 1000.)), //EURO_PER_GRAMM_NOx
+	NO2 (0.), // NO2 is included in NOx; we are not separately computing possible additional damages of NO2.  kai/ihab, feb'19
 	HC (0.), // not included in Maibach et al; they only have NMVOC, which should be equivalent to our NMHC, see below.
 	NMHC (1700. / (1000. * 1000.)), //EURO_PER_GRAMM_NMVOC
 	SO2 (11000. / (1000. * 1000.)), //EURO_PER_GRAMM_SO2

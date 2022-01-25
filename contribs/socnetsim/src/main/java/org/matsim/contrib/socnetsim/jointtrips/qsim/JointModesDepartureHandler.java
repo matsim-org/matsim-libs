@@ -28,6 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
+import org.matsim.contrib.socnetsim.utils.IdentifiableCollectionsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -36,14 +42,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-
-import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
-import org.matsim.contrib.socnetsim.utils.IdentifiableCollectionsUtils;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 
 /**
  * @author thibautd
@@ -61,7 +60,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		new LinkedHashMap<Id , WaitingDriver>();
 	
 	public JointModesDepartureHandler(
-			final QNetsimEngine netsimEngine) {
+			final QNetsimEngineI netsimEngine) {
 		this( new NetsimWrappingQVehicleProvider( netsimEngine ),
 				netsimEngine.getDepartureHandler() );
 	}

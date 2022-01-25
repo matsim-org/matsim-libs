@@ -57,21 +57,22 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof Activity) {
 				Activity actTemplate = ((Activity) planTemplate.getPlanElements().get(actLegIndex));
-				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((Activity) pe).setCoord(actTemplate.getCoord());
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
-				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration().seconds());
+				((Activity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
-				r.setTravelTime( legTemplate.getDepartureTime() + legTemplate.getTravelTime() - r.getDepartureTime() );
-				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				r.setTravelTime( legTemplate.getDepartureTime().seconds()
+						+ legTemplate.getTravelTime().seconds() - r.getDepartureTime().seconds());
+				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
-				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
+				((Leg) pe).setTravelTime(legTemplate.getTravelTime().seconds());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -84,21 +85,21 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof Activity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((Activity) pe).setCoord(actTemplate.getCoord());
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
-				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration().seconds());
+				((Activity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
-				r.setTravelTime( legTemplate.getArrivalTime() - r.getDepartureTime() );
-				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				r.setTravelTime( legTemplate.getArrivalTime().seconds() - r.getDepartureTime().seconds());
+				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
-				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
+				((Leg) pe).setTravelTime(legTemplate.getTravelTime().seconds());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -111,20 +112,20 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof LCActivity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((LCActivity) pe).setEndTime(actTemplate.getEndTime());
+				((LCActivity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((LCActivity) pe).setCoord(actTemplate.getCoord());
 				((LCActivity) pe).setFacilityId(actTemplate.getFacilityId());
 				((LCActivity) pe).setLinkId(actTemplate.getLinkId());
-				((LCActivity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((LCActivity) pe).setStartTime(actTemplate.getStartTime());
+				((LCActivity) pe).setMaximumDuration(actTemplate.getMaximumDuration().seconds());
+				((LCActivity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((LCActivity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof LCLeg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
-				((LCLeg) pe).setArrivalTime(legTemplate.getArrivalTime());
-				((LCLeg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				((LCLeg) pe).setArrivalTime(legTemplate.getArrivalTime().seconds());
+				((LCLeg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((LCLeg) pe).setMode(legTemplate.getMode());
 				((LCLeg) pe).setRoute(legTemplate.getRoute());
-				((LCLeg) pe).setTravelTime(legTemplate.getTravelTime());
+				((LCLeg) pe).setTravelTime(legTemplate.getTravelTime().seconds());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -187,7 +188,7 @@ import org.matsim.facilities.ActivityFacility;
 		if (leg instanceof Leg) {
 			final double arrTime = arrivalTime;
 			Leg r = ((Leg) leg);
-			r.setTravelTime( arrTime - r.getDepartureTime() );
+			r.setTravelTime( arrTime - r.getDepartureTime().seconds());
 		} else if (leg instanceof LCLeg) {
 			((LCLeg) leg).setArrivalTime(arrivalTime);
 		} else throw new RuntimeException("Unexpected type of leg was found: " + leg.getClass().toString() + ". Aborting!");

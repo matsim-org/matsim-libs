@@ -45,8 +45,10 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
-public class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
+public final class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	// could be/remain public as long as constructor is package-private. kai, feb'20
+	// used from outside, e.g. vsp-playgrounds
 	
 	private static final Logger log = Logger.getLogger(PlansTranslatorBasedOnEvents.class);
 
@@ -67,7 +69,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	@Inject
 	PlansTranslatorBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
-		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedLinks();
 		for ( String str : abc ) {
 			this.calibratedLinks.add( Id.createLinkId(str) ) ;
 		}

@@ -19,64 +19,41 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import org.matsim.api.core.v01.network.Network;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.STAY;
+
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.contrib.zone.SquareGridSystem;
-import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
  */
 public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
-	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility) {
-		double cellSize = ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getCellSize();
-		return create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility,
-				new SquareGridSystem(network, cellSize));
-	}
-
-	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, ZonalSystem zonalSystem) {
-		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
-		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
-		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(scheduler, timer, network, travelTime,
-				travelDisutility, ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), idleTaxiRegistry,
-				unplannedRequestRegistry);
-		return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, idleTaxiRegistry,
-				unplannedRequestRegistry, requestInserter);
-	}
 
 	private final TaxiScheduler scheduler;
 	private final IdleTaxiZonalRegistry idleTaxiRegistry;
 	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
 	public RuleBasedTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, IdleTaxiZonalRegistry idleTaxiRegistry,
-			UnplannedRequestZonalRegistry unplannedRequestRegistry, UnplannedRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, scheduler, requestInserter);
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, ZonalRegisters zonalRegisters,
+			UnplannedRequestInserter requestInserter) {
+		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, requestInserter);
 
 		this.scheduler = scheduler;
-		this.idleTaxiRegistry = idleTaxiRegistry;
-		this.unplannedRequestRegistry = unplannedRequestRegistry;
+		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
+		this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
 
 		if (taxiCfg.isVehicleDiversion()) {
 			// hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
@@ -100,12 +77,12 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 			if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
 				idleTaxiRegistry.removeVehicle(vehicle);
 			}
-		} else if (scheduler.isIdle(vehicle)) {
+		} else if (scheduler.getScheduleInquiry().isIdle(vehicle)) {
 			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
 			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
-				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
-				if (isWaitStay(previousTask)) {
+				Task previousTask = Schedules.getPreviousTask(schedule);
+				if (STAY.isBaseTypeOf(previousTask)) {
 					idleTaxiRegistry.removeVehicle(vehicle);
 				}
 			}
@@ -113,11 +90,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	}
 
 	@Override
-	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
-		return isWaitStay(newCurrentTask);
-	}
-
-	protected boolean isWaitStay(TaxiTask task) {
-		return task.getTaxiTaskType() == TaxiTaskType.STAY;
+	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
+		return STAY.isBaseTypeOf(newCurrentTask);
 	}
 }

@@ -30,7 +30,7 @@ import org.matsim.core.events.handler.EventHandler;
  *
  */
 class HandlerToTestEmissionAnalysisModules implements EventsManager {
-	private static Double sumOverAll=0.0;
+	private Double sumOverAll=0.0;
 
 	@Override
 	public void processEvent(Event event) {	
@@ -81,14 +81,12 @@ class HandlerToTestEmissionAnalysisModules implements EventsManager {
 
 	}
 
-	public static Double getSum() {
-		return sumOverAll;
-
+	public void reset() {
+		sumOverAll=.0;
 	}
 
-	public static void reset() {
-		sumOverAll=.0;
-		
+	public Double getSum() {
+		return sumOverAll;
 	}
 
 }

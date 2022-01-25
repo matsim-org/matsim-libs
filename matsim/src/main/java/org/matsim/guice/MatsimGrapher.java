@@ -1,14 +1,20 @@
 package org.matsim.guice;
 
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.grapher.AbstractInjectorGrapher;
+import com.google.inject.grapher.BindingEdge;
+import com.google.inject.grapher.DependencyEdge;
+import com.google.inject.grapher.Edge;
+import com.google.inject.grapher.ImplementationNode;
+import com.google.inject.grapher.InstanceNode;
+import com.google.inject.grapher.InterfaceNode;
+import com.google.inject.grapher.Node;
+import com.google.inject.grapher.NodeId;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
-import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.MaskSubgraph;
 import org.matsim.analysis.IterationStopWatch;
@@ -32,18 +38,11 @@ import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.grapher.AbstractInjectorGrapher;
-import com.google.inject.grapher.BindingEdge;
-import com.google.inject.grapher.DependencyEdge;
-import com.google.inject.grapher.Edge;
-import com.google.inject.grapher.ImplementationNode;
-import com.google.inject.grapher.InstanceNode;
-import com.google.inject.grapher.InterfaceNode;
-import com.google.inject.grapher.Node;
-import com.google.inject.grapher.NodeId;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class MatsimGrapher extends AbstractInjectorGrapher {
 

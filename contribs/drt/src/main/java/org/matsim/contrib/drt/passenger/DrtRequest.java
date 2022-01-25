@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.passenger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
@@ -45,20 +44,34 @@ public class DrtRequest implements PassengerRequest {
 	private final Link fromLink;
 	private final Link toLink;
 
-	private DrtStopTask pickupTask = null;
-	private DrtStopTask dropoffTask = null;
+	private DrtRequest(Builder builder) {
+		id = builder.id;
+		submissionTime = builder.submissionTime;
+		earliestStartTime = builder.earliestStartTime;
+		latestStartTime = builder.latestStartTime;
+		latestArrivalTime = builder.latestArrivalTime;
+		passengerId = builder.passengerId;
+		mode = builder.mode;
+		fromLink = builder.fromLink;
+		toLink = builder.toLink;
+	}
 
-	public DrtRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime) {
-		this.id = id;
-		this.submissionTime = submissionTime;
-		this.earliestStartTime = earliestStartTime;
-		this.latestStartTime = latestStartTime;
-		this.latestArrivalTime = latestArrivalTime;
-		this.passengerId = passengerId;
-		this.mode = mode;
-		this.fromLink = fromLink;
-		this.toLink = toLink;
+	public static Builder newBuilder() {
+		return new Builder();
+	}
+
+	public static Builder newBuilder(DrtRequest copy) {
+		Builder builder = new Builder();
+		builder.id = copy.getId();
+		builder.submissionTime = copy.getSubmissionTime();
+		builder.earliestStartTime = copy.getEarliestStartTime();
+		builder.latestStartTime = copy.getLatestStartTime();
+		builder.latestArrivalTime = copy.getLatestArrivalTime();
+		builder.passengerId = copy.getPassengerId();
+		builder.mode = copy.getMode();
+		builder.fromLink = copy.getFromLink();
+		builder.toLink = copy.getToLink();
+		return builder;
 	}
 
 	@Override
@@ -105,22 +118,6 @@ public class DrtRequest implements PassengerRequest {
 		return mode;
 	}
 
-	public DrtStopTask getPickupTask() {
-		return pickupTask;
-	}
-
-	public void setPickupTask(DrtStopTask pickupTask) {
-		this.pickupTask = pickupTask;
-	}
-
-	public DrtStopTask getDropoffTask() {
-		return dropoffTask;
-	}
-
-	public void setDropoffTask(DrtStopTask dropoffTask) {
-		this.dropoffTask = dropoffTask;
-	}
-
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -133,8 +130,70 @@ public class DrtRequest implements PassengerRequest {
 				.add("mode", mode)
 				.add("fromLink", fromLink)
 				.add("toLink", toLink)
-				.add("pickupTask", pickupTask)
-				.add("dropoffTask", dropoffTask)
 				.toString();
+	}
+
+	public static final class Builder {
+		private Id<Request> id;
+		private double submissionTime;
+		private double earliestStartTime;
+		private double latestStartTime;
+		private double latestArrivalTime;
+		private Id<Person> passengerId;
+		private String mode;
+		private Link fromLink;
+		private Link toLink;
+
+		private Builder() {
+		}
+
+		public Builder id(Id<Request> val) {
+			id = val;
+			return this;
+		}
+
+		public Builder submissionTime(double val) {
+			submissionTime = val;
+			return this;
+		}
+
+		public Builder earliestStartTime(double val) {
+			earliestStartTime = val;
+			return this;
+		}
+
+		public Builder latestStartTime(double val) {
+			latestStartTime = val;
+			return this;
+		}
+
+		public Builder latestArrivalTime(double val) {
+			latestArrivalTime = val;
+			return this;
+		}
+
+		public Builder passengerId(Id<Person> val) {
+			passengerId = val;
+			return this;
+		}
+
+		public Builder mode(String val) {
+			mode = val;
+			return this;
+		}
+
+		public Builder fromLink(Link val) {
+			fromLink = val;
+			return this;
+		}
+
+		public Builder toLink(Link val) {
+			toLink = val;
+			return this;
+		}
+
+		public DrtRequest build() {
+			return new DrtRequest(this);
+		}
 	}
 }

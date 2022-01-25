@@ -22,9 +22,12 @@ package org.matsim.vehicles;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +47,8 @@ public final class VehicleUtils {
 	private static final String EGRESSTIME = "egressTimeInSecondsPerPerson";
 	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
 	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
+	private static final String ENERGYCONSUMPTION = "energyConsumptionKWhPerMeter";
+	private static final String ENERGYCAPACITY = "energyCapacityInKWhOrLiters";
 	private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
 	private static final String HBEFA_TECHNOLOGY = "HbefaTechnology";
 	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
@@ -86,26 +91,44 @@ public final class VehicleUtils {
 	}
 
 	public static void copyFromTo( VehicleType in, VehicleType out ) {
-		out.setMaximumVelocity( in.getMaximumVelocity() ) ;
-		out.setDescription( in.getDescription() ) ;
-		out.setPcuEquivalents( in.getPcuEquivalents() ) ;
-		out.setLength( in.getLength() ) ;
-		out.setWidth( in.getLength() ) ;
-		out.setFlowEfficiencyFactor( in.getFlowEfficiencyFactor() ) ;
-		out.setNetworkMode( in.getNetworkMode() ) ;
+		out.setMaximumVelocity(in.getMaximumVelocity());
+		out.setDescription(in.getDescription());
+		out.setPcuEquivalents(in.getPcuEquivalents());
+		out.setLength(in.getLength());
+		out.setWidth(in.getLength());
+		out.setFlowEfficiencyFactor(in.getFlowEfficiencyFactor());
+		out.setNetworkMode(in.getNetworkMode());
 		// (all the deprecated setters are copied via the attributes!)
-		AttributesUtils.copyAttributesFromTo( in, out );
+		AttributesUtils.copyAttributesFromTo(in, out);
 
-		CostInformation cost = in.getCostInformation();;
-		out.getCostInformation().setCostsPerSecond( cost.getCostsPerSecond() ).setCostsPerMeter( cost.getCostsPerMeter() ).setFixedCost( cost.getFixedCosts() ) ;
-		AttributesUtils.copyAttributesFromTo( cost, out.getCostInformation() );
+		CostInformation cost = in.getCostInformation();
+		out.getCostInformation().setCostsPerSecond(cost.getCostsPerSecond()).setCostsPerMeter(cost.getCostsPerMeter()).setFixedCost(cost.getFixedCosts());
+		AttributesUtils.copyAttributesFromTo(cost, out.getCostInformation());
 
-		VehicleCapacity cap = in.getCapacity() ;
-		out.getCapacity().setWeightInTons( cap.getWeightInTons() ).setSeats( cap.getSeats() ).setSeats( cap.getStandingRoom() ).setVolumeInCubicMeters( cap.getVolumeInCubicMeters() ) ;
-		AttributesUtils.copyAttributesFromTo( cap, out.getCapacity() );
+		VehicleCapacity cap = in.getCapacity();
+		out.getCapacity().setWeightInTons(cap.getWeightInTons()).setSeats(cap.getSeats()).setSeats(cap.getStandingRoom()).setVolumeInCubicMeters(cap.getVolumeInCubicMeters());
+		AttributesUtils.copyAttributesFromTo(cap, out.getCapacity());
 
-		AttributesUtils.copyAttributesFromTo( in.getEngineInformation(), out.getEngineInformation() );
+		AttributesUtils.copyAttributesFromTo(in.getEngineInformation(), out.getEngineInformation());
 
+	}
+
+	/**
+	 * Retrieves vehicleIds of all vehicles that are assigned to the person.
+	 *
+	 * @param person the person one wants to retrieve vehicles for
+	 * @return vehicle ids mapped to the mode the respective vehicle may be used for
+	 * @throws RuntimeException In case no vehicleIds were set
+	 */
+	public static Map<String, Id<Vehicle>> getVehicleIds(Person person) {
+		var vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
+		if (vehicleIds == null) {
+			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() +
+					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+					"a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
+		}
+		return vehicleIds;
 	}
 
 	/**
@@ -115,26 +138,35 @@ public final class VehicleUtils {
 	 * @throws RuntimeException In case no vehicleIds were set or in case no vehicleId was set for the specified mode
 	 */
 	public static Id<Vehicle> getVehicleId(Person person, String mode) {
-		Map<String, Id<Vehicle>> vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
-		if (vehicleIds == null || !vehicleIds.containsKey(mode)) {
+		Map<String, Id<Vehicle>> vehicleIds = getVehicleIds(person);
+		if (!vehicleIds.containsKey(mode)) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
-                    ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-                    "a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
-                    "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
-            );
+					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+					"a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
+			);
 		}
 		return vehicleIds.get(mode);
 	}
 
     /**
-     * Attaches a vehicle id to a person, so that the router knows which vehicle to use for which mode and person
-     */
-    public static void insertVehicleIdIntoAttributes(Person person, String mode, Id<Vehicle> vehicleId) {
-        Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
-        Map<String, Id<Vehicle>> map = attr == null ? new HashMap<>() : ((Map<String, Id<Vehicle>>) attr);
-        map.put(mode, vehicleId);
-        person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, map);
-    }
+	 * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
+	 *
+	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
+	 *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
+	 *                      and provided values are merged into one map
+	 */
+	public static void insertVehicleIdsIntoAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
+		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+		var toInsert = new HashMap<>(modeToVehicle);
+		if (attr != null) {
+			Map<String, Id<Vehicle>> attrMap = (Map<String, Id<Vehicle>>) attr;
+			for (var entry : attrMap.entrySet()) {
+				toInsert.putIfAbsent(entry.getKey(), entry.getValue());
+			}
+		}
+		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, Collections.unmodifiableMap(toInsert));
+	}
 	//******** general VehicleType attributes ************
 
 	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
@@ -226,28 +258,39 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( HBEFA_EMISSIONS_CONCEPT, emissionsConcept ) ;
 	}
 
+	public static Double getEnergyConsumptionKWhPerMeter(EngineInformation engineInformation) {
+    	return (Double) engineInformation.getAttributes().getAttribute(ENERGYCONSUMPTION);
+ 	}
+
+	public static void setEnergyConsumptionKWhPerMeter(EngineInformation engineInformation, double energyConsumptionKWhPerMeter) {
+		 engineInformation.getAttributes().putAttribute(ENERGYCONSUMPTION, energyConsumptionKWhPerMeter);
+	}
+
+	public static Double getEnergyCapacity(EngineInformation engineInformation) {
+		return (Double) engineInformation.getAttributes().getAttribute(ENERGYCAPACITY);
+	}
+
+	public static void setEnergyCapacity(EngineInformation engineInformation, double energyCapacityInKWhOrLiters) {
+		engineInformation.getAttributes().putAttribute(ENERGYCAPACITY, energyCapacityInKWhOrLiters);
+	}
 	//******** CostInformation attributes ************
 
-	@Deprecated
-	/*package*/ static double getCostsPerSecondWaiting(CostInformation costInformation) {
-		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
+	public static Double getCostsPerSecondWaiting(CostInformation costInformation) {
+		return (Double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
 	}
 
 
-	@Deprecated
-	/*package*/ static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
+	public static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_WAITING, costsPerSecond);
 	}
 
 
-	@Deprecated
-	/*package*/ static double getCostsPerSecondInService(CostInformation costInformation) {
-		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
+	public static Double getCostsPerSecondInService(CostInformation costInformation) {
+		return (Double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
 	}
 
 
-	@Deprecated
-	/*package*/ static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
+	public static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 
@@ -275,4 +318,42 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( FUELCONSUMPTION,  fuelConsumption);
 	}
 
+	public static Vehicles getOrCreateAllvehicles( Scenario  scenario ) {
+		Vehicles map = (Vehicles) scenario.getScenarioElement( "allvehicles" );
+		if ( map==null ) {
+			log.info( "adding scenario element for allvehicles container" );
+			map = new VehiclesImpl();
+			scenario.addScenarioElement("allvehicles" , map);
+		}
+		return map;
+	}
+	private static int tryStdCnt = 5;
+	private static int tryTrnCnt = 5;
+	public static Vehicle findVehicle( Id<Vehicle> vehicleId, Scenario scenario) {
+		Vehicle vehicle = getOrCreateAllvehicles( scenario ).getVehicles().get( vehicleId );
+		if ( vehicle==null ) {
+			if ( tryStdCnt>0){
+				tryStdCnt--;
+				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying standard vehicles container ..." );
+				if ( tryStdCnt==0 ) {
+					log.info( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			vehicle = scenario.getVehicles().getVehicles().get(  vehicleId );
+		}
+		if ( vehicle==null ) {
+			if ( tryTrnCnt>0 ) {
+				tryTrnCnt--;
+				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying transit vehicles container ..." );
+				if ( tryTrnCnt==0 ) {
+					log.info(  Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			vehicle = scenario.getTransitVehicles().getVehicles().get(  vehicleId );
+		}
+		if ( vehicle==null ) {
+			log.info( "unable to find vehicle for vehicleId=" + vehicleId + "; will return null") ;
+		}
+		return vehicle ;
+	}
 }

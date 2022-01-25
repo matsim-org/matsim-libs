@@ -18,20 +18,18 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -41,7 +39,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class VehicleDataEntryFactoryImpl implements EntryFactory {
+public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
@@ -52,35 +50,33 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 	}
 
-	public Entry create(DvrpVehicle vehicle, double currentTime) {
-		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
+	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
+		if (isNotEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
 
 		Schedule schedule = vehicle.getSchedule();
-		@SuppressWarnings("unchecked")
-		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
-
-		LinkTimePair start;
+		final LinkTimePair start;
+		final Task startTask;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-			switch (currentTask.getDrtTaskType()) {
+			startTask = schedule.getCurrentTask();
+			switch (getBaseTypeOrElseThrow(startTask)) {
 				case DRIVE:
-					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
-					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
-					if (start == null) { // too late to divert a vehicle
-						start = new LinkTimePair(driveTask.getPath().getToLink(), driveTask.getEndTime());
-					}
+					DrtDriveTask driveTask = (DrtDriveTask)startTask;
+					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
+					start = diversionPoint != null ? diversionPoint : //diversion possible
+							new LinkTimePair(driveTask.getPath().getToLink(),
+									driveTask.getEndTime());// too late for diversion
 					break;
 
 				case STOP:
-					DrtStopTask stopTask = (DrtStopTask)currentTask;
+					DrtStopTask stopTask = (DrtStopTask)startTask;
 					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
 					break;
 
 				case STAY:
-					DrtStayTask stayTask = (DrtStayTask)currentTask;
+					DrtStayTask stayTask = (DrtStayTask)startTask;
 					start = new LinkTimePair(stayTask.getLink(), currentTime);
 					break;
 
@@ -88,30 +84,60 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 					throw new RuntimeException();
 			}
 
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
+			nextTaskIdx = startTask.getTaskIdx() + 1;
 		} else { // PLANNED
 			start = new LinkTimePair(vehicle.getStartLink(), vehicle.getServiceBeginTime());
+			startTask = null;
 			nextTaskIdx = 0;
 		}
 
+		List<? extends Task> tasks = schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
-		for (DrtTask task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (task.getDrtTaskType() == DrtTaskType.STOP) {
+		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
+			if (STOP.isBaseTypeOf(task)) {
 				stopTasks.add((DrtStopTask)task);
 			}
 		}
 
-		Stop[] stops = new Stop[stopTasks.size()];
-		int outputOccupancy = 0;
+		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
+		int outgoingOccupancy = 0;
 		for (int i = stops.length - 1; i >= 0; i--) {
-			Stop s = stops[i] = new Stop(stopTasks.get(i), outputOccupancy);
-			outputOccupancy -= s.occupancyChange;
+			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy);
+			outgoingOccupancy -= s.getOccupancyChange();
 		}
 
-		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
+		var slackTimes = computeSlackTimes(vehicle, currentTime, stops);
+
+		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
+				ImmutableList.copyOf(stops), slackTimes);
 	}
 
-	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
-		return !(currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime());
+	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
+		return currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime();
+	}
+
+	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops) {
+		double[] slackTimes = new double[stops.length + 1];
+
+		//vehicle
+		double slackTime = calcVehicleSlackTime(vehicle, now);
+		slackTimes[stops.length] = slackTime;
+
+		//stops
+		for (int i = stops.length - 1; i >= 0; i--) {
+			var stop = stops[i];
+			slackTime = Math.min(stop.latestArrivalTime - stop.task.getBeginTime(), slackTime);
+			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
+			slackTimes[i] = slackTime;
+		}
+		return slackTimes;
+	}
+
+	static double calcVehicleSlackTime(DvrpVehicle vehicle, double now) {
+		DefaultStayTask lastTask = (DefaultStayTask)Schedules.getLastTask(vehicle.getSchedule());
+		//if the last task is started, take 'now', otherwise take the planned begin time
+		double availableFromTime = Math.max(lastTask.getBeginTime(), now);
+		//for an already delayed vehicle, assume slack is 0 (instead of a negative number)
+		return Math.max(0, vehicle.getServiceEndTime() - availableFromTime);
 	}
 }

@@ -20,6 +20,11 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,10 +42,11 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterJson;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.File;
+import org.matsim.core.utils.io.IOUtils;
 
 @Singleton
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
@@ -49,7 +55,6 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);
 	
 	private final EventsManager eventsManager;
-	private final int lastIteration;
 	private List<EventWriter> eventWriters = new LinkedList<>();
 
 	private int writeEventsInterval;
@@ -67,7 +72,6 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 			final OutputDirectoryHierarchy controlerIO) {
 		this.eventsManager = eventsManager;
 		this.writeEventsInterval = config.getWriteEventsInterval();
-		this.lastIteration = config.getLastIteration() ;
 		this.eventsFileFormats = config.getEventsFileFormats();
 		this.controlerIO = controlerIO;
 		this.writeMoreUntilIteration = config.getWriteEventsUntilIteration() ;
@@ -80,16 +84,32 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 		final boolean regularWriteEvents = writingEventsAtAll && ( event.getIteration()>0 && event.getIteration() % writeEventsInterval == 0 ) ;
 		// (w/o the "writingEventsAtAll && ..." this is a division by zero when writeEventsInterval=0. kai, apr'18)
 		final boolean earlyIteration = event.getIteration() <= writeMoreUntilIteration ;
-		final boolean lastIteration = event.getIteration()==this.lastIteration ;
+		final boolean lastIteration = event.isLastIteration();
 		if (writingEventsAtAll && (regularWriteEvents||earlyIteration || lastIteration ) ) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
-				case xml:
-					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
-							Controler.DefaultFiles.events)));
-					break;
-				default:
-					log.warn("Unknown events file format specified: " + format.toString() + ".");
+					case xml:
+						this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(),
+								Controler.DefaultFiles.events)));
+						break;
+					case pb:
+						// The pb dependency is optional at the moment so we search it first
+						URL url = IOUtils.getFileUrl(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.eventsPb));
+						try {
+							Class<?> writerClass = ClassLoader.getSystemClassLoader().loadClass("org.matsim.contrib.protobuf.EventWriterPB");
+							Constructor<?> constructor = writerClass.getConstructor(OutputStream.class);
+							EventWriter writer = (EventWriter) constructor.newInstance(IOUtils.getOutputStream(url, false));
+							this.eventWriters.add(writer);
+						} catch (ReflectiveOperationException e) {
+							throw new RuntimeException("Error using the PBWriter. Please make sure protobuf contrib on the classpath, or remove pb output format.", e);
+						}
+						break;
+					case json:
+						this.eventWriters.add(new EventWriterJson(new File(controlerIO.getIterationFilename(event.getIteration(),
+								Controler.DefaultFiles.eventsJson))));
+						break;
+					default:
+						log.warn("Unknown events file format specified: " + format.toString() + ".");
 				}
 			}
 			for (EventWriter writer : this.eventWriters) {

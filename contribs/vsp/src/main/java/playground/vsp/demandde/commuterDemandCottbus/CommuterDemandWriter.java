@@ -50,6 +50,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -125,7 +126,7 @@ public class CommuterDemandWriter {
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).get(
-				) );
+				), TimeInterpretation.create(scenario.getConfig()) );
 		this.pp4s = new PersonPrepareForSim(router, scenario);
 
 		int pnr = 0;
@@ -244,7 +245,7 @@ public class CommuterDemandWriter {
 		Activity homeAct = (Activity) p.getPlans().get(0).getPlanElements().get(0);
 		Activity workAct = (Activity) p.getPlans().get(0).getPlanElements().get(2);
 		Leg leg = (Leg) p.getPlans().get(0).getPlanElements().get(1);
-		homeAct.setEndTime(workAct.getStartTime() - leg.getTravelTime());
+		homeAct.setEndTime(workAct.getStartTime().seconds() - leg.getTravelTime().seconds());
 		// leg.setRoute(null);
 		// leg = (Leg) p.getPlans().get(0).getPlanElements().get(3);
 		// leg.setRoute(null);

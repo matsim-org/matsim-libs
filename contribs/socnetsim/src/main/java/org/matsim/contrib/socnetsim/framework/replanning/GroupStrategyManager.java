@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -119,14 +118,11 @@ public class GroupStrategyManager {
 	private static String identifySubpopulation(
 			final ReplanningGroup g,
 			final Scenario sc) {
-		final String attName = sc.getConfig().plans().getSubpopulationAttributeName();
-//		final ObjectAttributes atts = sc.getPopulation().getPersonAttributes();
 
 		String name = null;
 
 		for ( Person p : g.getPersons() ) {
-//			final String persSubPop = (String) atts.getAttribute( p.getId().toString() , attName );
-			final String persSubPop = (String) PopulationUtils.getPersonAttribute( p, attName );
+			final String persSubPop = PopulationUtils.getSubpopulation( p );
 			if ( persSubPop == null && name != null ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
 			if ( name != null && !name.equals( persSubPop ) ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
 			name = persSubPop;

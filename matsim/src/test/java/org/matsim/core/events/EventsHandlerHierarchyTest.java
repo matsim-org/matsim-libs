@@ -64,10 +64,14 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 		Id<Link> linkId = Id.create("1", Link.class);
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
 		EventHandler cc = new B();
+		events.initProcessing();
 		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+		events.finishProcessing();
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
+		events.initProcessing();
 		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+		events.finishProcessing();
 		assertEquals(this.eventHandled, 1);
 	}
 
@@ -77,10 +81,14 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
 		//first test if handleEvent is not called twice for A and for C
 		C cc = new C();
+		events.initProcessing();
 		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+		events.finishProcessing();
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
+		events.initProcessing();
 		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+		events.finishProcessing();
 		assertEquals(this.eventHandled, 1);
 		//then test the reset
 		events.resetHandlers(0);

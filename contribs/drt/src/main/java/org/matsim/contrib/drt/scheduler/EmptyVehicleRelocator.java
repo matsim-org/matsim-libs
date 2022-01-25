@@ -19,38 +19,40 @@
 
 package org.matsim.contrib.drt.scheduler;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.name.Named;
 
 /**
  * @author michalm
  */
 public class EmptyVehicleRelocator {
+	public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
+
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
 	private final DrtTaskFactory taskFactory;
 	private final LeastCostPathCalculator router;
 
-	public EmptyVehicleRelocator(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory) {
+	public EmptyVehicleRelocator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+			MobsimTimer timer, DrtTaskFactory taskFactory) {
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
 	public void relocateVehicle(DvrpVehicle vehicle, Link link) {
@@ -74,7 +76,7 @@ public class EmptyVehicleRelocator {
 		}
 
 		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
-		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath)); // add DRIVE
+		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath, RELOCATE_VEHICLE_TASK_TYPE)); // add RELOCATE
 		// append STAY
 		schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(),
 				vrpPath.getToLink()));

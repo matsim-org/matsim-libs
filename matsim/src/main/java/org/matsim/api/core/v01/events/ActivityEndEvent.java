@@ -22,32 +22,43 @@ package org.matsim.api.core.v01.events;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
-public final class ActivityEndEvent extends Event implements HasPersonId {
+public final class ActivityEndEvent extends Event implements HasPersonId, HasLinkId, HasFacilityId, BasicLocation {
 
-	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String EVENT_TYPE = "actend";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
 	private final Id<Person> personId;
+	private Coord coord;
 	private final Id<Link> linkId;
 	private final Id<ActivityFacility> facilityId;
 	private final String acttype;
-	
+
+	/**
+	 * @deprecated -- add Coord as argument
+	 */
+	@Deprecated // add Coord as argument
+	public ActivityEndEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
+							 final Id<ActivityFacility> facilityId, final String acttype ){
+		this( time, agentId, linkId, facilityId, acttype, null);
+	}
+	// this is the new constructor:
 	public ActivityEndEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
-			final Id<ActivityFacility> facilityId, final String acttype) {
+			final Id<ActivityFacility> facilityId, final String acttype, final Coord coord) {
 		super(time);
 		this.linkId = linkId;
 		this.facilityId = facilityId;
 		this.acttype = acttype == null ? "" : acttype;
 		this.personId = agentId;
+		this.coord = coord;
 	}
 
 	@Override
@@ -59,31 +70,31 @@ public final class ActivityEndEvent extends Event implements HasPersonId {
 		return this.acttype;
 	}
 
-	public Id<Link> getLinkId() {
+	@Override public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
-	public Id<ActivityFacility> getFacilityId() {
+	@Override public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
-	
-	public Id<Person> getPersonId() {
+
+	@Override public Id<Person> getPersonId() {
 		return this.personId;
 	}
 	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		if (this.linkId != null) {
-			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		}
-		if (this.facilityId != null) {
-			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
-		}
+		// person, link, facility done by superclass
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
 	}
 
-	
+	@Override public Coord getCoord(){
+		return coord;
+	}
+	public void setCoord( Coord coord ) {
+		// yy  this is to retrofit the coordinate into existing events that don't have it.
+		this.coord = coord;
+	}
 }

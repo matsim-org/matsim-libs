@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -49,7 +50,17 @@ public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 
 	@Override
 	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		return new TransitRouteStopImpl(stop, arrivalDelay, departureDelay);
+		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
+	}
+
+	@Override
+	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final OptionalTime arrivalDelay, final OptionalTime departureDelay) {
+		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
+	}
+
+	@Override
+	public TransitRouteStopImpl.Builder createTransitRouteStopBuilder(TransitStopFacility stop) {
+		return new TransitRouteStopImpl.Builder().stop(stop);
 	}
 
 	@Override

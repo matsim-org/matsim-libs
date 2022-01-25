@@ -33,12 +33,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.Signals;
-import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.builder.Signals.Configurator;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
-import org.matsim.contrib.signals.data.signalgroups.v20.*;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
@@ -52,7 +57,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
@@ -77,18 +81,10 @@ public class RunSimpleResponsiveSignalExample {
 		final Scenario scenario = defineScenario(config);
 		controler = new Controler(scenario);
 
-		// add the general signals module
-//		controler.addOverridingModule(new SignalsModule());
-		Signals.configure( controler );
-		
-		// add the responsive signal as a controler listener
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(SimpleResponsiveSignal.class).asEagerSingleton();
-				addControlerListenerBinding().to(SimpleResponsiveSignal.class);
-			}
-		});
+		/* the signals extensions works for planbased, sylvia and laemmer signal controller 
+		 * by default and is pluggable for your own signal controller like this: */
+        new Configurator(controler).addSignalControllerFactory(SimpleResponsiveSignal.IDENTIFIER,
+        		SimpleResponsiveSignal.SimpleResponsiveSignalFactory.class);
 	}
 	
 	public void run(){
@@ -102,7 +98,7 @@ public class RunSimpleResponsiveSignalExample {
 	private static Scenario defineScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// add missing scenario elements
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
 		createNetwork(scenario);
@@ -235,7 +231,7 @@ public class RunSimpleResponsiveSignalExample {
 		
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-		signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+		signalSystemControl.setControllerIdentifier(SimpleResponsiveSignal.IDENTIFIER);
 		signalControl.addSignalSystemControllerData(signalSystemControl);
 		
 		// create a plan for the signal system (with defined cycle time and offset 0)

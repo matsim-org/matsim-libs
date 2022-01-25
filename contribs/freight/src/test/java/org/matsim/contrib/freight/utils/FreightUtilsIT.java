@@ -20,7 +20,8 @@ package org.matsim.contrib.freight.utils;
 
 import java.util.Collection;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +34,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
@@ -52,29 +54,23 @@ import org.junit.Assert;
  */
 public class FreightUtilsIT {
 	
-	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
-	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
+	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
+	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
+
+	private Carrier carrierWServices;
+	private Carrier carrierWShipments;
+
+	private Carrier carrierWShipmentsOnlyFromCarrierWServices;
+	private Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
-	private static Carriers carriersWithServicesAndShpiments;
-	private static Carrier carrierWServices;
-	private static Carrier carrierWShipments;
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	private static Carriers carriersWithShipmentsOnly;
-	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
-	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
-	
-	/** Commented out because it is not working even as @Rule nor as @ClassRule due to different reasons, 
-	* e.g. @BeforeClass needs @ClassRule, but MatsimTestUtils does not work together with @ClassRule ;
-	*  MatsimTestUtils needs be static vs static not allowed in @Rule, KMT sep/18
-	**/
-//	@Rule		
-//	public static MatsimTestUtils testUtils = new MatsimTestUtils();
-	
-	@BeforeClass
-	public static void setUp() {
+	@Before
+	public void setUp() {
 		
 		//Create carrier with services and shipments
-		carriersWithServicesAndShpiments = new Carriers() ;
+		Carriers carriersWithServicesAndShpiments = new Carriers();
 		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarrierUtils.addService(carrierWServices, service1);
@@ -106,7 +102,8 @@ public class FreightUtilsIT {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 		
-		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType.getId()).build();
+		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
+				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType.getId() ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
@@ -123,7 +120,7 @@ public class FreightUtilsIT {
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(getPackageInputDirectory() + "grid-network.xml"); 
+		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
@@ -150,7 +147,8 @@ public class FreightUtilsIT {
 		 */
 
 		//Convert to jsprit VRP
-		carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(
+				carriersWithServicesAndShpiments);
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
@@ -192,7 +190,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursInitialCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-270.4, carrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
@@ -214,7 +212,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursInitialCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.8, carrierWShipments.getSelectedPlan().getScore(), 0.1);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -238,7 +236,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-140.4, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
@@ -264,7 +262,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.8, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18		
+		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -297,7 +295,7 @@ public class FreightUtilsIT {
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
 				.setDeliveryServiceTime(30.0)
-				.setDeliveryTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
+				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
 				.setPickupServiceTime(5.0)
 				.setPickupTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
 				.build();
@@ -307,20 +305,7 @@ public class FreightUtilsIT {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
 				.setCapacityDemand(size)
 				.setServiceDuration(31.0)
-				.setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
+				.setServiceStartTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
 				.build();
 	}
-	
-	
-	/**
-	 * Note: Manually added here, because MatsimTestUtils does not work with @BeforeClass; KMT sep/18
-	 * @return String location of the packageInputDirectory
-	 */
-	private static String getPackageInputDirectory() {
-		String classInputDirectory = "test/input/" + TestFreightUtils.class.getCanonicalName().replace('.', '/') + "/";
-		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
-		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
-		return packageInputDirectory;
-	}
-
 }

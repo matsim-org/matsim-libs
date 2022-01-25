@@ -19,18 +19,24 @@
 
 package org.matsim.contrib.ev.stats;
 
+import static java.util.stream.Collectors.*;
+
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -50,34 +56,31 @@ public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Pro
 		return new TimeProfileCollector(calc, 300, "average_soc_time_profiles", matsimServices);
 	}
 
+	private static final String ALL_VEHICLES_ID = "all vehicles";
+
 	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 
 		Set<String> vehicleTypes = evFleet.getElectricVehicles()
 				.values()
 				.stream()
-				.map(electricVehicle -> electricVehicle.getVehicleType())
+				.map(ElectricVehicle::getVehicleType)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
-		vehicleTypes.add("Fleet Average");
-		String[] header = vehicleTypes.stream().toArray(String[]::new);
+		vehicleTypes.add(ALL_VEHICLES_ID);
+		ImmutableList<String> header = ImmutableList.copyOf(vehicleTypes);
 		return TimeProfiles.createProfileCalculator(header, () -> {
-			Double[] result = new Double[header.length];
-			for (int i = 0; i < header.length - 1; i++) {
-				String type = header[i];
-				result[i] = evFleet.getElectricVehicles()
-						.values()
-						.stream()
-						.filter(electricVehicle -> electricVehicle.getVehicleType().equals(type))
-						.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))
-						.average()
-						.orElse(Double.NaN);
-			}
-			result[header.length - 1] = evFleet.getElectricVehicles()
+			Map<String, Double> averageSocByType = evFleet.getElectricVehicles()
+					.values()
+					.stream()
+					.collect(groupingBy(ElectricVehicle::getVehicleType,
+							mapping(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()), averagingDouble(soc -> soc))));
+			double averageSoc = evFleet.getElectricVehicles()
 					.values()
 					.stream()
 					.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))
 					.average()
 					.getAsDouble();
-			return result;
+			averageSocByType.put(ALL_VEHICLES_ID, averageSoc);
+			return ImmutableMap.copyOf(averageSocByType);
 		});
 	}
 

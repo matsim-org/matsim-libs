@@ -29,6 +29,19 @@ import org.matsim.contrib.dvrp.optimizer.Request;
  * @author michalm
  */
 public interface PassengerRequestCreator {
+	/**
+	 * Thread safety: This method can be called concurrently from multiple QSim worker threads.
+	 * Prefer stateless implementation, otherwise provide other ways to achieve thread-safety.
+	 *
+	 * @param id             request ID
+	 * @param passengerId    passenger ID
+	 * @param route          planned route (the required route type depends on the optimizer)
+	 * @param fromLink       start location
+	 * @param toLink         end location
+	 * @param departureTime  requested time of departure
+	 * @param submissionTime time at which request was submitted
+	 * @return
+	 */
 	PassengerRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink, Link toLink,
 			double departureTime, double submissionTime);
 }

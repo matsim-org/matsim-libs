@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
@@ -461,16 +461,19 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	
 	@Test
 	public void testMutatedTrips() {
+		Config config = ConfigUtils.createConfig();
+		config.subtourModeChoice().setModes(MODES);
+		config.subtourModeChoice().setConsiderCarAvailability(false);
 		final ChooseRandomLegModeForSubtour testee =
-			new ChooseRandomLegModeForSubtour(
-					new MainModeIdentifierImpl(),
-					new PermissibleModesCalculatorImpl( MODES , false ),
-					MODES,
-					CHAIN_BASED_MODES,
-					new Random( 20130225 ), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes,
-					probaForRandomSingleTripMode);
+				new ChooseRandomLegModeForSubtour(
+						new MainModeIdentifierImpl(),
+						new PermissibleModesCalculatorImpl(config),
+						MODES,
+						CHAIN_BASED_MODES,
+						new Random(20130225), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes,
+						probaForRandomSingleTripMode);
 
-		for ( Fixture f : createFixtures() ) {
+		for (Fixture f : createFixtures()) {
 			for (int i = 0; i < 5; i++) {
 				final Plan plan = f.createNewPlanInstance();
 				final int initNTrips = TripStructureUtils.getTrips( plan ).size();

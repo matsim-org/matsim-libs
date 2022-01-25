@@ -370,7 +370,7 @@ public class DensityCluster {
 			BufferedWriter output = IOUtils.getBufferedWriter(filename);
 			try{
 				output.write("ClusterId,Long,Lat,NumberOfActivities");
-				output.newLine();
+				output.write("\n");
 				
 				for (Cluster c : clusterList) {
 					c.setCenterOfGravity();
@@ -382,7 +382,7 @@ public class DensityCluster {
 					output.write(String.valueOf(center.getY()));
 					output.write(delimiter);
 					output.write(String.valueOf(c.getPoints().size()));
-					output.newLine();
+					output.write("\n");
 					
 					clusterCount++;
 					// Report progress

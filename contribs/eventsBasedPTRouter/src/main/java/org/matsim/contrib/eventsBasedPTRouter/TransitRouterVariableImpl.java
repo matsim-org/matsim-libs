@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -49,7 +50,8 @@ import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitRouterVariableImpl implements TransitRouter {
@@ -109,7 +111,12 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return new HashMap<>();
 	}
 	    @Override
-	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(RoutingRequest request) {
+	    final Facility fromFacility = request.getFromFacility();
+	    final Facility toFacility = request.getToFacility();
+	    final double departureTime = request.getDepartureTime();
+	    final Person person = request.getPerson();
+	    	
 		// find possible start stops
 		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops
@@ -182,7 +189,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			else if(l.fromNode.route!=null) {
 				//inside link
 				leg = PopulationUtils.createLeg(TransportMode.pt);
-				ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(stop.getStopFacility(), l.fromNode.line, l.fromNode.route, l.fromNode.stop.getStopFacility());
+				TransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(stop.getStopFacility(), l.fromNode.line, l.fromNode.route, l.fromNode.stop.getStopFacility());
 				leg.setRoute(ptRoute);
 				leg.setTravelTime(travelTime);
 				legs.add(leg);

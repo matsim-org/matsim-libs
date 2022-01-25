@@ -4,8 +4,10 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -57,9 +59,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 
 /**
  * @author mrieser / SBB
@@ -208,10 +209,27 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(7)).getMode());
         Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(9)).getMode());
 
-        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration().seconds(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration().seconds(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration().seconds(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration().seconds(), 0.0);
+
+        Assert.assertTrue( ((Activity) planElements.get(2)).getEndTime().isUndefined() );
+        Assert.assertTrue( ((Activity) planElements.get(4)).getEndTime().isUndefined() );
+        Assert.assertTrue( ((Activity) planElements.get(6)).getEndTime().isUndefined() );
+        Assert.assertTrue( ((Activity) planElements.get(8)).getEndTime().isUndefined() );
+
+        // MM started filling the times of the swiss rail raptor pt interaction activities with content and so the above (evidently) started failing.  I am
+        // fixing it here:
+
+//		Assert.assertTrue((((Activity)planElements.get(2)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(4)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(6)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(8)).getMaximumDuration().isUndefined())) ;
+
+        // (And that is actually where I should have noticed that something is wrong, since durations need to be zero, and endTimes need to be undefined.  :-(
+        // :-( :-(  kai, mar'20)
+
     }
     
     /**
@@ -302,7 +320,7 @@ public class SwissRailRaptorModuleTest {
         
         // Check route: should return one of the added lines although the removed green line would be faster
         Leg ptLeg = (Leg) planElements.get(3);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) ptLeg.getRoute();
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) ptLeg.getRoute();
         Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());        
     }
     

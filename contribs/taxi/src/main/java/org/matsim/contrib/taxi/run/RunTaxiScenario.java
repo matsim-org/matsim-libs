@@ -30,6 +30,6 @@ public class RunTaxiScenario {
 	public static void run(URL configUrl, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		TaxiControlerCreator.createControlerWithSingleModeTaxi(config, otfvis).run();
+		TaxiControlerCreator.createControler(config, otfvis).run();
 	}
 }

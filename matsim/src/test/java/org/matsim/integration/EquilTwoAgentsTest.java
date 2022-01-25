@@ -50,8 +50,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Inject;
 
-import java.net.URL;
-
 import static org.junit.Assert.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 
@@ -116,8 +114,18 @@ public class EquilTwoAgentsTest {
 
 					@Override
 					public void notifyStartup(final StartupEvent event) {
-						double agent1LeaveHomeTime = ((Activity) population.getPersons().get(personId1).getPlans().get(0).getPlanElements().get(0)).getEndTime();
-						double agent2LeaveHomeTime = ((Activity) population.getPersons().get(personId2).getPlans().get(0).getPlanElements().get(0)).getEndTime();
+						double agent1LeaveHomeTime = ((Activity)population.getPersons()
+								.get(personId1)
+								.getPlans()
+								.get(0)
+								.getPlanElements()
+								.get(0)).getEndTime().seconds();
+						double agent2LeaveHomeTime = ((Activity)population.getPersons()
+								.get(personId2)
+								.getPlans()
+								.get(0)
+								.getPlanElements()
+								.get(0)).getEndTime().seconds();
 						handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
 						eventsManager.addHandler(handler);
 					}

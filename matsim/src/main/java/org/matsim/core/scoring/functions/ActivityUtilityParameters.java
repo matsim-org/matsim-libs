@@ -20,9 +20,9 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Class that converts the config parameters into parameters that are used by the scoring.
@@ -75,12 +75,12 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	public final static class Builder {
 		private String type;
 		private double priority = 1. ;
-		private double typicalDuration_s;
-		private double closingTime;
-		private double earliestEndTime;
-		private double latestStartTime;
-		private double minimalDuration;
-		private double openingTime;
+		private OptionalTime typicalDuration_s = OptionalTime.undefined();
+		private OptionalTime closingTime = OptionalTime.undefined();
+		private OptionalTime earliestEndTime = OptionalTime.undefined();
+		private OptionalTime latestStartTime = OptionalTime.undefined();
+		private OptionalTime minimalDuration = OptionalTime.undefined();
+		private OptionalTime openingTime = OptionalTime.undefined();
 		private boolean scoreAtAll;
 		private ZeroUtilityComputation zeroUtilityComputation ;
 
@@ -96,12 +96,12 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		public Builder(ActivityParams ppp ) {
 			this.type = ppp.getActivityType() ;
 			this.priority = ppp.getPriority() ;
-			this.typicalDuration_s = ppp.getTypicalDuration() ;
-			this.closingTime = ppp.getClosingTime() ;
-			this.earliestEndTime = ppp.getEarliestEndTime() ;
-			this.latestStartTime = ppp.getLatestStartTime() ;
-			this.minimalDuration = ppp.getMinimalDuration() ;
-			this.openingTime = ppp.getOpeningTime() ;
+			this.typicalDuration_s = ppp.getTypicalDuration();
+			this.closingTime = ppp.getClosingTime();
+			this.earliestEndTime = ppp.getEarliestEndTime();
+			this.latestStartTime = ppp.getLatestStartTime();
+			this.minimalDuration = ppp.getMinimalDuration();
+			this.openingTime = ppp.getOpeningTime();
 			this.scoreAtAll = ppp.isScoringThisActivityAtAll() ;
 			switch( ppp.getTypicalDurationScoreComputation() ) {
 			case relative:
@@ -129,32 +129,32 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		}
 
 		public Builder setTypicalDuration_s(double typicalDurationS) {
-			typicalDuration_s = typicalDurationS;
+			typicalDuration_s = OptionalTime.defined(typicalDurationS);
 			return this;
 		}
 
 		public Builder setClosingTime(double closingTime) {
-			this.closingTime = closingTime;
+			this.closingTime = OptionalTime.defined(closingTime);
 			return this;
 		}
 
 		public Builder setEarliestEndTime(double earliestEndTime) {
-			this.earliestEndTime = earliestEndTime;
+			this.earliestEndTime = OptionalTime.defined(earliestEndTime);
 			return this;
 		}
 
 		public Builder setLatestStartTime(double latestStartTime) {
-			this.latestStartTime = latestStartTime;
+			this.latestStartTime = OptionalTime.defined(latestStartTime);
 			return this;
 		}
 
 		public Builder setMinimalDuration(double minimalDuration) {
-			this.minimalDuration = minimalDuration;
+			this.minimalDuration = OptionalTime.defined(minimalDuration);
 			return this;
 		}
 
 		public Builder setOpeningTime(double openingTime) {
-			this.openingTime = openingTime;
+			this.openingTime = OptionalTime.defined(openingTime);
 			return this;
 		}
 
@@ -166,13 +166,13 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		public ActivityUtilityParameters build() {
 			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
 			params.setScoreAtAll(this.scoreAtAll) ;
-			params.setTypicalDuration( this.typicalDuration_s) ;
-			params.setZeroUtilityDuration_s( this.zeroUtilityComputation.computeZeroUtilityDuration_s(priority, typicalDuration_s)) ;
-			params.setClosingTime(this.closingTime) ;
-			params.setEarliestEndTime(this.earliestEndTime) ;
-			params.setLatestStartTime(this.latestStartTime) ;
-			params.setMinimalDuration(this.minimalDuration) ;
-			params.setOpeningTime(this.openingTime) ;
+			this.typicalDuration_s.ifDefined(params::setTypicalDuration) ;
+			this.typicalDuration_s.ifDefined(duration-> params.setZeroUtilityDuration_s( this.zeroUtilityComputation.computeZeroUtilityDuration_s(priority, duration)));
+			params.closingTime = this.closingTime;
+			params.earliestEndTime = this.earliestEndTime;
+			params.latestStartTime = this.latestStartTime;
+			params.minimalDuration = this.minimalDuration;
+			params.openingTime = this.openingTime;
 			params.checkConsistency();
 			return params ;
 		}
@@ -184,19 +184,19 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	}
 
 	private final String type;
-	private double typicalDuration_s;
+	private double typicalDuration_s = 0;
 
 	/**
 	 * 	"duration at which the [performance] utility starts to be positive"
 	 * (from Dave's paper, ga-acts-iatbr03.tex, though he called it t_0)
 	 * (In decimal number of hours.)
 	 */
-	private double zeroUtilityDuration_h; // in hours!
-	private double minimalDuration = -1;
-	private double openingTime = -1;
-	private double closingTime = -1;
-	private double latestStartTime = -1;
-	private double earliestEndTime = -1;
+	private double zeroUtilityDuration_h = 0; // in hours!
+	private OptionalTime minimalDuration = OptionalTime.undefined();
+	private OptionalTime openingTime = OptionalTime.undefined();
+	private OptionalTime closingTime = OptionalTime.undefined();
+	private OptionalTime latestStartTime = OptionalTime.undefined();
+	private OptionalTime earliestEndTime = OptionalTime.undefined();
 	private boolean scoreAtAll=true;
 
 	// use factory.  nov'12
@@ -232,23 +232,23 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	}
 	
 	/*package!*/ final void setMinimalDuration(final double dur) {
-		this.minimalDuration = dur;
+		this.minimalDuration = OptionalTime.defined(dur);
 	}
 
 	/*package!*/ final void setOpeningTime(final double time) {
-		this.openingTime = time;
+		this.openingTime = OptionalTime.defined(time);
 	}
 
 	/*package!*/ final void setClosingTime(final double time) {
-		this.closingTime = time;
+		this.closingTime = OptionalTime.defined(time);
 	}
 
 	/*package!*/ final void setLatestStartTime(final double time) {
-		this.latestStartTime = time;
+		this.latestStartTime = OptionalTime.defined(time);
 	}
 
 	/*package!*/ final void setEarliestEndTime(final double time) {
-		this.earliestEndTime = time;
+		this.earliestEndTime = OptionalTime.defined(time);
 	}
 
 	public final String getType() {
@@ -263,23 +263,23 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		return this.zeroUtilityDuration_h;
 	}
 
-	public final double getMinimalDuration() {
+	public final OptionalTime getMinimalDuration() {
 		return this.minimalDuration;
 	}
 
-	public final double getOpeningTime() {
+	public final OptionalTime getOpeningTime() {
 		return this.openingTime;
 	}
 
-	public final double getClosingTime() {
+	public final OptionalTime getClosingTime() {
 		return this.closingTime;
 	}
 
-	public final double getLatestStartTime() {
+	public final OptionalTime getLatestStartTime() {
 		return this.latestStartTime;
 	}
 
-	public final double getEarliestEndTime() {
+	public final OptionalTime getEarliestEndTime() {
 		return this.earliestEndTime;
 	}
 

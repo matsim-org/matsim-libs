@@ -40,7 +40,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.RouteUtils;
@@ -55,7 +55,7 @@ import org.matsim.core.scoring.SumScoringFunction;
  */
 public class GroupCompositionPenalizerTest {
 	private static final Logger log = Logger.getLogger( GroupCompositionPenalizerTest.class );
-	private static final Id<Link> linkId = Id.createLinkId( 1 );
+	private final Id<Link> linkId = Id.createLinkId( 1 );
 	private final double utilOneCopart = 100;
 	private final double utilAlone = -1;
 
@@ -104,7 +104,7 @@ public class GroupCompositionPenalizerTest {
 
 		final SocialNetwork sn = createSocialNetwork( sc );
 
-		final EventsManager events = EventsUtils.createEventsManager();
+		final EventsManager events = new ParallelEventsManager(true);
 
 		final GroupCompositionPenalizer penalizer = new GroupCompositionPenalizer(
 				"leisure",
@@ -136,8 +136,7 @@ public class GroupCompositionPenalizerTest {
 				},
 				events );
 
-		eventsToScore.beginIteration( 1 );
-		events.initProcessing();
+		eventsToScore.beginIteration( 1, false );
 
 		new QSimBuilder(sc.getConfig()) //
 				.useDefaults()
@@ -145,7 +144,6 @@ public class GroupCompositionPenalizerTest {
 				.run();
 
 		eventsToScore.finish();
-		events.finishProcessing();
 
 		final double score = penalizer.getScore();
 		Assert.assertEquals(

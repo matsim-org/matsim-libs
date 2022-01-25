@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * A route for passenger trips.
@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PassengerRoute implements Route {
 	private double distance = Double.NaN;
-	private double travelTime = Time.UNDEFINED_TIME;
+	private OptionalTime travelTime = OptionalTime.undefined();
 	private Id<Link> startLink = null;
 	private Id<Link> endLink = null;
 	private Id<Person> driver = null;
@@ -64,13 +64,18 @@ public class PassengerRoute implements Route {
 	}
 
 	@Override
-	public double getTravelTime() {
+	public OptionalTime getTravelTime() {
 		return travelTime;
 	}
 
 	@Override
 	public void setTravelTime(final double travelTime) {
-		this.travelTime = travelTime;
+		this.travelTime = OptionalTime.defined(travelTime);
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		this.travelTime = OptionalTime.undefined();
 	}
 
 	@Override

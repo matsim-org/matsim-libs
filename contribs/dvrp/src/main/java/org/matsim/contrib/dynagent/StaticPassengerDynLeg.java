@@ -22,13 +22,14 @@ package org.matsim.contrib.dynagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * @author jbischoff
  */
 public class StaticPassengerDynLeg implements PassengerDynLeg {
-	private Route route;
-	private String mode;
+	private final Route route;
+	private final String mode;
 
 	public StaticPassengerDynLeg(Route route, String mode) {
 		this.route = route;
@@ -50,7 +51,7 @@ public class StaticPassengerDynLeg implements PassengerDynLeg {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		return route.getTravelTime();
 	}
 

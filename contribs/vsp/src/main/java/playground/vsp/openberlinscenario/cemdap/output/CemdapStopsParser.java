@@ -200,7 +200,7 @@ public class CemdapStopsParser {
 		Set<Id<Person>> idsOfPersonsToRemove = new HashSet<>();
 		for (Person person : population.getPersons().values()) {
 			Activity firstActivity = (Activity)person.getPlans().get(planNumber).getPlanElements().get(0);
-			if (firstActivity.getEndTime() < 0.0) {
+			if (firstActivity.getEndTime().seconds() < 0.0) {
 				idsOfPersonsToRemove.add(person.getId());
 				LOG.info("Person with ID " + person.getId() + ": first departure before 00:00:00. Will be removed from the population");
 			}

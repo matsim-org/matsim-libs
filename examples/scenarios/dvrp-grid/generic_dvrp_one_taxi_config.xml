@@ -21,7 +21,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/one_taxi"/>
+		<param name="outputDirectory" value="test/output/generic_dvrp_one_taxi"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="firstIteration" value="0"/>
 		<param name="lastIteration" value="0"/>

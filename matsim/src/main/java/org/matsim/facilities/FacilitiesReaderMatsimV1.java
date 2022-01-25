@@ -20,6 +20,9 @@
 
 package org.matsim.facilities;
 
+import java.util.Map;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,9 +37,6 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
-import java.util.Map;
-import java.util.Stack;
-
 /**
  * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
  *
@@ -44,7 +44,7 @@ import java.util.Stack;
  * @author balmermi
  */
 final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
-    private static Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
+    private static final  Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";
@@ -186,7 +186,9 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     }
 
     private void startOpentime(final Attributes atts) {
-        this.curractivity.addOpeningTime(new OpeningTimeImpl(Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
+        this.curractivity.addOpeningTime(OpeningTimeImpl.createFromOptionalTimes(
+                Time.parseOptionalTime(atts.getValue("start_time")),
+                Time.parseOptionalTime(atts.getValue("end_time"))));
     }
 
 

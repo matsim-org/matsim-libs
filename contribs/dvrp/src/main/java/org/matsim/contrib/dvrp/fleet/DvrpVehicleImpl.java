@@ -23,7 +23,6 @@ package org.matsim.contrib.dvrp.fleet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleImpl;
 
 import com.google.common.base.MoreObjects;
 
@@ -37,7 +36,11 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
 		if (startLink == null) {
-			throw new RuntimeException("Start link " + specification.getStartLinkId() + " of vehicle " + specification.getId() + " is null."
+			throw new RuntimeException("Start link "
+					+ specification.getStartLinkId()
+					+ " of vehicle "
+					+ specification.getId()
+					+ " is null."
 					+ " Please make sure the link is part of the mode-filtered (and cleaned?) network! Aborting...");
 		}
 		if (!startLink.getId().equals(specification.getStartLinkId())) {
@@ -45,7 +48,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		}
 		this.specification = specification;
 		this.startLink = startLink;
-		schedule = new ScheduleImpl(specification);
+		schedule = Schedule.create(specification);
 	}
 
 	@Override
@@ -76,6 +79,10 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	@Override
 	public Schedule getSchedule() {
 		return schedule;
+	}
+
+	public DvrpVehicleSpecification getSpecification() {
+		return specification;
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierModule;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericStrategyModule;
@@ -64,10 +65,10 @@ public class GroupPlanStrategyFactoryUtils {
 
 	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
 			final Config config,
-			final Provider<TripRouter> tripRouterFactory) {
+			final Provider<TripRouter> tripRouterFactory, TimeInterpretation timeInterpretation) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
-					config.global().getNumberOfThreads() ) );
+					config.global().getNumberOfThreads(), timeInterpretation ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
@@ -90,7 +91,7 @@ public class GroupPlanStrategyFactoryUtils {
 		return new IndividualBasedGroupStrategyModule(
 				new TourModeUnifierModule(
 					config.global().getNumberOfThreads(),
-					JointActingTypes.JOINT_STAGE_ACTS,
+					JointActingTypes.JOINT_STAGE_ACTS::contains,
 					new MainModeIdentifier() {
 						@Override
 						public String identifyMainMode(

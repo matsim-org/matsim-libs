@@ -50,7 +50,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Provides;
 
@@ -168,7 +167,7 @@ public class VehicleHandlerTest {
 	}
 
 	private class LatestArrivalHandler implements PersonArrivalEventHandler {
-		double latestArrivalTime = Time.getUndefinedTime();
+		Double latestArrivalTime = null;
 
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {

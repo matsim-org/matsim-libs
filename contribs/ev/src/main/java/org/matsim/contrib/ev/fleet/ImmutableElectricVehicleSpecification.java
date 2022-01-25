@@ -21,9 +21,12 @@
 package org.matsim.contrib.ev.fleet;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -70,6 +73,11 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 	}
 
 	@Override
+	public Optional<Vehicle> getMatsimVehicle() {
+		return Optional.empty();
+	}
+
+	@Override
 	public String getVehicleType() {
 		return vehicleType;
 	}
@@ -87,6 +95,17 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 	@Override
 	public double getBatteryCapacity() {
 		return batteryCapacity;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("vehicleType", vehicleType)
+				.add("chargerTypes", chargerTypes)
+				.add("initialSoc", initialSoc)
+				.add("batteryCapacity", batteryCapacity)
+				.toString();
 	}
 
 	public static final class Builder {

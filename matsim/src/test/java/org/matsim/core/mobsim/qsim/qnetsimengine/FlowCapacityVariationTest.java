@@ -175,14 +175,14 @@ public class FlowCapacityVariationTest {
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-				a1.setEndTime(0*3600);
+				a1.setEndTime(0 * 3600);
 				Leg leg = population.getFactory().createLeg(travelMode);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route= (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+				route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
 				linkIds.add(link2.getId());
 				route.setLinkIds(link1.getId(), linkIds, link3.getId());
 				leg.setRoute(route);
@@ -191,8 +191,8 @@ public class FlowCapacityVariationTest {
 				plan.addActivity(a2);
 				population.addPerson(p);
 
-				Id<Vehicle> vehId = Id.create(i,Vehicle.class);
-				VehicleUtils.insertVehicleIdIntoAttributes(p, travelMode, vehId);
+				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
+				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

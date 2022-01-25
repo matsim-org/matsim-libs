@@ -39,12 +39,12 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "matsimParameterType")
-public class XMLMatsimParameterType {
+final class XMLMatsimParameterType {
 
     @XmlAttribute(required = true)
-    protected String name;
+    private String name;
     @XmlAttribute(required = true)
-    protected String value;
+    private String value;
 
     /**
      * Gets the value of the name property.

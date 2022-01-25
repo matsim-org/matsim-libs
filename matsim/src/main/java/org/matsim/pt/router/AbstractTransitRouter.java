@@ -23,6 +23,7 @@
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,8 +33,9 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 public class AbstractTransitRouter {
 
@@ -83,7 +85,7 @@ public class AbstractTransitRouter {
 	private Leg createAccessTransitWalkLeg(Coord fromCoord, RouteSegment routeSegement) {
 		Leg leg = this.createTransitWalkLeg(fromCoord, routeSegement.fromStop.getCoord());
 		Route walkRoute = RouteUtils.createGenericRouteImpl(null, routeSegement.fromStop.getLinkId());
-		walkRoute.setTravelTime(leg.getTravelTime() );
+		walkRoute.setTravelTime(leg.getTravelTime().seconds());
 		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(fromCoord, routeSegement.fromStop.getCoord()));
 		leg.setRoute(walkRoute);
 		return leg;
@@ -92,7 +94,7 @@ public class AbstractTransitRouter {
 	private Leg createEgressTransitWalkLeg(RouteSegment routeSegement, Coord toCoord) {
 		Leg leg = this.createTransitWalkLeg(routeSegement.toStop.getCoord(), toCoord);
 		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.toStop.getLinkId(), null);
-		walkRoute.setTravelTime(leg.getTravelTime() );
+		walkRoute.setTravelTime(leg.getTravelTime().seconds());
 		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(routeSegement.toStop.getCoord(), toCoord));
 		leg.setRoute(walkRoute);
 		return leg;
@@ -111,7 +113,7 @@ public class AbstractTransitRouter {
 		return leg;
 	}
 
-	protected List<Leg> convertPassengerRouteToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
+	protected List<Leg> convertPassengerRouteToLegList(double departureTime, InternalTransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
 		// convert the route into a sequence of legs
 		List<Leg> legs = new ArrayList<>();
 
@@ -170,11 +172,13 @@ public class AbstractTransitRouter {
 
 	private Leg createTransitLeg(RouteSegment routeSegment) {
 		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
+		
+		TransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute( //
+				routeSegment.getFromStop().getLinkId(), routeSegment.getToStop().getLinkId(), //
+				routeSegment.getFromStop().getId(), routeSegment.getToStop().getId(), //
+				routeSegment.getLineTaken(), routeSegment.getRouteTaken()
+				);
 
-		TransitStopFacility accessStop = routeSegment.getFromStop();
-		TransitStopFacility egressStop = routeSegment.getToStop();
-
-		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.getLineTaken(), routeSegment.getRouteTaken());
 		ptRoute.setTravelTime(routeSegment.travelTime);
 		leg.setRoute(ptRoute);
 

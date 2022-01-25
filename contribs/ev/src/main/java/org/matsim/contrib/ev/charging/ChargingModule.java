@@ -34,7 +34,7 @@ import com.google.inject.Provider;
 public class ChargingModule extends AbstractModule {
 	@Override
 	public void install() {
-		bind(ChargingLogic.Factory.class).toProvider(new Provider<ChargingLogic.Factory>() {
+		bind(ChargingLogic.Factory.class).toProvider(new Provider<>() {
 			@Inject
 			private EventsManager eventsManager;
 

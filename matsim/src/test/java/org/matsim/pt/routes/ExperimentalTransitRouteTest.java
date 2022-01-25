@@ -25,7 +25,6 @@ import java.util.Collections;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -85,10 +84,10 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testTravelTime() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		assertEquals(Time.UNDEFINED_TIME, route.getTravelTime(), MatsimTestCase.EPSILON);
+		assertTrue(route.getTravelTime().isUndefined());
 		double traveltime = 987.65;
 		route.setTravelTime(traveltime);
-		assertEquals(traveltime, route.getTravelTime(), MatsimTestCase.EPSILON);
+		assertEquals(traveltime, route.getTravelTime().seconds(), MatsimTestCase.EPSILON);
 	}
 
 	public void testSetRouteDescription_PtRoute() {

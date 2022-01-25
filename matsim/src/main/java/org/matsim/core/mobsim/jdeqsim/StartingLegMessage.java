@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * The micro-simulation internal handler for starting a leg.
@@ -55,7 +56,7 @@ public class StartingLegMessage extends EventMessage {
 			}
 
 		} else {
-			scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime());
+			scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime().orElse(0));
 		}
 	}
 
@@ -72,12 +73,12 @@ public class StartingLegMessage extends EventMessage {
 
 		// schedule ActEndEvent
 		event = new ActivityEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle
-				.getPreviousActivity().getFacilityId(), vehicle.getPreviousActivity().getType());
+				.getPreviousActivity().getFacilityId(), vehicle.getPreviousActivity().getType(), vehicle.getPreviousActivity().getCoord());
 		eventsManager.processEvent(event);
 
 		// schedule AgentDepartureEvent
 		event = new PersonDepartureEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(),
-				vehicle.getCurrentLeg().getMode());
+				vehicle.getCurrentLeg().getMode(), TripStructureUtils.getRoutingMode(vehicle.getCurrentLeg()));
 
 		eventsManager.processEvent(event);
 

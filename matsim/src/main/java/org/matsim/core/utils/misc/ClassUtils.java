@@ -26,7 +26,8 @@ import java.util.Stack;
 /**
  * @author mrieser
  */
-public abstract class ClassUtils {
+public final class ClassUtils {
+	private ClassUtils(){} // do not instantiate
 
 	/**
 	 * Returns all classes and implemented interfaces of the given class.
@@ -55,4 +56,19 @@ public abstract class ClassUtils {
 		return set;
 	}
 
+	public static Set<Class<?>> getAllInterfaces( final Class<?> klass ) {
+		Set<Class<?>> intfs = new HashSet<Class<?>>();
+		for (Class<?> intf : klass.getInterfaces()) {
+			intfs.add(intf);
+			intfs.addAll(getAllInterfaces(intf));
+		}
+		if (!klass.isInterface()) {
+			Class<?> superclass = klass.getSuperclass();
+			while (superclass != Object.class) {
+				intfs.addAll(getAllInterfaces(superclass));
+				superclass = superclass.getSuperclass();
+			}
+		}
+		return intfs;
+	}
 }

@@ -19,13 +19,6 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -61,6 +54,13 @@ import org.openstreetmap.osmosis.core.store.IndexedObjectStoreReader;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactory;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 public class TransitNetworkSink implements Sink {
 	
@@ -178,7 +178,7 @@ public class TransitNetworkSink implements Sink {
 				} 
 			}
 		}
-		transitLineIterator.release();
+		transitLineIterator.close();
 
 		ReleasableIterator<NodeContainer> nodeIterator = allNodes.iterate();
 		while (nodeIterator.hasNext()) {
@@ -189,7 +189,7 @@ public class TransitNetworkSink implements Sink {
 				stopNodeStore.add(node.getId(), nodeContainer);
 			}
 		}
-		nodeIterator.release();
+		nodeIterator.close();
 		stopNodeStore.complete();
 
 		ReleasableIterator<WayContainer> wayIterator = allWays.iterate();
@@ -200,7 +200,7 @@ public class TransitNetworkSink implements Sink {
 				routeSegmentStore.add(way.getId(), wayContainer);
 			}
 		}
-		wayIterator.release();
+		wayIterator.close();
 		routeSegmentStore.complete();
 
 		transitLineIterator = transitLines.iterate();
@@ -303,9 +303,9 @@ public class TransitNetworkSink implements Sink {
 			transitSchedule.addTransitLine(line);
 			
 		}
-		transitLineIterator.release();
-		nodeReader.release();
-		wayReader.release();
+		transitLineIterator.close();
+		nodeReader.close();
+		wayReader.close();
 	}
 
 	private List<TransitRouteStop> enterStopLinkIds(List<Node> stopNodes, List<Id<Link>> stopLinkIdsH, List<Double> travelTimes, String routeRef, org.matsim.api.core.v01.network.Node node) {
@@ -373,7 +373,7 @@ public class TransitNetworkSink implements Sink {
 	}
 
 	@Override
-	public void release() {
+	public void close() {
 
 	}
 

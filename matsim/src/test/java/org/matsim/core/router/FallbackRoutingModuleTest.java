@@ -1,5 +1,7 @@
 package org.matsim.core.router;
 
+import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -9,7 +11,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -19,10 +26,6 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class FallbackRoutingModuleTest{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -57,6 +60,7 @@ public class FallbackRoutingModuleTest{
 		Plan plan = pf.createPlan();
 		{
 			Activity act = pf.createActivityFromCoord( "dummy", new Coord( 0., 0. ) );
+			act.setEndTime(0);
 			plan.addActivity( act );
 		}
 		Leg leg = pf.createLeg( "abcd" );
@@ -75,7 +79,7 @@ public class FallbackRoutingModuleTest{
 			@Override public void install(){
 				this.addRoutingModuleBinding( "abcd" ).toInstance( new RoutingModule(){
 					@Override
-					public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
+					public List<? extends PlanElement> calcRoute( RoutingRequest request ){
 						return null;
 					}
 				} );
