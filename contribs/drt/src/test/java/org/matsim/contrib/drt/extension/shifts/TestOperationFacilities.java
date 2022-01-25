@@ -61,7 +61,7 @@ public class TestOperationFacilities {
             Assert.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
             Assert.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
             Assert.assertEquals(capacity, facility.getCapacity());
-            Assert.assertEquals(charger.toString(), facility.getCharger().toString());
+            Assert.assertEquals(charger.toString(), facility.getCharger().get().toString());
         }
 
         for (int i = 10; i < 20; i++) {
@@ -75,7 +75,7 @@ public class TestOperationFacilities {
             Assert.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
             Assert.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
             Assert.assertEquals(capacity, facility.getCapacity());
-            Assert.assertEquals(charger.toString(), facility.getCharger().toString());
+            Assert.assertEquals(charger.toString(), facility.getCharger().get().toString());
         }
     }
 }

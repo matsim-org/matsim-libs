@@ -8,7 +8,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.evrp.ChargingActivity;
 import org.matsim.contrib.evrp.ChargingTask;
 
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Map;
  */
 public class ChargingChangeoverActivity implements DynActivity {
 
-    private final ChargingActivity chargingDelegate;
+    private final FixedTimeChargingActivity chargingDelegate;
     private final BusStopActivity busStopDelegate;
 	private final double endTime;
 
@@ -26,7 +25,7 @@ public class ChargingChangeoverActivity implements DynActivity {
                                       DynAgent driver, StayTask task,
                                       Map<Id<Request>, ? extends PassengerRequest> dropoffRequests,
                                       Map<Id<Request>, ? extends PassengerRequest> pickupRequests) {
-        chargingDelegate = new ChargingActivity(chargingTask);
+        chargingDelegate = new FixedTimeChargingActivity(chargingTask, task.getEndTime());
         busStopDelegate = new BusStopActivity(passengerHandler, driver, task, dropoffRequests, pickupRequests, "");
 		endTime = task.getEndTime();
 	}
