@@ -36,13 +36,13 @@ public class RunWithParkingProxyIT {
         @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
         @Test
+        @Ignore
         public void testMain(){
                 RunWithParkingProxy.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "chessboard" ), "config.xml" ).toString()
                                 , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
                                 , "--config:controler.lastIteration=2"
                                 , "--config:controler.writePlansInterval=1"
                                 , "--config:parkingProxy.method=events"
-                                , "--config:qsim.usingThreadpool=false"
                                 , "--config:global.numberOfThreads=1"
                                 , "--config:controler.routingAlgorithmType=FastAStarLandmarks"
                 } );
