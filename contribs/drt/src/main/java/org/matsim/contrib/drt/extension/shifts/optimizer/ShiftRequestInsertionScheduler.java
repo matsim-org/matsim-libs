@@ -38,25 +38,20 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler {
 
-    private final Fleet fleet;
     private final double stopDuration;
     private final MobsimTimer timer;
     private final TravelTime travelTime;
     private final ScheduleTimingUpdater scheduleTimingUpdater;
     private final ShiftDrtTaskFactory taskFactory;
-    private final OperationFacilities shiftBreakNetwork;
 
 
-    public ShiftRequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer, TravelTime travelTime,
-			ScheduleTimingUpdater scheduleTimingUpdater, ShiftDrtTaskFactory taskFactory,
-			OperationFacilities shiftBreakNetwork) {
-		this.fleet = fleet;
+    public ShiftRequestInsertionScheduler(DrtConfigGroup drtCfg, MobsimTimer timer, TravelTime travelTime,
+			ScheduleTimingUpdater scheduleTimingUpdater, ShiftDrtTaskFactory taskFactory) {
 		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
-		this.shiftBreakNetwork = shiftBreakNetwork;
 	}
 
 

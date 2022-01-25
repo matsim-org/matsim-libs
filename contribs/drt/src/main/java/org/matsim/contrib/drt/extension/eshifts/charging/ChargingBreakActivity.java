@@ -24,7 +24,7 @@ import java.util.Map;
 public class ChargingBreakActivity extends FirstLastSimStepDynActivity implements DynActivity, PassengerPickupActivity {
 
     public static final String CHARGING_BREAK = "Charging Break";
-    private final ChargingActivity chargingDelegate;
+    private final FixedTimeChargingActivity chargingDelegate;
     private final Map<Id<Request>, ? extends PassengerRequest> dropoffRequests;
     private final Map<Id<Request>, ? extends PassengerRequest> pickupRequests;
     private final PassengerHandler passengerHandler;
@@ -38,7 +38,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
                                  Map<Id<Request>, ? extends PassengerRequest> dropoffRequests,
                                  Map<Id<Request>, ? extends PassengerRequest> pickupRequests) {
         super(CHARGING_BREAK);
-        chargingDelegate = new ChargingActivity(chargingTask);
+        chargingDelegate = new FixedTimeChargingActivity(chargingTask, task.getEndTime());
         this.dropoffRequests = dropoffRequests;
         this.pickupRequests = pickupRequests;
         this.passengerHandler = passengerHandler;

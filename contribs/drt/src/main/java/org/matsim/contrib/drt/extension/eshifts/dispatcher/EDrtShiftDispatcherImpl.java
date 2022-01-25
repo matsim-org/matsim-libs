@@ -21,13 +21,11 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.drt.extension.eshifts.charging.ChargingWithBreaksAndAssignmentLogic;
 import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.eshifts.schedule.EDrtWaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
-import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -97,24 +95,13 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.chargingInfrastructure = chargingInfrastructure;
         this.eventsManager = eventsManager;
         this.configGroup = configGroup;
-        if (chargingInfrastructure != null) {
-            resetCharger();
-        }
 		shiftTaskScheduler.initSchedules();
         createQueues();
     }
 
-    private void resetCharger() {
-        for (Charger charger : chargingInfrastructure.getChargers().values()) {
-            final ChargingLogic logic = charger.getLogic();
-            if (logic instanceof ChargingWithBreaksAndAssignmentLogic) {
-                ((ChargingWithBreaksAndAssignmentLogic) logic).resetFleet(fleet);
-            }
-        }
-    }
 
     private void createQueues() {
-        unscheduledShifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
+		unscheduledShifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
         unscheduledShifts.addAll(shifts.getShifts().values());
 
         assignedShifts = new PriorityQueue<>(Comparator.comparingDouble(v -> v.shift.getStartTime()));
