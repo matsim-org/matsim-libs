@@ -36,12 +36,13 @@ import java.util.Map;
  * Created by molloyj on 01.12.2017.
  * class to mimic the old org.matsim.contrib.emissions.roadTypeMapping that berlin uses with VISUM
  */
-class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
+public class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
     private static final Logger logger = Logger.getLogger(VisumHbefaRoadTypeMapping.class);
 
     private final Map<String, String> mapping = new HashMap<>();
 
-    private VisumHbefaRoadTypeMapping(){}
+    private VisumHbefaRoadTypeMapping() {
+    }
 
     @Override
     public String determineHebfaType(Link link) {

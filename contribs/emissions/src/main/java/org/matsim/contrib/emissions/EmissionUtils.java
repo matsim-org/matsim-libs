@@ -46,7 +46,7 @@ public abstract class EmissionUtils {
 
 	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS, END_EMISSIONS}
 
-	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
 	public static void setHbefaRoadType(Link link, String type) {
 		link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);

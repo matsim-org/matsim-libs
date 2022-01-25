@@ -56,7 +56,7 @@ import java.util.Map;
  *    living;Access
 
  */
-class OsmHbefaMapping extends HbefaRoadTypeMapping {
+public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
     private final Map<String, Hbefa> hbfeaMap = new HashMap<>();
 

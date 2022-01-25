@@ -20,6 +20,7 @@
 package org.matsim.contrib.emissions.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -518,18 +519,30 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	public void setHandlesHighAverageSpeeds(boolean handleHighAverageSpeeds) {
 		this.handleHighAverageSpeeds = handleHighAverageSpeeds;
 	}
+
 	// ============================================
 	// ============================================
 	@StringGetter(Hbefa_ROADTYPE_SOURCE)
-	//	@Deprecated // kai, oct'18 // I now think that this is ok: It just writes the categories directly into the network and then keeps them there, e.g. for output. kai, feb'20
+	@Deprecated
 	public HbefaRoadTypeSource getHbefaRoadTypeSource() {
 		return hbefaRoadTypeSource;
 	}
+
+	/**
+	 * @param hbefaRoadTypeSource this is ignored. The Enum will be removed in future releases
+	 * @deprecated This used to set how the contrib was guessing HBEFA-Road types. The contib now expects the road types
+	 * to be set explicitly as link attribute. {@link org.matsim.contrib.emissions.EmissionUtils#setHbefaRoadType(Link, String)}
+	 * Also, there are mappers to set these attributes from Osm, Visum-files or by guessing based on the freespeed of links
+	 * {@link org.matsim.contrib.emissions.OsmHbefaMapping}, {@link org.matsim.contrib.emissions.VisumHbefaRoadTypeMapping} or
+	 * {@link org.matsim.contrib.emissions.VspHbefaRoadTypeMapping}
+	 */
 	@StringSetter(Hbefa_ROADTYPE_SOURCE)
-	//	@Deprecated // kai, oct'18 // I now think that this is ok: It just writes the categories directly into the network and then keeps them there, e.g. for output. kai, feb'20
+	@Deprecated
 	public void setHbefaRoadTypeSource(HbefaRoadTypeSource hbefaRoadTypeSource) {
+		log.warn("This property is deprecated and will be removed soon. The emission contrib expects HbefaRaodTypes to be set as link attributes explicitly");
 		this.hbefaRoadTypeSource = hbefaRoadTypeSource;
 	}
+
 	// ============================================
 	// ============================================
 	@StringGetter(NON_SCENARIO_VEHICLES)
