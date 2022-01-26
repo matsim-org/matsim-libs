@@ -127,80 +127,79 @@ import java.util.*;
 					.setReloadingScheduler( depotScheduler )
 					.build();
 		}
-
-		//TODO KMT Dez21: Weiter die Builder aufräuen.
+		
 		LogisticsSolutionElement depotElement;
 		{
-
 			//The SolutionElement for the first reloading point is created
-			Id<LogisticsSolutionElement> depotElementId = Id.create( "DepotElement", LogisticsSolutionElement.class );
-			LSPUtils.LogisticsSolutionElementBuilder depotElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance( depotElementId );
-			depotElementBuilder.setResource( depotResource );
-			depotElement = depotElementBuilder.build(); //Nicht unbedingt nötig, aber nehme das alte Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
+			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
+				.setResource( depotResource )
+				.build(); //Nicht unbedingt nötig, aber nehme das alte Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 			//Maybe TODO: Depot als LogisticSolutionElement raus nehmen.(?)
 		}
 
 		//The adapter i.e. the main run resource is created
 		LSPResource mainRunResource;
 		{
-			UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(
-					Id.create( "MainRunAdapter", LSPResource.class ), network );
-			mainRunAdapterBuilder.setFromLinkId(depotLinkId);
-			mainRunAdapterBuilder.setToLinkId(hubLinkId);
 
-			{
-				log.info( "" );
-				log.info( "The Carrier for the main run is created" );
-				Carrier mainRunCarrier = CarrierUtils.createCarrier( Id.create( "MainRunCarrier", Carrier.class ) );
+			log.info( "" );
+			log.info( "The Carrier for the main run is created" );
+			Carrier mainRunCarrier = CarrierUtils.createCarrier( Id.create( "MainRunCarrier", Carrier.class ) );
 
-				Id<VehicleType> mainRunVehicleTypeId = Id.create( "MainRunCarrierVehicleType", VehicleType.class );
+			VehicleType mainRunVehicleType = CarrierVehicleType.Builder.newInstance(Id.create( "MainRunCarrierVehicleType", VehicleType.class ))
+					.setCapacity( 30 )
+					.setCostPerDistanceUnit( 0.0002 )
+					.setCostPerTimeUnit( 0.38 )
+					.setFixCost( 120 )
+					.setMaxVelocity( 50 / 3.6 )
+					.build();
 
-				VehicleType mainRunVehicleType = CarrierVehicleType.Builder.newInstance( mainRunVehicleTypeId ).setCapacity( 30 ).setCostPerDistanceUnit( 0.0002 )
-						.setCostPerTimeUnit( 0.38 ).setFixCost( 120 ).setMaxVelocity( 50 / 3.6 ).build();
+			CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance(Id.createVehicleId( "MainRunVehicle" ), depotLinkId)
+					.setType(mainRunVehicleType)
+					.build();
 
-				Id<Vehicle> mainRunVehicleId = Id.createVehicleId( "MainRunVehicle" );
-				CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance( mainRunVehicleId, depotLinkId)
-						.setType(mainRunVehicleType)
-						.build();
-
-				mainRunCarrier.setCarrierCapabilities(
-						CarrierCapabilities.Builder.newInstance().addType( mainRunVehicleType ).addVehicle( mainRunCarrierVehicle ).setFleetSize( FleetSize.INFINITE ).build() );
-
-				mainRunAdapterBuilder.setCarrier( mainRunCarrier );
-			}
+			mainRunCarrier.setCarrierCapabilities(
+					CarrierCapabilities.Builder.newInstance()
+							.addType( mainRunVehicleType )
+							.addVehicle( mainRunCarrierVehicle )
+							.setFleetSize( FleetSize.INFINITE )
+							.build() );
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			mainRunAdapterBuilder.setMainRunCarrierScheduler( UsecaseUtils.createDefaultMainRunCarrierScheduler() );
-			mainRunResource = mainRunAdapterBuilder.build();
+			mainRunResource = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(
+					Id.create( "MainRunAdapter", LSPResource.class ), network )
+					.setFromLinkId(depotLinkId)
+					.setToLinkId(hubLinkId)
+					.setCarrier( mainRunCarrier )
+					.setMainRunCarrierScheduler( UsecaseUtils.createDefaultMainRunCarrierScheduler() )
+					.build();
 		}
 
 		//The LogisticsSolutionElement for the main run Resource is created
 		LogisticsSolutionElement mainRunElement;
 		{
-			Id<LogisticsSolutionElement> mainRunElementId = Id.create( "MainRunElement", LogisticsSolutionElement.class );
-			LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance( mainRunElementId );
-			mainRunBuilder.setResource( mainRunResource );
-			mainRunElement = mainRunBuilder.build();
+			mainRunElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "MainRunElement", LogisticsSolutionElement.class ))
+				.setResource( mainRunResource )
+			 	.build();
 		}
 
-		LogisticsSolutionElement hubElement;
+
 		LSPResource hubResource;
+		LogisticsSolutionElement hubElement;
 		{
 			log.info( "" );
-			log.info( "The second reloading adapter i.e. the Resource is created" );
+			log.info( "The second reloading adapter (hub) i.e. the Resource is created" );
 			//The scheduler for the second reloading point is created
-			UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance()
+			LSPResourceScheduler hubScheduler = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed( 10 )
-					.setCapacityNeedLinear( 1 );
+					.setCapacityNeedLinear( 1 )
+					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
 			//The second reloading adapter i.e. the Resource is created
 			Id<LSPResource> secondReloadingId = Id.create( "ReloadingPoint2", LSPResource.class );
-			UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(
-					secondReloadingId, hubLinkId);
-
-			secondReloadingPointBuilder.setReloadingScheduler( secondSchedulerBuilder.build() );
-			hubResource = secondReloadingPointBuilder.build();
+			hubResource = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId, hubLinkId)
+					.setReloadingScheduler( hubScheduler )
+					.build();
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 			hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "SecondReloadElement", LogisticsSolutionElement.class ))
@@ -209,58 +208,75 @@ import java.util.*;
 		}
 
 
+		LSPResource distributionAdapter;
 		LogisticsSolutionElement distributionElement;
-		LSPResource distributionResource;
 		{
 			//The Carrier for distribution from reloading Point is created
-			Id<Carrier> distributionCarrierId = Id.create( "DistributionCarrier", Carrier.class );
 			VehicleType distributionVehicleType = createCarrierVehicleType("DistributionCarrierVehicleType");
 
 			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), hubLinkId)
 					.setType(distributionVehicleType)
 					.build();
 
-			Carrier distributionCarrier = CarrierUtils.createCarrier( distributionCarrierId );
+			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create( "DistributionCarrier", Carrier.class ));
 			distributionCarrier.setCarrierCapabilities(
-					CarrierCapabilities.Builder.newInstance().addType( distributionVehicleType ).addVehicle( distributionCarrierVehicle ).setFleetSize( FleetSize.INFINITE ).build() );
+					CarrierCapabilities.Builder.newInstance()
+							.addType( distributionVehicleType )
+							.addVehicle( distributionCarrierVehicle )
+							.setFleetSize( FleetSize.INFINITE )
+							.build() );
 
 			//The distribution adapter i.e. the Resource is created
-			distributionResource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-					Id.create("DistributionCarrierAdapter", LSPResource.class ), network ).setCarrier( distributionCarrier ).setLocationLinkId(hubLinkId)
-					.setDistributionScheduler( UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
+			distributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
+					Id.create("DistributionCarrierAdapter", LSPResource.class ), network )
+					.setCarrier( distributionCarrier ).setLocationLinkId(hubLinkId)
+					.setDistributionScheduler( UsecaseUtils.createDefaultDistributionCarrierScheduler() )
+					.build();
 			// (The scheduler is where jsprit comes into play.)
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 
 			distributionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
-					Id.create("DistributionElement", LogisticsSolutionElement.class ) ).setResource(distributionResource ).build();
+					Id.create("DistributionElement", LogisticsSolutionElement.class ) )
+					.setResource(distributionAdapter )
+					.build();
 		}
 
 
 		//### New (KMT): Carrier for direct distribution from Depot (without 2nd reloading Point)
-		//The Carrier for distribution from reloading Point is created
-		Id<Carrier> directDistributionCarrierId = Id.create("DirectDistributionCarrier", Carrier.class);
-		VehicleType directDistributionVehicleType = createCarrierVehicleType("DirectDistributionCarrierVehicleType");
+		LSPResource directDistributionAdapter;
+		LogisticsSolutionElement directDistributionElement;
+		{
+			//The Carrier for distribution from reloading Point is created
+			VehicleType directDistributionVehicleType = createCarrierVehicleType("DirectDistributionCarrierVehicleType");
 
-		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId("DirectDistributionVehicle" ), depotLinkId)
-				.setType(directDistributionVehicleType)
-				.build();
+			CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance(
+						Id.createVehicleId("DirectDistributionVehicle"), depotLinkId)
+					.setType(directDistributionVehicleType)
+					.build();
 
-		CarrierCapabilities directDistributionCarrierCapabilities = CarrierCapabilities.Builder.newInstance().addType(directDistributionVehicleType )
-				.addVehicle(directDistributionCarrierVehicle ).setFleetSize(FleetSize.INFINITE ).build();
-		Carrier directDistributionCarrier = CarrierUtils.createCarrier( directDistributionCarrierId );
-		directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
+			CarrierCapabilities directDistributionCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
+					.addType(directDistributionVehicleType)
+					.addVehicle(directDistributionCarrierVehicle)
+					.setFleetSize(FleetSize.INFINITE)
+					.build();
+			Carrier directDistributionCarrier = CarrierUtils.createCarrier(Id.create("DirectDistributionCarrier", Carrier.class));
+			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
-		//The distribution adapter i.e. the Resource is created
-		LSPResource directDistributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-				Id.create("DirectDistributionCarrierAdapter", LSPResource.class ), network ).setCarrier(directDistributionCarrier ).setLocationLinkId(depotLinkId)
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler() ).build();
-		// (The scheduler is where jsprit comes into play.)
+			//The distribution adapter i.e. the Resource is created
+			directDistributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
+						Id.create("DirectDistributionCarrierAdapter", LSPResource.class), network)
+					.setCarrier(directDistributionCarrier).setLocationLinkId(depotLinkId)
+					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.build();
+			// (The scheduler is where jsprit comes into play.)
 
-		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		LogisticsSolutionElement directDistributionElement =    LSPUtils.LogisticsSolutionElementBuilder.newInstance(
-				Id.create("DirectDistributionElement", LogisticsSolutionElement.class ) ).setResource(directDistributionAdapter ).build();
-
+			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
+			directDistributionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
+						Id.create("DirectDistributionElement", LogisticsSolutionElement.class))
+					.setResource(directDistributionAdapter)
+					.build();
+		}
 		//### end new
 
 		//TODO: Beide Lösungen anbieten und "bessere" oder zunächst "eine" auswählen"
@@ -308,19 +324,22 @@ import java.util.*;
 				log.info("");
 				log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
-				LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createDeterministicShipmentAssigner()).addSolution(completeSolutionWithReloading);
+				LSPPlan lspPlanWithReloading = LSPUtils.createLSPPlan()
+						.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
+						.addSolution(completeSolutionWithReloading);
 
 				log.info("");
 				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
 
 				List<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(
-						depotResource, mainRunResource, hubResource, distributionResource
+						depotResource, mainRunResource, hubResource, distributionAdapter
 				)); //TODO KMT Dez21: Hole es aus allen SolutionElementes.getRessource und nicht "per-Hand". -In UtilsKlasse(?) extractRewourcesFromSolutionElements()
 
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-				return LSPUtils.LSPBuilder.getInstance().setInitialPlan(completePlan)
-						.setId(Id.create("CollectionLSP", LSP.class))
+				return LSPUtils.LSPBuilder.getInstance()
+						.setInitialPlan(lspPlanWithReloading)
+						.setId(Id.create("LSPwithReloading", LSP.class))
 						.setSolutionScheduler(simpleScheduler)
 						.build();
 
@@ -343,12 +362,17 @@ import java.util.*;
 				log.info("set up logistic Solution - direct distribution from the depot is created");
 
 				LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
-						Id.create("SolutionDirectId", LogisticsSolution.class)).addSolutionElement(depotElement).addSolutionElement(directDistributionElement).build();
+							Id.create("SolutionDirectId", LogisticsSolution.class))
+						.addSolutionElement(depotElement)
+						.addSolutionElement(directDistributionElement)
+						.build();
 
 				log.info("");
 				log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
-				LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner(UsecaseUtils.createDeterministicShipmentAssigner()).addSolution(completeSolutionDirect);
+				LSPPlan completePlan = LSPUtils.createLSPPlan()
+						.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
+						.addSolution(completeSolutionDirect);
 
 				log.info("");
 				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
@@ -359,7 +383,11 @@ import java.util.*;
 				//			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-				return LSPUtils.LSPBuilder.getInstance().setInitialPlan(completePlan).setId(Id.create("MyLSP", LSP.class)).setSolutionScheduler(simpleScheduler).build();
+				return LSPUtils.LSPBuilder.getInstance()
+						.setInitialPlan(completePlan)
+						.setId(Id.create("LSPdirect", LSP.class))
+						.setSolutionScheduler(simpleScheduler)
+						.build();
 			}
 			default:
 				throw new IllegalStateException("Unexpected value: " + solutionType);
