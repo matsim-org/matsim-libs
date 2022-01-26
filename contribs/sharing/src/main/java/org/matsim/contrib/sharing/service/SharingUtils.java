@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.sharing.run.SharingConfigGroup;
 import org.matsim.contrib.sharing.run.SharingModes;
+import org.matsim.contrib.sharing.run.SharingQSimServiceModule;
 import org.matsim.contrib.sharing.run.SharingServiceConfigGroup;
 import org.matsim.contrib.sharing.service.events.SharingDropoffEvent;
 import org.matsim.contrib.sharing.service.events.SharingFailedDropoffEvent;

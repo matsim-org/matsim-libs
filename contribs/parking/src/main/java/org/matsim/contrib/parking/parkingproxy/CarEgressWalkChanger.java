@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingproxy.AccessEgressFinder.LegActPair;
+import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup.Iter0Method;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -50,17 +51,11 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  */
 class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener {
 	
+	public static final String PENALTY_ATTRIBUTE = "parkingPenalty";
+	
 	private final CarEgressWalkObserver observer;
 	private final AccessEgressFinder egressFinder = new AccessEgressFinder(TransportMode.car);
-	
-	/**
-	 * Sets the class up with the {@linkplain PenaltyCalculator.DefaultPenaltyFunction} and the specified {@linkplain PenaltyGenerator}.
-	 * 
-	 * @param penaltyGenerator
-	 */
-	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator) {
-		this(penaltyGenerator, new PenaltyCalculator.DefaultPenaltyFunction());
-	}
+	private final Iter0Method iter0Method;
 	
 	/**
 	 * Sets the class up with the specified {@linkplain PenaltyGenerator} and {@linkplain PenaltyFunction}.
@@ -68,8 +63,9 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 	 * @param penaltyGenerator
 	 * @param penaltyFunction
 	 */
-	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction) {
-		this.observer = new CarEgressWalkObserver(penaltyGenerator, penaltyFunction);
+	public CarEgressWalkChanger(PenaltyGenerator penaltyGenerator, PenaltyFunction penaltyFunction, CarEgressWalkObserver observer, Iter0Method iter0Method) {
+		this.observer = observer;
+		this.iter0Method = iter0Method;
 	}
 
 	/**
@@ -81,7 +77,21 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 		this.observer.notifyBeforeMobsim(event);
 		
 		// then we alter the egressWalk times according to the penalty
-		this.changeEgressTimes(event.getServices().getScenario().getPopulation().getPersons().values(), false);
+		if (event.getIteration() == 0) {
+			switch (this.iter0Method) {
+			case hourPenalty:
+			case estimateFromPlans:
+				this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), false);
+				break;
+			case noPenalty:
+				break;
+			case takeFromAttributes:
+				this.changeEgressTimesByAttribute(event.getServices().getScenario().getPopulation().getPersons().values(), false);
+				break;
+			}
+		} else {
+			this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), false);
+		}
 	}
 	
 	/**
@@ -91,29 +101,74 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// we need to roll back the changes we made before the mobsim, otherwise we can't apply
 		// a different penalty next iteration.
-		this.changeEgressTimes(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+		if (event.getIteration() == 0) {
+			switch (this.iter0Method) {
+			case noPenalty:
+			case hourPenalty:
+			case estimateFromPlans:
+				this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+				break;
+			case takeFromAttributes:
+				this.changeEgressTimesByAttribute(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+				break;
+			default:
+				throw new RuntimeException("Unknown iter0 mode");
+			}
+		} else {
+			this.changeEgressTimesByGridcell(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+		}
 		// yyyy this is something we do not like: to just "fake" something and take it back afterwards.  Would be good to find some other design
 		// eventually.  Not so obvious, though ...   kai, mar'20
 	}
 
 	/**
-	 * Changes the egress times of all agents using cars according to the penalty for the corresponding space-time-gridcell.
+	 * Changes the egress times of all agents using cars according to the penalty for the corresponding space-time-gridcell and writes the penalty
+	 * into the leg attributes.
 	 * 
 	 * @param population All persons with their plan(s)
 	 * @param reverse if {@code false}, the egress times get prolonged by the penalty time, if {@code true}, they get shortened
 	 * by that time (calling this method twice, first with {@code false}, then with {@code true} should yield the original plans)
 	 */
-	private void changeEgressTimes(Collection<? extends Person> population, boolean reverse) {
+	private void changeEgressTimesByGridcell(Collection<? extends Person> population, boolean reverse) {
 		int sign = reverse ? -1 : 1;
 		for (Person p : population) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
-				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(
-						walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord());
-				walkActPair.leg.setTravelTime(walkActPair.leg.getTravelTime().seconds() + penalty);
-				walkActPair.leg.getRoute().setTravelTime(walkActPair.leg.getRoute().getTravelTime().seconds() + penalty);
-				walkActPair.act.setStartTime(walkActPair.act.getStartTime().seconds() + penalty);
+				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord());
+				setTimes(walkActPair, penalty);
+				if (!reverse) {
+					walkActPair.leg.getAttributes().putAttribute(PENALTY_ATTRIBUTE, penalty);
+				}
 			}
 		}
 	}
-
+	
+	/**
+	 * Changes the egress times of all agents using cars according to the penalty stored in the leg attributes
+	 * 
+	 * @param population All persons with their plan(s)
+	 * @param reverse if {@code false}, the egress times get prolonged by the penalty time, if {@code true}, they get shortened
+	 * by that time (calling this method twice, first with {@code false}, then with {@code true} should yield the original plans)
+	 * 
+	 * @throws RuntimeException if an egress leg without penalty attribute is encountered
+	 */
+	private void changeEgressTimesByAttribute(Collection<? extends Person> population, boolean reverse) {
+		int sign = reverse ? -1 : 1;
+		for (Person p : population) {
+			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
+				Object penalty = walkActPair.leg.getAttributes().getAttribute(PENALTY_ATTRIBUTE);
+				if (penalty == null) {
+					throw new RuntimeException("Leg with departure time " +  walkActPair.leg.getDepartureTime() + " of person " + p.getId().toString() + " has no penalty!");
+				} else {
+					setTimes(walkActPair, sign * (double) penalty);
+				}
+			}
+			
+		}
+	}
+	
+	private static void setTimes(LegActPair walkActPair, double penalty) {
+		walkActPair.leg.setTravelTime(walkActPair.leg.getTravelTime().seconds() + penalty);
+		walkActPair.leg.getRoute().setTravelTime(walkActPair.leg.getRoute().getTravelTime().seconds() + penalty);
+		walkActPair.act.setStartTime(walkActPair.act.getStartTime().seconds() + penalty);
+	}
 }

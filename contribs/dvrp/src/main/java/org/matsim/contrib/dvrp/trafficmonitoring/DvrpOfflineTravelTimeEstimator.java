@@ -56,6 +56,9 @@ public class DvrpOfflineTravelTimeEstimator
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	private final TimeDiscretizer timeDiscretizer;
+	private final int intervalCount;
+	private final int timeInterval;
+
 	private final double[][] linkTravelTimes;
 	private final double alpha;
 
@@ -74,7 +77,11 @@ public class DvrpOfflineTravelTimeEstimator
 			OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		this.observedTT = observedTT;
 		this.network = network;
+
 		this.timeDiscretizer = timeDiscretizer;
+		this.intervalCount = timeDiscretizer.getIntervalCount();
+		this.timeInterval = timeDiscretizer.getTimeInterval();
+
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 
 		alpha = travelTimeEstimationAlpha;
@@ -92,9 +99,20 @@ public class DvrpOfflineTravelTimeEstimator
 		var linkTT = checkNotNull(linkTravelTimes[link.getId().index()],
 				"Link (%s) does not belong to network. No travel time data.", link.getId());
 
-		//handle negative times (e.g. in backward shortest path search)
-		int timeBin = time < 0 ? 0 : timeDiscretizer.getIdx(time);
+		int timeBin = getIdx(time);
 		return linkTT[timeBin];
+	}
+
+	private int getIdx(double time) {
+		//handle negative times (e.g. in backward shortest path search)
+		if (time < 0) {
+			return 0;
+		}
+		int idx = (int)time / timeInterval;// rounding down
+		if (idx < intervalCount) {
+			return idx;
+		}
+		return intervalCount - 1;
 	}
 
 	@Override

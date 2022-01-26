@@ -19,13 +19,13 @@
 package org.matsim.contrib.parking.parkingproxy;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.map.TLongIntMap;
@@ -103,8 +103,8 @@ class PenaltyCalculator {
 	 * 
 	 * @param outputfile The file in which to write
 	 */
-	public void dump(File outputfile) {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputfile))) {
+	public void dump(URL outputfile) {
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputfile)) {
 			writer.write("x;y;t;penalty");
 			writer.newLine();
 			for (int tbin = 0; tbin < numberOfEntities.length; tbin++) {
@@ -127,16 +127,30 @@ class PenaltyCalculator {
 	}
 	
 	/**
-	 * Creates a dummy calculator with one timebin and a spatial binsize of 100km. It returns a constant value on
+	 * Creates a dummy calculator with one timebin and a spatial binsize of 100km. It returns 3600s (1h) on
 	 * every request by using {@linkplain PenaltyCalculator.DummyPenaltyFunction} as function.
 	 * 
 	 * @return The created dummy calculator
 	 */
-	public static PenaltyCalculator getDummyCalculator() {
+	public static PenaltyCalculator getDummyHourCalculator() {
 		TLongIntMap[] cars = new TLongIntMap[1];
 		cars[0] = new TLongIntHashMap();
 		PenaltyCalculator penaltyCalculator = new PenaltyCalculator(cars, 1, new HectareMapper(100000));
-		penaltyCalculator.setPenaltyFunction(new DummyPenaltyFunction());
+		penaltyCalculator.setPenaltyFunction(new DummyPenaltyFunction(3600));
+		return penaltyCalculator;
+	}
+	
+	/**
+	 * Creates a dummy calculator with one timebin and a spatial binsize of 100km. It returns 0 on
+	 * every request by using {@linkplain PenaltyCalculator.DummyPenaltyFunction} as function.
+	 * 
+	 * @return The created dummy calculator
+	 */
+	public static PenaltyCalculator getDummyZeroCalculator() {
+		TLongIntMap[] cars = new TLongIntMap[1];
+		cars[0] = new TLongIntHashMap();
+		PenaltyCalculator penaltyCalculator = new PenaltyCalculator(cars, 1, new HectareMapper(100000));
+		penaltyCalculator.setPenaltyFunction(new DummyPenaltyFunction(0));
 		return penaltyCalculator;
 	}
 	
@@ -152,12 +166,16 @@ class PenaltyCalculator {
 	}
 	
 	/**
-	 * Always returns 3600s (1h) regardless of how many entities there are in the space-time-bin.
+	 * Always returns a fixed time regardless of how many entities there are in the space-time-bin.
 	 */
 	public static class DummyPenaltyFunction implements PenaltyFunction {
+		private final int time;
+		public DummyPenaltyFunction(int time) {
+			this.time = time;
+		}
 		@Override
 		public double calculatePenalty(int numberOfCars) {
-			return 3600;
+			return time;
 		}
 	}
 }

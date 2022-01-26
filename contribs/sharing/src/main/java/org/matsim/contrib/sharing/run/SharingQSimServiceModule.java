@@ -12,14 +12,16 @@ import org.matsim.contrib.sharing.service.SharingService;
 import org.matsim.contrib.sharing.service.SharingUtils;
 import org.matsim.contrib.sharing.service.StationBasedService;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.modal.AbstractModalQSimModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
-
 import com.google.inject.Singleton;
 
 public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMode> {
 	private final SharingServiceConfigGroup serviceConfig;
+	public static final String AGENT_SOURCE_SUFFIX = "_agentsource";
 
 	protected SharingQSimServiceModule(SharingServiceConfigGroup serviceConfig) {
 		super(SharingUtils.getServiceMode(serviceConfig), SharingModes::mode);
@@ -57,6 +59,16 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			return new FreefloatingService(Id.create(serviceConfig.getId(), SharingService.class),
 					specification.getVehicles(), network, serviceConfig.getMaximumAccessEgressDistance());
 		})).in(Singleton.class);
+
+
+		addModalComponent(AgentSource.class, modalProvider(getter -> {
+
+			QSim qsim = getter.get(QSim.class);
+			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
+
+			return new SharingVehicleSource(qsim, specification);
+
+		}));
 
 		bindModal(StationBasedService.class).toProvider(modalProvider(getter -> {
 			Network network = getter.get(Network.class);

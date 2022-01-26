@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.eshifts.optimizer;
 
 import com.google.inject.Provider;
+import org.matsim.contrib.drt.extension.shifts.schedule.WaitForShiftStayTask;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -34,22 +35,23 @@ public class ShiftEDrtVehicleDataEntryFactory implements VehicleEntry.EntryFacto
     public boolean isEligibleForRequestInsertion(DvrpVehicle dvrpVehicle, double currentTime) {
         final DrtShift currentShift = ((ShiftDvrpVehicle) dvrpVehicle).getShifts().peek();
         return currentShift != null && !(currentTime > currentShift.getEndTime())
-                && (currentShift.isStarted() && !currentShift.isEnded());
+				&& !(dvrpVehicle.getSchedule().getCurrentTask() instanceof WaitForShiftStayTask)
+				&& (currentShift.isStarted() && !currentShift.isEnded());
     }
 
     public static class ShiftEDrtVehicleDataEntryFactoryProvider implements Provider<ShiftEDrtVehicleDataEntryFactory> {
-        private final double minimumRelativeSoc;
+		private final DrtConfigGroup drtCfg;
+		private final double minimumRelativeSoc;
 
-        @Inject
-        private Config config;
 
-        public ShiftEDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
+        public ShiftEDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+			this.drtCfg = drtCfg;
             this.minimumRelativeSoc = minimumRelativeSoc;
         }
 
         @Override
         public ShiftEDrtVehicleDataEntryFactory get() {
-            return new ShiftEDrtVehicleDataEntryFactory(DrtConfigGroup.getSingleModeDrtConfig(config), minimumRelativeSoc);
+            return new ShiftEDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
         }
     }
 }
