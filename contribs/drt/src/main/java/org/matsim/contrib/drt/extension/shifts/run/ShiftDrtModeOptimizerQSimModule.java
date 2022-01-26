@@ -110,10 +110,9 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-				getter -> new ShiftRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+				getter -> new ShiftRequestInsertionScheduler(drtCfg,
 						getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
-						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class),
-						getter.getModal(OperationFacilities.class)))
+						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class)))
 		).asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(

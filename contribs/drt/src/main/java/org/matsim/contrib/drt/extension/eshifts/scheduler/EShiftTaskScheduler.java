@@ -134,19 +134,19 @@ public class EShiftTaskScheduler {
 
             double startTime = path.getArrivalTime();
             double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
-            double relocationDuration = path.getDepartureTime() + path.getTravelTime();
-            relocateForBreakImpl(vehicle, startTime, endTime, relocationDuration, toLink, shift, breakFacility);
+            double latestDetourArrival = path.getDepartureTime() + path.getTravelTime() + 1.5;
+            relocateForBreakImpl(vehicle, startTime, endTime, latestDetourArrival, toLink, shift, breakFacility);
 
         } else {
             final Task task = schedule.getTasks().get(schedule.getTaskCount() - 1);
             final Link lastLink = ((StayTask) task).getLink();
-            if (lastLink.getId() != breakFacility.getLinkId()) {
-                double departureTime = task.getBeginTime();
+			double departureTime = task.getBeginTime();
 
-                // @Nico Did I change something here?
-                if (schedule.getCurrentTask() == task) {
-                    departureTime = Math.max(task.getBeginTime(), timer.getTimeOfDay());
-                }
+			// @Nico Did I change something here?
+			if (schedule.getCurrentTask() == task) {
+				departureTime = Math.max(task.getBeginTime(), timer.getTimeOfDay());
+			}
+			if (lastLink.getId() != breakFacility.getLinkId()) {
 
                 VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(lastLink, toLink,
                         departureTime, router,
@@ -165,9 +165,9 @@ public class EShiftTaskScheduler {
                     schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE)); // add RELOCATE
                     double startTime = path.getArrivalTime();
                     double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
-                    double relocationDuration = path.getDepartureTime() + path.getTravelTime();
+                    double latestDetourArrival = path.getDepartureTime() + path.getTravelTime() * 1.5;
 
-                    relocateForBreakImpl(vehicle, startTime, endTime, relocationDuration, toLink, shift, breakFacility);
+                    relocateForBreakImpl(vehicle, startTime, endTime, latestDetourArrival, toLink, shift, breakFacility);
                 }
             } else {
                 double startTime;
@@ -180,14 +180,15 @@ public class EShiftTaskScheduler {
                     schedule.removeLastTask();
                 }
                 double endTime = startTime + shift.getBreak().orElseThrow().getDuration();
-                double relocationDuration = 0;
-                relocateForBreakImpl(vehicle, startTime, endTime, relocationDuration, toLink, shift, breakFacility);
+                double latestDetourArrival = timer.getTimeOfDay();
+
+				relocateForBreakImpl(vehicle, startTime, endTime, latestDetourArrival, toLink, shift, breakFacility);
             }
         }
     }
 
     private void relocateForBreakImpl(ShiftDvrpVehicle vehicle, double startTime, double endTime,
-                                      double relocationDuration, Link link, DrtShift shift,
+                                      double latestDetourArrival, Link link, DrtShift shift,
                                       OperationFacility breakFacility) {
         Schedule schedule = vehicle.getSchedule();
 
@@ -220,7 +221,6 @@ public class EShiftTaskScheduler {
         schedule.addTask(taskFactory.createStayTask(vehicle, endTime, shift.getEndTime(),
                 link));
 
-        double latestDetourArrival = relocationDuration * 1.5 + 10;
         final double latestTimeConstraintArrival = shiftBreak.getLatestBreakEndTime() - shiftBreak.getDuration();
 
 		shiftBreak.schedule(Math.min(latestDetourArrival, latestTimeConstraintArrival));
