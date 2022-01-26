@@ -48,7 +48,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class Links2ESRIShape {
 
-	private static Logger log = Logger.getLogger(Links2ESRIShape.class);
+	private static final  Logger log = Logger.getLogger(Links2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
 	private final Network network;

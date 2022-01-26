@@ -61,6 +61,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -97,7 +98,7 @@ public abstract class AbstractJDEQSimTest {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(new PersonEventCollector());
 		events.initProcessing();
-		new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, events).run();
+		new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, events, TimeInterpretation.create(scenario.getConfig())).run();
 		events.finishProcessing();
 	}
 

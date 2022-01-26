@@ -30,12 +30,10 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{
 
-		 private static Logger log = Logger.getLogger(DriverLegScoring.class);
-			
 			private double score = 0.0;
 			private final Network network;
 			private final Carrier carrier;
-			private Set<CarrierVehicle> employedVehicles;
+			private final Set<CarrierVehicle> employedVehicles;
 			private Leg currentLeg = null;
 			private double currentLegStartTime;
 			

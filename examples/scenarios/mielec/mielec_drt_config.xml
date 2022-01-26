@@ -2,9 +2,6 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="dvrp">
-		<parameterset type="travelTimeMatrix">
-			<param name="cellSize" value="10000"/>
-		</parameterset>
 	</module>
 
 	<module name="multiModeDrt">

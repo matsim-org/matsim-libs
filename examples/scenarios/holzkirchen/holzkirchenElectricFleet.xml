@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/electric_vehicles_v1.dtd">
+
+<vehicles>
+    <vehicle id="drt_0" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_1" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_2" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_3" battery_capacity="30" initial_soc="30"/>
+    <vehicle id="drt_4" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_5" battery_capacity="30" initial_soc="30"/>
+    <vehicle id="drt_6" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_7" battery_capacity="30" initial_soc="30"/>
+    <vehicle id="drt_8" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_9" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_10" battery_capacity="30" initial_soc="30"/>
+    <vehicle id="drt_11" battery_capacity="30" initial_soc="30"/>
+    <vehicle id="drt_12" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_13" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_14" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_15" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_16" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_17" battery_capacity="30" initial_soc="30"/>
+    <vehicle id="drt_18" battery_capacity="77" initial_soc="77"/>
+    <vehicle id="drt_19" battery_capacity="77" initial_soc="77"/>
+</vehicles>

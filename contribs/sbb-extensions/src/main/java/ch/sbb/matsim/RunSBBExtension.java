@@ -21,7 +21,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunSBBExtension {
 
-    private static Logger log = Logger.getLogger(RunSBBExtension.class);
+    private static final  Logger log = Logger.getLogger(RunSBBExtension.class);
 
     public static void main(String[] args) {
         String configFilename = args[0];

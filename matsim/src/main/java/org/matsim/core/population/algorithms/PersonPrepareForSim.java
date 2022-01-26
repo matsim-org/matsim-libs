@@ -36,6 +36,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import java.util.HashSet;
 import java.util.List;
@@ -87,7 +89,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		if (NetworkUtils.isMultimodal( carOnlyNetwork )) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( carOnlyNetwork );
-			net = NetworkUtils.createNetwork();
+			net = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
@@ -206,6 +208,17 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 //							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
 							// using the full network for the distance calculation.  kai, jul'18
+						} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+							// replace deprecated ExperimentalTransitRoute with DefaultTransitPassengerRoute
+							ExperimentalTransitRoute oldRoute = (ExperimentalTransitRoute) leg.getRoute();
+							DefaultTransitPassengerRoute newRoute = new DefaultTransitPassengerRoute(
+									oldRoute.getStartLinkId(),
+									oldRoute.getEndLinkId(),
+									oldRoute.getAccessStopId(),
+									oldRoute.getEgressStopId(),
+									oldRoute.getLineId(),
+									oldRoute.getRouteId());
+							leg.setRoute(newRoute);
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

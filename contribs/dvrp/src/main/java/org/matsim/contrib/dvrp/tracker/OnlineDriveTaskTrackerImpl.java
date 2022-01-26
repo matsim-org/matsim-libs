@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
@@ -134,7 +135,7 @@ public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 
 	@Override
 	public double predictEndTime() {
-		return predictLinkExitTime() + remainingTTs[currentLinkIdx];
+		return predictLinkExitTime() + remainingTTs[currentLinkIdx] - VrpPaths.NODE_TRANSITION_TIME;
 	}
 
 	private double predictLinkExitTime() {

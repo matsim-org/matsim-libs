@@ -2,19 +2,12 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>cadytsIntegration</artifactId>
+  <artifactId>cadyts-integration</artifactId>
   <name>cadytsIntegration</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
   <dependencies>
   	<dependency>
   		<groupId>cadyts</groupId>
@@ -24,15 +17,8 @@
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>analysis</artifactId>
-  		<version>13.0-SNAPSHOT</version>
+  		<version>14.0-SNAPSHOT</version>
   	</dependency>
-    <dependency>
-      <groupId>org.matsim</groupId>
-      <artifactId>matsim-examples</artifactId>
-      <version>13.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
   <inceptionYear>2012</inceptionYear>
   <description>Provides integration of MATSim with Cadyts for automated calibration.</description>

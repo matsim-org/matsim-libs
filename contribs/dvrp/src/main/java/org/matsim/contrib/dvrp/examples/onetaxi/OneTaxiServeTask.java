@@ -22,12 +22,12 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import static org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer.OneTaxiTaskType;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 /**
  * @author michalm
  */
-public class OneTaxiServeTask extends StayTask {
+public class OneTaxiServeTask extends DefaultStayTask {
 	private final OneTaxiRequest request;
 
 	public OneTaxiServeTask(OneTaxiTaskType taskType, double beginTime, double endTime, Link link,

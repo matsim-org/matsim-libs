@@ -7,7 +7,6 @@ package ch.sbb.matsim.routing.pt.raptor;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.pt.router.TransitRouter;
 
 /**
@@ -48,9 +47,6 @@ public class SwissRailRaptorModule extends AbstractModule {
                 break;
             }
 
-            if (srrConfig.isUseIntermodalAccessEgress()) {
-                bind(MainModeIdentifier.class).to(IntermodalAwareRouterModeIdentifier.class);
-            }
             bind(RaptorStopFinder.class).to(DefaultRaptorStopFinder.class);
 
             boolean useCapacityConstraints = srrConfig.isUseCapacityConstraints();

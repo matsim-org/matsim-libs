@@ -34,7 +34,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class DgLanduseReader {
 	
-	public static String BASE_DIR = "../../../shared-svn/studies/countries/de/berlin_brandenburg_corine_landcover/shapefiles/";
+	public static final  String BASE_DIR = "../../../shared-svn/studies/countries/de/berlin_brandenburg_corine_landcover/shapefiles/";
 	
 	private static final String STADTGEFUEGE_KONTINUIERLICH = BASE_DIR + "clc06_c111.shp";
 	private static final String STADTGEFUEGE_NICHT_KONTINUIERLICH = BASE_DIR + "clc06_c112.shp";

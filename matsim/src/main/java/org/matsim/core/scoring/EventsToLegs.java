@@ -38,6 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -67,6 +68,7 @@ public final class EventsToLegs
 		VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
+	public static final String VEHICLE_ID_ATTRIBUTE_NAME = "vehicleId";
 
 	private static class PendingTransitTravel {
 		final Id<Vehicle> vehicleId;
@@ -182,6 +184,7 @@ public final class EventsToLegs
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		Leg leg = PopulationUtils.createLeg(event.getLegMode());
+		TripStructureUtils.setRoutingMode(leg, event.getRoutingMode());
 		leg.setDepartureTime(event.getTime());
 		legs.put(event.getPersonId(), leg);
 
@@ -194,6 +197,7 @@ public final class EventsToLegs
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Leg leg = legs.get(event.getPersonId());
 		leg.getAttributes().putAttribute(ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, event.getTime());
+		leg.getAttributes().putAttribute(VEHICLE_ID_ATTRIBUTE_NAME, event.getVehicleId());
 		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
 		if (lineAndRoute != null) {
 			if (!event.getPersonId().equals(lineAndRoute.driverId)) {

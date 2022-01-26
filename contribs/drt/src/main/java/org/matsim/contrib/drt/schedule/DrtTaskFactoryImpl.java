@@ -33,7 +33,7 @@ public class DrtTaskFactoryImpl implements DrtTaskFactory {
 
 	@Override
 	public DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return new DrtStopTask(beginTime, endTime, link);
+		return new DefaultDrtStopTask(beginTime, endTime, link);
 	}
 
 	@Override

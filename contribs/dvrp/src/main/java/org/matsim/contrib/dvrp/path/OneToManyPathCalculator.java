@@ -20,17 +20,17 @@
 
 package org.matsim.contrib.dvrp.path;
 
-import static ch.sbb.matsim.routing.graph.LeastCostPathTree.StopCriterion;
+import static java.util.stream.Collectors.toList;
+import static org.matsim.contrib.dvrp.path.LeastCostPathTreeStopCriteria.allEndNodesReached;
+import static org.matsim.contrib.dvrp.path.LeastCostPathTreeStopCriteria.withMaxTravelTime;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -39,11 +39,9 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
-
-import com.google.common.base.Preconditions;
-
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -51,14 +49,16 @@ import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 class OneToManyPathCalculator {
 	private final IdMap<Node, Node> nodeMap;
 	private final LeastCostPathTree dijkstraTree;
+	private final TravelTime travelTime;
 	private final boolean forwardSearch;
 	private final Link fromLink;
 	private final double startTime;
 
-	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, boolean forwardSearch,
-			Link fromLink, double startTime) {
+	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
+			boolean forwardSearch, Link fromLink, double startTime) {
 		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
+		this.travelTime = travelTime;
 		this.forwardSearch = forwardSearch;
 		this.fromLink = fromLink;
 		this.startTime = startTime;
@@ -69,22 +69,18 @@ class OneToManyPathCalculator {
 	}
 
 	void calculateDijkstraTree(Collection<Link> toLinks, double maxTravelTime) {
-		Preconditions.checkArgument(!Double.isNaN(maxTravelTime) && maxTravelTime >= 0);
+		var toNodes = toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode).collect(toList());
+		if (toNodes.size() == 0) {
+			return;
+		}
 
 		int fromNodeIdx = getStartNode(fromLink).getId().index();
-		Stream<Node> toNodes = toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode);
-		var multiNodeStopCriterion = new MultiNodeStopCriterion(toNodes);
+		var stopCriterion = withMaxTravelTime(allEndNodesReached(toNodes), maxTravelTime);
 
-		StopCriterion stopCriterion = maxTravelTime < Double.POSITIVE_INFINITY ?
-				new MaxTravelTimeStopCriterion(maxTravelTime, multiNodeStopCriterion) :
-				multiNodeStopCriterion;
-
-		if (multiNodeStopCriterion.counter > 0) {
-			if (forwardSearch) {
-				dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);
-			} else {
-				dijkstraTree.calculateBackwards(fromNodeIdx, startTime, null, null, stopCriterion);
-			}
+		if (forwardSearch) {
+			dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);
+		} else {
+			dijkstraTree.calculateBackwards(fromNodeIdx, startTime, null, null, stopCriterion);
 		}
 	}
 
@@ -182,43 +178,8 @@ class OneToManyPathCalculator {
 
 	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, double pathTravelTime, double time) {
 		double lastLinkTT = forwardSearch ?
-				VrpPaths.getLastLinkTT(toLink, time + pathTravelTime) :
-				VrpPaths.getLastLinkTT(fromLink, time);
+				VrpPaths.getLastLinkTT(travelTime, toLink, time + pathTravelTime) :
+				VrpPaths.getLastLinkTT(travelTime, fromLink, time);
 		return FIRST_LINK_TT + lastLinkTT;
-	}
-
-	private static class MaxTravelTimeStopCriterion implements StopCriterion {
-		private final double maxTravelTime;
-		private final MultiNodeStopCriterion multiNodeStopCriterion;
-
-		private MaxTravelTimeStopCriterion(double maxTravelTime, MultiNodeStopCriterion multiNodeStopCriterion) {
-			this.maxTravelTime = maxTravelTime;
-			this.multiNodeStopCriterion = multiNodeStopCriterion;
-		}
-
-		@Override
-		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
-				double departureTime) {
-			return arrivalTime - departureTime > maxTravelTime //
-					|| multiNodeStopCriterion.stop(nodeIndex, arrivalTime, travelCost, distance, departureTime);
-		}
-	}
-
-	private static class MultiNodeStopCriterion implements StopCriterion {
-		private final BitSet nodesToVisit = new BitSet(Id.getNumberOfIds(Node.class));
-		private int counter;
-
-		public MultiNodeStopCriterion(Stream<Node> endNodes) {
-			endNodes.forEach(node -> nodesToVisit.set(node.getId().index()));
-			counter = nodesToVisit.cardinality();
-		}
-
-		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
-				double departureTime) {
-			if (nodesToVisit.get(nodeIndex)) {
-				counter--;
-			}
-			return counter == 0;
-		}
 	}
 }

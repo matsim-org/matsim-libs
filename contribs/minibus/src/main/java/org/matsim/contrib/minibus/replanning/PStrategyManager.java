@@ -24,7 +24,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.PStrategySettings;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
-import org.matsim.contrib.minibus.operator.TimeProvider;
+import org.matsim.contrib.minibus.hook.TimeProvider;
 import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.ArrayList;
@@ -62,33 +62,46 @@ public final class PStrategyManager {
 
 	private PStrategy loadStrategy(final String name, final PStrategySettings settings, StageContainerCreator stageContainerCreator, TicketMachineI ticketMachine, TimeProvider timeProvider) {
 		PStrategy strategy = null;
-		
-		if (name.equals(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {
-			strategy = new MaxRandomStartTimeAllocator(settings.getParametersAsArrayList());
-		} else if (name.equals(MaxRandomEndTimeAllocator.STRATEGY_NAME)) {
-			strategy = new MaxRandomEndTimeAllocator(settings.getParametersAsArrayList());
-		} else if(name.equals(SidewaysRouteExtension.STRATEGY_NAME)){
-			strategy = new SidewaysRouteExtension(settings.getParametersAsArrayList());
-		} else if(name.equals(EndRouteExtension.STRATEGY_NAME)){
-			strategy = new EndRouteExtension(settings.getParametersAsArrayList());
-		} else if (name.equals(ReduceTimeServedRFare.STRATEGY_NAME)) {
-			ReduceTimeServedRFare strat = new ReduceTimeServedRFare(settings.getParametersAsArrayList());
-			strat.setTicketMachine(ticketMachine);
-			stageContainerCreator.addStageContainerHandler(strat);
-			strategy = strat;
-		} else if (name.equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)) {
-			ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
-			strat.setTicketMachine(ticketMachine);
-			stageContainerCreator.addStageContainerHandler(strat);
-			strategy = strat;
-		} else if (name.equals(WeightedStartTimeExtension.STRATEGY_NAME)) {
-			WeightedStartTimeExtension strat = new WeightedStartTimeExtension(settings.getParametersAsArrayList());
-			strat.setTimeProvider(timeProvider);
-			strategy = strat;
-		} else if (name.equals(WeightedEndTimeExtension.STRATEGY_NAME)) {
-			WeightedEndTimeExtension strat = new WeightedEndTimeExtension(settings.getParametersAsArrayList());
-			strat.setTimeProvider(timeProvider);
-			strategy = strat;
+
+		switch (name) {
+			case MaxRandomStartTimeAllocator.STRATEGY_NAME:
+				strategy = new MaxRandomStartTimeAllocator(settings.getParametersAsArrayList());
+				break;
+			case MaxRandomEndTimeAllocator.STRATEGY_NAME:
+				strategy = new MaxRandomEndTimeAllocator(settings.getParametersAsArrayList());
+				break;
+			case SidewaysRouteExtension.STRATEGY_NAME:
+				strategy = new SidewaysRouteExtension(settings.getParametersAsArrayList());
+				break;
+			case EndRouteExtension.STRATEGY_NAME:
+				strategy = new EndRouteExtension(settings.getParametersAsArrayList());
+				break;
+			case ReduceTimeServedRFare.STRATEGY_NAME: {
+				ReduceTimeServedRFare strat = new ReduceTimeServedRFare(settings.getParametersAsArrayList());
+				strat.setTicketMachine(ticketMachine);
+				stageContainerCreator.addStageContainerHandler(strat);
+				strategy = strat;
+				break;
+			}
+			case ReduceStopsToBeServedRFare.STRATEGY_NAME: {
+				ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
+				strat.setTicketMachine(ticketMachine);
+				stageContainerCreator.addStageContainerHandler(strat);
+				strategy = strat;
+				break;
+			}
+			case WeightedStartTimeExtension.STRATEGY_NAME: {
+				WeightedStartTimeExtension strat = new WeightedStartTimeExtension(settings.getParametersAsArrayList());
+				strat.setTimeProvider(timeProvider);
+				strategy = strat;
+				break;
+			}
+			case WeightedEndTimeExtension.STRATEGY_NAME: {
+				WeightedEndTimeExtension strat = new WeightedEndTimeExtension(settings.getParametersAsArrayList());
+				strat.setTimeProvider(timeProvider);
+				strategy = strat;
+				break;
+			}
 		}
 		
 		if (strategy == null) {
@@ -107,8 +120,6 @@ public final class PStrategyManager {
 
 	/**
 	 * Changes the weights of each strategy to zero and removes it from the choice set if it needs to be disabled
-	 * 
-	 * @param iteration
 	 */
 	public void updateStrategies(int iteration) {
 		for (int i = 0; i < this.disableInIteration.size(); i++) {
@@ -145,13 +156,13 @@ public final class PStrategyManager {
 
 	@Override
 	public String toString() {
-		StringBuffer strBuffer = new StringBuffer();
-		strBuffer.append("Strategies: ");
-		strBuffer.append(this.strategies.get(0).getStrategyName()); strBuffer.append(" ("); strBuffer.append(this.weights.get(0)); strBuffer.append(")");
+		StringBuilder strBuilder = new StringBuilder();
+		strBuilder.append("Strategies: ");
+		strBuilder.append(this.strategies.get(0).getStrategyName()); strBuilder.append(" ("); strBuilder.append(this.weights.get(0)); strBuilder.append(")");
 		
 		for (int i = 1; i < this.strategies.size(); i++) {
-			strBuffer.append(", "); strBuffer.append(this.strategies.get(i).getStrategyName()); strBuffer.append(" ("); strBuffer.append(this.weights.get(i)); strBuffer.append(")");
+			strBuilder.append(", "); strBuilder.append(this.strategies.get(i).getStrategyName()); strBuilder.append(" ("); strBuilder.append(this.weights.get(i)); strBuilder.append(")");
 		}
-		return strBuffer.toString();
+		return strBuilder.toString();
 	}
 }

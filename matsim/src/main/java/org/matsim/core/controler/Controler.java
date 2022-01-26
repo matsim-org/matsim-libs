@@ -91,8 +91,8 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		allVehicles("allVehicles.xml"),
 		linkstats("linkstats.txt"),
 		tripscsv("trips.csv"),
-        personscsv("persons.csv"),
-        legscsv("legs.csv"),
+		personscsv("persons.csv"),
+		legscsv("legs.csv"),
         ;
 
 		final String filename;

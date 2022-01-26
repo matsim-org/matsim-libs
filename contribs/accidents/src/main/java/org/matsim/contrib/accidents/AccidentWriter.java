@@ -23,7 +23,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -102,7 +104,11 @@ class AccidentWriter {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
+		NumberFormat nf = NumberFormat.getInstance(Locale.US);
+		nf.setMaximumFractionDigits(2);
+		nf.setGroupingUsed(false);
+
 		for (AccidentLinkInfo info : linkId2info.values()) {			
 			double accidentCostsPerDay_BVWP = 0.0;
 			double accidentCostsPerYear_BVWP = 0.0;
@@ -126,7 +132,7 @@ class AccidentWriter {
 				if (linkComputationMethod.toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
 					try {
-						accidentCostsBVWP.write(Double.toString(info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts()));
+						accidentCostsBVWP.write(nf.format(info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts()));
 						accidentCostsBVWP.write(";");
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -136,9 +142,9 @@ class AccidentWriter {
 			accidentCostsPerYear_BVWP = accidentCostsPerDay_BVWP * 365;
 			try {
 				if (linkComputationMethod.toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
-					accidentCostsBVWP.write(Double.toString(accidentCostsPerDay_BVWP));
+					accidentCostsBVWP.write(nf.format(accidentCostsPerDay_BVWP));
 					accidentCostsBVWP.write(";");
-					accidentCostsBVWP.write(Double.toString(accidentCostsPerYear_BVWP));
+					accidentCostsBVWP.write(nf.format(accidentCostsPerYear_BVWP));
 					accidentCostsBVWP.write(";");
 					accidentCostsBVWP.newLine();
 				}

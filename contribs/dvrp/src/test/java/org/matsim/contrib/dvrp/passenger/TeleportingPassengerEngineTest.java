@@ -70,14 +70,14 @@ public class TeleportingPassengerEngineTest {
 		double arrivalTime = departureTime + travelTime;
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
-				new ActivityEndEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, PERSON_ID, null, departureTime,
-						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, PERSON_ID, null),
-				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, PERSON_ID, null),
-				new TeleportationArrivalEvent(arrivalTime, PERSON_ID, travelDistance, MODE),
-				new PersonArrivalEvent(arrivalTime, PERSON_ID, fixture.linkBA.getId(), MODE),
-				new ActivityStartEvent(arrivalTime, PERSON_ID, fixture.linkBA.getId(), null, END_ACTIVITY));
+				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null, departureTime,
+						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null),
+				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, fixture.PERSON_ID, null),
+				new TeleportationArrivalEvent(arrivalTime, fixture.PERSON_ID, travelDistance, MODE),
+				new PersonArrivalEvent(arrivalTime, fixture.PERSON_ID, fixture.linkBA.getId(), MODE),
+				new ActivityStartEvent(arrivalTime, fixture.PERSON_ID, fixture.linkBA.getId(), null, END_ACTIVITY));
 	}
 
 	@Test
@@ -91,10 +91,10 @@ public class TeleportingPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
-				new ActivityEndEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
-				new PersonDepartureEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, PERSON_ID, "invalid"),
-				new PersonStuckEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE));
+				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, fixture.PERSON_ID, "invalid"),
+				new PersonStuckEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	private QSim createQSim(TeleportedRouteCalculator teleportedRouteCalculator,

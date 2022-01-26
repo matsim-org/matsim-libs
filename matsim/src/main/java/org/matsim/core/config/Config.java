@@ -20,23 +20,48 @@
 
 package org.matsim.core.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.*;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.ChangeModeConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.CountsConfigGroup;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.HouseholdsConfigGroup;
+import org.matsim.core.config.groups.LinkStatsConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PtCountsConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.VehiclesConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
+import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.*;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -85,7 +110,8 @@ public final class Config implements MatsimExtensionPoint {
 	private VehiclesConfigGroup vehicles = null ;
 	private ChangeModeConfigGroup changeMode = null;
 	private JDEQSimConfigGroup jdeqSim = null;
-    private HermesConfigGroup hermes = null;
+	private HermesConfigGroup hermes = null;
+	private ReplanningAnnealerConfigGroup replanningAnnealer = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<>();
 
@@ -190,9 +216,11 @@ public final class Config implements MatsimExtensionPoint {
 		this.jdeqSim = new JDEQSimConfigGroup();
 		this.modules.put(JDEQSimConfigGroup.NAME, this.jdeqSim);
 
-        this.hermes = new HermesConfigGroup();
-        this.modules.put(HermesConfigGroup.NAME, this.hermes);
+		this.hermes = new HermesConfigGroup();
+		this.modules.put(HermesConfigGroup.NAME, this.hermes);
 
+		this.replanningAnnealer = new ReplanningAnnealerConfigGroup();
+		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, this.replanningAnnealer);
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
@@ -376,9 +404,6 @@ public final class Config implements MatsimExtensionPoint {
 		}
 		try {
 			String str = m.getValue(paramName);
-			if (str == null) {
-				return null;
-			}
 			return str;
 		} catch (IllegalArgumentException e) {
 			return null;
@@ -513,17 +538,21 @@ public final class Config implements MatsimExtensionPoint {
 		return this.jdeqSim;
 	}
 
-    public HermesConfigGroup hermes() {
-        return this.hermes;
-    }
+	public HermesConfigGroup hermes() {
+		return this.hermes;
+	}
+
+	public ReplanningAnnealerConfigGroup replanningAnnealer() {
+		return replanningAnnealer;
+	}
 
 	// other:
 
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {
-		boolean alreadyExists = false ;
-		for ( ConfigConsistencyChecker ch : consistencyCheckers ) {
-			if ( ch.getClass().equals( checker.getClass() ) ) {
-				alreadyExists = true ;
+		boolean alreadyExists = false;
+		for (ConfigConsistencyChecker ch : consistencyCheckers) {
+			if (ch.getClass().equals(checker.getClass())) {
+				alreadyExists = true;
 			}
 		}
 		if ( !alreadyExists ) {

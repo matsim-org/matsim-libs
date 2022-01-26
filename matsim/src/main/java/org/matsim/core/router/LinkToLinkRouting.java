@@ -37,6 +37,7 @@ import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 public class LinkToLinkRouting
         implements Provider<RoutingModule> {
@@ -68,6 +69,9 @@ public class LinkToLinkRouting
 
     @Inject
     NetworkTurnInfoBuilderI networkTurnInfoBuilder;
+    
+    @Inject
+    TimeInterpretation timeInterpretation;
 
     @Inject
     @Named(TransportMode.walk)
@@ -97,7 +101,7 @@ public class LinkToLinkRouting
                 TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
                 Set<String> modes = new HashSet<>();
                 modes.add(mode);
-                filteredNetwork = NetworkUtils.createNetwork();
+                filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
                 filter.filter(filteredNetwork, modes);
 
                 invertedNetwork = new NetworkInverter(filteredNetwork, networkTurnInfoBuilder.createAllowedTurnInfos()).getInvertedNetwork();
@@ -116,10 +120,10 @@ public class LinkToLinkRouting
         if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
             if (mode.equals(TransportMode.walk)) {
                 return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, null,null);
+                        filteredNetwork, invertedNetwork, null,null, timeInterpretation);
             } else {
                 return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, walkRouter, walkRouter);
+                        filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpretation);
             }
 
         } else {

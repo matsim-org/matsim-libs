@@ -27,13 +27,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
-import javax.inject.Inject;
 
 /**
  * @author cdobler
@@ -142,6 +141,7 @@ public final class ParallelEventsManager implements EventsManager {
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Exception while waiting on join...", e);
 		}
+		this.init = false;
 
 	}
 

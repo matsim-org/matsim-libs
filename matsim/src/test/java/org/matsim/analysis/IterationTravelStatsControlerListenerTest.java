@@ -31,7 +31,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ExperiencedPlansModule;
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -43,11 +44,11 @@ public class IterationTravelStatsControlerListenerTest {
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	Config config = ConfigUtils.createConfig();
 	
-	private static int person;
-	private static int executed_score;
-	private static int first_act_x;
-	private static int first_act_y;
-	private static int first_act_type;
+	private int person;
+	private int executed_score;
+	private int first_act_x;
+	private int first_act_y;
+	private int first_act_type;
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -106,9 +107,10 @@ public class IterationTravelStatsControlerListenerTest {
 			public void install() {
 				install(new IterationTravelStatsModule());
 				install(new ScenarioByInstanceModule(scenario));
-				install(new ExperiencedPlansModule());
+				install(new StandaloneExperiencedPlansModule());
 				// an AnalysisMainModeIdentifier must be bound to avoid injection creation errors. TripRouterModule should do this. Check thereby that TripRouterModule still does that by installing TripRouterModule instead of binding AnalysisMainModeIdentifier directly
 				install(new TripRouterModule());
+				install(new TimeInterpretationModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
 				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
@@ -164,7 +166,7 @@ public class IterationTravelStatsControlerListenerTest {
 	
 	}
 	
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

@@ -1,0 +1,14 @@
+controler:
+    runId: 567
+
+global:
+  numberOfThreads: 8
+
+planCalcScore:
+
+  scoringParameters:
+    - modeParams:
+      - mode: car
+        constant: -1
+      - mode: bike
+        constant:  -2

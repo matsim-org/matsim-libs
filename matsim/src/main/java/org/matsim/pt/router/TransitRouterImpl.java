@@ -24,7 +24,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -110,7 +112,12 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     }
 
     @Override
-    public List<Leg> calcRoute( final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+    public List<? extends PlanElement> calcRoute( final RoutingRequest request ) {
+    	final Facility fromFacility = request.getFromFacility();
+    	final Facility toFacility = request.getToFacility();
+    	final double departureTime = request.getDepartureTime();
+    	final Person person = request.getPerson();
+    	
         // find possible start stops
         Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person,
                 fromFacility.getCoord(),

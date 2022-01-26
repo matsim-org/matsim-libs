@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.drt.routing;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -47,10 +48,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.TeleportationRoutingModule;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTrees;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -91,11 +94,11 @@ public class DrtRoutingModuleTest {
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
+				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
 		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
 				scenario.getPopulation().getFactory(), drtRouteCreator);
 		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
-				drtMode, scenario);
+				drtMode, TimeInterpretation.create(scenario.getConfig()));
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
@@ -105,7 +108,7 @@ public class DrtRoutingModuleTest {
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
 		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
-		List<? extends PlanElement> routedList = dvrpRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
+		List<? extends PlanElement> routedList = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf, wf, 8 * 3600, p1));
 
 		Assert.assertEquals(5, routedList.size());
 
@@ -160,7 +163,7 @@ public class DrtRoutingModuleTest {
 		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
 		Facility wf2 = FacilitiesUtils.toFacility(w2, facilities);
 
-		List<? extends PlanElement> routedList2 = dvrpRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
+		List<? extends PlanElement> routedList2 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf2, wf2, 8 * 3600, p2));
 
 		Assert.assertNull(routedList2);
 
@@ -172,7 +175,7 @@ public class DrtRoutingModuleTest {
 		Activity w3 = (Activity)p3.getSelectedPlan().getPlanElements().get(2);
 		Facility wf3 = FacilitiesUtils.toFacility(w3, facilities);
 
-		List<? extends PlanElement> routedList3 = dvrpRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
+		List<? extends PlanElement> routedList3 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf3, wf3, 8 * 3600, p3));
 
 		Assert.assertNull(routedList3);
 
@@ -184,7 +187,7 @@ public class DrtRoutingModuleTest {
 		Activity w4 = (Activity)p4.getSelectedPlan().getPlanElements().get(2);
 		Facility wf4 = FacilitiesUtils.toFacility(w4, facilities);
 
-		List<? extends PlanElement> routedList4 = dvrpRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
+		List<? extends PlanElement> routedList4 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf4, wf4, 8 * 3600, p4));
 
 		Assert.assertNull(routedList4);
 
@@ -196,7 +199,7 @@ public class DrtRoutingModuleTest {
 		Activity w5 = (Activity)p5.getSelectedPlan().getPlanElements().get(2);
 		Facility wf5 = FacilitiesUtils.toFacility(w5, facilities);
 
-		List<? extends PlanElement> routedList5 = dvrpRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
+		List<? extends PlanElement> routedList5 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf5, wf5, 8 * 3600, p5));
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList5);
@@ -209,10 +212,38 @@ public class DrtRoutingModuleTest {
 		Activity w6 = (Activity)p6.getSelectedPlan().getPlanElements().get(2);
 		Facility wf6 = FacilitiesUtils.toFacility(w6, facilities);
 
-		List<? extends PlanElement> routedList6 = dvrpRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
+		List<? extends PlanElement> routedList6 = dvrpRoutingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(hf6, wf6, 8 * 3600, p6));
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList6);
+
+	}
+	
+	@Test
+	public void testRouteDescriptionHandling() {
+		String oldRouteFormat = "600 400";
+		String newRouteFormat = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
+
+		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+
+		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
+		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
+		Facility hf = FacilitiesUtils.toFacility(h, facilities);
+
+		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
+		Facility wf = FacilitiesUtils.toFacility(w, facilities);
+
+		DrtRoute drtRoute = new DrtRoute(h.getLinkId(),w.getLinkId());
+
+		drtRoute.setRouteDescription(oldRouteFormat);
+		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+
+		drtRoute.setRouteDescription(newRouteFormat);
+		Assert.assertTrue(drtRoute.getMaxWaitTime()==600.);
+		Assert.assertTrue(drtRoute.getDirectRideTime()==400);
+		Assert.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
 
 	}
 

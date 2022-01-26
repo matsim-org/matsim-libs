@@ -25,9 +25,11 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class ParkingProxyConfigGroup extends ReflectiveConfigGroup {
 	
 	public static enum CalculationMethod {none, events, plans};
+	public static enum Iter0Method {noPenalty, hourPenalty, takeFromAttributes, estimateFromPlans}
 	
 	public static final String GROUP_NAME = "parkingProxy";
 	public static final String METHOD = "method";
+	public static final String ITER0 = "iter0";
 	public static final String OBSERVE_ONLY = "observeOnly";
 	public static final String DELAY_PER_CAR = "delayPerCar";
 	public static final String MAX_DELAY = "maxDelay";
@@ -37,6 +39,7 @@ public class ParkingProxyConfigGroup extends ReflectiveConfigGroup {
 	public static final String CARS_PER_1000_PERSONS = "carsPer1000Persons";
 	
 	private CalculationMethod method = CalculationMethod.events;
+	private Iter0Method iter0Method = Iter0Method.hourPenalty;
 	private boolean observeOnly = false;
 	private double delayPerCar = 2.5;
 	private double maxDelay = 900;
@@ -69,6 +72,15 @@ public class ParkingProxyConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(METHOD)
 	public void setCalculationMethod(CalculationMethod method) {
 		this.method = method;
+	}
+	
+	@StringGetter(ITER0)
+	public Iter0Method getIter0Method() {
+		return this.iter0Method;
+	}
+	@StringSetter(ITER0)
+	public void setIter0Method(Iter0Method iter0Method) {
+		this.iter0Method = iter0Method;
 	}
 	
 	@StringGetter(OBSERVE_ONLY)

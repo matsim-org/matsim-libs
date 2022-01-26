@@ -41,7 +41,7 @@ import com.google.common.base.Preconditions;
  */
 public class DvrpOfflineTravelTimeEstimatorTest {
 	private final Network network = NetworkUtils.createNetwork();
-	private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord());
+    private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord());
 	private final Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord());
 	private final Link linkAB = NetworkUtils.createAndAddLink(network, Id.createLinkId("A_B"), nodeA, nodeB, 100, 10,
 			10, 1);

@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.fare;
 
 import java.util.Map;
 
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 

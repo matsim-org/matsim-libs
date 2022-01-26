@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.ev.charging;
 
+import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
@@ -26,19 +27,27 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
  */
 public class FixedSpeedCharging implements BatteryCharging {
 	private final double maxPower;
+	private final ElectricVehicle electricVehicle;
 
 	/**
 	 * @param electricVehicle
 	 * @param relativeSpeed   in C, where 1 C = full recharge in 1 hour
 	 */
 	public FixedSpeedCharging(ElectricVehicle electricVehicle, double relativeSpeed) {
-		double c = electricVehicle.getBattery().getCapacity() / 3600.;
+		this.electricVehicle = electricVehicle;
+		double c = this.electricVehicle.getBattery().getCapacity() / 3600.;
 		maxPower = relativeSpeed * c;
 	}
 
 	@Override
 	public double calcChargingPower(ChargerSpecification charger) {
 		return Math.min(maxPower, charger.getPlugPower());
+	}
+
+	@Override
+	public double calcEnergyCharged(ChargerSpecification charger, double chargePeriod) {
+		final Battery battery = electricVehicle.getBattery();
+		return Math.min(calcChargingPower(charger) * chargePeriod, battery.getCapacity() - battery.getSoc());
 	}
 
 	@Override

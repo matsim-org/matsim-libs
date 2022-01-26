@@ -31,7 +31,7 @@ import org.matsim.utils.MemoryObserver;
     // we already had one case where a method of this was removed, causing downstream failures; better just not
 	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
-    private static Logger log = Logger.getLogger(AbstractController.class);
+    private static final  Logger log = Logger.getLogger(AbstractController.class);
 
     private OutputDirectoryHierarchy controlerIO;
 

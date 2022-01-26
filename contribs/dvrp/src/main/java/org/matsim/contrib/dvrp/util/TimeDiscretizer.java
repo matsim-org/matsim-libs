@@ -76,7 +76,14 @@ public class TimeDiscretizer {
 
 		switch (type) {
 			case ACYCLIC:
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("Out of bound index: time="
+						+ time
+						+ ", timeInterval="
+						+ timeInterval
+						+ ", idx="
+						+ idx
+						+ ", intervalCount="
+						+ intervalCount);
 
 			case CYCLIC:
 				return idx % intervalCount;

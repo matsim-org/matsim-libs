@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import java.io.FileWriter;
@@ -47,7 +68,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
-        private static Logger log = Logger.getLogger(DriversActivityScoring.class);
+        private static final  Logger log = Logger.getLogger(DriversActivityScoring.class);
 
         private double score;
         private double timeParameter = 0.008;
@@ -138,7 +159,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
-        private static Logger log = Logger.getLogger(DriversLegScoring.class);
+        private static final  Logger log = Logger.getLogger(DriversLegScoring.class);
 
         private double score = 0.0;
         private final Network network;
@@ -221,7 +242,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
-        private static Logger log = Logger.getLogger(TollScoring.class);
+        private static final  Logger log = Logger.getLogger(TollScoring.class);
 
         private double score = 0.;
         private Carrier carrier;

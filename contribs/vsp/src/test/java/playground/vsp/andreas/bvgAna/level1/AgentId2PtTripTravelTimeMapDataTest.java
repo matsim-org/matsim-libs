@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -52,10 +53,10 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 	        Id<Person> agentId1 = Id.create(4, Person.class);
 	        Id<ActivityFacility> facilId1 = Id.create(5, ActivityFacility.class);
 
-        ActivityEndEvent event = new ActivityEndEvent(1.2*3600, agentId1, linkId1, facilId1, "w");	
-        PersonDepartureEvent event3 = new PersonDepartureEvent(1.2*3600, agentId1, linkId2, "pt");        
+        ActivityEndEvent event = new ActivityEndEvent(1.2*3600, agentId1, linkId1, facilId1, "w", new Coord( 234., 5.67 ));
+        PersonDepartureEvent event3 = new PersonDepartureEvent(1.2*3600, agentId1, linkId2, "pt", "pt");        
         PersonArrivalEvent event4 = new PersonArrivalEvent(1.9*3600, agentId1, linkId3, "pt");
-        PersonDepartureEvent event5 = new PersonDepartureEvent(2.1*3600, agentId1, linkId3, "pt");        
+        PersonDepartureEvent event5 = new PersonDepartureEvent(2.1*3600, agentId1, linkId3, "pt", "pt");        
         PersonArrivalEvent event6 = new PersonArrivalEvent(2.5*3600, agentId1, linkId2, "pt");
 		
 		AgentId2PtTripTravelTimeMapData test = new AgentId2PtTripTravelTimeMapData(event);

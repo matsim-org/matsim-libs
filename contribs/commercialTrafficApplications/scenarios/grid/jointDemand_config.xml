@@ -486,7 +486,7 @@
         <parameterset type="strategysettings">
             <param name="disableAfterIteration" value="-1"/>
             <param name="executionPath" value="null"/>
-            <param name="strategyName" value="changeCommercialJobOperator"/>
+            <param name="strategyName" value="ChangeCommercialJobOperator"/>
             <param name="subpopulation" value="null"/>
             <param name="weight" value="0.5"/>
         </parameterset>

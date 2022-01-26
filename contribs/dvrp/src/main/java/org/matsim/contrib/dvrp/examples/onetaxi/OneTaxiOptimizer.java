@@ -33,15 +33,16 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.DijkstraFactory;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -73,12 +74,12 @@ public final class OneTaxiOptimizer implements VrpOptimizer {
 		this.eventsManager = eventsManager;
 		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
-		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
+		router = new SpeedyDijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
 				travelTime);
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.getSchedule()
-				.addTask(new StayTask(OneTaxiTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+				.addTask(new DefaultStayTask(OneTaxiTaskType.WAIT, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 						vehicle.getStartLink()));
 	}
 
@@ -113,14 +114,14 @@ public final class OneTaxiOptimizer implements VrpOptimizer {
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,
 				travelTime);
-		schedule.addTask(new DriveTask(OneTaxiTaskType.EMPTY_DRIVE, pathToCustomer));
+		schedule.addTask(new DefaultDriveTask(OneTaxiTaskType.EMPTY_DRIVE, pathToCustomer));
 
 		double t1 = pathToCustomer.getArrivalTime();
 		double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
 		schedule.addTask(new OneTaxiServeTask(OneTaxiTaskType.PICKUP, t1, t2, fromLink, req));
 
 		VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router, travelTime);
-		schedule.addTask(new DriveTask(OneTaxiTaskType.OCCUPIED_DRIVE, pathWithCustomer));
+		schedule.addTask(new DefaultDriveTask(OneTaxiTaskType.OCCUPIED_DRIVE, pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
 		double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
@@ -128,7 +129,7 @@ public final class OneTaxiOptimizer implements VrpOptimizer {
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
-		schedule.addTask(new StayTask(OneTaxiTaskType.WAIT, t4, tEnd, toLink));
+		schedule.addTask(new DefaultStayTask(OneTaxiTaskType.WAIT, t4, tEnd, toLink));
 
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),

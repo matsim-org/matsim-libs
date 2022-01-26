@@ -57,6 +57,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EditRoutesTest extends MatsimTestCase {
@@ -543,7 +545,7 @@ private void createSamplePlan() {
 	/*
 	 * run a PlanRouter to create and set routes
 	 */
-	new PlanRouter(tripRouter).run(plan);
+	new PlanRouter(tripRouter, TimeInterpretation.create(scenario.getConfig())).run(plan);
 }
 
 /**
@@ -557,6 +559,7 @@ private void createTripRouter() {
 				@Override
 				public void install() {
 					install(new ScenarioByInstanceModule(scenario));
+					install(new TimeInterpretationModule());
 					addTravelTimeBinding("car").toInstance(new FreeSpeedTravelTime());
 					addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 				}

@@ -23,18 +23,15 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  */
 public class RunTest {
-	private static String configFile;
-	private static String outputDirectory;
-	private static String runId;	
-	
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
 	public void test1() {
-		
-		configFile = utils.getPackageInputDirectory() + "/trial_scenario/trial_scenario_config.xml";
-		outputDirectory = utils.getOutputDirectory();
-		runId = "run1";
+
+		String configFile = utils.getPackageInputDirectory() + "/trial_scenario/trial_scenario_config.xml";
+		String outputDirectory = utils.getOutputDirectory();
+		String runId = "run1";
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -89,12 +86,12 @@ public class RunTest {
 					
 					if (lineCounter == 0 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
-						Assert.assertEquals("wrong accident costs", 10.37988, accidentCosts , MatsimTestUtils.EPSILON);	
+						Assert.assertEquals("wrong accident costs", 10.38, accidentCosts , MatsimTestUtils.EPSILON);
 					}
 					
 					if (lineCounter == 1 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
-						Assert.assertEquals("wrong accident costs", 16.68195, accidentCosts , MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong accident costs", 16.68, accidentCosts , MatsimTestUtils.EPSILON);
 					}
 										
 				}

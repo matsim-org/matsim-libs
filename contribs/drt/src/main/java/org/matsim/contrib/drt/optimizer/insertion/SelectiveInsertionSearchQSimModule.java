@@ -23,19 +23,13 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
-import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -50,30 +44,32 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
-		bindModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
-		}).toProvider(modalProvider(getter -> {
-			var costCalculator = getter.getModal(CostCalculationStrategy.class);
-			var timer = getter.get(MobsimTimer.class);
-			var provider = SelectiveInsertionProvider.create(drtCfg, timer, costCalculator,
-					getter.getModal(DvrpTravelTimeMatrix.class),
+		bindModal(DrtInsertionSearch.class).toProvider(modalProvider(getter -> {
+			var provider = SelectiveInsertionProvider.create(drtCfg, getter.getModal(InsertionCostCalculator.class),
+					getter.getModal(DvrpTravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class), costCalculator,
-					drtCfg, timer);
+			// Use 0 as the cost for the selected insertion:
+			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
+			//   no other insertion to compare with.
+			// - We assume that the travel times obtained from DvrpTravelTimeMatrix are reasonably well estimated(*),
+			//   so we do not want to check for time window violations
+			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
+			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
+			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
+					zeroCostInsertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();
 
-		addModalComponent(SingleInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
-
-			@Override
-			public SingleInsertionDetourPathCalculator get() {
-				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new SingleInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
-			}
-		});
+		addModalComponent(SingleInsertionDetourPathCalculator.class,
+				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+					@Override
+					public SingleInsertionDetourPathCalculator get() {
+						var travelTime = getModalInstance(TravelTime.class);
+						Network network = getModalInstance(Network.class);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new SingleInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
+					}
+				});
 		bindModal(DetourPathCalculator.class).to(modalKey(SingleInsertionDetourPathCalculator.class));
 	}
 }

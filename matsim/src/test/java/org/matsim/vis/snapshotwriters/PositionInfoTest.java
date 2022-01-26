@@ -41,7 +41,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_shortLink() {
 
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(1000, 1000));
 		Link link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), node1, node2, 1000, 10, 9999, 1);
 
@@ -76,8 +76,8 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_longLink() {
 
-		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+        Network network = NetworkUtils.createNetwork();
+        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(1000, 1000));
 		Link link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), node1, node2, 2000, 10, 9999, 1);
 

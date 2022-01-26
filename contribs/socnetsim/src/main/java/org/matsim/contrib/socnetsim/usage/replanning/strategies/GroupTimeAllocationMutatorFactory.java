@@ -28,6 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Inject;
 
@@ -48,17 +49,19 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 	// TODO make configurable again
 	private final double maxTemp = 1;
 
 	@Inject
 	public GroupTimeAllocationMutatorFactory( final Scenario sc , final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , final Provider<TripRouter> tripRouterFactory ,
-			@Strong final PlanLinkIdentifier planLinkIdentifier ) {
+			@Strong final PlanLinkIdentifier planLinkIdentifier, TimeInterpretation timeInterpretation ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -99,7 +102,7 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					config,
-					tripRouterFactory) );
+					tripRouterFactory, timeInterpretation) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(

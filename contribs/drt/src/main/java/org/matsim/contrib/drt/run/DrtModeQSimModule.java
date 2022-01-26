@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
@@ -31,11 +33,7 @@ import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRo
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -75,12 +73,10 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
 			@Inject
 			private EventsManager events;
-			@Inject
-			private MobsimTimer timer;
 
 			@Override
 			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events, timer);
+				return new DrtRequestCreator(getMode(), events);
 			}
 		}).asEagerSingleton();
 	}

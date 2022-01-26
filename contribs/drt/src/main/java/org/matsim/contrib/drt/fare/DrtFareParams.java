@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.fare;
 
 import java.util.Map;
 
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -42,7 +42,7 @@ public final class DrtFareParams extends ReflectiveConfigGroup {
 	public static final String MODE = "mode";
 
 	@PositiveOrZero
-	private double basefare;
+	private double baseFare;
 	@PositiveOrZero
 	private double minFarePerTrip = 0.0;
 	@PositiveOrZero
@@ -71,13 +71,13 @@ public final class DrtFareParams extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(BASEFARE)
-	public double getBasefare() {
-		return basefare;
+	public double getBaseFare() {
+		return baseFare;
 	}
 
 	@StringSetter(BASEFARE)
-	public void setBasefare(double basefare) {
-		this.basefare = basefare;
+	public void setBaseFare(double baseFare) {
+		this.baseFare = baseFare;
 	}
 
 	@StringGetter(MINFARE_PER_TRIP)

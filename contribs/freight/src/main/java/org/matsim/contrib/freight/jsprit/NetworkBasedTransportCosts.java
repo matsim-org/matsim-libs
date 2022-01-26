@@ -72,7 +72,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author stefan schröder
  *
  */
-public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts {
+public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 	public interface InternalLeastCostPathCalculatorListener {
 
@@ -840,10 +840,11 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 
 	private org.matsim.vehicles.Vehicle getMatsimVehicle(Vehicle vehicle) {
 		String typeId = vehicle.getType().getTypeId();
-		if (matsimVehicles.containsKey(typeId)) {
-			return matsimVehicles.get(typeId);
+		org.matsim.vehicles.Vehicle matsimVehicle = matsimVehicles.get(typeId);
+		if (matsimVehicle != null) {
+			return matsimVehicle;
 		}
-		org.matsim.vehicles.Vehicle matsimVehicle = new MatsimVehicleWrapper(vehicle);
+		matsimVehicle = new MatsimVehicleWrapper(vehicle);
 		matsimVehicles.put(typeId, matsimVehicle);
 		return matsimVehicle;
 	}
@@ -852,7 +853,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		return new TransportDataKey(fromId, toId, time, vehicleType);
 	}
 
-	LeastCostPathCalculator getRouter() {
+	public LeastCostPathCalculator getRouter() {
 		return createLeastCostPathCalculator();
 	}
 

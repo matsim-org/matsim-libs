@@ -28,17 +28,14 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 
 	@Rule
 	public MatsimTestUtils utils;
-	private static TransitConfigGroup transitConfigGroup;
-	private static ScenarioConfigGroup scenarioConfigGroup;
-	private static PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
-	private static IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
-	private static Population population;
+	private IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
+	private Population population;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		transitConfigGroup = new TransitConfigGroup();
-		scenarioConfigGroup = new ScenarioConfigGroup();
-		planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+	@Before
+	public void setUp() {
+		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
+		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
 
 		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("person");
 		personParams.setMarginalUtilityOfMoney(1);
@@ -91,14 +88,17 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 			PopulationUtils.putPersonAttribute(freightWithIncome2, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
 			population.addPerson(freightWithIncome2);
 		}
-		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population, planCalcScoreConfigGroup, scenarioConfigGroup, transitConfigGroup);
+		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population,
+				planCalcScoreConfigGroup,
+				scenarioConfigGroup,
+				transitConfigGroup);
 	}
 
 	@Test
 	public void testPersonWithNegativeIncome(){
 		Id<Person> id = Id.createPersonId("negativeIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
-		//person's attribute says it has 0 income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
+		//person's attribute says it has negative income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
 		makeAssert(params, 1d, 0.5d);
 	}
 
