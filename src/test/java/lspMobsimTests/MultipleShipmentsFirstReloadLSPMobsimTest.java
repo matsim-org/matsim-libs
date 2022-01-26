@@ -184,7 +184,7 @@ public class MultipleShipmentsFirstReloadLSPMobsimTest {
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }
-		lsp.scheduleSoultions();
+		lsp.scheduleSolutions();
 		
 		ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);

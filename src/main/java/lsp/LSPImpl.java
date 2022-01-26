@@ -59,7 +59,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	
 	@Override
-	public void scheduleSoultions() {
+	public void scheduleSolutions() {
 		solutionScheduler.scheduleSolutions();
 	}
 

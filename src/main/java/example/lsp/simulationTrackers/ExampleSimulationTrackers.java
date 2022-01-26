@@ -165,7 +165,7 @@ import lsp.shipment.LSPShipment;
 		}
 
 		//schedule the LSP with the shipments and according to the scheduler of the Resource
-		lsp.scheduleSoultions();
+		lsp.scheduleSolutions();
 
 		//Prepare LSPModule and add the LSP
 		ArrayList<LSP> lspList = new ArrayList<LSP>();

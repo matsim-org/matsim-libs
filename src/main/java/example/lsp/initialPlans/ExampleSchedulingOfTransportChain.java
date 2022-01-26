@@ -317,7 +317,7 @@ import lsp.resources.LSPResource;
         }
         
         //schedule the LSP with the shipments and according to the scheduler of the Resource
-        lsp.scheduleSoultions();
+        lsp.scheduleSolutions();
         
       //print the schedules for the assigned LSPShipments
         for(LSPShipment shipment : lsp.getShipments()) {

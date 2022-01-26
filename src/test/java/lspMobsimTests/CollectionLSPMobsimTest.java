@@ -156,7 +156,7 @@ public class CollectionLSPMobsimTest {
 				LSPShipment shipment = builder.build();
 				collectionLSP.assignShipmentToLSP( shipment );
 			}
-			collectionLSP.scheduleSoultions();
+			collectionLSP.scheduleSolutions();
 		}
 		final LSPs lsps;
 		{

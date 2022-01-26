@@ -314,7 +314,7 @@ import lsp.resources.LSPResource;
 				}
 				        
 				//schedule the LSP with the shipments and according to the scheduler of the Resource
-				lsp.scheduleSoultions();
+				lsp.scheduleSolutions();
 			
 				//set up simulation controler and LSPModule
 				ArrayList<LSP> lspList = new ArrayList<LSP>();

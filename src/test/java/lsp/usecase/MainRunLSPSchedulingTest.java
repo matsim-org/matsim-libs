@@ -220,7 +220,7 @@ public class MainRunLSPSchedulingTest {
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }
-		 lsp.scheduleSoultions();
+		 lsp.scheduleSolutions();
 	
 	}
 	

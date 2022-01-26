@@ -22,7 +22,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
@@ -96,7 +95,7 @@ import java.util.*;
 
 		//schedule the LSP with the shipments and according to the scheduler of the Resource
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-		lsp.scheduleSoultions();
+		lsp.scheduleSolutions();
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
@@ -116,9 +115,9 @@ import java.util.*;
 			log.info( "" );
 			log.info( "Create depot" );
 
-			//The scheduler for the first reloading point is created --> this will be the depot in this usecase
+			//The scheduler for the first reloading point is created --> this will be the depot in this use case
 			LSPResourceScheduler depotScheduler = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance()
-					.setCapacityNeedFixed(10) //Time needed fixed (for Scheduler)
+					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
 					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
 					.build();
 
@@ -127,13 +126,13 @@ import java.util.*;
 					.setReloadingScheduler( depotScheduler )
 					.build();
 		}
-		
+
 		LogisticsSolutionElement depotElement;
 		{
 			//The SolutionElement for the first reloading point is created
 			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
 				.setResource( depotResource )
-				.build(); //Nicht unbedingt nötig, aber nehme das alte Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
+				.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 			//Maybe TODO: Depot als LogisticSolutionElement raus nehmen.(?)
 		}
 
@@ -307,7 +306,7 @@ import java.util.*;
 				log.info("");
 				log.info("set up logistic Solution - original solution is created");
 
-				//Das ist wichtig, damit er die die Kette zur Verfügung hat.
+				//Das ist wichtig, damit er die Kette zur Verfügung hat.
 				depotElement.setNextElement(mainRunElement);
 				mainRunElement.setNextElement(hubElement);
 				hubElement.setNextElement(distributionElement);
@@ -333,7 +332,7 @@ import java.util.*;
 
 				List<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(
 						depotResource, mainRunResource, hubResource, distributionAdapter
-				)); //TODO KMT Dez21: Hole es aus allen SolutionElementes.getRessource und nicht "per-Hand". -In UtilsKlasse(?) extractRewourcesFromSolutionElements()
+				)); //TODO KMT Dez21: Hole es aus allen SolutionElementes.getRessource und nicht "per-Hand". -In UtilsKlasse(?) extractResourcesFromSolutionElements()
 
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 

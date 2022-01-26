@@ -279,7 +279,7 @@ public class CompleteLSPMobsimTest {
 	        	LSPShipment shipment = builder.build();
 	        	completeLSP.assignShipmentToLSP(shipment);
 	        }
-		completeLSP.scheduleSoultions();
+		completeLSP.scheduleSolutions();
 		
 		ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(completeLSP);

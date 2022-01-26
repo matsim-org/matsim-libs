@@ -132,7 +132,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
         	LSPShipment shipment = builder.build();
         	collectionLSP.assignShipmentToLSP(shipment);
         }
-		collectionLSP.scheduleSoultions();
+		collectionLSP.scheduleSolutions();
 		
 	}
 	

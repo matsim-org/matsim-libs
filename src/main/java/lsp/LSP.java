@@ -29,7 +29,7 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
 	/**
 	 * ok (behavioral method)
 	 */
-	void scheduleSoultions();
+	void scheduleSolutions();
 	
 	/**
 	 * @return
