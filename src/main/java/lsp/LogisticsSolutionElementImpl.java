@@ -1,31 +1,29 @@
 package lsp;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.handler.EventHandler;
-
+import lsp.controler.LSPSimulationTracker;
 import lsp.functions.LSPInfo;
 import lsp.resources.LSPResource;
-import lsp.controler.LSPSimulationTracker;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.handler.EventHandler;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 
 /* package-private */ class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
 
-	private Id<LogisticsSolutionElement>id;
-	//die beiden nicht im Builder. Die koennen erst in der Solution als ganzes gesetzt werden
+	private final Id<LogisticsSolutionElement>id;
+	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
 	private LogisticsSolutionElement nextElement;
-	private LSPResource resource;
-	private WaitingShipments incomingShipments;
-	private WaitingShipments outgoingShipments;
+	private final LSPResource resource;
+	private final WaitingShipments incomingShipments;
+	private final WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private Collection<LSPInfo> infos;
-	private Collection<LSPSimulationTracker> trackers;
-	private Collection<EventHandler> handlers;
+	private final Collection<LSPInfo> infos;
+	private final Collection<LSPSimulationTracker> trackers;
+	private final Collection<EventHandler> handlers;
 //	private EventsManager eventsManager;
 
 	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
@@ -74,7 +72,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 //	@Override
-//	//KMT, KN: Never Used? -- Wäre wenn eher eh was für eine Utilsklasse. (ggf. mit anderem Namen). Frage: gedoppelt mit Scheduler?
+//	//KMT, KN: Never Used? -- Wäre wenn eher eh was für eine Utils-klasse. (ggf. mit anderem Namen). Frage: gedoppelt mit Scheduler?
 //	public void schedulingOfResourceCompleted() {
 //		for( ShipmentWithTime tuple : outgoingShipments.getSortedShipments()){
 //			nextElement.getIncomingShipments().addShipment(tuple.getTime(), tuple.getShipment());
