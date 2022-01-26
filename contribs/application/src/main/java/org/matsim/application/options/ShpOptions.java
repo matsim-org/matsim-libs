@@ -149,6 +149,11 @@ public final class ShpOptions {
 		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		if (features.size() > 1) {
 			for (SimpleFeature simpleFeature : features) {
+				if (simpleFeature.getDefaultGeometry() == null) {
+					log.warn("Features {} has no geometry", simpleFeature);
+					continue;
+				}
+
 				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
 				geometry.union(subArea);
 			}
@@ -247,6 +252,11 @@ public final class ShpOptions {
 			FeatureReader<SimpleFeatureType, SimpleFeature> it = ds.getFeatureReader();
 			while (it.hasNext()) {
 				SimpleFeature ft = it.next();
+
+				if (ft.getDefaultGeometry() == null) {
+					log.warn("Feature {} has no geometry", ft);
+					continue;
+				}
 
 				if (filter != null && !filter.contains(ft.getAttribute(attr)))
 					continue;
