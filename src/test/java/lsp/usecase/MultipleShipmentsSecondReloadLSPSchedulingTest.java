@@ -166,11 +166,11 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		
 		
 		
-		collectionElement.setNextElement(firstReloadElement);
+		collectionElement.connectWithNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
 		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
 		secondReloadElement.setPreviousElement(mainRunElement);
 		
 		

@@ -136,7 +136,7 @@ public class LSPUtils{
 				}
 				else{
 					currentElement = element;
-					previousElement.setNextElement(currentElement);
+					previousElement.connectWithNextElement(currentElement);
 					currentElement.setPreviousElement(previousElement);
 					previousElement = currentElement;
 				}

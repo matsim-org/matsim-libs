@@ -109,7 +109,7 @@ public class MultipleShipmentsFirstReloadLSPMobsimTest {
 		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
 		firstReloadElement = firstReloadingElementBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
+		collectionElement.connectWithNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
 		
 		

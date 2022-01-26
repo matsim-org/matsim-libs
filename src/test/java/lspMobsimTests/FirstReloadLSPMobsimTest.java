@@ -108,7 +108,7 @@ public class FirstReloadLSPMobsimTest {
 		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
 		firstReloadElement = firstReloadingElementBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
+		collectionElement.connectWithNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
 		
 		

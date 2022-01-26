@@ -198,13 +198,13 @@ import lsp.resources.LSPResource;
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
 		//The Order of the logisticsSolutionElements is now specified
-		collectionElement.setNextElement(firstReloadElement);
+		collectionElement.connectWithNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
 		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
 		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
 		distributionElement.setPreviousElement(secondReloadElement);	
 		
 		

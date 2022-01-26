@@ -288,11 +288,11 @@ import java.util.*;
 //		log.info("");
 //		log.info("The Order of the logisticsSolutionElements is now specified");
 //		//The Order of the logisticsSolutionElements is now specified
-//		firstReloadElement.setNextElement(mainRunElement);
+//		firstReloadElement.connectWithNextElement(mainRunElement);
 //		mainRunElement.setPreviousElement(firstReloadElement);
-//		mainRunElement.setNextElement(secondReloadElement);
+//		mainRunElement.connectWithNextElement(secondReloadElement);
 //		secondReloadElement.setPreviousElement(mainRunElement);
-//		secondReloadElement.setNextElement(directDistributionElement);
+//		secondReloadElement.connectWithNextElement(directDistributionElement);
 //		directDistributionElement.setPreviousElement(secondReloadElement);
 
 
@@ -307,9 +307,9 @@ import java.util.*;
 				log.info("set up logistic Solution - original solution is created");
 
 				//Das ist wichtig, damit er die Kette zur Verfügung hat.
-				depotElement.setNextElement(mainRunElement);
-				mainRunElement.setNextElement(hubElement);
-				hubElement.setNextElement(distributionElement);
+				depotElement.connectWithNextElement(mainRunElement);
+				mainRunElement.connectWithNextElement(hubElement);
+				hubElement.connectWithNextElement(distributionElement);
 
 				LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
 						Id.create("SolutionWithReloadingId", LogisticsSolution.class))
@@ -348,7 +348,7 @@ import java.util.*;
 
 				log.info("");
 				log.info("The order of the logisticsSolutionElements is now specified");
-				depotElement.setNextElement(directDistributionElement);	//TODO: Ist es Connect (beide Richtungen) oder nur setNext? -> Falls connect -> rename2: connectWithNextElement
+				depotElement.connectWithNextElement(directDistributionElement);	//TODO: Ist es Connect (beide Richtungen) oder nur setNext? -> Falls connect -> rename2: connectWithNextElement
 				directDistributionElement.setPreviousElement(depotElement); //Todo: Warum geht es in beide Richtungen??
 
 				//TODO WIP: KostenInfo an das Element dran hängen.

@@ -195,13 +195,13 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		distributionBuilder.setResource(distributionAdapter);
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
+		collectionElement.connectWithNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
 		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
 		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
 		distributionElement.setPreviousElement(secondReloadElement);
 		
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
