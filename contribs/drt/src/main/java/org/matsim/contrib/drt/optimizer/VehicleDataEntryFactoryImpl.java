@@ -29,10 +29,8 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -136,7 +134,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	}
 
 	static double calcVehicleSlackTime(DvrpVehicle vehicle, double now) {
-		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vehicle.getSchedule());
+		DefaultStayTask lastTask = (DefaultStayTask)Schedules.getLastTask(vehicle.getSchedule());
 		//if the last task is started, take 'now', otherwise take the planned begin time
 		double availableFromTime = Math.max(lastTask.getBeginTime(), now);
 		//for an already delayed vehicle, assume slack is 0 (instead of a negative number)

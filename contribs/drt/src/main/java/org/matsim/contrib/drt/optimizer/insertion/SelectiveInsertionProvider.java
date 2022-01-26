@@ -50,19 +50,19 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 				insertionCostCalculator);
 	}
 
-	private final BestInsertionFinder<Double> initialInsertionFinder;
+	private final BestInsertionFinder initialInsertionFinder;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
 	public SelectiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator restrictiveTimeEstimator,
 			ForkJoinPool forkJoinPool, InsertionCostCalculator restrictiveCostCalculator) {
-		this(new BestInsertionFinder<>(restrictiveCostCalculator),
+		this(new BestInsertionFinder(restrictiveCostCalculator),
 				new InsertionGenerator(drtCfg.getStopDuration(), restrictiveTimeEstimator), forkJoinPool);
 	}
 
 	@VisibleForTesting
-	SelectiveInsertionProvider(BestInsertionFinder<Double> initialInsertionFinder,
-			InsertionGenerator insertionGenerator, ForkJoinPool forkJoinPool) {
+	SelectiveInsertionProvider(BestInsertionFinder initialInsertionFinder, InsertionGenerator insertionGenerator,
+			ForkJoinPool forkJoinPool) {
 		this.initialInsertionFinder = initialInsertionFinder;
 		this.insertionGenerator = insertionGenerator;
 		this.forkJoinPool = forkJoinPool;
@@ -71,7 +71,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
-		Optional<InsertionWithDetourData<Double>> bestInsertion = forkJoinPool.submit(
+		Optional<InsertionWithDetourData> bestInsertion = forkJoinPool.submit(
 				// find best insertion given a stream of insertion with time data
 				() -> initialInsertionFinder.findBestInsertion(drtRequest,
 						//for each vehicle entry

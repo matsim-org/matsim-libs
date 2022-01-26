@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.util.*;
@@ -25,14 +46,14 @@ public class CarrierCapabilities {
 	}
 	
 	public static class Builder {
-		
+
 		public static Builder newInstance(){ return new Builder(); }
 		
-		private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
+		private final Collection<VehicleType> vehicleTypes = new ArrayList<>();
 
-		private Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
+		private final Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
 		
-		private Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
+		private final Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
 		
 		private FleetSize fleetSize = FleetSize.FINITE;
 		
@@ -83,7 +104,7 @@ public class CarrierCapabilities {
 	
 	private Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = new LinkedHashMap<>();
 	
-	private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
+	private Collection<VehicleType> vehicleTypes = new ArrayList<>();
 	
 	
 	/**

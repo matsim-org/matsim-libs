@@ -46,6 +46,7 @@ public final class TravelTimeMatrices {
 				.stream()
 				.map(z -> (lcpTree -> computeForDepartureZone(z, centralNodes, departureTime, travelTimeMatrix, lcpTree,
 						counter))));
+		counter.printCounter();
 
 		executorService.shutdown();
 		return travelTimeMatrix;
@@ -83,6 +84,7 @@ public final class TravelTimeMatrices {
 		executorService.submitRunnablesAndWait(nodes.stream()
 				.map(n -> (lcpTree -> computeForDepartureNode(n, nodes, departureTime, travelTimeMatrix, lcpTree,
 						counter, maxDistance))));
+		counter.printCounter();
 
 		executorService.shutdown();
 		return travelTimeMatrix;

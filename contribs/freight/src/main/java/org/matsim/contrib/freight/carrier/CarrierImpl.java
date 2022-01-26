@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.util.ArrayList;
@@ -20,18 +41,13 @@ public final class CarrierImpl implements Carrier {
 	public static Carrier newInstance( Id<Carrier> carrierId ){
 		return CarrierUtils.createCarrier( carrierId ) ;
 	}
+
 	private final Id<Carrier> id;
-
 	private final List<CarrierPlan> plans;
-
 	private final Map<Id<CarrierShipment>, CarrierShipment> shipments;
-
 	private final Map<Id<CarrierService>, CarrierService> services;
-
 	private CarrierCapabilities carrierCapabilities;
-	
 	private CarrierPlan selectedPlan;
-
 	private final Attributes attributes = new Attributes();
 
 	CarrierImpl( final Id<Carrier> id ) {
@@ -48,10 +64,6 @@ public final class CarrierImpl implements Carrier {
 		return id;
 	}
 
-//	@Override
-//	public Id getDepotLinkId() {
-//		return depotLinkId;
-//	}
 
 	@Override
 	public List<CarrierPlan> getPlans() {
@@ -120,7 +132,5 @@ public final class CarrierImpl implements Carrier {
 	public Attributes getAttributes() {
 		return attributes;
 	}
-
-
 
 }

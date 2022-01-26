@@ -62,10 +62,10 @@ public class InsertionCostCalculatorTest {
 				INFEASIBLE_SOLUTION_COST);
 	}
 
-	private <D> void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost) {
+	private void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator(
 				new CostCalculationStrategy.RejectSoftConstraintViolations());
-		var insertionWithDetourData = new InsertionWithDetourData<D>(insertion, null, detourTimeInfo);
+		var insertionWithDetourData = new InsertionWithDetourData(insertion, null, detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData.insertion,
 				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);
 	}

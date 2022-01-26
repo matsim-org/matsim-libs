@@ -1,28 +1,51 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.VehicleType;
 
 /**
+ * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
+ *
  * Loader that loads/assigns vehicleTypes to their vehicles and carriers respectively.
  * 
  * @author sschroeder
  *
  */
+@Deprecated
 public class CarrierVehicleTypeLoader {
 	
 	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeLoader.class);
-	
-	private Carriers carriers;
+
+	private final Carriers carriers;
 
 	/**
 	 * Constructs the loader with the carriers the types should be assigned to.
 	 * 
 	 * @param carriers
+	 *
+	 *  * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
 	 */
+	@Deprecated
 	public CarrierVehicleTypeLoader(Carriers carriers) {
 		super();
 		this.carriers = carriers;
@@ -32,29 +55,12 @@ public class CarrierVehicleTypeLoader {
 	 * Assigns types to carriers and their vehicles.
 	 * 
 	 * @param types
+	 *
+	 * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
 	 */
+	@Deprecated
 	public void loadVehicleTypes(CarrierVehicleTypes types){
-		for(Carrier c : carriers.getCarriers().values()){
-			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles().values()){
-				Id<org.matsim.vehicles.VehicleType> typeId = v.getVehicleTypeId();
-				if(typeId != null){
-					VehicleType vehicleType = types.getVehicleTypes().get(typeId);
-					if(vehicleType != null){
-						v.setType(vehicleType);
-						Collection<VehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
-						if(!vTypes.contains(vehicleType)){
-							vTypes.add(vehicleType);
-						}
-					}
-					else{
-						throw new IllegalStateException("cannot assign all vehicleTypes, since vehicleType to typeId \"" + typeId + "\" is missing.");
-					}
-				}
-				else{
-					logger.warn("vehicleTypeId is missing, thus no vehicleType can be assigned.");
-				}
-			}
-		}
+		logger.error("Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle.");
 	}
 
 }

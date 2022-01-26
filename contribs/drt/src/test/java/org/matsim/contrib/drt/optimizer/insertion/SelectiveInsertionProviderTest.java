@@ -46,9 +46,7 @@ public class SelectiveInsertionProviderTest {
 	@Rule
 	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
 
-	@SuppressWarnings("unchecked")
-	private final BestInsertionFinder<Double> initialInsertionFinder = (BestInsertionFinder<Double>)mock(
-			BestInsertionFinder.class);
+	private final BestInsertionFinder initialInsertionFinder = mock(BestInsertionFinder.class);
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
@@ -72,8 +70,8 @@ public class SelectiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var insertionWithDetourData = new InsertionWithDetourData<>(new Insertion(vehicleEntry, null, null),
-				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN), null);
+		var insertionWithDetourData = new InsertionWithDetourData(new Insertion(vehicleEntry, null, null),
+				new InsertionDetourData(null, null, null, null), null);
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(
 				List.of(insertionWithDetourData));
@@ -81,7 +79,7 @@ public class SelectiveInsertionProviderTest {
 		//mock initialInsertionFinder
 		var selectedInsertion = oneSelected ?
 				Optional.of(insertionWithDetourData) :
-				Optional.<InsertionWithDetourData<Double>>empty();
+				Optional.<InsertionWithDetourData>empty();
 		when(initialInsertionFinder.findBestInsertion(eq(request),
 				argThat(argument -> argument.collect(toSet()).equals(Set.of(insertionWithDetourData)))))//
 				.thenReturn(selectedInsertion);

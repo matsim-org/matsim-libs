@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.sharing.run.SharingConfigGroup;
 import org.matsim.contrib.sharing.run.SharingModes;
+import org.matsim.contrib.sharing.run.SharingQSimServiceModule;
 import org.matsim.contrib.sharing.run.SharingServiceConfigGroup;
 import org.matsim.contrib.sharing.service.events.SharingDropoffEvent;
 import org.matsim.contrib.sharing.service.events.SharingFailedDropoffEvent;
@@ -23,7 +24,7 @@ public class SharingUtils {
 	static public final String STATION_ID_ATTRIBUTE = "sharing:stationId";
 	static public final String SERVICE_ID_ATTRIBUTE = "sharing:service";
 
-	static public final String MODE_PREFIX = "sharing:";
+	static public final String MODE_PREFIX = "sharing_";
 
 	static public final double INTERACTION_DURATION = 60.0;
 

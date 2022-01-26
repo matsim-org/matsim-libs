@@ -1,5 +1,6 @@
 package org.matsim.contrib.sharing.run;
 
+import org.matsim.contrib.sharing.analysis.SharingAnalysisModule;
 import org.matsim.core.controler.AbstractModule;
 
 public class SharingModule extends AbstractModule {
@@ -11,5 +12,7 @@ public class SharingModule extends AbstractModule {
 		for (SharingServiceConfigGroup modeConfig : micromobilityConfig.getServices()) {
 			install(new SharingServiceModule(modeConfig));
 		}
+
+		install(new SharingAnalysisModule());
 	}
 }

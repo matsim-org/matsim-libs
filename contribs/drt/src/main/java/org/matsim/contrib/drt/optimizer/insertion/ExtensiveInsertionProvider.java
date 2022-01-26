@@ -73,21 +73,20 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
-		List<InsertionWithDetourData<Double>> preFilteredInsertions = forkJoinPool.submit(
-				() -> vehicleEntries.parallelStream()
-						//generate feasible insertions (wrt occupancy limits) with admissible detour times
-						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
-						//optimistic pre-filtering wrt admissible cost function
-						.filter(i -> admissibleCostCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)
-								< INFEASIBLE_SOLUTION_COST)
-						//collect
-						.collect(Collectors.toList())).join();
+		List<InsertionWithDetourData> preFilteredInsertions = forkJoinPool.submit(() -> vehicleEntries.parallelStream()
+				//generate feasible insertions (wrt occupancy limits) with admissible detour times
+				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
+				//optimistic pre-filtering wrt admissible cost function
+				.filter(i -> admissibleCostCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)
+						< INFEASIBLE_SOLUTION_COST)
+				//collect
+				.collect(Collectors.toList())).join();
 
 		if (preFilteredInsertions.isEmpty()) {
 			return List.of();
 		}
 
 		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.getNearestInsertionsAtEndLimit(),
-				insertionParams.getAdmissibleBeelineSpeedFactor(), preFilteredInsertions);
+				preFilteredInsertions);
 	}
 }

@@ -24,7 +24,8 @@ import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.base.MoreObjects;
@@ -84,6 +85,31 @@ public class InsertionGenerator {
 		}
 	}
 
+	private static InsertionPoint createPickupInsertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx,
+			boolean followedByDropoff) {
+		var pickupWaypoint = new Waypoint.Pickup(request);
+		var pickupPreviousWaypoint = vehicleEntry.getWaypoint(pickupIdx);
+		var pickupNextLink = followedByDropoff ?
+				new Waypoint.Dropoff(request) :
+				vehicleEntry.getWaypoint(pickupIdx + 1);
+		return new InsertionPoint(pickupIdx, pickupPreviousWaypoint, pickupWaypoint, pickupNextLink);
+	}
+
+	private static InsertionPoint createDropoffInsertion(DrtRequest request, VehicleEntry vehicleEntry,
+			InsertionPoint pickup, int dropoffIdx) {
+		var dropoffNextLink = vehicleEntry.getWaypoint(dropoffIdx + 1);
+
+		if (pickup.index == dropoffIdx) {
+			var dropoffPreviousLink = pickup.newWaypoint;
+			var dropoffWaypoint = (Waypoint.Dropoff)pickup.nextWaypoint;
+			return new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffWaypoint, dropoffNextLink);
+		}
+
+		var dropoffPreviousLink = vehicleEntry.getWaypoint(dropoffIdx);
+		var dropoffWaypoint = new Waypoint.Dropoff(request);
+		return new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffWaypoint, dropoffNextLink);
+	}
+
 	public static class Insertion {
 		public final VehicleEntry vehicleEntry;
 		public final InsertionPoint pickup;
@@ -95,23 +121,10 @@ public class InsertionGenerator {
 			this.dropoff = dropoff;
 		}
 
-		public Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
+		Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
-
-			Waypoint.Pickup pickupWaypoint = new Waypoint.Pickup(request);
-			Waypoint.Dropoff dropoffWaypoint = new Waypoint.Dropoff(request);
-
-			Waypoint pickupPreviousWaypoint = vehicleEntry.getWaypoint(pickupIdx);
-			Waypoint pickupNextLink = pickupIdx == dropoffIdx ?
-					dropoffWaypoint :
-					vehicleEntry.getWaypoint(pickupIdx + 1);
-			pickup = new InsertionPoint(pickupIdx, pickupPreviousWaypoint, pickupWaypoint, pickupNextLink);
-
-			Waypoint dropoffPreviousLink = pickupIdx == dropoffIdx ?
-					pickupWaypoint :
-					vehicleEntry.getWaypoint(dropoffIdx);
-			Waypoint dropoffNextLink = vehicleEntry.getWaypoint(dropoffIdx + 1);
-			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffWaypoint, dropoffNextLink);
+			pickup = createPickupInsertion(request, vehicleEntry, pickupIdx, pickupIdx == dropoffIdx);
+			dropoff = createDropoffInsertion(request, vehicleEntry, pickup, dropoffIdx);
 		}
 
 		@Override
@@ -124,25 +137,24 @@ public class InsertionGenerator {
 		}
 	}
 
-	private final DetourTime detourTime;
-	private final InsertionDetourTimeCalculator<Double> detourTimeCalculator;
+	private final DetourTimeEstimator detourTimeEstimator;
+	private final InsertionDetourTimeCalculator detourTimeCalculator;
 
 	public InsertionGenerator(double stopDuration, DetourTimeEstimator detourTimeEstimator) {
-		detourTime = new DetourTime(detourTimeEstimator);
-		detourTimeCalculator = new InsertionDetourTimeCalculator<>(stopDuration, Double::doubleValue,
-				detourTimeEstimator);
+		this.detourTimeEstimator = detourTimeEstimator;
+		detourTimeCalculator = new InsertionDetourTimeCalculator(stopDuration, detourTimeEstimator);
 	}
 
-	public List<InsertionWithDetourData<Double>> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
+	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
 		int stopCount = vEntry.stops.size();
-		List<InsertionWithDetourData<Double>> insertions = new ArrayList<>();
+		List<InsertionWithDetourData> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
 			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
 				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
-					generateDropoffInsertions(drtRequest, vEntry, i, detourTime, insertions);
+					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
 				}
 				// else: do not evaluate insertion _before_stop i, evaluate only insertion _after_ stop i
 			}
@@ -150,37 +162,82 @@ public class InsertionGenerator {
 			occupancy = nextStop.outgoingOccupancy;
 		}
 
-		generateDropoffInsertions(drtRequest, vEntry, stopCount, detourTime, insertions);// at/after last stop
+		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// at/after last stop
 
 		return insertions;
 	}
 
-	//TODO replace argument: int i -> InsertionPoint pickup//?
-	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleEntry vEntry, int i, DetourTime detourTime,
-			List<InsertionWithDetourData<Double>> insertions) {
+	private void generateDropoffInsertions(DrtRequest request, VehicleEntry vEntry, int i,
+			List<InsertionWithDetourData> insertions) {
+		var pickupInsertion = createPickupInsertion(request, vEntry, i, true);
+		double toPickupTT = detourTimeEstimator.estimateTime(pickupInsertion.previousWaypoint.getLink(),
+				request.getFromLink());
+		double fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(),
+				pickupInsertion.nextWaypoint.getLink());
+		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
+				fromPickupTT, true);
+
 		int stopCount = vEntry.stops.size();
-		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
-			// i -> pickup -> i+1 && j -> dropoff -> j+1
-
-			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
-				Waypoint.Stop currentStop = currentStop(vEntry, j);
-				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
-					if (drtRequest.getToLink() == currentStop.task.getLink()) {
-						//special case -- we can insert dropoff exactly at node j
-						insertions.add(createInsertionWithDetourData(drtRequest, vEntry, i, j));
-					}
-
-					return;// stop iterating -- cannot insert dropoff after node j
-				}
+		// i == j
+		if (vEntry.getSlackTime(i) >= pickupDetourInfo.pickupTimeLoss) {
+			// insertion: i -> pickup -> dropoff -> i+1 (only if time slack allows)
+			int j = i;
+			if (i == stopCount || request.getToLink() != nextStop(vEntry, j).task.getLink()) {
+				// next stop at different link
+				// otherwise, do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
+				addInsertion(insertions,
+						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+								j));
 			}
-
-			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
-				insertions.add(createInsertionWithDetourData(drtRequest, vEntry, i, j));
-			}
-			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
-		insertions.add(createInsertionWithDetourData(drtRequest, vEntry, i, stopCount));// insertion after last stop
+		if (i == stopCount) {
+			// insertion after last stop
+			return;
+		}
+
+		//calculate it once for all j > i
+		pickupInsertion = createPickupInsertion(request, vEntry, i, false);
+		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink());
+		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
+				false);
+
+		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
+			return; // skip all insertions: i -> pickup -> dropoff
+		}
+
+		for (int j = i + 1; j < stopCount; j++) {// insertions up to before last stop
+			// i -> pickup -> i+1 && j -> dropoff -> j+1
+			// check the capacity constraints if i < j (already validated for `i == j`)
+			Waypoint.Stop currentStop = currentStop(vEntry, j);
+			if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
+				if (request.getToLink() == currentStop.task.getLink()) {
+					//special case -- we can insert dropoff exactly at node j
+					addInsertion(insertions,
+							createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT,
+									pickupDetourInfo, j));
+				}
+
+				return;// stop iterating -- cannot insert dropoff after node j
+			}
+
+			if (request.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
+				//do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
+				addInsertion(insertions,
+						createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+								j));
+			}
+		}
+
+		addInsertion(insertions,
+				createInsertionWithDetourData(request, vEntry, pickupInsertion, fromPickupTT, pickupDetourInfo,
+						stopCount));
+	}
+
+	private void addInsertion(List<InsertionWithDetourData> insertions, InsertionWithDetourData insertion) {
+		if (insertion != null) {
+			insertions.add(insertion);
+		}
 	}
 
 	private Waypoint.Stop currentStop(VehicleEntry entry, int insertionIdx) {
@@ -191,16 +248,26 @@ public class InsertionGenerator {
 		return entry.stops.get(insertionIdx);
 	}
 
-	private InsertionWithDetourData<Double> createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
-			int pickupIdx, int dropoffIdx) {
-		var insertion = new Insertion(request, vehicleEntry, pickupIdx, dropoffIdx);
-		double toPickup = detourTime.calcToPickupTime(insertion, request);
-		double fromPickup = detourTime.calcFromPickupTime(insertion, request);
-		double toDropoff = detourTime.calcToDropoffTime(insertion, request);
-		double fromDropoff = detourTime.calcFromDropoffTime(insertion, request);
-		var insertionDetourData = new InsertionDetourData<>(toPickup, fromPickup, toDropoff, fromDropoff);
+	private InsertionWithDetourData createInsertionWithDetourData(DrtRequest request, VehicleEntry vehicleEntry,
+			InsertionPoint pickupInsertion, double fromPickupTT, PickupDetourInfo pickupDetourInfo, int dropoffIdx) {
+		var dropoffInsertion = createDropoffInsertion(request, vehicleEntry, pickupInsertion, dropoffIdx);
+		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion);
 
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData);
-		return new InsertionWithDetourData<>(insertion, insertionDetourData, detourTimeInfo);
+		double toDropoffTT = pickupInsertion.index == dropoffIdx ?
+				fromPickupTT :
+				detourTimeEstimator.estimateTime(dropoffInsertion.previousWaypoint.getLink(), request.getToLink());
+		double fromDropoffTT = dropoffIdx == vehicleEntry.stops.size() ?
+				0 :
+				detourTimeEstimator.estimateTime(request.getToLink(), dropoffInsertion.nextWaypoint.getLink());
+
+		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
+				pickupDetourInfo);
+
+		if (vehicleEntry.getSlackTime(dropoffIdx)
+				< pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss) {
+			return null; // skip this dropoff insertion
+		}
+
+		return new InsertionWithDetourData(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
 	}
 }

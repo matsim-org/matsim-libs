@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -32,13 +33,12 @@ public interface CostCalculationStrategy {
 	 * @param detourTimeInfo
 	 * @return the cost of insertion, INFEASIBLE_SOLUTION_COST if insertion is not feasible
 	 */
-	double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
-			InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo);
+	double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, DetourTimeInfo detourTimeInfo);
 
 	class RejectSoftConstraintViolations implements CostCalculationStrategy {
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
-				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
+				DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 			if (detourTimeInfo.pickupDetourInfo.departureTime > request.getLatestStartTime()
 					|| detourTimeInfo.dropoffDetourInfo.arrivalTime > request.getLatestArrivalTime()) {
@@ -58,7 +58,7 @@ public interface CostCalculationStrategy {
 
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
-				InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
+				DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 			double waitTimeViolation = Math.max(0,
 					detourTimeInfo.pickupDetourInfo.departureTime - request.getLatestStartTime());
