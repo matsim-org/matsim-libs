@@ -164,13 +164,10 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		
 		
 		collectionElement.connectWithNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
 		firstReloadElement.connectWithNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
 		mainRunElement.connectWithNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		
-		
+
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);

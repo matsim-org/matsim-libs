@@ -193,13 +193,9 @@ public class CompleteSolutionTest {
 		distributionElement = distributionBuilder.build();
 
 		collectionElement.connectWithNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
 		firstReloadElement.connectWithNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
 		mainRunElement.connectWithNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
 		secondReloadElement.connectWithNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);
 
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );

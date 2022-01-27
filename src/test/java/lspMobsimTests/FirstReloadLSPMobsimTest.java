@@ -109,9 +109,8 @@ public class FirstReloadLSPMobsimTest {
 		firstReloadElement = firstReloadingElementBuilder.build();
 		
 		collectionElement.connectWithNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		
-		
+
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);

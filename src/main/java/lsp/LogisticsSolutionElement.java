@@ -17,8 +17,7 @@ public interface LogisticsSolutionElement {
 	void setLogisticsSolution(LogisticsSolution solution);
 	
 	LogisticsSolution getLogisticsSolution();
-	
-	void setPreviousElement(LogisticsSolutionElement element);
+
 	
 	void connectWithNextElement(LogisticsSolutionElement element);
 	

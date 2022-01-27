@@ -42,19 +42,11 @@ import java.util.Collection;
 		return id;
 	}
 
-	@Override
-	public void setPreviousElement(LogisticsSolutionElement element) {
-		this.previousElement = element;
-	}
 
 	@Override
 	public void connectWithNextElement(LogisticsSolutionElement element) {
 		this.nextElement = element;
-		element.setPreviousElement(this);
-		//TODO KMT Dez21: add some functionality like
-		// * element.setPreviousElement(this); ->
-		// * rename Method to connectWithNextElement and co the bi-directional connection
-		// * and remove "setPreviousElement
+		((LogisticsSolutionElementImpl) element).previousElement = this;
 	}
 
 	@Override

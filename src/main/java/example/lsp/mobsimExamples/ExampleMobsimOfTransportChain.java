@@ -201,15 +201,11 @@ import lsp.resources.LSPResource;
 		
 		//The Order of the logisticsSolutionElements is now specified
 		collectionElement.connectWithNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
 		firstReloadElement.connectWithNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
 		mainRunElement.connectWithNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
 		secondReloadElement.connectWithNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);	
-		
-		
+
+
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
