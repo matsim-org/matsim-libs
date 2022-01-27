@@ -348,8 +348,7 @@ import java.util.*;
 
 				log.info("");
 				log.info("The order of the logisticsSolutionElements is now specified");
-				depotElement.connectWithNextElement(directDistributionElement);	//TODO: Ist es Connect (beide Richtungen) oder nur setNext? -> Falls connect -> rename2: connectWithNextElement
-				//Todo: Warum geht es in beide Richtungen??
+				depotElement.connectWithNextElement(directDistributionElement);
 
 				//TODO WIP: KostenInfo an das Element dran hängen.
 
