@@ -7,7 +7,9 @@ import lsp.shipment.LSPShipment;
 
 /* package-private */ class ForwardSolutionSchedulerImpl implements SolutionScheduler {
 
-	private class ResourceNeighbours{
+	private static class ResourceNeighbours{
+		// internal data structure, try to ignore when looking from outside.  kai/kai, jan'22
+
 		private ArrayList<LSPResource> predecessors;
 		private ArrayList<LSPResource> successors;
 		private LSPResource resource;
@@ -55,6 +57,7 @@ import lsp.shipment.LSPShipment;
 	}
 
 	private void setResourceNeighbours() {
+		// internal data structure, try to ignore when looking from outside.  kai/kai, jan'22
 		neighbourList.clear();
 		for(LSPResource resource : lsp.getResources()) {
 			ResourceNeighbours neighbours = new ResourceNeighbours(resource);
