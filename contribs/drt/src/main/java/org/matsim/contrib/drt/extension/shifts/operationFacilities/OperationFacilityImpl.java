@@ -6,10 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author nkuehnel / MOIA
@@ -82,8 +79,8 @@ public class OperationFacilityImpl implements OperationFacility {
     }
 
     @Override
-    public Id<Charger> getCharger() {
-        return charger;
+    public Optional<Id<Charger>> getCharger() {
+        return Optional.ofNullable(charger);
     }
 
     @Override

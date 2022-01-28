@@ -44,14 +44,14 @@ public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShi
 
     @Override
     public void handleEvent(DrtShiftBreakStartedEvent event) {
-        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak();
+        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
         final double earliestBreakStartTime = drtShiftBreak.getEarliestBreakStartTime();
         shift2plannedVsActualBreakStart.put(event.getShiftId(), new Tuple<>(earliestBreakStartTime, event.getTime()));
     }
 
     @Override
     public void handleEvent(DrtShiftBreakEndedEvent event) {
-        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak();
+        final DrtShiftBreakSpecification drtShiftBreak = shifts.getShiftSpecifications().get(event.getShiftId()).getBreak().orElseThrow();
         final double latestBreakEndTime = drtShiftBreak.getLatestBreakEndTime();
         shift2plannedVsActualBreakEnd.put(event.getShiftId(), new Tuple<>(latestBreakEndTime, event.getTime()));
     }

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -173,7 +174,7 @@ public class TripsAndLegsCSVWriter {
 					double waitingTime = boardingTime - leg.getDepartureTime().seconds();
                     totalWaitingTime += waitingTime;
                 }
-                if (legDist > currentLongestShareDistance) {
+                if (StringUtils.isBlank(currentModeWithLongestShare) || legDist > currentLongestShareDistance) {
                     currentLongestShareDistance = legDist;
                     currentModeWithLongestShare = leg.getMode();
 

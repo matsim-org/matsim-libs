@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.Map;
 
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;

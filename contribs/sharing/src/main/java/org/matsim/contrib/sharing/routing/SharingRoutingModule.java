@@ -61,7 +61,9 @@ public class SharingRoutingModule implements RoutingModule {
 			return null;
 		}
 
-		if (pickupInteraction.get().equals(dropoffInteraction.get())) {
+		InteractionPoint a = pickupInteraction.get();
+		InteractionPoint b = dropoffInteraction.get();
+		if (a.equals(b)) {
 			return null;
 		}
 

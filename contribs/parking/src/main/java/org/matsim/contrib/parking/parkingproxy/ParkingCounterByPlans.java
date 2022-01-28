@@ -19,9 +19,11 @@
 package org.matsim.contrib.parking.parkingproxy;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.parkingproxy.AccessEgressFinder.LegActPair;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.contrib.parking.parkingproxy.AccessEgressFinder.LegActPair;
 
 /**
  * <b>For some reason not working at the moment</b></br>
@@ -65,28 +67,34 @@ class ParkingCounterByPlans implements IterationStartsListener, PenaltyGenerator
 	}
 
 	/**
-	 * Iterates over all plans and calls the {@linkplain MovingEntityCounter#handleArrival(int, double, double, int)}
-	 * and {@linkplain MovingEntityCounter#handleDeparture(int, double, double, int)} functions whenever an
-	 * arrival or departure is detected. More precisely, the functions are called whenever an egress leg
-	 * after a car leg starts and whenever an access leg followed by a car leg ends.
+	 * Gets the current population from the event services and calls {@link #calculateByPopulation(Population)}.
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		for (Person p : event.getServices().getScenario().getPopulation().getPersons().values()) {
+		calculateByPopulation(event.getServices().getScenario().getPopulation(), event.getServices().getScenario().getNetwork());
+	}
+	
+	/**
+	 * Iterates over all plans and calls the {@linkplain MovingEntityCounter#handleArrival(int, double, double, int)}
+	 * and {@linkplain MovingEntityCounter#handleDeparture(int, double, double, int)} functions whenever an
+	 * arrival or departure is detected. More precisely, the functions are called whenever an egress leg
+	 * after a car leg starts and whenever an access leg followed by a car leg ends. The Coordinate used is
+	 * the to-coord of the link the activity is at which is consistent with how {@linkplain ParkingVehiclesCountEventHandler}
+	 * currently does things.
+	 */
+	public void calculateByPopulation(Population pop, Network network) {
+		for (Person p : pop.getPersons().values()) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
 				carCounter.handleArrival(
-						(int)walkActPair.leg.getDepartureTime().seconds(),
-						walkActPair.act.getCoord().getX(),
-						walkActPair.act.getCoord().getY(),
+						(int) walkActPair.leg.getDepartureTime().seconds(),
+						network.getLinks().get(walkActPair.act.getLinkId()).getToNode().getCoord(),
 						carWeight
 						);
 			}
 			for (LegActPair walkActPair : this.egressFinder.findAccessWalks(p.getSelectedPlan())) {
 				carCounter.handleDeparture(
-						(int) (walkActPair.leg.getDepartureTime().seconds() + walkActPair.leg.getTravelTime()
-								.seconds()),
-						walkActPair.act.getCoord().getX(),
-						walkActPair.act.getCoord().getY(),
+						(int) (walkActPair.leg.getDepartureTime().seconds() + walkActPair.leg.getTravelTime().seconds()),
+						network.getLinks().get(walkActPair.act.getLinkId()).getToNode().getCoord(),
 						carWeight
 						);
 			}

@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.io.BufferedWriter;
@@ -19,7 +40,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * A writer that writes carriers and their plans in an xml-file.
+ * A writer that writes carriers and their plans in a xml-file.
  * 
  * @author sschroeder
  *
@@ -29,12 +50,9 @@ import org.matsim.core.utils.misc.Time;
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
 	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
-
-	private Collection<Carrier> carriers;
-
+	private final Collection<Carrier> carriers;
 	private int idCounter = 0;
-
-	private Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<CarrierShipment, Id<Shipment>>();
+	private final Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();
 
 	/**
 	 * Constructs the writer with the carriers to be written.

@@ -1,11 +1,8 @@
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -21,7 +18,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(getClassInputDirectory() + "vehicleTypes.xml");
 		carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers).readFile(getClassInputDirectory() + "carrierPlansEquils.xml" );
+		new CarrierPlanXmlReader(carriers, types ).readFile(getClassInputDirectory() + "carrierPlansEquils.xml" );
 	}
 
 	@Test

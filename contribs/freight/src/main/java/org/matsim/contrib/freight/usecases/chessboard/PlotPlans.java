@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import com.graphhopper.jsprit.analysis.toolbox.Plotter;
@@ -25,13 +46,13 @@ final class PlotPlans {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9.xml");
 
+        CarrierVehicleTypes types = new CarrierVehicleTypes();
+        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
 
         final Carriers carriers = new Carriers();
 //		new CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
-        new CarrierPlanXmlReader(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
+        new CarrierPlanXmlReader(carriers, types ).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
 
-        CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1",Carrier.class));

@@ -24,6 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.DiscourageSoftConstraintViolations.MAX_TRAVEL_TIME_VIOLATION_PENALTY;
 import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.DiscourageSoftConstraintViolations.MAX_WAIT_TIME_VIOLATION_PENALTY;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
@@ -35,17 +37,21 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 public class CostCalculationStrategyTest {
 	@Test
 	public void RejectSoftConstraintViolations_tooLongWaitTime() {
-		assertRejectSoftConstraintViolations(10, 9999, new DetourTimeInfo(11, 22, 0, 0), INFEASIBLE_SOLUTION_COST);
+		assertRejectSoftConstraintViolations(10, 9999,
+				new DetourTimeInfo(new PickupDetourInfo(11, 0), new DropoffDetourInfo(22, 0)),
+				INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	public void RejectSoftConstraintViolations_tooLongTravelTime() {
-		assertRejectSoftConstraintViolations(9999, 10, new DetourTimeInfo(0, 11, 0, 0), INFEASIBLE_SOLUTION_COST);
+		assertRejectSoftConstraintViolations(9999, 10,
+				new DetourTimeInfo(new PickupDetourInfo(0, 0), new DropoffDetourInfo(11, 0)), INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	public void RejectSoftConstraintViolations_allConstraintSatisfied() {
-		assertRejectSoftConstraintViolations(9999, 9999, new DetourTimeInfo(11, 22, 33, 44), 33 + 44);
+		assertRejectSoftConstraintViolations(9999, 9999,
+				new DetourTimeInfo(new PickupDetourInfo(11, 33), new DropoffDetourInfo(22, 44)), 33 + 44);
 	}
 
 	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
@@ -60,19 +66,22 @@ public class CostCalculationStrategyTest {
 
 	@Test
 	public void DiscourageSoftConstraintViolations_tooLongWaitTime() {
-		assertDiscourageSoftConstraintViolations(10, 9999, new DetourTimeInfo(11, 22, 0, 0),
+		assertDiscourageSoftConstraintViolations(10, 9999,
+				new DetourTimeInfo(new PickupDetourInfo(11, 0), new DropoffDetourInfo(22, 0)),
 				MAX_WAIT_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
 	public void DiscourageSoftConstraintViolations_tooLongTravelTime() {
-		assertDiscourageSoftConstraintViolations(9999, 10, new DetourTimeInfo(0, 11, 0, 0),
+		assertDiscourageSoftConstraintViolations(9999, 10,
+				new DetourTimeInfo(new PickupDetourInfo(0, 0), new DropoffDetourInfo(11, 0)),
 				MAX_TRAVEL_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
 	public void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
-		assertDiscourageSoftConstraintViolations(9999, 9999, new DetourTimeInfo(11, 22, 33, 44), 33 + 44);
+		assertDiscourageSoftConstraintViolations(9999, 9999,
+				new DetourTimeInfo(new PickupDetourInfo(11, 33), new DropoffDetourInfo(22, 44)), 33 + 44);
 	}
 
 	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,

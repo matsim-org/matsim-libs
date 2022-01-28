@@ -43,4 +43,8 @@ public class InteractionPoint {
 	static public InteractionPoint of(SharingStation station) {
 		return new InteractionPoint(station.getLink().getId(), Optional.of(station.getId()));
 	}
+
+	public boolean equals(InteractionPoint interactionPoint) {
+		return interactionPoint.getLinkId().equals(this.getLinkId());
+	}
 }

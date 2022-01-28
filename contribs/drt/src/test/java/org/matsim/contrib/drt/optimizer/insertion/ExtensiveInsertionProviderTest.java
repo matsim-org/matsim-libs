@@ -21,6 +21,8 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,7 +46,7 @@ public class ExtensiveInsertionProviderTest {
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
-		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(null),
+		var insertionProvider = new ExtensiveInsertionProvider(null, null, new InsertionGenerator(120, null),
 				rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
 	}
@@ -76,13 +78,11 @@ public class ExtensiveInsertionProviderTest {
 						insertionWithDetourData(infeasibleInsertion)));
 
 		//mock admissibleCostCalculator
-		@SuppressWarnings("unchecked")
-		var admissibleCostCalculator = (InsertionCostCalculator<Double>)mock(InsertionCostCalculator.class);
-		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == feasibleInsertion))).thenReturn(1.);
-		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == infeasibleInsertion)))//
-				.thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
+		var admissibleCostCalculator = (InsertionCostCalculator)mock(InsertionCostCalculator.class);
+		when(admissibleCostCalculator.calculate(eq(request), argThat(argument -> argument == feasibleInsertion),
+				any())).thenReturn(1.);
+		when(admissibleCostCalculator.calculate(eq(request), argThat(argument -> argument == infeasibleInsertion),
+				any())).thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
 		//test insertionProvider
 		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
@@ -98,8 +98,8 @@ public class ExtensiveInsertionProviderTest {
 		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
 	}
 
-	private InsertionWithDetourData<Double> insertionWithDetourData(Insertion insertion) {
-		return new InsertionWithDetourData<>(insertion,
-				new InsertionDetourData<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN));
+	private InsertionWithDetourData insertionWithDetourData(Insertion insertion) {
+		return new InsertionWithDetourData(insertion, new InsertionDetourData(null, null, null, null),
+				new DetourTimeInfo(new PickupDetourInfo(11, Double.NaN), null));
 	}
 }

@@ -119,7 +119,7 @@ public class DetourPathDataCacheTest {
 		Insertion insertion = new Insertion(request, entry, pickupIdx, dropoffIdx);
 		var actual = detourPathDataCache.createInsertionDetourData(insertion);
 
-		var expectedInsertionDetourData = new InsertionDetourData<>(detourToPickup, detourFromPickup, detourToDropoff,
+		var expectedInsertionDetourData = new InsertionDetourData(detourToPickup, detourFromPickup, detourToDropoff,
 				detourFromDropoff);
 
 		assertThat(actual).usingRecursiveComparison().isEqualTo(expectedInsertionDetourData);

@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import org.matsim.api.core.v01.Scenario;
@@ -59,11 +80,13 @@ final class RunPassengerAlongWithCarriers {
 		}
 
 		Controler controler = new Controler(scenario);
-		final Carriers carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readURL( IOUtils.extendUrl(url, "vehicleTypes.xml" ) );
+
+		final Carriers carriers = new Carriers();
+		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
+
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);

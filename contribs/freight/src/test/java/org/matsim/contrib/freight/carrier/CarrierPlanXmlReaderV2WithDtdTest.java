@@ -1,6 +1,5 @@
 package org.matsim.contrib.freight.carrier;
 
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -17,9 +16,13 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsWithDtd.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquilsWithDtd.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
@@ -71,9 +74,13 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 	
 	@Test
 	public void test_whenReadingCarrierWithFiniteFleet_itSetsFleetSizeCorrectly(){
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleetWithDtd.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleetWithDtd.xml" );
 		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
 	}
 	
