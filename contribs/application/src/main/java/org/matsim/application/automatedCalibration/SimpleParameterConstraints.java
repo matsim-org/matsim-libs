@@ -4,12 +4,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 
 public class SimpleParameterConstraints {
-    private final double rideMarginalTravelUtility;
     private final double carMarginalTravelUtility;
 
     public SimpleParameterConstraints(Config config) {
-        this.rideMarginalTravelUtility = config.planCalcScore().getModes().get(TransportMode.ride).
-                getMarginalUtilityOfTraveling();
         this.carMarginalTravelUtility = config.planCalcScore().getModes().get(TransportMode.car).
                 getMarginalUtilityOfTraveling();
     }
@@ -29,11 +26,11 @@ public class SimpleParameterConstraints {
     }
 
     /**
-     * Car and ride should be the most comfortable modes of travel. As a result, the marginal utility of other modes
-     * should be lower than these two modes (i.e. more negative).
+     * Car should be the most comfortable modes of travel. As a result, the marginal utility of other modes
+     * should be lower than car (i.e. more negative).
      */
     public double processRelationAmongDifferentModes(double marginalTravelUtility) {
-        return Math.min(marginalTravelUtility, Math.max(rideMarginalTravelUtility, carMarginalTravelUtility));
+        return Math.min(marginalTravelUtility, carMarginalTravelUtility);
     }
 
 }
