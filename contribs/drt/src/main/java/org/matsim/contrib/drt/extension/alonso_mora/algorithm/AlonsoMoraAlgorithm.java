@@ -346,7 +346,8 @@ public class AlonsoMoraAlgorithm {
 												function.calculateRoute(Arrays.asList(request), vehicle, now));
 									})//
 									.filter(result -> result.getRight().isPresent()) //
-									.map(pair -> Pair.of(pair.getLeft(), pair.getRight().get())).sorted((a, b) -> {
+									.map(pair -> Pair.of(pair.getLeft(), pair.getRight().get())) //
+									.sorted((a, b) -> {
 										return Double.compare(a.getRight().getCost(), b.getRight().getCost());
 									}) //
 									.limit(settings.candidateVehiclesPerRequest);
