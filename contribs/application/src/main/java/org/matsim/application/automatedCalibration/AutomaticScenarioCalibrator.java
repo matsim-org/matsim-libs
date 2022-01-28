@@ -80,8 +80,8 @@ public abstract class AutomaticScenarioCalibrator {
         this.patience = patience;
         this.configFile = configFile;
         this.config = ConfigUtils.loadConfig(configFile);
-        this.parameterTuner = new SimpleParameterTuner(targetError, modes);
         this.distanceGrouping = new StandardDistanceGrouping();
+        this.parameterTuner = new SimpleParameterTuner(modes, distanceGrouping);
         if (output == null || output.equals("")) {
             output = "./output/auto-calibration";
         }

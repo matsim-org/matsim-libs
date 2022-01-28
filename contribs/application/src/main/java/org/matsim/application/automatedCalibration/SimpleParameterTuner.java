@@ -18,61 +18,70 @@ import java.util.Map;
  */
 public class SimpleParameterTuner implements ParameterTuner {
     private final String[] modes;
-    private final double targetError;
-    private final DistanceGrouping distanceGrouping = new StandardDistanceGrouping();
+    private final DistanceGrouping distanceGrouping;
+    private final Map<String, Map<String, Double>> cumulativeErrorMap;
 
-    public SimpleParameterTuner(double targetError, String[] modes) {
-        this.targetError = targetError;
+    private final double pValue = 40.0; // TODO maybe make this configurable?
+    private final double iValue = 10.0; // TODO maybe make this configurable?
+    private final double alpha = 0.75; // TODO maybe make this configurable?
+
+    public SimpleParameterTuner(String[] modes, DistanceGrouping distanceGrouping) {
         this.modes = modes;
+        this.distanceGrouping = distanceGrouping;
+        this.cumulativeErrorMap = createModeDistanceMatrix(modes, distanceGrouping);
     }
 
     @Override
     public void tune(Config config, Map<String, Map<String, Double>> errorMap, List<AutomaticScenarioCalibrator.Trip> trips) {
-        // Find the mode to tune
+        // Calculate cost tuning matrix
+        Map<String, Map<String, Double>> tuningRatioMatrix = createModeDistanceMatrix(modes, distanceGrouping);
         for (String mode : modes) {
             if (mode.equals(TransportMode.walk)) {
-                continue; // The cost for walk is fixed
-            }
-
-            // Tuning the parameter
-            Map<String, List<Double>> relevantTrips = new HashMap<>();
-            Map<String, Double> averageTravelTimes = new HashMap<>();
-            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
-                relevantTrips.put(distanceGroup, new ArrayList<>());
-            }
-
-            for (AutomaticScenarioCalibrator.Trip trip : trips) {
-                if (trip.getMode().equals(mode)) {
-                    String distanceGroup = distanceGrouping.assignDistanceGroup(trip.getDistance());
-                    relevantTrips.get(distanceGroup).add(trip.getTravelTime());
+                for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
+                    tuningRatioMatrix.get(mode).put(distanceGroup, 1.0); // Walk will not be tuned (1.0 --> unchanged)
                 }
             }
 
             for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
-                double average = relevantTrips.get(distanceGroup).stream().mapToDouble(t -> t).average().orElse(0);
-                averageTravelTimes.put(distanceGroup, average);
+                double error = errorMap.get(mode).get(distanceGroup);
+                double cumulativeError = error + cumulativeErrorMap.get(mode).get(distanceGroup) * alpha;
+                cumulativeErrorMap.get(mode).put(distanceGroup, cumulativeError); // update cumulative error
+                // calculate ratio
+                double tuningRatio = calculateAdjustmentRatio(error, cumulativeError);
+                tuningRatioMatrix.get(mode).put(distanceGroup, tuningRatio);
             }
+        }
 
-            // Tune the parameter by fitting the new cost structure
-            SimpleRegression regression = new SimpleRegression();
-            Map<String, Double> errorMapForModeToTune = errorMap.get(mode);
+        // Initialize regression models
+        Map<String, SimpleRegression> regressionMap = new HashMap<>();
+        for (String mode : modes) {
+            regressionMap.put(mode, new SimpleRegression());
+        }
+
+        // Go through all trips
+        for (AutomaticScenarioCalibrator.Trip trip : trips) {
+            String mode = trip.getMode();
+            String distanceGroup = distanceGrouping.assignDistanceGroup(trip.getDistance());
+            double travelTime = trip.getTravelTime() / 3600; // in the unit of hour
+
             double a0 = config.planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling();
             double b0 = config.planCalcScore().getModes().get(mode).getConstant();
-            double xBase = averageTravelTimes.get(distanceGrouping.getDistanceGroupings()[0]) / 3600;
-            double yBase = a0 * xBase + b0;
-            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
-                double x = averageTravelTimes.get(distanceGroup) / 3600; // x-axis: travel time (unit: hour). We use average travel time of the distance group
-                double y0 = a0 * x + b0; // y-axis: the cost of the trip
-                double ratio = y0 / yBase; // The long distance trips normally have higher impact on the regression. Therefore, we need to normalize the cost adjustment
-                double alpha = calculateAdjustmentRatio(errorMapForModeToTune.get(distanceGroup));
-                double y = (1 + alpha / ratio) * y0;
-                regression.addData(x, y);
+            double originalCost = a0 * travelTime + b0;
+            double newCost = originalCost * tuningRatioMatrix.get(mode).get(distanceGroup);
+
+            regressionMap.get(mode).addData(travelTime, newCost);
+        }
+
+        for (String mode : modes) {
+            if (mode.equals(TransportMode.walk)) {
+                continue;
             }
 
+            SimpleRegression regression = regressionMap.get(mode);
             double a = regression.getSlope();
             double b = regression.getIntercept();
 
-            // Apply constriants
+            // Apply constraints
             SimpleParameterConstraints simpleParameterConstraints = new SimpleParameterConstraints(config);
             a = simpleParameterConstraints.processMarginalTravelUtility(a);
             b = simpleParameterConstraints.processASC(b);
@@ -83,13 +92,27 @@ public class SimpleParameterTuner implements ParameterTuner {
         }
     }
 
-    private double calculateAdjustmentRatio(double error) {
-        if (error < -4 * targetError) {
-            return -0.2;
+    private double calculateAdjustmentRatio(double error, double cumulativeError) {
+        double ratio = pValue * error + iValue * cumulativeError + 1;
+        if (ratio > 2.0) {
+            ratio = 2.0;
         }
-        if (error > 4 * targetError) {
-            return 0.2;
+        if (ratio < 0.5) {
+            ratio = 0.5;
         }
-        return error / (20 * targetError);
+        return ratio;
     }
+
+    private Map<String, Map<String, Double>> createModeDistanceMatrix(String[] modes, DistanceGrouping distanceGrouping) {
+        Map<String, Map<String, Double>> modeDistanceMatrix = new HashMap<>();
+        for (String mode : modes) {
+            Map<String, Double> cumulativeErrorForOneMode = new HashMap<>();
+            for (String distanceGroup : distanceGrouping.getDistanceGroupings()) {
+                cumulativeErrorForOneMode.put(distanceGroup, 0.0);
+            }
+            modeDistanceMatrix.put(mode, cumulativeErrorForOneMode);
+        }
+        return modeDistanceMatrix;
+    }
+
 }
