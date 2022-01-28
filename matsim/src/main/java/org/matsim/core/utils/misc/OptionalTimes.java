@@ -32,4 +32,20 @@ public class OptionalTimes {
 		Preconditions.checkArgument(time.isDefined(), "Time must be defined");
 		return time;
 	}
+	
+	public static OptionalTime add(OptionalTime time1, OptionalTime time2) {
+		if (time1.isUndefined() || time2.isUndefined()) {
+			return OptionalTime.undefined();
+		} else {
+			return OptionalTime.defined(time1.seconds() + time2.seconds());
+		}
+	}
+	
+	public static OptionalTime subtract(OptionalTime time1, OptionalTime time2) {
+		if (time1.isUndefined() || time2.isUndefined()) {
+			return OptionalTime.undefined();
+		} else {
+			return OptionalTime.defined(time1.seconds() - time2.seconds());
+		}
+	}
 }

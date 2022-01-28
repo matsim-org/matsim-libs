@@ -36,4 +36,22 @@ public class OptionalTimesTest {
 
 		assertThat(OptionalTimes.requireDefined(OptionalTime.defined(1)).seconds()).isEqualTo(1);
 	}
+	
+	@Test
+	public void testAdd() {
+		assertThat(OptionalTimes.add(OptionalTime.undefined(), OptionalTime.undefined()).isUndefined()).isEqualTo(true);
+		assertThat(OptionalTimes.add(OptionalTime.undefined(), OptionalTime.defined(10)).isUndefined()).isEqualTo(true);
+		assertThat(OptionalTimes.add(OptionalTime.defined(7.25), OptionalTime.undefined()).isUndefined()).isEqualTo(true);
+		assertThat(OptionalTimes.add(OptionalTime.defined(65), OptionalTime.defined(12)).seconds()).isEqualTo(77);
+		assertThat(OptionalTimes.add(OptionalTime.defined(-85), OptionalTime.defined(0.6)).seconds()).isEqualTo(-84.4);
+	}
+	
+	@Test
+	public void testSubtract() {
+		assertThat(OptionalTimes.subtract(OptionalTime.undefined(), OptionalTime.undefined()).isUndefined()).isEqualTo(true);
+		assertThat(OptionalTimes.subtract(OptionalTime.undefined(), OptionalTime.defined(10)).isUndefined()).isEqualTo(true);
+		assertThat(OptionalTimes.subtract(OptionalTime.defined(7.25), OptionalTime.undefined()).isUndefined()).isEqualTo(true);
+		assertThat(OptionalTimes.subtract(OptionalTime.defined(65), OptionalTime.defined(12)).seconds()).isEqualTo(53);
+		assertThat(OptionalTimes.subtract(OptionalTime.defined(-85), OptionalTime.defined(0.6)).seconds()).isEqualTo(-85.6);
+	}
 }
