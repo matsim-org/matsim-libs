@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
 
 public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 	private static final Logger log = Logger.getLogger( ExampleSchedulingOfTransportChainHubsVsDirectTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testMain1(){

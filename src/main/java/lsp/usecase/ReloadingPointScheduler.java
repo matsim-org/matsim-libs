@@ -14,7 +14,7 @@ import lsp.shipment.ShipmentPlanElement;
 
 /*package-private*/ class ReloadingPointScheduler extends LSPResourceScheduler {
 
-	Logger log = Logger.getLogger(ReloadingPointScheduler.class);
+	final Logger log = Logger.getLogger(ReloadingPointScheduler.class);
 
 	private ReloadingPoint reloadingPoint;
 	private final double capacityNeedLinear;

@@ -18,8 +18,8 @@ import lsp.resources.LSPResource;
 /*package-private*/  class ReloadingPointTourEndEventHandler implements LSPTourEndEventHandler {
 
 	static class ReloadingPointEventHandlerPair{
-		public LSPShipment shipment;
-		public LogisticsSolutionElement element;
+		public final LSPShipment shipment;
+		public final LogisticsSolutionElement element;
 				
 		public ReloadingPointEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element){
 			this.shipment = shipment;

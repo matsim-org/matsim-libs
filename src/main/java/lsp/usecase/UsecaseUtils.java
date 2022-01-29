@@ -35,12 +35,12 @@ public class UsecaseUtils {
 
 	public static class CollectionCarrierAdapterBuilder {
 
-		Id<LSPResource> id;
+		final Id<LSPResource> id;
 		Carrier carrier;
 		Id<Link> locationLinkId;
-		ArrayList<LogisticsSolutionElement> clientElements;
+		final ArrayList<LogisticsSolutionElement> clientElements;
 		CollectionCarrierScheduler collectionScheduler;
-		Network network;
+		final Network network;
 
 			public static CollectionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
 				return new CollectionCarrierAdapterBuilder(id,network);
@@ -77,12 +77,12 @@ public class UsecaseUtils {
 
 	public static class DistributionCarrierAdapterBuilder {
 
-		Id<LSPResource>id;
+		final Id<LSPResource>id;
 		Carrier carrier;
 		Id<Link> locationLinkId;
-		ArrayList<LogisticsSolutionElement> clientElements;
+		final ArrayList<LogisticsSolutionElement> clientElements;
 		DistributionCarrierScheduler distributionHandler;
-		Network network;
+		final Network network;
 
 			public static DistributionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
 				return new DistributionCarrierAdapterBuilder(id,network);

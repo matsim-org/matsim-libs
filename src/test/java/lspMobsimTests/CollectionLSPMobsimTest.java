@@ -38,7 +38,7 @@ import lsp.resources.LSPResource;
 public class CollectionLSPMobsimTest {
 	private static final Logger log = Logger.getLogger( CollectionLSPMobsimTest.class );
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private LSP collectionLSP;
 	private Carrier carrier;

@@ -26,7 +26,7 @@ public class LSPUtils{
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
-		Collection<LSPResource> resources;
+		final Collection<LSPResource> resources;
 		LSPScorer scorer;
 		LSPReplanner replanner;
 
@@ -80,11 +80,11 @@ public class LSPUtils{
 	}
 
 	public static class LogisticsSolutionBuilder{
-		Id<LogisticsSolution> id;
-		Collection<LogisticsSolutionElement> elements;
-		Collection<LSPInfo> solutionInfos;
-		Collection<EventHandler> eventHandlers;
-		Collection<LSPSimulationTracker>trackers;
+		final Id<LogisticsSolution> id;
+		final Collection<LogisticsSolutionElement> elements;
+		final Collection<LSPInfo> solutionInfos;
+		final Collection<EventHandler> eventHandlers;
+		final Collection<LSPSimulationTracker>trackers;
 
 		public static LogisticsSolutionBuilder newInstance( Id<LogisticsSolution>id ){
 			return new LogisticsSolutionBuilder(id);
@@ -144,10 +144,10 @@ public class LSPUtils{
 	}
 
 	public static class LogisticsSolutionElementBuilder{
-		Id<LogisticsSolutionElement>id;
+		final Id<LogisticsSolutionElement>id;
 		LSPResource resource;
-		WaitingShipments incomingShipments;
-		WaitingShipments outgoingShipments;
+		final WaitingShipments incomingShipments;
+		final WaitingShipments outgoingShipments;
 
 		public static LogisticsSolutionElementBuilder newInstance( Id<LogisticsSolutionElement>id ){
 			return new LogisticsSolutionElementBuilder(id);
