@@ -112,7 +112,7 @@ public class DistributionAdapterTest {
 						assertEquals((50 / 3.6), distributionType.getMaximumVelocity(), 0.0);
 						
 					}
-					ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
+					ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 					if(vehicles.size() == 1) {
 						assertSame(vehicles.get(0), distributionCarrierVehicle);
 						assertSame(distributionCarrierVehicle.getType(), distributionType);

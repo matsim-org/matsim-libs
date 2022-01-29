@@ -207,7 +207,7 @@ public class CompleteLSPShipmentAssignerTest {
 		
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
@@ -219,7 +219,7 @@ public class CompleteLSPShipmentAssignerTest {
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 11; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -267,7 +267,7 @@ public class CompleteLSPShipmentAssignerTest {
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(completeLSP.getSelectedPlan(), completePlan);
-		ArrayList<LogisticsSolution> solutions = new ArrayList<LogisticsSolution>(completeLSP.getSelectedPlan().getSolutions());
+		ArrayList<LogisticsSolution> solutions = new ArrayList<>(completeLSP.getSelectedPlan().getSolutions());
 
 		for(LogisticsSolution solution : solutions) {
 			if(solutions.indexOf(solution) == 0 ) {

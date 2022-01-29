@@ -97,7 +97,7 @@ import lsp.shipment.LSPShipment;
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
@@ -107,8 +107,8 @@ import lsp.shipment.LSPShipment;
 	}
 
 	public static Collection<LSPShipment> createInitialLSPShipments(Network network){
-		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		//Create five LSPShipments that are located in the left half of the network.
 		for(int i = 1; i < 6; i++) {
@@ -164,7 +164,7 @@ import lsp.shipment.LSPShipment;
 		lsp.scheduleSolutions();
 
 		//Prepare LSPModule and add the LSP
-		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
 		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());

@@ -48,7 +48,7 @@ import lsp.resources.LSPResourceScheduler;
 
 
 	CollectionCarrierScheduler(){
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 	}
 	
 	
@@ -78,7 +78,7 @@ import lsp.resources.LSPResourceScheduler;
 	
 	
 	@Override public void initializeValues( LSPResource resource ){
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 		if(resource.getClass() == CollectionCarrierAdapter.class){
 			this.adapter = (CollectionCarrierAdapter) resource;
 			this.carrier = adapter.getCarrier();

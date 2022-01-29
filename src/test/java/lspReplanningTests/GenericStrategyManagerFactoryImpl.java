@@ -11,7 +11,7 @@ public class GenericStrategyManagerFactoryImpl implements LSPPlanStrategyManager
 
 	@Override
 	public GenericStrategyManager<LSPPlan, LSP> createStrategyManager(LSP lsp) {
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<LSPPlan, LSP>();
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<>();
 		ShipmentAssigner tomorrowAssigner = new TomorrowAssigner();
 		tomorrowAssigner.setLSP(lsp);
 		strategyManager.addStrategy(new TomorrowShipmentAssignerStrategyFactory(tomorrowAssigner).createStrategy(), null, 1);

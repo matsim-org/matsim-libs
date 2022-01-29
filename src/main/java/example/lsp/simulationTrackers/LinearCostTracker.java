@@ -29,9 +29,9 @@ import lsp.controler.LSPSimulationTracker;
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
 		example.lsp.simulationTrackers.CostInfo costInfo = new example.lsp.simulationTrackers.CostInfo();
-		infos = new ArrayList<LSPInfo>();
+		infos = new ArrayList<>();
 		infos.add(costInfo);
-		this.eventHandlers = new ArrayList<EventHandler>();
+		this.eventHandlers = new ArrayList<>();
 	}
 	
 	

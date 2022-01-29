@@ -152,7 +152,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
@@ -162,7 +162,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 100; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -307,7 +307,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		}
 
 		assertEquals(1, firstReloadingPointAdapter.getEventHandlers().size());
-		ArrayList<EventHandler> eventHandlers = new ArrayList<EventHandler>(firstReloadingPointAdapter.getEventHandlers());
+		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
 		Iterator<Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair>>  iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
@@ -334,8 +334,8 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 	
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertEquals(4, shipment.getEventHandlers().size());
-			eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
 			ArrayList<LogisticsSolutionElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());

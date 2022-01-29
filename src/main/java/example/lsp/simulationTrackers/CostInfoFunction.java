@@ -15,7 +15,7 @@ import lsp.functions.LSPInfoFunctionValue;
 	private final Collection<LSPInfoFunctionValue<?>> values;
 	
 	public CostInfoFunction() {
-		values = new ArrayList<LSPInfoFunctionValue<?>>();
+		values = new ArrayList<>();
 		fixedValue = new FixedCostFunctionValue();
 		linearValue = new LinearCostFunctionValue();
 		values.add(fixedValue);

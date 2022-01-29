@@ -104,7 +104,7 @@ public class MainRunAdapterTest {
 			if(carrier.getCarrierCapabilities() == capabilities) {
 				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
-				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
+				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
 					assertSame(types.get(0), mainRunType);
 					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
@@ -113,7 +113,7 @@ public class MainRunAdapterTest {
 					assertEquals(120, mainRunType.getCostInformation().getFix(), 0.0);
 					assertEquals((50 / 3.6), mainRunType.getMaximumVelocity(), 0.0);
 				}
-				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
+				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
 					assertSame(vehicles.get(0), carrierVehicle);
 					assertSame(carrierVehicle.getType(), mainRunType);

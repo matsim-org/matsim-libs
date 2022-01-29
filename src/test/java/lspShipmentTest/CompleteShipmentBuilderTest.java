@@ -34,8 +34,8 @@ public class CompleteShipmentBuilderTest {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();
-        ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-        this.shipments = new ArrayList<LSPShipment>();
+        ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+        this.shipments = new ArrayList<>();
         
         for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);

@@ -193,9 +193,9 @@ public class CollectionLSPMobsimTest {
 			log.warn("");
 
 			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new ShipmentPlanElementComparator());
 
 			//Das muss besser in den SchedulingTest rein

@@ -22,14 +22,14 @@ public class TomorrowShipmentAssignerStrategyFactory  {
 	}
 	
 	public GenericPlanStrategy<LSPPlan, LSP> createStrategy(){
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<LSPPlan, LSP>( new BestPlanSelector<LSPPlan, LSP>());
+		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
 		
-		GenericPlanStrategyModule<LSPPlan> tomorrowModule = new GenericPlanStrategyModule<LSPPlan>() {
+		GenericPlanStrategyModule<LSPPlan> tomorrowModule = new GenericPlanStrategyModule<>() {
 
 			@Override
 			public void prepareReplanning(ReplanningContext replanningContext) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
@@ -38,7 +38,7 @@ public class TomorrowShipmentAssignerStrategyFactory  {
 //				LSP lsp = assigner.getLSP();
 				LSP lsp = plan.getLsp();
 				Collection<LSPShipment> shipments = lsp.getShipments();
-				for(LSPShipment shipment : shipments) {
+				for (LSPShipment shipment : shipments) {
 					assigner.assignShipment(shipment);
 				}
 			}
@@ -46,9 +46,9 @@ public class TomorrowShipmentAssignerStrategyFactory  {
 			@Override
 			public void finishReplanning() {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 		};
 		
 		strategy.addStrategyModule(tomorrowModule);

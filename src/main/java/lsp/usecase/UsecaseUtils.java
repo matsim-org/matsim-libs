@@ -48,7 +48,7 @@ public class UsecaseUtils {
 
 			private CollectionCarrierAdapterBuilder(Id<LSPResource> id, Network network){
 				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.clientElements = new ArrayList<>();
 				this.network = network;
 			}
 
@@ -87,7 +87,7 @@ public class UsecaseUtils {
 
 			private DistributionCarrierAdapterBuilder(Id<LSPResource> id, Network network){
 				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.clientElements = new ArrayList<>();
 				this.network = network;
 			}
 
@@ -129,7 +129,7 @@ public class UsecaseUtils {
 
 			private MainRunCarrierAdapterBuilder(Id<LSPResource> id, Network network){
 				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.clientElements = new ArrayList<>();
 				this.network = network;
 			}
 
@@ -236,7 +236,7 @@ public class UsecaseUtils {
 
 		private ReloadingPointBuilder(Id<LSPResource> id, Id<Link> locationLinkId){
 			this.id = id;
-			this.clientElements = new ArrayList <LogisticsSolutionElement>();
+			this.clientElements = new ArrayList<>();
 			this.locationLinkId = locationLinkId;
 		}
 

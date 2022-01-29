@@ -27,8 +27,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){
-		this.shipments = new ArrayList<LSPShipment>();
-		this.plans= new ArrayList<LSPPlan>();
+		this.shipments = new ArrayList<>();
+		this.plans= new ArrayList<>();
 		this.id = builder.id;
 		this.solutionScheduler = builder.solutionScheduler;
 		this.solutionScheduler.setLSP(this);

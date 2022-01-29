@@ -92,7 +92,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 	
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -100,7 +100,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		int numberOfShipments = 1 + new Random().nextInt(50);
 	    for(int i = 1; i < 1 + numberOfShipments; i++) {
@@ -133,7 +133,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
         }
 		collectionLSP.scheduleSolutions();
 		
-		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 		
@@ -155,9 +155,9 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new ShipmentPlanElementComparator());
 
 			for(ShipmentPlanElement scheduleElement : scheduleElements){

@@ -217,7 +217,7 @@ public class CompleteSolutionTest {
 		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());
 		assertEquals(5, solution.getSolutionElements().size());
-		ArrayList<LogisticsSolutionElement> elements = new ArrayList<LogisticsSolutionElement>(solution.getSolutionElements());
+		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(solution.getSolutionElements());
 		 	for(LogisticsSolutionElement element : elements) {
 				if(elements.indexOf(element) == 0) {
 					assertNull(element.getPreviousElement());

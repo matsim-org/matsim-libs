@@ -19,7 +19,7 @@ public class RequirementsTransferrer implements OfferTransferrer{
 	private final Collection<LogisticsSolutionDecorator> feasibleSolutions;
 	
 	public RequirementsTransferrer() {
-		this.feasibleSolutions = new ArrayList<LogisticsSolutionDecorator>();
+		this.feasibleSolutions = new ArrayList<>();
 	}
 	
 	

@@ -90,7 +90,7 @@ public class CollectionSolutionTest {
 		assertNotNull(collectionSolution.getShipments());
 		assertTrue(collectionSolution.getShipments().isEmpty());
 		assertEquals(1, collectionSolution.getSolutionElements().size());
-		ArrayList<LogisticsSolutionElement> elements = new ArrayList<LogisticsSolutionElement>(collectionSolution.getSolutionElements());
+		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(collectionSolution.getSolutionElements());
 		for(LogisticsSolutionElement element : elements) {
 			if(elements.indexOf(element) == 0) {
 				assertNull(element.getPreviousElement());

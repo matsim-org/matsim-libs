@@ -101,7 +101,7 @@ public class CollectionLSPScoringTest {
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -118,7 +118,7 @@ public class CollectionLSPScoringTest {
 		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
 		collectionLSP.setScorer(tipScorer);
 
-		ArrayList<Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -151,7 +151,7 @@ public class CollectionLSPScoringTest {
 
 		collectionLSP.scheduleSolutions();
 
-		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 

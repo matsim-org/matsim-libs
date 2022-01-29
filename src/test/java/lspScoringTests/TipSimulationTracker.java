@@ -23,14 +23,14 @@ public class TipSimulationTracker implements LSPSimulationTracker{
 	
 	@Override
 	public Collection<EventHandler> getEventHandlers() {
-		ArrayList<EventHandler> handlers = new ArrayList<EventHandler>();
+		ArrayList<EventHandler> handlers = new ArrayList<>();
 		handlers.add(handler);
 		return handlers;
 	}
 
 	@Override
 	public Collection<LSPInfo> getInfos() {
-		ArrayList<LSPInfo> infos = new ArrayList<LSPInfo>();
+		ArrayList<LSPInfo> infos = new ArrayList<>();
 		infos.add(info);
 		return infos;
 	}

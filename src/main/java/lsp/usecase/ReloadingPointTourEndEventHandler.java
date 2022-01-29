@@ -37,7 +37,7 @@ import lsp.resources.LSPResource;
 		this.reloadingPoint = reloadingPoint;
 		this.linkId = reloadingPoint.getEndLinkId();
 		this.resourceId = reloadingPoint.getId();
-		this.servicesWaitedFor = new HashMap<CarrierService, ReloadingPointEventHandlerPair>();
+		this.servicesWaitedFor = new HashMap<>();
 	}
 	
 	@Override

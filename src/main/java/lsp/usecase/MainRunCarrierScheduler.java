@@ -45,11 +45,11 @@ import org.matsim.vehicles.VehicleType;
 
 
 	/*package-private*/   MainRunCarrierScheduler(){
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 	}
 	
 	@Override protected void initializeValues( LSPResource resource ) {
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 		if(resource.getClass() == MainRunCarrierAdapter.class){
 			this.adapter = (MainRunCarrierAdapter) resource;
 			this.carrier = adapter.getCarrier();
@@ -62,10 +62,10 @@ import org.matsim.vehicles.VehicleType;
 	
 	@Override protected void scheduleResource() {
 		int load = 0;
-		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<ShipmentWithTime>(shipments);
+		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
 		Collections.sort(copyOfAssignedShipments, new ShipmentComparator());
-		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<ShipmentWithTime>();
-		ArrayList<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
+		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
+		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
@@ -98,7 +98,7 @@ import org.matsim.vehicles.VehicleType;
 		
 		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), adapter.getCarrier().getCarrierCapabilities().getVehicleTypes());
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-		Collection<ScheduledTour> tours = new ArrayList<ScheduledTour>();
+		Collection<ScheduledTour> tours = new ArrayList<>();
 		
 		Tour.Builder tourBuilder = Tour.Builder.newInstance();
 		tourBuilder.scheduleStart(Id.create(adapter.getStartLinkId(), Link.class));

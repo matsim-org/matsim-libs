@@ -134,7 +134,7 @@ public class TransferrerRequirementsTest {
 		offerLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		offerLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(redCollectionAdapter);
 		resourcesList.add(blueCollectionAdapter);
 			
@@ -143,7 +143,7 @@ public class TransferrerRequirementsTest {
 		offerLSP = offerLSPBuilder.build();
 		LSPPlanDecorator decorator = (LSPPlanDecorator)offerLSP.getSelectedPlan();
 		
-		demandObjects = new ArrayList<DemandObject>();
+		demandObjects = new ArrayList<>();
 	    
 	    Random rand = new Random(1); 
 	    

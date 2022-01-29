@@ -112,7 +112,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 
@@ -122,7 +122,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 100; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -175,7 +175,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 	public void testFirstReloadLSPScheduling() {
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			
 			System.out.println();
@@ -235,7 +235,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		}
 
 		assertEquals(1, firstReloadingPointAdapter.getEventHandlers().size());
-		ArrayList<EventHandler> eventHandlers = new ArrayList<EventHandler>(firstReloadingPointAdapter.getEventHandlers());
+		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
 		Iterator<Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair>>  iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
@@ -264,8 +264,8 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertEquals(2, shipment.getEventHandlers().size());
-			eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);

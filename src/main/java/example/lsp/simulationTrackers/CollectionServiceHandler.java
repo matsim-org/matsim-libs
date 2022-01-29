@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
 	private int totalWeightOfShipments;
 	
 	public  CollectionServiceHandler() {
-		this.tuples = new ArrayList<ServiceTuple>();
+		this.tuples = new ArrayList<>();
 	}
 	
 	@Override

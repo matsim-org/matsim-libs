@@ -103,7 +103,7 @@ public class CollectionAdapterTest {
 			if(collectionCarrier.getCarrierCapabilities() == capabilities) {
 				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
-				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
+				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
 					assertSame(types.get(0), collectionType);
 					assertEquals(10, collectionType.getCapacity().getOther().intValue());
@@ -113,7 +113,7 @@ public class CollectionAdapterTest {
 					assertEquals((50 / 3.6), collectionType.getMaximumVelocity(), 0.0);
 					
 				}
-				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
+				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
 					assertSame(vehicles.get(0), collectionCarrierVehicle);
 					assertSame(collectionCarrierVehicle.getType(), collectionType);

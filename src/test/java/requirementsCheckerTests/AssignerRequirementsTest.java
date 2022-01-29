@@ -119,7 +119,7 @@ public class AssignerRequirementsTest {
 		
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(redCollectionAdapter);
 		resourcesList.add(blueCollectionAdapter);
 			
@@ -127,7 +127,7 @@ public class AssignerRequirementsTest {
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		Random rand = new Random(1);
 	    

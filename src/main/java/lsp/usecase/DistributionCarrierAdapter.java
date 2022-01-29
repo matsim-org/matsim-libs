@@ -35,9 +35,9 @@ import lsp.controler.LSPSimulationTracker;
 			this.clientElements = builder.clientElements;
 			this.carrier = builder.carrier;
 			this.network = builder.network;
-			this.eventHandlers = new ArrayList<EventHandler>();
-			this.infos = new ArrayList<LSPInfo>();
-			this.trackers = new ArrayList<LSPSimulationTracker>();
+			this.eventHandlers = new ArrayList<>();
+			this.infos = new ArrayList<>();
+			this.trackers = new ArrayList<>();
 		}
 	
 	@Override

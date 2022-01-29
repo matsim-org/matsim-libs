@@ -16,8 +16,8 @@ import lsp.shipment.LSPShipment;
 				
 		private ResourceNeighbours(LSPResource resource) {
 			this.resource = resource;
-			this.predecessors = new ArrayList<LSPResource>();
-			this.successors = new ArrayList<LSPResource>();
+			this.predecessors = new ArrayList<>();
+			this.successors = new ArrayList<>();
 		}
 		
 		private void addPredecessor(LSPResource resource) {
@@ -35,8 +35,8 @@ import lsp.shipment.LSPShipment;
 	private int bufferTime;
 	
 	ForwardSolutionSchedulerImpl() {
-		this.sortedResourceList = new ArrayList<LSPResource>();
-		this.neighbourList = new ArrayList<ResourceNeighbours>();
+		this.sortedResourceList = new ArrayList<>();
+		this.neighbourList = new ArrayList<>();
 	}
 	
 	

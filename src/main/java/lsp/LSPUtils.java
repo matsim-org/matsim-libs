@@ -36,7 +36,7 @@ public class LSPUtils{
 		}
 
 		private LSPBuilder(Id<LSP> id){
-			this.resources = new ArrayList<LSPResource>();
+			this.resources = new ArrayList<>();
 
 		}
 
@@ -91,10 +91,10 @@ public class LSPUtils{
 		}
 
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
-			this.elements = new ArrayList<LogisticsSolutionElement>();
-			this.solutionInfos = new ArrayList<LSPInfo>();
-			this.eventHandlers = new ArrayList<EventHandler>();
-			this.trackers = new ArrayList<LSPSimulationTracker>();
+			this.elements = new ArrayList<>();
+			this.solutionInfos = new ArrayList<>();
+			this.eventHandlers = new ArrayList<>();
+			this.trackers = new ArrayList<>();
 			this.id = id;
 		}
 

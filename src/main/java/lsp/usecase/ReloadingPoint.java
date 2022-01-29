@@ -32,9 +32,9 @@ import lsp.controler.LSPSimulationTracker;
 		ReloadingPointTourEndEventHandler eventHandler = new ReloadingPointTourEndEventHandler(this);
 		reloadingScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
-		this.eventHandlers = new ArrayList<EventHandler>();
-		this.infos = new ArrayList<LSPInfo>();
-		this.trackers = new ArrayList<LSPSimulationTracker>();
+		this.eventHandlers = new ArrayList<>();
+		this.infos = new ArrayList<>();
+		this.trackers = new ArrayList<>();
 		eventHandlers.add(eventHandler);
 	}
 	

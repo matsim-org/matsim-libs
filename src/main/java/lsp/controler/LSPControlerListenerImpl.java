@@ -98,7 +98,7 @@ ReplanningListener, IterationStartsListener{
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		eventsManager.removeHandler(carrierResourceTracker);
 		
-		ArrayList<LSPSimulationTracker> alreadyUpdatedTrackers = new ArrayList<LSPSimulationTracker>();
+		ArrayList<LSPSimulationTracker> alreadyUpdatedTrackers = new ArrayList<>();
 		for(LSP lsp : lsps.getLSPs().values()) {
 			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {

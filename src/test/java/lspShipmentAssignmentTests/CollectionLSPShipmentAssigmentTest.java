@@ -88,14 +88,14 @@ public class CollectionLSPShipmentAssigmentTest {
 	
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 
 
 		for(int i = 1; i < 11; i++) {
@@ -131,7 +131,7 @@ public class CollectionLSPShipmentAssigmentTest {
 	public void testCollectionLSPShipmentAssignment() {
 		assertSame(collectionLSP.getSelectedPlan(), collectionPlan);
 		assertFalse(collectionLSP.getShipments().isEmpty());
-		ArrayList<LogisticsSolution> solutions = new ArrayList<LogisticsSolution>(collectionLSP.getSelectedPlan().getSolutions());
+		ArrayList<LogisticsSolution> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getSolutions());
 
 		for(LogisticsSolution solution : solutions) {
 			if(solutions.indexOf(solution) == 0 ) {

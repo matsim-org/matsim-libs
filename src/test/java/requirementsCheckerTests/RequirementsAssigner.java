@@ -15,7 +15,7 @@ public class RequirementsAssigner implements  ShipmentAssigner {
 	private final Collection<LogisticsSolution> feasibleSolutions;
 	
 	public RequirementsAssigner() {
-		this.feasibleSolutions = new ArrayList<LogisticsSolution>();
+		this.feasibleSolutions = new ArrayList<>();
 	}
 	
 	@Override

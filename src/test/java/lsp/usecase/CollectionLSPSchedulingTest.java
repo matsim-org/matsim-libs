@@ -88,14 +88,14 @@ public class CollectionLSPSchedulingTest {
 	
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 
 
 		for(int i = 1; i < 2; i++) {
@@ -134,7 +134,7 @@ public class CollectionLSPSchedulingTest {
 	public void testCollectionLSPScheduling() {
 		
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			
 			System.out.println();
@@ -146,7 +146,7 @@ public class CollectionLSPSchedulingTest {
 				
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
 			assertEquals(3, shipment.getShipmentPlan().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			assertEquals("UNLOAD", planElements.get(2).getElementType());
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
@@ -175,7 +175,7 @@ public class CollectionLSPSchedulingTest {
 			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 
 			assertEquals(2, shipment.getEventHandlers().size());
-			ArrayList<EventHandler> eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
+			ArrayList<EventHandler> eventHandlers = new ArrayList<>(shipment.getEventHandlers());
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
