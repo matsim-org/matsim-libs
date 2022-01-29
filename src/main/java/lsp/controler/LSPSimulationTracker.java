@@ -9,7 +9,7 @@ import lsp.functions.LSPInfo;
 
 public interface LSPSimulationTracker extends AfterMobsimListener {
 
-	public Collection<EventHandler> getEventHandlers();
-	public Collection<LSPInfo> getInfos();
-	public void reset();
+	Collection<EventHandler> getEventHandlers();
+	Collection<LSPInfo> getInfos();
+	void reset();
 }

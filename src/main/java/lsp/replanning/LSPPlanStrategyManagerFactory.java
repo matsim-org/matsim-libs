@@ -7,6 +7,6 @@ import lsp.LSPPlan;
 
 public interface LSPPlanStrategyManagerFactory {
 	
-	public GenericStrategyManager<LSPPlan, LSP> createStrategyManager(LSP lsp);
+	GenericStrategyManager<LSPPlan, LSP> createStrategyManager(LSP lsp);
 
 }

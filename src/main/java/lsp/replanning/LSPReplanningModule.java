@@ -5,6 +5,6 @@ import org.matsim.core.controler.listener.ReplanningListener;
 
 public interface LSPReplanningModule extends ReplanningListener{
 
-	public void replanLSPs(ReplanningEvent arg0);
+	void replanLSPs(ReplanningEvent arg0);
 
 }
