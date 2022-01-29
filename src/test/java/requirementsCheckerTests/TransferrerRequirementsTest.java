@@ -151,7 +151,7 @@ public class TransferrerRequirementsTest {
         	DemandObjectImpl.Builder builder = DemandObjectImpl.Builder.newInstance();
         	
         	boolean blue = rand.nextBoolean();
-        	if (blue == true) {
+        	if (blue) {
         		builder.addRequirement(new BlueRequirement());
         	}
         	else {

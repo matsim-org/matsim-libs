@@ -30,7 +30,7 @@ public class RequirementsTransferrer implements OfferTransferrer{
 			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 					LogisticsSolutionDecorator solutionWithOffers = (LogisticsSolutionDecorator) solution;
 					for(Requirement requirement : object.getRequirements()) {
-						if(requirement.checkRequirement(solutionWithOffers) == false) {
+						if(!requirement.checkRequirement(solutionWithOffers)) {
 							continue label;
 						}
 					}
