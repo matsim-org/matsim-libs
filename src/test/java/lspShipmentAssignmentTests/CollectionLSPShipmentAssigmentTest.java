@@ -96,10 +96,9 @@ public class CollectionLSPShipmentAssigmentTest {
 		collectionLSP = collectionLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
-	
-	        
-	    for(int i = 1; i < 11; i++) {
+
+
+		for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = new Random().nextInt(10);
@@ -117,7 +116,7 @@ public class CollectionLSPShipmentAssigmentTest {
         		}	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setToLinkId(collectionLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));

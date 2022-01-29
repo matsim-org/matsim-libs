@@ -130,9 +130,7 @@ import lsp.shipment.LSPShipment;
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
 		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Link> toLinkId = collectionLinkId;
-		
+
 		//Create five LSPShipments that are located in the left half of the network.
 		for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -153,7 +151,7 @@ import lsp.shipment.LSPShipment;
 	        		}	
 	        	}
 	        	
-	        	builder.setToLinkId(toLinkId);
+	        	builder.setToLinkId(Id.createLinkId("(4 2) (4 3)"));
 	        	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));

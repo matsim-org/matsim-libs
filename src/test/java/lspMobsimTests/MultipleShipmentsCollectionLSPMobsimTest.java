@@ -101,7 +101,6 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 		collectionLSP = collectionLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
 
 		int numberOfShipments = 1 + new Random().nextInt(50);
 	    for(int i = 1; i < 1+ numberOfShipments; i++) {
@@ -123,7 +122,7 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
         		}	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setToLinkId(collectionLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));

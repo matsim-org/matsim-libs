@@ -120,7 +120,6 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSP.setScorer(tipScorer);
 
 		ArrayList<Link> linkList = new ArrayList<Link>(network.getLinks().values());
-		Id<Link> toLinkId = collectionLinkId;
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -141,7 +140,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 				}
 			}
 
-			builder.setToLinkId(toLinkId);
+			builder.setToLinkId(collectionLinkId);
 			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setEndTimeWindow(endTimeWindow);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));

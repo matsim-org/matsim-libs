@@ -128,9 +128,8 @@ public class AssignerRequirementsTest {
 		LSP collectionLSP = collectionLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
-	
-	    Random rand = new Random(1); 
+
+		Random rand = new Random(1);
 	    
 	    for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -150,7 +149,7 @@ public class AssignerRequirementsTest {
         		}	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setToLinkId(collectionLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));

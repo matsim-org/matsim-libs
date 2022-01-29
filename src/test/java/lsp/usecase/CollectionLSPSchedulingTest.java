@@ -96,10 +96,9 @@ public class CollectionLSPSchedulingTest {
 		collectionLSP = collectionLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
-	
-	        
-	    for(int i = 1; i < 2; i++) {
+
+
+		for(int i = 1; i < 2; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	Random random = new Random(1);
@@ -118,7 +117,7 @@ public class CollectionLSPSchedulingTest {
         		}	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setToLinkId(collectionLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
