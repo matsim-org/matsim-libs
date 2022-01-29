@@ -12,7 +12,6 @@ import lsp.resources.LSPResource;
 
 class ScheduledShipmentLoad implements ShipmentPlanElement {
 
-	private final String type = "LOAD";
 	private final double startTime;
 	private final double endTime;
 	private final LogisticsSolutionElement element;
@@ -34,6 +33,7 @@ class ScheduledShipmentLoad implements ShipmentPlanElement {
 	
 	@Override
 	public String getElementType() {
+		String type = "LOAD";
 		return type;
 	}
 

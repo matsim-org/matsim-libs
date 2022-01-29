@@ -13,7 +13,6 @@ import lsp.resources.LSPResource;
 
 public class FirstReloadAdapterTest {
 
-	private  Id<LSPResource> reloadingId;
 	private Id<Link> reloadingLinkId;
 	private ReloadingPoint reloadingPoint;
 	
@@ -25,7 +24,7 @@ public class FirstReloadAdapterTest {
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
 
-		reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
+		Id<LSPResource> reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);

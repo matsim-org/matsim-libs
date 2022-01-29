@@ -25,10 +25,6 @@ import lsp.resources.LSPResource;
 
 public class CollectionSolutionTest {
 
-	private Network network;
-	private Carrier carrier;
-	private LSPCarrierResource carrierAdapter;
-	private LogisticsSolutionElement collectionElement; 
 	private LogisticsSolution collectionSolution;
 	
 	@Before
@@ -37,7 +33,7 @@ public class CollectionSolutionTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -59,7 +55,7 @@ public class CollectionSolutionTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
@@ -68,13 +64,13 @@ public class CollectionSolutionTest {
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		carrierAdapter = adapterBuilder.build();
+		LSPCarrierResource carrierAdapter = adapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
 		collectionElementBuilder.setResource(carrierAdapter);
-				collectionElement = collectionElementBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder

@@ -16,15 +16,14 @@ public class SecondReloadAdapterTest {
 
 	private ReloadingPoint reloadingPoint;
 	private Id<Link> reloadingLinkId;
-	private Id<LSPResource> reloadingId;
-	
+
 	@Before
 	public void initialize(){
 		UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
 
-		reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
+		Id<LSPResource> reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
         reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
         UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);

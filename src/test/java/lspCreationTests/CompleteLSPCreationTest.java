@@ -25,7 +25,6 @@ import lsp.resources.LSPResource;
 
 
 public class CompleteLSPCreationTest {
-	private Network network;
 	private LSP completeLSP;
 	private ShipmentAssigner assigner;
 	private LogisticsSolution completeSolution;
@@ -36,7 +35,7 @@ public class CompleteLSPCreationTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);

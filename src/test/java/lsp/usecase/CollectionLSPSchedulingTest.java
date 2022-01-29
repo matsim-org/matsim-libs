@@ -26,10 +26,8 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.LSPResource;
 
 public class CollectionLSPSchedulingTest {
-	
-	private Network network;
-	private LSP collectionLSP;	
-	private Carrier carrier;
+
+	private LSP collectionLSP;
 	private LSPResource collectionAdapter;
 	private LogisticsSolutionElement collectionElement;
 	
@@ -40,7 +38,7 @@ public class CollectionLSPSchedulingTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -62,7 +60,7 @@ public class CollectionLSPSchedulingTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 		
 		

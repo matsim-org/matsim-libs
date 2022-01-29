@@ -12,29 +12,26 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
 
 public class FirstReloadElementTest {
-	
-	private Id<LSPResource> reloadingId;
-	private Id<Link> reloadingLinkId;
+
 	private ReloadingPoint point;
 	private LogisticsSolutionElement reloadingElement;
-	private Id<LogisticsSolutionElement> elementId;
-	
+
 	@Before
 	public void initialize() {
 			UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
 	        schedulerBuilder.setCapacityNeedFixed(10);
 	        schedulerBuilder.setCapacityNeedLinear(1);
-	       
-	        
-	        reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
-	        reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
+
+
+		Id<LSPResource> reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
+		Id<Link> reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
 	        
 	        UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
 	        reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
 	        point = reloadingPointBuilder.build();
 
-	        elementId = Id.create("FiretReloadElement", LogisticsSolutionElement.class);
-			LSPUtils.LogisticsSolutionElementBuilder reloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		Id<LogisticsSolutionElement> elementId = Id.create("FiretReloadElement", LogisticsSolutionElement.class);
+			LSPUtils.LogisticsSolutionElementBuilder reloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 			reloadingElementBuilder.setResource(point);
 			reloadingElement  = reloadingElementBuilder.build();
 	}

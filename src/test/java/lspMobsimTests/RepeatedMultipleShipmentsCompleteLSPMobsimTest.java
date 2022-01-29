@@ -33,12 +33,7 @@ import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.resources.LSPResource;
 
 public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
-	private Network network;
-	private LogisticsSolution completeSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP completeLSP;	
+	private LSP completeLSP;
 		
 
 	public void initialize() {
@@ -46,7 +41,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -206,10 +201,10 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		completeSolutionBuilder.addSolutionElement(secondReloadElement);
 		completeSolutionBuilder.addSolutionElement(distributionElement);
-		completeSolution = completeSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-		completePlan = LSPUtils.createLSPPlan();
+		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
@@ -223,7 +218,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		resourcesList.add(distributionAdapter);
 
 
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();

@@ -30,21 +30,13 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.LSPResource;
 
 public class MainRunLSPSchedulingTest {
-	private Network network;
-	private LogisticsSolution completeSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP lsp;	
+	private LSP lsp;
 	private LSPResource collectionAdapter;
 	private LogisticsSolutionElement collectionElement;
 	private LSPResource firstReloadingPointAdapter;
 	private LogisticsSolutionElement firstReloadElement;
 	private LSPResource mainRunAdapter;
 	private LogisticsSolutionElement mainRunElement;
-	private Id<Link> collectionLinkId;
-	private Id<Link> firstReloadingLinkId;
-	private Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
 	
 	@Before
@@ -53,7 +45,7 @@ public class MainRunLSPSchedulingTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> collectionVehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -64,8 +56,8 @@ public class MainRunLSPSchedulingTest {
 		collectionVehicleTypeBuilder.setFixCost(49);
 		collectionVehicleTypeBuilder.setMaxVelocity(50/3.6);
 		org.matsim.vehicles.VehicleType collectionType = collectionVehicleTypeBuilder.build();
-		
-		collectionLinkId = Id.createLinkId("(4 2) (4 3)");
+
+		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
 		collectionCarrierVehicle.setType( collectionType );
@@ -95,7 +87,7 @@ public class MainRunLSPSchedulingTest {
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
                
         Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
-        firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
@@ -115,8 +107,8 @@ public class MainRunLSPSchedulingTest {
 		mainRunVehicleTypeBuilder.setFixCost(120);
 		mainRunVehicleTypeBuilder.setMaxVelocity(50/3.6);
 		org.matsim.vehicles.VehicleType mainRunType = mainRunVehicleTypeBuilder.build();
-		
-		fromLinkId = Id.createLinkId("(4 2) (4 3)");
+
+		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		toLinkId = Id.createLinkId("(14 2) (14 3)");
 		
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
@@ -152,10 +144,10 @@ public class MainRunLSPSchedulingTest {
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolution = completeSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-		completePlan = LSPUtils.createLSPPlan();
+		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
@@ -166,7 +158,7 @@ public class MainRunLSPSchedulingTest {
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
 
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();

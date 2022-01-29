@@ -536,7 +536,6 @@ public class ShipmentUtils{
 		double endTime;
 		LogisticsSolutionElement element;
 		Id<LSPResource> resourceId;
-		private Id<Link> linkId;
 
 		private ScheduledShipmentHandleBuilder(){
 		}
@@ -566,7 +565,6 @@ public class ShipmentUtils{
 		}
 
 		public ScheduledShipmentHandleBuilder setLinkId( Id<Link> linkId ){
-			this.linkId = linkId;
 			return this;
 		}
 

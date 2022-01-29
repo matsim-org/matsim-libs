@@ -8,11 +8,9 @@ import lsp.scoring.LSPScorer;
 
 public class TipScorer implements LSPScorer {
 
-	private final LSP lsp;
 	private final TipSimulationTracker tracker;
 	
 	public TipScorer(LSP lsp, TipSimulationTracker tracker) {
-		this.lsp = lsp;
 		this.tracker = tracker;
 	}
 	

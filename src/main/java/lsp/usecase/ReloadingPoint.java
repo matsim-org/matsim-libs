@@ -23,7 +23,6 @@ import lsp.controler.LSPSimulationTracker;
 	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
-	private EventsManager eventsManager;
 
 	ReloadingPoint(UsecaseUtils.ReloadingPointBuilder builder){
 		this.id = builder.getId();
@@ -100,6 +99,5 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 }

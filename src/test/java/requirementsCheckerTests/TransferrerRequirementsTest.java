@@ -31,11 +31,8 @@ import lsp.resources.LSPResource;
 import lsp.shipment.Requirement;
 
 public class TransferrerRequirementsTest {
-	private Network network;
 	private LogisticsSolutionDecorator blueOfferSolution;
 	private LogisticsSolutionDecorator redOfferSolution;
-	private OfferTransferrer transferrer;
-	private LSPPlanDecorator collectionPlan;
 	private LSPDecorator offerLSP;
 	private ArrayList<DemandObject> demandObjects;
 
@@ -45,7 +42,7 @@ public class TransferrerRequirementsTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -90,8 +87,8 @@ public class TransferrerRequirementsTest {
 		OfferFactoryImpl redOfferFactory = new OfferFactoryImpl(redOfferSolution);
 		redOfferFactory.addOffer(new NonsenseOffer());
 		redOfferSolution.setOfferFactory(redOfferFactory);
-		
-		collectionPlan = new LSPPlanWithOfferTransferrer();
+
+		LSPPlanDecorator collectionPlan = new LSPPlanWithOfferTransferrer();
 		collectionPlan.addSolution(redOfferSolution);
 
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
@@ -128,8 +125,8 @@ public class TransferrerRequirementsTest {
 		blueOfferFactory.addOffer(new NonsenseOffer());
 		blueOfferSolution.setOfferFactory(blueOfferFactory);
 		collectionPlan.addSolution(blueOfferSolution);
-		
-		transferrer = new RequirementsTransferrer();
+
+		OfferTransferrer transferrer = new RequirementsTransferrer();
 		collectionPlan.setOfferTransferrer(transferrer);
 		
 		LSPWithOffers.Builder offerLSPBuilder = LSPWithOffers.Builder.getInstance();

@@ -25,7 +25,6 @@ import lsp.shipment.LSPShipment;
 public class DistributionShipmentBuilderTest {
 
 	private Network network;
-	private Id<Link> fromLinkId;
 	private ArrayList<LSPShipment> shipments;
 	
 	
@@ -38,7 +37,7 @@ public class DistributionShipmentBuilderTest {
         this.network = scenario.getNetwork();
         ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
         Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
-        this.fromLinkId = network.getLinks().get(distributionLinkId).getId();
+		Id<Link> fromLinkId = network.getLinks().get(distributionLinkId).getId();
         this.shipments = new ArrayList<LSPShipment>();
         
         for(int i = 1; i < 11; i++) {

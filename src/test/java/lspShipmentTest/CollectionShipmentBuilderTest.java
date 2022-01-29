@@ -23,7 +23,6 @@ import lsp.shipment.LSPShipment;
 public class CollectionShipmentBuilderTest {
 
 	private Network network;
-	private Id<Link> toLinkId;
 	private ArrayList<LSPShipment> shipments;
 	
 	
@@ -36,7 +35,7 @@ public class CollectionShipmentBuilderTest {
         this.network = scenario.getNetwork();
         ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
         Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-        this.toLinkId = network.getLinks().get(collectionLinkId).getId();
+		Id<Link> toLinkId = network.getLinks().get(collectionLinkId).getId();
         this.shipments = new ArrayList<LSPShipment>();
         
         for(int i = 1; i < 11; i++) {

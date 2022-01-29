@@ -28,7 +28,6 @@ import lsp.controler.LSPSimulationTracker;
 	private final Collection<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker> trackers;
 	private final Collection<LSPInfo> infos;
-	private EventsManager eventsManager;
 
 
 	MainRunCarrierAdapter(UsecaseUtils.MainRunCarrierAdapterBuilder builder){
@@ -106,7 +105,6 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 
 }

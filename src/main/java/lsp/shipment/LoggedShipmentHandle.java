@@ -10,7 +10,6 @@ import lsp.resources.LSPResource;
 
 /*package*/ class LoggedShipmentHandle implements ShipmentPlanElement {
 
-	private final String type = "HANDLE";
 	private final double startTime;
 	private final double endTime;
 	private final LogisticsSolutionElement element;
@@ -37,6 +36,7 @@ import lsp.resources.LSPResource;
 
 	@Override
 	public String getElementType() {
+		String type = "HANDLE";
 		return type;
 	}
 

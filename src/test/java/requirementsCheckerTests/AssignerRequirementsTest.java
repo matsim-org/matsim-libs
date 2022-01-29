@@ -26,14 +26,10 @@ import java.util.Random;
 import static org.junit.Assert.assertTrue;
 
 public class AssignerRequirementsTest {
-	
-	private Network network;
+
 	private LogisticsSolution blueSolution;
 	private LogisticsSolution redSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlan collectionPlan;
-	private LSP collectionLSP;	
-	
+
 	@Before
 	public void initialize() {
 		
@@ -41,7 +37,7 @@ public class AssignerRequirementsTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -83,9 +79,9 @@ public class AssignerRequirementsTest {
 		redCollectionSolutionBuilder.addSolutionElement(redCollectionElement);
 		redSolution = redCollectionSolutionBuilder.build();
 		redSolution.getInfos().add(new RedInfo());
-		
-		assigner = new RequirementsAssigner();
-		collectionPlan = LSPUtils.createLSPPlan();
+
+		ShipmentAssigner assigner = new RequirementsAssigner();
+		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(redSolution);
 
@@ -129,7 +125,7 @@ public class AssignerRequirementsTest {
 			
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
-		collectionLSP = collectionLSPBuilder.build();
+		LSP collectionLSP = collectionLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 	    Id<Link> toLinkId = collectionLinkId;

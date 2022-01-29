@@ -24,10 +24,6 @@ import lsp.resources.LSPResource;
 
 public class CollectionElementTest {
 
-	private Network network;
-	private org.matsim.vehicles.VehicleType collectionType;
-	private CarrierCapabilities capabilities;
-	private Carrier carrier; 
 	private LogisticsSolutionElement collectionElement;
 	private LSPCarrierResource carrierAdapter;
 	
@@ -38,7 +34,7 @@ public class CollectionElementTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -48,19 +44,19 @@ public class CollectionElementTest {
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
 		vehicleTypeBuilder.setMaxVelocity(50/3.6);
-		collectionType = vehicleTypeBuilder.build();
+		VehicleType collectionType = vehicleTypeBuilder.build();
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		carrierVehicle.setType( collectionType );
+		carrierVehicle.setType(collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		CarrierCapabilities capabilities = capabilitiesBuilder.build();
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 		
 		

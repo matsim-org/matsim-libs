@@ -29,9 +29,8 @@ public class DistributionAdapterTest {
 		
 		//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 		//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
-		
-		private Network network;
-		private org.matsim.vehicles.VehicleType distributionType;
+
+	private org.matsim.vehicles.VehicleType distributionType;
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
 		private Carrier distributionCarrier;
@@ -44,7 +43,7 @@ public class DistributionAdapterTest {
 	        config.addCoreModules();
 	        Scenario scenario = ScenarioUtils.createScenario(config);
 	        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-	        this.network = scenario.getNetwork();
+			Network network = scenario.getNetwork();
 
 			Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 			Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);

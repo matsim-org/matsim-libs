@@ -32,13 +32,8 @@ import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.resources.LSPResource;
 
 public class MultipleIterationsCollectionLSPMobsimTest {
-	private Network network;
-	private LSP collectionLSP;	
-	private Carrier carrier;
-	private LSPResource collectionAdapter;
-	private LogisticsSolutionElement collectionElement;
-	private int numberOfShipments;
-	
+	private LSP collectionLSP;
+
 	@Before
 	public void initialize() {
 		
@@ -46,7 +41,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -69,7 +64,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 		
 		
@@ -78,12 +73,12 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 		collectionElementBuilder.setResource(collectionAdapter);
-		collectionElement = collectionElementBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 		
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
@@ -107,8 +102,8 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 	    Id<Link> toLinkId = collectionLinkId;
-	
-	    numberOfShipments = 1 + new Random().nextInt(50);
+
+		int numberOfShipments = 1 + new Random().nextInt(50);
 	    for(int i = 1; i < 1 + numberOfShipments; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );

@@ -22,19 +22,17 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
 
 public class MainRunElementTest {
-	
-	private Network network;
+
 	private LSPResource mainRunAdapter;
 	private LogisticsSolutionElement mainRunElement;
-	private Carrier carrier;
-	
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 	
        
         Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
@@ -59,7 +57,7 @@ public class MainRunElementTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 

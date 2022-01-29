@@ -9,21 +9,18 @@ import lsp.resources.LSPResource;
 
 class LoggedShipmentUnload implements ShipmentPlanElement {
 
-	private final String type = "UNLOAD";
 	private final double startTime;
 	private final double endTime;
 	private final LogisticsSolutionElement element;
 	private final Id<LSPResource> resourceId;
-	private final Id<Carrier> carrierId;
-	private final Id<Link> linkId;
 
 	LoggedShipmentUnload( ShipmentUtils.LoggedShipmentUnloadBuilder builder ){
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
-		this.carrierId = builder.carrierId;
-		this.linkId = builder.linkId;
+		Id<Carrier> carrierId = builder.carrierId;
+		Id<Link> linkId = builder.linkId;
 	}
 	
 	
@@ -39,6 +36,7 @@ class LoggedShipmentUnload implements ShipmentPlanElement {
 
 	@Override
 	public String getElementType() {
+		String type = "UNLOAD";
 		return type;
 	}
 

@@ -26,9 +26,6 @@ import lsp.resources.LSPResource;
 
 public class MainRunAdapterTest {
 
-	private Network network;
-	private Id<Carrier> carrierId;
-	private Id<VehicleType> vehicleTypeId;
 	private org.matsim.vehicles.VehicleType mainRunType;
 	private Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
@@ -43,11 +40,11 @@ public class MainRunAdapterTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
-	
-       
-        carrierId = Id.create("MainRunCarrier", Carrier.class);
-		vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+		Network network = scenario.getNetwork();
+
+
+		Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
+		Id<VehicleType> vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(30);
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0008);
@@ -68,7 +65,7 @@ public class MainRunAdapterTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 

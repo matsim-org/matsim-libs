@@ -21,18 +21,16 @@ import lsp.controler.LSPSimulationTracker;
 
 	private final Id<LSPResource>id;
 	private final Carrier carrier;
-	private final Id<Link> locationLinkId;
 	private final ArrayList<LogisticsSolutionElement> clientElements;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
 	private final Collection<EventHandler> eventHandlers;
 	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
-	private EventsManager eventsManager;
 
 	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
 		this.id = builder.id;
-		this.locationLinkId = builder.locationLinkId;
+		Id<Link> locationLinkId = builder.locationLinkId;
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
@@ -125,7 +123,6 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 
 }

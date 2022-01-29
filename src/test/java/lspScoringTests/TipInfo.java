@@ -6,14 +6,14 @@ import lsp.functions.LSPInfoFunction;
 public class TipInfo extends LSPInfo {
 
 	private final LSPInfoFunction function;
-	private final String name = "TIPINFO";
-	
+
 	public TipInfo (LSPInfoFunction function) {
 		this.function = function;
 	}
 	
 	@Override
 	public String getName() {
+		String name = "TIPINFO";
 		return name;
 	}
 

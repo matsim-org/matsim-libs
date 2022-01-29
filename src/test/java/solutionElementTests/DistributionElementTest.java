@@ -24,11 +24,6 @@ import lsp.resources.LSPResource;
 
 public class DistributionElementTest {
 
-	private Network network;
-	private org.matsim.vehicles.VehicleType distributionType;
-	private CarrierVehicle carrierVehicle;
-	private CarrierCapabilities capabilities;
-	private Carrier carrier;
 	private LSPCarrierResource adapter;
 	private LogisticsSolutionElement distributionElement;
 	
@@ -39,7 +34,7 @@ public class DistributionElementTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
@@ -49,19 +44,19 @@ public class DistributionElementTest {
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
 		vehicleTypeBuilder.setMaxVelocity(50/3.6);
-		distributionType = vehicleTypeBuilder.build();
+		VehicleType distributionType = vehicleTypeBuilder.build();
 		
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");
-		carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-		carrierVehicle.setType( distributionType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
+		carrierVehicle.setType(distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(distributionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		CarrierCapabilities capabilities = capabilitiesBuilder.build();
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 		
 		

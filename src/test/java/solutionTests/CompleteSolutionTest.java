@@ -24,7 +24,6 @@ import lsp.resources.LSPResource;
 
 public class CompleteSolutionTest {
 
-	private Network network;
 	private LogisticsSolutionElement collectionElement;
 	private LogisticsSolutionElement firstReloadElement;
 	private LogisticsSolutionElement mainRunElement;
@@ -39,7 +38,7 @@ public class CompleteSolutionTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> collectionVehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);

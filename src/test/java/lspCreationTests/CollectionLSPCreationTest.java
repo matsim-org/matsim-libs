@@ -25,12 +25,10 @@ import lsp.resources.LSPResource;
 
 public class CollectionLSPCreationTest {
 
-	private Network network;
 	private LogisticsSolution collectionSolution;
 	private ShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP collectionLSP;	
+	private LSP collectionLSP;
 	
 	@Before
 	public void initialize() {
@@ -39,7 +37,7 @@ public class CollectionLSPCreationTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -91,8 +89,8 @@ public class CollectionLSPCreationTest {
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
-		
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	}

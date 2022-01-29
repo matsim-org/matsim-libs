@@ -14,8 +14,6 @@ import lsp.resources.LSPResource;
 
 public class SecondReloadElementTest {
 
-	private  Id<LSPResource> reloadingId;
-	private  Id<Link> reloadingLinkId;
 	private LSPResource point;
 	private LogisticsSolutionElement reloadElement;
 	
@@ -24,10 +22,10 @@ public class SecondReloadElementTest {
 		UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
-       
-        
-        reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
-        reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
+
+
+		Id<LSPResource> reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
+		Id<Link> reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
         UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
         reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());

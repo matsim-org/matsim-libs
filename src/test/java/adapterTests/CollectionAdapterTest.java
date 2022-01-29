@@ -28,8 +28,7 @@ public class CollectionAdapterTest {
 
 	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
-	
-	private Network network;
+
 	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierVehicle collectionCarrierVehicle;
 	private Carrier collectionCarrier;
@@ -43,7 +42,7 @@ public class CollectionAdapterTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);

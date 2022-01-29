@@ -36,16 +36,7 @@ import lsp.shipment.LSPShipment;
 
 public class MultipleIterationsCollectionLSPScoringTest {
 
-	private Network network;
 	private LSP collectionLSP;
-	private Carrier carrier;
-	private LSPResource collectionAdapter;
-	private LogisticsSolutionElement collectionElement;
-	private LSPScorer tipScorer;
-	private TipSimulationTracker tipTracker;
-	private TipInfo info;
-	private LSPInfoFunction function;
-	private LSPInfoFunctionValue<Double> value;
 	private final int numberOfShipments = 25;
 
 	@Before
@@ -55,7 +46,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -81,7 +72,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
@@ -90,13 +81,13 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
-		collectionElement = collectionElementBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder
@@ -119,13 +110,13 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-		function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR");
+		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 		function.getValues().add(value);
-		info = new TipInfo(function);
-		tipTracker = new TipSimulationTracker(handler, info);
+		TipInfo info = new TipInfo(function);
+		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
-		tipScorer = new TipScorer(collectionLSP, tipTracker);
+		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
 		collectionLSP.setScorer(tipScorer);
 
 		ArrayList<Link> linkList = new ArrayList<Link>(network.getLinks().values());

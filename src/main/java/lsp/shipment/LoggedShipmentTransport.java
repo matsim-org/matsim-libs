@@ -9,7 +9,6 @@ import lsp.resources.LSPResource;
 public final class LoggedShipmentTransport implements ShipmentPlanElement {
 	// yyyy cannot make package-private since used outside package.  kai, jun'20
 
-	private final String type = "TRANSPORT";
 	private final double startTime;
 	private double endTime;
 	private final LogisticsSolutionElement element;
@@ -38,6 +37,7 @@ public final class LoggedShipmentTransport implements ShipmentPlanElement {
 
 	@Override
 	public String getElementType() {
+		String type = "TRANSPORT";
 		return type;
 	}
 
