@@ -17,7 +17,7 @@ public interface LSPPlan extends BasicPlan{
 
 	LSPPlan setAssigner( ShipmentAssigner assigner );
 
-	LSPPlan setLSP( LSP lsp );
+	void setLSP(LSP lsp );
 	
 	LSP getLsp();
 

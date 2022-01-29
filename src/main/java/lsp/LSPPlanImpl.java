@@ -45,7 +45,7 @@ import java.util.Collection;
 		this.score = score;
 	}
 
-	@Override public LSPPlan setLSP( LSP lsp ) {
+	@Override public void setLSP(LSP lsp ) {
 		this.lsp = lsp;
 		if(assigner != null) {
 			this.assigner.setLSP(lsp);
@@ -53,7 +53,6 @@ import java.util.Collection;
 		for(LogisticsSolution solution : solutions) {
 			solution.setLSP(lsp);
 		}
-		return this;
 	}
 	
 	@Override public LSP getLsp() {
