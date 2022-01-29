@@ -82,23 +82,23 @@ public class CollectionSolutionTest {
 
 	@Test
 	public void testCollectionSolution() {
-		assertTrue(collectionSolution.getEventHandlers() != null);
+		assertNotNull(collectionSolution.getEventHandlers());
 		assertTrue(collectionSolution.getEventHandlers().isEmpty());
-		assertTrue(collectionSolution.getInfos() != null);
+		assertNotNull(collectionSolution.getInfos());
 		assertTrue(collectionSolution.getInfos().isEmpty());
-		assertTrue(collectionSolution.getLSP() == null);
-		assertTrue(collectionSolution.getShipments() != null);
+		assertNull(collectionSolution.getLSP());
+		assertNotNull(collectionSolution.getShipments());
 		assertTrue(collectionSolution.getShipments().isEmpty());
-		assertTrue(collectionSolution.getSolutionElements().size() == 1);
+		assertEquals(1, collectionSolution.getSolutionElements().size());
 		ArrayList<LogisticsSolutionElement> elements = new ArrayList<LogisticsSolutionElement>(collectionSolution.getSolutionElements());
 		for(LogisticsSolutionElement element : elements) {
 			if(elements.indexOf(element) == 0) {
-				assertTrue(element.getPreviousElement() == null);
+				assertNull(element.getPreviousElement());
 			}
 			if(elements.indexOf(element) == (elements.size() -1)) {
-				assertTrue(element.getNextElement() == null);
+				assertNull(element.getNextElement());
 			}
-			assertTrue(element.getLogisticsSolution() == collectionSolution);
+			assertSame(element.getLogisticsSolution(), collectionSolution);
 		}	
 	}
 	

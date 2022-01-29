@@ -73,7 +73,7 @@ public class DistributionShipmentBuilderTest {
 	
 	@Test
 	public void testShipments() {
-		assertTrue(shipments.size() == 10);
+		assertEquals(10, shipments.size());
 		for(LSPShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
 			assertNotNull(shipment.getSize() );

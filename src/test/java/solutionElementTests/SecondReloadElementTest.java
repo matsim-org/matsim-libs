@@ -40,18 +40,18 @@ public class SecondReloadElementTest {
 	
 	@Test
 	public void testDistributionElement() {
-		assertTrue(reloadElement.getIncomingShipments()!= null);
-		assertTrue(reloadElement.getIncomingShipments().getShipments() != null);
+		assertNotNull(reloadElement.getIncomingShipments());
+		assertNotNull(reloadElement.getIncomingShipments().getShipments());
 		assertTrue(reloadElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertTrue(reloadElement.getInfos() != null);
+		assertNotNull(reloadElement.getInfos());
 		assertTrue(reloadElement.getInfos().isEmpty());
-		assertTrue(reloadElement.getLogisticsSolution() == null);
-		assertTrue(reloadElement.getNextElement() == null);
-		assertTrue(reloadElement.getOutgoingShipments()!= null);
-		assertTrue(reloadElement.getOutgoingShipments().getShipments() != null);
+		assertNull(reloadElement.getLogisticsSolution());
+		assertNull(reloadElement.getNextElement());
+		assertNotNull(reloadElement.getOutgoingShipments());
+		assertNotNull(reloadElement.getOutgoingShipments().getShipments());
 		assertTrue(reloadElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertTrue(reloadElement.getPreviousElement() == null);
-		assertTrue(reloadElement.getResource() == point);
-		assertTrue(reloadElement.getResource().getClientElements().iterator().next() == reloadElement);
+		assertNull(reloadElement.getPreviousElement());
+		assertSame(reloadElement.getResource(), point);
+		assertSame(reloadElement.getResource().getClientElements().iterator().next(), reloadElement);
 	}
 }

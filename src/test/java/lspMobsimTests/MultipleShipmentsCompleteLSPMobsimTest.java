@@ -1,9 +1,5 @@
 package lspMobsimTests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -32,6 +28,8 @@ import org.matsim.vehicles.VehicleType;
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.resources.LSPResource;
+
+import static org.junit.Assert.*;
 
 public class MultipleShipmentsCompleteLSPMobsimTest {
 	private LSP completeLSP;
@@ -299,9 +297,9 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		
 			for(ShipmentPlanElement scheduleElement : scheduleElements){
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
-				assertTrue(scheduleElement.getElementType().equals(logElement.getElementType()));
-				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
-				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
+				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
+				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());
+				assertSame(scheduleElement.getSolutionElement(), logElement.getSolutionElement());
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
 		}

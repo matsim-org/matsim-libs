@@ -1,8 +1,5 @@
 package lspCreationTests;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 
 import lsp.*;
@@ -22,6 +19,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.LSPResource;
+
+import static org.junit.Assert.*;
 
 
 public class CompleteLSPCreationTest {
@@ -220,17 +219,17 @@ public class CompleteLSPCreationTest {
 
 	@Test
 	public void testCollectionLSPCreation() {
-		assertTrue(completeLSP.getPlans() != null);
+		assertNotNull(completeLSP.getPlans());
 		assertFalse(completeLSP.getPlans().isEmpty());
-		assertTrue(completeLSP.getResources() != null);
+		assertNotNull(completeLSP.getResources());
 		LSPPlan selectedPlan = completeLSP.getSelectedPlan();
-		assertTrue(selectedPlan.getScore() == 0);
-		assertTrue(selectedPlan.getLsp() == completeLSP);
-		assertTrue(selectedPlan.getAssigner() == assigner);
-		assertTrue(selectedPlan.getSolutions().iterator().next() == completeSolution);
-		assertTrue(selectedPlan.getSolutions().iterator().next().getLSP() == completeLSP);
+		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
+		assertSame(selectedPlan.getLsp(), completeLSP);
+		assertSame(selectedPlan.getAssigner(), assigner);
+		assertSame(selectedPlan.getSolutions().iterator().next(), completeSolution);
+		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), completeLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);
-		assertTrue(selectedPlan.getLsp()== completeLSP);
+		assertSame(selectedPlan.getLsp(), completeLSP);
 	}
 
 }

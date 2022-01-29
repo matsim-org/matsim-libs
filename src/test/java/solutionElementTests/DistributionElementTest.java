@@ -1,7 +1,5 @@
 package solutionElementTests;
 
-import static org.junit.Assert.assertTrue;
-
 import lsp.LSPUtils;
 import lsp.resources.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
@@ -21,6 +19,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
+
+import static org.junit.Assert.*;
 
 public class DistributionElementTest {
 
@@ -76,18 +76,18 @@ public class DistributionElementTest {
 	
 	@Test
 	public void testDistributionElement() {
-		assertTrue(distributionElement.getIncomingShipments()!= null);
-		assertTrue(distributionElement.getIncomingShipments().getShipments() != null);
+		assertNotNull(distributionElement.getIncomingShipments());
+		assertNotNull(distributionElement.getIncomingShipments().getShipments());
 		assertTrue(distributionElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertTrue(distributionElement.getInfos() != null);
+		assertNotNull(distributionElement.getInfos());
 		assertTrue(distributionElement.getInfos().isEmpty());
-		assertTrue(distributionElement.getLogisticsSolution() == null);
-		assertTrue(distributionElement.getNextElement() == null);
-		assertTrue(distributionElement.getOutgoingShipments()!= null);
-		assertTrue(distributionElement.getOutgoingShipments().getShipments() != null);
+		assertNull(distributionElement.getLogisticsSolution());
+		assertNull(distributionElement.getNextElement());
+		assertNotNull(distributionElement.getOutgoingShipments());
+		assertNotNull(distributionElement.getOutgoingShipments().getShipments());
 		assertTrue(distributionElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertTrue(distributionElement.getPreviousElement() == null);
-		assertTrue(distributionElement.getResource() == adapter);
-		assertTrue(distributionElement.getResource().getClientElements().iterator().next() == distributionElement);
+		assertNull(distributionElement.getPreviousElement());
+		assertSame(distributionElement.getResource(), adapter);
+		assertSame(distributionElement.getResource().getClientElements().iterator().next(), distributionElement);
 	}
 }

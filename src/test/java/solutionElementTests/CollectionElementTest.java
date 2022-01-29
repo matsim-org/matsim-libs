@@ -75,19 +75,19 @@ public class CollectionElementTest {
 	
 	@Test
 	public void testCollectionElement() {
-		assertTrue(collectionElement.getIncomingShipments()!= null);
-		assertTrue(collectionElement.getIncomingShipments().getShipments() != null);
+		assertNotNull(collectionElement.getIncomingShipments());
+		assertNotNull(collectionElement.getIncomingShipments().getShipments());
 		assertTrue(collectionElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertTrue(collectionElement.getInfos() != null);
+		assertNotNull(collectionElement.getInfos());
 		assertTrue(collectionElement.getInfos().isEmpty());
-		assertTrue(collectionElement.getLogisticsSolution() == null);
-		assertTrue(collectionElement.getNextElement() == null);
-		assertTrue(collectionElement.getOutgoingShipments()!= null);
-		assertTrue(collectionElement.getOutgoingShipments().getShipments() != null);
+		assertNull(collectionElement.getLogisticsSolution());
+		assertNull(collectionElement.getNextElement());
+		assertNotNull(collectionElement.getOutgoingShipments());
+		assertNotNull(collectionElement.getOutgoingShipments().getShipments());
 		assertTrue(collectionElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertTrue(collectionElement.getPreviousElement() == null);
-		assertTrue(collectionElement.getResource() == carrierAdapter);
-		assertTrue(collectionElement.getResource().getClientElements().iterator().next() == collectionElement);
+		assertNull(collectionElement.getPreviousElement());
+		assertSame(collectionElement.getResource(), carrierAdapter);
+		assertSame(collectionElement.getResource().getClientElements().iterator().next(), collectionElement);
 	}
 	
 }

@@ -1,7 +1,5 @@
 package lspShipmentAssignmentTests;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -25,6 +23,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
+
+import static org.junit.Assert.*;
 
 public class CompleteLSPShipmentAssignerTest {
 
@@ -266,12 +266,12 @@ public class CompleteLSPShipmentAssignerTest {
 
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
-		assertTrue(completeLSP.getSelectedPlan()  == completePlan);
+		assertSame(completeLSP.getSelectedPlan(), completePlan);
 		ArrayList<LogisticsSolution> solutions = new ArrayList<LogisticsSolution>(completeLSP.getSelectedPlan().getSolutions());
 
 		for(LogisticsSolution solution : solutions) {
 			if(solutions.indexOf(solution) == 0 ) {
-				assertTrue(solution.getShipments().size() == 10);
+				assertEquals(10, solution.getShipments().size());
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 					if(element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getShipments().isEmpty());

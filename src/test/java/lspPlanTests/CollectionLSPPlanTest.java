@@ -84,11 +84,11 @@ public class CollectionLSPPlanTest {
 
 	@Test
 	public void collectionLSPPlanTest() {
-		assertTrue(collectionPlan.getAssigner() == assigner);
-		assertTrue(collectionPlan.getScore() == 0);
-		assertTrue(collectionPlan.getLsp() == null);
-		assertTrue(collectionPlan.getSolutions().size() == 1);
-		assertTrue(collectionPlan.getSolutions().iterator().next() == collectionSolution);
+		assertSame(collectionPlan.getAssigner(), assigner);
+		assertEquals(0, (double) collectionPlan.getScore(), 0.0);
+		assertNull(collectionPlan.getLsp());
+		assertEquals(1, collectionPlan.getSolutions().size());
+		assertSame(collectionPlan.getSolutions().iterator().next(), collectionSolution);
 	}
 
 }

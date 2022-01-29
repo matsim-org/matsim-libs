@@ -81,43 +81,43 @@ public class MainRunAdapterTest {
 	
 	@Test
 	public void testMainRunAdapter() {
-		assertTrue(mainRunAdapter.getClientElements() != null);
+		assertNotNull(mainRunAdapter.getClientElements());
 		assertTrue(mainRunAdapter.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass()));
 		if(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass())) {
 			assertTrue(Carrier.class.isAssignableFrom(mainRunAdapter.getClassOfResource()));
-			assertTrue(mainRunAdapter.getCarrier() == carrier);
+			assertSame(mainRunAdapter.getCarrier(), carrier);
 		}
-		assertTrue(mainRunAdapter.getEndLinkId() == toLinkId);
-		assertTrue(mainRunAdapter.getStartLinkId() == fromLinkId);
-		assertTrue(mainRunAdapter.getEventHandlers() != null);
+		assertSame(mainRunAdapter.getEndLinkId(), toLinkId);
+		assertSame(mainRunAdapter.getStartLinkId(), fromLinkId);
+		assertNotNull(mainRunAdapter.getEventHandlers());
 		assertTrue(mainRunAdapter.getEventHandlers().isEmpty());
-		assertTrue(mainRunAdapter.getInfos() != null);
+		assertNotNull(mainRunAdapter.getInfos());
 		assertTrue(mainRunAdapter.getInfos().isEmpty());
 		if(mainRunAdapter.getCarrier() == carrier) {
-			assertTrue(carrier.getCarrierCapabilities() == capabilities);
+			assertSame(carrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
 			assertTrue(carrier.getPlans().isEmpty());
-			assertTrue(carrier.getSelectedPlan() == null);
+			assertNull(carrier.getSelectedPlan());
 			assertTrue(carrier.getServices().isEmpty());
 			assertTrue(carrier.getShipments().isEmpty());
 			if(carrier.getCarrierCapabilities() == capabilities) {
-				assertTrue(capabilities.getFleetSize() == FleetSize.INFINITE);
+				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
-					assertTrue(types.get(0) == mainRunType);
-					assertTrue( mainRunType.getCapacity().getOther().intValue() == 30 );
-					assertTrue( mainRunType.getCostInformation().getPerDistanceUnit() == 0.0008 );
-					assertTrue( mainRunType.getCostInformation().getPerTimeUnit() == 0.38 );
-					assertTrue( mainRunType.getCostInformation().getFix() == 120 );
-					assertTrue(mainRunType.getMaximumVelocity() == (50/3.6));					
+					assertSame(types.get(0), mainRunType);
+					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
+					assertEquals(0.0008, mainRunType.getCostInformation().getPerDistanceUnit(), 0.0);
+					assertEquals(0.38, mainRunType.getCostInformation().getPerTimeUnit(), 0.0);
+					assertEquals(120, mainRunType.getCostInformation().getFix(), 0.0);
+					assertEquals((50 / 3.6), mainRunType.getMaximumVelocity(), 0.0);
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
-					assertTrue(vehicles.get(0) == carrierVehicle);
-					assertTrue(carrierVehicle.getType() == mainRunType);
-					assertTrue(carrierVehicle.getLocation() == fromLinkId);
+					assertSame(vehicles.get(0), carrierVehicle);
+					assertSame(carrierVehicle.getType(), mainRunType);
+					assertSame(carrierVehicle.getLocation(), fromLinkId);
 				}
 			}
 		}

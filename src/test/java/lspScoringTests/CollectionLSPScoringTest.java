@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CollectionLSPScoringTest {
@@ -170,9 +171,9 @@ public class CollectionLSPScoringTest {
 	@Test
 	public void testCollectionLSPScoring() {
 		System.out.println(collectionLSP.getSelectedPlan().getScore());
-		assertTrue(collectionLSP.getShipments().size() == numberOfShipments);
-		assertTrue(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments()
-				.size() == numberOfShipments);
+		assertEquals(numberOfShipments, collectionLSP.getShipments().size());
+		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments()
+				.size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
 		/*noch zu testen

@@ -79,45 +79,45 @@ public class CollectionAdapterTest {
 	
 	@Test
 	public void testCollectionAdapter() {
-		assertTrue(carrierResource.getClientElements() != null);
+		assertNotNull(carrierResource.getClientElements());
 		assertTrue(carrierResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass()));
 		if(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
 			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
-			assertTrue(carrierResource.getCarrier() == collectionCarrier);
+			assertSame(carrierResource.getCarrier(), collectionCarrier);
 		}
-		assertTrue(carrierResource.getEndLinkId() == collectionLinkId);
-		assertTrue(carrierResource.getStartLinkId() == collectionLinkId);
-		assertTrue(carrierResource.getEventHandlers() != null);
+		assertSame(carrierResource.getEndLinkId(), collectionLinkId);
+		assertSame(carrierResource.getStartLinkId(), collectionLinkId);
+		assertNotNull(carrierResource.getEventHandlers());
 		assertTrue(carrierResource.getEventHandlers().isEmpty());
-		assertTrue(carrierResource.getInfos() != null);
+		assertNotNull(carrierResource.getInfos());
 		assertTrue(carrierResource.getInfos().isEmpty());
-		assertTrue(carrierResource.getStartLinkId() == collectionLinkId);
+		assertSame(carrierResource.getStartLinkId(), collectionLinkId);
 		if(carrierResource.getCarrier() == collectionCarrier) {
-			assertTrue(collectionCarrier.getCarrierCapabilities() == capabilities);
+			assertSame(collectionCarrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(collectionCarrier.getClass()));
 			assertTrue(collectionCarrier.getPlans().isEmpty());
-			assertTrue(collectionCarrier.getSelectedPlan() == null);
+			assertNull(collectionCarrier.getSelectedPlan());
 			assertTrue(collectionCarrier.getServices().isEmpty());
 			assertTrue(collectionCarrier.getShipments().isEmpty());
 			if(collectionCarrier.getCarrierCapabilities() == capabilities) {
-				assertTrue(capabilities.getFleetSize() == FleetSize.INFINITE);
+				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
-					assertTrue(types.get(0) == collectionType);
-					assertTrue( collectionType.getCapacity().getOther().intValue() == 10 );
-					assertTrue( collectionType.getCostInformation().getPerDistanceUnit() == 0.0004 );
-					assertTrue( collectionType.getCostInformation().getPerTimeUnit() == 0.38 );
-					assertTrue( collectionType.getCostInformation().getFix() == 49 );
-					assertTrue(collectionType.getMaximumVelocity() == (50/3.6));
+					assertSame(types.get(0), collectionType);
+					assertEquals(10, collectionType.getCapacity().getOther().intValue());
+					assertEquals(0.0004, collectionType.getCostInformation().getPerDistanceUnit(), 0.0);
+					assertEquals(0.38, collectionType.getCostInformation().getPerTimeUnit(), 0.0);
+					assertEquals(49, collectionType.getCostInformation().getFix(), 0.0);
+					assertEquals((50 / 3.6), collectionType.getMaximumVelocity(), 0.0);
 					
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
-					assertTrue(vehicles.get(0) == collectionCarrierVehicle);
-					assertTrue(collectionCarrierVehicle.getType() == collectionType);
-					assertTrue(collectionCarrierVehicle.getLocation() == collectionLinkId);
+					assertSame(vehicles.get(0), collectionCarrierVehicle);
+					assertSame(collectionCarrierVehicle.getType(), collectionType);
+					assertSame(collectionCarrierVehicle.getLocation(), collectionLinkId);
 				}
 			}
 		}

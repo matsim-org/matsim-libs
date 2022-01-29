@@ -202,11 +202,11 @@ public class CompleteLSPPlanTest {
 
 	@Test
 	public void testCompleteLSPPlan() {
-		assertTrue(completePlan.getAssigner() == assigner);
-		assertTrue(completePlan.getLsp() == null);
-		assertTrue(completePlan.getScore() == 0);
-		assertTrue(completePlan.getSolutions().size() ==1);
-		assertTrue(completePlan.getSolutions().iterator().next() == completeSolution);
+		assertSame(completePlan.getAssigner(), assigner);
+		assertNull(completePlan.getLsp());
+		assertEquals(0, (double) completePlan.getScore(), 0.0);
+		assertEquals(1, completePlan.getSolutions().size());
+		assertSame(completePlan.getSolutions().iterator().next(), completeSolution);
 	}
 	
 }

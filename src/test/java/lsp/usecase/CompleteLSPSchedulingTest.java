@@ -1,8 +1,5 @@
 package lsp.usecase;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,6 +24,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.LSPResource;
+
+import static org.junit.Assert.*;
 
 public class CompleteLSPSchedulingTest {
 
@@ -296,131 +295,131 @@ public class CompleteLSPSchedulingTest {
 		ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 		
 		for(LSPShipment shipment : lsp.getShipments()){
-			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 11);
+			assertEquals(11, shipment.getShipmentPlan().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
-			
-			assertTrue(planElements.get(10).getElementType().equals("UNLOAD"));
+
+			assertEquals("UNLOAD", planElements.get(10).getElementType());
 			assertTrue(planElements.get(10).getEndTime() >= (0));
 			assertTrue(planElements.get(10).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(10).getStartTime() <= planElements.get(10).getEndTime());
 			assertTrue(planElements.get(10).getStartTime() >= (0));
-			assertTrue(planElements.get(10).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(10).getResourceId() == distributionAdapter.getId());
-			assertTrue(planElements.get(10).getSolutionElement() == distributionElement);	
-									
-			assertTrue(planElements.get(10).getStartTime() == planElements.get(9).getEndTime());
-				
-			assertTrue(planElements.get(9).getElementType().equals("TRANSPORT"));
+			assertTrue(planElements.get(10).getStartTime() <= (24*3600));
+			assertSame(planElements.get(10).getResourceId(), distributionAdapter.getId());
+			assertSame(planElements.get(10).getSolutionElement(), distributionElement);
+
+			assertEquals(planElements.get(10).getStartTime(), planElements.get(9).getEndTime(), 0.0);
+
+			assertEquals("TRANSPORT", planElements.get(9).getElementType());
 			assertTrue(planElements.get(9).getEndTime() >= (0));
 			assertTrue(planElements.get(9).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(9).getStartTime() <= planElements.get(9).getEndTime());
 			assertTrue(planElements.get(9).getStartTime() >= (0));
-			assertTrue(planElements.get(9).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(9).getResourceId() == distributionAdapter.getId());
-			assertTrue(planElements.get(9).getSolutionElement() == distributionElement);	
-			
-			assertTrue(planElements.get(9).getStartTime() == planElements.get(8).getEndTime());
-			
-			assertTrue(planElements.get(8).getElementType().equals("LOAD"));
+			assertTrue(planElements.get(9).getStartTime() <= (24*3600));
+			assertSame(planElements.get(9).getResourceId(), distributionAdapter.getId());
+			assertSame(planElements.get(9).getSolutionElement(), distributionElement);
+
+			assertEquals(planElements.get(9).getStartTime(), planElements.get(8).getEndTime(), 0.0);
+
+			assertEquals("LOAD", planElements.get(8).getElementType());
 			assertTrue(planElements.get(8).getEndTime() >= (0));
 			assertTrue(planElements.get(8).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(8).getStartTime() <= planElements.get(8).getEndTime());
 			assertTrue(planElements.get(8).getStartTime() >= (0));
-			assertTrue(planElements.get(8).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(8).getResourceId() == distributionAdapter.getId());
-			assertTrue(planElements.get(8).getSolutionElement() == distributionElement);	
+			assertTrue(planElements.get(8).getStartTime() <= (24*3600));
+			assertSame(planElements.get(8).getResourceId(), distributionAdapter.getId());
+			assertSame(planElements.get(8).getSolutionElement(), distributionElement);
 			
 			assertTrue(planElements.get(8).getStartTime() >= (planElements.get(7).getEndTime()/ 1.0001) + 300);
-			
-			assertTrue(planElements.get(7).getElementType().equals("HANDLE"));
+
+			assertEquals("HANDLE", planElements.get(7).getElementType());
 			assertTrue(planElements.get(7).getEndTime() >= (0));
 			assertTrue(planElements.get(7).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(7).getStartTime() <= planElements.get(7).getEndTime());
 			assertTrue(planElements.get(7).getStartTime() >= (0));
-			assertTrue(planElements.get(7).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(7).getResourceId() == secondReloadingPointAdapter.getId());
-			assertTrue(planElements.get(7).getSolutionElement() == secondReloadElement);	
-			
-			assertTrue(planElements.get(7).getStartTime() == (planElements.get(6).getEndTime() +300));
-			
-			assertTrue(planElements.get(6).getElementType().equals("UNLOAD"));
+			assertTrue(planElements.get(7).getStartTime() <= (24*3600));
+			assertSame(planElements.get(7).getResourceId(), secondReloadingPointAdapter.getId());
+			assertSame(planElements.get(7).getSolutionElement(), secondReloadElement);
+
+			assertEquals(planElements.get(7).getStartTime(), (planElements.get(6).getEndTime() + 300), 0.0);
+
+			assertEquals("UNLOAD", planElements.get(6).getElementType());
 			assertTrue(planElements.get(6).getEndTime() >= (0));
 			assertTrue(planElements.get(6).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(6).getStartTime() <= planElements.get(6).getEndTime());
 			assertTrue(planElements.get(6).getStartTime() >= (0));
-			assertTrue(planElements.get(6).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(6).getResourceId() == mainRunAdapter.getId());
-			assertTrue(planElements.get(6).getSolutionElement() == mainRunElement);	
-			
-			assertTrue(planElements.get(6).getStartTime() == planElements.get(5).getEndTime());
-			
-			assertTrue(planElements.get(5).getElementType().equals("TRANSPORT"));
+			assertTrue(planElements.get(6).getStartTime() <= (24*3600));
+			assertSame(planElements.get(6).getResourceId(), mainRunAdapter.getId());
+			assertSame(planElements.get(6).getSolutionElement(), mainRunElement);
+
+			assertEquals(planElements.get(6).getStartTime(), planElements.get(5).getEndTime(), 0.0);
+
+			assertEquals("TRANSPORT", planElements.get(5).getElementType());
 			assertTrue(planElements.get(5).getEndTime() >= (0));
 			assertTrue(planElements.get(5).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(5).getStartTime() <= planElements.get(5).getEndTime());
 			assertTrue(planElements.get(5).getStartTime() >= (0));
-			assertTrue(planElements.get(5).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(5).getResourceId() == mainRunAdapter.getId());
-			assertTrue(planElements.get(5).getSolutionElement() == mainRunElement);	
-		
-			assertTrue(planElements.get(5).getStartTime() == planElements.get(4).getEndTime());
-			
-			assertTrue(planElements.get(4).getElementType().equals("LOAD"));
+			assertTrue(planElements.get(5).getStartTime() <= (24*3600));
+			assertSame(planElements.get(5).getResourceId(), mainRunAdapter.getId());
+			assertSame(planElements.get(5).getSolutionElement(), mainRunElement);
+
+			assertEquals(planElements.get(5).getStartTime(), planElements.get(4).getEndTime(), 0.0);
+
+			assertEquals("LOAD", planElements.get(4).getElementType());
 			assertTrue(planElements.get(4).getEndTime() >= (0));
 			assertTrue(planElements.get(4).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(4).getStartTime() <= planElements.get(4).getEndTime());
 			assertTrue(planElements.get(4).getStartTime() >= (0));
-			assertTrue(planElements.get(4).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(4).getResourceId() == mainRunAdapter.getId());
-			assertTrue(planElements.get(4).getSolutionElement() == mainRunElement);	
+			assertTrue(planElements.get(4).getStartTime() <= (24*3600));
+			assertSame(planElements.get(4).getResourceId(), mainRunAdapter.getId());
+			assertSame(planElements.get(4).getSolutionElement(), mainRunElement);
 			
 			assertTrue(planElements.get(4).getStartTime() >= (planElements.get(3).getEndTime() / (1.0001)) + 300);
-			
-			assertTrue(planElements.get(3).getElementType().equals("HANDLE"));
+
+			assertEquals("HANDLE", planElements.get(3).getElementType());
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
 			assertTrue(planElements.get(3).getStartTime() >= (0));
-			assertTrue(planElements.get(3).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(3).getResourceId() == firstReloadingPointAdapter.getId());
-			assertTrue(planElements.get(3).getSolutionElement() == firstReloadElement);	
-			
-			assertTrue(planElements.get(3).getStartTime() == (planElements.get(2).getEndTime() + 300));
-			
-			assertTrue(planElements.get(2).getElementType().equals("UNLOAD"));
+			assertTrue(planElements.get(3).getStartTime() <= (24*3600));
+			assertSame(planElements.get(3).getResourceId(), firstReloadingPointAdapter.getId());
+			assertSame(planElements.get(3).getSolutionElement(), firstReloadElement);
+
+			assertEquals(planElements.get(3).getStartTime(), (planElements.get(2).getEndTime() + 300), 0.0);
+
+			assertEquals("UNLOAD", planElements.get(2).getElementType());
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
 			assertTrue(planElements.get(2).getStartTime() >= (0));
-			assertTrue(planElements.get(2).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(2).getResourceId() == collectionAdapter.getId());
-			assertTrue(planElements.get(2).getSolutionElement() == collectionElement);	
-			
-			assertTrue(planElements.get(2).getStartTime() == planElements.get(1).getEndTime());
-			
-			assertTrue(planElements.get(1).getElementType().equals("TRANSPORT"));
+			assertTrue(planElements.get(2).getStartTime() <= (24*3600));
+			assertSame(planElements.get(2).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(2).getSolutionElement(), collectionElement);
+
+			assertEquals(planElements.get(2).getStartTime(), planElements.get(1).getEndTime(), 0.0);
+
+			assertEquals("TRANSPORT", planElements.get(1).getElementType());
 			assertTrue(planElements.get(1).getEndTime() >= (0));
 			assertTrue(planElements.get(1).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(1).getStartTime() <= planElements.get(1).getEndTime());
 			assertTrue(planElements.get(1).getStartTime() >= (0));
-			assertTrue(planElements.get(1).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(1).getResourceId() == collectionAdapter.getId());
-			assertTrue(planElements.get(1).getSolutionElement() == collectionElement);	
-			
-			assertTrue(planElements.get(1).getStartTime() == planElements.get(0).getEndTime());
-			
-			assertTrue(planElements.get(0).getElementType().equals("LOAD"));
+			assertTrue(planElements.get(1).getStartTime() <= (24*3600));
+			assertSame(planElements.get(1).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(1).getSolutionElement(), collectionElement);
+
+			assertEquals(planElements.get(1).getStartTime(), planElements.get(0).getEndTime(), 0.0);
+
+			assertEquals("LOAD", planElements.get(0).getElementType());
 			assertTrue(planElements.get(0).getEndTime() >= (0));
 			assertTrue(planElements.get(0).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(0).getStartTime() <= planElements.get(0).getEndTime());
 			assertTrue(planElements.get(0).getStartTime() >= (0));
-			assertTrue(planElements.get(0).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(0).getResourceId() == collectionAdapter.getId());
-			assertTrue(planElements.get(0).getSolutionElement() == collectionElement);	
+			assertTrue(planElements.get(0).getStartTime() <= (24*3600));
+			assertSame(planElements.get(0).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 		}
-		
-		assertTrue(firstReloadingPointAdapter.getEventHandlers().size() ==1);
+
+		assertEquals(1, firstReloadingPointAdapter.getEventHandlers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<EventHandler>(firstReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
@@ -431,9 +430,9 @@ public class CompleteLSPSchedulingTest {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
-			assertTrue(service.getLocationLinkId() == shipment.getFrom() );
-			assertTrue(service.getCapacityDemand() == shipment.getSize() );
-			assertTrue(service.getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertSame(service.getLocationLinkId(), shipment.getFrom());
+			assertEquals(service.getCapacityDemand(), shipment.getSize());
+			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByReloadingPoint = false;
 			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
 				if(clientElement == element) {
@@ -445,8 +444,8 @@ public class CompleteLSPSchedulingTest {
 			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));	
 			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));	
 		}
-		
-		assertTrue(secondReloadingPointAdapter.getEventHandlers().size() ==1);
+
+		assertEquals(1, secondReloadingPointAdapter.getEventHandlers().size());
 		eventHandlers = new ArrayList<EventHandler>(secondReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
@@ -457,9 +456,9 @@ public class CompleteLSPSchedulingTest {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
-			assertTrue(service.getLocationLinkId() == toLinkId);
-			assertTrue(service.getCapacityDemand() == shipment.getSize() );
-			assertTrue(service.getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertSame(service.getLocationLinkId(), toLinkId);
+			assertEquals(service.getCapacityDemand(), shipment.getSize());
+			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByReloadingPoint = false;
 			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
 				if(clientElement == element) {
@@ -473,115 +472,115 @@ public class CompleteLSPSchedulingTest {
 		}
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
-			assertTrue(shipment.getEventHandlers().size() == 6);
+			assertEquals(6, shipment.getEventHandlers().size());
 			eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
 				
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
-			assertTrue(endHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
-			assertTrue(endHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(endHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(endHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
-			assertTrue(endHandler.getElement() == planElements.get(0).getSolutionElement());
-			assertTrue(endHandler.getElement() == planElements.get(1).getSolutionElement());
-			assertTrue(endHandler.getElement() == planElements.get(2).getSolutionElement());
-			assertTrue(endHandler.getElement() == solutionElements.get(0));
-			assertTrue(endHandler.getLspShipment() == shipment);
-			assertTrue(endHandler.getResourceId() == planElements.get(0).getResourceId());
-			assertTrue(endHandler.getResourceId() == planElements.get(1).getResourceId());
-			assertTrue(endHandler.getResourceId() == planElements.get(2).getResourceId());
-			assertTrue(endHandler.getResourceId()  == resources.get(0).getId());
+			assertSame(endHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
+			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertSame(endHandler.getElement(), planElements.get(0).getSolutionElement());
+			assertSame(endHandler.getElement(), planElements.get(1).getSolutionElement());
+			assertSame(endHandler.getElement(), planElements.get(2).getSolutionElement());
+			assertSame(endHandler.getElement(), solutionElements.get(0));
+			assertSame(endHandler.getLspShipment(), shipment);
+			assertSame(endHandler.getResourceId(), planElements.get(0).getResourceId());
+			assertSame(endHandler.getResourceId(), planElements.get(1).getResourceId());
+			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
+			assertSame(endHandler.getResourceId(), resources.get(0).getId());
 			
 			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
-			assertTrue(serviceHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
-			assertTrue(serviceHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(serviceHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(serviceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
-			assertTrue(serviceHandler.getElement() == planElements.get(0).getSolutionElement());
-			assertTrue(serviceHandler.getElement() == planElements.get(1).getSolutionElement());
-			assertTrue(serviceHandler.getElement() == planElements.get(2).getSolutionElement());
-			assertTrue(serviceHandler.getElement() == solutionElements.get(0));
-			assertTrue(serviceHandler.getLspShipment() == shipment);
-			assertTrue(serviceHandler.getResourceId() == planElements.get(0).getResourceId());
-			assertTrue(serviceHandler.getResourceId() == planElements.get(1).getResourceId());
-			assertTrue(serviceHandler.getResourceId() == planElements.get(2).getResourceId());
-			assertTrue(serviceHandler.getResourceId()  == resources.get(0).getId());
+			assertSame(serviceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
+			assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertSame(serviceHandler.getElement(), planElements.get(0).getSolutionElement());
+			assertSame(serviceHandler.getElement(), planElements.get(1).getSolutionElement());
+			assertSame(serviceHandler.getElement(), planElements.get(2).getSolutionElement());
+			assertSame(serviceHandler.getElement(), solutionElements.get(0));
+			assertSame(serviceHandler.getLspShipment(), shipment);
+			assertSame(serviceHandler.getResourceId(), planElements.get(0).getResourceId());
+			assertSame(serviceHandler.getResourceId(), planElements.get(1).getResourceId());
+			assertSame(serviceHandler.getResourceId(), planElements.get(2).getResourceId());
+			assertSame(serviceHandler.getResourceId(), resources.get(0).getId());
 			
 			assertTrue(eventHandlers.get(2) instanceof MainRunTourStartEventHandler);
 			MainRunTourStartEventHandler mainRunStartHandler = (MainRunTourStartEventHandler) eventHandlers.get(2);
-			assertTrue(mainRunStartHandler.getCarrierService().getLocationLinkId() == toLinkId);
-			assertTrue(mainRunStartHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(mainRunStartHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getStart() == 0);
-			assertTrue(mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd() == Integer.MAX_VALUE);
-			assertTrue(mainRunStartHandler.getSolutionElement() == planElements.get(4).getSolutionElement());
-			assertTrue(mainRunStartHandler.getSolutionElement() == planElements.get(5).getSolutionElement());
-			assertTrue(mainRunStartHandler.getSolutionElement() == planElements.get(6).getSolutionElement());
-			assertTrue(mainRunStartHandler.getSolutionElement() == solutionElements.get(2));
-			assertTrue(mainRunStartHandler.getLspShipment() == shipment);
-			assertTrue(mainRunStartHandler.getResource().getId() == planElements.get(4).getResourceId());
-			assertTrue(mainRunStartHandler.getResource().getId() == planElements.get(5).getResourceId());
-			assertTrue(mainRunStartHandler.getResource().getId() == planElements.get(6).getResourceId());
-			assertTrue(mainRunStartHandler.getResource().getId()  == resources.get(2).getId());
+			assertSame(mainRunStartHandler.getCarrierService().getLocationLinkId(), toLinkId);
+			assertEquals(mainRunStartHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(mainRunStartHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+			assertSame(mainRunStartHandler.getSolutionElement(), planElements.get(4).getSolutionElement());
+			assertSame(mainRunStartHandler.getSolutionElement(), planElements.get(5).getSolutionElement());
+			assertSame(mainRunStartHandler.getSolutionElement(), planElements.get(6).getSolutionElement());
+			assertSame(mainRunStartHandler.getSolutionElement(), solutionElements.get(2));
+			assertSame(mainRunStartHandler.getLspShipment(), shipment);
+			assertSame(mainRunStartHandler.getResource().getId(), planElements.get(4).getResourceId());
+			assertSame(mainRunStartHandler.getResource().getId(), planElements.get(5).getResourceId());
+			assertSame(mainRunStartHandler.getResource().getId(), planElements.get(6).getResourceId());
+			assertSame(mainRunStartHandler.getResource().getId(), resources.get(2).getId());
 			
 			assertTrue(eventHandlers.get(3) instanceof MainRunTourEndEventHandler);
 			MainRunTourEndEventHandler mainRunEndHandler = (MainRunTourEndEventHandler) eventHandlers.get(3);
-			assertTrue(mainRunEndHandler.getCarrierService().getLocationLinkId() == toLinkId);
-			assertTrue(mainRunEndHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(mainRunEndHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getStart() == 0);
-			assertTrue(mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getEnd() == Integer.MAX_VALUE);
-			assertTrue(mainRunEndHandler.getSolutionElement() == planElements.get(4).getSolutionElement());
-			assertTrue(mainRunEndHandler.getSolutionElement() == planElements.get(5).getSolutionElement());
-			assertTrue(mainRunEndHandler.getSolutionElement() == planElements.get(6).getSolutionElement());
-			assertTrue(mainRunEndHandler.getSolutionElement() == solutionElements.get(2));
-			assertTrue(mainRunEndHandler.getLspShipment() == shipment);
-			assertTrue(mainRunEndHandler.getResource().getId() == planElements.get(4).getResourceId());
-			assertTrue(mainRunEndHandler.getResource().getId() == planElements.get(5).getResourceId());
-			assertTrue(mainRunEndHandler.getResource().getId() == planElements.get(6).getResourceId());
-			assertTrue(mainRunEndHandler.getResource().getId()  == resources.get(2).getId());
+			assertSame(mainRunEndHandler.getCarrierService().getLocationLinkId(), toLinkId);
+			assertEquals(mainRunEndHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(mainRunEndHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+			assertSame(mainRunEndHandler.getSolutionElement(), planElements.get(4).getSolutionElement());
+			assertSame(mainRunEndHandler.getSolutionElement(), planElements.get(5).getSolutionElement());
+			assertSame(mainRunEndHandler.getSolutionElement(), planElements.get(6).getSolutionElement());
+			assertSame(mainRunEndHandler.getSolutionElement(), solutionElements.get(2));
+			assertSame(mainRunEndHandler.getLspShipment(), shipment);
+			assertSame(mainRunEndHandler.getResource().getId(), planElements.get(4).getResourceId());
+			assertSame(mainRunEndHandler.getResource().getId(), planElements.get(5).getResourceId());
+			assertSame(mainRunEndHandler.getResource().getId(), planElements.get(6).getResourceId());
+			assertSame(mainRunEndHandler.getResource().getId(), resources.get(2).getId());
 			
 			assertTrue(eventHandlers.get(4) instanceof DistributionTourStartEventHandler);
 			DistributionTourStartEventHandler distributionStartHandler = (DistributionTourStartEventHandler) eventHandlers.get(4);
-			assertTrue(distributionStartHandler.getCarrierService().getLocationLinkId() == shipment.getTo() );
-			assertTrue(distributionStartHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(distributionStartHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(distributionStartHandler.getCarrierService().getServiceStartTimeWindow().getStart() == 0);
-			assertTrue(distributionStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd() == Integer.MAX_VALUE);
-			assertTrue(distributionStartHandler.getElement() == planElements.get(8).getSolutionElement());
-			assertTrue(distributionStartHandler.getElement() == planElements.get(9).getSolutionElement());
-			assertTrue(distributionStartHandler.getElement() == planElements.get(10).getSolutionElement());
-			assertTrue(distributionStartHandler.getElement() == solutionElements.get(4));
-			assertTrue(distributionStartHandler.getLspShipment() == shipment);
-			assertTrue(distributionStartHandler.getResource().getId() == planElements.get(8).getResourceId());
-			assertTrue(distributionStartHandler.getResource().getId() == planElements.get(9).getResourceId());
-			assertTrue(distributionStartHandler.getResource().getId() == planElements.get(10).getResourceId());
-			assertTrue(distributionStartHandler.getResource().getId()  == resources.get(4).getId());
+			assertSame(distributionStartHandler.getCarrierService().getLocationLinkId(), shipment.getTo());
+			assertEquals(distributionStartHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(distributionStartHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, distributionStartHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, distributionStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+			assertSame(distributionStartHandler.getElement(), planElements.get(8).getSolutionElement());
+			assertSame(distributionStartHandler.getElement(), planElements.get(9).getSolutionElement());
+			assertSame(distributionStartHandler.getElement(), planElements.get(10).getSolutionElement());
+			assertSame(distributionStartHandler.getElement(), solutionElements.get(4));
+			assertSame(distributionStartHandler.getLspShipment(), shipment);
+			assertSame(distributionStartHandler.getResource().getId(), planElements.get(8).getResourceId());
+			assertSame(distributionStartHandler.getResource().getId(), planElements.get(9).getResourceId());
+			assertSame(distributionStartHandler.getResource().getId(), planElements.get(10).getResourceId());
+			assertSame(distributionStartHandler.getResource().getId(), resources.get(4).getId());
 			
 			assertTrue(eventHandlers.get(5) instanceof DistributionServiceStartEventHandler);
 			DistributionServiceStartEventHandler distributionServiceHandler = (DistributionServiceStartEventHandler) eventHandlers.get(5);
-			assertTrue(distributionServiceHandler.getCarrierService().getLocationLinkId() == shipment.getTo() );
-			assertTrue(distributionServiceHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(distributionServiceHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(distributionServiceHandler.getCarrierService().getServiceStartTimeWindow().getStart() == 0);
-			assertTrue(distributionServiceHandler.getCarrierService().getServiceStartTimeWindow().getEnd() == Integer.MAX_VALUE);
-			assertTrue(distributionServiceHandler.getSolutionElement() == planElements.get(8).getSolutionElement());
-			assertTrue(distributionServiceHandler.getSolutionElement() == planElements.get(9).getSolutionElement());
-			assertTrue(distributionServiceHandler.getSolutionElement() == planElements.get(10).getSolutionElement());
-			assertTrue(distributionServiceHandler.getSolutionElement() == solutionElements.get(4));
-			assertTrue(distributionServiceHandler.getLspShipment() == shipment);
-			assertTrue(distributionServiceHandler.getResource().getId() == planElements.get(8).getResourceId());
-			assertTrue(distributionServiceHandler.getResource().getId() == planElements.get(9).getResourceId());
-			assertTrue(distributionServiceHandler.getResource().getId() == planElements.get(10).getResourceId());
-			assertTrue(distributionServiceHandler.getResource().getId()  == resources.get(4).getId());
+			assertSame(distributionServiceHandler.getCarrierService().getLocationLinkId(), shipment.getTo());
+			assertEquals(distributionServiceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertEquals(distributionServiceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(0, distributionServiceHandler.getCarrierService().getServiceStartTimeWindow().getStart(), 0.0);
+			assertEquals(Integer.MAX_VALUE, distributionServiceHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), 0.0);
+			assertSame(distributionServiceHandler.getSolutionElement(), planElements.get(8).getSolutionElement());
+			assertSame(distributionServiceHandler.getSolutionElement(), planElements.get(9).getSolutionElement());
+			assertSame(distributionServiceHandler.getSolutionElement(), planElements.get(10).getSolutionElement());
+			assertSame(distributionServiceHandler.getSolutionElement(), solutionElements.get(4));
+			assertSame(distributionServiceHandler.getLspShipment(), shipment);
+			assertSame(distributionServiceHandler.getResource().getId(), planElements.get(8).getResourceId());
+			assertSame(distributionServiceHandler.getResource().getId(), planElements.get(9).getResourceId());
+			assertSame(distributionServiceHandler.getResource().getId(), planElements.get(10).getResourceId());
+			assertSame(distributionServiceHandler.getResource().getId(), resources.get(4).getId());
 			
 		}
 		
 		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-			assertTrue(solution.getShipments().size() == 1);
+			assertEquals(1, solution.getShipments().size());
 			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if(element.getNextElement() != null) {

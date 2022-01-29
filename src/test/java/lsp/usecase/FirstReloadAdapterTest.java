@@ -34,18 +34,18 @@ public class FirstReloadAdapterTest {
 	
 	@Test
 	public void reloadingPointTest() {
-		assertTrue(reloadingPoint.getCapacityNeedFixed() == 10);
-		assertTrue(reloadingPoint.getCapacityNeedLinear() == 1);
+		assertEquals(10, reloadingPoint.getCapacityNeedFixed(), 0.0);
+		assertEquals(1, reloadingPoint.getCapacityNeedLinear(), 0.0);
 		assertFalse(LSPCarrierResource.class.isAssignableFrom(reloadingPoint.getClass()));
-		assertTrue(reloadingPoint.getClassOfResource() == ReloadingPoint.class);
-		assertTrue(reloadingPoint.getClientElements() != null);
+		assertSame(reloadingPoint.getClassOfResource(), ReloadingPoint.class);
+		assertNotNull(reloadingPoint.getClientElements());
 		assertTrue(reloadingPoint.getClientElements().isEmpty());
-		assertTrue(reloadingPoint.getEndLinkId() == reloadingLinkId);
-		assertTrue(reloadingPoint.getStartLinkId() == reloadingLinkId);
-		assertTrue(reloadingPoint.getEventHandlers() != null);
+		assertSame(reloadingPoint.getEndLinkId(), reloadingLinkId);
+		assertSame(reloadingPoint.getStartLinkId(), reloadingLinkId);
+		assertNotNull(reloadingPoint.getEventHandlers());
 		assertFalse(reloadingPoint.getEventHandlers().isEmpty());
-		assertTrue(reloadingPoint.getEventHandlers().size() == 1);
-		assertTrue(reloadingPoint.getInfos() != null);
+		assertEquals(1, reloadingPoint.getEventHandlers().size());
+		assertNotNull(reloadingPoint.getInfos());
 		assertTrue(reloadingPoint.getInfos().isEmpty());
 	}
 }

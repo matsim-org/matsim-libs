@@ -1,5 +1,6 @@
 package requirementsCheckerTests;
 
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -169,10 +170,10 @@ public class TransferrerRequirementsTest {
 	    		Offer offer = offerLSP.getOffer(demandObject, "nonsense", null);
 	    		for(Requirement requirement : demandObject.getRequirements()) {
 	    			if(requirement instanceof RedRequirement) {
-	    				assertTrue(offer.getSolution() == redOfferSolution);
+						assertSame(offer.getSolution(), redOfferSolution);
 	    			}
 	    			if(requirement instanceof BlueRequirement) {
-	    				assertTrue(offer.getSolution() == blueOfferSolution);
+						assertSame(offer.getSolution(), blueOfferSolution);
 	    			}
 	    		}
 	    	}

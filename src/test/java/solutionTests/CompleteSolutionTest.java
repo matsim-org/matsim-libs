@@ -209,34 +209,34 @@ public class CompleteSolutionTest {
 
 	@Test
 	public void testCompleteSolution() {
-		assertTrue(solution.getEventHandlers() != null);
+		assertNotNull(solution.getEventHandlers());
 		assertTrue(solution.getEventHandlers().isEmpty());
-		assertTrue(solution.getInfos() != null);
+		assertNotNull(solution.getInfos());
 		assertTrue(solution.getInfos().isEmpty());
-		assertTrue(solution.getLSP() == null);
-		assertTrue(solution.getShipments() != null);
+		assertNull(solution.getLSP());
+		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());
-		assertTrue(solution.getSolutionElements().size() == 5);
+		assertEquals(5, solution.getSolutionElements().size());
 		ArrayList<LogisticsSolutionElement> elements = new ArrayList<LogisticsSolutionElement>(solution.getSolutionElements());
 		 	for(LogisticsSolutionElement element : elements) {
 				if(elements.indexOf(element) == 0) {
-					assertTrue(element.getPreviousElement() == null);
+					assertNull(element.getPreviousElement());
 				}
 				if(elements.indexOf(element) == (elements.size() -1)) {
-					assertTrue(element.getNextElement() == null);
+					assertNull(element.getNextElement());
 				}
-				assertTrue(element.getLogisticsSolution() == solution);
-			}	
-		assertTrue(collectionElement.getPreviousElement() == null);
-		assertTrue(collectionElement.getNextElement() == firstReloadElement);
-		assertTrue(firstReloadElement.getPreviousElement() == collectionElement);
-		assertTrue(firstReloadElement.getNextElement() == mainRunElement);
-		assertTrue(mainRunElement.getPreviousElement() == firstReloadElement);
-		assertTrue(mainRunElement.getNextElement() == secondReloadElement);
-		assertTrue(secondReloadElement.getPreviousElement() == mainRunElement);
-		assertTrue(secondReloadElement.getNextElement() == distributionElement);
-		assertTrue(distributionElement.getPreviousElement() == secondReloadElement);
-		assertTrue(distributionElement.getNextElement() == null);
+				assertSame(element.getLogisticsSolution(), solution);
+			}
+		assertNull(collectionElement.getPreviousElement());
+		assertSame(collectionElement.getNextElement(), firstReloadElement);
+		assertSame(firstReloadElement.getPreviousElement(), collectionElement);
+		assertSame(firstReloadElement.getNextElement(), mainRunElement);
+		assertSame(mainRunElement.getPreviousElement(), firstReloadElement);
+		assertSame(mainRunElement.getNextElement(), secondReloadElement);
+		assertSame(secondReloadElement.getPreviousElement(), mainRunElement);
+		assertSame(secondReloadElement.getNextElement(), distributionElement);
+		assertSame(distributionElement.getPreviousElement(), secondReloadElement);
+		assertNull(distributionElement.getNextElement());
 	}
 		
 	

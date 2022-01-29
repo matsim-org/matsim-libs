@@ -97,17 +97,17 @@ public class CollectionLSPCreationTest {
 
 	@Test
 	public void testCollectionLSPCreation() {
-		assertTrue(collectionLSP.getPlans() != null);
+		assertNotNull(collectionLSP.getPlans());
 		assertFalse(collectionLSP.getPlans().isEmpty());
-		assertTrue(collectionLSP.getResources() != null);
+		assertNotNull(collectionLSP.getResources());
 		LSPPlan selectedPlan = collectionLSP.getSelectedPlan();
-		assertTrue(selectedPlan.getScore() == 0);
-		assertTrue(selectedPlan.getLsp() == collectionLSP);
-		assertTrue(selectedPlan.getAssigner() == assigner);
-		assertTrue(selectedPlan.getSolutions().iterator().next() == collectionSolution);
-		assertTrue(selectedPlan.getSolutions().iterator().next().getLSP() == collectionLSP);
+		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
+		assertSame(selectedPlan.getLsp(), collectionLSP);
+		assertSame(selectedPlan.getAssigner(), assigner);
+		assertSame(selectedPlan.getSolutions().iterator().next(), collectionSolution);
+		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), collectionLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
-		assertTrue(selectedPlan.getLsp()== collectionLSP);
+		assertSame(selectedPlan.getLsp(), collectionLSP);
 	}
 
 }

@@ -129,13 +129,13 @@ public class CollectionLSPShipmentAssigmentTest {
 
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
-		assertTrue(collectionLSP.getSelectedPlan()  == collectionPlan);
+		assertSame(collectionLSP.getSelectedPlan(), collectionPlan);
 		assertFalse(collectionLSP.getShipments().isEmpty());
 		ArrayList<LogisticsSolution> solutions = new ArrayList<LogisticsSolution>(collectionLSP.getSelectedPlan().getSolutions());
 
 		for(LogisticsSolution solution : solutions) {
 			if(solutions.indexOf(solution) == 0 ) {
-				assertTrue(solution.getShipments().size() == 10);
+				assertEquals(10, solution.getShipments().size());
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 					if(element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getShipments().isEmpty());
