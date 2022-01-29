@@ -297,7 +297,7 @@ public class CompleteLSPMobsimTest {
 		
 			for(ShipmentPlanElement scheduleElement : scheduleElements){
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
-				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
+				assertTrue(scheduleElement.getElementType().equals(logElement.getElementType()));
 				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
 				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);

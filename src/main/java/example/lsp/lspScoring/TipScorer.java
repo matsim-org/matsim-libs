@@ -21,7 +21,7 @@ import lsp.scoring.LSPScorer;
 			if(info instanceof TipInfo) {
 				LSPInfoFunction function = info.getFunction();
 					for(LSPInfoFunctionValue value : function.getValues()) {
-						if(value.getName() == "TIP IN EUR" && value.getValue() instanceof Double) {
+						if(value.getName().equals("TIP IN EUR") && value.getValue() instanceof Double) {
 							double trinkgeldValue = (Double) value.getValue();
 							score += trinkgeldValue;
 						}

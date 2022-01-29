@@ -231,7 +231,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 7);
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
-			assertTrue(planElements.get(6).getElementType() == "UNLOAD");
+			assertTrue(planElements.get(6).getElementType().equals("UNLOAD"));
 			assertTrue(planElements.get(6).getEndTime() >= (0));
 			assertTrue(planElements.get(6).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(6).getStartTime() <= planElements.get(6).getEndTime());
@@ -242,7 +242,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			
 			assertTrue(planElements.get(6).getStartTime() == planElements.get(5).getEndTime());
 			
-			assertTrue(planElements.get(5).getElementType() == "TRANSPORT");
+			assertTrue(planElements.get(5).getElementType().equals("TRANSPORT"));
 			assertTrue(planElements.get(5).getEndTime() >= (0));
 			assertTrue(planElements.get(5).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(5).getStartTime() <= planElements.get(5).getEndTime());
@@ -253,7 +253,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		
 			assertTrue(planElements.get(5).getStartTime() == planElements.get(4).getEndTime());
 			
-			assertTrue(planElements.get(4).getElementType() == "LOAD");
+			assertTrue(planElements.get(4).getElementType().equals("LOAD"));
 			assertTrue(planElements.get(4).getEndTime() >= (0));
 			assertTrue(planElements.get(4).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(4).getStartTime() <= planElements.get(4).getEndTime());
@@ -264,7 +264,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			
 			assertTrue(planElements.get(4).getStartTime() >= planElements.get(3).getEndTime() / (1.0001) + 300);
 			
-			assertTrue(planElements.get(3).getElementType() == "HANDLE");
+			assertTrue(planElements.get(3).getElementType().equals("HANDLE"));
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
@@ -275,7 +275,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			
 			assertTrue(planElements.get(3).getStartTime() == (planElements.get(2).getEndTime() +300));
 			
-			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
+			assertTrue(planElements.get(2).getElementType().equals("UNLOAD"));
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
@@ -286,7 +286,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			
 			assertTrue(planElements.get(2).getStartTime() == planElements.get(1).getEndTime());
 			
-			assertTrue(planElements.get(1).getElementType() == "TRANSPORT");
+			assertTrue(planElements.get(1).getElementType().equals("TRANSPORT"));
 			assertTrue(planElements.get(1).getEndTime() >= (0));
 			assertTrue(planElements.get(1).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(1).getStartTime() <= planElements.get(1).getEndTime());
@@ -297,7 +297,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			
 			assertTrue(planElements.get(1).getStartTime() == planElements.get(0).getEndTime());
 			
-			assertTrue(planElements.get(0).getElementType() == "LOAD");
+			assertTrue(planElements.get(0).getElementType().equals("LOAD"));
 			assertTrue(planElements.get(0).getEndTime() >= (0));
 			assertTrue(planElements.get(0).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(0).getStartTime() <= planElements.get(0).getEndTime());

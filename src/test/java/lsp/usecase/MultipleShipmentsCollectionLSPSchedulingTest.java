@@ -148,7 +148,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
 			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 3);
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
-			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
+			assertTrue(planElements.get(2).getElementType().equals("UNLOAD"));
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
@@ -156,7 +156,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			assertTrue(planElements.get(2).getStartTime() <= (24*3600));	
 			assertTrue(planElements.get(2).getResourceId() == collectionAdapter.getId());
 			assertTrue(planElements.get(2).getSolutionElement() == collectionElement);	
-			assertTrue(planElements.get(1).getElementType() == "TRANSPORT");
+			assertTrue(planElements.get(1).getElementType().equals("TRANSPORT"));
 			assertTrue(planElements.get(1).getEndTime() >= (0));
 			assertTrue(planElements.get(1).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() == planElements.get(1).getEndTime());
@@ -165,7 +165,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			assertTrue(planElements.get(1).getStartTime() <= (24*3600));	
 			assertTrue(planElements.get(1).getResourceId() == collectionAdapter.getId());
 			assertTrue(planElements.get(1).getSolutionElement() == collectionElement);
-			assertTrue(planElements.get(0).getElementType() == "LOAD");
+			assertTrue(planElements.get(0).getElementType().equals("LOAD"));
 			assertTrue(planElements.get(0).getEndTime() >= (0));
 			assertTrue(planElements.get(0).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(1).getStartTime() == planElements.get(0).getEndTime());

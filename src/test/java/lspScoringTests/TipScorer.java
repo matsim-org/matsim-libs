@@ -18,10 +18,10 @@ public class TipScorer implements LSPScorer {
 	public double scoreCurrentPlan(LSP lsp) {
 		double score = 0;
 		for(LSPInfo info : tracker.getInfos()) {
-			if(info.getName() == "TIPINFO") {
+			if(info.getName().equals("TIPINFO")) {
 				LSPInfoFunction function = info.getFunction();
 					for(LSPInfoFunctionValue<?> value : function.getValues()) {
-						if(value.getName() == "TIP IN EUR" && value.getValue() instanceof Double) {
+						if(value.getName().equals("TIP IN EUR") && value.getValue() instanceof Double) {
 							double tipValue = (Double)value.getValue();
 							score += tipValue;
 						}

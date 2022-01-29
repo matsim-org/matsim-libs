@@ -301,7 +301,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 			
 				for(ShipmentPlanElement scheduleElement : scheduleElements){
 					ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
-					if(scheduleElement.getElementType() != logElement.getElementType()) {
+					if(!scheduleElement.getElementType().equals(logElement.getElementType())) {
 						System.out.println(scheduleElement.getElementType());
 						System.out.println(logElement.getElementType());
 						for(int j = 0; j < shipment.getShipmentPlan().getPlanElements().size(); j++) {
@@ -314,7 +314,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 						System.out.println();
 					}
 					
-					assertTrue(scheduleElement.getElementType() == logElement.getElementType());
+					assertTrue(scheduleElement.getElementType().equals(logElement.getElementType()));
 					assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
 					assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
 					assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
