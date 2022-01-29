@@ -12,7 +12,7 @@ import lsp.shipment.LSPShipment;
 /*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
 
 	private LSP lsp;
-	private List<LSPResource> resources;
+	private final List<LSPResource> resources;
 	private int bufferTime;
 	
 	SimpleForwardSolutionScheduler( List<LSPResource> resources ) {

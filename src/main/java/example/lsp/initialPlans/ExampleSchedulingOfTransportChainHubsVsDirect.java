@@ -282,19 +282,6 @@ import java.util.*;
 
 		//TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
-//		log.info("");
-//		log.info("(existing) logistic Solution - via reloadingPoint2 is created");
-//
-//		log.info("");
-//		log.info("The Order of the logisticsSolutionElements is now specified");
-//		//The Order of the logisticsSolutionElements is now specified
-//		firstReloadElement.connectWithNextElement(mainRunElement);
-//		mainRunElement.setPreviousElement(firstReloadElement);
-//		mainRunElement.connectWithNextElement(secondReloadElement);
-//		secondReloadElement.setPreviousElement(mainRunElement);
-//		secondReloadElement.connectWithNextElement(directDistributionElement);
-//		directDistributionElement.setPreviousElement(secondReloadElement);
-
 
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.

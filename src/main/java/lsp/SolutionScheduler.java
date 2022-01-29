@@ -1,12 +1,14 @@
 package lsp;
 
 
-
+/**
+ * Was macht das?
+ */
 public interface SolutionScheduler {
 
-	public void scheduleSolutions();
+	void scheduleSolutions();
 
-	public void setLSP(LSP lsp);
+	void setLSP(LSP lsp);
 	
-	public void setBufferTime(int bufferTime);
+	void setBufferTime(int bufferTime);
 }

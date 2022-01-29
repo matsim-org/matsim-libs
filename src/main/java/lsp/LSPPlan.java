@@ -4,6 +4,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.population.BasicPlan;
 
+/**
+ * Was macht das hier?
+ */
 public interface LSPPlan extends BasicPlan{
 
 	LSPPlan addSolution( LogisticsSolution solution );
