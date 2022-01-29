@@ -310,10 +310,8 @@ public class MainRunLSPSchedulingTest {
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
-		Iterator<Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair>>  iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
-		
-		while(iter.hasNext()) {
-			Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry =  iter.next();
+
+		for (Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
@@ -321,15 +319,15 @@ public class MainRunLSPSchedulingTest {
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByReloadingPoint = false;
-			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
-				if(clientElement == element) {
+			for (LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
+				if (clientElement == element) {
 					handledByReloadingPoint = true;
 				}
 			}
 			assertTrue(handledByReloadingPoint);
-			
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));	
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));	
+
+			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
+			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
 		}
 	
 		for(LSPShipment shipment : lsp.getShipments()) {

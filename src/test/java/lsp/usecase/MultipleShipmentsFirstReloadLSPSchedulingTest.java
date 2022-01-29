@@ -238,10 +238,8 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
-		Iterator<Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair>>  iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
-		
-		while(iter.hasNext()) {
-			Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry =  iter.next();
+
+		for (Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
@@ -249,15 +247,15 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertEquals(service.getCapacityDemand(), shipment.getSize());
 			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByReloadingPoint = false;
-			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
-				if(clientElement == element) {
+			for (LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
+				if (clientElement == element) {
 					handledByReloadingPoint = true;
 				}
 			}
 			assertTrue(handledByReloadingPoint);
 			//This asserts that the shipments waiting for handling have been handled and the queues have been cleared
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));	
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));	
+			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
+			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
 		}
 		
 	
