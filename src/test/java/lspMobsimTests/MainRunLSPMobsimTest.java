@@ -154,7 +154,7 @@ public class MainRunLSPMobsimTest {
 		
 		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
-		completePlan.setAssigner(assigner);;
+		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));

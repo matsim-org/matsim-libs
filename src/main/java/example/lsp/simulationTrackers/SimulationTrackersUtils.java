@@ -1,10 +1,6 @@
 package example.lsp.simulationTrackers;
 
-import jdk.jshell.spi.ExecutionControl;
 import lsp.functions.LSPInfoFunction;
-import lsp.functions.LSPInfoFunctionValue;
-
-import java.util.Collection;
 
 public class SimulationTrackersUtils {
 

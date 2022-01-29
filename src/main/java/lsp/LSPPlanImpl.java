@@ -4,8 +4,6 @@ package lsp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.population.BasicPlan;
-
 /* package-private */ class LSPPlanImpl implements LSPPlan{
 
 	private LSP lsp;

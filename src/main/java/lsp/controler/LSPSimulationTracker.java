@@ -2,7 +2,6 @@ package lsp.controler;
 
 import java.util.Collection;
 
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 

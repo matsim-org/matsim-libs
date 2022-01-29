@@ -1,6 +1,5 @@
 package lsp.shipment;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
