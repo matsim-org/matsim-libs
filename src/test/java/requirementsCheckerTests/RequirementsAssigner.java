@@ -12,7 +12,7 @@ import lsp.shipment.Requirement;
 public class RequirementsAssigner implements  ShipmentAssigner {
 
 	private LSP lsp;
-	private Collection<LogisticsSolution> feasibleSolutions;
+	private final Collection<LogisticsSolution> feasibleSolutions;
 	
 	public RequirementsAssigner() {
 		this.feasibleSolutions = new ArrayList<LogisticsSolution>();

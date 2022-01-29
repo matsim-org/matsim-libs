@@ -19,15 +19,15 @@ import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class DistributionCarrierAdapter implements LSPCarrierResource {
 
-	private Id<LSPResource>id;
-	private Carrier carrier;
-	private Id<Link> locationLinkId;
-	private ArrayList<LogisticsSolutionElement> clientElements;
-	private DistributionCarrierScheduler distributionHandler;
-	private Network network;
-	private Collection<EventHandler> eventHandlers;
-	private Collection<LSPInfo> infos;
-	private Collection<LSPSimulationTracker> trackers;
+	private final Id<LSPResource>id;
+	private final Carrier carrier;
+	private final Id<Link> locationLinkId;
+	private final ArrayList<LogisticsSolutionElement> clientElements;
+	private final DistributionCarrierScheduler distributionHandler;
+	private final Network network;
+	private final Collection<EventHandler> eventHandlers;
+	private final Collection<LSPInfo> infos;
+	private final Collection<LSPSimulationTracker> trackers;
 	private EventsManager eventsManager;
 
 	DistributionCarrierAdapter(UsecaseUtils.DistributionCarrierAdapterBuilder builder){

@@ -17,7 +17,7 @@ public class ShipmentUtils{
 
 	public static class LSPShipmentBuilder{
 
-		private Id<LSPShipment> id;
+		private final Id<LSPShipment> id;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
 		private TimeWindow startTimeWindow;
@@ -25,9 +25,9 @@ public class ShipmentUtils{
 		private int capacityDemand;
 		private double deliveryServiceTime;
 		private double pickupServiceTime;
-		private ArrayList<Requirement> requirements;
-		private ArrayList<UtilityFunction> utilityFunctions;
-		private ArrayList<LSPInfo> infos;
+		private final ArrayList<Requirement> requirements;
+		private final ArrayList<UtilityFunction> utilityFunctions;
+		private final ArrayList<LSPInfo> infos;
 
 		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
 			return new LSPShipmentBuilder(id);

@@ -12,14 +12,14 @@ public final class ScheduledShipmentTransport implements ShipmentPlanElement {
 	// yyyy cannot make package-private since used in one instanceof outside package.  kai, jun'20
 
 	private final String type = "TRANSPORT";
-	private double startTime;
-	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<LSPResource> resourceId;
-	private Id<Carrier> carrierId;
-	private Id<Link> fromLinkId;
-	private Id<Link> toLinkId;
-	private CarrierService carrierService;
+	private final double startTime;
+	private final double endTime;
+	private final LogisticsSolutionElement element;
+	private final Id<LSPResource> resourceId;
+	private final Id<Carrier> carrierId;
+	private final Id<Link> fromLinkId;
+	private final Id<Link> toLinkId;
+	private final CarrierService carrierService;
 
 	ScheduledShipmentTransport( ShipmentUtils.ScheduledShipmentTransportBuilder builder ){
 		this.startTime = builder.startTime;

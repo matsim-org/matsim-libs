@@ -15,15 +15,15 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* package-private */class LSPImpl implements LSP {
 
-	private Id<LSP> id;
-	private Collection<LSPShipment> shipments;
-	private ArrayList<LSPPlan> plans; 
-	private SolutionScheduler solutionScheduler;
+	private final Id<LSP> id;
+	private final Collection<LSPShipment> shipments;
+	private final ArrayList<LSPPlan> plans;
+	private final SolutionScheduler solutionScheduler;
 	private LSPPlan selectedPlan;
-	private Collection<LSPResource> resources;
+	private final Collection<LSPResource> resources;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
-	private Attributes attributes = new Attributes();
+	private final Attributes attributes = new Attributes();
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){

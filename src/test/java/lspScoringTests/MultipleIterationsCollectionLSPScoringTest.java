@@ -46,7 +46,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 	private TipInfo info;
 	private LSPInfoFunction function;
 	private LSPInfoFunctionValue<Double> value;
-	private int numberOfShipments = 25;
+	private final int numberOfShipments = 25;
 
 	@Before
 	public void initialize() {

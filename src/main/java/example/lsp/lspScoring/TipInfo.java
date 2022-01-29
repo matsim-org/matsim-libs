@@ -5,8 +5,8 @@ import lsp.functions.LSPInfoFunction;
 
 /*package-private*/ class TipInfo extends LSPInfo {
 
-	private LSPInfoFunction function;
-	private String name = "TIPINFO";
+	private final LSPInfoFunction function;
+	private final String name = "TIPINFO";
 
 	/*package-private*/ TipInfo (LSPInfoFunction function) {
 		this.function = function;

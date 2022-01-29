@@ -10,12 +10,12 @@ import lsp.resources.LSPResource;
 class LoggedShipmentUnload implements ShipmentPlanElement {
 
 	private final String type = "UNLOAD";
-	private double startTime;
-	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<LSPResource> resourceId;
-	private Id<Carrier> carrierId;
-	private Id<Link> linkId;
+	private final double startTime;
+	private final double endTime;
+	private final LogisticsSolutionElement element;
+	private final Id<LSPResource> resourceId;
+	private final Id<Carrier> carrierId;
+	private final Id<Link> linkId;
 
 	LoggedShipmentUnload( ShipmentUtils.LoggedShipmentUnloadBuilder builder ){
 		this.startTime = builder.startTime;

@@ -13,8 +13,8 @@ import lsp.controler.LSPSimulationTracker;
 
 public class TipSimulationTracker implements LSPSimulationTracker{
 
-	private TipEventHandler handler;
-	private TipInfo info;
+	private final TipEventHandler handler;
+	private final TipInfo info;
 	
 	public TipSimulationTracker(TipEventHandler handler, TipInfo info) {
 		this.info = info;

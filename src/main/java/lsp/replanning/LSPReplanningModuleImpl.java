@@ -7,7 +7,7 @@ import lsp.LSPs;
 
 class LSPReplanningModuleImpl implements LSPReplanningModule{
 
-	private LSPs lsps;
+	private final LSPs lsps;
 	
 	LSPReplanningModuleImpl(LSPs lsps) {
 		this.lsps = lsps;

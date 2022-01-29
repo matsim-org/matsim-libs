@@ -5,7 +5,7 @@ import lsp.functions.LSPInfoFunction;
 
 /*package-private*/ class CostInfo extends LSPInfo {
 
-	private CostInfoFunction costFunction;
+	private final CostInfoFunction costFunction;
 
 	CostInfo() {
 		this.costFunction = new CostInfoFunction();

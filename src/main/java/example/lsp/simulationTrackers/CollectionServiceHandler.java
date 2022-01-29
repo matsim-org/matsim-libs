@@ -16,8 +16,8 @@ import org.matsim.vehicles.Vehicle;
 
 
 	private static class ServiceTuple {
-		private CarrierService service;
-		private double startTime;
+		private final CarrierService service;
+		private final double startTime;
 		
 		public ServiceTuple(CarrierService service, double startTime) {
 			this.service = service;
@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 		
 	}
 
-	private Collection<ServiceTuple> tuples;
+	private final Collection<ServiceTuple> tuples;
 	private double totalLoadingCosts;
 	private int totalNumberOfShipments;
 	private int totalWeightOfShipments;

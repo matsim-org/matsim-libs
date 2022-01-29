@@ -10,9 +10,9 @@ import lsp.shipment.LSPShipment;
 	private static class ResourceNeighbours{
 		// internal data structure, try to ignore when looking from outside.  kai/kai, jan'22
 
-		private ArrayList<LSPResource> predecessors;
-		private ArrayList<LSPResource> successors;
-		private LSPResource resource;
+		private final ArrayList<LSPResource> predecessors;
+		private final ArrayList<LSPResource> successors;
+		private final LSPResource resource;
 				
 		private ResourceNeighbours(LSPResource resource) {
 			this.resource = resource;
@@ -30,8 +30,8 @@ import lsp.shipment.LSPShipment;
 	}
 	
 	private LSP lsp;
-	private ArrayList<LSPResource> sortedResourceList;
-	private ArrayList<ResourceNeighbours> neighbourList;
+	private final ArrayList<LSPResource> sortedResourceList;
+	private final ArrayList<ResourceNeighbours> neighbourList;
 	private int bufferTime;
 	
 	ForwardSolutionSchedulerImpl() {

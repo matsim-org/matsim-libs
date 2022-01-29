@@ -10,7 +10,7 @@ import lsp.shipment.ShipmentComparator;
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
 		
-	private ArrayList<ShipmentWithTime> shipments;
+	private final ArrayList<ShipmentWithTime> shipments;
 	
 	WaitingShipmentsImpl() {
 		this.shipments = new ArrayList<>();

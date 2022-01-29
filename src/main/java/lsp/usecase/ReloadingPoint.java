@@ -15,13 +15,13 @@ import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class ReloadingPoint implements LSPResource {
 
-	private Id<LSPResource> id;
-	private Id<Link> locationLinkId;
-	private ReloadingPointScheduler reloadingScheduler;
-	private ArrayList <LogisticsSolutionElement> clientElements;
-	private ArrayList<EventHandler> eventHandlers;
-	private Collection<LSPInfo> infos;
-	private Collection<LSPSimulationTracker> trackers;
+	private final Id<LSPResource> id;
+	private final Id<Link> locationLinkId;
+	private final ReloadingPointScheduler reloadingScheduler;
+	private final ArrayList <LogisticsSolutionElement> clientElements;
+	private final ArrayList<EventHandler> eventHandlers;
+	private final Collection<LSPInfo> infos;
+	private final Collection<LSPSimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
 	private EventsManager eventsManager;
 

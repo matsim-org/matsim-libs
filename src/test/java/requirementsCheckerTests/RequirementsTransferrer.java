@@ -16,7 +16,7 @@ import lsp.shipment.Requirement;
 public class RequirementsTransferrer implements OfferTransferrer{
 
 	private LSPDecorator lsp;
-	private Collection<LogisticsSolutionDecorator> feasibleSolutions;
+	private final Collection<LogisticsSolutionDecorator> feasibleSolutions;
 	
 	public RequirementsTransferrer() {
 		this.feasibleSolutions = new ArrayList<LogisticsSolutionDecorator>();

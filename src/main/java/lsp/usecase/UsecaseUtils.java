@@ -118,13 +118,13 @@ public class UsecaseUtils {
 
 	public static class MainRunCarrierAdapterBuilder {
 
-		private Id<LSPResource>id;
+		private final Id<LSPResource>id;
 		private Carrier carrier;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
-		private ArrayList<LogisticsSolutionElement> clientElements;
+		private final ArrayList<LogisticsSolutionElement> clientElements;
 		private MainRunCarrierScheduler mainRunScheduler;
-		private Network network;
+		private final Network network;
 
 			public static MainRunCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
 				return new MainRunCarrierAdapterBuilder(id,network);
@@ -228,10 +228,10 @@ public class UsecaseUtils {
 
 	public static class ReloadingPointBuilder {
 
-		private Id<LSPResource> id;
-		private Id<Link> locationLinkId;
+		private final Id<LSPResource> id;
+		private final Id<Link> locationLinkId;
 		private ReloadingPointScheduler reloadingScheduler;
-		private ArrayList <LogisticsSolutionElement> clientElements;
+		private final ArrayList <LogisticsSolutionElement> clientElements;
 
 		public static ReloadingPointBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId){
 			return new ReloadingPointBuilder(id,locationLinkId);

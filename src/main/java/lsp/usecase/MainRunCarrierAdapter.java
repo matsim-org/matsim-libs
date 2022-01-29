@@ -18,16 +18,16 @@ import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class MainRunCarrierAdapter implements LSPCarrierResource {
 
-	private Id<LSPResource>id;
-	private Carrier carrier;
-	private Id<Link> fromLinkId;
-	private Id<Link> toLinkId;
-	private ArrayList<LogisticsSolutionElement> clientElements;
-	private MainRunCarrierScheduler mainRunScheduler;
-	private Network network;
-	private Collection<EventHandler> eventHandlers;
-	private Collection<LSPSimulationTracker> trackers;
-	private Collection<LSPInfo> infos;
+	private final Id<LSPResource>id;
+	private final Carrier carrier;
+	private final Id<Link> fromLinkId;
+	private final Id<Link> toLinkId;
+	private final ArrayList<LogisticsSolutionElement> clientElements;
+	private final MainRunCarrierScheduler mainRunScheduler;
+	private final Network network;
+	private final Collection<EventHandler> eventHandlers;
+	private final Collection<LSPSimulationTracker> trackers;
+	private final Collection<LSPInfo> infos;
 	private EventsManager eventsManager;
 
 

@@ -8,7 +8,7 @@ import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 /*package-private*/ class TipEventHandler implements LSPServiceEndEventHandler {
 
 	private double tipSum;
-	private Random tipRandom;
+	private final Random tipRandom;
 
 	/*package-private*/ TipEventHandler() {
 		tipRandom = new Random(1);

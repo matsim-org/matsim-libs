@@ -15,7 +15,7 @@ import lsp.shipment.LSPShipment;
 
 public class TomorrowShipmentAssignerStrategyFactory  {
 	
-	private ShipmentAssigner assigner;
+	private final ShipmentAssigner assigner;
 	
 	public TomorrowShipmentAssignerStrategyFactory(ShipmentAssigner assigner) {
 		this.assigner = assigner;

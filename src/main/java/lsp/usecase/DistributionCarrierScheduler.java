@@ -31,8 +31,8 @@ import org.matsim.vehicles.VehicleType;
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
 	static class LSPCarrierPair{
-		private ShipmentWithTime tuple;
-		private CarrierService service;
+		private final ShipmentWithTime tuple;
+		private final CarrierService service;
 		
 		public LSPCarrierPair( ShipmentWithTime tuple, CarrierService service ){
 			this.tuple = tuple;
