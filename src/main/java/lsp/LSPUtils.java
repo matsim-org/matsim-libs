@@ -31,12 +31,11 @@ public class LSPUtils{
 		LSPReplanner replanner;
 
 
-
-		public static LSPBuilder getInstance(){
-			return new LSPBuilder();
+		public static LSPBuilder getInstance(Id<LSP> id){
+			return new LSPBuilder(id);
 		}
 
-		private LSPBuilder(){
+		private LSPBuilder(Id<LSP> id){
 			this.resources = new ArrayList<LSPResource>();
 
 		}
@@ -69,10 +68,10 @@ public class LSPUtils{
 			return this;
 		}
 
-		public LSPBuilder setId( Id<LSP> id ){
-			this.id = id;
-			return this;
-		}
+//		public LSPBuilder setId( Id<LSP> id ){
+//			this.id = id;
+//			return this;
+//		}
 
 		public LSP build(){
 			return new LSPImpl(this);

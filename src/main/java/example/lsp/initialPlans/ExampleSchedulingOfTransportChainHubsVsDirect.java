@@ -323,9 +323,8 @@ import java.util.*;
 
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-				return LSPUtils.LSPBuilder.getInstance()
+				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class))
 						.setInitialPlan(lspPlanWithReloading)
-						.setId(Id.create("LSPwithReloading", LSP.class))
 						.setSolutionScheduler(simpleScheduler)
 						.build();
 
@@ -368,9 +367,8 @@ import java.util.*;
 				//			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 
-				return LSPUtils.LSPBuilder.getInstance()
+				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
 						.setInitialPlan(completePlan)
-						.setId(Id.create("LSPdirect", LSP.class))
 						.setSolutionScheduler(simpleScheduler)
 						.build();
 			}

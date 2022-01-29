@@ -85,10 +85,8 @@ import lsp.resources.LSPResource;
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 		
-		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		collectionLSPBuilder.setId(collectionLSPId);
 		
 		//The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is added to the LSPBuilder 
 		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();

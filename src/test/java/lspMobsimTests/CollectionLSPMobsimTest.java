@@ -116,10 +116,8 @@ public class CollectionLSPMobsimTest {
 		{
 			final LSPUtils.LSPBuilder collectionLSPBuilder;
 			ArrayList<LSPResource> resourcesList = new ArrayList<>();
-			collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+			collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 			collectionLSPBuilder.setInitialPlan( collectionPlan );
-			Id<LSP> collectionLSPId = Id.create( "CollectionLSP", LSP.class );
-			collectionLSPBuilder.setId( collectionLSPId );
 			resourcesList.add( collectionAdapter );
 			SolutionScheduler simpleScheduler = createDefaultSimpleForwardSolutionScheduler( resourcesList );
 			simpleScheduler.setBufferTime( 300 );
