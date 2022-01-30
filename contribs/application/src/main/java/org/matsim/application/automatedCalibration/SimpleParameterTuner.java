@@ -11,9 +11,8 @@ import java.util.Map;
 
 /**
  * This simple tuner will tune the ASC and marginal traveling utility based on the error between simulated output
- * and reference data. All modes (except walk) are tuned. Average travel time of trips for each distance group is
- * calculated and the cost of the trip can then be estimated. Based on the error, we will slightly modify the cost
- * and a new cost structure will be computed based on the linear regression. The walk cost for the walk mode is
+ * and reference data. All modes (except walk) are tuned. We will slightly modify the cost for each trip
+ * and a new cost structure will be computed based on the linear regression. The cost for the walk mode is
  * fixed.
  */
 public class SimpleParameterTuner implements ParameterTuner {
