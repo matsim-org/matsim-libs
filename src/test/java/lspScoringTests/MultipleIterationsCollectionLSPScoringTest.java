@@ -36,17 +36,8 @@ import lsp.shipment.LSPShipment;
 
 public class MultipleIterationsCollectionLSPScoringTest {
 
-	private Network network;
 	private LSP collectionLSP;
-	private Carrier carrier;
-	private LSPResource collectionAdapter;
-	private LogisticsSolutionElement collectionElement;
-	private LSPScorer tipScorer;
-	private TipSimulationTracker tipTracker;
-	private TipInfo info;
-	private LSPInfoFunction function;
-	private LSPInfoFunctionValue<Double> value;
-	private int numberOfShipments = 25;
+	private final int numberOfShipments = 25;
 
 	@Before
 	public void initialize() {
@@ -55,7 +46,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -81,7 +72,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
@@ -90,13 +81,13 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
-		collectionElement = collectionElementBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder
@@ -109,11 +100,9 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 
-		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		collectionLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -121,17 +110,16 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-		function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR");
+		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 		function.getValues().add(value);
-		info = new TipInfo(function);
-		tipTracker = new TipSimulationTracker(handler, info);
+		TipInfo info = new TipInfo(function);
+		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
-		tipScorer = new TipScorer(collectionLSP, tipTracker);
+		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
 		collectionLSP.setScorer(tipScorer);
 
-		ArrayList<Link> linkList = new ArrayList<Link>(network.getLinks().values());
-		Id<Link> toLinkId = collectionLinkId;
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -152,7 +140,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 				}
 			}
 
-			builder.setToLinkId(toLinkId);
+			builder.setToLinkId(collectionLinkId);
 			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setEndTimeWindow(endTimeWindow);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
@@ -162,9 +150,9 @@ public class MultipleIterationsCollectionLSPScoringTest {
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 
-		collectionLSP.scheduleSoultions();
+		collectionLSP.scheduleSolutions();
 
-		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 
@@ -184,9 +172,9 @@ public class MultipleIterationsCollectionLSPScoringTest {
 	@Test
 	public void testCollectionLSPScoring() {
 		System.out.println(collectionLSP.getSelectedPlan().getScore());
-		assertTrue(collectionLSP.getShipments().size() == numberOfShipments);
-		assertTrue(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments()
-				.size() == numberOfShipments);
+		assertEquals(numberOfShipments, collectionLSP.getShipments().size());
+		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments()
+				.size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
 	}

@@ -1,8 +1,5 @@
 package lspCreationTests;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 
 import lsp.*;
@@ -23,9 +20,10 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.LSPResource;
 
+import static org.junit.Assert.*;
+
 
 public class CompleteLSPCreationTest {
-	private Network network;
 	private LSP completeLSP;
 	private ShipmentAssigner assigner;
 	private LogisticsSolution completeSolution;
@@ -36,7 +34,7 @@ public class CompleteLSPCreationTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -184,15 +182,11 @@ public class CompleteLSPCreationTest {
 		distributionBuilder.setResource(distributionAdapter);
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);
-		
+		collectionElement.connectWithNextElement(firstReloadElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
@@ -207,11 +201,9 @@ public class CompleteLSPCreationTest {
 		completeSolution  = completeSolutionBuilder.build();
 		completePlan.addSolution(completeSolution);
 		
-		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
@@ -227,17 +219,17 @@ public class CompleteLSPCreationTest {
 
 	@Test
 	public void testCollectionLSPCreation() {
-		assertTrue(completeLSP.getPlans() != null);
+		assertNotNull(completeLSP.getPlans());
 		assertFalse(completeLSP.getPlans().isEmpty());
-		assertTrue(completeLSP.getResources() != null);
+		assertNotNull(completeLSP.getResources());
 		LSPPlan selectedPlan = completeLSP.getSelectedPlan();
-		assertTrue(selectedPlan.getScore() == 0);
-		assertTrue(selectedPlan.getLsp() == completeLSP);
-		assertTrue(selectedPlan.getAssigner() == assigner);
-		assertTrue(selectedPlan.getSolutions().iterator().next() == completeSolution);
-		assertTrue(selectedPlan.getSolutions().iterator().next().getLSP() == completeLSP);
+		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
+		assertSame(selectedPlan.getLsp(), completeLSP);
+		assertSame(selectedPlan.getAssigner(), assigner);
+		assertSame(selectedPlan.getSolutions().iterator().next(), completeSolution);
+		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), completeLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);
-		assertTrue(selectedPlan.getLsp()== completeLSP);
+		assertSame(selectedPlan.getLsp(), completeLSP);
 	}
 
 }

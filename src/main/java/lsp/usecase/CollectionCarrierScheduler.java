@@ -32,8 +32,8 @@ import lsp.resources.LSPResourceScheduler;
 /*package-private*/  class CollectionCarrierScheduler extends LSPResourceScheduler {
 	
 	static class LSPCarrierPair{
-		private ShipmentWithTime tuple;
-		private CarrierService service;
+		private final ShipmentWithTime tuple;
+		private final CarrierService service;
 		
 		public LSPCarrierPair( ShipmentWithTime tuple, CarrierService service ){
 			this.tuple = tuple;
@@ -48,7 +48,7 @@ import lsp.resources.LSPResourceScheduler;
 
 
 	CollectionCarrierScheduler(){
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 	}
 	
 	
@@ -78,7 +78,7 @@ import lsp.resources.LSPResourceScheduler;
 	
 	
 	@Override public void initializeValues( LSPResource resource ){
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 		if(resource.getClass() == CollectionCarrierAdapter.class){
 			this.adapter = (CollectionCarrierAdapter) resource;
 			this.carrier = adapter.getCarrier();

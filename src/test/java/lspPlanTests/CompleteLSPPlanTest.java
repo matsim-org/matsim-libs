@@ -21,8 +21,7 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.LSPResource;
 
 public class CompleteLSPPlanTest {
-	
-	private Network network;
+
 	private ShipmentAssigner assigner;
 	private LSPPlan completePlan;
 	private LogisticsSolution completeSolution;
@@ -33,7 +32,7 @@ public class CompleteLSPPlanTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -181,15 +180,11 @@ public class CompleteLSPPlanTest {
 		distributionBuilder.setResource(distributionAdapterBuilder.build());
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);
-		
+		collectionElement.connectWithNextElement(firstReloadElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
@@ -207,11 +202,11 @@ public class CompleteLSPPlanTest {
 
 	@Test
 	public void testCompleteLSPPlan() {
-		assertTrue(completePlan.getAssigner() == assigner);
-		assertTrue(completePlan.getLsp() == null);
-		assertTrue(completePlan.getScore() == 0);
-		assertTrue(completePlan.getSolutions().size() ==1);
-		assertTrue(completePlan.getSolutions().iterator().next() == completeSolution);
+		assertSame(completePlan.getAssigner(), assigner);
+		assertNull(completePlan.getLsp());
+		assertEquals(0, (double) completePlan.getScore(), 0.0);
+		assertEquals(1, completePlan.getSolutions().size());
+		assertSame(completePlan.getSolutions().iterator().next(), completeSolution);
 	}
 	
 }

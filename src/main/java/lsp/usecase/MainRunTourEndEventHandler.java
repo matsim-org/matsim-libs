@@ -14,10 +14,10 @@ import lsp.resources.LSPCarrierResource;
 
 /*package-private*/ class MainRunTourEndEventHandler implements LSPTourEndEventHandler {
 
-	private LSPShipment lspShipment;
-	private CarrierService carrierService;
-	private LogisticsSolutionElement solutionElement;
-	private LSPCarrierResource resource;
+	private final LSPShipment lspShipment;
+	private final CarrierService carrierService;
+	private final LogisticsSolutionElement solutionElement;
+	private final LSPCarrierResource resource;
 	
 	
 	MainRunTourEndEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, LSPCarrierResource resource){

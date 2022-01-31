@@ -16,10 +16,10 @@ import lsp.shipment.Requirement;
 public class RequirementsTransferrer implements OfferTransferrer{
 
 	private LSPDecorator lsp;
-	private Collection<LogisticsSolutionDecorator> feasibleSolutions;
+	private final Collection<LogisticsSolutionDecorator> feasibleSolutions;
 	
 	public RequirementsTransferrer() {
-		this.feasibleSolutions = new ArrayList<LogisticsSolutionDecorator>();
+		this.feasibleSolutions = new ArrayList<>();
 	}
 	
 	
@@ -30,7 +30,7 @@ public class RequirementsTransferrer implements OfferTransferrer{
 			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 					LogisticsSolutionDecorator solutionWithOffers = (LogisticsSolutionDecorator) solution;
 					for(Requirement requirement : object.getRequirements()) {
-						if(requirement.checkRequirement(solutionWithOffers) == false) {
+						if(!requirement.checkRequirement(solutionWithOffers)) {
 							continue label;
 						}
 					}

@@ -12,10 +12,10 @@ import lsp.resources.LSPResource;
 
 class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 
-	private CarrierService carrierService;
-	private LSPShipment lspShipment;
-	private LogisticsSolutionElement solutionElement;
-	private LSPCarrierResource resource;
+	private final CarrierService carrierService;
+	private final LSPShipment lspShipment;
+	private final LogisticsSolutionElement solutionElement;
+	private final LSPCarrierResource resource;
 	
 	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;

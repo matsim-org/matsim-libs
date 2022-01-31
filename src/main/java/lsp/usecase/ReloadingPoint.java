@@ -15,15 +15,14 @@ import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class ReloadingPoint implements LSPResource {
 
-	private Id<LSPResource> id;
-	private Id<Link> locationLinkId;
-	private ReloadingPointScheduler reloadingScheduler;
-	private ArrayList <LogisticsSolutionElement> clientElements;
-	private ArrayList<EventHandler> eventHandlers;
-	private Collection<LSPInfo> infos;
-	private Collection<LSPSimulationTracker> trackers;
+	private final Id<LSPResource> id;
+	private final Id<Link> locationLinkId;
+	private final ReloadingPointScheduler reloadingScheduler;
+	private final ArrayList <LogisticsSolutionElement> clientElements;
+	private final ArrayList<EventHandler> eventHandlers;
+	private final Collection<LSPInfo> infos;
+	private final Collection<LSPSimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
-	private EventsManager eventsManager;
 
 	ReloadingPoint(UsecaseUtils.ReloadingPointBuilder builder){
 		this.id = builder.getId();
@@ -33,9 +32,9 @@ import lsp.controler.LSPSimulationTracker;
 		ReloadingPointTourEndEventHandler eventHandler = new ReloadingPointTourEndEventHandler(this);
 		reloadingScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
-		this.eventHandlers = new ArrayList<EventHandler>();
-		this.infos = new ArrayList<LSPInfo>();
-		this.trackers = new ArrayList<LSPSimulationTracker>();
+		this.eventHandlers = new ArrayList<>();
+		this.infos = new ArrayList<>();
+		this.trackers = new ArrayList<>();
 		eventHandlers.add(eventHandler);
 	}
 	
@@ -100,6 +99,5 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 }

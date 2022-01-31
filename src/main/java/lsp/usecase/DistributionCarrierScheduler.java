@@ -31,8 +31,8 @@ import org.matsim.vehicles.VehicleType;
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
 	static class LSPCarrierPair{
-		private ShipmentWithTime tuple;
-		private CarrierService service;
+		private final ShipmentWithTime tuple;
+		private final CarrierService service;
 		
 		public LSPCarrierPair( ShipmentWithTime tuple, CarrierService service ){
 			this.tuple = tuple;
@@ -48,12 +48,12 @@ import org.matsim.vehicles.VehicleType;
 
 	
 	DistributionCarrierScheduler(){
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 	}
 	
 
 	@Override protected void initializeValues( LSPResource resource ) {
-		this.pairs = new ArrayList<LSPCarrierPair>();
+		this.pairs = new ArrayList<>();
 		if(resource.getClass() == DistributionCarrierAdapter.class){
 			this.adapter = (DistributionCarrierAdapter) resource;
 			this.carrier = adapter.getCarrier();
@@ -68,9 +68,9 @@ import org.matsim.vehicles.VehicleType;
 		int load = 0;
 		double cumulatedLoadingTime = 0;
 		double availiabilityTimeOfLastShipment = 0;
-		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<ShipmentWithTime>(shipments);
-		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<ShipmentWithTime>();
-		ArrayList<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
+		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
+		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
+		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 		
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();

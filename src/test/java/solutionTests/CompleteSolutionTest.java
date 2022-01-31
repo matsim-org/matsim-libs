@@ -24,7 +24,6 @@ import lsp.resources.LSPResource;
 
 public class CompleteSolutionTest {
 
-	private Network network;
 	private LogisticsSolutionElement collectionElement;
 	private LogisticsSolutionElement firstReloadElement;
 	private LogisticsSolutionElement mainRunElement;
@@ -39,7 +38,7 @@ public class CompleteSolutionTest {
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> collectionVehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -192,14 +191,10 @@ public class CompleteSolutionTest {
 		distributionBuilder.setResource(distributionAdapterBuilder.build());
 		distributionElement = distributionBuilder.build();
 
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);
+		collectionElement.connectWithNextElement(firstReloadElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
 
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
@@ -214,34 +209,34 @@ public class CompleteSolutionTest {
 
 	@Test
 	public void testCompleteSolution() {
-		assertTrue(solution.getEventHandlers() != null);
+		assertNotNull(solution.getEventHandlers());
 		assertTrue(solution.getEventHandlers().isEmpty());
-		assertTrue(solution.getInfos() != null);
+		assertNotNull(solution.getInfos());
 		assertTrue(solution.getInfos().isEmpty());
-		assertTrue(solution.getLSP() == null);
-		assertTrue(solution.getShipments() != null);
+		assertNull(solution.getLSP());
+		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());
-		assertTrue(solution.getSolutionElements().size() == 5);
-		ArrayList<LogisticsSolutionElement> elements = new ArrayList<LogisticsSolutionElement>(solution.getSolutionElements());
+		assertEquals(5, solution.getSolutionElements().size());
+		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(solution.getSolutionElements());
 		 	for(LogisticsSolutionElement element : elements) {
 				if(elements.indexOf(element) == 0) {
-					assertTrue(element.getPreviousElement() == null);
+					assertNull(element.getPreviousElement());
 				}
 				if(elements.indexOf(element) == (elements.size() -1)) {
-					assertTrue(element.getNextElement() == null);
+					assertNull(element.getNextElement());
 				}
-				assertTrue(element.getLogisticsSolution() == solution);
-			}	
-		assertTrue(collectionElement.getPreviousElement() == null);
-		assertTrue(collectionElement.getNextElement() == firstReloadElement);
-		assertTrue(firstReloadElement.getPreviousElement() == collectionElement);
-		assertTrue(firstReloadElement.getNextElement() == mainRunElement);
-		assertTrue(mainRunElement.getPreviousElement() == firstReloadElement);
-		assertTrue(mainRunElement.getNextElement() == secondReloadElement);
-		assertTrue(secondReloadElement.getPreviousElement() == mainRunElement);
-		assertTrue(secondReloadElement.getNextElement() == distributionElement);
-		assertTrue(distributionElement.getPreviousElement() == secondReloadElement);
-		assertTrue(distributionElement.getNextElement() == null);
+				assertSame(element.getLogisticsSolution(), solution);
+			}
+		assertNull(collectionElement.getPreviousElement());
+		assertSame(collectionElement.getNextElement(), firstReloadElement);
+		assertSame(firstReloadElement.getPreviousElement(), collectionElement);
+		assertSame(firstReloadElement.getNextElement(), mainRunElement);
+		assertSame(mainRunElement.getPreviousElement(), firstReloadElement);
+		assertSame(mainRunElement.getNextElement(), secondReloadElement);
+		assertSame(secondReloadElement.getPreviousElement(), mainRunElement);
+		assertSame(secondReloadElement.getNextElement(), distributionElement);
+		assertSame(distributionElement.getPreviousElement(), secondReloadElement);
+		assertNull(distributionElement.getNextElement());
 	}
 		
 	

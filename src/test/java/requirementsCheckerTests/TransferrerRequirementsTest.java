@@ -1,5 +1,6 @@
 package requirementsCheckerTests;
 
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -31,11 +32,8 @@ import lsp.resources.LSPResource;
 import lsp.shipment.Requirement;
 
 public class TransferrerRequirementsTest {
-	private Network network;
 	private LogisticsSolutionDecorator blueOfferSolution;
 	private LogisticsSolutionDecorator redOfferSolution;
-	private OfferTransferrer transferrer;
-	private LSPPlanDecorator collectionPlan;
 	private LSPDecorator offerLSP;
 	private ArrayList<DemandObject> demandObjects;
 
@@ -45,7 +43,7 @@ public class TransferrerRequirementsTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -90,8 +88,8 @@ public class TransferrerRequirementsTest {
 		OfferFactoryImpl redOfferFactory = new OfferFactoryImpl(redOfferSolution);
 		redOfferFactory.addOffer(new NonsenseOffer());
 		redOfferSolution.setOfferFactory(redOfferFactory);
-		
-		collectionPlan = new LSPPlanWithOfferTransferrer();
+
+		LSPPlanDecorator collectionPlan = new LSPPlanWithOfferTransferrer();
 		collectionPlan.addSolution(redOfferSolution);
 
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
@@ -128,15 +126,15 @@ public class TransferrerRequirementsTest {
 		blueOfferFactory.addOffer(new NonsenseOffer());
 		blueOfferSolution.setOfferFactory(blueOfferFactory);
 		collectionPlan.addSolution(blueOfferSolution);
-		
-		transferrer = new RequirementsTransferrer();
+
+		OfferTransferrer transferrer = new RequirementsTransferrer();
 		collectionPlan.setOfferTransferrer(transferrer);
 		
 		LSPWithOffers.Builder offerLSPBuilder = LSPWithOffers.Builder.getInstance();
 		offerLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		offerLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(redCollectionAdapter);
 		resourcesList.add(blueCollectionAdapter);
 			
@@ -145,7 +143,7 @@ public class TransferrerRequirementsTest {
 		offerLSP = offerLSPBuilder.build();
 		LSPPlanDecorator decorator = (LSPPlanDecorator)offerLSP.getSelectedPlan();
 		
-		demandObjects = new ArrayList<DemandObject>();
+		demandObjects = new ArrayList<>();
 	    
 	    Random rand = new Random(1); 
 	    
@@ -154,7 +152,7 @@ public class TransferrerRequirementsTest {
         	DemandObjectImpl.Builder builder = DemandObjectImpl.Builder.newInstance();
         	
         	boolean blue = rand.nextBoolean();
-        	if (blue == true) {
+        	if (blue) {
         		builder.addRequirement(new BlueRequirement());
         	}
         	else {
@@ -172,10 +170,10 @@ public class TransferrerRequirementsTest {
 	    		Offer offer = offerLSP.getOffer(demandObject, "nonsense", null);
 	    		for(Requirement requirement : demandObject.getRequirements()) {
 	    			if(requirement instanceof RedRequirement) {
-	    				assertTrue(offer.getSolution() == redOfferSolution);
+						assertSame(offer.getSolution(), redOfferSolution);
 	    			}
 	    			if(requirement instanceof BlueRequirement) {
-	    				assertTrue(offer.getSolution() == blueOfferSolution);
+						assertSame(offer.getSolution(), blueOfferSolution);
 	    			}
 	    		}
 	    	}

@@ -22,7 +22,7 @@ class LSPShipmentMaker {
 		MatsimNetworkReader reader = new MatsimNetworkReader(network);
 		reader.readFile("D:/Working_Copies_Dissertation/Code_Dissertation/logistics/scenarios/2regions/2regions-network.xml");
 		Random random = new Random(1);
-		ArrayList<LSPShipment> shipments = new ArrayList<LSPShipment>();
+		ArrayList<LSPShipment> shipments = new ArrayList<>();
 
 		for(int i = 0; i < 8; i++){
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class ) );
@@ -35,7 +35,7 @@ class LSPShipmentMaker {
 			Id<Link>fromLinkId= null;
 			Id<Link>toLinkId = null;
 			while (fromLinkId == null || toLinkId == null){
-				List<Link> linkList = new ArrayList<Link>(network.getLinks().values());
+				List<Link> linkList = new ArrayList<>(network.getLinks().values());
 				Collections.shuffle(linkList);
 				Link link = linkList.get(0);
 

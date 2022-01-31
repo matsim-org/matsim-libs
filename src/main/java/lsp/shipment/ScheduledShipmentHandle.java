@@ -8,11 +8,10 @@ import lsp.resources.LSPResource;
 
 class ScheduledShipmentHandle implements ShipmentPlanElement {
 
-	private final String type = "HANDLE";
-	private double startTime;
-	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<LSPResource> resourceId;
+	private final double startTime;
+	private final double endTime;
+	private final LogisticsSolutionElement element;
+	private final Id<LSPResource> resourceId;
 	private Id<Link> linkId;
 
 	ScheduledShipmentHandle( ShipmentUtils.ScheduledShipmentHandleBuilder builder ){
@@ -24,6 +23,7 @@ class ScheduledShipmentHandle implements ShipmentPlanElement {
 	
 	@Override
 	public String getElementType() {
+		String type = "HANDLE";
 		return type;
 	}
 

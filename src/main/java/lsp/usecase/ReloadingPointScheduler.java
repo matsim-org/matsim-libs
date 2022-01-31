@@ -14,15 +14,15 @@ import lsp.shipment.ShipmentPlanElement;
 
 /*package-private*/ class ReloadingPointScheduler extends LSPResourceScheduler {
 
-	Logger log = Logger.getLogger(ReloadingPointScheduler.class);
+	final Logger log = Logger.getLogger(ReloadingPointScheduler.class);
 
 	private ReloadingPoint reloadingPoint;
-	private double capacityNeedLinear;
-	private double capacityNeedFixed;
+	private final double capacityNeedLinear;
+	private final double capacityNeedFixed;
 	private ReloadingPointTourEndEventHandler eventHandler;
 
 	ReloadingPointScheduler(UsecaseUtils.ReloadingPointSchedulerBuilder builder){
-		this.shipments = new ArrayList<ShipmentWithTime>();
+		this.shipments = new ArrayList<>();
 		this.capacityNeedLinear = builder.getCapacityNeedLinear();
 		this.capacityNeedFixed = builder.getCapacityNeedFixed();
 

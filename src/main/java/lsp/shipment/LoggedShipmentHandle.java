@@ -10,12 +10,11 @@ import lsp.resources.LSPResource;
 
 /*package*/ class LoggedShipmentHandle implements ShipmentPlanElement {
 
-	private final String type = "HANDLE";
-	private double startTime;
-	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<LSPResource> resourceId;
-	private Id<Link> linkId;
+	private final double startTime;
+	private final double endTime;
+	private final LogisticsSolutionElement element;
+	private final Id<LSPResource> resourceId;
+	private final Id<Link> linkId;
 
 	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder){
 		this.startTime = builder.getStartTime();
@@ -37,6 +36,7 @@ import lsp.resources.LSPResource;
 
 	@Override
 	public String getElementType() {
+		String type = "HANDLE";
 		return type;
 	}
 

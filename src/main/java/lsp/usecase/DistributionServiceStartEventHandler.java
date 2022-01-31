@@ -11,10 +11,10 @@ import lsp.resources.LSPCarrierResource;
 
 /*package-private*/  class DistributionServiceStartEventHandler implements LSPServiceStartEventHandler {
 
-	private CarrierService carrierService;
-	private LSPShipment lspShipment;
-	private LogisticsSolutionElement solutionElement;
-	private LSPCarrierResource resource;
+	private final CarrierService carrierService;
+	private final LSPShipment lspShipment;
+	private final LogisticsSolutionElement solutionElement;
+	private final LSPCarrierResource resource;
 
 	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;

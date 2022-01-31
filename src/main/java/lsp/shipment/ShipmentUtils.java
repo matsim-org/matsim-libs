@@ -17,7 +17,7 @@ public class ShipmentUtils{
 
 	public static class LSPShipmentBuilder{
 
-		private Id<LSPShipment> id;
+		private final Id<LSPShipment> id;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
 		private TimeWindow startTimeWindow;
@@ -25,9 +25,9 @@ public class ShipmentUtils{
 		private int capacityDemand;
 		private double deliveryServiceTime;
 		private double pickupServiceTime;
-		private ArrayList<Requirement> requirements;
-		private ArrayList<UtilityFunction> utilityFunctions;
-		private ArrayList<LSPInfo> infos;
+		private final ArrayList<Requirement> requirements;
+		private final ArrayList<UtilityFunction> utilityFunctions;
+		private final ArrayList<LSPInfo> infos;
 
 		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
 			return new LSPShipmentBuilder(id);
@@ -40,43 +40,36 @@ public class ShipmentUtils{
 			this.id = id;
 		}
 
-		public LSPShipmentBuilder setFromLinkId( Id<Link> fromLinkId ){
+		public void setFromLinkId(Id<Link> fromLinkId ){
 			this.fromLinkId = fromLinkId;
-			return this;
 		}
 
-		public LSPShipmentBuilder setToLinkId( Id<Link> toLinkId ){
+		public void setToLinkId(Id<Link> toLinkId ){
 			this.toLinkId = toLinkId;
-			return this;
 		}
 
-		public LSPShipmentBuilder setStartTimeWindow( TimeWindow startTimeWindow ){
+		public void setStartTimeWindow(TimeWindow startTimeWindow ){
 			this.startTimeWindow = startTimeWindow;
-			return this;
 		}
 
-		public LSPShipmentBuilder setEndTimeWindow( TimeWindow endTimeWindow ){
+		public void setEndTimeWindow(TimeWindow endTimeWindow ){
 			this.endTimeWindow = endTimeWindow;
-			return this;
 		}
 
-		public LSPShipmentBuilder setCapacityDemand( int capacityDemand ){
+		public void setCapacityDemand(int capacityDemand ){
 			this.capacityDemand = capacityDemand;
-			return this;
 		}
 
-		public LSPShipmentBuilder setDeliveryServiceTime( double serviceTime ){
+		public void setDeliveryServiceTime(double serviceTime ){
 			this.deliveryServiceTime = serviceTime;
-			return this;
 		}
 		public LSPShipmentBuilder setPickupServiceTime( double serviceTime ){
 			this.pickupServiceTime = serviceTime;
 			return this;
 		}
 
-		public LSPShipmentBuilder addRequirement( Requirement requirement ) {
+		public void addRequirement(Requirement requirement ) {
 			requirements.add(requirement);
-			return this;
 		}
 
 		public LSPShipmentBuilder addUtilityFunction( UtilityFunction utilityFunction ) {
@@ -84,9 +77,8 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LSPShipmentBuilder addInfo( LSPInfo info ) {
+		public void addInfo(LSPInfo info ) {
 			infos.add(info);
-			return this;
 		}
 
 		public LSPShipment build(){
@@ -154,29 +146,24 @@ public class ShipmentUtils{
 			return new LoggedShipmentHandleBuilder();
 		}
 
-		public LoggedShipmentHandleBuilder setStartTime(double startTime){
+		public void setStartTime(double startTime){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public LoggedShipmentHandleBuilder setEndTime(double endTime){
+		public void setEndTime(double endTime){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public LoggedShipmentHandleBuilder setLogisticsSolutionElement(LogisticsSolutionElement element){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element){
 			this.element = element;
-			return this;
 		}
 
-		public LoggedShipmentHandleBuilder setResourceId(Id<LSPResource> resourceId){
+		public void setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public LoggedShipmentHandleBuilder setLinkId(Id<Link> linkId){
+		public void setLinkId(Id<Link> linkId){
 			this.linkId = linkId;
-			return this;
 		}
 
 		public ShipmentPlanElement build(){
@@ -221,34 +208,28 @@ public class ShipmentUtils{
 			return new LoggedShipmentLoadBuilder();
 		}
 
-		public LoggedShipmentLoadBuilder setStartTime(double startTime){
+		public void setStartTime(double startTime){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public LoggedShipmentLoadBuilder setEndTime(double endTime){
+		public void setEndTime(double endTime){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public LoggedShipmentLoadBuilder setLogisticsSolutionElement(LogisticsSolutionElement element){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element){
 			this.element = element;
-			return this;
 		}
 
-		public LoggedShipmentLoadBuilder setResourceId(Id<LSPResource> resourceId){
+		public void setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public LoggedShipmentLoadBuilder setLinkId(Id<Link> linkId){
+		public void setLinkId(Id<Link> linkId){
 			this.linkId = linkId;
-			return this;
 		}
 
-		public LoggedShipmentLoadBuilder setCarrierId(Id<Carrier> carrierId){
+		public void setCarrierId(Id<Carrier> carrierId){
 			this.carrierId = carrierId;
-			return this;
 		}
 
 		public LoggedShipmentLoad build(){
@@ -297,34 +278,28 @@ public class ShipmentUtils{
 			return new LoggedShipmentTransportBuilder();
 		}
 
-		public LoggedShipmentTransportBuilder setStartTime(double startTime){
+		public void setStartTime(double startTime){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public LoggedShipmentTransportBuilder setLogisticsSolutionElement(LogisticsSolutionElement element){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element){
 			this.element = element;
-			return this;
 		}
 
-		public LoggedShipmentTransportBuilder setResourceId(Id<LSPResource> resourceId){
+		public void setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public LoggedShipmentTransportBuilder setFromLinkId(Id<Link> fromLinkId){
+		public void setFromLinkId(Id<Link> fromLinkId){
 			this.fromLinkId = fromLinkId;
-			return this;
 		}
 
-		public LoggedShipmentTransportBuilder setToLinkId(Id<Link> toLinkId){
+		public void setToLinkId(Id<Link> toLinkId){
 			this.toLinkId = toLinkId;
-			return this;
 		}
 
-		public LoggedShipmentTransportBuilder setCarrierId(Id<Carrier> carrierId){
+		public void setCarrierId(Id<Carrier> carrierId){
 			this.carrierId = carrierId;
-			return this;
 		}
 
 		public LoggedShipmentTransport build(){
@@ -373,39 +348,32 @@ public class ShipmentUtils{
 			return new ScheduledShipmentUnloadBuilder();
 		}
 
-		public ScheduledShipmentUnloadBuilder setStartTime( double startTime ){
+		public void setStartTime(double startTime ){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setEndTime( double endTime ){
+		public void setEndTime(double endTime ){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element ){
 			this.element = element;
-			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setResourceId( Id<LSPResource> resourceId ){
+		public void setResourceId(Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setCarrierId( Id<Carrier> carrierId ){
+		public void setCarrierId(Id<Carrier> carrierId ){
 			this.carrierId = carrierId;
-			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setLinkId( Id<Link> linkId ){
+		public void setLinkId(Id<Link> linkId ){
 			this.linkId = linkId;
-			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setCarrierService( CarrierService carrierService ){
+		public void setCarrierService(CarrierService carrierService ){
 			this.carrierService = carrierService;
-			return this;
 		}
 
 		public ScheduledShipmentUnload build(){
@@ -430,44 +398,36 @@ public class ShipmentUtils{
 			return new ScheduledShipmentTransportBuilder();
 		}
 
-		public ScheduledShipmentTransportBuilder setStartTime( double startTime ){
+		public void setStartTime(double startTime ){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setEndTime( double endTime ){
+		public void setEndTime(double endTime ){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element ){
 			this.element = element;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setResourceId( Id<LSPResource> resourceId ){
+		public void setResourceId(Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setCarrierId( Id<Carrier> carrierId ){
+		public void setCarrierId(Id<Carrier> carrierId ){
 			this.carrierId = carrierId;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setFromLinkId( Id<Link> fromLinkId ){
+		public void setFromLinkId(Id<Link> fromLinkId ){
 			this.fromLinkId = fromLinkId;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setToLinkId( Id<Link> toLinkId ){
+		public void setToLinkId(Id<Link> toLinkId ){
 			this.toLinkId = toLinkId;
-			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setCarrierService( CarrierService carrierService ){
+		public void setCarrierService(CarrierService carrierService ){
 			this.carrierService = carrierService;
-			return this;
 		}
 
 		public ScheduledShipmentTransport build(){
@@ -491,39 +451,32 @@ public class ShipmentUtils{
 			return new ScheduledShipmentLoadBuilder();
 		}
 
-		public ScheduledShipmentLoadBuilder setStartTime( double startTime ){
+		public void setStartTime(double startTime ){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setEndTime( double endTime ){
+		public void setEndTime(double endTime ){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element ){
 			this.element = element;
-			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setResourceId( Id<LSPResource> resourceId ){
+		public void setResourceId(Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setLinkId( Id<Link> linkId ){
+		public void setLinkId(Id<Link> linkId ){
 			this.linkId = linkId;
-			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setCarrierId( Id<Carrier> carrierId ){
+		public void setCarrierId(Id<Carrier> carrierId ){
 			this.carrierId = carrierId;
-			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setCarrierService( CarrierService carrierService ){
+		public void setCarrierService(CarrierService carrierService ){
 			this.carrierService = carrierService;
-			return this;
 		}
 
 		public ScheduledShipmentLoad build(){
@@ -536,7 +489,6 @@ public class ShipmentUtils{
 		double endTime;
 		LogisticsSolutionElement element;
 		Id<LSPResource> resourceId;
-		private Id<Link> linkId;
 
 		private ScheduledShipmentHandleBuilder(){
 		}
@@ -545,29 +497,23 @@ public class ShipmentUtils{
 			return new ScheduledShipmentHandleBuilder();
 		}
 
-		public ScheduledShipmentHandleBuilder setStartTime( double startTime ){
+		public void setStartTime(double startTime ){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public ScheduledShipmentHandleBuilder setEndTime( double endTime ){
+		public void setEndTime(double endTime ){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public ScheduledShipmentHandleBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element ){
 			this.element = element;
-			return this;
 		}
 
-		public ScheduledShipmentHandleBuilder setResourceId( Id<LSPResource> resourceId ){
+		public void setResourceId(Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public ScheduledShipmentHandleBuilder setLinkId( Id<Link> linkId ){
-			this.linkId = linkId;
-			return this;
+		public void setLinkId(Id<Link> linkId ){
 		}
 
 		public ScheduledShipmentHandle build(){
@@ -590,34 +536,28 @@ public class ShipmentUtils{
 			return new LoggedShipmentUnloadBuilder();
 		}
 
-		public LoggedShipmentUnloadBuilder setStartTime( double startTime ){
+		public void setStartTime(double startTime ){
 			this.startTime = startTime;
-			return this;
 		}
 
-		public LoggedShipmentUnloadBuilder setEndTime( double endTime ){
+		public void setEndTime(double endTime ){
 			this.endTime = endTime;
-			return this;
 		}
 
-		public LoggedShipmentUnloadBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+		public void setLogisticsSolutionElement(LogisticsSolutionElement element ){
 			this.element = element;
-			return this;
 		}
 
-		public LoggedShipmentUnloadBuilder setResourceId( Id<LSPResource> resourceId ){
+		public void setResourceId(Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
-			return this;
 		}
 
-		public LoggedShipmentUnloadBuilder setLinkId( Id<Link> linkId ){
+		public void setLinkId(Id<Link> linkId ){
 			this.linkId = linkId;
-			return this;
 		}
 
-		public LoggedShipmentUnloadBuilder setCarrierId( Id<Carrier> carrierId ){
+		public void setCarrierId(Id<Carrier> carrierId ){
 			this.carrierId = carrierId;
-			return this;
 		}
 
 		public LoggedShipmentUnload build(){

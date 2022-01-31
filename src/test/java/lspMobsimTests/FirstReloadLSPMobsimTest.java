@@ -1,9 +1,5 @@
 package lspMobsimTests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -33,26 +29,18 @@ import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.resources.LSPResource;
 
+import static org.junit.Assert.*;
+
 public class FirstReloadLSPMobsimTest {
-	private Network network;
-	private LogisticsSolution completeSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
-	private SolutionScheduler simpleScheduler;
-	private Carrier collectionCarrier;
-	private LogisticsSolutionElement collectionElement;
-	private LogisticsSolutionElement firstReloadElement;
-	private LSP lsp;	
-	private LSPResource collectionAdapter;
-	private LSPResource firstReloadingPointAdapter;
-	 
+	private LSP lsp;
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -75,7 +63,7 @@ public class FirstReloadLSPMobsimTest {
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
-		collectionCarrier = CarrierUtils.createCarrier( collectionCarrierId );
+		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 		
 		
@@ -84,12 +72,12 @@ public class FirstReloadLSPMobsimTest {
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
 		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = collectionAdapterBuilder.build();
+		LSPResource collectionAdapter = collectionAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(collectionElementId );
 		collectionBuilder.setResource(collectionAdapter);
-		collectionElement = collectionBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
 		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -101,43 +89,40 @@ public class FirstReloadLSPMobsimTest {
         
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+		LSPResource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstReloadingElementId );
 		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
-		firstReloadElement = firstReloadingElementBuilder.build();
+		LogisticsSolutionElement firstReloadElement = firstReloadingElementBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		
-		
+		collectionElement.connectWithNextElement(firstReloadElement);
+
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
-		completeSolution = completeSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-		completePlan = LSPUtils.createLSPPlan();
+		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
-		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
-		
 
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -182,9 +167,9 @@ public class FirstReloadLSPMobsimTest {
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }
-		lsp.scheduleSoultions();
+		lsp.scheduleSolutions();
 		
-		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
 		
@@ -205,17 +190,17 @@ public class FirstReloadLSPMobsimTest {
 
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
-			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new ShipmentPlanElementComparator());
+			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			scheduleElements.sort(new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+			logElements.sort(new ShipmentPlanElementComparator());
 										
 			for(ShipmentPlanElement scheduleElement : scheduleElements){
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
-				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
-				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
-				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
+				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
+				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());
+				assertSame(scheduleElement.getSolutionElement(), logElement.getSolutionElement());
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
 		}

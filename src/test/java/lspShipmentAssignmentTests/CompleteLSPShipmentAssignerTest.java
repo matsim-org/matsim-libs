@@ -1,7 +1,5 @@
 package lspShipmentAssignmentTests;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -26,14 +24,12 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
+import static org.junit.Assert.*;
+
 public class CompleteLSPShipmentAssignerTest {
 
-	private Network network;
-	private LogisticsSolution completeSolution;
-	private ShipmentAssigner assigner;
 	private LSPPlan completePlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP completeLSP;	
+	private LSP completeLSP;
 	
 	
 	@Before
@@ -42,7 +38,7 @@ public class CompleteLSPShipmentAssignerTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -190,15 +186,11 @@ public class CompleteLSPShipmentAssignerTest {
 		distributionBuilder.setResource(distributionAdapter);
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);
-		
+		collectionElement.connectWithNextElement(firstReloadElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
@@ -206,18 +198,16 @@ public class CompleteLSPShipmentAssignerTest {
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		completeSolutionBuilder.addSolutionElement(secondReloadElement);
 		completeSolutionBuilder.addSolutionElement(distributionElement);
-		completeSolution = completeSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
-		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
@@ -225,11 +215,11 @@ public class CompleteLSPShipmentAssignerTest {
 		resourcesList.add(distributionAdapter);
 
 
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 11; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -276,12 +266,12 @@ public class CompleteLSPShipmentAssignerTest {
 
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
-		assertTrue(completeLSP.getSelectedPlan()  == completePlan);
-		ArrayList<LogisticsSolution> solutions = new ArrayList<LogisticsSolution>(completeLSP.getSelectedPlan().getSolutions());
+		assertSame(completeLSP.getSelectedPlan(), completePlan);
+		ArrayList<LogisticsSolution> solutions = new ArrayList<>(completeLSP.getSelectedPlan().getSolutions());
 
 		for(LogisticsSolution solution : solutions) {
 			if(solutions.indexOf(solution) == 0 ) {
-				assertTrue(solution.getShipments().size() == 10);
+				assertEquals(10, solution.getShipments().size());
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 					if(element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getShipments().isEmpty());

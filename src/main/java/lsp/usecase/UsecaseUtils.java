@@ -2,6 +2,7 @@ package lsp.usecase;
 
 import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
+import lsp.resources.LSPResourceScheduler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,12 +35,12 @@ public class UsecaseUtils {
 
 	public static class CollectionCarrierAdapterBuilder {
 
-		Id<LSPResource> id;
+		final Id<LSPResource> id;
 		Carrier carrier;
 		Id<Link> locationLinkId;
-		ArrayList<LogisticsSolutionElement> clientElements;
+		final ArrayList<LogisticsSolutionElement> clientElements;
 		CollectionCarrierScheduler collectionScheduler;
-		Network network;
+		final Network network;
 
 			public static CollectionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
 				return new CollectionCarrierAdapterBuilder(id,network);
@@ -47,24 +48,21 @@ public class UsecaseUtils {
 
 			private CollectionCarrierAdapterBuilder(Id<LSPResource> id, Network network){
 				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.clientElements = new ArrayList<>();
 				this.network = network;
 			}
 
-			public CollectionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId){
+			public void setLocationLinkId(Id<Link> locationLinkId){
 				this.locationLinkId = locationLinkId;
-				return this;
 			}
 
-			public CollectionCarrierAdapterBuilder setCarrier(Carrier carrier){
+			public void setCarrier(Carrier carrier){
 				this.carrier = carrier;
-				return this;
 			}
 
 
-			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
+			public void setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
 				this.collectionScheduler = collectionCarrierScheduler;
-				return this;
 			}
 
 			public CollectionCarrierAdapter build(){
@@ -76,12 +74,12 @@ public class UsecaseUtils {
 
 	public static class DistributionCarrierAdapterBuilder {
 
-		Id<LSPResource>id;
+		final Id<LSPResource>id;
 		Carrier carrier;
 		Id<Link> locationLinkId;
-		ArrayList<LogisticsSolutionElement> clientElements;
+		final ArrayList<LogisticsSolutionElement> clientElements;
 		DistributionCarrierScheduler distributionHandler;
-		Network network;
+		final Network network;
 
 			public static DistributionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
 				return new DistributionCarrierAdapterBuilder(id,network);
@@ -89,7 +87,7 @@ public class UsecaseUtils {
 
 			private DistributionCarrierAdapterBuilder(Id<LSPResource> id, Network network){
 				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.clientElements = new ArrayList<>();
 				this.network = network;
 			}
 
@@ -117,13 +115,13 @@ public class UsecaseUtils {
 
 	public static class MainRunCarrierAdapterBuilder {
 
-		private Id<LSPResource>id;
+		private final Id<LSPResource>id;
 		private Carrier carrier;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
-		private ArrayList<LogisticsSolutionElement> clientElements;
+		private final ArrayList<LogisticsSolutionElement> clientElements;
 		private MainRunCarrierScheduler mainRunScheduler;
-		private Network network;
+		private final Network network;
 
 			public static MainRunCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
 				return new MainRunCarrierAdapterBuilder(id,network);
@@ -131,7 +129,7 @@ public class UsecaseUtils {
 
 			private MainRunCarrierAdapterBuilder(Id<LSPResource> id, Network network){
 				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.clientElements = new ArrayList<>();
 				this.network = network;
 			}
 
@@ -227,10 +225,10 @@ public class UsecaseUtils {
 
 	public static class ReloadingPointBuilder {
 
-		private Id<LSPResource> id;
-		private Id<Link> locationLinkId;
+		private final Id<LSPResource> id;
+		private final Id<Link> locationLinkId;
 		private ReloadingPointScheduler reloadingScheduler;
-		private ArrayList <LogisticsSolutionElement> clientElements;
+		private final ArrayList <LogisticsSolutionElement> clientElements;
 
 		public static ReloadingPointBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId){
 			return new ReloadingPointBuilder(id,locationLinkId);
@@ -238,12 +236,12 @@ public class UsecaseUtils {
 
 		private ReloadingPointBuilder(Id<LSPResource> id, Id<Link> locationLinkId){
 			this.id = id;
-			this.clientElements = new ArrayList <LogisticsSolutionElement>();
+			this.clientElements = new ArrayList<>();
 			this.locationLinkId = locationLinkId;
 		}
 
-		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingPointScheduler){
-			this.reloadingScheduler = reloadingPointScheduler;
+		public ReloadingPointBuilder setReloadingScheduler( LSPResourceScheduler reloadingPointScheduler){
+			this.reloadingScheduler = (ReloadingPointScheduler) reloadingPointScheduler;
 			return this;
 		}
 

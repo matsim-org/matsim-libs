@@ -26,18 +26,17 @@ public class LSPUtils{
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
-		Collection<LSPResource> resources;
+		final Collection<LSPResource> resources;
 		LSPScorer scorer;
 		LSPReplanner replanner;
 
 
-
-		public static LSPBuilder getInstance(){
-			return new LSPBuilder();
+		public static LSPBuilder getInstance(Id<LSP> id){
+			return new LSPBuilder(id);
 		}
 
-		private LSPBuilder(){
-			this.resources = new ArrayList<LSPResource>();
+		private LSPBuilder(Id<LSP> id){
+			this.resources = new ArrayList<>();
 
 		}
 
@@ -69,10 +68,10 @@ public class LSPUtils{
 			return this;
 		}
 
-		public LSPBuilder setId( Id<LSP> id ){
-			this.id = id;
-			return this;
-		}
+//		public LSPBuilder setId( Id<LSP> id ){
+//			this.id = id;
+//			return this;
+//		}
 
 		public LSP build(){
 			return new LSPImpl(this);
@@ -81,21 +80,21 @@ public class LSPUtils{
 	}
 
 	public static class LogisticsSolutionBuilder{
-		Id<LogisticsSolution> id;
-		Collection<LogisticsSolutionElement> elements;
-		Collection<LSPInfo> solutionInfos;
-		Collection<EventHandler> eventHandlers;
-		Collection<LSPSimulationTracker>trackers;
+		final Id<LogisticsSolution> id;
+		final Collection<LogisticsSolutionElement> elements;
+		final Collection<LSPInfo> solutionInfos;
+		final Collection<EventHandler> eventHandlers;
+		final Collection<LSPSimulationTracker>trackers;
 
 		public static LogisticsSolutionBuilder newInstance( Id<LogisticsSolution>id ){
 			return new LogisticsSolutionBuilder(id);
 		}
 
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
-			this.elements = new ArrayList<LogisticsSolutionElement>();
-			this.solutionInfos = new ArrayList<LSPInfo>();
-			this.eventHandlers = new ArrayList<EventHandler>();
-			this.trackers = new ArrayList<LSPSimulationTracker>();
+			this.elements = new ArrayList<>();
+			this.solutionInfos = new ArrayList<>();
+			this.eventHandlers = new ArrayList<>();
+			this.trackers = new ArrayList<>();
 			this.id = id;
 		}
 
@@ -136,7 +135,7 @@ public class LSPUtils{
 				}
 				else{
 					currentElement = element;
-					previousElement.setNextElement(currentElement);
+					previousElement.connectWithNextElement(currentElement);
 					currentElement.setPreviousElement(previousElement);
 					previousElement = currentElement;
 				}
@@ -145,10 +144,10 @@ public class LSPUtils{
 	}
 
 	public static class LogisticsSolutionElementBuilder{
-		Id<LogisticsSolutionElement>id;
+		final Id<LogisticsSolutionElement>id;
 		LSPResource resource;
-		WaitingShipments incomingShipments;
-		WaitingShipments outgoingShipments;
+		final WaitingShipments incomingShipments;
+		final WaitingShipments outgoingShipments;
 
 		public static LogisticsSolutionElementBuilder newInstance( Id<LogisticsSolutionElement>id ){
 			return new LogisticsSolutionElementBuilder(id);

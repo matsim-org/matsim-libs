@@ -88,13 +88,11 @@ import lsp.shipment.LSPShipment;
 				collectionPlan.setAssigner(assigner);
 				collectionPlan.addSolution(collectionSolution);
 				
-				LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+				LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 				collectionLSPBuilder.setInitialPlan(collectionPlan);
-				Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-				collectionLSPBuilder.setId(collectionLSPId);
 				
 				//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-				ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+				ArrayList<LSPResource> resourcesList = new ArrayList<>();
 				resourcesList.add(collectionAdapter);
 				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 				collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
@@ -118,11 +116,9 @@ import lsp.shipment.LSPShipment;
 	}
 	
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
-		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Link> toLinkId = collectionLinkId;
-		
+		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+
 		//Create five LSPShipments that are located in the left half of the network.
 		for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -143,7 +139,7 @@ import lsp.shipment.LSPShipment;
 	        		}	
 	        	}
 	        	
-	        	builder.setToLinkId(toLinkId);
+	        	builder.setToLinkId(Id.createLinkId("(4 2) (4 3)"));
 	        	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
@@ -174,7 +170,7 @@ import lsp.shipment.LSPShipment;
 		        
 		
 	//Prepare LSPModule and add the LSP
-        ArrayList<LSP> lspList = new ArrayList<LSP>();
+        ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
 		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());

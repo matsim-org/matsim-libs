@@ -14,8 +14,6 @@ import lsp.resources.LSPResource;
 
 public class SecondReloadElementTest {
 
-	private  Id<LSPResource> reloadingId;
-	private  Id<Link> reloadingLinkId;
 	private LSPResource point;
 	private LogisticsSolutionElement reloadElement;
 	
@@ -24,10 +22,10 @@ public class SecondReloadElementTest {
 		UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
-       
-        
-        reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
-        reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
+
+
+		Id<LSPResource> reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
+		Id<Link> reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
         UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
         reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
@@ -42,18 +40,18 @@ public class SecondReloadElementTest {
 	
 	@Test
 	public void testDistributionElement() {
-		assertTrue(reloadElement.getIncomingShipments()!= null);
-		assertTrue(reloadElement.getIncomingShipments().getShipments() != null);
+		assertNotNull(reloadElement.getIncomingShipments());
+		assertNotNull(reloadElement.getIncomingShipments().getShipments());
 		assertTrue(reloadElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertTrue(reloadElement.getInfos() != null);
+		assertNotNull(reloadElement.getInfos());
 		assertTrue(reloadElement.getInfos().isEmpty());
-		assertTrue(reloadElement.getLogisticsSolution() == null);
-		assertTrue(reloadElement.getNextElement() == null);
-		assertTrue(reloadElement.getOutgoingShipments()!= null);
-		assertTrue(reloadElement.getOutgoingShipments().getShipments() != null);
+		assertNull(reloadElement.getLogisticsSolution());
+		assertNull(reloadElement.getNextElement());
+		assertNotNull(reloadElement.getOutgoingShipments());
+		assertNotNull(reloadElement.getOutgoingShipments().getShipments());
 		assertTrue(reloadElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertTrue(reloadElement.getPreviousElement() == null);
-		assertTrue(reloadElement.getResource() == point);
-		assertTrue(reloadElement.getResource().getClientElements().iterator().next() == reloadElement);
+		assertNull(reloadElement.getPreviousElement());
+		assertSame(reloadElement.getResource(), point);
+		assertSame(reloadElement.getResource().getClientElements().iterator().next(), reloadElement);
 	}
 }

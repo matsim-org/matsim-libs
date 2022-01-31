@@ -35,13 +35,9 @@ import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 public class CollectionLSPReplanningTest {
-	private Network network;
-	private LSP collectionLSP;	
-	private Carrier carrier;
-	private LSPResource collectionAdapter;
-	private LogisticsSolutionElement collectionElement;
+	private LSP collectionLSP;
 
-	
+
 	@Before
 	public void initialize() {
 		
@@ -49,7 +45,7 @@ public class CollectionLSPReplanningTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -75,7 +71,7 @@ public class CollectionLSPReplanningTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 		
 		
@@ -84,12 +80,12 @@ public class CollectionLSPReplanningTest {
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 		collectionElementBuilder.setResource(collectionAdapter);
-		collectionElement = collectionElementBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 		
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
@@ -101,11 +97,9 @@ public class CollectionLSPReplanningTest {
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
-		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		collectionLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -114,11 +108,10 @@ public class CollectionLSPReplanningTest {
 	
 		
 		
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
-	
-	        
-	    for(int i = 1; i < 21; i++) {
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+
+
+		for(int i = 1; i < 21; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	Random random = new Random(1);
@@ -137,7 +130,7 @@ public class CollectionLSPReplanningTest {
         		}	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setToLinkId(collectionLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
@@ -146,14 +139,14 @@ public class CollectionLSPReplanningTest {
         	LSPShipment shipment = builder.build();
         	collectionLSP.assignShipmentToLSP(shipment);
         }
-		collectionLSP.scheduleSoultions();
+		collectionLSP.scheduleSolutions();
 		GenericStrategyManagerFactoryImpl factory = new GenericStrategyManagerFactoryImpl();
 		GenericStrategyManager<LSPPlan, LSP> manager = factory.createStrategyManager(collectionLSP);
 		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(collectionLSP);
 		replanner.setStrategyManager(manager);
 		collectionLSP.setReplanner(replanner);
 		
-		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 		

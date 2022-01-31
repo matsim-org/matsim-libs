@@ -4,8 +4,6 @@ import demand.decoratedLSP.LSPDecorator;
 import demand.decoratedLSP.LogisticsSolutionDecorator;
 import demand.offer.Offer;
 import demand.offer.OfferVisitor;
-import lsp.LSP;
-import lsp.LogisticsSolution;
 
 public class NonsenseOffer implements Offer{
 

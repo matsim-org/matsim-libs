@@ -14,14 +14,13 @@ import lsp.controler.LSPSimulationTracker;
 /* package-private */ class LogisticsSolutionImpl implements LogisticsSolution {
 
 	
-	private Id<LogisticsSolution> id;
+	private final Id<LogisticsSolution> id;
 	private LSP lsp;
-	private Collection<LogisticsSolutionElement> solutionElements; 
-	private Collection<LSPShipment> shipments;
-	private Collection<LSPInfo> solutionInfos;
-	private Collection<EventHandler> eventHandlers;
-	private Collection<LSPSimulationTracker>trackers;
-	private EventsManager eventsManager;
+	private final Collection<LogisticsSolutionElement> solutionElements;
+	private final Collection<LSPShipment> shipments;
+	private final Collection<LSPInfo> solutionInfos;
+	private final Collection<EventHandler> eventHandlers;
+	private final Collection<LSPSimulationTracker>trackers;
 
 
 	LogisticsSolutionImpl( LSPUtils.LogisticsSolutionBuilder builder ){
@@ -94,7 +93,6 @@ import lsp.controler.LSPSimulationTracker;
 	
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 
 }	

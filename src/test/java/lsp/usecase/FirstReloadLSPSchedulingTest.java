@@ -1,8 +1,5 @@
 package lsp.usecase;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,13 +25,10 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.LSPResource;
 
+import static org.junit.Assert.*;
+
 public class FirstReloadLSPSchedulingTest {
-	private Network network;
-	private LogisticsSolution completeSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP lsp;	
+	private LSP lsp;
 	private LSPResource firstReloadingPointAdapter;
 	private LogisticsSolutionElement firstReloadElement;
 	private LogisticsSolutionElement collectionElement;
@@ -46,7 +40,7 @@ public class FirstReloadLSPSchedulingTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -102,36 +96,33 @@ public class FirstReloadLSPSchedulingTest {
 		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
 		firstReloadElement = firstReloadingElementBuilder.build();
 		
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		
-		
+		collectionElement.connectWithNextElement(firstReloadElement);
+
+
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
-		completeSolution = completeSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-		completePlan = LSPUtils.createLSPPlan();
+		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
-		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
-		
 
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -176,7 +167,7 @@ public class FirstReloadLSPSchedulingTest {
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }
-		lsp.scheduleSoultions();
+		lsp.scheduleSolutions();
 	
 	}
 
@@ -184,8 +175,8 @@ public class FirstReloadLSPSchedulingTest {
 	public void testFirstReloadLSPScheduling() {
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			scheduleElements.sort(new ShipmentPlanElementComparator());
 			
 			System.out.println();
 			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
@@ -196,113 +187,111 @@ public class FirstReloadLSPSchedulingTest {
 	
 	
 		for(LSPShipment shipment : lsp.getShipments()){
-			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 4);
+			assertEquals(4, shipment.getShipmentPlan().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(planElements, new ShipmentPlanElementComparator());
-			assertTrue(planElements.get(3).getElementType() == "HANDLE");
+			planElements.sort(new ShipmentPlanElementComparator());
+			assertEquals("HANDLE", planElements.get(3).getElementType());
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
 			assertTrue(planElements.get(3).getStartTime() >= (0));
-			assertTrue(planElements.get(3).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(3).getResourceId() == firstReloadingPointAdapter.getId());
-			assertTrue(planElements.get(3).getSolutionElement() == firstReloadElement);	
-			
-			assertTrue(planElements.get(3).getStartTime() == (planElements.get(2).getEndTime() + 300));
-			
-			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
+			assertTrue(planElements.get(3).getStartTime() <= (24*3600));
+			assertSame(planElements.get(3).getResourceId(), firstReloadingPointAdapter.getId());
+			assertSame(planElements.get(3).getSolutionElement(), firstReloadElement);
+
+			assertEquals(planElements.get(3).getStartTime(), (planElements.get(2).getEndTime() + 300), 0.0);
+
+			assertEquals("UNLOAD", planElements.get(2).getElementType());
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
 			assertTrue(planElements.get(2).getStartTime() >= (0));
-			assertTrue(planElements.get(2).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(2).getResourceId() == collectionAdapter.getId());
-			assertTrue(planElements.get(2).getSolutionElement() == collectionElement);	
-		
-			assertTrue(planElements.get(2).getStartTime() == planElements.get(1).getEndTime());
-			
-			assertTrue(planElements.get(1).getElementType() == "TRANSPORT");
+			assertTrue(planElements.get(2).getStartTime() <= (24*3600));
+			assertSame(planElements.get(2).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(2).getSolutionElement(), collectionElement);
+
+			assertEquals(planElements.get(2).getStartTime(), planElements.get(1).getEndTime(), 0.0);
+
+			assertEquals("TRANSPORT", planElements.get(1).getElementType());
 			assertTrue(planElements.get(1).getEndTime() >= (0));
 			assertTrue(planElements.get(1).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(1).getStartTime() <= planElements.get(1).getEndTime());
 			assertTrue(planElements.get(1).getStartTime() >= (0));
-			assertTrue(planElements.get(1).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(1).getResourceId() == collectionAdapter.getId());
-			assertTrue(planElements.get(1).getSolutionElement() == collectionElement);	
-			
-			assertTrue(planElements.get(1).getStartTime() == planElements.get(0).getEndTime());
-			
-			assertTrue(planElements.get(0).getElementType() == "LOAD");
+			assertTrue(planElements.get(1).getStartTime() <= (24*3600));
+			assertSame(planElements.get(1).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(1).getSolutionElement(), collectionElement);
+
+			assertEquals(planElements.get(1).getStartTime(), planElements.get(0).getEndTime(), 0.0);
+
+			assertEquals("LOAD", planElements.get(0).getElementType());
 			assertTrue(planElements.get(0).getEndTime() >= (0));
 			assertTrue(planElements.get(0).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(0).getStartTime() <= planElements.get(0).getEndTime());
 			assertTrue(planElements.get(0).getStartTime() >= (0));
-			assertTrue(planElements.get(0).getStartTime() <= (24*3600));	
-			assertTrue(planElements.get(0).getResourceId() == collectionAdapter.getId());
-			assertTrue(planElements.get(0).getSolutionElement() == collectionElement);	
+			assertTrue(planElements.get(0).getStartTime() <= (24*3600));
+			assertSame(planElements.get(0).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 			
 		}
-			
-		assertTrue(firstReloadingPointAdapter.getEventHandlers().size() ==1);
-		ArrayList<EventHandler> eventHandlers = new ArrayList<EventHandler>(firstReloadingPointAdapter.getEventHandlers());
+
+		assertEquals(1, firstReloadingPointAdapter.getEventHandlers().size());
+		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstReloadingPointAdapter.getEventHandlers());
 		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
 		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
-		Iterator<Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair>>  iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
-		
-		while(iter.hasNext()) {
-			Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry =  iter.next();
+
+		for (Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
-			assertTrue(service.getLocationLinkId() == shipment.getFrom() );
-			assertTrue(service.getCapacityDemand() == shipment.getSize() );
-			assertTrue(service.getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertSame(service.getLocationLinkId(), shipment.getFrom());
+			assertEquals(service.getCapacityDemand(), shipment.getSize());
+			assertEquals(service.getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
 			boolean handledByReloadingPoint = false;
-			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
-				if(clientElement == element) {
+			for (LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
+				if (clientElement == element) {
 					handledByReloadingPoint = true;
 				}
 			}
 			assertTrue(handledByReloadingPoint);
 			//This asserts that the shipments waiting for handling have been handled and the queues have been cleared
-			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));	
-			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));	
+			assertFalse(element.getOutgoingShipments().getShipments().contains(shipment));
+			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));
 		}
 		
 	
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
-			assertTrue(shipment.getEventHandlers().size() == 2);
-			eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
+			assertEquals(2, shipment.getEventHandlers().size());
+			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
-			assertTrue(endHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
-			assertTrue(endHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(endHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(endHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
-			assertTrue(endHandler.getElement() == planElements.get(2).getSolutionElement());
-			assertTrue(endHandler.getElement() == lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
-			assertTrue(endHandler.getLspShipment() == shipment);
-			assertTrue(endHandler.getResourceId() == planElements.get(2).getResourceId());
-			assertTrue(endHandler.getResourceId()  == lsp.getResources().iterator().next().getId());
+			assertSame(endHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
+			assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertSame(endHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertSame(endHandler.getElement(), planElements.get(2).getSolutionElement());
+			assertSame(endHandler.getElement(), lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
+			assertSame(endHandler.getLspShipment(), shipment);
+			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
+			assertSame(endHandler.getResourceId(), lsp.getResources().iterator().next().getId());
 			
 			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
-			assertTrue(serviceHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
-			assertTrue(serviceHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
-			assertTrue(serviceHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
-			assertTrue(serviceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
-			assertTrue(serviceHandler.getElement() == planElements.get(0).getSolutionElement());
-			assertTrue(serviceHandler.getElement() == lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
-			assertTrue(serviceHandler.getLspShipment() == shipment);
-			assertTrue(serviceHandler.getResourceId() == planElements.get(0).getResourceId());
-			assertTrue(serviceHandler.getResourceId()  == lsp.getResources().iterator().next().getId());
+			assertSame(serviceHandler.getCarrierService().getLocationLinkId(), shipment.getFrom());
+			assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
+			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
+			assertSame(serviceHandler.getCarrierService().getServiceStartTimeWindow(), shipment.getPickupTimeWindow());
+			assertSame(serviceHandler.getElement(), planElements.get(0).getSolutionElement());
+			assertSame(serviceHandler.getElement(), lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
+			assertSame(serviceHandler.getLspShipment(), shipment);
+			assertSame(serviceHandler.getResourceId(), planElements.get(0).getResourceId());
+			assertSame(serviceHandler.getResourceId(), lsp.getResources().iterator().next().getId());
 		}	
 	
 		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-			assertTrue(solution.getShipments().size() == 1);
+			assertEquals(1, solution.getShipments().size());
 			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
 				if(element.getNextElement() != null) {

@@ -22,19 +22,17 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
 
 public class MainRunElementTest {
-	
-	private Network network;
+
 	private LSPResource mainRunAdapter;
 	private LogisticsSolutionElement mainRunElement;
-	private Carrier carrier;
-	
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 	
        
         Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
@@ -59,7 +57,7 @@ public class MainRunElementTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 
@@ -80,19 +78,19 @@ public class MainRunElementTest {
 
 	@Test
 	public void testDistributionElement() {
-		assertTrue(mainRunElement.getIncomingShipments()!= null);
-		assertTrue(mainRunElement.getIncomingShipments().getShipments() != null);
+		assertNotNull(mainRunElement.getIncomingShipments());
+		assertNotNull(mainRunElement.getIncomingShipments().getShipments());
 		assertTrue(mainRunElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertTrue(mainRunElement.getInfos() != null);
+		assertNotNull(mainRunElement.getInfos());
 		assertTrue(mainRunElement.getInfos().isEmpty());
-		assertTrue(mainRunElement.getLogisticsSolution() == null);
-		assertTrue(mainRunElement.getNextElement() == null);
-		assertTrue(mainRunElement.getOutgoingShipments()!= null);
-		assertTrue(mainRunElement.getOutgoingShipments().getShipments() != null);
+		assertNull(mainRunElement.getLogisticsSolution());
+		assertNull(mainRunElement.getNextElement());
+		assertNotNull(mainRunElement.getOutgoingShipments());
+		assertNotNull(mainRunElement.getOutgoingShipments().getShipments());
 		assertTrue(mainRunElement.getOutgoingShipments().getSortedShipments().isEmpty());
-		assertTrue(mainRunElement.getPreviousElement() == null);
-		assertTrue(mainRunElement.getResource() == mainRunAdapter);
-		assertTrue(mainRunElement.getResource().getClientElements().iterator().next() == mainRunElement);
+		assertNull(mainRunElement.getPreviousElement());
+		assertSame(mainRunElement.getResource(), mainRunAdapter);
+		assertSame(mainRunElement.getResource().getClientElements().iterator().next(), mainRunElement);
 	}
 
 

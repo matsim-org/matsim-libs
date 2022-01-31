@@ -9,7 +9,7 @@ import lsp.shipment.LSPShipment;
 public class TomorrowAssigner implements ShipmentAssigner{
 
 	private LSP lsp;
-	private Random random;
+	private final Random random;
 	
 	public TomorrowAssigner() {
 		this.random = new Random(1);

@@ -27,13 +27,9 @@ import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 public class CollectionLSPShipmentAssigmentTest {
- 
-	private Network network;
-	private LogisticsSolution collectionSolution;
-	private ShipmentAssigner assigner;
+
 	private LSPPlan collectionPlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP collectionLSP;	
+	private LSP collectionLSP;
 	
 	@Before
 	public void initialize() {
@@ -42,7 +38,7 @@ public class CollectionLSPShipmentAssigmentTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -83,29 +79,26 @@ public class CollectionLSPShipmentAssigmentTest {
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		collectionSolution = collectionSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
-		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		collectionLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
-		
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
-	
-	        
-	    for(int i = 1; i < 11; i++) {
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+
+
+		for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = new Random().nextInt(10);
@@ -123,7 +116,7 @@ public class CollectionLSPShipmentAssigmentTest {
         		}	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setToLinkId(collectionLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
@@ -136,13 +129,13 @@ public class CollectionLSPShipmentAssigmentTest {
 
 	@Test
 	public void testCollectionLSPShipmentAssignment() {
-		assertTrue(collectionLSP.getSelectedPlan()  == collectionPlan);
+		assertSame(collectionLSP.getSelectedPlan(), collectionPlan);
 		assertFalse(collectionLSP.getShipments().isEmpty());
-		ArrayList<LogisticsSolution> solutions = new ArrayList<LogisticsSolution>(collectionLSP.getSelectedPlan().getSolutions());
+		ArrayList<LogisticsSolution> solutions = new ArrayList<>(collectionLSP.getSelectedPlan().getSolutions());
 
 		for(LogisticsSolution solution : solutions) {
 			if(solutions.indexOf(solution) == 0 ) {
-				assertTrue(solution.getShipments().size() == 10);
+				assertEquals(10, solution.getShipments().size());
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 					if(element.getPreviousElement() == null) {
 						assertTrue(element.getIncomingShipments().getShipments().isEmpty());

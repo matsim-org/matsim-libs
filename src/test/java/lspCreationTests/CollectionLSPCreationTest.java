@@ -25,12 +25,10 @@ import lsp.resources.LSPResource;
 
 public class CollectionLSPCreationTest {
 
-	private Network network;
 	private LogisticsSolution collectionSolution;
 	private ShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP collectionLSP;	
+	private LSP collectionLSP;
 	
 	@Before
 	public void initialize() {
@@ -39,7 +37,7 @@ public class CollectionLSPCreationTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -87,31 +85,29 @@ public class CollectionLSPCreationTest {
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
-		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		collectionLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
-		
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	}
 
 	@Test
 	public void testCollectionLSPCreation() {
-		assertTrue(collectionLSP.getPlans() != null);
+		assertNotNull(collectionLSP.getPlans());
 		assertFalse(collectionLSP.getPlans().isEmpty());
-		assertTrue(collectionLSP.getResources() != null);
+		assertNotNull(collectionLSP.getResources());
 		LSPPlan selectedPlan = collectionLSP.getSelectedPlan();
-		assertTrue(selectedPlan.getScore() == 0);
-		assertTrue(selectedPlan.getLsp() == collectionLSP);
-		assertTrue(selectedPlan.getAssigner() == assigner);
-		assertTrue(selectedPlan.getSolutions().iterator().next() == collectionSolution);
-		assertTrue(selectedPlan.getSolutions().iterator().next().getLSP() == collectionLSP);
+		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
+		assertSame(selectedPlan.getLsp(), collectionLSP);
+		assertSame(selectedPlan.getAssigner(), assigner);
+		assertSame(selectedPlan.getSolutions().iterator().next(), collectionSolution);
+		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), collectionLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
-		assertTrue(selectedPlan.getLsp()== collectionLSP);
+		assertSame(selectedPlan.getLsp(), collectionLSP);
 	}
 
 }

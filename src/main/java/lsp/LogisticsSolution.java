@@ -11,27 +11,30 @@ import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
 
 
+/**
+ * Was macht das hier?
+ */
 public interface LogisticsSolution {
 
-	public Id<LogisticsSolution> getId();
+	Id<LogisticsSolution> getId();
 	
-	public void setLSP(LSP lsp);
+	void setLSP(LSP lsp);
 	
-	public LSP getLSP();
+	LSP getLSP();
 	
-	public Collection<LogisticsSolutionElement> getSolutionElements();
+	Collection<LogisticsSolutionElement> getSolutionElements();
 	
-	public Collection<LSPShipment> getShipments();
+	Collection<LSPShipment> getShipments();
 	
-	public void assignShipment(LSPShipment shipment);
+	void assignShipment(LSPShipment shipment);
 	
-	public Collection<LSPInfo> getInfos();
+	Collection<LSPInfo> getInfos();
 	
-    public Collection <EventHandler> getEventHandlers();
+    Collection <EventHandler> getEventHandlers();
         
-    public void addSimulationTracker( LSPSimulationTracker tracker );
+    void addSimulationTracker(LSPSimulationTracker tracker);
     
-    public Collection<LSPSimulationTracker> getSimulationTrackers();
+    Collection<LSPSimulationTracker> getSimulationTrackers();
     
-    public void setEventsManager(EventsManager eventsManager);
+    void setEventsManager(EventsManager eventsManager);
 }

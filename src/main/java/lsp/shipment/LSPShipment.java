@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
 
-import demand.UtilityFunction;
 import lsp.LogisticsSolution;
 import lsp.functions.LSPInfo;
 

@@ -6,7 +6,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 
 class LSPScoringModuleImpl implements LSPScoringModule{
 
-	private LSPs lsps;
+	private final LSPs lsps;
 	
 	LSPScoringModuleImpl(LSPs lsps) {
 		this.lsps = lsps;

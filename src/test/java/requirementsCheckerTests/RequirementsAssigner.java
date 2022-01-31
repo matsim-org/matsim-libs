@@ -12,10 +12,10 @@ import lsp.shipment.Requirement;
 public class RequirementsAssigner implements  ShipmentAssigner {
 
 	private LSP lsp;
-	private Collection<LogisticsSolution> feasibleSolutions;
+	private final Collection<LogisticsSolution> feasibleSolutions;
 	
 	public RequirementsAssigner() {
-		this.feasibleSolutions = new ArrayList<LogisticsSolution>();
+		this.feasibleSolutions = new ArrayList<>();
 	}
 	
 	@Override
@@ -25,7 +25,7 @@ public class RequirementsAssigner implements  ShipmentAssigner {
 		label:
 		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 			for(Requirement requirement : shipment.getRequirements()) {
-				if(requirement.checkRequirement(solution) == false) {
+				if(!requirement.checkRequirement(solution)) {
 					
 					continue label;
 				}

@@ -21,8 +21,7 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.LSPResource;
 
 public class CollectionLSPPlanTest {
-	
-	private Network network;
+
 	private LogisticsSolution collectionSolution;
 	private ShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
@@ -34,7 +33,7 @@ public class CollectionLSPPlanTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -85,11 +84,11 @@ public class CollectionLSPPlanTest {
 
 	@Test
 	public void collectionLSPPlanTest() {
-		assertTrue(collectionPlan.getAssigner() == assigner);
-		assertTrue(collectionPlan.getScore() == 0);
-		assertTrue(collectionPlan.getLsp() == null);
-		assertTrue(collectionPlan.getSolutions().size() == 1);
-		assertTrue(collectionPlan.getSolutions().iterator().next() == collectionSolution);
+		assertSame(collectionPlan.getAssigner(), assigner);
+		assertEquals(0, (double) collectionPlan.getScore(), 0.0);
+		assertNull(collectionPlan.getLsp());
+		assertEquals(1, collectionPlan.getSolutions().size());
+		assertSame(collectionPlan.getSolutions().iterator().next(), collectionSolution);
 	}
 
 }

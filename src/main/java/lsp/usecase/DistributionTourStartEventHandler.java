@@ -14,10 +14,10 @@ import lsp.resources.LSPCarrierResource;
 
 /*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler {
 
-	private CarrierService carrierService;
-	private LSPShipment lspShipment;
-	private LogisticsSolutionElement element;
-	private LSPCarrierResource resource;
+	private final CarrierService carrierService;
+	private final LSPShipment lspShipment;
+	private final LogisticsSolutionElement element;
+	private final LSPCarrierResource resource;
 	
 	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;

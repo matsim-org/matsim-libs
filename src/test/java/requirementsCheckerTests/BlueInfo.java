@@ -4,7 +4,7 @@ import lsp.functions.*;
 
 public class BlueInfo extends LSPInfo {
 
-	private LSPInfoFunction blueInfoFunction;
+	private final LSPInfoFunction blueInfoFunction;
 	
 	public BlueInfo() {
 		blueInfoFunction = LSPInfoFunctionUtils.createDefaultInfoFunction();

@@ -1,8 +1,5 @@
 package adapterTests;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 
 import lsp.usecase.UsecaseUtils;
@@ -23,15 +20,15 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.LSPCarrierResource;
 import lsp.resources.LSPResource;
 
+import static org.junit.Assert.*;
 
 
 public class DistributionAdapterTest {
 		
 		//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 		//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
-		
-		private Network network;
-		private org.matsim.vehicles.VehicleType distributionType;
+
+	private org.matsim.vehicles.VehicleType distributionType;
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
 		private Carrier distributionCarrier;
@@ -44,7 +41,7 @@ public class DistributionAdapterTest {
 	        config.addCoreModules();
 	        Scenario scenario = ScenarioUtils.createScenario(config);
 	        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-	        this.network = scenario.getNetwork();
+			Network network = scenario.getNetwork();
 
 			Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 			Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
@@ -81,45 +78,45 @@ public class DistributionAdapterTest {
 
 		@Test
 		public void testCollectionAdapter() {
-			assertTrue(distributionAdapter.getClientElements() != null);
+			assertNotNull(distributionAdapter.getClientElements());
 			assertTrue(distributionAdapter.getClientElements().isEmpty());
 			assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
 			if(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
 				assertTrue(Carrier.class.isAssignableFrom(distributionAdapter.getClassOfResource()));
-				assertTrue(distributionAdapter.getCarrier() == distributionCarrier);
+				assertSame(distributionAdapter.getCarrier(), distributionCarrier);
 			}
-			assertTrue(distributionAdapter.getEndLinkId() == distributionLinkId);
-			assertTrue(distributionAdapter.getStartLinkId() == distributionLinkId);
-			assertTrue(distributionAdapter.getEventHandlers() != null);
+			assertSame(distributionAdapter.getEndLinkId(), distributionLinkId);
+			assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
+			assertNotNull(distributionAdapter.getEventHandlers());
 			assertTrue(distributionAdapter.getEventHandlers().isEmpty());
-			assertTrue(distributionAdapter.getInfos() != null);
+			assertNotNull(distributionAdapter.getInfos());
 			assertTrue(distributionAdapter.getInfos().isEmpty());
-			assertTrue(distributionAdapter.getStartLinkId() == distributionLinkId);
+			assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
 			if(distributionAdapter.getCarrier() == distributionCarrier) {
-				assertTrue(distributionCarrier.getCarrierCapabilities() == capabilities);
+				assertSame(distributionCarrier.getCarrierCapabilities(), capabilities);
 				assertTrue(Carrier.class.isAssignableFrom(distributionCarrier.getClass()));
 				assertTrue(distributionCarrier.getPlans().isEmpty());
-				assertTrue(distributionCarrier.getSelectedPlan() == null);
+				assertNull(distributionCarrier.getSelectedPlan());
 				assertTrue(distributionCarrier.getServices().isEmpty());
 				assertTrue(distributionCarrier.getShipments().isEmpty());
 				if(distributionCarrier.getCarrierCapabilities() == capabilities) {
-					assertTrue(capabilities.getFleetSize() == FleetSize.INFINITE);
+					assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 					assertFalse(capabilities.getVehicleTypes().isEmpty());
 					ArrayList<VehicleType> types = new ArrayList<>( capabilities.getVehicleTypes() );
 					if(types.size() ==1) {
-						assertTrue(types.get(0) == distributionType);
-						assertTrue( distributionType.getCapacity().getOther().intValue() == 10 );
-						assertTrue( distributionType.getCostInformation().getPerDistanceUnit() == 0.0004 );
-						assertTrue( distributionType.getCostInformation().getPerTimeUnit() == 0.38 );
-						assertTrue( distributionType.getCostInformation().getFix() == 49 );
-						assertTrue(distributionType.getMaximumVelocity() == (50/3.6));
+						assertSame(types.get(0), distributionType);
+						assertEquals(10, distributionType.getCapacity().getOther().intValue());
+						assertEquals(0.0004, distributionType.getCostInformation().getPerDistanceUnit(), 0.0);
+						assertEquals(0.38, distributionType.getCostInformation().getPerTimeUnit(), 0.0);
+						assertEquals(49, distributionType.getCostInformation().getFix(), 0.0);
+						assertEquals((50 / 3.6), distributionType.getMaximumVelocity(), 0.0);
 						
 					}
-					ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
+					ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
 					if(vehicles.size() == 1) {
-						assertTrue(vehicles.get(0) == distributionCarrierVehicle);
-						assertTrue(distributionCarrierVehicle.getType() == distributionType);
-						assertTrue(distributionCarrierVehicle.getLocation() == distributionLinkId);
+						assertSame(vehicles.get(0), distributionCarrierVehicle);
+						assertSame(distributionCarrierVehicle.getType(), distributionType);
+						assertSame(distributionCarrierVehicle.getLocation(), distributionLinkId);
 					}
 				}
 			}

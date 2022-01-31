@@ -10,7 +10,7 @@ import lsp.shipment.ShipmentComparator;
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
 		
-	private ArrayList<ShipmentWithTime> shipments;
+	private final ArrayList<ShipmentWithTime> shipments;
 	
 	WaitingShipmentsImpl() {
 		this.shipments = new ArrayList<>();
@@ -21,12 +21,12 @@ import lsp.shipment.ShipmentComparator;
 	public void addShipment(double time, LSPShipment shipment) {
 		ShipmentWithTime tuple = new ShipmentWithTime(time, shipment);
 		this.shipments.add(tuple);
-		Collections.sort(shipments, new ShipmentComparator());
+		shipments.sort(new ShipmentComparator());
 	}
 
 	@Override
 	public Collection <ShipmentWithTime> getSortedShipments() {
-		Collections.sort(shipments, new ShipmentComparator());
+		shipments.sort(new ShipmentComparator());
 		return shipments;
 	}
 

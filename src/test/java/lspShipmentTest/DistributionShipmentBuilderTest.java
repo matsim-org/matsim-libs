@@ -25,7 +25,6 @@ import lsp.shipment.LSPShipment;
 public class DistributionShipmentBuilderTest {
 
 	private Network network;
-	private Id<Link> fromLinkId;
 	private ArrayList<LSPShipment> shipments;
 	
 	
@@ -36,10 +35,10 @@ public class DistributionShipmentBuilderTest {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();
-        ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+        ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
         Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
-        this.fromLinkId = network.getLinks().get(distributionLinkId).getId();
-        this.shipments = new ArrayList<LSPShipment>();
+		Id<Link> fromLinkId = network.getLinks().get(distributionLinkId).getId();
+        this.shipments = new ArrayList<>();
         
         for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -74,7 +73,7 @@ public class DistributionShipmentBuilderTest {
 	
 	@Test
 	public void testShipments() {
-		assertTrue(shipments.size() == 10);
+		assertEquals(10, shipments.size());
 		for(LSPShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
 			assertNotNull(shipment.getSize() );

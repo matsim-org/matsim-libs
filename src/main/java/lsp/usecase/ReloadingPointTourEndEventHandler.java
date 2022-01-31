@@ -18,8 +18,8 @@ import lsp.resources.LSPResource;
 /*package-private*/  class ReloadingPointTourEndEventHandler implements LSPTourEndEventHandler {
 
 	static class ReloadingPointEventHandlerPair{
-		public LSPShipment shipment;
-		public LogisticsSolutionElement element;
+		public final LSPShipment shipment;
+		public final LogisticsSolutionElement element;
 				
 		public ReloadingPointEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element){
 			this.shipment = shipment;
@@ -28,16 +28,16 @@ import lsp.resources.LSPResource;
 	}
 	
 	
-	private HashMap<CarrierService, ReloadingPointEventHandlerPair> servicesWaitedFor;
-	private ReloadingPoint reloadingPoint;
-	private Id<LSPResource> resourceId;
-	private Id<Link> linkId;
+	private final HashMap<CarrierService, ReloadingPointEventHandlerPair> servicesWaitedFor;
+	private final ReloadingPoint reloadingPoint;
+	private final Id<LSPResource> resourceId;
+	private final Id<Link> linkId;
 	
 	ReloadingPointTourEndEventHandler(ReloadingPoint reloadingPoint){
 		this.reloadingPoint = reloadingPoint;
 		this.linkId = reloadingPoint.getEndLinkId();
 		this.resourceId = reloadingPoint.getId();
-		this.servicesWaitedFor = new HashMap<CarrierService, ReloadingPointEventHandlerPair>();
+		this.servicesWaitedFor = new HashMap<>();
 	}
 	
 	@Override

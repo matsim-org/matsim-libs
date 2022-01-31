@@ -12,14 +12,13 @@ import lsp.resources.LSPResource;
 
 class ScheduledShipmentLoad implements ShipmentPlanElement {
 
-	private final String type = "LOAD";
-	private double startTime;
-	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<LSPResource> resourceId;
-	private Id<Carrier> carrierId;
-	private Id<Link> linkId;
-	private CarrierService carrierService;
+	private final double startTime;
+	private final double endTime;
+	private final LogisticsSolutionElement element;
+	private final Id<LSPResource> resourceId;
+	private final Id<Carrier> carrierId;
+	private final Id<Link> linkId;
+	private final CarrierService carrierService;
 
 	ScheduledShipmentLoad( ShipmentUtils.ScheduledShipmentLoadBuilder builder ){
 		this.startTime = builder.startTime;
@@ -34,6 +33,7 @@ class ScheduledShipmentLoad implements ShipmentPlanElement {
 	
 	@Override
 	public String getElementType() {
+		String type = "LOAD";
 		return type;
 	}
 

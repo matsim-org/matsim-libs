@@ -4,8 +4,6 @@ package lsp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.population.BasicPlan;
-
 /* package-private */ class LSPPlanImpl implements LSPPlan{
 
 	private LSP lsp;
@@ -47,7 +45,7 @@ import org.matsim.api.core.v01.population.BasicPlan;
 		this.score = score;
 	}
 
-	@Override public LSPPlan setLSP( LSP lsp ) {
+	@Override public void setLSP(LSP lsp ) {
 		this.lsp = lsp;
 		if(assigner != null) {
 			this.assigner.setLSP(lsp);
@@ -55,7 +53,6 @@ import org.matsim.api.core.v01.population.BasicPlan;
 		for(LogisticsSolution solution : solutions) {
 			solution.setLSP(lsp);
 		}
-		return this;
 	}
 	
 	@Override public LSP getLsp() {

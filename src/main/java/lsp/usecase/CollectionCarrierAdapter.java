@@ -19,27 +19,25 @@ import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class CollectionCarrierAdapter implements LSPCarrierResource {
 
-	private Id<LSPResource>id;
-	private Carrier carrier;
-	private Id<Link> locationLinkId;
-	private ArrayList<LogisticsSolutionElement> clientElements;
-	private CollectionCarrierScheduler collectionScheduler;
-	private Network network;
-	private Collection<EventHandler> eventHandlers;
-	private Collection<LSPInfo> infos;
-	private Collection<LSPSimulationTracker> trackers;
-	private EventsManager eventsManager;
+	private final Id<LSPResource>id;
+	private final Carrier carrier;
+	private final ArrayList<LogisticsSolutionElement> clientElements;
+	private final CollectionCarrierScheduler collectionScheduler;
+	private final Network network;
+	private final Collection<EventHandler> eventHandlers;
+	private final Collection<LSPInfo> infos;
+	private final Collection<LSPSimulationTracker> trackers;
 
 	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
 		this.id = builder.id;
-		this.locationLinkId = builder.locationLinkId;
+		Id<Link> locationLinkId = builder.locationLinkId;
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
 		this.network = builder.network;
-		this.eventHandlers = new ArrayList<EventHandler>();
-		this.infos = new ArrayList<LSPInfo>();
-		this.trackers = new ArrayList<LSPSimulationTracker>();
+		this.eventHandlers = new ArrayList<>();
+		this.infos = new ArrayList<>();
+		this.trackers = new ArrayList<>();
 	}
 	
 	
@@ -125,7 +123,6 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 
 }

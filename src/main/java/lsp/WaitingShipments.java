@@ -6,12 +6,12 @@ import lsp.shipment.LSPShipment;
 
 public interface WaitingShipments {
 
-	public void addShipment(double time ,LSPShipment shipment);
+	void addShipment(double time, LSPShipment shipment);
 	
-	public Collection<ShipmentWithTime> getSortedShipments();
+	Collection<ShipmentWithTime> getSortedShipments();
 	
-	public Collection<ShipmentWithTime> getShipments();
+	Collection<ShipmentWithTime> getShipments();
 	
-	public void clear();
+	void clear();
 	
 }

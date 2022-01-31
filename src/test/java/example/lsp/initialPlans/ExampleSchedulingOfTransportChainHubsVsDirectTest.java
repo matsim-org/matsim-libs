@@ -3,10 +3,6 @@ package example.lsp.initialPlans;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -15,7 +11,7 @@ import static org.junit.Assert.fail;
 
 public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 	private static final Logger log = Logger.getLogger( ExampleSchedulingOfTransportChainHubsVsDirectTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testMain1(){

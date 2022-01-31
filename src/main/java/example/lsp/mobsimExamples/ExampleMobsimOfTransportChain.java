@@ -200,16 +200,12 @@ import lsp.resources.LSPResource;
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
 		//The Order of the logisticsSolutionElements is now specified
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
-		firstReloadElement.setNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);	
-		
-		
+		collectionElement.connectWithNextElement(firstReloadElement);
+		firstReloadElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(secondReloadElement);
+		secondReloadElement.connectWithNextElement(distributionElement);
+
+
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
@@ -227,13 +223,11 @@ import lsp.resources.LSPResource;
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
-		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> completeLSPId = Id.create("CollectionLSP", LSP.class);
-		completeLSPBuilder.setId(completeLSPId);
 		
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
@@ -247,8 +241,8 @@ import lsp.resources.LSPResource;
 	}
 	
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
-		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		Random rand = new Random(1);
 		 for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -314,10 +308,10 @@ import lsp.resources.LSPResource;
 				}
 				        
 				//schedule the LSP with the shipments and according to the scheduler of the Resource
-				lsp.scheduleSoultions();
+				lsp.scheduleSolutions();
 			
 				//set up simulation controler and LSPModule
-				ArrayList<LSP> lspList = new ArrayList<LSP>();
+				ArrayList<LSP> lspList = new ArrayList<>();
 				lspList.add(lsp);
 				LSPs lsps = new LSPs(lspList);
 				LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
@@ -332,10 +326,10 @@ import lsp.resources.LSPResource;
 			
 				for(LSPShipment shipment : lsp.getShipments()) {
 					System.out.println("Shipment: " + shipment.getId());
-					ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
-					Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
-					ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-					Collections.sort(logElements, new ShipmentPlanElementComparator());
+					ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+					scheduleElements.sort(new ShipmentPlanElementComparator());
+					ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+					logElements.sort(new ShipmentPlanElementComparator());
 					
 					for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 						System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());

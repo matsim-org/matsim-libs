@@ -8,11 +8,9 @@ import lsp.scoring.LSPScorer;
 
 /*package-private*/ class TipScorer implements LSPScorer {
 
-	private LSP lsp;
-	private TipSimulationTracker tracker;
+	private final TipSimulationTracker tracker;
 
 	/*package-private*/ TipScorer(LSP lsp, TipSimulationTracker tracker) {
-		this.lsp = lsp;
 		this.tracker = tracker;
 	}
 	
@@ -23,7 +21,7 @@ import lsp.scoring.LSPScorer;
 			if(info instanceof TipInfo) {
 				LSPInfoFunction function = info.getFunction();
 					for(LSPInfoFunctionValue value : function.getValues()) {
-						if(value.getName() == "TIP IN EUR" && value.getValue() instanceof Double) {
+						if(value.getName().equals("TIP IN EUR") && value.getValue() instanceof Double) {
 							double trinkgeldValue = (Double) value.getValue();
 							score += trinkgeldValue;
 						}

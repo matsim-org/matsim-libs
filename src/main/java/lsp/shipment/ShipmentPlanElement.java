@@ -7,14 +7,14 @@ import lsp.resources.LSPResource;
 
 public interface ShipmentPlanElement {
 	
-	public LogisticsSolutionElement getSolutionElement();
+	LogisticsSolutionElement getSolutionElement();
 	
-	public Id<LSPResource> getResourceId();
+	Id<LSPResource> getResourceId();
 	
-	public String getElementType();
+	String getElementType();
 	
-	public double getStartTime();
+	double getStartTime();
 	
-	public double getEndTime();
+	double getEndTime();
 	
 }

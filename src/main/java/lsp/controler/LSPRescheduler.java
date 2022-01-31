@@ -14,7 +14,7 @@ import lsp.shipment.LSPShipment;
 class LSPRescheduler implements BeforeMobsimListener{
 
 	
-	private LSPs lsps;
+	private final LSPs lsps;
 	
 	public LSPRescheduler(LSPs lsps) {
 		this.lsps = lsps;
@@ -36,7 +36,7 @@ class LSPRescheduler implements BeforeMobsimListener{
 					shipment.getLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignShipment(shipment);
 				}
-				lsp.scheduleSoultions();
+				lsp.scheduleSolutions();
 			}		
 		}		
 	}

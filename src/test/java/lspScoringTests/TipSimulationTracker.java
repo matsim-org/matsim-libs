@@ -13,8 +13,8 @@ import lsp.controler.LSPSimulationTracker;
 
 public class TipSimulationTracker implements LSPSimulationTracker{
 
-	private TipEventHandler handler;
-	private TipInfo info;
+	private final TipEventHandler handler;
+	private final TipInfo info;
 	
 	public TipSimulationTracker(TipEventHandler handler, TipInfo info) {
 		this.info = info;
@@ -23,14 +23,14 @@ public class TipSimulationTracker implements LSPSimulationTracker{
 	
 	@Override
 	public Collection<EventHandler> getEventHandlers() {
-		ArrayList<EventHandler> handlers = new ArrayList<EventHandler>();
+		ArrayList<EventHandler> handlers = new ArrayList<>();
 		handlers.add(handler);
 		return handlers;
 	}
 
 	@Override
 	public Collection<LSPInfo> getInfos() {
-		ArrayList<LSPInfo> infos = new ArrayList<LSPInfo>();
+		ArrayList<LSPInfo> infos = new ArrayList<>();
 		infos.add(info);
 		return infos;
 	}

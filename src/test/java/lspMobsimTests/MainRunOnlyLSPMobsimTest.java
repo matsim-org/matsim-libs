@@ -1,9 +1,5 @@
 package lspMobsimTests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -33,13 +29,10 @@ import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.resources.LSPResource;
 
+import static org.junit.Assert.*;
+
 public class MainRunOnlyLSPMobsimTest {
-	private Network network;
-	private LogisticsSolution completeSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
-	private SolutionScheduler simpleScheduler;
-	private LSP lsp;	
+	private LSP lsp;
 
 	@Before
 	public void initialize() {
@@ -47,7 +40,7 @@ public class MainRunOnlyLSPMobsimTest {
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();	
+		Network network = scenario.getNetwork();
         
         Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
@@ -94,27 +87,25 @@ public class MainRunOnlyLSPMobsimTest {
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 	
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolution = completeSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-		completePlan = LSPUtils.createLSPPlan();
-		completePlan.setAssigner(assigner);;
+		LogisticsSolution completeSolution = completeSolutionBuilder.build();
+
+		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		LSPPlan completePlan = LSPUtils.createLSPPlan();
+		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
-		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		
 		resourcesList.add(mainRunAdapter);
 
-		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -158,9 +149,9 @@ public class MainRunOnlyLSPMobsimTest {
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }
-		 lsp.scheduleSoultions();
+		 lsp.scheduleSolutions();
 	
-			ArrayList<LSP> lspList = new ArrayList<LSP>();
+			ArrayList<LSP> lspList = new ArrayList<>();
 			lspList.add(lsp);
 			LSPs lsps = new LSPs(lspList);
 			
@@ -179,17 +170,17 @@ public class MainRunOnlyLSPMobsimTest {
 	public void testFirstReloadLSPMobsim() {
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
-			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
-			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new ShipmentPlanElementComparator());
+			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+			scheduleElements.sort(new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
+			logElements.sort(new ShipmentPlanElementComparator());
 
 			for(ShipmentPlanElement scheduleElement : scheduleElements){
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
-				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
-				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
-				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
+				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
+				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());
+				assertSame(scheduleElement.getSolutionElement(), logElement.getSolutionElement());
 				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}	
 		}

@@ -9,26 +9,24 @@ import lsp.resources.LSPResource;
 
 /*package-private*/ class LoggedShipmentLoad implements ShipmentPlanElement {
 
-	private final String type = "LOAD";
-	private double startTime;
-	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<LSPResource> resourceId;
-	private Id<Carrier> carrierId;
-	private Id<Link> linkId;
+	private final double startTime;
+	private final double endTime;
+	private final LogisticsSolutionElement element;
+	private final Id<LSPResource> resourceId;
 
 	LoggedShipmentLoad(ShipmentUtils.LoggedShipmentLoadBuilder builder){
 		this.startTime = builder.getStartTime();
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
-		this.carrierId = builder.getCarrierId();
-		this.linkId = builder.getLinkId();
+		Id<Carrier> carrierId = builder.getCarrierId();
+		Id<Link> linkId = builder.getLinkId();
 	}
 	
 	
 	@Override
 	public String getElementType() {
+		String type = "LOAD";
 		return type;
 	}
 
