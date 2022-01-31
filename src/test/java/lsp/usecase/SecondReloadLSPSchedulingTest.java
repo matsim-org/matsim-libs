@@ -244,7 +244,7 @@ public class SecondReloadLSPSchedulingTest {
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
 			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(elementList, new ShipmentPlanElementComparator());
+			elementList.sort(new ShipmentPlanElementComparator());
 			System.out.println();
 			for(ShipmentPlanElement element : elementList) {
 				System.out.println(element.getSolutionElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());	
@@ -255,7 +255,7 @@ public class SecondReloadLSPSchedulingTest {
 		for(LSPShipment shipment : lsp.getShipments()){
 			assertEquals(8, shipment.getShipmentPlan().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(planElements, new ShipmentPlanElementComparator());
+			planElements.sort(new ShipmentPlanElementComparator());
 
 			assertEquals("HANDLE", planElements.get(7).getElementType());
 			assertTrue(planElements.get(7).getEndTime() >= (0));
@@ -400,7 +400,7 @@ public class SecondReloadLSPSchedulingTest {
 			assertEquals(4, shipment.getEventHandlers().size());
 			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(planElements, new ShipmentPlanElementComparator());
+			planElements.sort(new ShipmentPlanElementComparator());
 			ArrayList<LogisticsSolutionElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 	

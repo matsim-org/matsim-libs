@@ -136,7 +136,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+			scheduleElements.sort(new ShipmentPlanElementComparator());
 			
 			System.out.println();
 			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {

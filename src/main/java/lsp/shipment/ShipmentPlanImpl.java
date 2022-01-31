@@ -60,7 +60,7 @@ import org.matsim.api.core.v01.Id;
 		// should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
 
 		ArrayList<ShipmentPlanElement> logList = new ArrayList<>( logElements.values() );
-		Collections.sort(logList, new LogElementComparator() );
+		logList.sort(new LogElementComparator());
 		Collections.reverse(logList);
 		return logList.get(0);
 	}

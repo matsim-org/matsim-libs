@@ -63,7 +63,7 @@ import org.matsim.vehicles.VehicleType;
 	@Override protected void scheduleResource() {
 		int load = 0;
 		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
-		Collections.sort(copyOfAssignedShipments, new ShipmentComparator());
+		copyOfAssignedShipments.sort(new ShipmentComparator());
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
 		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 

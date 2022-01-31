@@ -229,7 +229,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		for(LSPShipment shipment : lsp.getShipments()){
 			assertEquals(7, shipment.getShipmentPlan().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(planElements, new ShipmentPlanElementComparator());
+			planElements.sort(new ShipmentPlanElementComparator());
 			assertEquals("UNLOAD", planElements.get(6).getElementType());
 			assertTrue(planElements.get(6).getEndTime() >= (0));
 			assertTrue(planElements.get(6).getEndTime() <= (24*3600));
@@ -334,7 +334,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertEquals(4, shipment.getEventHandlers().size());
 			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			Collections.sort(planElements, new ShipmentPlanElementComparator());
+			planElements.sort(new ShipmentPlanElementComparator());
 			ArrayList<LogisticsSolutionElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
 	

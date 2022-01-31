@@ -327,9 +327,9 @@ import lsp.resources.LSPResource;
 				for(LSPShipment shipment : lsp.getShipments()) {
 					System.out.println("Shipment: " + shipment.getId());
 					ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-					Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+					scheduleElements.sort(new ShipmentPlanElementComparator());
 					ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-					Collections.sort(logElements, new ShipmentPlanElementComparator());
+					logElements.sort(new ShipmentPlanElementComparator());
 					
 					for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 						System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
