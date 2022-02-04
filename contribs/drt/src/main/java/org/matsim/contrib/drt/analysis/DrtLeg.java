@@ -51,21 +51,21 @@ final class DrtLeg {
 	final double fare;
 	final double latestDepartureTime;
 	final double latestArrivalTime;
-	
+
 	DrtLeg(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
 		Preconditions.checkArgument(sequence.isCompleted());
 		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
-		PersonDepartureEvent departedEvent = sequence.getDeparted().get();
+		PersonDepartureEvent departureEvent = sequence.getDeparture().get();
 		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();
 		this.request = submittedEvent.getRequestId();
-		this.departureTime = departedEvent.getTime();
+		this.departureTime = departureEvent.getTime();
 		this.person = submittedEvent.getPersonId();
 		this.vehicle = pickedUpEvent.getVehicleId();
 		this.fromLinkId = submittedEvent.getFromLinkId();
 		this.fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
 		this.toLink = submittedEvent.getToLinkId();
 		this.toCoord = linkProvider.apply(toLink).getToNode().getCoord();
-		this.waitTime = pickedUpEvent.getTime() - departedEvent.getTime();
+		this.waitTime = pickedUpEvent.getTime() - departureEvent.getTime();
 		this.unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
 		this.arrivalTime = sequence.getDroppedOff().get().getTime();
