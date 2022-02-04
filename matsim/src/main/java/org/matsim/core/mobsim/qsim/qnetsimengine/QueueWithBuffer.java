@@ -372,12 +372,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
 		// I am currently not sure if this statement is correct. kai, feb'18
 		
-//		double now = context.getSimTimer().getTimeOfDay() ;
-
-		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
-//		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
-		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
+		flowCapacityPerTimeStep = unscaledFlowCapacity_s * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		
 		// start with the base assumption, might be adjusted below depending on the traffic dynamics
