@@ -198,7 +198,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				filename(event, "drt_detours"), createGraphs);
 		DrtLegsAnalyser.analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs);
 		DrtLegsAnalyser.analyseConstraints(filename(event, "constraints"), legs, createGraphs);
-		
+
 		double endTime = qSimCfg.getEndTime()
 				.orElseGet(() -> legs.isEmpty() ?
 						qSimCfg.getStartTime().orElse(0) :
@@ -273,7 +273,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			Collection<EventSequence> performedRequestEventSequences, String plotFileName,
 			String textFileName, boolean createChart) {
 		try (var bw = IOUtils.getBufferedWriter(textFileName)) {
-			XYSeries times = new XYSeries("waittimes", true, true);
+			XYSeries times = new XYSeries("waittimes", false, true);
 
 			bw.append(line("RequestId", "actualWaitTime", "estimatedWaitTime", "deviate"));
 			for (EventSequence seq : performedRequestEventSequences) {
