@@ -3,12 +3,13 @@ package org.matsim.application.prepare.freight.tripGeneration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.LanduseOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
@@ -16,6 +17,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultLocationCalculator implements FreightAgentGenerator.LocationCalculator {
+    private final static Logger logger = LogManager.getLogger(DefaultLocationCalculator.class);
     private final Random rnd = new Random(5678);
     private final LanduseOptions landUse;
     private final Network network;
@@ -40,13 +43,17 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
     }
 
     private void prepareMapping() throws IOException {
+        logger.info("Reading NUTS shape files...");
         ShpOptions.Index index = shp.createIndex("EPSG:25832", "NUTS_ID"); // network CRS: EPSG:25832
+
+        logger.info("Reading land use data...");
         ShpOptions.Index landIndex = landUse.getIndex("EPSG:25832"); //TODO
+
+        logger.info("Processing shape network and shapefile...");
         List<Link> links = network.getLinks().values().stream().filter(l -> l.getAllowedModes().contains("car"))
                 .collect(Collectors.toList());
         Map<String, List<Link>> nutsToLinksMapping = new HashMap<>();
         Map<String, List<Link>> filteredNutsToLinksMapping = new HashMap<>();
-
         for (Link link : links) {
             String nutsId = index.query(link.getToNode().getCoord());
             if (nutsId != null) {
@@ -64,13 +71,16 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
         for (String nutsId : filteredNutsToLinksMapping.keySet()) {
             nutsToLinksMapping.put(nutsId, filteredNutsToLinksMapping.get(nutsId));
         }
+        logger.info("Network and shapefile processing complete!");
 
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(Path.of(lookUpTablePath), StandardCharsets.ISO_8859_1),
+        logger.info("Computing mapping between Verkehrszelle and departure location...");
+
+        try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.ISO_8859_1,
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
                 String verkehrszelle = record.get(0);
                 String nuts2021 = record.get(3);
-                if (!nuts2021.equals("")) {
+                if (!nuts2021.equals("") && nutsToLinksMapping.get(nuts2021) != null) {
                     mapping.put(verkehrszelle, nutsToLinksMapping.get(nuts2021).stream().map(Identifiable::getId).collect(Collectors.toList()));
                     continue;
                 }
@@ -82,6 +92,7 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
                 mapping.put(verkehrszelle, List.of(backupLink.getId()));
             }
         }
+        logger.info("Location generator is successfully created!");
     }
 
     @Override

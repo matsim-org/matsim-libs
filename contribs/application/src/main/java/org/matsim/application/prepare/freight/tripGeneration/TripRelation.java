@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -168,9 +169,9 @@ public class TripRelation {
     }
 
 
-    public static List<TripRelation> readTripRelations(Path pathToKettenData) throws IOException {
+    public static List<TripRelation> readTripRelations(String pathToKettenData) throws IOException {
         List<TripRelation> tripRelations = new ArrayList<>();
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(pathToKettenData, StandardCharsets.ISO_8859_1),
+        try (CSVParser parser = CSVParser.parse(URI.create(pathToKettenData).toURL(), StandardCharsets.ISO_8859_1,
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
                 Builder builder = new Builder();
