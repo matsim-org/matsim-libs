@@ -58,6 +58,7 @@ public class FreightAgentGenerator {
                 endAct.setCoord(network.getLinks().get(endLinkId).getToNode().getCoord());
                 plan.addActivity(endAct);
 
+                person.addPlan(plan);
                 person.getAttributes().putAttribute("trip_type", "pre-run");
                 writeCommonAttributes(person, tripRelation, tripRelationId);
 
@@ -84,6 +85,7 @@ public class FreightAgentGenerator {
                 endAct.setCoord(network.getLinks().get(endLinkId).getToNode().getCoord());
                 plan.addActivity(endAct);
 
+                person.addPlan(plan);
                 person.getAttributes().putAttribute("trip_type", "main-run");
                 writeCommonAttributes(person, tripRelation, tripRelationId);
 
@@ -110,6 +112,7 @@ public class FreightAgentGenerator {
                 endAct.setCoord(network.getLinks().get(endLinkId).getToNode().getCoord());
                 plan.addActivity(endAct);
 
+                person.addPlan(plan);
                 person.getAttributes().putAttribute("trip_type", "post-run");
                 writeCommonAttributes(person, tripRelation, tripRelationId);
 
