@@ -11,7 +11,7 @@ import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.options.SampleOptions;
-import org.matsim.application.prepare.freight.ExtractRelevantFreightTrips;
+import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.freight.GenerateGermanWideFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
 import org.matsim.application.prepare.population.MergePopulations;
