@@ -1,11 +1,12 @@
 package org.matsim.application.prepare.freight.tripGeneration;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.LanduseOptions;
 import org.matsim.core.config.ConfigUtils;
@@ -13,6 +14,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -36,7 +39,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
     // TODO Currently we have problem reading shp from URL... Shp needs to be downloaded to local disk.
     private Path shpPath;
 
-    @CommandLine.Option(names = "--output", description = "Output path", required = true)
+    @CommandLine.Option(names = "--output", description = "Output folder path", required = true)
     private Path output;
 
     @CommandLine.Option(names = "--truck-load", defaultValue = "16.0", description = "Average load of truck")
@@ -77,8 +80,28 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             }
         }
 
+        if (!Files.exists(output)) {
+            Files.createDirectory(output);
+        }
+
+        String outputPlansPath = output.toString() + "/german_freight.25pct.plans.xml.gz";
         PopulationWriter populationWriter = new PopulationWriter(outputPopulation);
-        populationWriter.write(output.toString());
+        populationWriter.write(outputPlansPath);
+
+        // Write down tsv file for visualisation and analysis
+        String freightTripTsvPath = output.toString() + "/freight_trips_data.tsv";
+        CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
+        tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
+        for (Person person : outputPopulation.getPersons().values()) {
+            List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+            Activity act0 = (Activity) planElements.get(0);
+            Activity act1 = (Activity) planElements.get(2);
+            Coord fromCoord = act0.getCoord();
+            Coord toCoord = act1.getCoord();
+            tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
+        }
+        tsvWriter.close();
+
         return 0;
     }
 

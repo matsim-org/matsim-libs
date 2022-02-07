@@ -19,11 +19,14 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Type description //TODO
+ * // TODO Typo 2021--> 2016
+ */
 public class DefaultLocationCalculator implements FreightAgentGenerator.LocationCalculator {
     private final static Logger logger = LogManager.getLogger(DefaultLocationCalculator.class);
     private final Random rnd = new Random(5678);
@@ -44,7 +47,16 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 
     private void prepareMapping() throws IOException {
         logger.info("Reading NUTS shape files...");
-        ShpOptions.Index index = shp.createIndex("EPSG:25832", "NUTS_ID"); // network CRS: EPSG:25832
+        Set<String> relevantNutsIds = new HashSet<>();
+        try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
+                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+            for (CSVRecord record : parser) {
+                if (!record.get(3).equals("")) {
+                    relevantNutsIds.add(record.get(3));
+                }
+            }
+        }
+        ShpOptions.Index index = shp.createIndex("EPSG:25832", "NUTS_ID", relevantNutsIds); // network CRS: EPSG:25832
 
         logger.info("Reading land use data...");
         ShpOptions.Index landIndex = landUse.getIndex("EPSG:25832"); //TODO
@@ -74,8 +86,7 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
         logger.info("Network and shapefile processing complete!");
 
         logger.info("Computing mapping between Verkehrszelle and departure location...");
-
-        try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.ISO_8859_1,
+        try (CSVParser parser = CSVParser.parse(URI.create(lookUpTablePath).toURL(), StandardCharsets.UTF_8,
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
                 String verkehrszelle = record.get(0);

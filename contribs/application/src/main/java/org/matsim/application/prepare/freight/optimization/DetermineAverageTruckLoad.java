@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -25,12 +26,17 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,8 +51,28 @@ import java.util.stream.Collectors;
 public class DetermineAverageTruckLoad implements MATSimAppCommand {
     private static final Logger log = LogManager.getLogger(DetermineAverageTruckLoad.class);
 
-    @CommandLine.Option(names = "--directory", description = "Path to the raw data directory", required = true)
-    private Path rawDataDirectory;
+    @CommandLine.Option(names = "--output", description = "Path to the traffic count data", required = true)
+    private Path outputDirectory;
+
+    @CommandLine.Option(names = "--freight-data", description = "Path to the german freight traffic data",
+            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
+    private String freightData;
+
+    @CommandLine.Option(names = "--traffic-count", description = "Path to the traffic count data",
+            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
+    private String trafficCount;
+
+    @CommandLine.Option(names = "--nuts", description = "Path to the NUTS shape file",
+            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/shp/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp")
+    private String nutsPath;
+
+    @CommandLine.Option(names = "--network", description = "Path to the network",
+            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/v2/germany-europe-network.xml.gz")
+    private String networkPath;
+
+    @CommandLine.Option(names = "--lookup-table", description = "Path to the lookup table",
+            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/v2/processed-data/complete-lookup-table.csv")
+    private String lookupTablePath;
 
     @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year")
     private int workingDays;
@@ -56,9 +82,11 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
     private String loadsToTryOut;
 
     @CommandLine.Mixin
-    private CrsOptions crs = new CrsOptions();  // Use EPSG:5677 for input-crs under current setup
+    private CrsOptions crs = new CrsOptions();
 
     private final Random random = new Random(1234);
+    private final static String NUTS_CRS = "EPSG:4326";
+    private static final String NETWORK_CRS = "EPSG:25832";
 
     public static void main(String[] args) {
         new DetermineAverageTruckLoad().execute(args);
@@ -66,28 +94,34 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 
     @Override
     public Integer call() throws Exception {
-        Path freightDataPath = rawDataDirectory.resolve("ketten-2010.csv");
-        Path lookupTablePath = rawDataDirectory.resolve("lookup-table.csv");
-        Path pathToBoundaryLinks = rawDataDirectory.resolve("boundary-links.csv");
-        Path pathToInternationalRegions = rawDataDirectory.resolve("international-regions.csv");
-        Path networkPath = rawDataDirectory.resolve("german-primary-road.network.xml.gz");
-        Path shapeFilePath = rawDataDirectory.resolve("NUTS3").resolve("NUTS3_2010_DE.shp");
-        Path freightTrafficCountPath = rawDataDirectory.resolve("traffic-count").resolve("freight-count-data.tsv");
-        checkIfAllRequiredFilesArePresent(freightDataPath, lookupTablePath, pathToBoundaryLinks,
-                pathToInternationalRegions, networkPath, shapeFilePath, freightTrafficCountPath);
+        Network network = NetworkUtils.readNetwork(networkPath);
+        CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(NUTS_CRS, NETWORK_CRS);
 
-        Network network = NetworkUtils.readNetwork(networkPath.toString());
-        LeastCostPathCalculator router = createRouter(network);
-        ShpOptions shp = new ShpOptions(shapeFilePath, crs.getInputCRS(), StandardCharsets.UTF_8);
-        ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "NUTS_ID");
-        List<SimpleFeature> features = index.getAll();
+        // Read lookup table
+        Map<String, Id<Link>> cellToLinkIdMapping = new HashMap<>();
+        List<String> relevantNutsIds = new ArrayList<>();
+        try (CSVParser parser = CSVParser.parse(URI.create(lookupTablePath).toURL(), StandardCharsets.UTF_8,
+                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+            for (CSVRecord record : parser) {
+                String cell = record.get(0);
+                String nutsId = record.get(3);
+                relevantNutsIds.add(nutsId);
+                Coord coord = new Coord(Double.parseDouble(record.get(5)), Double.parseDouble(record.get(6)));
+                Link link = NetworkUtils.getNearestLink(network, ct.transform(coord));
+                assert link != null;
+                cellToLinkIdMapping.put(cell, link.getId());
+            }
+        }
 
-        Map<String, Id<Link>> verkehrszelleToLinkIdMapping = createMapping(lookupTablePath, features, network);
-        addingInternationalMapping(verkehrszelleToLinkIdMapping, pathToInternationalRegions, pathToBoundaryLinks);
+        // Read shape file // TODO this is acutally not needed. Just testing the functionality of reading shape file from URL
+        List<SimpleFeature> nutsFeatures = ShapeFileReader.getAllFeatures(URI.create(nutsPath).toURL()).
+                stream().filter(f -> relevantNutsIds.contains(f.getAttribute("NUTS_ID").toString())).
+                collect(Collectors.toList());
+        System.out.println("There are " + nutsFeatures.size() + " relevant NUTS regions");
 
         // Read counting data
         Map<Id<Link>, Double> referenceCounts = new HashMap<>();
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(freightTrafficCountPath),
+        try (CSVParser parser = CSVParser.parse(URI.create(trafficCount).toURL(), StandardCharsets.UTF_8,
                 CSVFormat.TDF.withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
                 String linkIdString = record.get(0);
@@ -97,18 +131,25 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         }
         List<Id<Link>> countingStations = new ArrayList<>(referenceCounts.keySet());
 
+        // Create router
+        LeastCostPathCalculator router = createRouter(network);
+
         // Calculate route between any two regions (Or read from the file if exists)
-        Path preCalculatedRoutes = rawDataDirectory.resolve("pre-calculated-route.tsv");
+        if (!Files.exists(outputDirectory)) {
+            Files.createDirectory(outputDirectory);
+        }
+        Path preCalculatedRoutes = outputDirectory.resolve("pre-calculated-route.tsv");
+
         Map<String, Map<String, List<Id<Link>>>> routesMap = new HashMap<>();
         if (Files.exists(preCalculatedRoutes)) {
-            loadRoutesMapFromData(preCalculatedRoutes, routesMap, verkehrszelleToLinkIdMapping);
+            loadRoutesMapFromData(preCalculatedRoutes, routesMap, cellToLinkIdMapping);
         } else {
-            computeRoutesMap(routesMap, network, verkehrszelleToLinkIdMapping, router, countingStations, preCalculatedRoutes);
+            computeRoutesMap(routesMap, network, cellToLinkIdMapping, router, countingStations, preCalculatedRoutes);
         }
 
         // Read data (ketten data)
         List<GoodsFlow> goodsFlows = new ArrayList<>();
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(freightDataPath, StandardCharsets.ISO_8859_1),
+        try (CSVParser parser = CSVParser.parse(URI.create(freightData).toURL(), StandardCharsets.ISO_8859_1,
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
                 // Vorlauf
@@ -169,7 +210,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         }
 
         // write down the summary data in csv (also print in the console)
-        String resultSummaryPath = rawDataDirectory.toString() + "/average-truck-load-summary.tsv";
+        String resultSummaryPath = outputDirectory.toString() + "/average-truck-load-summary.tsv";
         CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(resultSummaryPath), CSVFormat.TDF);
         tsvWriter.printRecord("average_load", "sum_abs_error");
         for (double load : sumAbsErrorSummary.keySet()) {
@@ -253,7 +294,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         double totalError = 0;
         for (Id<Link> linkId : referenceCounts.keySet()) {
             double error = Math.abs(actualCounts.get(linkId) - referenceCounts.get(linkId));
-            totalError += Math.log10(error);
+            totalError += error;
         }
         return totalError;
     }
@@ -286,52 +327,6 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
         return mode.equals("2") && !from.equals(to) && !tons.equals("0");
     }
 
-    private Map<String, Id<Link>> createMapping(Path lookupTablePath, List<SimpleFeature> features, Network network) throws IOException {
-        Map<String, Id<Link>> verkehrszelleToLinkIdMapping = new HashMap<>();
-        Map<String, Id<Link>> nutsLinkIdMap = new HashMap<>();
-        for (SimpleFeature feature : features) {
-            Geometry geometry = (Geometry) feature.getDefaultGeometry();
-            Coord centroidCoord = MGC.point2Coord(geometry.getCentroid());
-            Link link = NetworkUtils.getNearestLink(network, centroidCoord);
-            assert link != null;
-            nutsLinkIdMap.put((String) feature.getAttribute("NUTS_ID"), link.getId());
-        }
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(lookupTablePath, StandardCharsets.ISO_8859_1),
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
-            for (CSVRecord record : parser) {
-                String zelle = record.get(0);
-                String nuts = record.get(3);
-                verkehrszelleToLinkIdMapping.put(zelle, nutsLinkIdMap.get(nuts));
-            }
-        }
-        return verkehrszelleToLinkIdMapping;
-    }
-
-    private void addingInternationalMapping(Map<String, Id<Link>> verkehrszelleToLinkIdMapping,
-                                            Path pathToInternationalRegions, Path pathToBoundaryLinks) throws IOException {
-        // Read border links
-        Map<String, Id<Link>> orientationToLinkMapping = new HashMap<>();
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(pathToBoundaryLinks),
-                CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
-            for (CSVRecord record : parser) {
-                orientationToLinkMapping.put(record.get(1), Id.createLinkId(record.get(0)));
-            }
-        }
-        assert orientationToLinkMapping.size() == 8 :
-                "Currently we have in total 8 orientations. Each orientation should contain at least 1 link!";
-
-        // Read international regions and add mappings to the map
-        try (CSVParser parser = new CSVParser(Files.newBufferedReader(pathToInternationalRegions, StandardCharsets.ISO_8859_1),
-                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
-            for (CSVRecord record : parser) {
-                String zelle = record.get(0);
-                String orientation = record.get(2);
-                Id<Link> linkId = orientationToLinkMapping.get(orientation);
-                verkehrszelleToLinkIdMapping.put(zelle, linkId);
-            }
-        }
-    }
-
     private LeastCostPathCalculator createRouter(Network network) {
         Config config = ConfigUtils.createConfig();
         config.plansCalcRoute().setRoutingRandomness(0);
@@ -340,21 +335,5 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
                 (TransportMode.car, config).createTravelDisutility(travelTime);
         return new SpeedyALTFactory().
                 createPathCalculator(network, travelDisutility, travelTime);
-    }
-
-
-    private void checkIfAllRequiredFilesArePresent(Path freightDataPath,
-                                                   Path lookupTablePath, Path pathToBoundaryLinks,
-                                                   Path pathToInternationalRegions, Path networkPath,
-                                                   Path shapeFilePath, Path freightCountPath) {
-        List<Path> paths = List.of(freightCountPath, lookupTablePath, pathToBoundaryLinks,
-                pathToInternationalRegions, networkPath, shapeFilePath, freightCountPath);
-
-        for (Path path : paths) {
-            if (!Files.exists(path)) {
-                log.error("Required data {} not found", path);
-                throw new RuntimeException("Required files are missing. Aborting...");
-            }
-        }
     }
 }

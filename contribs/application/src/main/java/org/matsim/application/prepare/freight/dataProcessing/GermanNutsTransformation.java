@@ -77,7 +77,7 @@ public class GermanNutsTransformation {
     }
 
     public static void main(String[] args) {
-        String german2006shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/to-put-on-public-svn/raw-data/NUTS3/NUTS3_2010_DE.shp";
+        String german2006shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/to-put-on-public-svn/raw-data/NUTS3/NUTS3_2010_DE.shp"; //TODO
         String nuts2021shp = "/Users/luchengqi/Documents/MATSimScenarios/GermanFreight/NUTS_RG_20M_2016_4326.shp/NUTS_RG_20M_2016_4326.shp";
         ShpOptions oldShapeFile = new ShpOptions(Path.of(german2006shp), "EPSG:5677", StandardCharsets.UTF_8);
         ShpOptions shapeFile2021 = new ShpOptions(Path.of(nuts2021shp), "EPSG:4326", StandardCharsets.UTF_8);
