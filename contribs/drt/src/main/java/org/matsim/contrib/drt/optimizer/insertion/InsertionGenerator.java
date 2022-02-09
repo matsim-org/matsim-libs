@@ -170,10 +170,12 @@ public class InsertionGenerator {
 	private void generateDropoffInsertions(DrtRequest request, VehicleEntry vEntry, int i,
 			List<InsertionWithDetourData> insertions) {
 		var pickupInsertion = createPickupInsertion(request, vEntry, i, true);
+		double toPickupDepartureTime = pickupInsertion.previousWaypoint.getDepartureTime();
 		double toPickupTT = detourTimeEstimator.estimateTime(pickupInsertion.previousWaypoint.getLink(),
-				request.getFromLink());
+				request.getFromLink(), toPickupDepartureTime);
 		double fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(),
-				pickupInsertion.nextWaypoint.getLink());
+				pickupInsertion.nextWaypoint.getLink(),
+				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 				fromPickupTT, true);
 
@@ -198,7 +200,8 @@ public class InsertionGenerator {
 
 		//calculate it once for all j > i
 		pickupInsertion = createPickupInsertion(request, vEntry, i, false);
-		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink());
+		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink(),
+				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
 				false);
 
@@ -253,12 +256,17 @@ public class InsertionGenerator {
 		var dropoffInsertion = createDropoffInsertion(request, vehicleEntry, pickupInsertion, dropoffIdx);
 		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion);
 
+		double toDropoffDepartureTime = pickupInsertion.index == dropoffIdx ?
+				pickupDetourInfo.departureTime :
+				dropoffInsertion.previousWaypoint.getDepartureTime() + pickupDetourInfo.pickupTimeLoss;
 		double toDropoffTT = pickupInsertion.index == dropoffIdx ?
 				fromPickupTT :
-				detourTimeEstimator.estimateTime(dropoffInsertion.previousWaypoint.getLink(), request.getToLink());
+				detourTimeEstimator.estimateTime(dropoffInsertion.previousWaypoint.getLink(), request.getToLink(),
+						toDropoffDepartureTime);
 		double fromDropoffTT = dropoffIdx == vehicleEntry.stops.size() ?
 				0 :
-				detourTimeEstimator.estimateTime(request.getToLink(), dropoffInsertion.nextWaypoint.getLink());
+				detourTimeEstimator.estimateTime(request.getToLink(), dropoffInsertion.nextWaypoint.getLink(),
+						toDropoffDepartureTime + toDropoffTT); //TODO stopDuration not included
 
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
 				pickupDetourInfo);
