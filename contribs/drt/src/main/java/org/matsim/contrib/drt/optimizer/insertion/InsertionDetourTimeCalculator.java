@@ -60,7 +60,7 @@ public class InsertionDetourTimeCalculator {
 			return new PickupDetourInfo(departureTime, pickupTimeLoss);
 		}
 
-		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
+		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index, toPickupDepartureTime);
 		double pickupTimeLoss = toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
 		double departureTime = toPickupDepartureTime + toPickupTT + stopDuration;
 		return new PickupDetourInfo(departureTime, pickupTimeLoss);
@@ -83,11 +83,10 @@ public class InsertionDetourTimeCalculator {
 			return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
 		}
 
-		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, dropoff.index);
+		double toDropoffDepartureTime = dropoff.previousWaypoint.getDepartureTime();
+		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, dropoff.index, toDropoffDepartureTime);
 		double dropoffTimeLoss = toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
-		double arrivalTime = dropoff.previousWaypoint.getDepartureTime()
-				+ pickupDetourInfo.pickupTimeLoss
-				+ toDropoffTT;
+		double arrivalTime = toDropoffDepartureTime + pickupDetourInfo.pickupTimeLoss + toDropoffTT;
 		return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
 	}
 
@@ -101,10 +100,11 @@ public class InsertionDetourTimeCalculator {
 			additionalPickupStopDuration = stopDuration;
 		}
 
-		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index);
+		double toPickupDepartureTime = pickup.previousWaypoint.getDepartureTime();
+		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index, toPickupDepartureTime);
 
 		double pickupTimeLoss = toPickupTT + additionalPickupStopDuration + fromPickupTT - replacedDriveTT;
-		double departureTime = pickup.previousWaypoint.getDepartureTime() + toPickupTT + additionalPickupStopDuration;
+		double departureTime = toPickupDepartureTime + toPickupTT + additionalPickupStopDuration;
 		return new PickupDetourInfo(departureTime, pickupTimeLoss);
 	}
 
@@ -123,7 +123,7 @@ public class InsertionDetourTimeCalculator {
 		return startTask.isPresent() && STOP.isBaseTypeOf(startTask.get()) ? 0 : stopDuration;
 	}
 
-	private double calculateReplacedDriveDuration(VehicleEntry vEntry, int insertionIdx) {
+	private double calculateReplacedDriveDuration(VehicleEntry vEntry, int insertionIdx, double detourStartTime) {
 		if (vEntry.isAfterLastStop(insertionIdx)) {
 			return 0;// end of route - bus would wait there
 		}
@@ -131,7 +131,7 @@ public class InsertionDetourTimeCalculator {
 		if (replacedDriveTimeEstimator != null) {
 			//use the approximated drive times instead of deriving (presumably more accurate) times from the schedule
 			return replacedDriveTimeEstimator.estimateTime(vEntry.getWaypoint(insertionIdx).getLink(),
-					vEntry.getWaypoint(insertionIdx + 1).getLink());
+					vEntry.getWaypoint(insertionIdx + 1).getLink(), detourStartTime);
 		}
 
 		double replacedDriveStartTime = vEntry.getWaypoint(insertionIdx).getDepartureTime();
