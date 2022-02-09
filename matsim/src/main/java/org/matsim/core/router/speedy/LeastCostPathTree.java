@@ -9,6 +9,8 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Implements a least-cost-path-tree upon a {@link SpeedyGraph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation (NodeMinHeap)
  * which operates directly on the least-cost-path-three data for additional performance gains.
@@ -57,8 +59,8 @@ public class LeastCostPathTree {
 
         while (!this.pq.isEmpty()) {
             final int nodeIdx = this.pq.poll();
-            OptionalTime currOptionalTime = getTime(nodeIdx);
-            double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time"));
+            double currTime = getTimeRaw(nodeIdx);
+            Preconditions.checkState(currTime != Double.POSITIVE_INFINITY, "Undefined Time");
             double currCost = getCost(nodeIdx);
             double currDistance = getDistance(nodeIdx);
 
@@ -107,8 +109,8 @@ public class LeastCostPathTree {
 
         while (!this.pq.isEmpty()) {
             final int nodeIdx = this.pq.poll();
-            OptionalTime currOptionalTime = getTime(nodeIdx);
-            double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time"));
+            double currTime = getTimeRaw(nodeIdx);
+            Preconditions.checkState(currTime != Double.POSITIVE_INFINITY, "Undefined Time");
             double currCost = getCost(nodeIdx);
             double currDistance = getDistance(nodeIdx);
 
@@ -146,8 +148,12 @@ public class LeastCostPathTree {
         return this.data[nodeIndex * 3];
     }
 
+    private double getTimeRaw(int nodeIndex) {
+        return this.data[nodeIndex * 3 + 1];
+    }
+
     public OptionalTime getTime(int nodeIndex) {
-        double time = this.data[nodeIndex * 3 + 1];
+        double time = getTimeRaw(nodeIndex);
         if (Double.isInfinite(time)) {
             return OptionalTime.undefined();
         }
