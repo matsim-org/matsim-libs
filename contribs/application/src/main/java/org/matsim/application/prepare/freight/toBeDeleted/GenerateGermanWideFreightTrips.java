@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight;
+package org.matsim.application.prepare.freight.toBeDeleted;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -32,6 +32,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * This script is now outdated. Please use GenerateFreightPlans instead.
+ *
  * This code generates German wide long distance freight trip.
  * Input: Freight data; German major road network; NUTS3 shape file; Look up
  * table between NUTS zone ID and Verkehrszellen
@@ -50,6 +52,7 @@ import java.util.stream.Collectors;
         description = "Generate german wide freight population",
         showDefaultValues = true
 )
+@Deprecated
 public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
     private static final Logger log = LogManager.getLogger(GenerateGermanWideFreightTrips.class);

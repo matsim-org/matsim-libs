@@ -36,13 +36,13 @@ public class GenerateFreightPlans implements MATSimAppCommand {
     private String networkPath;
 
     @CommandLine.Option(names = "--nuts", description = "Path to desired network file", required = true)
-    // TODO Currently we have problem reading shp from URL... Shp needs to be downloaded to local disk.
+    // TODO Change this to URL pointing to SVN--> need to update the Location calculator
     private Path shpPath;
 
     @CommandLine.Option(names = "--output", description = "Output folder path", required = true)
     private Path output;
 
-    @CommandLine.Option(names = "--truck-load", defaultValue = "16.0", description = "Average load of truck")
+    @CommandLine.Option(names = "--truck-load", defaultValue = "13.0", description = "Average load of truck")
     private double averageTruckLoad;
 
     @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year")

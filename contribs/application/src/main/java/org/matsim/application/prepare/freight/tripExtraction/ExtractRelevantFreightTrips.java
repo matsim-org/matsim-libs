@@ -133,7 +133,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             }
 
             Plan plan = person.getSelectedPlan();
-            String goodType = (String) person.getAttributes().getAttribute("type_of_good");
+//            String goodType = (String) person.getAttributes().getAttribute("type_of_good"); // TODO keep all the attribute from original population
             // By default, the plan of each freight person consist of only 3 elements:
             // startAct, leg, endAct
             Activity startActivity = (Activity) plan.getPlanElements().get(0);
@@ -268,7 +268,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             if (act0.getEndTime().orElse(86400) < 86400) {
                 Person freightPerson = populationFactory
                         .createPerson(Id.create("freight_" + generated, Person.class));
-                freightPerson.getAttributes().putAttribute("good_type", goodType);
                 freightPerson.getAttributes().putAttribute("subpopulation", "freight");
                 Plan freightPersonPlan = populationFactory.createPlan();
                 freightPersonPlan.addActivity(act0);

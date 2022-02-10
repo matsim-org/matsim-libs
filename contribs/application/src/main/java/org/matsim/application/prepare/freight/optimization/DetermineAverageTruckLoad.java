@@ -26,6 +26,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -59,7 +60,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
     private String freightData;
 
     @CommandLine.Option(names = "--traffic-count", description = "Path to the traffic count data",
-            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/ketten-2010.csv")
+            defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/raw-data/Jawe2019.csv")
     private String trafficCount;
 
     @CommandLine.Option(names = "--nuts", description = "Path to the NUTS shape file",
@@ -113,7 +114,7 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
             }
         }
 
-        // Read shape file // TODO this is acutally not needed. Just testing the functionality of reading shape file from URL
+        // Read shape file // TODO this is acutally not needed. Just testing the functionality of reading shape file from URL. Delete afterwards!!!
         List<SimpleFeature> nutsFeatures = ShapeFileReader.getAllFeatures(URI.create(nutsPath).toURL()).
                 stream().filter(f -> relevantNutsIds.contains(f.getAttribute("NUTS_ID").toString())).
                 collect(Collectors.toList());
@@ -121,12 +122,24 @@ public class DetermineAverageTruckLoad implements MATSimAppCommand {
 
         // Read counting data
         Map<Id<Link>, Double> referenceCounts = new HashMap<>();
-        try (CSVParser parser = CSVParser.parse(URI.create(trafficCount).toURL(), StandardCharsets.UTF_8,
-                CSVFormat.TDF.withFirstRecordAsHeader())) {
+        try (CSVParser parser = CSVParser.parse(URI.create(trafficCount).toURL(), StandardCharsets.ISO_8859_1,
+                CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
             for (CSVRecord record : parser) {
-                String linkIdString = record.get(0);
-                double count = Double.parseDouble(record.get(1)) / 2;
-                referenceCounts.put(Id.createLinkId(linkIdString), count);
+                String totalCountString = record.get(37).replace(".", "");
+                if (!totalCountString.equals("") && !totalCountString.equals("0")) {
+                    String xString = record.get(156).replace(".", "");
+                    String yString = record.get(157).replace(".", "");
+                    Coord coord = new Coord(Double.parseDouble(xString), Double.parseDouble(yString)); // This coord is in EPSG:25832, which is same as the network coordinate
+                    Link link = NetworkUtils.getNearestLink(network, coord);
+                    assert link != null;
+                    double distance = CoordUtils.distancePointLinesegment
+                            (link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
+                    if (distance > 1000 || referenceCounts.containsKey(link.getId())) {
+                        continue;
+                    }
+                    double count = Double.parseDouble(totalCountString) / 2;
+                    referenceCounts.put(link.getId(), count);
+                }
             }
         }
         List<Id<Link>> countingStations = new ArrayList<>(referenceCounts.keySet());
