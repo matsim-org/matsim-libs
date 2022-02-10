@@ -39,7 +39,7 @@ import lsp.shipment.LSPShipment;
 				LSP lsp = plan.getLsp();
 				Collection<LSPShipment> shipments = lsp.getShipments();
 				for (LSPShipment shipment : shipments) {
-					assigner.assignShipment(shipment);
+					assigner.assignToSolution(shipment);
 				}
 			}
 

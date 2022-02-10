@@ -155,7 +155,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void assignShipmentToLSP(LSPShipment shipment) {
 		shipments.add(shipment);
-		selectedPlan.getAssigner().assignShipment(shipment);
+		selectedPlan.getAssigner().assignToSolution(shipment);
 	}
 	
 	public void replan( final ReplanningEvent arg0 ) {
