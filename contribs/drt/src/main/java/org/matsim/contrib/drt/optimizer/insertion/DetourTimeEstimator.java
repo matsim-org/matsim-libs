@@ -31,12 +31,12 @@ import org.matsim.core.router.util.TravelTime;
  */
 public interface DetourTimeEstimator {
 	static DetourTimeEstimator createNodeToNodeBeelineTimeEstimator(double beelineSpeed) {
-		return (from, to) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
+		return (from, to, departureTime) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
 	}
 
 	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double speedFactor, DvrpTravelTimeMatrix matrix,
 			TravelTime travelTime) {
-		return (from, to) -> {
+		return (from, to, departureTime) -> {
 			if (from == to) {
 				return 0;
 			}
@@ -47,5 +47,5 @@ public interface DetourTimeEstimator {
 		};
 	}
 
-	double estimateTime(Link from, Link to);
+	double estimateTime(Link from, Link to, double departureTime);
 }
