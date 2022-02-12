@@ -337,6 +337,11 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private void updateShiftEnd(ShiftEntry next) {
 
+		if(next.shift.getOperationFacilityId().isPresent()) {
+			//start and end facility are fixed
+			return;
+		}
+
         final List<? extends Task> tasks = next.vehicle.getSchedule().getTasks();
 
         Task lastTask = null;
