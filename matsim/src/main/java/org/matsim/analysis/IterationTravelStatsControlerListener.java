@@ -21,11 +21,6 @@
 
  package org.matsim.analysis;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
@@ -43,6 +38,12 @@ import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.io.IOUtils;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 class IterationTravelStatsControlerListener implements IterationEndsListener, ShutdownListener {
 
     @Inject
@@ -58,8 +59,8 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 
 	@Inject
     private PHbyModeCalculator pHbyModeCalculator;
-	
-	@Inject
+
+    @Inject
     private PKMbyModeCalculator pkMbyModeCalculator;
     @Inject
     OutputDirectoryHierarchy outputDirectoryHierarchy;
@@ -68,13 +69,16 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     TripsAndLegsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension;
     @Inject
     TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
+    @Inject
+    TripsAndLegsCSVWriter.CustomTimeWriter customTimeWriter;
+
 
     @Inject
     AnalysisMainModeIdentifier mainModeIdentifier;
 
     Logger log = Logger.getLogger(IterationTravelStatsControlerListener.class);
 
-	@Override
+    @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pHbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
@@ -84,7 +88,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
         final boolean regularWriteEvents = writingTripsAtAll && ((event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0) || event.isLastIteration());
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
-            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension, mainModeIdentifier).write(experiencedPlansService.getExperiencedPlans()
+            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension, mainModeIdentifier, customTimeWriter).write(experiencedPlansService.getExperiencedPlans()
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.legscsv));
         }
