@@ -198,7 +198,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				filename(event, "drt_detours"), createGraphs);
 		DrtLegsAnalyser.analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs);
 		DrtLegsAnalyser.analyseConstraints(filename(event, "constraints"), legs, createGraphs);
-		
+
 		double endTime = qSimCfg.getEndTime()
 				.orElseGet(() -> legs.isEmpty() ?
 						qSimCfg.getStartTime().orElse(0) :
@@ -273,13 +273,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			Collection<EventSequence> performedRequestEventSequences, String plotFileName,
 			String textFileName, boolean createChart) {
 		try (var bw = IOUtils.getBufferedWriter(textFileName)) {
-			XYSeries times = new XYSeries("waittimes", true, true);
+			XYSeries times = new XYSeries("waittimes", false, true);
 
 			bw.append(line("RequestId", "actualWaitTime", "estimatedWaitTime", "deviate"));
 			for (EventSequence seq : performedRequestEventSequences) {
 				if (seq.getPickedUp().isPresent()) {
-					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getTime();
+					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getDeparture().get().getTime();
+					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getDeparture().get().getTime();
 					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime,
 							actualWaitTime - estimatedWaitTime));
 					times.add(actualWaitTime, estimatedWaitTime);

@@ -40,7 +40,7 @@ public class DetourTimeEstimatorTest {
 	public void freeSpeedZonalTimeEstimator_fromLinkToLinkSame() {
 		var link = new FakeLink(null);
 		var estimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(1, null, null);
-		Assertions.assertThat(estimator.estimateTime(link, link)).isZero();
+		Assertions.assertThat(estimator.estimateTime(link, link, 345)).isZero();
 	}
 
 	@Test
@@ -56,6 +56,6 @@ public class DetourTimeEstimatorTest {
 				+ 1234 // TT between nodes
 				+ linkB.getLength() / linkB.getFreespeed();// last link TT
 		double adjustedTT = expectedTT / 1.5;// using speed factor
-		Assertions.assertThat(estimator.estimateTime(linkA, linkB)).isEqualTo(adjustedTT);
+		Assertions.assertThat(estimator.estimateTime(linkA, linkB, 345)).isEqualTo(adjustedTT);
 	}
 }
