@@ -26,7 +26,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.FreeSpeedTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -63,6 +64,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		if (useModeFilteredSubnetwork) {
+			//filter out the subnetwork
 			checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
 			bindModal(Network.class).toProvider(modalProvider(getter -> {
 				Network subnetwork = NetworkUtils.createNetwork(getConfig().network());
@@ -73,15 +75,19 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 				return subnetwork;
 			})).asEagerSingleton();
 
+			//use mode-specific travel time matrix built for this subnetwork
 			//lazily initialised: optimisers may not need it
-			bindModal(DvrpTravelTimeMatrix.class).toProvider(modalProvider(
-					getter -> DvrpTravelTimeMatrix.createFreeSpeedMatrix(getter.getModal(Network.class),
+			bindModal(TravelTimeMatrix.class).toProvider(modalProvider(
+					getter -> FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(getter.getModal(Network.class),
 							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads(),
 							qSimConfigGroup.getTimeStepSize()))).in(Singleton.class);
 		} else {
+			//use DVRP-routing (dvrp-global) network
 			bindModal(Network.class).to(
 					Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
-			bindModal(DvrpTravelTimeMatrix.class).to(DvrpTravelTimeMatrix.class);
+
+			//use dvrp-global travel time matrix
+			bindModal(TravelTimeMatrix.class).to(TravelTimeMatrix.class);
 		}
 	}
 

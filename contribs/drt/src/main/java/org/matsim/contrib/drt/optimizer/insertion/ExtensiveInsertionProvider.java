@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.Inse
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -41,11 +41,11 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class ExtensiveInsertionProvider implements InsertionProvider {
 	public static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg,
-			InsertionCostCalculator insertionCostCalculator, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
-			TravelTime travelTime, ForkJoinPool forkJoinPool) {
+			InsertionCostCalculator insertionCostCalculator, TravelTimeMatrix travelTimeMatrix, TravelTime travelTime,
+			ForkJoinPool forkJoinPool) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
+				insertionParams.getAdmissibleBeelineSpeedFactor(), travelTimeMatrix, travelTime);
 		return new ExtensiveInsertionProvider(drtCfg, admissibleTimeEstimator, forkJoinPool, insertionCostCalculator);
 	}
 

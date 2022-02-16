@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,38 +20,11 @@
 
 package org.matsim.contrib.zone.skims;
 
-import javax.inject.Provider;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpGlobalTravelTimesMatrixProvider implements Provider<TravelTimeMatrix> {
-	private final DvrpTravelTimeMatrixParams params;
-	private final int numberOfThreads;
-
-	@Inject
-	@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
-	private Network network;
-
-	@Inject
-	private QSimConfigGroup qSimConfigGroup;
-
-	public DvrpGlobalTravelTimesMatrixProvider(GlobalConfigGroup globalConfig, DvrpTravelTimeMatrixParams params) {
-		this.params = params;
-		this.numberOfThreads = globalConfig.getNumberOfThreads();
-	}
-
-	@Override
-	public TravelTimeMatrix get() {
-		return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
-				qSimConfigGroup.getTimeStepSize());
-	}
+public interface TravelTimeMatrix {
+	int getTravelTime(Node fromNode, Node toNode, double departureTime);
 }
