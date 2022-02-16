@@ -22,7 +22,7 @@ import java.util.Set;
 public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
 		DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
-	public static final int DEFAULT_BIN_COUNT = 30 * 3600;
+	public static final int DEFAULT_END_TIME = 30 * 3600;
 	public static final int DEFAULT_BIN_SIZE = 300;
 
     private Set<Id<DrtShift>> shiftIds;
@@ -35,7 +35,7 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     public ShiftHistogram(Population population, EventsManager eventsManager, Config config) {
 		super();
 		this.binSize = DEFAULT_BIN_SIZE;
-		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_BIN_COUNT) ) / this.binSize + 1;
+		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
 		reset(0);
         if (population == null) {
             this.shiftIds = null;
