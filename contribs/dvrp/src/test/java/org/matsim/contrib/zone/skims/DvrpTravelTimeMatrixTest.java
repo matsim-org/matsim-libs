@@ -35,7 +35,7 @@ import org.matsim.core.network.NetworkUtils;
 public class DvrpTravelTimeMatrixTest {
 
 	private final Network network = NetworkUtils.createNetwork();
-    private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
+	private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 	private final Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 	private final Node nodeC = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), new Coord(-10, -10));
 
@@ -52,16 +52,16 @@ public class DvrpTravelTimeMatrixTest {
 		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeB)).isEqualTo(0);
+		assertThat(matrix.getTravelTime(nodeA, nodeA, 0)).isEqualTo(0);
+		assertThat(matrix.getTravelTime(nodeA, nodeB, 0)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeB, nodeA, 0)).isEqualTo(20 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeB, nodeB, 0)).isEqualTo(0);
 
 		// non-central node: C and A are in the same zone; A is the central node
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeC)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeA)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeC)).isEqualTo(20 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeA, nodeC, 0)).isEqualTo(0);
+		assertThat(matrix.getTravelTime(nodeC, nodeA, 0)).isEqualTo(0);
+		assertThat(matrix.getTravelTime(nodeB, nodeC, 0)).isEqualTo(20 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeC, nodeB, 0)).isEqualTo(10 + 1); // 1 s for moving over nodes
 	}
 
 	@Test
@@ -71,15 +71,15 @@ public class DvrpTravelTimeMatrixTest {
 		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeA)).isEqualTo(0);
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeB)).isEqualTo(10 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeA)).isEqualTo(20 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeB)).isEqualTo(0);
+		assertThat(matrix.getTravelTime(nodeA, nodeA, 0)).isEqualTo(0);
+		assertThat(matrix.getTravelTime(nodeA, nodeB, 0)).isEqualTo(10 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeB, nodeA, 0)).isEqualTo(20 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeB, nodeB, 0)).isEqualTo(0);
 
 		// non-central node: C and A are in the same zone; A is the central node
-		assertThat(matrix.getFreeSpeedTravelTime(nodeA, nodeC)).isEqualTo(11 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeA)).isEqualTo(9 + 1); // 1 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeB, nodeC)).isEqualTo(20 + 11 + 2); // 2 s for moving over nodes
-		assertThat(matrix.getFreeSpeedTravelTime(nodeC, nodeB)).isEqualTo(10 + 9 + 2); // 2 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeA, nodeC, 0)).isEqualTo(11 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeC, nodeA, 0)).isEqualTo(9 + 1); // 1 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeB, nodeC, 0)).isEqualTo(20 + 11 + 2); // 2 s for moving over nodes
+		assertThat(matrix.getTravelTime(nodeC, nodeB, 0)).isEqualTo(10 + 9 + 2); // 2 s for moving over nodes
 	}
 }

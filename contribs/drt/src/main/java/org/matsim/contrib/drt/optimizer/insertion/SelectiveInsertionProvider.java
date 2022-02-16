@@ -44,7 +44,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 			InsertionCostCalculator insertionCostCalculator, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
 			TravelTime travelTime, ForkJoinPool forkJoinPool) {
 		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
+		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
 				insertionParams.getRestrictiveBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
 		return new SelectiveInsertionProvider(drtCfg, restrictiveDetourTimeEstimator, forkJoinPool,
 				insertionCostCalculator);

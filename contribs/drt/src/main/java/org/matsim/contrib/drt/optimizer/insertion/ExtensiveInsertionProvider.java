@@ -44,7 +44,7 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 			InsertionCostCalculator insertionCostCalculator, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
 			TravelTime travelTime, ForkJoinPool forkJoinPool) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		var admissibleTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
+		var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
 				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix, travelTime);
 		return new ExtensiveInsertionProvider(drtCfg, admissibleTimeEstimator, forkJoinPool, insertionCostCalculator);
 	}
