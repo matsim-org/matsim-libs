@@ -32,8 +32,8 @@ import org.matsim.core.router.util.TravelTime;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpTravelTimeMatrix {
-	public static DvrpTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork,
-			DvrpTravelTimeMatrixParams params, int numberOfThreads, double qSimTimeStepSize) {
+	public static DvrpTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params,
+			int numberOfThreads, double qSimTimeStepSize) {
 		return new DvrpTravelTimeMatrix(dvrpNetwork, params, numberOfThreads,
 				new QSimFreeSpeedTravelTime(qSimTimeStepSize));
 	}
@@ -53,7 +53,7 @@ public class DvrpTravelTimeMatrix {
 				params.getMaxNeighborDistance(), 0, travelTime, travelDisutility, numberOfThreads);
 	}
 
-	public int getFreeSpeedTravelTime(Node fromNode, Node toNode) {
+	public int getTravelTime(Node fromNode, Node toNode, double departureTime) {
 		if (fromNode == toNode) {
 			return 0;
 		}

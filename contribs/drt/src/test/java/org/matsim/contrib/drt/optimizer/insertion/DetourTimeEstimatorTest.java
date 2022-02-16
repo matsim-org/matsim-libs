@@ -26,8 +26,8 @@ import static org.mockito.Mockito.when;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 
@@ -39,7 +39,7 @@ public class DetourTimeEstimatorTest {
 	@Test
 	public void freeSpeedZonalTimeEstimator_fromLinkToLinkSame() {
 		var link = new FakeLink(null);
-		var estimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(1, null, null);
+		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1, null, null);
 		Assertions.assertThat(estimator.estimateTime(link, link, 345)).isZero();
 	}
 
@@ -49,10 +49,11 @@ public class DetourTimeEstimatorTest {
 		var linkB = new FakeLink(null, new FakeNode(null), null);
 
 		DvrpTravelTimeMatrix ttMatrix = mock(DvrpTravelTimeMatrix.class);
-		when(ttMatrix.getFreeSpeedTravelTime(eq(linkA.getToNode()), eq(linkB.getFromNode()))).thenReturn(1234);
+		when(ttMatrix.getTravelTime(eq(linkA.getToNode()), eq(linkB.getFromNode()), eq(345. + 2.))).thenReturn(1234);
 
-		var estimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(1.5, ttMatrix, new FreeSpeedTravelTime());
-		double expectedTT = 1 //first link TT
+		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1.5, ttMatrix,
+				new QSimFreeSpeedTravelTime(1));
+		double expectedTT = 2 //first link TT
 				+ 1234 // TT between nodes
 				+ linkB.getLength() / linkB.getFreespeed();// last link TT
 		double adjustedTT = expectedTT / 1.5;// using speed factor
