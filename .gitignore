@@ -9,6 +9,7 @@ matsimExamples
 **/target
 /log_projects.log
 *.orig
+pom.xml
 
 # ignore output directories:
 output/
