@@ -1,0 +1,16 @@
+vehicleId	vehicleType	tripNumber	carrierId	driverId	tripRoadTime	tripDistance	tripVehicleCost
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	0	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	1	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	2	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	3	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	4	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-804.0	6000.0	-3.6120000000000005
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	5	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-1239.0	7000.0	-6.622000000000001
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	6	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-1641.0	10000.0	-8.428
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	7	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	8	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	9	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-1477.0	11000.0	-6.646000000000001
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	10	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-971.0	5000.0	-5.417999999999999
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	11	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-703.0	3000.0	-4.214
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	12	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-837.0	4000.0	-4.816
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	13	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-837.0	4000.0	-4.816
+freight_carrier1_veh_carrier_19_lightVehicle_0	light	14	##carrier1	freight_carrier1_veh_carrier_19_lightVehicle_0	-1507.0	9000.0	-7.826000000000001
