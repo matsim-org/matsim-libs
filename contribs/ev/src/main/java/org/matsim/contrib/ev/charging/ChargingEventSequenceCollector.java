@@ -83,7 +83,7 @@ public class ChargingEventSequenceCollector
 				"Vehicle (%s) was not at charger (%s)", event.getVehicleId(), event.getChargerId());
 		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).queuedAtCharger != null,
 				"Vehicle (%s) was not queued at charger (%s)", event.getVehicleId(), event.getChargerId());
-		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).queuedAtCharger != null,
+		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).chargingStartEvent == null,
 				"Vehicle (%s) already is already plugged", event.getVehicleId(), event.getChargerId());
 		ongoingSequences.remove(event.getVehicleId());
 	}
