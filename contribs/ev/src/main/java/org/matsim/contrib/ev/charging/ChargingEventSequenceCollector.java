@@ -38,7 +38,7 @@ import com.google.common.base.Preconditions;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingEventSequenceCollector
-		implements QueuedAtChargerEventHandler, ChargingStartEventHandler, ChargingEndEventHandler {
+		implements QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler, ChargingStartEventHandler, ChargingEndEventHandler {
 
 	public static class ChargingSequence {
 		@Nullable //null if no queueing occurred
@@ -75,6 +75,17 @@ public class ChargingEventSequenceCollector
 	public void handleEvent(QueuedAtChargerEvent event) {
 		Preconditions.checkState(ongoingSequences.put(event.getVehicleId(), new ChargingSequence(event)) == null,
 				"Vehicle (%s) already at a charger", event.getVehicleId());
+	}
+
+	@Override
+	public void handleEvent(QuitQueueAtChargerEvent event) {
+		Preconditions.checkState(ongoingSequences.containsKey(event.getVehicleId()),
+				"Vehicle (%s) was not at charger (%s)", event.getVehicleId(), event.getChargerId());
+		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).queuedAtCharger != null,
+				"Vehicle (%s) was not queued at charger (%s)", event.getVehicleId(), event.getChargerId());
+		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).queuedAtCharger != null,
+				"Vehicle (%s) already is already plugged", event.getVehicleId(), event.getChargerId());
+		ongoingSequences.remove(event.getVehicleId());
 	}
 
 	@Override
