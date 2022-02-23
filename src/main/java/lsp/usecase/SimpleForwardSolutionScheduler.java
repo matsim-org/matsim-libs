@@ -12,11 +12,11 @@ import lsp.shipment.LSPShipment;
 /**
   * In the class SimpleForwardSolutionScheduler two tasks are performed:
  *
- * First, the {@link LSPShipment}s that were assigned to the suitable
+ * 1.) the {@link LSPShipment}s that were assigned to the suitable
  * {@link LogisticsSolution} by the {@link lsp.ShipmentAssigner} in a previous step are handed over to the first
  * {@link LogisticsSolutionElement}.
  *
- * Second, all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
+ * 2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
  * exogenously, are now scheduled sequentially in an order that was also specified exogenously.
  * This order ensures that each {@link LogisticsSolution} is traversed from the
  * first to the last {@link LogisticsSolutionElement}. During this procedure, the concerned
@@ -24,8 +24,7 @@ import lsp.shipment.LSPShipment;
  * {@link LSPResource} in charge and then added to the collection of outgoing shipments of the client
  * {@link LogisticsSolutionElement}.
  *
- * The SimpleForwardSolutionScheduler needs the sequence in which the Resources
- * are scheduled as exogenous input.
+ * The SimpleForwardSolutionScheduler needs the sequence in which the Resources are scheduled as exogenous input.
  *
  * The expression "`forward"' refers to the fact that in both cases the scheduling process starts at the first element
  * of each {@link LogisticsSolution} and from the earliest possible point of time.
