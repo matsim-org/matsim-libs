@@ -162,12 +162,10 @@ public class CalculateSkimMatrices {
         // skims.loadSamplingPointsFromFile("coordinates.csv");
 
         if (modes.contains(TransportMode.car)) {
-//            skims.calculateNetworkMatrices(networkFilename, eventsFilename, timesCar, config, l -> true);
             skims.calculateAndWriteNetworkMatrices(networkFilename, eventsFilename, timesCar, config, "", l -> true);
         }
 
         if (modes.contains(TransportMode.pt)) {
-//            skims.calculatePTMatrices(networkFilename, transitScheduleFilename, timesPt[0], timesPt[1], config, (line, route) -> route.getTransportMode().equals("train"));
             skims.calculateAndWritePTMatrices(networkFilename,
                     transitScheduleFilename,
                     timesPt[0],
@@ -176,8 +174,7 @@ public class CalculateSkimMatrices {
                     "",
                     (line, route) -> route.getTransportMode().equals("train"));
         }
-
-//        skims.calculateBeelineMatrix();
+        
         skims.calculateAndWriteBeelineMatrix();
     }
 
