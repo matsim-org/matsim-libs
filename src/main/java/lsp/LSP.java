@@ -10,6 +10,13 @@ import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.controler.events.ReplanningEvent;
 
+/**
+ *  In the class library, the interface LSP has the following tasks:
+ * 1. Maintain one or several transport chains through which {@link LSPShipment}s are routed.
+ * 2. Assign {@link LSPShipment}s to the suitable transport chain. --> {@link ShipmentAssigner}.
+ * 3. Interact with the agents that embody the demand side of the freight transport market, if they are specified in the setting.
+ * 4. Coordinate carriers that are in charge of the physical transport.
+ */
 public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
 	
 	/**
