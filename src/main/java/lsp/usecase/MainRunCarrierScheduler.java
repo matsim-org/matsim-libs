@@ -25,7 +25,20 @@ import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
 
-
+/**
+ * In the case of the MainRunAdapter, the incoming LSPShipments are bundled
+ * together until their total weight exceeds the capacity of the deployed vehicle
+ * type. Then, this bundle of LSPShipments is converted to a scheduled tour
+ * from the freight contrib of MATSim. The start of this tour is located at
+ * the first ReloadingPoint and the end at the second one. All LSPShipments
+ * are converted to services that take place at the end point of the tour.
+ *
+ * Tour is routed by MATSim Network Router.
+ *
+ *  * The tour starts after the last shipment
+ *  * has arrived and the time necessary for loading all shipments into the vehicle
+ *  * has passed.
+ */
 /*package-private*/  class MainRunCarrierScheduler extends LSPResourceScheduler {
 
 	static class LSPCarrierPair{
