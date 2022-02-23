@@ -10,10 +10,7 @@ import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /**
- * The expression "`forward"' refers to the fact that in both cases the scheduling process starts at the first element
- * of each {@link LogisticsSolution} and from the earliest possible point of time.
- *
- * In the class SimpleForwardSolutionScheduler two tasks are performed:
+  * In the class SimpleForwardSolutionScheduler two tasks are performed:
  *
  * First, the {@link LSPShipment}s that were assigned to the suitable
  * {@link LogisticsSolution} by the {@link lsp.ShipmentAssigner} in a previous step are handed over to the first
@@ -26,6 +23,9 @@ import lsp.shipment.LSPShipment;
  * {@link LSPShipment}s  are taken from the collection of incoming shipments, handled by the
  * {@link LSPResource} in charge and then added to the collection of outgoing shipments of the client
  * {@link LogisticsSolutionElement}.
+ *
+ * The expression "`forward"' refers to the fact that in both cases the scheduling process starts at the first element
+ * of each {@link LogisticsSolution} and from the earliest possible point of time.
  */
 /*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
 
