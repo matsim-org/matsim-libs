@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +18,14 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.DetourPathCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -34,10 +38,10 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModule {
+public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 
-	public SelectiveInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
+	public ExtensiveInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
@@ -45,31 +49,25 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 	@Override
 	protected void configureQSim() {
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider(getter -> {
-			var provider = SelectiveInsertionProvider.create(drtCfg, getter.getModal(InsertionCostCalculator.class),
+			var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
+			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculator,
 					getter.getModal(TravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			// Use 0 as the cost for the selected insertion:
-			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
-			//   no other insertion to compare with.
-			// - We assume that the travel times obtained from DvrpTravelTimeMatrix are reasonably well estimated(*),
-			//   so we do not want to check for time window violations
-			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
-			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
 			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
-					zeroCostInsertionCostCalculator, drtCfg.getStopDuration());
+					insertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();
 
-		addModalComponent(SingleInsertionDetourPathCalculator.class,
+		addModalComponent(MultiInsertionDetourPathCalculator.class,
 				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 					@Override
-					public SingleInsertionDetourPathCalculator get() {
+					public MultiInsertionDetourPathCalculator get() {
 						var travelTime = getModalInstance(TravelTime.class);
 						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new SingleInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
+						return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
 					}
 				});
-		bindModal(DetourPathCalculator.class).to(modalKey(SingleInsertionDetourPathCalculator.class));
+		bindModal(DetourPathCalculator.class).to(modalKey(MultiInsertionDetourPathCalculator.class));
 	}
 }

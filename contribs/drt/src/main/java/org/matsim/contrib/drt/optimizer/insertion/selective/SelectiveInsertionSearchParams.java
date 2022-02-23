@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,9 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
+
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 
 import jakarta.validation.constraints.Positive;
 

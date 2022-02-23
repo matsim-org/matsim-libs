@@ -39,7 +39,7 @@ public class DetourPathDataCache {
 	private final Map<Link, PathData> detourFromDropoff;
 	private final PathData zeroDetour;
 
-	DetourPathDataCache(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
+	public DetourPathDataCache(Map<Link, PathData> detourToPickup, Map<Link, PathData> detourFromPickup,
 			Map<Link, PathData> detourToDropoff, Map<Link, PathData> detourFromDropoff, PathData zeroDetour) {
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;

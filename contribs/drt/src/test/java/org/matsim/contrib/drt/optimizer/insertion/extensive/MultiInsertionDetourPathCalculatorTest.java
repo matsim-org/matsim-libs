@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,17 +18,18 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
-import static org.matsim.contrib.dvrp.path.VrpPaths.getLastLinkTT;
+import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Test;
@@ -36,24 +37,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.Waypoint.Dropoff;
-import org.matsim.contrib.drt.optimizer.Waypoint.End;
-import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
+import org.mockito.ArgumentMatchers;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class SingleInsertionDetourPathCalculatorTest {
-
+public class MultiInsertionDetourPathCalculatorTest {
 	private final Link beforePickupLink = link("before_pickup");
 	private final Link pickupLink = link("pickup");
 	private final Link afterPickupLink = link("after_pickup");
@@ -70,9 +65,10 @@ public class SingleInsertionDetourPathCalculatorTest {
 			.latestArrivalTime(500)
 			.build();
 
-	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);
-	private final SingleInsertionDetourPathCalculator detourPathCalculator = new SingleInsertionDetourPathCalculator(
-			null, new FreeSpeedTravelTime(), null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
+	private final OneToManyPathSearch pathSearch = mock(OneToManyPathSearch.class);
+
+	private final MultiInsertionDetourPathCalculator detourPathCalculator = new MultiInsertionDetourPathCalculator(
+			pathSearch, pathSearch, pathSearch, pathSearch, 1);
 
 	@After
 	public void after() {
@@ -81,73 +77,81 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 	@Test
 	public void calculatePaths() {
-		var pathToPickup = mockCalcLeastCostPath(beforePickupLink, pickupLink, request.getEarliestStartTime(), 11);
-		var pathFromPickup = mockCalcLeastCostPath(pickupLink, afterPickupLink, request.getEarliestStartTime(), 22);
-		var pathToDropoff = mockCalcLeastCostPath(beforeDropoffLink, dropoffLink, request.getLatestArrivalTime(), 33);
-		var pathFromDropoff = mockCalcLeastCostPath(dropoffLink, afterDropoffLink, request.getLatestArrivalTime(), 44);
+		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
+		var pathFromPickup = mockCalcPathData(pickupLink, afterPickupLink, request.getEarliestStartTime(), true, 22);
+		var pathToDropoff = mockCalcPathData(dropoffLink, beforeDropoffLink, request.getLatestArrivalTime(), false, 33);
+		var pathFromDropoff = mockCalcPathData(dropoffLink, afterDropoffLink, request.getLatestArrivalTime(), true, 44);
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertPathData(insertionWithDetourData.detourToPickup, pathToPickup, pickupLink);
-		assertPathData(insertionWithDetourData.detourFromPickup, pathFromPickup, afterPickupLink);
-		assertPathData(insertionWithDetourData.detourToDropoff, pathToDropoff, dropoffLink);
-		assertPathData(insertionWithDetourData.detourFromDropoff, pathFromDropoff, afterDropoffLink);
+		assertThat(insertionWithDetourData.detourToPickup).isEqualTo(pathToPickup);
+		assertThat(insertionWithDetourData.detourFromPickup).isEqualTo(pathFromPickup);
+		assertThat(insertionWithDetourData.detourToDropoff).isEqualTo(pathToDropoff);
+		assertThat(insertionWithDetourData.detourFromDropoff).isEqualTo(pathFromDropoff);
 	}
 
 	@Test
 	public void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
 		//compute only 2 paths (instead of 4)
-		var pathToPickup = mockCalcLeastCostPath(beforePickupLink, pickupLink, request.getEarliestStartTime(), 11);
-		var pathFromPickup = mockCalcLeastCostPath(pickupLink, dropoffLink, request.getEarliestStartTime(), 22);
+		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
+		var pathFromPickup = mockCalcPathData(pickupLink, dropoffLink, request.getEarliestStartTime(), true, 22);
 
 		//use specific class of waypoint to allow for detecting the special case
-		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Dropoff.class));
-		var dropoff = insertionPoint(waypoint(pickupLink, Pickup.class), waypoint(dropoffLink, End.class));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Waypoint.Dropoff.class));
+		var dropoff = insertionPoint(waypoint(pickupLink, Waypoint.Pickup.class),
+				waypoint(dropoffLink, Waypoint.End.class));
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertPathData(insertionWithDetourData.detourToPickup, pathToPickup, pickupLink);
-		assertPathData(insertionWithDetourData.detourFromPickup, pathFromPickup, afterPickupLink);
-		//this path data should not be used and is null
+		assertThat(insertionWithDetourData.detourToPickup).isEqualTo(pathToPickup);
+		assertThat(insertionWithDetourData.detourFromPickup).isEqualTo(pathFromPickup);
 		assertThat(insertionWithDetourData.detourToDropoff).isNull();
-		//this path data is of zero duration
 		assertThat(insertionWithDetourData.detourFromDropoff.getTravelTime()).isZero();
 	}
 
 	@Test
 	public void calculatePaths_noDetours() {
+		// OneToManyPathSearch.calcPathDataMap() returns a map that contains entries for all toLinks
+		// (unless the stop criterion terminates computations earlier)
+		// If fromLink is in toLinks than PathData.EMPTY is mapped for such a link
+		when(pathSearch.calcPathDataMap(eq(pickupLink), eqSingleLinkCollection(pickupLink),
+				eq(request.getEarliestStartTime()), anyBoolean())).thenReturn(Map.of(pickupLink, PathData.EMPTY));
+		when(pathSearch.calcPathDataMap(eq(dropoffLink), eqSingleLinkCollection(dropoffLink),
+				eq(request.getLatestArrivalTime()), anyBoolean())).thenReturn(Map.of(dropoffLink, PathData.EMPTY));
+
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
 
-		assertThat(insertionWithDetourData.detourToPickup.getTravelTime()).isZero();
-		assertThat(insertionWithDetourData.detourFromPickup.getTravelTime()).isZero();
-		assertThat(insertionWithDetourData.detourToDropoff.getTravelTime()).isZero();
-		assertThat(insertionWithDetourData.detourFromDropoff.getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.detourToPickup).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourFromPickup).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourToDropoff).isEqualTo(PathData.EMPTY);
+		assertThat(insertionWithDetourData.detourFromDropoff).isEqualTo(PathData.EMPTY);
 	}
 
-	private Path mockCalcLeastCostPath(Link fromLink, Link toLink, double startTimeArg, double pathTravelTime) {
+	private PathData mockCalcPathData(Link fromLink, Link toLink, double startTimeArg, boolean forward,
+			double pathTravelTime) {
 		var fromNode = fromLink.getToNode();
 		var toNode = toLink.getFromNode();
 		var path = new Path(List.of(fromNode, toNode), List.of(), pathTravelTime, pathTravelTime + 1000);
-		when(pathCalculator.calcLeastCostPath(eq(fromNode), eq(toNode), eq(startTimeArg + FIRST_LINK_TT), isNull(),
-				isNull())).thenReturn(path);
-		return path;
+		var pathData = new PathData(path, 99);
+		when(pathSearch.calcPathDataMap(eq(fromLink), eqSingleLinkCollection(toLink), eq(startTimeArg),
+				eq(forward))).thenReturn(Map.of(toLink, pathData));
+		return pathData;
 	}
 
-	private void assertPathData(PathData pathData, Path inputPath, Link toLink) {
-		assertThat(pathData.getTravelTime()).isEqualTo(
-				inputPath.travelTime + FIRST_LINK_TT + getLastLinkTT(new FreeSpeedTravelTime(), toLink, Double.NaN));
+	private Collection<Link> eqSingleLinkCollection(Link link) {
+		return ArgumentMatchers.argThat(argument -> argument.contains(link) && argument.size() == 1);
 	}
 
 	private Link link(String id) {
@@ -158,8 +162,8 @@ public class SingleInsertionDetourPathCalculatorTest {
 		return new FakeNode(Id.createNodeId(id));
 	}
 
-	private InsertionPoint insertionPoint(Waypoint beforeWaypoint, Waypoint afterWaypoint) {
-		return new InsertionPoint(-1, beforeWaypoint, null, afterWaypoint);
+	private InsertionGenerator.InsertionPoint insertionPoint(Waypoint beforeWaypoint, Waypoint afterWaypoint) {
+		return new InsertionGenerator.InsertionPoint(-1, beforeWaypoint, null, afterWaypoint);
 	}
 
 	private Waypoint waypoint(Link afterLink) {

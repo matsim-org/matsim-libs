@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,17 +15,20 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
 import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder.InsertionWithCost;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 
 /**
  * "Insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride
