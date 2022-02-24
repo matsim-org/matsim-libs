@@ -315,7 +315,24 @@ import java.util.*;
 			case twoPlans_directAndHub: {
 				log.info("Creating LSP with two plans: i) direct distribution from the depot ii) reloading at hub");
 
-				throw new NotImplementedException( solutionType + "is not implemented");
+				log.error("This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
+
+				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
+				LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
+
+				//TODO: Müsste nicht eigentlich der SolutionScheduler dann auf Ebene der einzelnen Pläne (mit ihren Solutions) sein?? kmt Feb22
+				//So muss ich erst die Ressourcen aus beiden hinzuzufügenden Plänen aufsammeln, damit die dann schon in den Builder können. Irgendwie unschön.
+				List<LSPResource> resourcesList = createResourcesListFromLSPPlan(lspPlan_direct);
+				resourcesList.addAll(createResourcesListFromLSPPlan(lspPlan_Reloading));
+
+				final LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
+						.setInitialPlan(lspPlan_direct)
+						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList))
+						.build();
+
+				lsp.addPlan(lspPlan_Reloading); //adding the second plan
+
+				return lsp;
 			}
 			default:
 				throw new IllegalStateException("Unexpected value: " + solutionType);
