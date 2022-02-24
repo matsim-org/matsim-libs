@@ -43,8 +43,8 @@ import java.util.*;
 
 	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
-	enum SolutionType { original, direct }
-	private static SolutionType solutionType = SolutionType.direct;
+	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub }
+	private static SolutionType solutionType = SolutionType.onePlan_direct;
 
 	public static void main (String [] args) throws CommandLine.ConfigurationException{
 
@@ -287,7 +287,7 @@ import java.util.*;
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
 
 		switch (solutionType) {
-			case original: {
+			case onePlan_withHub: {
 				// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
 
 				log.info("");
@@ -329,7 +329,7 @@ import java.util.*;
 						.build();
 
 			}
-			case direct: {
+			case onePlan_direct: {
 				// ### This is the new solution with  directDistribution from the Depot.
 
 				log.info("");

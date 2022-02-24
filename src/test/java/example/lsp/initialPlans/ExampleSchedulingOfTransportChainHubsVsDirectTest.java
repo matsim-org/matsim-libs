@@ -1,5 +1,6 @@
 package example.lsp.initialPlans;
 
+import example.lsp.initialPlans.ExampleSchedulingOfTransportChainHubsVsDirect.SolutionType;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 					IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=2"
-					,"--solutionType=original"
+					,"--solutionType=" + SolutionType.onePlan_withHub
 			} );
 
 		} catch ( Exception ee ) {
@@ -40,7 +41,7 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 					IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=2"
-					,"--solutionType=direct"
+					,"--solutionType=" + SolutionType.onePlan_direct
 			} );
 
 		} catch ( Exception ee ) {
