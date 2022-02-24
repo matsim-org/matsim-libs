@@ -13,6 +13,19 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
+/**
+ * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.
+ *
+ * Thus, these activities are entered directly in the Schedule of the LSPShipments that pass through the ReloadingPoint.
+ *
+ * An entry is added to the schedule of the shipments that is an instance of
+ * {@link lsp.shipment.ScheduledShipmentHandle}. There, the name of the Resource
+ * and the client element are entered, so that the way that the {@link lsp.shipment.LSPShipment}
+ * takes is specified. In addition, the planned start and end time of the handling
+ * (i.e. crossdocking) of the shipment is entered. In the example, crossdocking
+ * starts as soon as the considered LSPShipment arrives at the {@link ReloadingPoint}
+ * and ends after a fixed and a size dependent amount of time.
+ */
 /*package-private*/ class ReloadingPoint implements LSPResource {
 
 	private final Id<LSPResource> id;

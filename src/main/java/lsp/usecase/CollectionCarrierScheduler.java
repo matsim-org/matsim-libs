@@ -28,7 +28,13 @@ import lsp.resources.LSPCarrierResource;
 import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
 
-
+/**
+ *  Schedules the {@link CollectionCarrierAdapter}.
+ *
+ * Converts the {@link LSPShipment}s into {@link CarrierService}s that are needed for the {@link Carrier}
+ * from the freight contrib of MATSim and then routes the vehicles of this
+ * {@link Carrier} through the network by calling the corresponding methods of jsprit
+ */
 /*package-private*/  class CollectionCarrierScheduler extends LSPResourceScheduler {
 	
 	static class LSPCarrierPair{

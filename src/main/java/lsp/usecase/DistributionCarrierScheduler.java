@@ -28,6 +28,16 @@ import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
 
+/**
+ * Ähnlich zu {@link CollectionCarrierScheduler}: Nun werden Sendungen verteilt statt eingesammelt.
+ *
+ * BUT: scheduleResource() is different from the one
+ * used in the case of collection. The LSPShipments are not simply handed over
+ * to jsprit which calculates the vehicle tours, but rather loaded into a waiting
+ * distribution vehicle in the order of their arrival at the depot.
+ * Once this vehicle is full, the tour for this single one is planned by jsprit. All vehicles are thus
+ * filled and scheduled consecutively.
+ */
 /*package-private*/ class DistributionCarrierScheduler extends LSPResourceScheduler {
 
 	static class LSPCarrierPair{

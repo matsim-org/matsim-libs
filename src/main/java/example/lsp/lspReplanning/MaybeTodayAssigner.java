@@ -17,7 +17,7 @@ import org.matsim.core.gbl.Gbl;
 	}
 	
 	@Override
-	public void assignShipment(LSPShipment shipment) {
+	public void assignToSolution(LSPShipment shipment) {
 		boolean assignToday = random.nextBoolean();
 		if(assignToday) {
 			Gbl.assertIf( lsp.getSelectedPlan().getSolutions().size()==1 );

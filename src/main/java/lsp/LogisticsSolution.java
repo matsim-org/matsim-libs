@@ -12,7 +12,12 @@ import lsp.controler.LSPSimulationTracker;
 
 
 /**
- * Was macht das hier?
+ * A LogisticsSolution can be seen as a representative of a
+ * transport chain. It consists of several chain links that implement the interface
+ * {@link LogisticsSolutionElement}. The latter is more a logical than a physical entity.
+ * Physical entities, in turn, are housed inside classes that implement the interface
+ * {@link lsp.resources.LSPResource}. This introduction of an intermediate layer allows physical Resources
+ * to be used by several {@link LogisticsSolution}s and thus transport chains.
  */
 public interface LogisticsSolution {
 

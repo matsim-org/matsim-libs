@@ -26,9 +26,18 @@ public interface LogisticsSolutionElement {
 	LogisticsSolutionElement getPreviousElement();
 	
 	LogisticsSolutionElement getNextElement();
-	
+
+	/**
+	 * This collections stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
+	 *  charge of the actual physical handling.
+	 *
+	 * @return WaitingShipments
+	 */
 	WaitingShipments getIncomingShipments();
-	
+
+	/**
+	 *  Shipments that have already been treated.
+	 */
 	WaitingShipments getOutgoingShipments();
 	
 //	public void schedulingOfResourceCompleted();

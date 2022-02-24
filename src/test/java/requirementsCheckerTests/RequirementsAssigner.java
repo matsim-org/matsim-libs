@@ -9,7 +9,7 @@ import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.Requirement;
 
-public class RequirementsAssigner implements  ShipmentAssigner {
+	public class RequirementsAssigner implements  ShipmentAssigner {
 
 	private LSP lsp;
 	private final Collection<LogisticsSolution> feasibleSolutions;
@@ -19,7 +19,7 @@ public class RequirementsAssigner implements  ShipmentAssigner {
 	}
 	
 	@Override
-	public void assignShipment(LSPShipment shipment) {
+	public void assignToSolution(LSPShipment shipment) {
 		feasibleSolutions.clear();
 		
 		label:

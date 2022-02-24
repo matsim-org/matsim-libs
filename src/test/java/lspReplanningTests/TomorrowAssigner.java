@@ -16,7 +16,7 @@ public class TomorrowAssigner implements ShipmentAssigner{
 	}
 	
 	@Override
-	public void assignShipment(LSPShipment shipment) {
+	public void assignToSolution(LSPShipment shipment) {
 		boolean assignToday = random.nextBoolean();
 		if(assignToday) {
 			lsp.getSelectedPlan().getSolutions().iterator().next().assignShipment(shipment);

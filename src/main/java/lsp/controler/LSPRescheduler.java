@@ -10,7 +10,32 @@ import lsp.LogisticsSolutionElement;
 import lsp.shipment.LSPShipment;
 
 
-
+/**
+ * There is a possibility and also sometimes a need for rescheduling before each
+ * new iteration. This need results from changes to the plan of the LSP during
+ * the replanning process. There, changes of the structure and/or number of the
+ * active LogisticsSolutions or to the assignment of the LSPShipments to the
+ * LogisticsSolutions can happen. Consequently, the transport operations that
+ * result from this change in behavior of the corresponding LSP will also change
+ * and thus the preparation of the simulation has to be redone.
+ *
+ * The rescheduling process is triggered in the BeforeMobsimEvent of the following iteration which has
+ * a LSPRescheduler as one of its listeners.
+ *
+ * In this case, all LogisticsSolutions,
+ * LogisticsSolutionElements and Resources are cleared of all shipments that
+ * were assigned to them in the previous iteration in order to allow a new assignment.
+ *
+ * Then, all LSPShipments of each LSP are assigned to the corresponding
+ * LogisticsSolutions by the Assigner of the LSP in order to account for possible
+ * changes in the LogisticsSolutions as well as in the assignment itself due to
+ * the replanning that took place before. After this assignment is done, the actual
+ * scheduling takes place. In cases, where no replanning takes place (further details of
+ * the replanning algorithm follow in 3.8), rescheduling will nevertheless take place.
+ * This is reasonable for example in cases where also other traffic takes place on the
+ * network, for example passenger traffic, and the network conditions change between
+ * subsequent iterations of the simulation due to congestion.
+ */
 class LSPRescheduler implements BeforeMobsimListener{
 
 	
@@ -34,7 +59,7 @@ class LSPRescheduler implements BeforeMobsimListener{
 				for(LSPShipment shipment : lsp.getShipments()) {
 					shipment.getShipmentPlan().clear();
 					shipment.getLog().clear();
-					lsp.getSelectedPlan().getAssigner().assignShipment(shipment);
+					lsp.getSelectedPlan().getAssigner().assignToSolution(shipment);
 				}
 				lsp.scheduleSolutions();
 			}		
