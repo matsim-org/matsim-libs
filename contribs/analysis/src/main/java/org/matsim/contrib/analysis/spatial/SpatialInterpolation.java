@@ -24,6 +24,16 @@ public abstract class SpatialInterpolation {
         double b = (to.x - from.x) * (from.x - cellCentroid.x) + (to.y - from.y) * (from.y - cellCentroid.y);
         double linkLength = from.distance(to);
 
+        // debug stuff:
+        double D = Math.sqrt(Math.PI) / (2 * linkLength);
+        double C = (a - (b*b / (linkLength * linkLength))) / (smoothingRadius*smoothingRadius);
+        double F = linkLength / smoothingRadius + b / linkLength / smoothingRadius;
+        double G = b / linkLength / smoothingRadius;
+
+        double g = Math.exp(-1 * C) * smoothingRadius * D;
+        double h = Erf.erf(F) - Erf.erf(G);
+
+
         double c = (smoothingRadius * Math.sqrt(Math.PI) / (linkLength * 2)) * Math.exp(-(a - (b * b / (linkLength * linkLength))) / (smoothingRadius * smoothingRadius));
 
         double upperLimit = linkLength + b / linkLength;
