@@ -90,8 +90,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
 		var insertion = new Insertion(null, pickup, dropoff);
 
-		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
+		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
 		assertPathData(insertionWithDetourData.detourToPickup, pathToPickup, pickupLink);
 		assertPathData(insertionWithDetourData.detourFromPickup, pathFromPickup, afterPickupLink);
@@ -110,8 +109,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 		var dropoff = insertionPoint(waypoint(pickupLink, Pickup.class), waypoint(dropoffLink, End.class));
 		var insertion = new Insertion(null, pickup, dropoff);
 
-		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
+		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
 		assertPathData(insertionWithDetourData.detourToPickup, pathToPickup, pickupLink);
 		assertPathData(insertionWithDetourData.detourFromPickup, pathFromPickup, afterPickupLink);
@@ -127,8 +125,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
 		var insertion = new Insertion(null, pickup, dropoff);
 
-		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
-		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
+		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
 		assertThat(insertionWithDetourData.detourToPickup.getTravelTime()).isZero();
 		assertThat(insertionWithDetourData.detourFromPickup.getTravelTime()).isZero();

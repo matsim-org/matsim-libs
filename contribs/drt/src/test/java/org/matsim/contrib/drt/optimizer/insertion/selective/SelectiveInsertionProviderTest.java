@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion.selective;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -56,7 +55,7 @@ public class SelectiveInsertionProviderTest {
 	public void getInsertions_noInsertionsGenerated() {
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder,
 				new InsertionGenerator(120, null), rule.forkJoinPool);
-		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
+		assertThat(insertionProvider.getInsertion(null, List.of())).isEmpty();
 	}
 
 	@Test
@@ -91,8 +90,7 @@ public class SelectiveInsertionProviderTest {
 		//test insertionProvider
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder, insertionGenerator,
 				rule.forkJoinPool);
-		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(selectedInsertion.stream()
-				.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion)
-				.collect(toList()));
+		assertThat(insertionProvider.getInsertion(request, List.of(vehicleEntry))).isEqualTo(
+				selectedInsertion.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion));
 	}
 }
