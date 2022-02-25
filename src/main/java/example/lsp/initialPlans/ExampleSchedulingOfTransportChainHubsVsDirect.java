@@ -8,7 +8,6 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentPlanElementComparator;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -19,6 +18,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,21 +55,23 @@ import java.util.*;
 
 		//Set up required MATSim classes
 
-		Config config;
+		Config config = ConfigUtils.createConfig();
 		if (args.length != 0) {
 			for (String arg : args) {
 				log.warn(arg);
 			}
-			config = ConfigUtils.loadConfig(args);
-			CommandLine cmd = ConfigUtils.getCommandLine(args);
+//			config = ConfigUtils.loadConfig(args);
+			ConfigUtils.applyCommandline(config, args);
 
+			CommandLine cmd = ConfigUtils.getCommandLine(args);
 			ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf(cmd.getOption("solutionType").orElseThrow());
+
 		} else {
-			config = ConfigUtils.createConfig();
-			config.controler().setOutputDirectory("output/ChainVsDirect");
+			config.controler().setOutputDirectory("output/ChainVsDirect/" + solutionType);
 			config.controler().setLastIteration(2);
-			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+
 		}
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
 
@@ -97,6 +99,11 @@ import java.util.*;
 		//schedule the LSP with the shipments and according to the scheduler of the Resource
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
 		lsp.scheduleSolutions();
+
+
+		log.info("Run MATSim");
+		Controler controler = new Controler(scenario);
+		controler.run();
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
