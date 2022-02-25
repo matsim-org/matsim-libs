@@ -36,8 +36,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.DetourPathCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.DetourPathDataCache;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
@@ -53,7 +51,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public class MultiInsertionDetourPathCalculator implements DetourPathCalculator, MobsimBeforeCleanupListener {
+class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 	public static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
@@ -63,7 +61,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 
 	private final ExecutorService executorService;
 
-	public MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+	MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		SpeedyGraph graph = new SpeedyGraph(network);
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
@@ -86,8 +84,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
-	@Override
-	public DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
+	DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
 		// pathsFromDropoff is the least demanding one
 		var pathsToPickupFuture = executorService.submit(() -> calcPathsToPickup(drtRequest, filteredInsertions));

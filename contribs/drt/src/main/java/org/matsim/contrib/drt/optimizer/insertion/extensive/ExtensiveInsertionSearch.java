@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,16 +15,20 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,25 +36,23 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public final class DefaultDrtInsertionSearch implements DrtInsertionSearch {
-	public interface InsertionProvider {
-		List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries);
-	}
-
-	private final InsertionProvider insertionProvider;
-	private final DetourPathCalculator detourPathCalculator;
+final class ExtensiveInsertionSearch implements DrtInsertionSearch {
+	private final ExtensiveInsertionProvider insertionProvider;
+	private final MultiInsertionDetourPathCalculator detourPathCalculator;
 	private final InsertionDetourTimeCalculator detourTimeCalculator;
 	private final BestInsertionFinder bestInsertionFinder;
 
-	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			InsertionCostCalculator insertionCostCalculator, double stopDuration) {
+	public ExtensiveInsertionSearch(ExtensiveInsertionProvider insertionProvider,
+			MultiInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
+			double stopDuration) {
 		this(insertionProvider, detourPathCalculator, new BestInsertionFinder(insertionCostCalculator),
 				new InsertionDetourTimeCalculator(stopDuration, null));
 	}
 
 	@VisibleForTesting
-	DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			BestInsertionFinder bestInsertionFinder, InsertionDetourTimeCalculator detourTimeCalculator) {
+	ExtensiveInsertionSearch(ExtensiveInsertionProvider insertionProvider,
+			MultiInsertionDetourPathCalculator detourPathCalculator, BestInsertionFinder bestInsertionFinder,
+			InsertionDetourTimeCalculator detourTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.detourTimeCalculator = detourTimeCalculator;

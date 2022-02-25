@@ -28,7 +28,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
 import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
@@ -44,26 +43,21 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public class ExtensiveInsertionProvider implements InsertionProvider {
-	public static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg,
-			InsertionCostCalculator insertionCostCalculator, TravelTimeMatrix travelTimeMatrix, TravelTime travelTime,
-			ForkJoinPool forkJoinPool) {
+class ExtensiveInsertionProvider {
+	static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg, InsertionCostCalculator insertionCostCalculator,
+			TravelTimeMatrix travelTimeMatrix, TravelTime travelTime, ForkJoinPool forkJoinPool) {
 		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var admissibleTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
 				insertionParams.getAdmissibleBeelineSpeedFactor(), travelTimeMatrix, travelTime);
-		return new ExtensiveInsertionProvider(drtCfg, admissibleTimeEstimator, forkJoinPool, insertionCostCalculator);
+		return new ExtensiveInsertionProvider((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(),
+				insertionCostCalculator, new InsertionGenerator(drtCfg.getStopDuration(), admissibleTimeEstimator),
+				forkJoinPool);
 	}
 
 	private final ExtensiveInsertionSearchParams insertionParams;
 	private final InsertionCostCalculator admissibleCostCalculator;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
-
-	public ExtensiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator admissibleTimeEstimator,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator admissibleCostCalculator) {
-		this((ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams(), admissibleCostCalculator,
-				new InsertionGenerator(drtCfg.getStopDuration(), admissibleTimeEstimator), forkJoinPool);
-	}
 
 	@VisibleForTesting
 	ExtensiveInsertionProvider(ExtensiveInsertionSearchParams insertionParams,
@@ -75,8 +69,7 @@ public class ExtensiveInsertionProvider implements InsertionProvider {
 		this.forkJoinPool = forkJoinPool;
 	}
 
-	@Override
-	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
+	List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<InsertionWithDetourData> preFilteredInsertions = forkJoinPool.submit(() -> vehicleEntries.parallelStream()
 				//generate feasible insertions (wrt occupancy limits) with admissible detour times
