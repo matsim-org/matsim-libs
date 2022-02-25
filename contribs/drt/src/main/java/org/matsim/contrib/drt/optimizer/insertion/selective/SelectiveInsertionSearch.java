@@ -62,12 +62,12 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch {
 	@Override
 	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
 			Collection<VehicleEntry> vehicleEntries) {
-		var optionalInsertion = insertionProvider.getInsertion(drtRequest, vehicleEntries);
-		if (optionalInsertion.isEmpty()) {
+		var selectedInsertion = insertionProvider.getInsertion(drtRequest, vehicleEntries);
+		if (selectedInsertion.isEmpty()) {
 			return Optional.empty();
 		}
 
-		var insertion = optionalInsertion.get();
+		var insertion = selectedInsertion.get().insertion;
 		var insertionDetourData = detourPathCalculator.calculatePaths(drtRequest, insertion);
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
 				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData));

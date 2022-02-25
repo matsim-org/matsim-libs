@@ -90,7 +90,6 @@ public class SelectiveInsertionProviderTest {
 		//test insertionProvider
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder, insertionGenerator,
 				rule.forkJoinPool);
-		assertThat(insertionProvider.getInsertion(request, List.of(vehicleEntry))).isEqualTo(
-				selectedInsertion.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion));
+		assertThat(insertionProvider.getInsertion(request, List.of(vehicleEntry))).isEqualTo(selectedInsertion);
 	}
 }
