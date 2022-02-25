@@ -31,8 +31,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
-import com.google.common.annotations.VisibleForTesting;
-
 /**
  * @author michalm
  */
@@ -45,18 +43,10 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch {
 	public SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
 			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
 			double stopDuration) {
-		this(insertionProvider, detourPathCalculator, insertionCostCalculator,
-				new InsertionDetourTimeCalculator(stopDuration, null));
-	}
-
-	@VisibleForTesting
-	SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
-			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			InsertionDetourTimeCalculator detourTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
-		this.detourTimeCalculator = detourTimeCalculator;
 		this.insertionCostCalculator = insertionCostCalculator;
+		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopDuration, null);
 	}
 
 	@Override
