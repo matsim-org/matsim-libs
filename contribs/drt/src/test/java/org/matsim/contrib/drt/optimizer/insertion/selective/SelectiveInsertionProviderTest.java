@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,9 +18,8 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -35,7 +34,11 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
+import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolTestRule;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
@@ -52,7 +55,7 @@ public class SelectiveInsertionProviderTest {
 	public void getInsertions_noInsertionsGenerated() {
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder,
 				new InsertionGenerator(120, null), rule.forkJoinPool);
-		assertThat(insertionProvider.getInsertions(null, List.of())).isEmpty();
+		assertThat(insertionProvider.getInsertion(null, List.of())).isEmpty();
 	}
 
 	@Test
@@ -87,8 +90,7 @@ public class SelectiveInsertionProviderTest {
 		//test insertionProvider
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder, insertionGenerator,
 				rule.forkJoinPool);
-		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(selectedInsertion.stream()
-				.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion)
-				.collect(toList()));
+		assertThat(insertionProvider.getInsertion(request, List.of(vehicleEntry))).isEqualTo(
+				selectedInsertion.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion));
 	}
 }

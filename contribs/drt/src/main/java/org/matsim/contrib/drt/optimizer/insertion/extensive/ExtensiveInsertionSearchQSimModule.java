@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +18,12 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -49,7 +51,7 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			var provider = ExtensiveInsertionProvider.create(drtCfg, insertionCostCalculator,
 					getter.getModal(TravelTimeMatrix.class), getter.getModal(TravelTime.class),
 					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
-			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
+			return new ExtensiveInsertionSearch(provider, getter.getModal(MultiInsertionDetourPathCalculator.class),
 					insertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();
 
@@ -64,6 +66,5 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 						return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
 					}
 				});
-		bindModal(DetourPathCalculator.class).to(modalKey(MultiInsertionDetourPathCalculator.class));
 	}
 }

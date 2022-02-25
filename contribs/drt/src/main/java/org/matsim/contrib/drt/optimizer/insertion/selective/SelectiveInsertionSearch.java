@@ -17,14 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
+
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,44 +36,44 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public final class DefaultDrtInsertionSearch implements DrtInsertionSearch {
-	public interface InsertionProvider {
-		List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries);
-	}
-
-	private final InsertionProvider insertionProvider;
-	private final DetourPathCalculator detourPathCalculator;
+final class SelectiveInsertionSearch implements DrtInsertionSearch {
+	private final SelectiveInsertionProvider insertionProvider;
+	private final SingleInsertionDetourPathCalculator detourPathCalculator;
 	private final InsertionDetourTimeCalculator detourTimeCalculator;
-	private final BestInsertionFinder bestInsertionFinder;
+	private final InsertionCostCalculator insertionCostCalculator;
 
-	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			InsertionCostCalculator insertionCostCalculator, double stopDuration) {
-		this(insertionProvider, detourPathCalculator, new BestInsertionFinder(insertionCostCalculator),
+	public SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
+			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
+			double stopDuration) {
+		this(insertionProvider, detourPathCalculator, insertionCostCalculator,
 				new InsertionDetourTimeCalculator(stopDuration, null));
 	}
 
 	@VisibleForTesting
-	DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
-			BestInsertionFinder bestInsertionFinder, InsertionDetourTimeCalculator detourTimeCalculator) {
+	SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
+			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
+			InsertionDetourTimeCalculator detourTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.detourTimeCalculator = detourTimeCalculator;
-		this.bestInsertionFinder = bestInsertionFinder;
+		this.insertionCostCalculator = insertionCostCalculator;
 	}
 
 	@Override
 	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
 			Collection<VehicleEntry> vehicleEntries) {
-		var insertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
-		if (insertions.isEmpty()) {
+		var optionalInsertion = insertionProvider.getInsertion(drtRequest, vehicleEntries);
+		if (optionalInsertion.isEmpty()) {
 			return Optional.empty();
 		}
 
-		DetourPathDataCache pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
-		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
-			var insertionDetourData = pathData.createInsertionDetourData(i);
-			return new InsertionWithDetourData(i, insertionDetourData,
-					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData));
-		}));
+		var insertion = optionalInsertion.get();
+		var insertionDetourData = detourPathCalculator.calculatePaths(drtRequest, insertion);
+		var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
+				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData));
+		double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
+				insertionWithDetourData.detourTimeInfo);
+
+		return insertionCost >= INFEASIBLE_SOLUTION_COST ? Optional.empty() : Optional.of(insertionWithDetourData);
 	}
 }

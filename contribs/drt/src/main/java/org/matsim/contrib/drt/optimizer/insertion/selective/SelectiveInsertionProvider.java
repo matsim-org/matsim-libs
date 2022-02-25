@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,20 +15,22 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.optimizer.insertion;
-
-import static java.util.stream.Collectors.toList;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
@@ -39,26 +41,20 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public class SelectiveInsertionProvider implements InsertionProvider {
+class SelectiveInsertionProvider {
 	public static SelectiveInsertionProvider create(DrtConfigGroup drtCfg,
 			InsertionCostCalculator insertionCostCalculator, TravelTimeMatrix travelTimeMatrix, TravelTime travelTime,
 			ForkJoinPool forkJoinPool) {
 		var insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
 				insertionParams.getRestrictiveBeelineSpeedFactor(), travelTimeMatrix, travelTime);
-		return new SelectiveInsertionProvider(drtCfg, restrictiveDetourTimeEstimator, forkJoinPool,
-				insertionCostCalculator);
+		return new SelectiveInsertionProvider(new BestInsertionFinder(insertionCostCalculator),
+				new InsertionGenerator(drtCfg.getStopDuration(), restrictiveDetourTimeEstimator), forkJoinPool);
 	}
 
 	private final BestInsertionFinder initialInsertionFinder;
 	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
-
-	public SelectiveInsertionProvider(DrtConfigGroup drtCfg, DetourTimeEstimator restrictiveTimeEstimator,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator restrictiveCostCalculator) {
-		this(new BestInsertionFinder(restrictiveCostCalculator),
-				new InsertionGenerator(drtCfg.getStopDuration(), restrictiveTimeEstimator), forkJoinPool);
-	}
 
 	@VisibleForTesting
 	SelectiveInsertionProvider(BestInsertionFinder initialInsertionFinder, InsertionGenerator insertionGenerator,
@@ -68,8 +64,7 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 		this.forkJoinPool = forkJoinPool;
 	}
 
-	@Override
-	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
+	Optional<Insertion> getInsertion(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		Optional<InsertionWithDetourData> bestInsertion = forkJoinPool.submit(
 				// find best insertion given a stream of insertion with time data
@@ -79,8 +74,6 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 								//generate feasible insertions (wrt occupancy limits) with restrictive detour times
 								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream()))).join();
 
-		return bestInsertion.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion)
-				.stream()
-				.collect(toList());
+		return bestInsertion.map(doubleInsertionWithDetourData -> doubleInsertionWithDetourData.insertion);
 	}
 }

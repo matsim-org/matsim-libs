@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,19 +33,21 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
+import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DefaultDrtInsertionSearchTest {
+public class ExtensiveInsertionSearchTest {
 	@Test
 	public void findBestInsertion_noInsertionsProvided() {
-		var insertionSearch = new DefaultDrtInsertionSearch(mock(InsertionProvider.class), null, null, null);
+		var insertionSearch = new ExtensiveInsertionSearch(mock(ExtensiveInsertionProvider.class), null, null, null);
 		assertThat(insertionSearch.findBestInsertion(null, List.of())).isEmpty();
 	}
 
@@ -57,12 +59,12 @@ public class DefaultDrtInsertionSearchTest {
 		//mock insertionProvider
 		var insertion = mock(Insertion.class);
 		var allInsertions = List.of(insertion);
-		var insertionProvider = mock(InsertionProvider.class);
+		var insertionProvider = mock(ExtensiveInsertionProvider.class);
 		when(insertionProvider.getInsertions(eq(request), eq(List.of(vehicleEntry)))).thenReturn(allInsertions);
 
 		//mock detourPathCalculator
 		var pathData = mock(DetourPathDataCache.class);
-		var detourPathCalculator = mock(DetourPathCalculator.class);
+		var detourPathCalculator = mock(MultiInsertionDetourPathCalculator.class);
 		when(detourPathCalculator.calculatePaths(eq(request), eq(allInsertions))).thenReturn(pathData);
 		var insertionPathData = new InsertionDetourData(null, null, null, null);
 		when(pathData.createInsertionDetourData(eq(insertion))).thenReturn(insertionPathData);
@@ -82,8 +84,8 @@ public class DefaultDrtInsertionSearchTest {
 						.equals(Set.of(insertion))))).thenReturn(Optional.of(insertionWithPathData));
 
 		//test insertion search
-		var insertionSearch = new DefaultDrtInsertionSearch(insertionProvider, detourPathCalculator,
-				bestInsertionFinder, detourTimeCalculator);
+		var insertionSearch = new ExtensiveInsertionSearch(insertionProvider, detourPathCalculator, bestInsertionFinder,
+				detourTimeCalculator);
 		assertThat(insertionSearch.findBestInsertion(request, List.of(vehicleEntry))).hasValue(insertionWithPathData);
 	}
 }

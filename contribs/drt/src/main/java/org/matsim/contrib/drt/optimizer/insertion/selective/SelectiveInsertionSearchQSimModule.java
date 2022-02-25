@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +18,12 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -45,9 +47,9 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 	@Override
 	protected void configureQSim() {
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider(getter -> {
-			var provider = SelectiveInsertionProvider.create(drtCfg, getter.getModal(InsertionCostCalculator.class),
-					getter.getModal(TravelTimeMatrix.class), getter.getModal(TravelTime.class),
-					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
+			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(drtCfg,
+					getter.getModal(InsertionCostCalculator.class), getter.getModal(TravelTimeMatrix.class),
+					getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
 			// Use 0 as the cost for the selected insertion:
 			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
 			//   no other insertion to compare with.
@@ -55,7 +57,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			//   so we do not want to check for time window violations
 			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
 			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
-			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class),
+			return new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculator.class),
 					zeroCostInsertionCostCalculator, drtCfg.getStopDuration());
 		})).asEagerSingleton();
 
@@ -70,6 +72,5 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 						return new SingleInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
 					}
 				});
-		bindModal(DetourPathCalculator.class).to(modalKey(SingleInsertionDetourPathCalculator.class));
 	}
 }
