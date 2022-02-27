@@ -1,13 +1,7 @@
-package lspScoringTests;
+package example.lsp.lspScoring;
 
-import example.lsp.lspScoring.TipInfo;
-import example.lsp.lspScoring.TipScorer;
-import example.lsp.lspScoring.TipSimulationTracker;
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.functions.LSPAttribute;
-import lsp.functions.LSPAttributes;
-import lsp.functions.LSPInfoFunctionUtils;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
@@ -112,10 +106,10 @@ public class CollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		function.getAttributes().add(value );
-		TipInfo info = new TipInfo(function);
+//		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+//		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+//		function.getAttributes().add(value );
+		TipInfo info = new TipInfo();
 		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
 		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);

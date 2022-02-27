@@ -1,16 +1,18 @@
-package testMutualReplanning;
+package example.lsp.simulationTrackers;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
-
+import demand.DemandAgent;
 import demand.DemandUtils;
 import demand.controler.DemandControlerUtils;
+import demand.controler.MutualModule;
 import demand.decoratedLSP.*;
+import demand.demandObject.*;
+import demand.mutualReplanning.*;
+import demand.offer.OfferFactoryImpl;
+import demand.offer.OfferTransferrer;
+import demand.scoring.MutualScoringModule;
+import demand.scoring.MutualScoringModuleImpl;
 import lsp.*;
+import lsp.resources.LSPResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -28,30 +31,18 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import demand.controler.MutualModule;
-import demand.DemandAgent;
-import demand.demandObject.DemandObject;
-import demand.demandObject.DemandObjectImpl;
-import demand.demandObject.DemandObjects;
-import demand.demandObject.DemandPlanImpl;
-import demand.demandObject.ShipperShipment;
-import demand.demandObject.ShipperShipmentImpl;
-import demand.mutualReplanning.DemandPlanStrategyImpl;
-import demand.mutualReplanning.DemandReplannerImpl;
-import demand.mutualReplanning.MutualReplanningModule;
-import demand.mutualReplanning.MutualReplanningModuleImpl;
-import demand.mutualReplanning.OfferReplanningStrategyModuleImpl;
-import demand.offer.OfferFactoryImpl;
-import demand.offer.OfferTransferrer;
-import demand.scoring.MutualScoringModule;
-import demand.scoring.MutualScoringModuleImpl;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPResource;
 import testLSPWithCostTracker.CollectionServiceHandler;
 import testLSPWithCostTracker.DistanceAndTimeHandler;
-import testLSPWithCostTracker.LinearCostTracker;
 import testLSPWithCostTracker.TourStartHandler;
+import testMutualReplanning.LinearOffer;
+import testMutualReplanning.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 public class MutualReplanningTest {
 
@@ -116,7 +107,7 @@ public class MutualReplanningTest {
 		
 		
 		OfferFactoryImpl offerFactory = new OfferFactoryImpl(solution);
-		offerFactory.addOffer(new LinearOffer(solution));
+		offerFactory.addOffer(new LinearOffer(solution) );
 		solution.setOfferFactory(offerFactory);
 		
 		LSPPlanDecorator plan = new LSPPlanWithOfferTransferrer();
@@ -172,14 +163,14 @@ public class MutualReplanningTest {
 			planBuilder.setLsp(lsp);
 			planBuilder.setLogisticsSolutionId(lsp.getSelectedPlan().getSolutions().iterator().next().getId());
 			builder.setInitialPlan(planBuilder.build());
-			builder.setScorer(new FortyTwoDemandScorer());
+			builder.setScorer(new FortyTwoDemandScorer() );
 			DemandReplannerImpl replanner = new DemandReplannerImpl();
 			DemandPlanStrategyImpl planStrategy = new DemandPlanStrategyImpl(new BestPlanSelector());
 			planStrategy.addStrategyModule(new OfferReplanningStrategyModuleImpl());
 			replanner.addStrategy(planStrategy);
 			builder.setReplanner(replanner);
-			builder.setOfferRequester(new AllOffersRequester());
-			builder.setDemandPlanGenerator(new HalfLotSizeDemandPlanGenerator());
+			builder.setOfferRequester(new AllOffersRequester() );
+			builder.setDemandPlanGenerator(new HalfLotSizeDemandPlanGenerator() );
 			DemandObject demandObject = builder.build();
 			demandObjects.add(demandObject);
 			

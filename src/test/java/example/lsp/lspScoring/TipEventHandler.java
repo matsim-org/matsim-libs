@@ -1,4 +1,4 @@
-package lspScoringTests;
+package example.lsp.lspScoring;
 
 import java.util.Random;
 

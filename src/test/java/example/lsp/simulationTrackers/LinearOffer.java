@@ -1,14 +1,12 @@
-package testMutualreplanningWithOfferUpdate;
-
-import java.util.Random;
+package example.lsp.simulationTrackers;
 
 import demand.decoratedLSP.LSPDecorator;
 import demand.decoratedLSP.LogisticsSolutionDecorator;
 import demand.offer.Offer;
 import demand.offer.OfferVisitor;
-import example.lsp.simulationTrackers.CostInfo;
 import lsp.functions.LSPInfo;
-import lsp.functions.LSPAttribute;
+
+import java.util.Random;
 
 
 public class LinearOffer implements Offer{

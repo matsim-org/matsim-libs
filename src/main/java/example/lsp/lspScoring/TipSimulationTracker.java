@@ -3,12 +3,10 @@ package example.lsp.lspScoring;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import lsp.functions.LSPInfoFunctionUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.functions.LSPInfo;
-import lsp.functions.LSPInfoFunctionValue;
 import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class TipSimulationTracker implements LSPSimulationTracker{
@@ -38,9 +36,10 @@ import lsp.controler.LSPSimulationTracker;
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		double tip = handler.getTip();
-		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-		value.setValue(tip);
-		info.getFunction().getValues().add(value);
+//		LSPInfoFunctionValueImpl<Object> value = LSPInfoFunctionUtils.createInfoFunctionValue( "TIP IN EUR" );
+//		value.setValue(tip);
+//		info.getAttributes().getAttributes().add(value );
+		info.getAttributes().putAttribute( "TIP IN EUR", tip );
 	}
 
 	@Override

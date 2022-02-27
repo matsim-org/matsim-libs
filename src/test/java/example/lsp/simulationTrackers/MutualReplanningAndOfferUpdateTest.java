@@ -1,4 +1,4 @@
-package testMutualreplanningWithOfferUpdate;
+package example.lsp.simulationTrackers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +7,7 @@ import java.util.Random;
 import demand.DemandUtils;
 import demand.controler.DemandControlerUtils;
 import demand.decoratedLSP.*;
+import example.lsp.simulationTrackers.LinearCostTracker;
 import example.lsp.simulationTrackers.LinearOffer;
 import lsp.*;
 import lsp.usecase.UsecaseUtils;
@@ -55,6 +56,10 @@ import lsp.resources.LSPResource;
 import testMutualReplanning.FortyTwoDemandScorer;
 import testMutualReplanning.HalfLotSizeDemandPlanGenerator;
 import testMutualReplanning.SimpleOfferTransferrer;
+import testMutualreplanningWithOfferUpdate.*;
+import testMutualreplanningWithOfferUpdate.CollectionServiceHandler;
+import testMutualreplanningWithOfferUpdate.DistanceAndTimeHandler;
+import testMutualreplanningWithOfferUpdate.TourStartHandler;
 
 import static org.junit.Assert.*;
 
@@ -120,9 +125,9 @@ public class MutualReplanningAndOfferUpdateTest {
 		solution = solutionBuilder.build();
 
 		tracker = new LinearCostTracker(0.2);
-		tracker.getEventHandlers().add(new TourStartHandler());
-		tracker.getEventHandlers().add(new CollectionServiceHandler());
-		tracker.getEventHandlers().add(new DistanceAndTimeHandler(network));	
+		tracker.getEventHandlers().add(new TourStartHandler() );
+		tracker.getEventHandlers().add(new CollectionServiceHandler() );
+		tracker.getEventHandlers().add(new DistanceAndTimeHandler(network) );
 		solution.addSimulationTracker(tracker);
 		
 		offerFactory = new OfferFactoryImpl(solution);
@@ -203,7 +208,7 @@ public class MutualReplanningAndOfferUpdateTest {
         	planStrategy.addStrategyModule(new OfferReplanningStrategyModuleImpl());
         	demandReplanner.addStrategy(planStrategy);
         	builder.setReplanner(demandReplanner);
-        	builder.setOfferRequester(new AllOffersRequester());
+        	builder.setOfferRequester(new AllOffersRequester() );
         	builder.setDemandPlanGenerator(new HalfLotSizeDemandPlanGenerator());
         	DemandObject demandObject = builder.build();
            	demandObjects.add(demandObject);

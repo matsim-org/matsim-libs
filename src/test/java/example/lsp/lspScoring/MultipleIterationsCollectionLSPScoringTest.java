@@ -1,4 +1,4 @@
-package lspScoringTests;
+package example.lsp.lspScoring;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
-import lsp.functions.*;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.ShipmentUtils;
@@ -110,10 +109,10 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		function.getAttributes().add(value );
-		TipInfo info = new TipInfo(function);
+//		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+//		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+//		function.getAttributes().add(value );
+		TipInfo info = new TipInfo();
 		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
 		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
