@@ -1,16 +1,15 @@
 package lspScoringTests;
 
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
 import lsp.*;
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.functions.LSPInfoFunction;
-import lsp.functions.LSPInfoFunctionUtils;
-import lsp.functions.LSPInfoFunctionValue;
+import lsp.functions.*;
 import lsp.replanning.LSPReplanningUtils;
-import lsp.resources.LSPResource;
-import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.junit.Before;
@@ -29,14 +28,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
+import lsp.controler.LSPModule;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
+import lsp.resources.LSPResource;
+import lsp.scoring.LSPScorer;
+import lsp.shipment.LSPShipment;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class CollectionLSPScoringTest {
+public class MultipleIterationsCollectionLSPScoringTest {
 
 	private LSP collectionLSP;
 	private final int numberOfShipments = 25;
@@ -62,6 +60,9 @@ public class CollectionLSPScoringTest {
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
+		if (collectionLink == null) {
+			System.exit(1);
+		}
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setType( collectionType );
@@ -109,9 +110,9 @@ public class CollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR");
-		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		function.getValues().add(value);
+		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+		function.getAttributes().add(value );
 		TipInfo info = new TipInfo(function);
 		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
@@ -162,7 +163,7 @@ public class CollectionLSPScoringTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(10);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
@@ -176,12 +177,6 @@ public class CollectionLSPScoringTest {
 				.size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
-		/*noch zu testen
-		 * tipTracker
-		 * InfoFunction
-		 * Info
-		 * Scorer
-		 */
 	}
 
 }

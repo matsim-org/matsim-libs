@@ -1,17 +1,20 @@
 package lspScoringTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
+import example.lsp.lspScoring.TipInfo;
+import example.lsp.lspScoring.TipScorer;
+import example.lsp.lspScoring.TipSimulationTracker;
 import lsp.*;
-import lsp.functions.*;
+import lsp.controler.LSPModule;
+import lsp.functions.LSPAttribute;
+import lsp.functions.LSPAttributes;
+import lsp.functions.LSPInfoFunctionUtils;
 import lsp.replanning.LSPReplanningUtils;
+import lsp.resources.LSPResource;
+import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringUtils;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -20,6 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -28,13 +32,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPResource;
-import lsp.scoring.LSPScorer;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
-public class MultipleIterationsCollectionLSPScoringTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CollectionLSPScoringTest {
 
 	private LSP collectionLSP;
 	private final int numberOfShipments = 25;
@@ -60,9 +65,6 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
-		if (collectionLink == null) {
-			System.exit(1);
-		}
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setType( collectionType );
@@ -110,9 +112,9 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR");
-		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		function.getValues().add(value);
+		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+		function.getAttributes().add(value );
 		TipInfo info = new TipInfo(function);
 		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
@@ -163,7 +165,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
@@ -177,6 +179,12 @@ public class MultipleIterationsCollectionLSPScoringTest {
 				.size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
+		/*noch zu testen
+		 * tipTracker
+		 * InfoFunction
+		 * Info
+		 * Scorer
+		 */
 	}
 
 }
