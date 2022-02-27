@@ -28,6 +28,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -46,7 +47,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
-		bindModal(DrtInsertionSearch.class).toProvider(modalProvider(getter -> {
+		addModalComponent(SelectiveInsertionSearch.class, modalProvider(getter -> {
 			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(drtCfg,
 					getter.getModal(InsertionCostCalculator.class), getter.getModal(TravelTimeMatrix.class),
 					getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
@@ -58,8 +59,9 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
 			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
 			return new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculator.class),
-					zeroCostInsertionCostCalculator, drtCfg.getStopDuration());
-		})).asEagerSingleton();
+					zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class));
+		}));
+		bindModal(DrtInsertionSearch.class).to(modalKey(SelectiveInsertionSearch.class));
 
 		addModalComponent(SingleInsertionDetourPathCalculator.class,
 				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
