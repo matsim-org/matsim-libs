@@ -249,11 +249,13 @@ public abstract class AutomaticScenarioCalibrator {
      */
     private void checkIfComplete() {
         // Check if we reach the stage 2:
-        usePreviousOutput = true;
-        for (String mode : modes) {
-            if (errorMap.get(mode).values().stream().mapToDouble(v -> v).sum() > 0.2) {
-                usePreviousOutput = false;
-                break;
+        if (!usePreviousOutput){
+            usePreviousOutput = true;
+            for (String mode : modes) {
+                if (errorMap.get(mode).values().stream().mapToDouble(v -> v).sum() > 0.2) {
+                    usePreviousOutput = false;
+                    break;
+                }
             }
         }
 
@@ -277,7 +279,6 @@ public abstract class AutomaticScenarioCalibrator {
             log.warn("Auto-tuning terminates because the maximum time allowed is exceeded!");
         }
     }
-
 
     /**
      * Calibrate the parameter in the config file and prepare for the next run
