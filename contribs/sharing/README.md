@@ -14,4 +14,4 @@ Main developers:
 - Sebastian Hörl (IRT SystemX)
 
 Main reference:
-- Balac, M. and S. Hörl (2021) [Simulation of intermodal shared mobility in the San Francisco Bay using MATSim](https://www.researchgate.net/publication/351069421_Simulation_of_intermodal_shared_mobility_in_the_San_Francisco_Bay_using_MATSim), to be presented at the 2021 Intelligent Transportation Systems Conference (ITSC).
+- Balac, M. and S. Hörl (2021) [Simulation of intermodal shared mobility in the San Francisco Bay Area using MATSim](https://www.researchgate.net/publication/355612958_Simulation_of_intermodal_shared_mobility_in_the_San_Francisco_Bay_Area_using_MATSim), paper presented at the 2021 IEEE Intelligent Transportation Systems Conference (ITSC).

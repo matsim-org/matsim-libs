@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,14 +18,13 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
 
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import static org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,14 +46,12 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class SingleInsertionDetourPathCalculator implements DetourPathCalculator, MobsimBeforeCleanupListener {
+class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 
 	public static final int MAX_THREADS = 4;
 
@@ -67,7 +64,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	private final ExecutorService executorService;
 
-	public SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
+	SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
 		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(), new SpeedyALTFactory());
 	}
@@ -84,13 +81,9 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
-	@Override
-	public DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
+	InsertionDetourData calculatePaths(DrtRequest drtRequest, Insertion insertion) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
-
-		Preconditions.checkArgument(filteredInsertions.size() == 1);
-		var insertion = filteredInsertions.get(0);
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
 		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
@@ -98,31 +91,29 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		// TODO use times from InsertionWithDetourData<Double> as approximate departure times for Dijkstra (will require
 		//  passing it as an argument, instead of Insertion)
 
-		Future<Map<Link, PathData>> pathsToPickupFuture = executorService.submit(
-				() -> Map.of(insertion.pickup.previousWaypoint.getLink(),
-						calcPathData(toPickupPathSearch, insertion.pickup.previousWaypoint.getLink(), pickup,
-								earliestPickupTime)));
+		Future<PathData> toPickupFuture = executorService.submit(
+				() -> calcPathData(toPickupPathSearch, insertion.pickup.previousWaypoint.getLink(), pickup,
+						earliestPickupTime));
 
-		Future<Map<Link, PathData>> pathsFromPickupFuture = executorService.submit(
-				() -> Map.of(insertion.pickup.nextWaypoint.getLink(),
-						calcPathData(fromPickupPathSearch, pickup, insertion.pickup.nextWaypoint.getLink(),
-								earliestPickupTime)));
+		Future<PathData> fromPickupFuture = executorService.submit(
+				() -> calcPathData(fromPickupPathSearch, pickup, insertion.pickup.nextWaypoint.getLink(),
+						earliestPickupTime));
 
-		Future<Map<Link, PathData>> pathsToDropoffFuture = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
-				Futures.immediateFuture(ImmutableMap.of()) :
-				executorService.submit(() -> Map.of(insertion.dropoff.previousWaypoint.getLink(),
-						calcPathData(toDropoffPathSearch, insertion.dropoff.previousWaypoint.getLink(), dropoff,
-								latestDropoffTime)));
+		Future<PathData> toDropoffFuture = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
+				Futures.immediateFuture(null) :
+				executorService.submit(
+						() -> calcPathData(toDropoffPathSearch, insertion.dropoff.previousWaypoint.getLink(), dropoff,
+								latestDropoffTime));
 
-		Future<Map<Link, PathData>> pathsFromDropoffFuture = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
-				Futures.immediateFuture(ImmutableMap.of()) :
-				executorService.submit(() -> Map.of(insertion.dropoff.nextWaypoint.getLink(),
-						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextWaypoint.getLink(),
-								latestDropoffTime)));
+		Future<PathData> fromDropoffFuture = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
+				Futures.immediateFuture(PathData.EMPTY) :
+				executorService.submit(
+						() -> calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextWaypoint.getLink(),
+								latestDropoffTime));
 
 		try {
-			return new DetourPathDataCache(pathsToPickupFuture.get(), pathsFromPickupFuture.get(),
-					pathsToDropoffFuture.get(), pathsFromDropoffFuture.get(), PathData.EMPTY);
+			return new InsertionDetourData(toPickupFuture.get(), fromPickupFuture.get(), toDropoffFuture.get(),
+					fromDropoffFuture.get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}

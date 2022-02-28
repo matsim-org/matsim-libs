@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 
@@ -48,11 +48,10 @@ public class DetourTimeEstimatorTest {
 		var linkA = new FakeLink(null, null, new FakeNode(null));
 		var linkB = new FakeLink(null, new FakeNode(null), null);
 
-		DvrpTravelTimeMatrix ttMatrix = mock(DvrpTravelTimeMatrix.class);
+		TravelTimeMatrix ttMatrix = mock(TravelTimeMatrix.class);
 		when(ttMatrix.getTravelTime(eq(linkA.getToNode()), eq(linkB.getFromNode()), eq(345. + 2.))).thenReturn(1234);
 
-		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1.5, ttMatrix,
-				new QSimFreeSpeedTravelTime(1));
+		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1.5, ttMatrix, new QSimFreeSpeedTravelTime(1));
 		double expectedTT = 2 //first link TT
 				+ 1234 // TT between nodes
 				+ linkB.getLength() / linkB.getFreespeed();// last link TT
