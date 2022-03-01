@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
@@ -49,7 +51,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
-public class MultiInsertionDetourPathCalculator implements DetourPathCalculator, MobsimBeforeCleanupListener {
+class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 	public static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
@@ -59,7 +61,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 
 	private final ExecutorService executorService;
 
-	public MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+	MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		SpeedyGraph graph = new SpeedyGraph(network);
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
@@ -82,8 +84,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
-	@Override
-	public DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
+	DetourPathDataCache calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
 		// pathsFromDropoff is the least demanding one
 		var pathsToPickupFuture = executorService.submit(() -> calcPathsToPickup(drtRequest, filteredInsertions));

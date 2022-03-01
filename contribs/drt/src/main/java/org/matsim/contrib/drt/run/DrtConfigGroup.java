@@ -27,11 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,8 +34,8 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
@@ -54,6 +49,12 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
@@ -480,7 +481,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		this.maxAbsoluteDetour = maxAbsoluteDetour;
 		return this;
 	}
-
 
 	/**
 	 * @return -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}

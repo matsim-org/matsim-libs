@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.Map;
 
@@ -32,7 +32,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
  * Contains detour data for all potential insertions (i.e. pickup and dropoff indices).
  * Typically, all path data of a given type (i.e. to/from pickup/delivery) are precomputed in one go and then cached.
  */
-public class DetourPathDataCache {
+class DetourPathDataCache {
 	private final Map<Link, PathData> detourToPickup;
 	private final Map<Link, PathData> detourFromPickup;
 	private final Map<Link, PathData> detourToDropoff;
@@ -48,7 +48,7 @@ public class DetourPathDataCache {
 		this.zeroDetour = zeroDetour;
 	}
 
-	public InsertionDetourData createInsertionDetourData(Insertion insertion) {
+	InsertionDetourData createInsertionDetourData(Insertion insertion) {
 		PathData toPickup = detourToPickup.get(insertion.pickup.previousWaypoint.getLink());
 		PathData fromPickup = detourFromPickup.get(insertion.pickup.nextWaypoint.getLink());
 		PathData toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?

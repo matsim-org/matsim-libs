@@ -235,7 +235,7 @@ public class EShiftTaskScheduler {
 					if (charger.getLogic().getChargingStrategy().isChargingCompleted(electricVehicle)) {
 						return false;
 					}
-					return ChargingEstimations.estimateMaxWaitTimeForNextVehicle(charger) < 5 * 60;
+					return true;
 				}
 			}
 		}

@@ -31,10 +31,10 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimeMatrix {
-	public static DvrpTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params,
+public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
+	public static TravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params,
 			int numberOfThreads, double qSimTimeStepSize) {
-		return new DvrpTravelTimeMatrix(dvrpNetwork, params, numberOfThreads,
+		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, params, numberOfThreads,
 				new QSimFreeSpeedTravelTime(qSimTimeStepSize));
 	}
 
@@ -42,7 +42,7 @@ public class DvrpTravelTimeMatrix {
 	private final Matrix freeSpeedTravelTimeMatrix;
 	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
-	public DvrpTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
+	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
 			TravelTime travelTime) {
 		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.getCellSize());
 		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
@@ -53,6 +53,7 @@ public class DvrpTravelTimeMatrix {
 				params.getMaxNeighborDistance(), 0, travelTime, travelDisutility, numberOfThreads);
 	}
 
+	@Override
 	public int getTravelTime(Node fromNode, Node toNode, double departureTime) {
 		if (fromNode == toNode) {
 			return 0;

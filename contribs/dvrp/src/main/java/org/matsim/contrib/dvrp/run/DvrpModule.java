@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.passenger.PassengerModule;
@@ -26,8 +28,9 @@ import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
-import org.matsim.contrib.zone.skims.DvrpGlobalTravelTimesMatrixProvider;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.FreeSpeedTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -35,6 +38,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
 /**
@@ -65,11 +69,25 @@ public final class DvrpModule extends AbstractModule {
 
 		install(dvrpTravelTimeEstimationModule);
 
-		//lazily initialised:
-		// 1. we have only mode-filtered subnetworks
-		// 2. optimisers may do not use it
-		bind(DvrpTravelTimeMatrix.class).toProvider(new DvrpGlobalTravelTimesMatrixProvider(getConfig().global(),
-				dvrpConfigGroup.getTravelTimeMatrixParams())).in(Singleton.class);
+		//lazily initialised because:
+		// 1. we may have only mode-filtered subnetworks
+		// 2. optimisers may not use it
+		bind(TravelTimeMatrix.class).toProvider(new Provider<>() {
+			@Inject
+			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
+			private Network network;
+
+			@Inject
+			private QSimConfigGroup qSimConfigGroup;
+
+			@Override
+			public TravelTimeMatrix get() {
+				var numberOfThreads = getConfig().global().getNumberOfThreads();
+				var params = dvrpConfigGroup.getTravelTimeMatrixParams();
+				return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
+						qSimConfigGroup.getTimeStepSize());
+			}
+		}).in(Singleton.class);
 
 		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpGlobalRoutingNetworkProvider.class)

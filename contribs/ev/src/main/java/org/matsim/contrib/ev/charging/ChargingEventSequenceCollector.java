@@ -79,13 +79,14 @@ public class ChargingEventSequenceCollector
 
 	@Override
 	public void handleEvent(QuitQueueAtChargerEvent event) {
-		Preconditions.checkState(ongoingSequences.containsKey(event.getVehicleId()),
-				"Vehicle (%s) was not at charger (%s)", event.getVehicleId(), event.getChargerId());
-		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).queuedAtCharger != null,
-				"Vehicle (%s) was not queued at charger (%s)", event.getVehicleId(), event.getChargerId());
-		Preconditions.checkState(ongoingSequences.get(event.getVehicleId()).queuedAtCharger != null,
-				"Vehicle (%s) already is already plugged", event.getVehicleId(), event.getChargerId());
-		ongoingSequences.remove(event.getVehicleId());
+		var sequence = ongoingSequences.remove(event.getVehicleId());
+		Preconditions.checkState(sequence != null, "Vehicle (%s) was not at charger (%s)", event.getVehicleId(),
+				event.getChargerId());
+		Preconditions.checkState(sequence.queuedAtCharger != null, "Vehicle (%s) was not queued at charger (%s)",
+				event.getVehicleId(), event.getChargerId());
+		Preconditions.checkState(sequence.chargingStartEvent == null, "Vehicle (%s) is already plugged",
+				event.getVehicleId(), event.getChargerId());
+		completedSequences.add(sequence);
 	}
 
 	@Override
