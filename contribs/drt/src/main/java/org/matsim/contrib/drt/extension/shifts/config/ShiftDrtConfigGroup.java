@@ -1,19 +1,16 @@
 package org.matsim.contrib.drt.extension.shifts.config;
 
-import java.net.URL;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+
+import java.net.URL;
+import java.util.Map;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
-
-    private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
 
     public static final String GROUP_NAME = "drtShifts";
 
@@ -29,6 +26,9 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     private static final String CHARGE_AT_HUB_THRESHOLD = "chargeAtHubThreshold";
     private static final String SHIFT_ASSIGNMENT_BATTERY_THRESHOLD = "shiftAssignmentBatteryThreshold";
 
+	private static final String BREAK_CHARGER_TYPE = "breakChargerType";
+	private static final String OUT_OF_SHIFT_CHARGER_TYPE = "outOfShiftChargerType";
+
     private String shiftInputFile;
     private String operationFacilityInputFile;
 
@@ -37,12 +37,15 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     private double shiftEndLookAhead = 3600;
     private double shiftEndRescheduleLookAhead = 1800;
 
-    private double chargeAtHubThreshold = 0.5;
-    private double shiftAssignmentBatteryThreshold = 0.6;
-
     private boolean allowInFieldChangeover = true;
 
-    public ShiftDrtConfigGroup() {
+	//electric shifts
+    private double chargeAtHubThreshold = 0.5;
+    private double shiftAssignmentBatteryThreshold = 0.6;
+	private String breakChargerType = ChargerSpecification.DEFAULT_CHARGER_TYPE;
+	private String outOfShiftChargerType = ChargerSpecification.DEFAULT_CHARGER_TYPE;
+
+	public ShiftDrtConfigGroup() {
         super(GROUP_NAME);
     }
 
@@ -62,6 +65,8 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
                 " at hubs when not in an active shift. values between [0,1)");
         map.put(SHIFT_ASSIGNMENT_BATTERY_THRESHOLD, "defines the minimum battery state of charge threshold at which vehicles are available " +
                 " for shift assignment. values between [0,1)");
+		map.put(BREAK_CHARGER_TYPE, "defines the charger type that should be chosen when charging during shift break or changeover. Defaults to '" + ChargerSpecification.DEFAULT_CHARGER_TYPE + "'");
+		map.put(OUT_OF_SHIFT_CHARGER_TYPE, "defines the charger type that should be chosen when charging inactive vehicles outside of shifts. Defaults to '" + ChargerSpecification.DEFAULT_CHARGER_TYPE + "'");
         return map;
     }
 
@@ -109,6 +114,15 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     public void setShiftAssignmentBatteryThreshold(final double shiftAssignmentBatteryThreshold) {
         this.shiftAssignmentBatteryThreshold = shiftAssignmentBatteryThreshold;
     }
+
+	@StringSetter( BREAK_CHARGER_TYPE )
+	public void setBreakChargerType(String breakChargerType) {
+		this.breakChargerType = breakChargerType;
+	}
+	@StringSetter( OUT_OF_SHIFT_CHARGER_TYPE )
+	public void setOutOfShiftChargerType(String outOfShiftChargerType) {
+		this.outOfShiftChargerType = outOfShiftChargerType;
+	}
 
     @StringGetter( SHIFT_INPUT_FILE )
     public String getShiftInputFile() {
@@ -164,4 +178,13 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     public double getShiftAssignmentBatteryThreshold() {
         return this.shiftAssignmentBatteryThreshold;
     }
+
+	@StringGetter( BREAK_CHARGER_TYPE )
+	public String getBreakChargerType() {
+		return breakChargerType;
+	}
+	@StringGetter( OUT_OF_SHIFT_CHARGER_TYPE )
+	public String getOutOfShiftChargerType() {
+		return outOfShiftChargerType;
+	}
 }

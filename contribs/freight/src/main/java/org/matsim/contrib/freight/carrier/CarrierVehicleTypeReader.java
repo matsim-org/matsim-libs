@@ -1,15 +1,29 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
-import java.util.Stack;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.VehicleType;
@@ -18,8 +32,13 @@ import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Map;
+import java.util.Stack;
+
 /**
- * Reader reading carrierVehicleTypes from an xml-file.
+ * Reader reading carrierVehicleTypes from a xml-file.
  * 
  * @author sschroeder
  *
@@ -30,9 +49,8 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 	private final CarrierVehicleTypeParser reader;
 
 	public CarrierVehicleTypeReader( final CarrierVehicleTypes types ) {
-		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefiniton_v2.0.xsd is online
+		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefinition_v2.0.xsd is online
 		this.reader = new CarrierVehicleTypeParser( types ) ;
-//		log.setLevel( Level.DEBUG );
 	}
 
 	@Override
@@ -101,10 +119,10 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 		}
 
 		@Override
-		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-			log.debug("Reading start tag. name: " + name + " , attributes: " + atts.toString() + " , context: " + context);
+		public void startTag(final String name, final Attributes attributes, final Stack<String> context) {
+			log.debug("Reading start tag. name: " + name + " , attributes: " + attributes.toString() + " , context: " + context);
 			if ( "vehicleTypes".equalsIgnoreCase( name ) ) {
-				String str = atts.getValue( "xsi:schemaLocation" );
+				String str = attributes.getValue( "xsi:schemaLocation" );
 				log.info("Found following schemeLocation in carriers definition file: " + str);
 				if (str == null){
 					log.warn( "No validation information found. Using ReaderV1." );
@@ -113,7 +131,7 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 					throw new RuntimeException( "should not happen" ) ;
 				}
 			} else if ( "vehicleDefinitions".equalsIgnoreCase( name ) ){
-				String str = atts.getValue( "xsi:schemaLocation" );
+				String str = attributes.getValue( "xsi:schemaLocation" );
 				if ( str==null ){
 					throw new RuntimeException( "should not happen" );
 				} else {
@@ -127,7 +145,7 @@ public class CarrierVehicleTypeReader implements MatsimReader{
 				// <vehicleTypes>.  If it is a later file, it starts with <vehicleDefinitions>. kai, sep'19
 
 			}
-			this.delegate.startTag( name, atts, context );
+			this.delegate.startTag( name, attributes, context );
 		}
 
 		@Override

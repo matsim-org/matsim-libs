@@ -33,22 +33,25 @@ public class ShiftDrtOptimizer implements DrtOptimizer {
         scheduleTimingUpdater.updateBeforeNextTask(vehicle);
         final Task task = vehicle.getSchedule().nextTask();
 
+		if(task != null) {
+			// previous task
+			int previousTaskIdx = task.getTaskIdx() - 1;
+			if (previousTaskIdx >= 0) {
+				Task previousTask = vehicle.getSchedule().getTasks().get(previousTaskIdx);
+				if (previousTask instanceof ShiftBreakTask) {
+					dispatcher.endBreak((ShiftDvrpVehicle) vehicle, (ShiftBreakTask) previousTask);
+				}
+			}
+		}
 
         if(task instanceof ShiftChangeOverTask) {
-            dispatcher.endShift((ShiftDvrpVehicle) vehicle, ((ShiftChangeOverTask) task).getLink().getId());
+			dispatcher.endShift(
+					(ShiftDvrpVehicle) vehicle,
+					((ShiftChangeOverTask) task).getLink().getId(),
+					((ShiftChangeOverTask) task).getFacility().getId()
+			);
         } else if(task instanceof ShiftBreakTask) {
             dispatcher.startBreak((ShiftDvrpVehicle) vehicle, ((ShiftBreakTask) task).getFacility().getLinkId());
-        }
-
-        if(task != null) {
-            // previous task
-            int previousTaskIdx = task.getTaskIdx() - 1;
-            if (previousTaskIdx >= 0) {
-                Task previousTask = vehicle.getSchedule().getTasks().get(previousTaskIdx);
-                if (previousTask instanceof ShiftBreakTask) {
-                    dispatcher.endBreak((ShiftDvrpVehicle) vehicle, (ShiftBreakTask) previousTask);
-                }
-            }
         }
     }
 

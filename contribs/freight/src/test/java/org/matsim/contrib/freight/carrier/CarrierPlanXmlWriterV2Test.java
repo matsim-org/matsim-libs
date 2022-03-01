@@ -2,10 +2,8 @@ package org.matsim.contrib.freight.carrier;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -17,7 +15,6 @@ import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -32,12 +29,16 @@ public class CarrierPlanXmlWriterV2Test {
 	
 	@Before
 	public void setUp() throws Exception{
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( this.testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+
 		Carriers carriers = new Carriers();
 		String classInputDirectory = this.testUtils.getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquils.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(classInputDirectory + "carrierPlansEquils.xml" );
 		new CarrierPlanXmlWriterV2(carriers).write(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 		carriers.getCarriers().clear();
-		new CarrierPlanXmlReader(carriers).readFile(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(this.testUtils.getClassInputDirectory() + "carrierPlansEquilsWritten.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
@@ -152,34 +153,35 @@ public class CarrierPlanXmlWriterV2Test {
 		assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
 	}
 
-	@Test
-	public void test_properErrorWhenVehicleTypeIdIsMissing() {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
-
-		Carrier carrier1 = CarrierUtils.createCarrier(Id.create("1", Carrier.class));
-		CarrierUtils.setJspritIterations(carrier1, 50);
-
-		CarrierVehicle c1hv = new CarrierVehicle.Builder(Id.create("carrier_1_heavyVehicle", Vehicle.class), Id.create("3", Link.class))
-				// don't use setType() or setTypeId()
-				.setEarliestStart(6 * 3600)
-				.setLatestEnd(16 * 3600)
-				.build();
-
-		carrier1.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
-		carrier1.getCarrierCapabilities().getCarrierVehicles().put(c1hv.getId(), c1hv);
-
-		carriers.addCarrier(carrier1);
-
-		String outputDir = this.testUtils.getOutputDirectory();
-		try {
-			new CarrierPlanXmlWriterV2(carriers).write(outputDir + "/carriers.xml");
-			Assert.fail("expected exception about missing vehicle type.");
-		} catch (IllegalStateException e) {
-			assertTrue(e.getMessage().contains("vehicleTypeId is missing"));
-		}
-
-	}
+//	@Test
+//	public void test_properErrorWhenVehicleTypeIdIsMissing() {
+//		Config config = ConfigUtils.createConfig();
+//		Scenario scenario = ScenarioUtils.createScenario(config);
+//		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
+//
+//		Carrier carrier1 = CarrierUtils.createCarrier(Id.create("1", Carrier.class));
+//		CarrierUtils.setJspritIterations(carrier1, 50);
+//
+//		CarrierVehicle c1hv = new CarrierVehicle.Builder(Id.create("carrier_1_heavyVehicle", Vehicle.class), Id.create("3", Link.class), vehicleType )
+//				// don't use setType() or setTypeId()
+//				.setEarliestStart(6 * 3600)
+//				.setLatestEnd(16 * 3600)
+//				.build();
+//
+//		carrier1.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
+//		carrier1.getCarrierCapabilities().getCarrierVehicles().put(c1hv.getId(), c1hv);
+//
+//		carriers.addCarrier(carrier1);
+//
+//		String outputDir = this.testUtils.getOutputDirectory();
+//		try {
+//			new CarrierPlanXmlWriterV2(carriers).write(outputDir + "/carriers.xml");
+//			Assert.fail("expected exception about missing vehicle type.");
+//		} catch (IllegalStateException e) {
+//			assertTrue(e.getMessage().contains("vehicleTypeId is missing"));
+//		}
+//
+//	}
+	// no longer possible. kai, jan'22
 
 }

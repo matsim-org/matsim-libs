@@ -54,7 +54,9 @@ import one.util.streamex.EntryStream;
  * @author michalm (Michal Maciejewski)
  */
 public class VehicleOccupancyProfileWriter implements IterationEndsListener {
-	private static final String OUTPUT_FILE = "occupancy_time_profiles";
+
+	private static final String DEFAULT_FILE_NAME = "occupancy_time_profiles";
+	private final String outputFile;
 
 	private final MatsimServices matsimServices;
 	private final String mode;
@@ -66,11 +68,18 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener {
 	public VehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
 			VehicleOccupancyProfileCalculator calculator, Comparator<Task.TaskType> nonPassengerTaskTypeComparator,
 			Map<Task.TaskType, Paint> taskTypePaints) {
+		this(matsimServices, mode, calculator, nonPassengerTaskTypeComparator, taskTypePaints, DEFAULT_FILE_NAME);
+	}
+
+	public VehicleOccupancyProfileWriter(MatsimServices matsimServices, String mode,
+										 VehicleOccupancyProfileCalculator calculator, Comparator<Task.TaskType> nonPassengerTaskTypeComparator,
+										 Map<Task.TaskType, Paint> taskTypePaints, String fileName) {
 		this.matsimServices = matsimServices;
 		this.mode = mode;
 		this.calculator = calculator;
 		this.nonPassengerTaskTypeComparator = nonPassengerTaskTypeComparator;
 		this.taskTypePaints = taskTypePaints;
+		this.outputFile = fileName;
 	}
 
 	@Override
@@ -91,7 +100,7 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener {
 		ImmutableMap<String, double[]> profiles = Stream.concat(nonPassengerTaskProfiles, occupancyProfiles)
 				.collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
 
-		String file = filename(OUTPUT_FILE);
+		String file = filename(outputFile);
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
@@ -132,7 +141,7 @@ public class VehicleOccupancyProfileWriter implements IterationEndsListener {
 			chart.setTitle(runID + " " + chart.getTitle().getText());
 		}
 		makeStayTaskSeriesGrey(chart.getXYPlot());
-		String imageFile = filename(OUTPUT_FILE + "_" + chartType.name());
+		String imageFile = filename(outputFile + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
 	}
 

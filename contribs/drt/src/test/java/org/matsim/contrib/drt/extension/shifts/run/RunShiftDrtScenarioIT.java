@@ -7,13 +7,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.optimizer.ShiftVehicleDataEntryFactory;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -26,9 +24,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunShiftDrtScenarioIT {
-
-	private static final boolean infield = true;
-	private static final boolean rebalancing = true;
 
 	@Test
 	public void test() {
@@ -56,24 +51,21 @@ public class RunShiftDrtScenarioIT {
 
 		drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
-		if (rebalancing) {
+		ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
+		drtConfigGroup.addParameterSet(rebalancing);
+		((RebalancingParams) rebalancing).setInterval(600);
 
-			ConfigGroup rebalancing = drtConfigGroup.createParameterSet("rebalancing");
-			drtConfigGroup.addParameterSet(rebalancing);
-			((RebalancingParams) rebalancing).setInterval(600);
+		MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
+		strategyParams.setTargetAlpha(0.3);
+		strategyParams.setTargetBeta(0.3);
 
-			MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-			strategyParams.setTargetAlpha(0.3);
-			strategyParams.setTargetBeta(0.3);
+		drtConfigGroup.getRebalancingParams().get().addParameterSet((ConfigGroup) strategyParams);
 
-			drtConfigGroup.getRebalancingParams().get().addParameterSet((ConfigGroup) strategyParams);
-
-			DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
-			drtZonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
-			drtZonalSystemParams.setCellSize(500.);
-			drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
-			drtConfigGroup.addParameterSet(drtZonalSystemParams);
-		}
+		DrtZonalSystemParams drtZonalSystemParams = new DrtZonalSystemParams();
+		drtZonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
+		drtZonalSystemParams.setCellSize(500.);
+		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
+		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
@@ -128,19 +120,9 @@ public class RunShiftDrtScenarioIT {
 		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
 		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
 		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(infield);
+		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
-
-		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-			run.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
-				@Override
-				public void install() {
-					bind(ShiftVehicleDataEntryFactory.ShiftVehicleDataEntryFactoryProvider.class).toInstance(
-							new ShiftVehicleDataEntryFactory.ShiftVehicleDataEntryFactoryProvider());
-				}
-			});
-		}
 		run.run();
 	}
 }

@@ -6,10 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author nkuehnel / MOIA
@@ -22,18 +19,18 @@ public class OperationFacilityImpl implements OperationFacility {
     private final Id<Link> linkId;
     private final Coord coord;
     private final int capacity;
-    private final Id<Charger> charger;
+    private final List<Id<Charger>> chargers;
     private final OperationFacilityType type;
 
     private final Set<Id<DvrpVehicle>> reservedVehicles = new LinkedHashSet<>();
 
     public OperationFacilityImpl(Id<OperationFacility> id, Id<Link> linkId, Coord coord, int capacity,
-                                 Id<Charger> charger, OperationFacilityType type) {
+                                 List<Id<Charger>> chargers, OperationFacilityType type) {
         this.id = id;
         this.linkId = linkId;
         this.coord = coord;
         this.capacity = capacity;
-        this.charger = charger;
+        this.chargers = Collections.unmodifiableList(chargers);
         this.type = type;
     }
 
@@ -82,8 +79,8 @@ public class OperationFacilityImpl implements OperationFacility {
     }
 
     @Override
-    public Id<Charger> getCharger() {
-        return charger;
+    public List<Id<Charger>> getChargers() {
+        return chargers;
     }
 
     @Override

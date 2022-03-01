@@ -35,7 +35,8 @@ import java.util.stream.Stream;
  */
 public class VehicleTaskProfileWriter implements IterationEndsListener {
 
-	private static final String OUTPUT_FILE = "task_time_profiles";
+	private static final String DEFAULT_FILE_NAME = "task_time_profiles";
+	private final String outputFile;
 
 	private final MatsimServices matsimServices;
 	private final String mode;
@@ -45,13 +46,20 @@ public class VehicleTaskProfileWriter implements IterationEndsListener {
 	private final Map<Task.TaskType, Paint> taskTypePaints;
 
 	public VehicleTaskProfileWriter(MatsimServices matsimServices, String mode,
+									VehicleTaskProfileCalculator calculator, Comparator<Task.TaskType> taskTypeComparator,
+									Map<Task.TaskType, Paint> taskTypePaints) {
+		this(matsimServices, mode, calculator, taskTypeComparator, taskTypePaints, DEFAULT_FILE_NAME);
+	}
+
+	public VehicleTaskProfileWriter(MatsimServices matsimServices, String mode,
 										 VehicleTaskProfileCalculator calculator, Comparator<Task.TaskType> taskTypeComparator,
-										 Map<Task.TaskType, Paint> taskTypePaints) {
+										 Map<Task.TaskType, Paint> taskTypePaints, String fileName) {
 		this.matsimServices = matsimServices;
 		this.mode = mode;
 		this.calculator = calculator;
 		this.taskTypeComparator = taskTypeComparator;
 		this.taskTypePaints = taskTypePaints;
+		this.outputFile = fileName;
 	}
 
 	@Override
@@ -66,7 +74,7 @@ public class VehicleTaskProfileWriter implements IterationEndsListener {
 				.map(e -> Pair.of(e.getKey().name(), e.getValue()))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 
-		String file = filename(OUTPUT_FILE);
+		String file = filename(outputFile);
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
@@ -107,7 +115,7 @@ public class VehicleTaskProfileWriter implements IterationEndsListener {
 			chart.setTitle(runID + " " + chart.getTitle().getText());
 		}
 		makeStayTaskSeriesGrey(chart.getXYPlot());
-		String imageFile = filename(OUTPUT_FILE + "_" + chartType.name());
+		String imageFile = filename(outputFile + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
 	}
 

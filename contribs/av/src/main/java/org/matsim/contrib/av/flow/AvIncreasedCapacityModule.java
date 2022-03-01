@@ -20,43 +20,40 @@
 package org.matsim.contrib.av.flow;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.vehicles.VehicleType;
-
-import com.google.inject.name.Names;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This module allows to de- or increase the amount of flow capacity used by a DVRP vehicle,
  * which may be useful for modelling autonomous vehicles within the Queue model.
- * 
- * When using this model in science, please consider citing 
+ * <p>
+ * When using this model in science, please consider citing
  * M. Maciejewski, J. Bischoff; Congestion Effects of Autonomous Taxi Fleets; 16-11;
  * available from <a href="http://www.vsp.tu-berlin.de/publications/vspwp/">http://www.vsp.tu-berlin.de/publications/vspwp/</a>
- *
  */
-public class AvIncreasedCapacityModule extends AbstractModule {
+public class AvIncreasedCapacityModule extends AbstractDvrpModeModule {
 	private final VehicleType vehicleType;
 
 	/**
 	 * @param flowEfficiencyFactor: A factor of 1.0 == same flow for dvrp vehicles as for cars (default),
-	 *                               a factor of > 1: increased efficiency, e.g. a value of 2.0 would mean that two AVs
-	 *                               would need only the flow capacity of 1 ordinary vehicle.
-	 *                               A factor below 1 would mean that more capacity is used.
+	 *                              a factor of > 1: increased efficiency, e.g. a value of 2.0 would mean that two AVs
+	 *                              would need only the flow capacity of 1 ordinary vehicle.
+	 *                              A factor below 1 would mean that more capacity is used.
 	 */
-	public AvIncreasedCapacityModule(double flowEfficiencyFactor) {
-		this(flowEfficiencyFactor, VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) ) );
+	public AvIncreasedCapacityModule(String mode, double flowEfficiencyFactor) {
+		this(mode, flowEfficiencyFactor,
+				VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class)));
 	}
 
-	public AvIncreasedCapacityModule(double flowEfficiencyFactor, VehicleType vehicleType) {
+	public AvIncreasedCapacityModule(String mode, double flowEfficiencyFactor, VehicleType vehicleType) {
+		super(mode);
 		vehicleType.setFlowEfficiencyFactor(flowEfficiencyFactor);//XXX set the factor here - not settable via XML
 		this.vehicleType = vehicleType;
 	}
 
 	@Override
 	public void install() {
-		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
-				.toInstance(vehicleType);
+		bindModal(VehicleType.class).toInstance(vehicleType);
 	}
 }

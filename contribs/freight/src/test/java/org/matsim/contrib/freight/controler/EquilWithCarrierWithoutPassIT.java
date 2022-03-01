@@ -27,9 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
@@ -41,6 +39,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import static org.matsim.contrib.freight.controler.EquilWithCarrierWithPassIT.addDummyVehicleType;
 
@@ -78,8 +78,13 @@ public class EquilWithCarrierWithoutPassIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
+		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+
 		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
-		new CarrierPlanXmlReader(carriers).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		addDummyVehicleType( carriers, "default") ;
 
 		controler = new Controler(scenario);

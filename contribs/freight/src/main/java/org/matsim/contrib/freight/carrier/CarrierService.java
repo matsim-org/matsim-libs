@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
@@ -14,8 +35,8 @@ public final class CarrierService implements Attributable {
 			return new Builder(id,locationLinkId);
 		}
 		
-		private Id<CarrierService> id;
-		private Id<Link> locationLinkId;
+		private final Id<CarrierService> id;
+		private final Id<Link> locationLinkId;
 		private String name = "service";
 		
 		private double serviceTime = 0.0;
@@ -82,7 +103,7 @@ public final class CarrierService implements Attributable {
 
 	private final int demand;
 
-	private Attributes attributes = new Attributes();
+	private final Attributes attributes = new Attributes();
 
 	private CarrierService(Builder builder){
 		id = builder.id;
@@ -154,11 +175,8 @@ public final class CarrierService implements Attributable {
 			return false;
 		CarrierService other = (CarrierService) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+			return other.id == null;
+		} else return id.equals(other.id);
 	}
 
 	

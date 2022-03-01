@@ -1,6 +1,9 @@
 package org.matsim.contrib.drt.extension.shifts.shift;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
+
+import java.util.Optional;
 
 /**
  * @author nkuehnel / MOIA
@@ -11,12 +14,14 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	private final double start;
 	private final double end;
 	private final DrtShiftBreakSpecification shiftBreak;
+	private final Id<OperationFacility> operationFacilityId;
 
 	private DrtShiftSpecificationImpl(Builder builder) {
 		this.id = builder.id;
 		this.start = builder.start;
 		this.end = builder.end;
 		this.shiftBreak = builder.shiftBreak;
+		this.operationFacilityId = builder.operationFacilityId;
 	}
 
 	@Override
@@ -30,8 +35,13 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	}
 
 	@Override
-	public DrtShiftBreakSpecification getBreak() {
-		return shiftBreak;
+	public Optional<DrtShiftBreakSpecification> getBreak() {
+		return Optional.ofNullable(shiftBreak);
+	}
+
+	@Override
+	public Optional<Id<OperationFacility>> getOperationFacilityId() {
+		return Optional.ofNullable(operationFacilityId);
 	}
 
 	@Override
@@ -48,7 +58,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		builder.id = copy.getId();
 		builder.start = copy.getStartTime();
 		builder.end = copy.getEndTime();
-		builder.shiftBreak = copy.getBreak();
+		builder.shiftBreak = copy.getBreak().orElse(null);
 		return builder;
 	}
 
@@ -57,6 +67,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		private double start;
 		private double end;
 		private DrtShiftBreakSpecification shiftBreak;
+		private Id<OperationFacility> operationFacilityId;
 
 		private Builder() {
 		}
@@ -78,6 +89,11 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 
 		public Builder shiftBreak(DrtShiftBreakSpecification val) {
 			shiftBreak = val;
+			return this;
+		}
+
+		public Builder operationFacility(Id<OperationFacility> operationFacilityId) {
+			this.operationFacilityId = operationFacilityId;
 			return this;
 		}
 

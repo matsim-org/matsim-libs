@@ -42,12 +42,15 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 				ImmutableMap<Id<DrtShift>, DrtShiftImpl> shifts = shiftsSpecification.getShiftSpecifications().values()
 						.stream()
 						.map(spec -> {
-							DrtShiftBreakSpecification breakSpec = spec.getBreak();
-							DefautShiftBreakImpl shiftBreak = new DefautShiftBreakImpl(
-									breakSpec.getEarliestBreakStartTime(),
-									breakSpec.getLatestBreakEndTime(),
-									breakSpec.getDuration());
-							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(), shiftBreak);
+							DefautShiftBreakImpl shiftBreak = null;
+							DrtShiftBreakSpecification breakSpec = spec.getBreak().orElse(null);
+							if(breakSpec != null) {
+								shiftBreak = new DefautShiftBreakImpl(
+										breakSpec.getEarliestBreakStartTime(),
+										breakSpec.getLatestBreakEndTime(),
+										breakSpec.getDuration());
+							}
+							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(), spec.getOperationFacilityId().orElse(null), shiftBreak);
 						})
 						.collect(ImmutableMap.toImmutableMap(DrtShift::getId, s -> s));
 				return () -> shifts;
@@ -63,7 +66,7 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 						.stream()
 						.map(spec -> (OperationFacility) new OperationFacilityImpl(
 								spec.getId(), spec.getLinkId(), spec.getCoord(),
-								spec.getCapacity(), spec.getCharger(), spec.getType()
+								spec.getCapacity(), spec.getChargers(), spec.getType()
 						))
 						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
 				return () -> operationFacilities;

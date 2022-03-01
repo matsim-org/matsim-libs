@@ -81,11 +81,15 @@ public class OsmPoiReader {
 	 * Parses a given <i>OpenStreetMap</i> file for data in it that can be converted into MATSim facilities.
 	 */
 	public void parseOsmFileAndAddFacilities(Map<String, String> osmToMatsimTypeMap, String osmKey) {
+		parseOsmFileAndAddFacilities(osmToMatsimTypeMap,  osmKey, CompressionMethod.None);
+	}
+
+	public void parseOsmFileAndAddFacilities(Map<String, String> osmToMatsimTypeMap, String osmKey, CompressionMethod compressionMethod) {
 		OsmPoiSink sink = new OsmPoiSink(this.ct, osmToMatsimTypeMap, osmKey, useGeneralTypeIsSpecificTypeUnknown);
-		XmlReader xmlReader = new XmlReader(inputFile, false, CompressionMethod.None);
+		XmlReader xmlReader = new XmlReader(inputFile, false, compressionMethod);
 		xmlReader.setSink(sink);
-		xmlReader.run();		
-		
+		xmlReader.run();
+
 		for (ActivityFacility af : sink.getFacilities().getFacilities().values()) {
 			if (!this.facilities.getFacilities().containsKey(af.getId())) {
 				this.facilities.addActivityFacility(af);
