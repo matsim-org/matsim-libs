@@ -137,6 +137,8 @@ public class RunEShiftDrtScenarioIT {
 		//e shifts
 		shiftDrtConfigGroup.setShiftAssignmentBatteryThreshold(0.6);
 		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
+		shiftDrtConfigGroup.setOutOfShiftChargerType("slow");
+		shiftDrtConfigGroup.setBreakChargerType("fast");
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setChargersFile(chargersFile);
