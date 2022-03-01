@@ -66,7 +66,7 @@ public class ShiftDrtQSimModule extends AbstractDvrpModeQSimModule {
 						.stream()
 						.map(spec -> (OperationFacility) new OperationFacilityImpl(
 								spec.getId(), spec.getLinkId(), spec.getCoord(),
-								spec.getCapacity(), spec.getCharger().orElse(null), spec.getType()
+								spec.getCapacity(), spec.getChargers(), spec.getType()
 						))
 						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
 				return () -> operationFacilities;
