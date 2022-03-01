@@ -12,7 +12,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.*;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class TestOperationFacilities {
+public class OperationFacilitiesIOTest {
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
