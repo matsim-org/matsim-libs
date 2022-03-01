@@ -8,16 +8,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.MatsimVehicleReader;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
 
 import java.io.File;
 import java.util.Iterator;
@@ -39,11 +37,17 @@ public class RunFreightAnalysisWithShipmentTest {
 
         Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
-        Carriers carriers = new Carriers();
-        new CarrierPlanXmlReader(carriers).readFile(carrierFile.getAbsolutePath());
-
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
         new MatsimVehicleReader(vehicles).readFile(vehiclesFile.getAbsolutePath());
+
+        CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+        for( VehicleType vehicleType : vehicles.getVehicleTypes().values() ){
+            carrierVehicleTypes.getVehicleTypes().put( vehicleType.getId(), vehicleType );
+        }
+        // yyyy the above is somewhat awkward.  ???
+
+        Carriers carriers = new Carriers();
+        new CarrierPlanXmlReader(carriers, carrierVehicleTypes).readFile(carrierFile.getAbsolutePath());
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         MyShipmentTrackerEventHandler eventHandler = new MyShipmentTrackerEventHandler(vehicles, network, carriers);

@@ -26,10 +26,7 @@ import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -87,11 +84,17 @@ public class RunFreightAnalysisIT {
 
 		Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
-		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers).readFile(carrierFile.getAbsolutePath());
-
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		new  MatsimVehicleReader(vehicles).readFile(vehiclesFile.getAbsolutePath());
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		for( VehicleType vehicleType : vehicles.getVehicleTypes().values() ){
+			carrierVehicleTypes.getVehicleTypes().put( vehicleType.getId(), vehicleType );
+		}
+		// yyyy the above is somewhat awkward.  ???
+
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes).readFile(carrierFile.getAbsolutePath());
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MyFreightVehicleTrackerEventHandler eventHandler = new MyFreightVehicleTrackerEventHandler(vehicles, network, carriers);
@@ -212,11 +215,16 @@ public class RunFreightAnalysisIT {
 
 		Network network = NetworkUtils.readNetwork(networkFile.getAbsolutePath());
 
-		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReader(carriers).readFile(carrierFile.getAbsolutePath());
-
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		new  MatsimVehicleReader(vehicles).readFile(vehiclesFile.getAbsolutePath());
+
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		for( VehicleType vehicleType : vehicles.getVehicleTypes().values() ){
+			carrierVehicleTypes.getVehicleTypes().put( vehicleType.getId(), vehicleType );
+		}
+
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes).readFile(carrierFile.getAbsolutePath());
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MyServiceTrackerEventHandler eventHandler = new MyServiceTrackerEventHandler(vehicles, network, carriers);
