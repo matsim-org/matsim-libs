@@ -1,6 +1,6 @@
 package lsp.shipment;
 
-import demand.UtilityFunction;
+//import demand.UtilityFunction;
 import lsp.LogisticsSolutionElement;
 import lsp.functions.LSPInfo;
 import lsp.resources.LSPResource;
@@ -26,7 +26,7 @@ public class ShipmentUtils{
 		private double deliveryServiceTime;
 		private double pickupServiceTime;
 		private final ArrayList<Requirement> requirements;
-		private final ArrayList<UtilityFunction> utilityFunctions;
+//		private final ArrayList<UtilityFunction> utilityFunctions;
 		private final ArrayList<LSPInfo> infos;
 
 		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
@@ -35,7 +35,7 @@ public class ShipmentUtils{
 
 		private LSPShipmentBuilder( Id<LSPShipment> id ){
 			this.requirements = new ArrayList<>();
-			this.utilityFunctions = new ArrayList<>();
+//			this.utilityFunctions = new ArrayList<>();
 			this.infos = new ArrayList<>();
 			this.id = id;
 		}
@@ -72,10 +72,10 @@ public class ShipmentUtils{
 			requirements.add(requirement);
 		}
 
-		public LSPShipmentBuilder addUtilityFunction( UtilityFunction utilityFunction ) {
-			utilityFunctions.add(utilityFunction);
-			return this;
-		}
+//		public LSPShipmentBuilder addUtilityFunction( UtilityFunction utilityFunction ) {
+//			utilityFunctions.add(utilityFunction);
+//			return this;
+//		}
 
 		public void addInfo(LSPInfo info ) {
 			infos.add(info);
@@ -122,9 +122,9 @@ public class ShipmentUtils{
 			return requirements;
 		}
 
-		public ArrayList<UtilityFunction> getUtilityFunctions() {
-			return utilityFunctions;
-		}
+//		public ArrayList<UtilityFunction> getUtilityFunctions() {
+//			return utilityFunctions;
+//		}
 
 		public ArrayList<LSPInfo> getInfos() {
 			return infos;
