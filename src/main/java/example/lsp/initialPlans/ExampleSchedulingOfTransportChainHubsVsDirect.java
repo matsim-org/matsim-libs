@@ -106,13 +106,13 @@ import java.util.*;
 
 		//set up simulation controler and LSPModule
 		log.info("Set up simulation controler and LSPModule");
-		ArrayList<LSP> lspList = new ArrayList<>();
+		LinkedHashSet<LSP> lspList = new LinkedHashSet<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
+		LSPModule lspModule = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(module);
+		controler.addOverridingModule(lspModule);
 
 		log.info("Run MATSim");
 		controler.run();
