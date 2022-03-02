@@ -1,8 +1,11 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
+import lsp.controler.LSPModule;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
+import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentPlanElementComparator;
@@ -15,9 +18,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,8 +48,8 @@ import java.util.*;
 
 	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
-	enum SolutionType { original, direct }
-	private static SolutionType solutionType = SolutionType.direct;
+	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub }
+	private static SolutionType solutionType = SolutionType.onePlan_withHub;
 
 	public static void main (String [] args) throws CommandLine.ConfigurationException{
 
@@ -54,21 +59,23 @@ import java.util.*;
 
 		//Set up required MATSim classes
 
-		Config config;
+		Config config = ConfigUtils.createConfig();
 		if (args.length != 0) {
 			for (String arg : args) {
 				log.warn(arg);
 			}
-			config = ConfigUtils.loadConfig(args);
-			CommandLine cmd = ConfigUtils.getCommandLine(args);
+//			config = ConfigUtils.loadConfig(args);
+			ConfigUtils.applyCommandline(config, args);
 
+			CommandLine cmd = ConfigUtils.getCommandLine(args);
 			ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf(cmd.getOption("solutionType").orElseThrow());
+
 		} else {
-			config = ConfigUtils.createConfig();
-			config.controler().setOutputDirectory("output/ChainVsDirect");
+			config.controler().setOutputDirectory("output/ChainVsDirect/" + solutionType);
 			config.controler().setLastIteration(2);
-			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+
 		}
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
 
@@ -96,6 +103,19 @@ import java.util.*;
 		//schedule the LSP with the shipments and according to the scheduler of the Resource
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
 		lsp.scheduleSolutions();
+
+		//set up simulation controler and LSPModule
+		log.info("Set up simulation controler and LSPModule");
+		LinkedHashSet<LSP> lspList = new LinkedHashSet<>();
+		lspList.add(lsp);
+		LSPs lsps = new LSPs(lspList);
+		LSPModule lspModule = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(lspModule);
+
+		log.info("Run MATSim");
+		controler.run();
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
@@ -287,95 +307,123 @@ import java.util.*;
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
 
 		switch (solutionType) {
-			case original: {
+			case onePlan_withHub: {
 				// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
+				log.info("Creating LSP with one plan: reloading at hub");
 
-				log.info("");
-				log.info("set up logistic Solution - original solution is created");
-
-				//Das ist wichtig, damit er die Kette zur Verfügung hat.
-				depotElement.connectWithNextElement(mainRunElement);
-				mainRunElement.connectWithNextElement(hubElement);
-				hubElement.connectWithNextElement(distributionElement);
-
-				LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
-						Id.create("SolutionWithReloadingId", LogisticsSolution.class))
-						.addSolutionElement(depotElement)
-						.addSolutionElement(mainRunElement)
-						.addSolutionElement(hubElement)
-						.addSolutionElement(distributionElement)
-						.build();
-
-
-				log.info("");
-				log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
-
-				LSPPlan lspPlanWithReloading = LSPUtils.createLSPPlan()
-						.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
-						.addSolution(completeSolutionWithReloading);
-
-				log.info("");
-				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
-
-				List<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(
-						depotResource, mainRunResource, hubResource, distributionAdapter
-				)); //TODO KMT Dez21: Hole es aus allen SolutionElementes.getRessource und nicht "per-Hand". -In UtilsKlasse(?) extractResourcesFromSolutionElements()
-
-				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
 
 				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class))
-						.setInitialPlan(lspPlanWithReloading)
-						.setSolutionScheduler(simpleScheduler)
+						.setInitialPlan(lspPlan_Reloading)
+						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
 						.build();
 
 			}
-			case direct: {
+			case onePlan_direct: {
 				// ### This is the new solution with  directDistribution from the Depot.
+				log.info("Creating LSP with one plan: direct distribution from the depot");
 
-				log.info("");
-				log.info("The order of the logisticsSolutionElements is now specified");
-				depotElement.connectWithNextElement(directDistributionElement);
-
-				//TODO WIP: KostenInfo an das Element dran hängen.
-
-// 				LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
-//				SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
-//				directDistributionElement.getInfos().add(costInfo);
-
-				log.info("");
-				log.info("set up logistic Solution - direct distribution from the depot is created");
-
-				LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
-							Id.create("SolutionDirectId", LogisticsSolution.class))
-						.addSolutionElement(depotElement)
-						.addSolutionElement(directDistributionElement)
-						.build();
-
-				log.info("");
-				log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
-
-				LSPPlan completePlan = LSPUtils.createLSPPlan()
-						.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
-						.addSolution(completeSolutionDirect);
-
-				log.info("");
-				log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
-
-				ArrayList<LSPResource> resourcesList = new ArrayList<>(Arrays.asList(depotResource, directDistributionAdapter));
-				// TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
-
-				//			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
-				SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+				LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
 
 				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
-						.setInitialPlan(completePlan)
-						.setSolutionScheduler(simpleScheduler)
+						.setInitialPlan(lspPlan_direct)
+						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 						.build();
+			}
+
+			case twoPlans_directAndHub: {
+				log.info("Creating LSP with two plans: i) direct distribution from the depot ii) reloading at hub");
+
+				log.error("This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
+
+				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
+				LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
+
+				//TODO: Müsste nicht eigentlich der SolutionScheduler dann auf Ebene der einzelnen Pläne (mit ihren Solutions) sein?? kmt Feb22
+				//So muss ich erst die Ressourcen aus beiden hinzuzufügenden Plänen aufsammeln, damit die dann schon in den Builder können. Irgendwie unschön.
+				List<LSPResource> resourcesList = createResourcesListFromLSPPlan(lspPlan_direct);
+				resourcesList.addAll(createResourcesListFromLSPPlan(lspPlan_Reloading));
+
+				final LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
+						.setInitialPlan(lspPlan_direct)
+						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList))
+						.build();
+
+				lsp.addPlan(lspPlan_Reloading); //adding the second plan
+
+				return lsp;
 			}
 			default:
 				throw new IllegalStateException("Unexpected value: " + solutionType);
 		}
 
+	}
+
+	private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
+		log.info("Collecting all LSPResources from the LSPPlan");
+		List<LSPResource> resourcesList = new ArrayList<>() ;			//TODO: Mahe daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
+		for (LogisticsSolution solution : lspPlanWithReloading.getSolutions()) {
+			for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+				resourcesList.add(solutionElement.getResource());
+			}
+		}
+		return resourcesList;
+	}
+
+	private static LSPPlan createLSPPlan_direct(LogisticsSolutionElement depotElement, LogisticsSolutionElement directDistributionElement) {
+		log.info("");
+		log.info("The order of the logisticsSolutionElements is now specified");
+		depotElement.connectWithNextElement(directDistributionElement);
+
+		//TODO WIP: KostenInfo an das Element dran hängen.(old) --> brauchen wir das dann noch? (KMT, Feb22)
+
+// 				LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
+//				SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
+//				directDistributionElement.getInfos().add(costInfo);
+
+		log.info("");
+		log.info("set up logistic Solution - direct distribution from the depot is created");
+
+		LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
+					Id.create("SolutionDirectId", LogisticsSolution.class))
+				.addSolutionElement(depotElement)
+				.addSolutionElement(directDistributionElement)
+				.build();
+
+		log.info("");
+		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
+
+		LSPPlan completePlan = LSPUtils.createLSPPlan()
+				.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
+				.addSolution(completeSolutionDirect);
+		return completePlan;
+	}
+
+	private static LSPPlan createLSPPlan_reloading(LogisticsSolutionElement depotElement, LogisticsSolutionElement mainRunElement, LogisticsSolutionElement hubElement, LogisticsSolutionElement distributionElement) {
+		log.info("");
+		log.info("set up logistic Solution - original with hub usage solution is created");
+
+		//Das ist wichtig, damit er die Kette zur Verfügung hat.
+		depotElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(hubElement);
+		hubElement.connectWithNextElement(distributionElement);
+
+		LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
+				Id.create("SolutionWithReloadingId", LogisticsSolution.class))
+				.addSolutionElement(depotElement)
+				.addSolutionElement(mainRunElement)
+				.addSolutionElement(hubElement)
+				.addSolutionElement(distributionElement)
+				.build();
+
+
+		log.info("");
+		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
+
+		LSPPlan lspPlanWithReloading = LSPUtils.createLSPPlan()
+				.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
+				.addSolution(completeSolutionWithReloading);
+		return lspPlanWithReloading;
 	}
 
 	private static VehicleType createCarrierVehicleType(String vehicleTypeId) {
