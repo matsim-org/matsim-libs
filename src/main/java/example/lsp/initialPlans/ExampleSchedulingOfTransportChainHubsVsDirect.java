@@ -1,8 +1,11 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
+import lsp.controler.LSPModule;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
+import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentPlanElementComparator;
@@ -15,6 +18,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,7 +49,7 @@ import java.util.*;
 	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
 	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub }
-	private static SolutionType solutionType = SolutionType.onePlan_direct;
+	private static SolutionType solutionType = SolutionType.onePlan_withHub;
 
 	public static void main (String [] args) throws CommandLine.ConfigurationException{
 
@@ -100,9 +104,17 @@ import java.util.*;
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
 		lsp.scheduleSolutions();
 
+		//set up simulation controler and LSPModule
+		log.info("Set up simulation controler and LSPModule");
+		LinkedHashSet<LSP> lspList = new LinkedHashSet<>();
+		lspList.add(lsp);
+		LSPs lsps = new LSPs(lspList);
+		LSPModule lspModule = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(lspModule);
 
 		log.info("Run MATSim");
-		Controler controler = new Controler(scenario);
 		controler.run();
 
 		//print the schedules for the assigned LSPShipments
