@@ -1,0 +1,21 @@
+SHELL := /bin/bash
+
+### Deploy to github packages
+.PHONY: deploy-moia
+deploy-moia:
+	mvn -pl org.matsim.contrib:drt,org.matsim.contrib:discrete_mode_choice deploy -am -DskipTests=true \
+	-DaltSnapshotDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs \
+	-DaltDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs
+
+
+### Deploy to github packages - custom version
+.PHONY: deploy-moia-custom-version
+deploy-moia-custom-version:
+ifndef VERSION
+	$(error VERSION is not set)
+endif
+	mvn versions:set -DnewVersion=$(VERSION)
+	mvn -pl org.matsim.contrib:drt,org.matsim.contrib:discrete_mode_choice deploy -am -DskipTests=true \
+	-DaltSnapshotDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs \
+	-DaltDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs
+	mvn versions:revert
