@@ -12,7 +12,7 @@ on:
 
 jobs:
   deploy-snapshot:
-    name: deploy snapshot/PR-labelled version
+    name: deploy MOIA
     # for PR-labelled deployment -- only if closed by merging
     if: github.event_name == 'push' || github.event.pull_request.merged == true
 
@@ -29,4 +29,4 @@ jobs:
         env:
           USERNAME: ${{github.actor}}
           PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn deploy -pl org.matsim.contrib:drt,org.matsim.contrib:discrete_mode_choice deploy -am --fail-at-end --batch-mode --settings settings.xml -DskipTests=true -Dmatsim.preferLocalDtds=true -DaltSnapshotDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs
+        run: mvn -pl org.matsim.contrib:drt,org.matsim.contrib:discrete_mode_choice deploy -am  --settings settings.xml -DskipTests=true -DaltSnapshotDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/moia-oss/matsim-libs
