@@ -129,10 +129,17 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         startShifts(timeStep);
         checkBreaks();
         checkChargingAtHub();
+		if(timeStep % configGroup.getLoggingInterval() == 0) {
+			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
+					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
+			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
+				logger.info(String.format("Idle vehicles at facility %s: %d", queueEntry.getKey().toString(), queueEntry.getValue().size()));
+			}
+		}
     }
 
     private void checkChargingAtHub() {
-        if (timer.getTimeOfDay() % (3 * 60) == 0) {
+        if (timer.getTimeOfDay() % (configGroup.getChargeAtHubInterval()) == 0) {
 			for (Queue<ShiftDvrpVehicle> idleVehiclesQueue : idleVehiclesQueues.values()) {
 				for (ShiftDvrpVehicle vehicle : idleVehiclesQueue) {
 					if (vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
