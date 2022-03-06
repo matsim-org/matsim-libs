@@ -4,11 +4,6 @@ on:
   push: # snapshot deployment
     branches:
       - moia-deployment
-  pull_request_target: # pr-labelled deployment
-    branches:
-      - moia-deployment
-    types:
-      - closed
 
 jobs:
   deploy-snapshot:
