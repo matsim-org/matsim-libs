@@ -98,6 +98,9 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
+	public static final String CPN_ATTRIBUTE = "CPN";
+	public static final String IS_LOCAL_ATTRIBUTE = "isLocal";
+
 	/**
 	 * time since last "info"
 	 */

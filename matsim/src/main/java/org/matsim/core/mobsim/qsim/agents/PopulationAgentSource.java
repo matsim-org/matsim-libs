@@ -41,9 +41,11 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class PopulationAgentSource implements AgentSource {
-	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
+	private static final Logger log = Logger.getLogger(PopulationAgentSource.class);
+	private static int cnt = 5;
 
 	private final Population population;
 	private final AgentFactory agentFactory;
@@ -65,14 +67,14 @@ public final class PopulationAgentSource implements AgentSource {
 	@Override
 	public void insertAgentsIntoMobsim() {
 		for (Person p : population.getPersons().values()) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-			qsim.insertAgentIntoMobsim(agent);
-		}
-		for (Person p : population.getPersons().values()) {
-			insertVehicles(p);
+			if (isLocal(p)) {
+				var agent = agentFactory.createMobsimAgentFromPerson(p);
+				qsim.insertAgentIntoMobsim(agent);
+				insertVehicles(p);
+			}
 		}
 	}
-	private static int cnt = 5 ;
+
 	private void insertVehicles(Person person) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
@@ -175,23 +177,31 @@ public final class PopulationAgentSource implements AgentSource {
 				// method here is sorted by persons, not departure times, and so we don't know
 				// which plan needs the vehicle first. (Looks to me that it should actually be possible
 				// to resolve this.)
-				
+
 			} else {
-				this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
+				this.seenVehicleIds.put(vehicleId, vehicleLinkId);
 //				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
-				qsim.addParkedVehicle( this.qVehicleFactory.createQVehicle( vehicle ) , vehicleLinkId );
+				qsim.addParkedVehicle(this.qVehicleFactory.createQVehicle(vehicle), vehicleLinkId);
 			}
 		}
 	}
 
+	private boolean isLocal(Person p) {
+		var firstActivity = (Activity) p.getSelectedPlan().getPlanElements().get(0);
+		var linkId = PopulationUtils.decideOnLinkIdForActivity(firstActivity, qsim.getScenario());
+		var isLocalAttr = qsim.getScenario().getNetwork().getLinks().get(linkId).getFromNode().getAttributes().getAttribute(QSim.IS_LOCAL_ATTRIBUTE);
+		return (boolean) Objects.requireNonNull(isLocalAttr);
+	}
+
 	/**
-	 *	A more careful way to decide where this agent should have its vehicles created
-	 *  than to ask agent.getCurrentLinkId() after creation.
+	 * A more careful way to decide where this agent should have its vehicles created
+	 * than to ask agent.getCurrentLinkId() after creation.
+	 *
 	 * @param person TODO
 	 */
-	private Id<Link> findVehicleLink(Person person ) {
+	private Id<Link> findVehicleLink(Person person) {
 		/* Cases that come to mind:
-		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.  
+		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.
 		 *      This is treated by the following algo.
 		 * (2) person starts day with non-car leg and has car parked somewhere else.  This is NOT treated by the following algo.
 		 *      It could be treated by placing the vehicle at the beginning of the first link where it is needed, but this would not

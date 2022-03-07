@@ -61,6 +61,10 @@
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
+        <repository>
+            <id>openmpi-bindings</id>
+            <url>https://github.com/matsim-vsp/openmpi-mvn-repo</url>
+        </repository>
     </repositories>
 
     <distributionManagement>

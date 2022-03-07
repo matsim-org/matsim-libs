@@ -929,18 +929,29 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	@Override
-	public final void changeEffectiveNumberOfLanes( final double val ) {
-		this.effectiveNumberOfLanes = val ;
+	public final void changeEffectiveNumberOfLanes(final double val) {
+		this.effectiveNumberOfLanes = val;
 		// be defensive (might now be called twice):
 		this.recalcTimeVariantAttributes();
 	}
 
-	@Override public Id<Lane> getId() {
+	@Override
+	public Id<Lane> getId() {
 		return this.id;
 	}
 
+
+	public final double getRemainingBufferStorageCapacity() {
+		return this.flowcap_accumulate.getValue();
+	}
+
+	public final void setRemainingBufferStorageCapacity(double val) {
+		// yyyyyy this needs to be protected if we merge with master. kai, aug'18
+		this.flowcap_accumulate.setValue(val);
+	}
+
 	static final class Hole implements QItem {
-		private double earliestLinkEndTime ;
+		private double earliestLinkEndTime;
 		private double pcu;
 
 		@Override
