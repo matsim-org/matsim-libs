@@ -27,11 +27,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.DemandEstimatorAsTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualRebalancableVehicleDistributionTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualVehicleDensityTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualVehiclesToPopulationRatioTargetCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -52,7 +48,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 	@Override
 	public void install() {
 		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
-		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
+		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams) params.getRebalancingStrategyParams();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -66,6 +62,13 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 					case EstimatedDemand:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new DemandEstimatorAsTargetCalculator(
+										getter.getModal(ZonalDemandEstimator.class),
+										strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
+						break;
+
+					case EstimatedDemandCustomized:
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
+								getter -> new DemandEstimatorWithCustomMappingFunction(
 										getter.getModal(ZonalDemandEstimator.class),
 										strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
 						break;
