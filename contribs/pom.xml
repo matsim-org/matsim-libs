@@ -104,7 +104,7 @@
 		<module>pseudosimulation</module>
 		<module>roadpricing</module>
 		<module>sbb-extensions</module>
-		<module>sharing</module>
+		<module>shared_mobility</module>
 		<module>signals</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
