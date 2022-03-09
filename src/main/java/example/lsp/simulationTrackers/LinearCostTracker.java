@@ -56,6 +56,7 @@ import java.util.Collection;
 				this.timeCosts = distanceHandler.getTimeCosts();
 			}
 			if(handler instanceof example.lsp.simulationTrackers.CollectionServiceHandler) {
+				//Todo kmt Wenn man den CollectionTrackerTest laufen lässt kommt er hier nicht an. Somit sind die Werte hier nicht gescheit gesetzt und es wird ... ((***))
 				example.lsp.simulationTrackers.CollectionServiceHandler collectionHandler = (example.lsp.simulationTrackers.CollectionServiceHandler) handler;
 				totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
 				System.out.println(totalNumberOfShipments);
@@ -65,6 +66,7 @@ import java.util.Collection;
 		}
 		
 		double totalCosts = distanceCosts + timeCosts + loadingCosts + vehicleFixedCosts;
+		//TODO KMT (***)).... hier dann zu Werten führen, die NaN sind .
 		fixedUnitCosts = (totalCosts * shareOfFixedCosts)/totalNumberOfShipments;
 		linearUnitCosts = (totalCosts * (1-shareOfFixedCosts))/totalWeightOfShipments;
 		
