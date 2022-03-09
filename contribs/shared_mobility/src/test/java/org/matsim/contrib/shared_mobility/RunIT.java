@@ -1,4 +1,4 @@
-package org.matsim.contrib.sharing;
+package org.matsim.contrib.shared_mobility;
 
 import java.net.URISyntaxException;
 import java.net.URL;
