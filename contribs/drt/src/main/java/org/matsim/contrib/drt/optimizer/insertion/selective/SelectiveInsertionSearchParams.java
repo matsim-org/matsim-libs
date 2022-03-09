@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,40 +18,35 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.zone.skims;
+package org.matsim.contrib.drt.optimizer.insertion.selective;
 
-import javax.inject.Provider;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpGlobalTravelTimesMatrixProvider implements Provider<DvrpTravelTimeMatrix> {
-	private final DvrpTravelTimeMatrixParams params;
-	private final int numberOfThreads;
+public class SelectiveInsertionSearchParams extends DrtInsertionSearchParams {
+	public static final String SET_NAME = "SelectiveInsertionSearch";
 
-	@Inject
-	@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
-	private Network network;
+	public static final String RESTRICTIVE_BEELINE_SPEED_FACTOR = "restrictiveBeelineSpeedFactor";
+	//use values that underestimate the actual speed, so the risk that the pre-filtering returns an insertion that
+	//violates time windows constraints (for existing passengers, given the actual path)
+	@Positive
+	private double restrictiveBeelineSpeedFactor = 0.5;
 
-	@Inject
-	private QSimConfigGroup qSimConfigGroup;
-
-	public DvrpGlobalTravelTimesMatrixProvider(GlobalConfigGroup globalConfig, DvrpTravelTimeMatrixParams params) {
-		this.params = params;
-		this.numberOfThreads = globalConfig.getNumberOfThreads();
+	public SelectiveInsertionSearchParams() {
+		super(SET_NAME);
 	}
 
-	@Override
-	public DvrpTravelTimeMatrix get() {
-		return DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
-				qSimConfigGroup.getTimeStepSize());
+	@StringGetter(RESTRICTIVE_BEELINE_SPEED_FACTOR)
+	public double getRestrictiveBeelineSpeedFactor() {
+		return restrictiveBeelineSpeedFactor;
+	}
+
+	@StringSetter(RESTRICTIVE_BEELINE_SPEED_FACTOR)
+	public void setRestrictiveBeelineSpeedFactor(double restrictiveBeelineSpeedFactor) {
+		this.restrictiveBeelineSpeedFactor = restrictiveBeelineSpeedFactor;
 	}
 }

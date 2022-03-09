@@ -32,14 +32,14 @@ import org.matsim.core.network.NetworkUtils;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimeMatrixTest {
+public class FreeSpeedTravelTimeMatrixTest {
 
 	private final Network network = NetworkUtils.createNetwork();
 	private final Node nodeA = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), new Coord(0, 0));
 	private final Node nodeB = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), new Coord(150, 150));
 	private final Node nodeC = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), new Coord(-10, -10));
 
-	public DvrpTravelTimeMatrixTest() {
+	public FreeSpeedTravelTimeMatrixTest() {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), nodeA, nodeB, 150, 15, 20, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), nodeB, nodeA, 300, 15, 40, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AC"), nodeA, nodeC, 165, 15, 20, 1);
@@ -49,7 +49,7 @@ public class DvrpTravelTimeMatrixTest {
 	@Test
 	public void matrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100).setMaxNeighborDistance(0);
-		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
+		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
 		assertThat(matrix.getTravelTime(nodeA, nodeA, 0)).isEqualTo(0);
@@ -68,7 +68,7 @@ public class DvrpTravelTimeMatrixTest {
 	public void sparseMatrix() {
 		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100)
 				.setMaxNeighborDistance(9999);
-		var matrix = DvrpTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
+		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
 		assertThat(matrix.getTravelTime(nodeA, nodeA, 0)).isEqualTo(0);

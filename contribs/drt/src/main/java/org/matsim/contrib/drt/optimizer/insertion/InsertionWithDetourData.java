@@ -82,7 +82,7 @@ public class InsertionWithDetourData {
 	public final InsertionDetourData detourData;
 	public final DetourTimeInfo detourTimeInfo;
 
-	InsertionWithDetourData(Insertion insertion, InsertionDetourData detourData, DetourTimeInfo detourTimeInfo) {
+	public InsertionWithDetourData(Insertion insertion, InsertionDetourData detourData, DetourTimeInfo detourTimeInfo) {
 		this.insertion = insertion;
 		this.detourData = detourData;
 		this.detourTimeInfo = detourTimeInfo;

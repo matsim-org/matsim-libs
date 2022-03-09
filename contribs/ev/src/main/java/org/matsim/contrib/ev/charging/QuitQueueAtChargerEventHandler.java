@@ -1,9 +1,9 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,26 +15,12 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.ev.charging;
 
-import java.util.Objects;
+import org.matsim.core.events.handler.EventHandler;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
-
-/**
- * @author Michal Maciejewski (michalm)
- */
-public final class DetourDataLogging {
-	private static final Logger log = Logger.getLogger(DetourDataLogging.class);
-
-	public static void printoutDetour(InsertionDetourData data) {
-		log.info("toPickup=" + Objects.toString(data.detourToPickup.getTravelTime()));
-		log.info("fromPickup=" + Objects.toString(data.detourFromPickup.getTravelTime()));
-		log.info("toDropoff=" + Objects.toString(data.detourToDropoff.getTravelTime()));
-		log.info("fromDropoff=" + Objects.toString(data.detourFromDropoff.getTravelTime()));
-	}
+public interface QuitQueueAtChargerEventHandler extends EventHandler {
+	void handleEvent(QuitQueueAtChargerEvent event);
 }

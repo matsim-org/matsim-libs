@@ -23,7 +23,7 @@ import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -35,7 +35,7 @@ public interface DetourTimeEstimator {
 				/ beelineSpeed;
 	}
 
-	static DetourTimeEstimator createMatrixBasedEstimator(double speedFactor, DvrpTravelTimeMatrix matrix,
+	static DetourTimeEstimator createMatrixBasedEstimator(double speedFactor, TravelTimeMatrix matrix,
 			TravelTime travelTime) {
 		return (from, to, departureTime) -> {
 			if (from == to) {

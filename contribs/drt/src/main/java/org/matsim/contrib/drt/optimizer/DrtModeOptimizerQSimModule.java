@@ -29,12 +29,12 @@ import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserte
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchQSimModule;
+import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
