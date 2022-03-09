@@ -38,6 +38,7 @@ import testLSPWithCostTracker.TourStartHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -279,6 +280,20 @@ public class CollectionTrackerTest {
 		LSPInfo info = collectionSolution.getInfos().iterator().next();
 		assertTrue(info instanceof CostInfo );
 		CostInfo costInfo = (CostInfo) info;
+
+		///----
+//		assertTrue(costInfo.getAttributes() instanceof CostInfoFunction );
+//		CostInfoFunction function = (CostInfoFunction) costInfo.getAttributes();
+//		ArrayList<LSPAttribute<?>> values = new ArrayList<>(function.getAttributes());
+
+		assertEquals(costInfo.getVariableCost() ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
+		assertEquals(costInfo.getVariableCost()  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
+		assertEquals(costInfo.getFixedCost() ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+		assertEquals(costInfo.getFixedCost(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+
+		//-----
+
+		///----
 //		assertTrue(costInfo.getAttributes() instanceof CostInfoFunction );
 //		CostInfoFunction function = (CostInfoFunction) costInfo.getAttributes();
 //		ArrayList<LSPAttribute<?>> values = new ArrayList<>(function.getAttributes());
@@ -294,6 +309,7 @@ public class CollectionTrackerTest {
 //				assertEquals(fixedValue.getValue(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,fixedValue.getValue()) * 0.01 );
 //			}
 //		}
+//		//-----
 
 		Assert.fail("not yet adapted");
 
