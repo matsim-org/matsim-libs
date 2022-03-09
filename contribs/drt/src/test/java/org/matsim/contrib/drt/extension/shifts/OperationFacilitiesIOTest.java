@@ -12,7 +12,7 @@ import org.matsim.contrib.drt.extension.shifts.operationFacilities.*;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class TestOperationFacilities {
+public class OperationFacilitiesIOTest {
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
@@ -28,7 +28,8 @@ public class TestOperationFacilities {
 					.linkId(Id.createLinkId(i)) //
 					.coord(new Coord(i,i)) //
 					.capacity(i) //
-					.chargerId(Id.create(i, Charger.class)) //
+					.addChargerId(Id.create(i, Charger.class)) //
+					.addChargerId(Id.create(i+"_2", Charger.class)) //
 					.type(OperationFacilityType.hub) //
 					.build());
         }
@@ -39,7 +40,7 @@ public class TestOperationFacilities {
 					.linkId(Id.createLinkId(i)) //
 					.coord(new Coord(i,i)) //
 					.capacity(i) //
-					.chargerId(Id.create(i, Charger.class)) //
+					.addChargerId(Id.create(i, Charger.class)) //
 					.type(OperationFacilityType.inField) //
 					.build());
         }
@@ -56,12 +57,14 @@ public class TestOperationFacilities {
             Coord coord = new Coord(i,i);
             int capacity = i;
             Id<Charger> charger = Id.create(i, Charger.class);
+            Id<Charger> charger2 = Id.create(i+"_2", Charger.class);
             final OperationFacilitySpecification facility = copy.getOperationFacilitySpecifications().get(id);
             Assert.assertEquals(linkId.toString(), facility.getLinkId().toString());
             Assert.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
             Assert.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
             Assert.assertEquals(capacity, facility.getCapacity());
-            Assert.assertEquals(charger.toString(), facility.getCharger().get().toString());
+            Assert.assertEquals(charger.toString(), facility.getChargers().get(0).toString());
+            Assert.assertEquals(charger2.toString(), facility.getChargers().get(1).toString());
         }
 
         for (int i = 10; i < 20; i++) {
@@ -75,7 +78,7 @@ public class TestOperationFacilities {
             Assert.assertEquals(coord.getX(), facility.getCoord().getX(), 0);
             Assert.assertEquals(coord.getY(), facility.getCoord().getY(), 0);
             Assert.assertEquals(capacity, facility.getCapacity());
-            Assert.assertEquals(charger.toString(), facility.getCharger().get().toString());
+            Assert.assertEquals(charger.toString(), facility.getChargers().get(0).toString());
         }
     }
 }
