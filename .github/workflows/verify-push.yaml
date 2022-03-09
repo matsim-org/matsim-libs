@@ -48,7 +48,7 @@ jobs:
           - contribs/integration
           - contribs/multimodal
           - contribs/protobuf
-          - contribs/sharing
+          - contribs/shared_mobility
           - contribs/socnetsim
           - contribs/sumo
           - contribs/pseudosimulation
