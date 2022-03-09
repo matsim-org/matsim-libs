@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.apache.log4j.Logger;
 
 import com.google.common.base.MoreObjects;
 
@@ -34,6 +35,7 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class TaxiRequest implements PassengerRequest {
+    private static final Logger logger = Logger.getLogger(TaxiRequest.class);
 	public enum TaxiRequestStatus {
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
@@ -67,6 +69,9 @@ public class TaxiRequest implements PassengerRequest {
 		this.mode = mode;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
+
+	    logger.warn("CTudorache new TaxiRequest: " + this);
+	    System.out.println("CTudorache new TaxiRequest: " + this);
 	}
 
 	@Override

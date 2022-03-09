@@ -34,6 +34,7 @@ public class DefaultDriveTask extends AbstractTask implements DriveTask {
 	public DefaultDriveTask(TaskType taskType, VrpPathWithTravelData path) {
 		super(taskType, path.getDepartureTime(), path.getArrivalTime());
 		this.path = path;
+	    System.out.println("CTudorache new DefaultDriveTask: " + this);
 	}
 
 	@Override

@@ -55,6 +55,8 @@ public final class VrpAgentLogic implements DynAgentLogic {
 		this.vehicle = vehicle;
 		this.dvrpMode = dvrpMode;
 		this.eventsManager = eventsManager;
+
+	    System.out.println("CTudorache new VrpAgentLogic: " + this);
 	}
 
 	@Override

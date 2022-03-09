@@ -49,6 +49,8 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		this.specification = specification;
 		this.startLink = startLink;
 		schedule = Schedule.create(specification);
+
+	    System.out.println("CTudorache new DvrpVehicleImpl: " + this);
 	}
 
 	@Override

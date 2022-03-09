@@ -9,11 +9,11 @@ hs: hybridsim
 
 hybridsim:
 	cd matsim ; mvn clean install -DskipTests
-	cd contribs/protobuf  ; mvn clean eclipse:clean eclipse:eclipse install
-	cd contribs/hybridsim ; mvn clean eclipse:clean eclipse:eclipse install
+	#cd contribs/protobuf  ; mvn clean eclipse:clean eclipse:eclipse install
+	#cd contribs/hybridsim ; mvn clean eclipse:clean eclipse:eclipse install
 
 release:
-	mvn clean ; cd matsim ; mvn -f ~/git/matsim/pom.xml --projects playgrounds/kairuns/ --also-make install -DskipTests
+	mvn clean ; cd matsim ; mvn -f pom.xml --projects playgrounds/kairuns/ --also-make install -DskipTests
 	cd playgrounds/kairuns ; mvn clean ; mvn -Prelease -DskipTests=true
 
 matsim-quick:

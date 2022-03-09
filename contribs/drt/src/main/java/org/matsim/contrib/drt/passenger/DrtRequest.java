@@ -54,6 +54,8 @@ public class DrtRequest implements PassengerRequest {
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
+
+	     System.out.println("CTudorache new DrtRequest: " + this);
 	}
 
 	public static Builder newBuilder() {
