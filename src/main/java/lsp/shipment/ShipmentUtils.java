@@ -2,135 +2,14 @@ package lsp.shipment;
 
 //import demand.UtilityFunction;
 import lsp.LogisticsSolutionElement;
-import lsp.functions.LSPInfo;
 import lsp.resources.LSPResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-
-import java.util.ArrayList;
 
 public class ShipmentUtils{
 	private ShipmentUtils(){} // do not instantiate
-
-	public static class LSPShipmentBuilder{
-
-		private final Id<LSPShipment> id;
-		private Id<Link> fromLinkId;
-		private Id<Link> toLinkId;
-		private TimeWindow startTimeWindow;
-		private TimeWindow endTimeWindow;
-		private int capacityDemand;
-		private double deliveryServiceTime;
-		private double pickupServiceTime;
-		private final ArrayList<Requirement> requirements;
-//		private final ArrayList<UtilityFunction> utilityFunctions;
-		private final ArrayList<LSPInfo> infos;
-
-		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
-			return new LSPShipmentBuilder(id);
-		}
-
-		private LSPShipmentBuilder( Id<LSPShipment> id ){
-			this.requirements = new ArrayList<>();
-//			this.utilityFunctions = new ArrayList<>();
-			this.infos = new ArrayList<>();
-			this.id = id;
-		}
-
-		public void setFromLinkId(Id<Link> fromLinkId ){
-			this.fromLinkId = fromLinkId;
-		}
-
-		public void setToLinkId(Id<Link> toLinkId ){
-			this.toLinkId = toLinkId;
-		}
-
-		public void setStartTimeWindow(TimeWindow startTimeWindow ){
-			this.startTimeWindow = startTimeWindow;
-		}
-
-		public void setEndTimeWindow(TimeWindow endTimeWindow ){
-			this.endTimeWindow = endTimeWindow;
-		}
-
-		public void setCapacityDemand(int capacityDemand ){
-			this.capacityDemand = capacityDemand;
-		}
-
-		public void setDeliveryServiceTime(double serviceTime ){
-			this.deliveryServiceTime = serviceTime;
-		}
-		public LSPShipmentBuilder setPickupServiceTime( double serviceTime ){
-			this.pickupServiceTime = serviceTime;
-			return this;
-		}
-
-		public void addRequirement(Requirement requirement ) {
-			requirements.add(requirement);
-		}
-
-//		public LSPShipmentBuilder addUtilityFunction( UtilityFunction utilityFunction ) {
-//			utilityFunctions.add(utilityFunction);
-//			return this;
-//		}
-
-		public void addInfo(LSPInfo info ) {
-			infos.add(info);
-		}
-
-		public LSPShipment build(){
-			return new LSPShipmentImpl(this);
-		}
-
-		// --- Getters ---
-
-		public Id<LSPShipment> getId() {
-			return id;
-		}
-
-		public Id<Link> getFromLinkId() {
-			return fromLinkId;
-		}
-
-		public Id<Link> getToLinkId() {
-			return toLinkId;
-		}
-
-		public TimeWindow getStartTimeWindow() {
-			return startTimeWindow;
-		}
-
-		public TimeWindow getEndTimeWindow() {
-			return endTimeWindow;
-		}
-
-		public int getCapacityDemand() {
-			return capacityDemand;
-		}
-
-		public double getDeliveryServiceTime() {
-			return deliveryServiceTime;
-		}
-		public double getPickupServiceTime(){
-			return pickupServiceTime;
-		}
-
-		public ArrayList<Requirement> getRequirements() {
-			return requirements;
-		}
-
-//		public ArrayList<UtilityFunction> getUtilityFunctions() {
-//			return utilityFunctions;
-//		}
-
-		public ArrayList<LSPInfo> getInfos() {
-			return infos;
-		}
-
-	}
 
 	public static class LoggedShipmentHandleBuilder {
 		private double startTime;

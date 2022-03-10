@@ -10,7 +10,7 @@ import lsp.*;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.ShipmentUtils;
+import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +113,7 @@ public class CollectionLSPReplanningTest {
 
 		for(int i = 1; i < 21; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
         	Random random = new Random(1);
         	int capacityDemand = random.nextInt(10);
         	builder.setCapacityDemand(capacityDemand);

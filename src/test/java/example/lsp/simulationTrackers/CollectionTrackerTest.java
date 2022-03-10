@@ -2,15 +2,16 @@ package example.lsp.simulationTrackers;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.controler.LSPSimulationTracker;
+import lsp.shipment.LSPShipmentImpl;
+import org.junit.Assert;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.functions.LSPInfo;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
-import org.junit.Assert;
+import lsp.controler.LSPSimulationTracker;
+import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -132,7 +133,7 @@ public class CollectionTrackerTest {
 
 		for(int i = 1; i < 2; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
         	Random random = new Random(1);
         	int capacityDemand = random.nextInt(4);
         	builder.setCapacityDemand(capacityDemand);

@@ -2,13 +2,14 @@ package example.lsp.lspScoring;
 
 import lsp.*;
 import lsp.controler.LSPModule;
+import lsp.shipment.LSPShipmentImpl;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentUtils;
-import lsp.usecase.UsecaseUtils;
+import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -17,7 +18,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -119,7 +119,7 @@ public class CollectionLSPScoringTest {
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);

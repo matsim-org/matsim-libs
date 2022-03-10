@@ -11,7 +11,7 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.LogisticsSolution;
 import lsp.functions.LSPInfo;
 
-/* package-private */ class LSPShipmentImpl implements LSPShipment {
+public class LSPShipmentImpl implements LSPShipment {
 
 	private final Id<LSPShipment> id;
 	private final Id<Link> fromLinkId;
@@ -25,33 +25,91 @@ import lsp.functions.LSPInfo;
 	private final ShipmentPlan log;
 	private final ArrayList<EventHandler> eventHandlers;
 	private final ArrayList<Requirement> requirements;
-//	private final ArrayList<UtilityFunction> utilityFunctions;
 	private final ArrayList<LSPInfo> infos;
 	private Id<LogisticsSolution> solutionId;
 
-	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
-		this.id = builder.getId();
-		this.fromLinkId = builder.getFromLinkId();
-		this.toLinkId = builder.getToLinkId();
-		this.startTimeWindow = builder.getStartTimeWindow();
-		this.endTimeWindow = builder.getEndTimeWindow();
-		this.capacityDemand = builder.getCapacityDemand();
-		this.deliveryServiceTime = builder.getDeliveryServiceTime();
-		this.pickupServiceTime = builder.getPickupServiceTime();
+	public static class LSPShipmentBuilder{
+		private final Id<LSPShipment> id;
+		private Id<Link> fromLinkId;
+		private Id<Link> toLinkId;
+		private TimeWindow startTimeWindow;
+		private TimeWindow endTimeWindow;
+		private int capacityDemand;
+		private double deliveryServiceTime;
+		private double pickupServiceTime;
+		private final ArrayList<Requirement> requirements;
+		private final ArrayList<LSPInfo> infos;
+
+		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
+			return new LSPShipmentBuilder(id);
+		}
+
+		private LSPShipmentBuilder( Id<LSPShipment> id ){
+			this.requirements = new ArrayList<>();
+			this.infos = new ArrayList<>();
+			this.id = id;
+		}
+
+		public void setFromLinkId(Id<Link> fromLinkId ){
+			this.fromLinkId = fromLinkId;
+		}
+
+		public void setToLinkId(Id<Link> toLinkId ){
+			this.toLinkId = toLinkId;
+		}
+
+		public void setStartTimeWindow(TimeWindow startTimeWindow ){
+			this.startTimeWindow = startTimeWindow;
+		}
+
+		public void setEndTimeWindow(TimeWindow endTimeWindow ){
+			this.endTimeWindow = endTimeWindow;
+		}
+
+		public void setCapacityDemand(int capacityDemand ){
+			this.capacityDemand = capacityDemand;
+		}
+
+		public void setDeliveryServiceTime(double serviceTime ){
+			this.deliveryServiceTime = serviceTime;
+		}
+		public LSPShipmentBuilder setPickupServiceTime( double serviceTime ){
+			this.pickupServiceTime = serviceTime;
+			return this;
+		}
+
+		public void addRequirement(Requirement requirement ) {
+			requirements.add(requirement);
+		}
+
+		public void addInfo(LSPInfo info ) {
+			infos.add(info);
+		}
+
+		public LSPShipment build(){
+			return new LSPShipmentImpl(this);
+		}
+	}
+
+	private LSPShipmentImpl( LSPShipmentBuilder builder ){
+		this.id = builder.id;
+		this.fromLinkId = builder.fromLinkId;
+		this.toLinkId = builder.toLinkId;
+		this.startTimeWindow = builder.startTimeWindow;
+		this.endTimeWindow = builder.endTimeWindow;
+		this.capacityDemand = builder.capacityDemand;
+		this.deliveryServiceTime = builder.deliveryServiceTime;
+		this.pickupServiceTime = builder.pickupServiceTime;
 		this.schedule = new ShipmentPlanImpl(this);
 		this.log = new ShipmentPlanImpl(this);
 		this.eventHandlers = new ArrayList<>();
 		this.requirements = new ArrayList<>();
-		this.requirements.addAll( builder.getRequirements() );
-//		this.utilityFunctions = new ArrayList<>();
-//		for(UtilityFunction utilityFunction : builder.getUtilityFunctions()) {
-//			this.utilityFunctions.add(utilityFunction);
-//		}
+		this.requirements.addAll( builder.requirements );
 		this.infos = new ArrayList<>();
-		this.infos.addAll( builder.getInfos() );
+		this.infos.addAll( builder.infos );
 	}
-	
-	
+
+
 	@Override
 	public Id<LSPShipment> getId() {
 		return id;
@@ -108,31 +166,17 @@ import lsp.functions.LSPInfo;
 		return requirements;
 	}
 
-
-//	@Override
-//	public Collection<UtilityFunction> getUtilityFunctions() {
-//		return utilityFunctions;
-//	}
-
-
 	@Override
 	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 
-
 	@Override public Id<LogisticsSolution> getSolutionId() {
 		return solutionId;
 	}
+
 	@Override public double getPickupServiceTime(){
 		return pickupServiceTime;
 	}
-
-
-//	@Override public void setSolutionId( Id<LogisticsSolution> solutionId ) {
-//		this.solutionId = solutionId;
-//	}
-
-	
 	
 }

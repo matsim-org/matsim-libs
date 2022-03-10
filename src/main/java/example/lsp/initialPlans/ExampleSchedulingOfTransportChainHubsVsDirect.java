@@ -6,10 +6,7 @@ import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
 import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.ShipmentPlanElementComparator;
-import lsp.shipment.ShipmentUtils;
+import lsp.shipment.*;
 import lsp.usecase.UsecaseUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -442,7 +439,7 @@ import java.util.*;
 		Random rand = new Random(1);
 		for(int i = 1; i < 6; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 			int capacityDemand = rand.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
