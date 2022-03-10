@@ -97,7 +97,7 @@ import lsp.resources.LSPResource;
 		//Create five LSPShipments that are located in the left half of the network.
 		for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 	        	Random random = new Random(1);
 	        	int capacityDemand = random.nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);

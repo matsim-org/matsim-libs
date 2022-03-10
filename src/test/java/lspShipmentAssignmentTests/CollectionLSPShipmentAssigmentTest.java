@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
-import lsp.shipment.ShipmentUtils;
+import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,7 +100,7 @@ public class CollectionLSPShipmentAssigmentTest {
 
 		for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = new Random().nextInt(10);
         	builder.setCapacityDemand(capacityDemand);
         	

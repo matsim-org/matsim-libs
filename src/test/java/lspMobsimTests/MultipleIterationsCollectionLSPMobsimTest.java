@@ -105,7 +105,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		int numberOfShipments = 1 + new Random().nextInt(50);
 	    for(int i = 1; i < 1 + numberOfShipments; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
         	//Random random = new Random(1);
         	int capacityDemand = 1 + new Random().nextInt(4);
         	builder.setCapacityDemand(capacityDemand);
