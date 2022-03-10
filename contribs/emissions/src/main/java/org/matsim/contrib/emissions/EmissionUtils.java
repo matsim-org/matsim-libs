@@ -41,29 +41,15 @@ import java.util.stream.Stream;
 /**
  * @author ikaddoura, benjamin
  */
-public final class EmissionUtils {
+public abstract class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
+	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS, END_EMISSIONS}
 
-	private EmissionUtils(){ } // do not instantiate
-
-	static Map<String, Integer> createIndexFromKey(String strLine) {
-		String[] keys = strLine.split(";");
-
-		Map<String, Integer> indexFromKey = new HashMap<>();
-		for (int ii = 0; ii < keys.length; ii++) {
-			indexFromKey.put(keys[ii], ii);
-		}
-		return indexFromKey;
-	}
-
-	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
 	public static void setHbefaRoadType(Link link, String type) {
-		if (type != null) {
-			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
-		}
+		link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 	}
 
 	public static String getHbefaRoadType(Link link) {
