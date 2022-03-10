@@ -23,7 +23,6 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -33,13 +32,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import testLSPWithCostTracker.CollectionServiceHandler;
-import testLSPWithCostTracker.DistanceAndTimeHandler;
-import testLSPWithCostTracker.TourStartHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -108,9 +103,9 @@ public class CollectionTrackerTest {
 
 		shareOfFixedCosts = 0.2;
         LinearCostTracker tracker = new LinearCostTracker(shareOfFixedCosts);
-		tracker.getEventHandlers().add(new testLSPWithCostTracker.TourStartHandler() );
-		tracker.getEventHandlers().add(new testLSPWithCostTracker.CollectionServiceHandler() );
-		tracker.getEventHandlers().add(new testLSPWithCostTracker.DistanceAndTimeHandler(network) );
+		tracker.getEventHandlers().add(new TourStartHandler() );
+		tracker.getEventHandlers().add(new CollectionServiceHandler() );
+		tracker.getEventHandlers().add(new DistanceAndTimeHandler(network) );
 
 		collectionSolution.addSimulationTracker(tracker);
 
@@ -192,8 +187,8 @@ public class CollectionTrackerTest {
 		int totalNumberOfScheduledShipments = 0;
 		int totalNumberOfTrackedShipments = 0;
 		for(EventHandler handler : linearTracker.getEventHandlers()) {
-			if(handler instanceof testLSPWithCostTracker.TourStartHandler ) {
-				testLSPWithCostTracker.TourStartHandler startHandler = (TourStartHandler) handler;
+			if(handler instanceof TourStartHandler ) {
+				TourStartHandler startHandler = (TourStartHandler) handler;
 				double scheduledCosts = 0;
 				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					scheduledCosts += ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getFix();
@@ -203,8 +198,8 @@ public class CollectionTrackerTest {
 				totalTrackedCosts += trackedCosts;
 				assertEquals(trackedCosts, scheduledCosts, 0.1);
 			}
-			if(handler instanceof testLSPWithCostTracker.CollectionServiceHandler ) {
-				testLSPWithCostTracker.CollectionServiceHandler serviceHandler = (CollectionServiceHandler) handler;
+			if(handler instanceof CollectionServiceHandler ) {
+				CollectionServiceHandler serviceHandler = (CollectionServiceHandler) handler;
 				totalTrackedWeight = serviceHandler.getTotalWeightOfShipments();
 				totalNumberOfTrackedShipments = serviceHandler.getTotalNumberOfShipments();
 				double scheduledCosts = 0;
@@ -224,8 +219,8 @@ public class CollectionTrackerTest {
 				totalTrackedCosts += trackedCosts;
 				assertEquals(trackedCosts, scheduledCosts, 0.1);
 			}
-			if(handler instanceof testLSPWithCostTracker.DistanceAndTimeHandler ) {
-				testLSPWithCostTracker.DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
+			if(handler instanceof DistanceAndTimeHandler ) {
+				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
 				double trackedTimeCosts = distanceHandler.getTimeCosts();
 				totalTrackedCosts += trackedTimeCosts;
 				double scheduledTimeCosts = 0;
