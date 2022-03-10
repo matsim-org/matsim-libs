@@ -282,7 +282,6 @@ public class CollectionTrackerTest {
 //		CostInfoFunction function = (CostInfoFunction) costInfo.getAttributes();
 //		ArrayList<LSPAttribute<?>> values = new ArrayList<>(function.getAttributes());
 
-		//TODO: Problem ist aktuell, dass costInfo.getVariableCost() als Ergebnis NaN hat... -> hier wurde nie was eingetragen...
 		assertEquals(costInfo.getVariableCost() ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
 		assertEquals(costInfo.getVariableCost()  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
 		assertEquals(costInfo.getFixedCost() ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
