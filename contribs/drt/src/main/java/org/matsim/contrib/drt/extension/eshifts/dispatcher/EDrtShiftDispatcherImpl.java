@@ -21,13 +21,12 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.drt.extension.eshifts.charging.ChargingWithBreaksAndAssignmentLogic;
 import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.eshifts.schedule.EDrtWaitForShiftStayTask;
 import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
-import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -97,24 +96,13 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.chargingInfrastructure = chargingInfrastructure;
         this.eventsManager = eventsManager;
         this.configGroup = configGroup;
-        if (chargingInfrastructure != null) {
-            resetCharger();
-        }
 		shiftTaskScheduler.initSchedules();
         createQueues();
     }
 
-    private void resetCharger() {
-        for (Charger charger : chargingInfrastructure.getChargers().values()) {
-            final ChargingLogic logic = charger.getLogic();
-            if (logic instanceof ChargingWithBreaksAndAssignmentLogic) {
-                ((ChargingWithBreaksAndAssignmentLogic) logic).resetFleet(fleet);
-            }
-        }
-    }
 
     private void createQueues() {
-        unscheduledShifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
+		unscheduledShifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
         unscheduledShifts.addAll(shifts.getShifts().values());
 
         assignedShifts = new PriorityQueue<>(Comparator.comparingDouble(v -> v.shift.getStartTime()));
@@ -141,10 +129,17 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         startShifts(timeStep);
         checkBreaks();
         checkChargingAtHub();
+		if(timeStep % configGroup.getLoggingInterval() == 0) {
+			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
+					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
+			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
+				logger.info(String.format("Idle vehicles at facility %s: %d", queueEntry.getKey().toString(), queueEntry.getValue().size()));
+			}
+		}
     }
 
     private void checkChargingAtHub() {
-        if (timer.getTimeOfDay() % (3 * 60) == 0) {
+        if (timer.getTimeOfDay() % (configGroup.getChargeAtHubInterval()) == 0) {
 			for (Queue<ShiftDvrpVehicle> idleVehiclesQueue : idleVehiclesQueues.values()) {
 				for (ShiftDvrpVehicle vehicle : idleVehiclesQueue) {
 					if (vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
@@ -154,24 +149,39 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 								final Task currentTask = vehicle.getSchedule().getCurrentTask();
 								if (currentTask instanceof EDrtWaitForShiftStayTask
 										&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
-									Optional<Id<Charger>> chargerId = ((WaitForShiftStayTask) currentTask).getFacility().getCharger();
-									if(chargerId.isEmpty()) {
+									List<Id<Charger>> chargerIds = ((WaitForShiftStayTask) currentTask).getFacility().getChargers();
+									if(chargerIds.isEmpty()) {
 										//facility does not have a charger
 										continue;
 									}
-									final Charger charger = chargingInfrastructure.getChargers()
-											.get(chargerId.get());
-									if (!charger.getLogic().getChargingStrategy().isChargingCompleted(electricVehicle)) {
-										final double waitTime = ChargingEstimations
-												.estimateMaxWaitTimeForNextVehicle(charger);
-										final double chargingTime = charger.getLogic().getChargingStrategy()
-												.calcRemainingTimeToCharge(electricVehicle);
-										double energy = -charger.getLogic().getChargingStrategy()
-												.calcRemainingEnergyToCharge(electricVehicle);
-										final double endTime = timer.getTimeOfDay() + waitTime + chargingTime;
-										if (endTime < currentTask.getEndTime()) {
-											shiftTaskScheduler.chargeAtHub((WaitForShiftStayTask) currentTask, vehicle,
-													electricVehicle, charger, timer.getTimeOfDay(), endTime, energy);
+
+									Optional<Charger> selectedCharger = chargerIds
+											.stream()
+											.map(id -> chargingInfrastructure.getChargers().get(id))
+											.filter(charger -> configGroup.getOutOfShiftChargerType().equals(charger.getChargerType()))
+											.min((c1, c2) -> {
+												final double waitTime = ChargingEstimations
+														.estimateMaxWaitTimeForNextVehicle(c1);
+												final double waitTime2 = ChargingEstimations
+														.estimateMaxWaitTimeForNextVehicle(c2);
+												return Double.compare(waitTime, waitTime2);
+											});
+
+									if(selectedCharger.isPresent()) {
+										Charger selectedChargerImpl = selectedCharger.get();
+										ChargingStrategy chargingStrategy = selectedChargerImpl.getLogic().getChargingStrategy();
+										if (!chargingStrategy.isChargingCompleted(electricVehicle)) {
+											final double waitTime = ChargingEstimations
+													.estimateMaxWaitTimeForNextVehicle(selectedChargerImpl);
+											final double chargingTime = chargingStrategy
+													.calcRemainingTimeToCharge(electricVehicle);
+											double energy = -chargingStrategy
+													.calcRemainingEnergyToCharge(electricVehicle);
+											final double endTime = timer.getTimeOfDay() + waitTime + chargingTime;
+											if (endTime < currentTask.getEndTime()) {
+												shiftTaskScheduler.chargeAtHub((WaitForShiftStayTask) currentTask, vehicle,
+														electricVehicle, selectedChargerImpl, timer.getTimeOfDay(), endTime, energy);
+											}
 										}
 									}
 								}
@@ -349,6 +359,11 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private void updateShiftEnd(ShiftEntry next) {
+
+		if(next.shift.getOperationFacilityId().isPresent()) {
+			//start and end facility are fixed
+			return;
+		}
 
         final List<? extends Task> tasks = next.vehicle.getSchedule().getTasks();
 

@@ -20,26 +20,12 @@
 
 package org.matsim.analysis;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.TripsAndLegsCSVWriter.NoLegsWriterExtension;
 import org.matsim.analysis.TripsAndLegsCSVWriter.NoTripWriterExtension;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -64,6 +50,11 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author Aravind
@@ -175,17 +166,18 @@ public class TripsAndLegsCSVWriterTest {
 	private void performTest(String tripsFilename, String legsFilename, IdMap<Person, Plan> map, AnalysisMainModeIdentifier mainModeIdentifier) {
 		TripsAndLegsCSVWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
 		TripsAndLegsCSVWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
+		TripsAndLegsCSVWriter.CustomTimeWriter timeWriter = new TripsAndLegsCSVWriter.DefaultTimeWriter();
 		TripsAndLegsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension = new CustomTripsWriterExtesion();
 		TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension = new CustomLegsWriterExtesion();
 		TripsAndLegsCSVWriter tripsAndLegsWriter = new TripsAndLegsCSVWriter(scenario, tripsWriterExtension,
-				legWriterExtension, mainModeIdentifier);
+				legWriterExtension, mainModeIdentifier, timeWriter);
 		tripsAndLegsWriter.write(map, tripsFilename, legsFilename);
 		readTripsFromPlansFile(map, mainModeIdentifier);
 		readAndValidateTrips(persontrips, tripsFilename);
 		readLegsFromPlansFile(map);
 		readAndValidateLegs(legsfromplan, legsFilename);
 		TripsAndLegsCSVWriter tripsAndLegsWriterTest = new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension,
-				customLegsWriterExtension, mainModeIdentifier);
+				customLegsWriterExtension, mainModeIdentifier, timeWriter);
 		tripsAndLegsWriterTest.write(map, tripsFilename, legsFilename);
 	}
 	
@@ -639,19 +631,21 @@ public class TripsAndLegsCSVWriterTest {
 			case "trip_number":
 				trip_number = i;
 				break;
-				
-			case "person":
-				person = i;
-				break;
-				
-			case "transitStopsVisited":
-				transitStopsVisited = i;
-				break;
-				
-			case "isIntermodalWalkPt":
-				isIntermodalWalkPt = i;
-				break;			
-				
+
+				case "person":
+					person = i;
+					break;
+
+				case "transitStopsVisited":
+					transitStopsVisited = i;
+					break;
+
+				case "isIntermodalWalkPt":
+					isIntermodalWalkPt = i;
+					break;
+				default:
+					break;
+
 			}
 			i++;
 		}

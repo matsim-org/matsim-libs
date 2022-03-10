@@ -1,0 +1,8 @@
+carrierId	shipmentId	driverId	vehicleId	pickupTime	deliveryTime	deliveryDuration	beelineDistance
+carrier1	1	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	10816.653826391968
+carrier1	11	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	6000.0
+carrier1	12	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	7106.335201775948
+carrier1	13	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	4123.105625617661
+carrier1	14	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	9055.385138137417
+carrier1	15	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	6964.19413859206
+carrier1	16	##freight_carrier1_veh_carrier_19_lightVehicle_0	##freight_carrier1_veh_carrier_19_lightVehicle_0	0.0	0.0	0.0	9192.388155425118

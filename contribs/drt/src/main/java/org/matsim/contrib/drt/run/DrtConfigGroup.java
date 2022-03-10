@@ -27,11 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,8 +34,8 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
@@ -54,6 +49,12 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
@@ -88,14 +89,20 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
 	static final String MAX_TRAVEL_TIME_ALPHA_EXP =
 			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
+					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
 					+ "Alpha should not be smaller than 1.";
 
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
 	static final String MAX_TRAVEL_TIME_BETA_EXP =
 			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
+					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
 					+ "Beta should not be smaller than 0.";
+
+	public static final String MAX_ABSOLUTE_DETOUR = "maxAbsoluteDetour";
+	static final String MAX_ABSOLUTE_DETOUR_EXP =
+			"Defines the maximum allowed absolute detour in seconds of the maxTravelTime estimation function (optimisation constraint), i.e. "
+					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
+					+ "maxAbsoluteDetour should not be smaller than 0. and should be higher than the offset maxTravelTimeBeta.";
 
 	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
 	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP =
@@ -161,13 +168,16 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	private double maxWaitTime = Double.NaN;// seconds
 
 	// max arrival time defined as:
-	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
+	// min(unshared_ride_travel_time(fromLink, toLink) + maxAbsoluteDetour, maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta),
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated during replanning (see: DrtRouteCreator)
 	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
 	@PositiveOrZero
 	private double maxTravelTimeBeta = Double.NaN;// [s]
+
+	@PositiveOrZero
+	private double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
 
 	private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 
@@ -315,6 +325,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
 		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAVEL_TIME_ALPHA_EXP);
 		map.put(MAX_TRAVEL_TIME_BETA, MAX_TRAVEL_TIME_BETA_EXP);
+		map.put(MAX_ABSOLUTE_DETOUR, MAX_ABSOLUTE_DETOUR_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP);
 		map.put(VEHICLES_FILE, VEHICLES_FILE_EXP);
 		map.put(WRITE_DETAILED_CUSTOMER_STATS, WRITE_DETAILED_CUSTOMER_STATS_EXP);
@@ -451,6 +462,23 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
 	public DrtConfigGroup setMaxTravelTimeBeta(double maxTravelTimeBeta) {
 		this.maxTravelTimeBeta = maxTravelTimeBeta;
+		return this;
+	}
+
+	/**
+	 * @return -- {@value #MAX_ABSOLUTE_DETOUR_EXP}
+	 */
+	@StringGetter(MAX_ABSOLUTE_DETOUR)
+	public double getMaxAbsoluteDetour() {
+		return maxAbsoluteDetour;
+	}
+
+	/**
+	 * @param maxAbsoluteDetour -- {@value #MAX_ABSOLUTE_DETOUR_EXP}
+	 */
+	@StringSetter(MAX_ABSOLUTE_DETOUR)
+	public DrtConfigGroup setMaxAbsoluteDetour(double maxAbsoluteDetour) {
+		this.maxAbsoluteDetour = maxAbsoluteDetour;
 		return this;
 	}
 

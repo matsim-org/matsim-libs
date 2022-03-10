@@ -8,6 +8,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
 import org.matsim.contrib.drt.extension.shifts.schedule.OperationalStop;
 
@@ -30,6 +31,9 @@ public class ShiftOperatingVehicleProvider implements AuxDischargingHandler.Vehi
         //assumes driverId == vehicleId
         DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle(Id.create(event.getPersonId(), DvrpVehicle.class));
         if(vehicle != null) {
+			if(!(vehicle instanceof EvDvrpVehicle)) {
+				return null;
+			}
             if (vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED && vehicle.getSchedule().getStatus()
                     != Schedule.ScheduleStatus.COMPLETED) {
                 if (vehicle.getSchedule().getCurrentTask() instanceof OperationalStop) {
