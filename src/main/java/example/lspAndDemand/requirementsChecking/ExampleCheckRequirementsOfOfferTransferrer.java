@@ -131,7 +131,7 @@ class ExampleCheckRequirementsOfOfferTransferrer {
 		OfferTransferrer transferrer = new RequirementsTransferrer();
 		plan.setOfferTransferrer(transferrer);
 		
-		LSPWithOffers.Builder offerLSPBuilder = LSPWithOffers.Builder.getInstance();
+		LSPWithOffers.Builder offerLSPBuilder = LSPWithOffers.Builder.newInstance();
 		offerLSPBuilder.setInitialPlan(plan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		offerLSPBuilder.setId(collectionLSPId);
@@ -153,9 +153,7 @@ class ExampleCheckRequirementsOfOfferTransferrer {
 	    Random rand = new Random(1); 
 	    
 	    for(int i = 1; i < 11; i++) {
-        	Id<DemandObject> id = Id.create(("DemandObject_" + i), DemandObject.class);
-        	DemandObjectImpl.Builder builder = DemandObjectImpl.Builder.newInstance();
-        	builder.setId(id);
+			DemandObjectImpl.Builder builder = DemandObjectImpl.Builder.newInstance(Id.create(("DemandObject_" + i), DemandObject.class));
         	
         	boolean blue = rand.nextBoolean();
         	if (blue) {

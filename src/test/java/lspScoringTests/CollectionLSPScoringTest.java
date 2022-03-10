@@ -2,6 +2,7 @@ package lspScoringTests;
 
 import lsp.*;
 import lsp.controler.LSPModule;
+import lsp.shipment.LSPShipmentImpl;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.functions.LSPInfoFunction;
 import lsp.functions.LSPInfoFunctionUtils;
@@ -11,7 +12,6 @@ import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -122,7 +122,7 @@ public class CollectionLSPScoringTest {
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);

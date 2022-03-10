@@ -234,7 +234,7 @@ public class CompleteLSPSchedulingTest {
 		Random rand = new Random(1);
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 	        	int capacityDemand = rand.nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	

@@ -2,7 +2,6 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -126,7 +125,7 @@ public class FirstReloadLSPSchedulingTest {
 		
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 	        	//Random random = new Random(1);
 	        	int capacityDemand = new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);

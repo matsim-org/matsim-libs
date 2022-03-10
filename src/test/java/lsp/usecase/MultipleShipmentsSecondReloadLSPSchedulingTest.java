@@ -195,7 +195,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		
 		 for(int i = 1; i < 100; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
 	        	int capacityDemand = new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
