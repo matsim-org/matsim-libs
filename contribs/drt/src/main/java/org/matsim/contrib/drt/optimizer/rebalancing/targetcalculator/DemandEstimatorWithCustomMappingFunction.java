@@ -19,17 +19,25 @@ public class DemandEstimatorWithCustomMappingFunction implements RebalancingTarg
 
 	@Override
 	public ToDoubleFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		return transform(demandEstimator.getExpectedDemand(time, demandEstimationPeriod));
+		return transform(time);
 	}
 
 	/**
 	 * Custom transform function (simple example)
 	 */
-	private ToDoubleFunction<DrtZone> transform(ToDoubleFunction<DrtZone> input) {
+	private ToDoubleFunction<DrtZone> transform(double time) {
+		ToDoubleFunction<DrtZone> originalFunction = demandEstimator.getExpectedDemand(time, demandEstimationPeriod);
+
+		double lookAheadTime = 300; //TODO make this a variable (or read from config file: = rebalancing period)
+		ToDoubleFunction<DrtZone> originalFunctionWithLookAhead = demandEstimator.getExpectedDemand(time + lookAheadTime, demandEstimationPeriod);
+
 		return drtZone -> {
-			double originalOutputValue = input.applyAsDouble(drtZone);
-			if (originalOutputValue >= 1) {
-				return 1;  // If the region is active, return 1. Otherwise, return 0.
+			double originalValue = Math.max(originalFunction.applyAsDouble(drtZone), originalFunctionWithLookAhead.applyAsDouble(drtZone));
+			// Take the larger value of the current estimated demand and the estimated demand of the near future (i.e., with look ahead)
+			if (originalValue >= 1) {
+				return Math.max(1, originalValue % 5);  //TODO improve this structure
+				// For any regions with request, send at least 1 vehicle to that area during the time bin. If there are
+				// more requests, send 1 additional vehicle for every 5 (a variable) requests.
 			}
 			return 0;
 		};
