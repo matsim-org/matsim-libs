@@ -22,7 +22,9 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Provides;
+import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,12 +56,11 @@ import java.util.Map;
  *    living;Access
 
  */
-class OsmHbefaMapping extends HbefaRoadTypeMapping {
-    private static final int MAX_SPEED = 130;
-    private static final String OSM_HIGHWAY_TAG = "osm:way:highway";
-    private Map<String, Hbefa> hbfeaMap = new HashMap<>();
+public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
-    public static class Hbefa {
+    private final Map<String, Hbefa> hbfeaMap = new HashMap<>();
+
+    static class Hbefa {
         String name;
         int min;
         int max;
@@ -94,20 +95,19 @@ class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
     @Override
     public String determineHebfaType(Link link) {
-        String roadType = (String) link.getAttributes().getAttribute(OSM_HIGHWAY_TAG);
-        String hbefaType = null;
-        if (roadType != null) {
-            hbefaType = getHEBFAtype(roadType,link.getFreespeed());
-        }
-        return hbefaType;
+        String roadTypeAttribute = (String) link.getAttributes().getAttribute(NetworkUtils.TYPE);
+        Object allowedSpeedAttribute = link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED);
+
+        String roadType = StringUtils.isBlank(roadTypeAttribute) ? "unclassified" : roadTypeAttribute;
+        double allowedSpeed = allowedSpeedAttribute != null ? (double) allowedSpeedAttribute : link.getFreespeed();
+
+        return getHEBFAtype(roadType, allowedSpeed);
     }
 
-    private String getHEBFAtype(String roadType, double freeVelocity) {
-        String[] ss = roadType.split("_"); //want to remove
-        String type = ss[0];
+    private String getHEBFAtype(String type, double speed) {
 
         //TODO: could make distinction between national and city, based on shapefile, or regions.
-        double freeVelocity_kmh = freeVelocity * 3.6;
+        double freeVelocity_kmh = speed * 3.6;
 
         if (type.equals("unclassified") || type.equals("road")) {
             if (freeVelocity_kmh <= 50) type = "living";
@@ -121,14 +121,13 @@ class OsmHbefaMapping extends HbefaRoadTypeMapping {
         if (type.equals("motorway") || type.equals("primary") && freeVelocity_kmh >= 90) {
             type += "-Nat.";
         }
-        if (hbfeaMap.get(type) == null) {
-            throw new RuntimeException("'"+ type +"' not in hbefa map");
+        if (!hbfeaMap.containsKey(type)) {
+            throw new RuntimeException("'" + type + "' not in hbefa map");
         }
         int min_speed = hbfeaMap.get(type).min;
         int max_speed = hbfeaMap.get(type).max;
-        int capped_speed = (int) Math.min(Math.max(min_speed, freeVelocity_kmh), max_speed);
+        int clamped_speed = (int) Math.min(Math.max(min_speed, freeVelocity_kmh), max_speed);
 
-        return "URB/" + hbfeaMap.get(type).name + "/" + capped_speed;
+        return "URB/" + hbfeaMap.get(type).name + "/" + clamped_speed;
     }
-
 }
