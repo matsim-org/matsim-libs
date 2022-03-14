@@ -36,12 +36,13 @@ import java.util.Map;
  * Created by molloyj on 01.12.2017.
  * class to mimic the old org.matsim.contrib.emissions.roadTypeMapping that berlin uses with VISUM
  */
-class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
+public class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
     private static final Logger logger = Logger.getLogger(VisumHbefaRoadTypeMapping.class);
 
-    private Map<String, String> mapping = new HashMap<>();
+    private final Map<String, String> mapping = new HashMap<>();
 
-    private VisumHbefaRoadTypeMapping(){}
+    private VisumHbefaRoadTypeMapping() {
+    }
 
     @Override
     public String determineHebfaType(Link link) {
@@ -64,7 +65,7 @@ class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
         try{
             BufferedReader br = IOUtils.getBufferedReader(filename);
             String strLine = br.readLine();
-            Map<String, Integer> indexFromKey = EmissionUtils.createIndexFromKey(strLine);
+            Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 
             while ((strLine = br.readLine()) != null){
                 if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
@@ -78,7 +79,17 @@ class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger.info("leaving createRoadTypeMapping ...") ;
+        logger.info("leaving createRoadTypeMapping ...");
         return mapping;
+    }
+
+    private static Map<String, Integer> createIndexFromKey(String strLine) {
+        String[] keys = strLine.split(";");
+
+        Map<String, Integer> indexFromKey = new HashMap<>();
+        for (int ii = 0; ii < keys.length; ii++) {
+            indexFromKey.put(keys[ii], ii);
+        }
+        return indexFromKey;
     }
 }
