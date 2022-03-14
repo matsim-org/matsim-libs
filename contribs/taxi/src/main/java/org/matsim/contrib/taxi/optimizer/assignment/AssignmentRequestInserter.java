@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
@@ -39,6 +40,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class AssignmentRequestInserter implements UnplannedRequestInserter {
+	private static final Logger log = Logger.getLogger(AssignmentRequestInserter.class);
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 	private final MobsimTimer timer;
@@ -69,6 +71,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+		log.warn("CTudorache scheduleUnplannedRequests #" + unplannedRequests.size());
 		// advance request not considered => horizon==0
 		AssignmentRequestData rData = AssignmentRequestData.create(timer.getTimeOfDay(), 0, unplannedRequests);
 		if (rData.getSize() == 0) {

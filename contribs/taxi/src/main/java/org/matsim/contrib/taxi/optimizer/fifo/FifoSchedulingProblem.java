@@ -22,12 +22,14 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 
 public class FifoSchedulingProblem {
+	private static final Logger log = Logger.getLogger(FifoSchedulingProblem.class);
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 	private final BestDispatchFinder dispatchFinder;
@@ -39,12 +41,14 @@ public class FifoSchedulingProblem {
 	}
 
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+		log.warn("CTudorache scheduleUnplannedRequests #" + unplannedRequests.size());
 		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			TaxiRequest req = reqIter.next();
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req,
 					fleet.getVehicles().values().stream());
+			log.warn("CTudorache scheduleUnplannedRequests req: " + req + " => dispatch: " + best);
 
 			// TODO search only through available vehicles
 			// TODO what about k-nearstvehicle filtering?

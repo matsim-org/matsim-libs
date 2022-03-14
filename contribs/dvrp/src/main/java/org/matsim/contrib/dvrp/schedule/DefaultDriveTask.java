@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -29,12 +30,14 @@ import com.google.common.base.MoreObjects;
  * @author Michal Maciejewski (michalm)
  */
 public class DefaultDriveTask extends AbstractTask implements DriveTask {
+    private static final Logger log = Logger.getLogger(DefaultDriveTask.class);
 	private VrpPath path;
 
 	public DefaultDriveTask(TaskType taskType, VrpPathWithTravelData path) {
 		super(taskType, path.getDepartureTime(), path.getArrivalTime());
 		this.path = path;
-	    System.out.println("CTudorache new DefaultDriveTask: " + this);
+
+	    log.warn("CTudorache new DefaultDriveTask: " + this);
 	}
 
 	@Override

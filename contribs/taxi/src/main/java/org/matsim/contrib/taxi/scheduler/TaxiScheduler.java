@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -66,6 +67,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.common.util.concurrent.Futures;
 
 public class TaxiScheduler implements MobsimBeforeCleanupListener {
+    private static final Logger log = Logger.getLogger(TaxiScheduler.class);
 	protected final TaxiConfigGroup taxiCfg;
 	private final Fleet fleet;
 	private final TravelTime travelTime;
@@ -117,6 +119,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	// =========================================================================================
 
 	public void scheduleRequest(DvrpVehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath) {
+		log.warn("CTudorache scheduleRequest vehicle: " + vehicle + ", req: " + request);
 		if (request.getStatus() != TaxiRequestStatus.UNPLANNED) {
 			throw new IllegalStateException();
 		}

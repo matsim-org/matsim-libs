@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import static org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer.OneTaxiTaskType;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
@@ -28,13 +29,14 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
  * @author michalm
  */
 public class OneTaxiServeTask extends DefaultStayTask {
+    private static final Logger log = Logger.getLogger(OneTaxiServeTask.class);
 	private final OneTaxiRequest request;
 
 	public OneTaxiServeTask(OneTaxiTaskType taskType, double beginTime, double endTime, Link link,
 			OneTaxiRequest request) {
 		super(taskType, beginTime, endTime, link);
 		this.request = request;
-	    System.out.println("CTudorache new OneTaxiServerTask: " + this);
+	    log.warn("CTudorache new OneTaxiServerTask: " + this);
 	}
 
 	public OneTaxiRequest getRequest() {

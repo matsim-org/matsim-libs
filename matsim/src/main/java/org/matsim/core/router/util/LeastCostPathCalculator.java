@@ -22,6 +22,7 @@ package org.matsim.core.router.util;
 
 import java.util.List;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -50,6 +51,16 @@ public interface LeastCostPathCalculator {
 
 		public Node getToNode() {
 			return nodes.get(nodes.size() - 1);
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("from", getFromNode())
+					.add("to", getToNode())
+					.add("travelTime", travelTime)
+					.add("travelCost", travelCost)
+					.toString();
 		}
 	}
 }

@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.google.common.base.MoreObjects;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,6 +30,7 @@ import com.google.common.collect.Maps;
  * @author michalm
  */
 public class BestDispatchFinder {
+	private static final Logger log = Logger.getLogger(BestDispatchFinder.class);
 	public static class Dispatch<D> {
 		public final DvrpVehicle vehicle;
 		public final D destination;
@@ -37,6 +40,14 @@ public class BestDispatchFinder {
 			this.vehicle = vehicle;
 			this.destination = destination;
 			this.path = path;
+		}
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("vehicle", vehicle)
+					.add("dest", destination)
+					.add("path", path)
+					.toString();
 		}
 	}
 
@@ -100,14 +111,20 @@ public class BestDispatchFinder {
 			return null;
 		}
 
+		log.warn("CTudorache multiSourceALT:");
+		log.warn(" - from: " + vehicleNodes.values());
+		log.warn(" - to: " + destinationNode);
 		Path path = multiSourceALT.calcLeastCostPath(vehicleNodes.values(), destinationNode, null, null, false);
+		log.warn(" - path: " + path);
 
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
 		Node fromNode = path.getFromNode();
 		DvrpVehicle bestVehicle = nodeToVehicle.get(fromNode.getId());
+		log.warn(" - bestVehicle: " + bestVehicle);
 		LinkTimePair bestDeparture = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(bestVehicle);
+		log.warn(" - bestDeparture: " + bestDeparture);
 
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(bestDeparture.link, destinationLink, bestDeparture.time,
 				path, travelTime);

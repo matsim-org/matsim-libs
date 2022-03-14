@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.vrpagent;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.getBaseTypeOrElseThrow;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
@@ -42,6 +43,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
+    private static final Logger log = Logger.getLogger(TaxiActionCreator.class);
 	public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
 	public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
 	public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
@@ -55,7 +57,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 				v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
 						OnlineTrackerListener.NO_LISTENER, timer) :
 				v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer));
-	    System.out.println("CTudorache new TaxiActionCreator: " + this);
+	    log.warn("CTudorache new TaxiActionCreator: " + this);
 	}
 
 	public TaxiActionCreator(PassengerHandler passengerHandler, VrpLegFactory legFactory) {

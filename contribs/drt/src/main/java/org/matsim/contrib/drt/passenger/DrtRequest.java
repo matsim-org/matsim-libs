@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -38,6 +39,8 @@ public class DrtRequest implements PassengerRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 
+    private static final Logger log = Logger.getLogger(DrtRequest.class);
+
 	private final Id<Person> passengerId;
 	private final String mode;
 
@@ -55,7 +58,7 @@ public class DrtRequest implements PassengerRequest {
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
 
-	     System.out.println("CTudorache new DrtRequest: " + this);
+		log.warn("CTudorache new DrtRequest: " + this);
 	}
 
 	public static Builder newBuilder() {

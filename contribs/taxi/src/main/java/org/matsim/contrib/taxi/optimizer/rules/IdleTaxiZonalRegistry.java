@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -38,6 +39,7 @@ import org.matsim.contrib.zone.Zone;
 import com.google.common.collect.Maps;
 
 public class IdleTaxiZonalRegistry {
+	private static final Logger log = Logger.getLogger(IdleTaxiZonalRegistry.class);
 	private final ScheduleInquiry scheduleInquiry;
 
 	private final ZonalSystem zonalSystem;
@@ -93,6 +95,7 @@ public class IdleTaxiZonalRegistry {
 				scheduleInquiry::isIdle :
 				vehicleFilter.and(scheduleInquiry::isIdle);
 
+		log.warn("CTudorache findNearestVehicles, node: " + node + ", minCount: " + minCount + ", vehicles: #" + vehicles.size());
 		return minCount >= vehicles.size() ?
 				vehicles.values().stream().filter(idleVehicleFilter) :
 				zonesSortedByDistance.get(zonalSystem.getZone(node).getId())

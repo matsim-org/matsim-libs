@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -34,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
  * @author michalm
  */
 public final class VrpAgentLogic implements DynAgentLogic {
+    private static final Logger log = Logger.getLogger(VrpAgentLogic.class);
 	public static final String BEFORE_SCHEDULE_ACTIVITY_TYPE = "BeforeVrpSchedule";
 	public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
 
@@ -56,7 +58,7 @@ public final class VrpAgentLogic implements DynAgentLogic {
 		this.dvrpMode = dvrpMode;
 		this.eventsManager = eventsManager;
 
-	    System.out.println("CTudorache new VrpAgentLogic: " + this);
+	    log.warn("CTudorache new VrpAgentLogic: " + this);
 	}
 
 	@Override

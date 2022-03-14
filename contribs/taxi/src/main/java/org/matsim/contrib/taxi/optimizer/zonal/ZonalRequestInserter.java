@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -52,6 +53,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class ZonalRequestInserter implements UnplannedRequestInserter {
+	private static final Logger log = Logger.getLogger(ZonalRequestInserter.class);
 	private static final Comparator<DvrpVehicle> LONGEST_WAITING_FIRST = Comparator.comparingDouble(
 			v -> v.getSchedule().getCurrentTask().getBeginTime());
 
@@ -116,6 +118,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 	}
 
 	private void scheduleUnplannedRequestsWithinZones(Collection<TaxiRequest> unplannedRequests) {
+		log.warn("CTudorache scheduleUnplannedRequestsWithinZones #" + unplannedRequests.size());
 		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			TaxiRequest req = reqIter.next();
@@ -132,7 +135,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 			Stream<DvrpVehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
-
+			log.warn("CTudorache scheduleUnplannedRequestsWithinZones req: " + req + " => dispatch: " + best);
 			if (best != null) {
 				scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 				reqIter.remove();

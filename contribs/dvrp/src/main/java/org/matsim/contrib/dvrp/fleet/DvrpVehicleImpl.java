@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -30,6 +31,8 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class DvrpVehicleImpl implements DvrpVehicle {
+    private static final Logger log = Logger.getLogger(DvrpVehicleImpl.class);
+
 	private final DvrpVehicleSpecification specification;
 	private final Link startLink;
 	private final Schedule schedule;
@@ -50,7 +53,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		this.startLink = startLink;
 		schedule = Schedule.create(specification);
 
-	    System.out.println("CTudorache new DvrpVehicleImpl: " + this);
+	    log.warn("CTudorache new DvrpVehicleImpl: " + this);
 	}
 
 	@Override

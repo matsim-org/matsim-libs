@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.collect.Iterators;
@@ -95,5 +97,15 @@ public class VrpPathWithTravelDataImpl implements VrpPathWithTravelData {
 	@Override
 	public VrpPathWithTravelData withDepartureTime(double newDepartureTime) {
 		return new VrpPathWithTravelDataImpl(newDepartureTime, travelTime, links, linkTTs);
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("departureTime", departureTime)
+				.add("travelTime", travelTime)
+				.add("links", links.length)
+				.add("linkTTs", Arrays.toString(linkTTs))
+				.toString();
 	}
 }

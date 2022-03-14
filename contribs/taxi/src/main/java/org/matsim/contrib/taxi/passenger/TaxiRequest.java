@@ -35,7 +35,7 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class TaxiRequest implements PassengerRequest {
-    private static final Logger logger = Logger.getLogger(TaxiRequest.class);
+    private static final Logger log = Logger.getLogger(TaxiRequest.class);
 	public enum TaxiRequestStatus {
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
@@ -70,8 +70,7 @@ public class TaxiRequest implements PassengerRequest {
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 
-	    logger.warn("CTudorache new TaxiRequest: " + this);
-	    System.out.println("CTudorache new TaxiRequest: " + this);
+	    log.warn("CTudorache new TaxiRequest: " + this);
 	}
 
 	@Override

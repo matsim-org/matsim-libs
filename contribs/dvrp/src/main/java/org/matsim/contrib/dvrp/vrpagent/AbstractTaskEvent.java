@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasLinkId;
@@ -40,6 +41,8 @@ public abstract class AbstractTaskEvent extends Event implements HasPersonId, Ha
 	public static final String ATTRIBUTE_TASK_INDEX = "taskIndex";
 	public static final String ATTRIBUTE_DVRP_MODE = "dvrpMode";
 
+    private static final Logger log = Logger.getLogger(AbstractTaskEvent.class);
+
 	private final String dvrpMode;
 	private final Id<DvrpVehicle> dvrpVehicleId;
 	private final Id<Person> driverId;
@@ -57,7 +60,7 @@ public abstract class AbstractTaskEvent extends Event implements HasPersonId, Ha
 		this.taskIndex = taskIndex;
 		this.linkId = linkId;
 
-	    System.out.println("CTudorache new AbstractTaskEvent: " + this);
+	    log.warn("CTudorache new AbstractTaskEvent: " + this);
 	}
 
 	public final Id<DvrpVehicle> getDvrpVehicleId() {

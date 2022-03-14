@@ -18,10 +18,13 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -39,6 +42,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class RuleBasedRequestInserter implements UnplannedRequestInserter {
+	private static final Logger log = Logger.getLogger(RuleBasedRequestInserter.class);
 	private final TaxiScheduler scheduler;
 	private final BestDispatchFinder dispatchFinder;
 	private final MobsimTimer timer;
@@ -100,6 +104,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	// request-initiated scheduling
 	private void scheduleUnplannedRequestsImpl(Collection<TaxiRequest> unplannedRequests) {
+		log.warn("CTudorache scheduleUnplannedRequestsImpl #" + unplannedRequests.size());
 		// vehicles are not immediately removed so calculate 'idleCount' locally
 		int idleCount = idleTaxiRegistry.getVehicleCount();
 		int nearestVehiclesLimit = params.getNearestVehiclesLimit();
@@ -112,7 +117,13 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 					idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(), nearestVehiclesLimit) :
 					idleTaxiRegistry.vehicles();
 
+			log.warn("CTudorache scheduleUnplannedRequestsImpl req: " + req + ", selectedVehs: ");
+			selectedVehs = selectedVehs.peek(v -> {
+				log.warn(" - " + v);
+			});
+
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, selectedVehs);
+			log.warn("CTudorache best dispatch: " + best);
 			if (best == null) {
 				// XXX NOTE:
 				// There may be no idle vehicle in the registry despite idleCount > 0
@@ -134,6 +145,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	// vehicle-initiated scheduling
 	private void scheduleIdleVehiclesImpl(Collection<TaxiRequest> unplannedRequests) {
+		log.warn("CTudorache scheduleIdleVehiclesImpl #" + unplannedRequests.size());
 		int nearestRequestsLimit = params.getNearestRequestsLimit();
 		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
 		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
@@ -145,6 +157,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 					unplannedRequests.stream();
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
+			log.warn("CTudorache scheduleIdleVehiclesImpl veh: " + veh + " => dispatch: " + best);
 
 			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 

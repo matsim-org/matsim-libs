@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +37,8 @@ public final class OneTaxiRequest implements PassengerRequest {
 	private final double submissionTime;
 	private final double earliestStartTime;
 
+    private static final Logger log = Logger.getLogger(OneTaxiRequest.class);
+
 	private final Id<Person> passengerId;
 	private final String mode;
 
@@ -52,7 +55,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 
-	    System.out.println("CTudorache new OneTaxiRequest: " + this);
+	    log.warn("CTudorache new OneTaxiRequest: " + this);
 	}
 
 	@Override
