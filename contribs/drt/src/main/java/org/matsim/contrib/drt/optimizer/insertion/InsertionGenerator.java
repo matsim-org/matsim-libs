@@ -121,7 +121,7 @@ public class InsertionGenerator {
 			this.dropoff = dropoff;
 		}
 
-		Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
+		public Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
 			pickup = createPickupInsertion(request, vehicleEntry, pickupIdx, pickupIdx == dropoffIdx);
 			dropoff = createDropoffInsertion(request, vehicleEntry, pickup, dropoffIdx);

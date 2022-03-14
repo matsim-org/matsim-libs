@@ -27,7 +27,6 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,6 @@ public final class EmissionModule {
 
 	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 
-
 	private final Set<Pollutant> warmPollutants = new HashSet<>();
 	private final Set<Pollutant> coldPollutants = new HashSet<>();
 	// these are/were the "automatic" maps collected by JM from the hbefa files.  kai, jan'20
@@ -69,7 +67,8 @@ public final class EmissionModule {
 		this.eventsManager = emissionConfigGroup.isWritingEmissionsEvents() ? eventsManager : EventsUtils.createEventsManager();
 
 		checkConfigConsistency();
-		//TODO: create roadtype mapping here from config
+		checkNetworkConsistency();
+
 		createLookupTables();
 		createEmissionHandlers();
 
@@ -146,6 +145,18 @@ public final class EmissionModule {
 		}
 	}
 
+	private void checkNetworkConsistency() {
+
+		var allMatch = scenario.getNetwork().getLinks().values().parallelStream()
+				.map(link -> link.getAttributes().getAttribute(EmissionUtils.HBEFA_ROAD_TYPE))
+				.allMatch(roadType -> roadType instanceof String);
+
+		if (!allMatch)
+			throw new RuntimeException("The Emission Contrib expects HbefaRoadTypes to be set as link attributes. " +
+					"Use EmissionUtils.setHbefaRoadType(link, type) to set HbefaRoadTypes on each link. " +
+					"Alternatively use an existing mapper such as OsmHbefaMapping, VisumHbefaRoadTypeMapping or VspHbefaRoadTypeMapping to set HbefaRoadTypes on your network.");
+	}
+
 	private void createLookupTables() {
 		logger.info("entering createLookupTables");
 
@@ -204,35 +215,11 @@ public final class EmissionModule {
 	private void createEmissionHandlers() {
 		logger.info("entering createEmissionHandlers");
 
-		loadRoadTypeMappings();
-
 		warmEmissionHandler = new WarmEmissionHandler(scenario, avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants, eventsManager);
 
 		coldEmissionHandler = new ColdEmissionHandler(scenario, avgHbefaColdTable, detailedHbefaColdTable, coldPollutants, eventsManager);
 		// this initiates all cold emissions processing!
 
 		logger.info("leaving createEmissionHandlers");
-	}
-
-	private void loadRoadTypeMappings() {
-		HbefaRoadTypeMapping roadTypeMapping;
-
-		switch (this.emissionConfigGroup.getHbefaRoadTypeSource()) {
-			case fromOsm:
-				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
-				roadTypeMapping = new OsmHbefaMapping();
-				roadTypeMapping.addHbefaMappings(scenario.getNetwork());
-				break;
-			case fromFile:
-				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
-				URL roadTypeMappingFile = this.emissionConfigGroup.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext());
-				roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(roadTypeMappingFile);
-				roadTypeMapping.addHbefaMappings(scenario.getNetwork());
-				break;
-			case fromLinkAttributes: //no need, road types are already there
-				break;
-			default:
-				throw new RuntimeException(this.emissionConfigGroup.getHbefaRoadTypeSource() + " is not implemented.");
-		}
 	}
 }

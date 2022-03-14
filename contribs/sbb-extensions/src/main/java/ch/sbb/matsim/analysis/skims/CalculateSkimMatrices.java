@@ -162,14 +162,20 @@ public class CalculateSkimMatrices {
         // skims.loadSamplingPointsFromFile("coordinates.csv");
 
         if (modes.contains(TransportMode.car)) {
-            skims.calculateNetworkMatrices(networkFilename, eventsFilename, timesCar, config, l -> true);
+            skims.calculateAndWriteNetworkMatrices(networkFilename, eventsFilename, timesCar, config, "", l -> true);
         }
 
         if (modes.contains(TransportMode.pt)) {
-            skims.calculatePTMatrices(networkFilename, transitScheduleFilename, timesPt[0], timesPt[1], config, (line, route) -> route.getTransportMode().equals("train"));
+            skims.calculateAndWritePTMatrices(networkFilename,
+                    transitScheduleFilename,
+                    timesPt[0],
+                    timesPt[1],
+                    config,
+                    "",
+                    (line, route) -> route.getTransportMode().equals("train"));
         }
-
-        skims.calculateBeelineMatrix();
+        
+        skims.calculateAndWriteBeelineMatrix();
     }
 
     public Map<String, Coord[]> getCoordsPerZone() {
@@ -418,10 +424,16 @@ public class CalculateSkimMatrices {
         return xy2lNetwork;
     }
 
-    public final void calculateAndWritePTMatrices(String networkFilename, String transitScheduleFilename, double startTime, double endTime, Config config, String outputPrefix,
+    public final void calculateAndWritePTMatrices(String networkFilename,
+                                                  String transitScheduleFilename,
+                                                  double startTime,
+                                                  double endTime,
+                                                  Config config,
+                                                  String outputPrefix,
             BiPredicate<TransitLine, TransitRoute> trainDetector) throws IOException {
 
-        var matrices = calculatePTMatrices(networkFilename, transitScheduleFilename, startTime, endTime, config, trainDetector);
+        var matrices = calculatePTMatrices(networkFilename,
+                transitScheduleFilename, startTime, endTime, config, trainDetector);
         writePTMatricesAsCSV(matrices, outputPrefix);
     }
 
@@ -440,7 +452,11 @@ public class CalculateSkimMatrices {
         FloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
     }
 
-    public final PTSkimMatrices.PtIndicators<String> calculatePTMatrices(String networkFilename, String transitScheduleFilename, double startTime, double endTime, Config config,
+    public final PTSkimMatrices.PtIndicators<String> calculatePTMatrices(String networkFilename,
+                                                                         String transitScheduleFilename,
+                                                                         double startTime,
+                                                                         double endTime,
+                                                                         Config config,
             BiPredicate<TransitLine, TransitRoute> trainDetector) {
         Scenario scenario = ScenarioUtils.createScenario(config);
         log.info("loading schedule from " + transitScheduleFilename);

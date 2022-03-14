@@ -34,22 +34,22 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public class BestInsertionFinder {
-	static class InsertionWithCost {
-		final InsertionWithDetourData insertionWithDetourData;
-		final double cost;
+	public static class InsertionWithCost {
+		public final InsertionWithDetourData insertionWithDetourData;
+		public final double cost;
 
-		InsertionWithCost(InsertionWithDetourData insertionWithDetourData, double cost) {
+		public InsertionWithCost(InsertionWithDetourData insertionWithDetourData, double cost) {
 			this.insertionWithDetourData = insertionWithDetourData;
 			this.cost = cost;
 		}
 	}
 
-	private static final Comparator<Insertion> INSERTION_COMPARATOR = //
+	public static final Comparator<Insertion> INSERTION_COMPARATOR = //
 			Comparator.<Insertion, Id<DvrpVehicle>>comparing(insertion -> insertion.vehicleEntry.vehicle.getId())
 					.thenComparingInt(insertion -> insertion.pickup.index)
 					.thenComparingInt(insertion -> insertion.dropoff.index);
 
-	static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
+	public static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
 			Comparator.<InsertionWithCost>comparingDouble(insertionWithCost -> insertionWithCost.cost)
 					.thenComparing(insertion -> insertion.insertionWithDetourData.insertion, INSERTION_COMPARATOR);
 
