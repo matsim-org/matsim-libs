@@ -71,6 +71,13 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+		double now = timer.getTimeOfDay();
+		long awaitingReqCount = unplannedRequests.stream()
+				.filter(r -> ((PassengerRequest)r).getEarliestStartTime() <= now)//urgent requests
+				.count();
+		log.warn("CTudorache scheduleUnplannedRequests, goal: " + params.getGoal()
+				+ ", awaitingReqCount: " + awaitingReqCount
+				+ ", idleTaxi: " + idleTaxiRegistry.getVehicleCount());
 		if (isReduceTP(unplannedRequests)) {
 			scheduleIdleVehiclesImpl(unplannedRequests);// reduce T_P to increase throughput (demand > supply)
 		} else {

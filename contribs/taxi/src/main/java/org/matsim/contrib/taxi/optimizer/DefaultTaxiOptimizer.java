@@ -23,6 +23,7 @@ import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -39,6 +40,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  * @author michalm
  */
 public class DefaultTaxiOptimizer implements TaxiOptimizer {
+	private static final Logger log = Logger.getLogger(DefaultTaxiOptimizer.class);
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
@@ -69,6 +71,14 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 		requiresReoptimization |= !unplannedRequests.getSchedulableRequests().isEmpty();
 
 		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
+			log.warn("CTudorache notifyMobsimBeforeSimStep"
+					+ ", event: " + e
+					+ ", unplannedRequests.schedulable: #" + unplannedRequests.getSchedulableRequests().size()
+					+ ", requiresReoptimization: " + requiresReoptimization
+					+ ", simTime: " + e.getSimulationTime()
+					+ ", reoptimisationTimeStep: " + params.getReoptimizationTimeStep()
+			        + ", doUnscheduleAwaitingRequests: " + params.doUnscheduleAwaitingRequests);
+
 			if (params.doUnscheduleAwaitingRequests) {
 				unscheduleAwaitingRequests();
 			}

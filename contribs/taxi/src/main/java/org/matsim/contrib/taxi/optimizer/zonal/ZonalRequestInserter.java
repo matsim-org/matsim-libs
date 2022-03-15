@@ -89,6 +89,8 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+		log.warn("CTudorache scheduleUnplannedRequests #" + unplannedRequests.size());
+
 		initIdleVehiclesInZones();
 		scheduleUnplannedRequestsWithinZones(unplannedRequests);
 
