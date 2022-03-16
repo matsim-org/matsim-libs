@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.optimizer;
 
 import com.google.inject.Provider;
+import org.matsim.contrib.drt.extension.shifts.schedule.OperationalStop;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -35,8 +36,13 @@ public class ShiftVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 
 	public boolean isEligibleForRequestInsertion(DvrpVehicle dvrpVehicle, double currentTime) {
 		final DrtShift currentShift = ((ShiftDvrpVehicle) dvrpVehicle).getShifts().peek();
-		return currentShift != null && !(currentTime > currentShift.getEndTime())
-				&& (currentShift.isStarted() && !currentShift.isEnded());
+		if(currentShift == null ||
+				currentTime > currentShift.getEndTime() ||
+				!currentShift.isStarted() ||
+				currentShift.isEnded()) {
+			return false;
+		}
+		return !(dvrpVehicle.getSchedule().getCurrentTask() instanceof OperationalStop);
 	}
 
 	public static class ShiftVehicleDataEntryFactoryProvider implements Provider<ShiftVehicleDataEntryFactory> {
