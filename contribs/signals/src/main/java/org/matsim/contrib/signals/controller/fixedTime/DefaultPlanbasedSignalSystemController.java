@@ -115,7 +115,7 @@ public final class DefaultPlanbasedSignalSystemController extends AbstractSignal
 		if (nextPlan.getStartTime() == now % (3600*24)) {
 			/* start time of next signal plan is reached: 
 			 * stop active plan (if it is still running) and start next signal plan */
-			log.info("Starting signal control plan " + nextPlan.getId());
+//			log.info("Starting signal control plan " + nextPlan.getId());
 			startFirstPlanInQueue(now);
 		}
 		else if (this.activePlan != null && now % (3600*24) == this.activePlan.getEndTime()) {
@@ -155,7 +155,7 @@ public final class DefaultPlanbasedSignalSystemController extends AbstractSignal
 	@Override
 	public void simulationInitialized(double simStartTime) {		
 		// store all plans in a queue, sort them according to their end times and validate them
-		this.planQueue = new LinkedList<SignalPlan>(this.signalPlans.values());
+		this.planQueue = new LinkedList<>(this.signalPlans.values());
 		Collections.sort(planQueue, new SignalPlanEndTimeComparator(simStartTime));
 		validateSignalPlans();
 		
