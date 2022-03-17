@@ -18,10 +18,8 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -83,6 +81,9 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 		} else {
 			scheduleUnplannedRequestsImpl(unplannedRequests);// reduce T_W (regular NOS)
 		}
+
+		// TODO(CTudorache) call expireRequests based on config param (should be enabled)
+		expireUnplannedOldRequests(unplannedRequests, now);
 	}
 
 	public enum Goal {
@@ -152,7 +153,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	// vehicle-initiated scheduling
 	private void scheduleIdleVehiclesImpl(Collection<TaxiRequest> unplannedRequests) {
-		log.warn("CTudorache scheduleIdleVehiclesImpl #" + unplannedRequests.size());
+		log.warn("CTudorache scheduleIdleVehiclesImpl, req: #" + unplannedRequests.size() + ", idleTaxiRegistry: " + idleTaxiRegistry.vehicles().count());
 		int nearestRequestsLimit = params.getNearestRequestsLimit();
 		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
 		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
@@ -170,6 +171,18 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 			unplannedRequests.remove(best.destination);
 			unplannedRequestRegistry.removeRequest(best.destination);
+		}
+	}
+
+	private void expireUnplannedOldRequests(Collection<TaxiRequest> unplannedRequests, double now) {
+		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+		while (reqIter.hasNext()) {
+			TaxiRequest req = reqIter.next();
+			if (req.getLatestStartTime() < now) {
+				log.warn("ExpiredRequest: " + req);
+				reqIter.remove();
+				scheduler.requestExpired(req);
+			}
 		}
 	}
 }

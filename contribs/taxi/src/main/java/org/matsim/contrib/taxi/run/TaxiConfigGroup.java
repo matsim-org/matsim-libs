@@ -91,6 +91,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	public static final String DROPOFF_DURATION = "dropoffDuration";
 	static final String DROPOFF_DURATION_EXP = "Dropoff duration. Must be positive.";
 
+	public static final String MAX_SEARCH_DURATION = "maxSearchDuration";
+	static final String MAX_SEARCH_DURATION_EXP = "Max wait time to find a taxi, in seconds.";
+
 	public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
 	static final String ONLINE_VEHICLE_TRACKER_EXP =
 			"If true, vehicles are (GPS-like) monitored while moving. This helps in getting more accurate "
@@ -145,6 +148,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 
 	@Positive
 	private double dropoffDuration = Double.NaN;// seconds
+
+	private double maxSearchDuration = Double.NaN; // seconds
 
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
@@ -209,6 +214,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		map.put(VEHICLE_DIVERSION, VEHICLE_DIVERSION_EXP);
 		map.put(PICKUP_DURATION, PICKUP_DURATION_EXP);
 		map.put(DROPOFF_DURATION, DROPOFF_DURATION_EXP);
+		map.put(MAX_SEARCH_DURATION, MAX_SEARCH_DURATION_EXP);
 		map.put(ONLINE_VEHICLE_TRACKER, ONLINE_VEHICLE_TRACKER_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP);
 		map.put(TAXIS_FILE, TAXIS_FILE_EXP);
@@ -321,6 +327,22 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	public TaxiConfigGroup setDropoffDuration(double dropoffDuration) {
 		this.dropoffDuration = dropoffDuration;
 		return this;
+	}
+
+	/**
+	 * @return {@value #MAX_SEARCH_DURATION_EXP}
+	 */
+	@StringGetter(MAX_SEARCH_DURATION)
+	public Double getMaxSearchDuration() {
+		return maxSearchDuration;
+	}
+
+	/**
+	 * @param maxSearchDuration {@value #MAX_SEARCH_DURATION_EXP}
+	 */
+	@StringSetter(MAX_SEARCH_DURATION)
+	public void setMaxSearchDuration(Double maxSearchDuration) {
+		this.maxSearchDuration = maxSearchDuration;
 	}
 
 	/**

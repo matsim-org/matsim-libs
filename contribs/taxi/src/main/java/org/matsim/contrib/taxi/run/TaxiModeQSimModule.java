@@ -146,7 +146,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public TaxiRequestCreator get() {
-						return new TaxiRequestCreator(getMode(), events);
+						return new TaxiRequestCreator(getMode(), taxiCfg.getMaxSearchDuration(), events);
 					}
 				}).asEagerSingleton();
 

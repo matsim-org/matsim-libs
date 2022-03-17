@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
@@ -68,6 +69,7 @@ import com.google.common.util.concurrent.Futures;
 
 public class TaxiScheduler implements MobsimBeforeCleanupListener {
     private static final Logger log = Logger.getLogger(TaxiScheduler.class);
+	public static final String REQUEST_EXPIRED = "request_expired";
 	protected final TaxiConfigGroup taxiCfg;
 	private final Fleet fleet;
 	private final TravelTime travelTime;
@@ -283,6 +285,10 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
 	}
 
+	public void requestExpired(TaxiRequest req) {
+		eventsManager.processEvent(new PassengerRequestRejectedEvent(
+				mobsimTimer.getTimeOfDay(), req.getMode(), req.getId(), req.getPassengerId(), REQUEST_EXPIRED));
+	}
 	// =========================================================================================
 
 	private List<TaxiRequest> removedRequests;

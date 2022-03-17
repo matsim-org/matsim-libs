@@ -49,6 +49,7 @@ public class TaxiRequest implements PassengerRequest {
 	private final Id<Request> id;
 	private final double submissionTime;
 	private final double earliestStartTime;
+	private final double latestStartTime;
 
 	private final Id<Person> passengerId;
 	private final String mode;
@@ -61,10 +62,11 @@ public class TaxiRequest implements PassengerRequest {
 	private TaxiDropoffTask dropoffTask;
 
 	public TaxiRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
-			double earliestStartTime, double submissionTime) {
+			double earliestStartTime, double submissionTime, double latestStartTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = earliestStartTime;
+		this.latestStartTime = latestStartTime;
 		this.passengerId = passengerId;
 		this.mode = mode;
 		this.fromLink = fromLink;
@@ -86,6 +88,11 @@ public class TaxiRequest implements PassengerRequest {
 	@Override
 	public double getEarliestStartTime() {
 		return earliestStartTime;
+	}
+
+	@Override
+	public double getLatestStartTime() {
+		return latestStartTime;
 	}
 
 	@Override
@@ -152,6 +159,7 @@ public class TaxiRequest implements PassengerRequest {
 				.add("id", id)
 				.add("submissionTime", submissionTime)
 				.add("earliestStartTime", earliestStartTime)
+				.add("latestStartTime", getLatestStartTime())
 				.add("passengerId", passengerId)
 				.add("mode", mode)
 				.add("fromLink", fromLink)

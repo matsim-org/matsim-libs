@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.MoreObjects;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -82,6 +83,14 @@ public class SpeedyMultiSourceALT {
 			this.node = node;
 			this.cost = cost;
 			this.time = time;
+		}
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("node", node)
+					.add("cost", cost)
+					.add("time", time)
+					.toString();
 		}
 	}
 

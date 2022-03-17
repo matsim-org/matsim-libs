@@ -33,10 +33,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public class TaxiRequestCreator implements PassengerRequestCreator {
 	private final String mode;
+	private final double maxSearchDuration;
 	private final EventsManager eventsManager;
 
-	public TaxiRequestCreator(String mode, EventsManager eventsManager) {
+	public TaxiRequestCreator(String mode, double maxSearchDuration, EventsManager eventsManager) {
 		this.mode = mode;
+		this.maxSearchDuration = maxSearchDuration;
 		this.eventsManager = eventsManager;
 	}
 
@@ -47,6 +49,6 @@ public class TaxiRequestCreator implements PassengerRequestCreator {
 				new PassengerRequestSubmittedEvent(submissionTime, mode, id, passengerId, fromLink.getId(),
 						toLink.getId()));
 
-		return new TaxiRequest(id, passengerId, mode, fromLink, toLink, departureTime, submissionTime);
+		return new TaxiRequest(id, passengerId, mode, fromLink, toLink, departureTime, submissionTime, departureTime + maxSearchDuration);
 	}
 }
