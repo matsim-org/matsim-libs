@@ -99,7 +99,7 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 		}
 
 		// write signal events in the same interval als usual matsim events
-		if (event.getIteration() % scenario.getConfig().controler().getWriteEventsInterval() == 0 || event.isLastIteration()) {
+		if (event.isLastIteration() || (scenario.getConfig().controler().getWriteEventsInterval() != 0 && event.getIteration() % scenario.getConfig().controler().getWriteEventsInterval() == 0)) {
 			writeThisIteration = true;
 			String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
 
