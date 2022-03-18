@@ -96,6 +96,10 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 			+ " During this time the request stays unplanned and waits for a free vehicle."
 			+ " If the limit is exceeded, then the req is considered failed.";
 
+	public static final String REQUEST_ACCEPTANCE_DELAY = "requestAcceptanceDelay";
+	static final String REQUEST_ACCEPTANCE_DELAY_EXP = "Time it takes the driver to accept the request."
+			+ " Should be less than maxSearchDuration, otherwise the req expires before the driver accepts.";
+
 	public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
 	static final String ONLINE_VEHICLE_TRACKER_EXP =
 			"If true, vehicles are (GPS-like) monitored while moving. This helps in getting more accurate "
@@ -152,6 +156,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	private double dropoffDuration = Double.NaN;// seconds
 
 	private double maxSearchDuration = Double.NaN; // seconds
+
+	private double requestAcceptanceDelay = 0; // seconds
 
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
@@ -217,6 +223,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		map.put(PICKUP_DURATION, PICKUP_DURATION_EXP);
 		map.put(DROPOFF_DURATION, DROPOFF_DURATION_EXP);
 		map.put(MAX_SEARCH_DURATION, MAX_SEARCH_DURATION_EXP);
+		map.put(REQUEST_ACCEPTANCE_DELAY, REQUEST_ACCEPTANCE_DELAY_EXP);
 		map.put(ONLINE_VEHICLE_TRACKER, ONLINE_VEHICLE_TRACKER_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP);
 		map.put(TAXIS_FILE, TAXIS_FILE_EXP);
@@ -345,6 +352,22 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	@StringSetter(MAX_SEARCH_DURATION)
 	public void setMaxSearchDuration(Double maxSearchDuration) {
 		this.maxSearchDuration = maxSearchDuration;
+	}
+
+	/**
+	 * @return {@value #REQUEST_ACCEPTANCE_DELAY_EXP}
+	 */
+	@StringGetter(REQUEST_ACCEPTANCE_DELAY)
+	public Double getRequestAcceptanceDelay() {
+		return requestAcceptanceDelay;
+	}
+
+	/**
+	 * @param requestAcceptanceDelay {@value #REQUEST_ACCEPTANCE_DELAY_EXP}
+	 */
+	@StringSetter(REQUEST_ACCEPTANCE_DELAY)
+	public void setRequestAcceptanceDelay(Double requestAcceptanceDelay) {
+		this.requestAcceptanceDelay = requestAcceptanceDelay;
 	}
 
 	/**

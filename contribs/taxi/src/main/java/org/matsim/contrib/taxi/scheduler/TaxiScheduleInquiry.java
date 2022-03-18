@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.scheduler;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -37,6 +38,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class TaxiScheduleInquiry implements ScheduleInquiry {
+	private static final Logger log = Logger.getLogger(TaxiScheduleInquiry.class);
 	private final TaxiConfigGroup taxiCfg;
 	private final MobsimTimer timer;
 
@@ -86,11 +88,13 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 			case PLANNED:
 			case STARTED:
 				Task lastTask = Schedules.getLastTask(schedule);
+				log.warn("CTudorache getEarliestIdleness veh: " + veh + ", lastTask: " + lastTask);
 
 				switch (getBaseTypeOrElseThrow(lastTask)) {
 					case STAY:
 						Link link = ((StayTask)lastTask).getLink();
-						double time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO very optimistic!!!
+						double time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay())
+								+ taxiCfg.getRequestAcceptanceDelay();
 						return createValidLinkTimePair(link, time, veh);
 
 					case PICKUP:
