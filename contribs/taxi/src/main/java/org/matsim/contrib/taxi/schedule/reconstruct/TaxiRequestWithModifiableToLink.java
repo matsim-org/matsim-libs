@@ -30,7 +30,7 @@ import org.matsim.contrib.taxi.passenger.TaxiRequest;
 class TaxiRequestWithModifiableToLink extends TaxiRequest {
 	public TaxiRequestWithModifiableToLink(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink,
 			double time) {
-		super(id, passengerId, mode, fromLink, null, time, time);
+		super(id, passengerId, mode, fromLink, null, time, time, time);
 	}
 
 	private Link toLink;

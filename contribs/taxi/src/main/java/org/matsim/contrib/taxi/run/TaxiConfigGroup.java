@@ -92,7 +92,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	static final String DROPOFF_DURATION_EXP = "Dropoff duration. Must be positive.";
 
 	public static final String MAX_SEARCH_DURATION = "maxSearchDuration";
-	static final String MAX_SEARCH_DURATION_EXP = "Max wait time to find a taxi, in seconds.";
+	static final String MAX_SEARCH_DURATION_EXP = "Max wait time to find a taxi, in seconds."
+			+ " During this time the request stays unplanned and waits for a free vehicle."
+			+ " If the limit is exceeded, then the req is considered failed.";
 
 	public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
 	static final String ONLINE_VEHICLE_TRACKER_EXP =
