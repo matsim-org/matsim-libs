@@ -30,11 +30,7 @@ import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
-import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
+import org.matsim.contrib.taxi.optimizer.rules.*;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
@@ -84,7 +80,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 					travelTime, travelDisutility);
 			RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(eScheduler, timer, dispatchFinder,
 					((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams(),
-					zonalRegisters);
+					zonalRegisters, createDriverConfirmationRegistry());
 
 			return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater,
 					chargingInfrastructure, zonalRegisters, dispatchFinder, requestInserter);
@@ -105,5 +101,8 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 				eScheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);
+	}
+	private DriverConfirmationRegistry createDriverConfirmationRegistry() {
+		return new DriverConfirmationRegistry(taxiCfg, timer);
 	}
 }

@@ -155,6 +155,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 						request.getPassengerId(), vehicle.getId(), pickupEndTime, dropoffStartTime));
 	}
 
+	// TODO(CTudorache): should be called divertOrAppendDriveToPickup()
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {
 		Task lastTask = Schedules.getLastTask(schedule);
 		log.warn("CTudorache divertOrAppendDrive lastTask: " + lastTask);
@@ -180,6 +181,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(vrpPath);
 	}
 
+	// TODO(CTudorache): should be called scheduleDriveToPickup
 	protected void scheduleDrive(Schedule schedule, TaxiStayTask lastTask, VrpPathWithTravelData vrpPath,
 			TaxiTaskType taskType) {
 		log.warn("CTudorache scheduleDrive lastTask: " + lastTask + ", vrpPath: " + vrpPath);

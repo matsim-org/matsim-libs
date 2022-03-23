@@ -29,6 +29,7 @@ import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParam
 import org.matsim.contrib.taxi.optimizer.fifo.FifoRequestInserter;
 import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
+import org.matsim.contrib.taxi.optimizer.rules.DriverConfirmationRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
@@ -96,7 +97,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 						((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()));
 				var requestInserter = new RuleBasedRequestInserter(scheduler, timer, network, travelTime,
 						travelDisutility, ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()),
-						zonalRegisters);
+						zonalRegisters, createDriverConfirmationRegistry());
 				return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 						zonalRegisters, requestInserter);
 			}
@@ -106,7 +107,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 						((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams());
 				var requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
 						travelDisutility, ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), zonalRegisters,
-						context);
+						createDriverConfirmationRegistry(), context);
 				return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 						zonalRegisters, requestInserter);
 			}
@@ -122,5 +123,8 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);
+	}
+	private DriverConfirmationRegistry createDriverConfirmationRegistry() {
+		return new DriverConfirmationRegistry(taxiCfg, timer);
 	}
 }

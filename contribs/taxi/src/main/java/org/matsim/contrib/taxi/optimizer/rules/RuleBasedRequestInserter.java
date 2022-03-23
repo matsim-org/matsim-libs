@@ -47,28 +47,33 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	private final IdleTaxiZonalRegistry idleTaxiRegistry;
 	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
+	private final DriverConfirmationRegistry driverConfirmationRegistry;
 
 	private final RuleBasedTaxiOptimizerParams params;
 
 	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params, ZonalRegisters zonalRegisters) {
+			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params, ZonalRegisters zonalRegisters,
+			DriverConfirmationRegistry driverConfirmationRegistry) {
 		this(scheduler, timer,
 				new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility),
-				params, zonalRegisters);
+				params, zonalRegisters, driverConfirmationRegistry);
 	}
 
 	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, BestDispatchFinder dispatchFinder,
-			RuleBasedTaxiOptimizerParams params, ZonalRegisters zonalRegisters) {
+			RuleBasedTaxiOptimizerParams params, ZonalRegisters zonalRegisters,
+			DriverConfirmationRegistry driverConfirmationRegistry) {
 		this.scheduler = scheduler;
 		this.timer = timer;
 		this.params = params;
 		this.dispatchFinder = dispatchFinder;
 		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
 		this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
+		this.driverConfirmationRegistry = driverConfirmationRegistry;
 	}
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+		driverConfirmationRegistry.updateForCurrentTime();
 		double now = timer.getTimeOfDay();
 		long awaitingReqCount = unplannedRequests.stream()
 				.filter(r -> ((PassengerRequest)r).getEarliestStartTime() <= now)//urgent requests
@@ -120,31 +125,52 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext() && idleCount > 0) {
 			TaxiRequest req = reqIter.next();
+			DriverConfirmation dc = driverConfirmationRegistry.getDriverConfirmation(req);
+			if (dc == null) {
+				// no confirmation requested from any driver => find a driver and ask for confirmation
 
-			Stream<DvrpVehicle> selectedVehs = idleCount > nearestVehiclesLimit ?
-					idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(), nearestVehiclesLimit) :
-					idleTaxiRegistry.vehicles();
+				// TODO(CTudorache): simplify, always call idleTaxiRegistry.findNearestVehicles which already contains test for minCount > idleCount
+				Stream<DvrpVehicle> selectedVehs = idleCount > nearestVehiclesLimit ?
+						idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(), nearestVehiclesLimit) :
+						idleTaxiRegistry.vehicles();
+				selectedVehs = selectedVehs.filter(v -> !driverConfirmationRegistry.isWaitingDriverConfirmation(v));
 
-			log.warn("CTudorache scheduleUnplannedRequestsImpl req: " + req + ", selectedVehs: ");
-			selectedVehs = selectedVehs.peek(v -> {
-				log.warn(" - " + v);
-			});
+				log.warn("CTudorache scheduleUnplannedRequestsImpl req: " + req + ", selectedVehs: ");
+				selectedVehs = selectedVehs.peek(v -> {
+					log.warn(" - " + v);
+				});
 
-			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, selectedVehs);
-			log.warn("CTudorache best dispatch: " + best);
-			if (best == null) {
-				// XXX NOTE:
-				// There may be no idle vehicle in the registry despite idleCount > 0
-				// Some vehicles may not be idle because they have been assigned another customer,
-				// while for others the time window ends (t1).
-				// Their statuses will be updated in this time step (we are just before the sim step,
-				// triggered by a MobsimBeforeSimStepEvent). Consequently, they will be
-				// removed from this registry, but till then they are there.
-				return;
+				BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, selectedVehs);
+				log.warn("CTudorache best dispatch: " + best);
+				if (best == null) {
+					// XXX NOTE:
+					// There may be no idle vehicle in the registry despite idleCount > 0
+					// Some vehicles may not be idle because they have been assigned another customer,
+					// while for others the time window ends (t1).
+					// Their statuses will be updated in this time step (we are just before the sim step,
+					// triggered by a MobsimBeforeSimStepEvent). Consequently, they will be
+					// removed from this registry, but till then they are there.
+					return;
+				}
+
+				driverConfirmationRegistry.addDriverConfirmation(req, best.vehicle, best.path);
+				continue;
 			}
 
-			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+			log.warn("CTudorache scheduleUnplannedRequestsImpl, waitingDriverConfirmation: " + dc);
+			if (!dc.isComplete()) {
+				// req is still unplanned, but it was already sent to a driver who is yet to confirm it
+				continue;
+			}
+			if (!dc.isAccepted()) {
+				throw new RuntimeException("DriverConfirmation rejection NOT-IMPLEMENTED");
+			}
 
+			// req is accepted => schedule it
+			driverConfirmationRegistry.removeDriverConfirmation(dc);
+			scheduler.scheduleRequest(dc.vehicle, dc.request, dc.getPathToPickup(timer.getTimeOfDay()));
+
+			log.warn("CTudorache req planned, removing from unplanned");
 			reqIter.remove();
 			unplannedRequestRegistry.removeRequest(req);
 			idleCount--;
@@ -158,19 +184,40 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
 		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
 			DvrpVehicle veh = vehIter.next();
-			Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
 
-			Stream<TaxiRequest> selectedReqs = unplannedRequests.size() > nearestRequestsLimit ?
-					unplannedRequestRegistry.findNearestRequests(link.getToNode(), nearestRequestsLimit) :
-					unplannedRequests.stream();
+			DriverConfirmation dc = driverConfirmationRegistry.getDriverConfirmation(veh);
+			if (dc == null) {
+				// no confirmation requested from this driver => find a req and ask for driver confirmation
 
-			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
-			log.warn("CTudorache scheduleIdleVehiclesImpl veh: " + veh + " => dispatch: " + best);
+				Link link = ((TaxiStayTask) veh.getSchedule().getCurrentTask()).getLink();
 
-			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+				Stream<TaxiRequest> selectedReqs = unplannedRequests.size() > nearestRequestsLimit ?
+						unplannedRequestRegistry.findNearestRequests(link.getToNode(), nearestRequestsLimit) :
+						unplannedRequests.stream();
 
-			unplannedRequests.remove(best.destination);
-			unplannedRequestRegistry.removeRequest(best.destination);
+				BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
+				log.warn("CTudorache scheduleIdleVehiclesImpl best dispatch: " + best);
+
+				driverConfirmationRegistry.addDriverConfirmation(best.destination, best.vehicle, best.path);
+				continue;
+			}
+
+			log.warn("CTudorache scheduleIdleVehiclesImpl, waitingDriverConfirmation: " + dc);
+			if (!dc.isComplete()) {
+				// req is still unplanned, but it was already sent to a driver who is yet to confirm it
+				continue;
+			}
+			if (!dc.isAccepted()) {
+				throw new RuntimeException("DriverConfirmation rejection NOT-IMPLEMENTED");
+			}
+
+			// req is accepted => schedule it
+			driverConfirmationRegistry.removeDriverConfirmation(dc);
+			scheduler.scheduleRequest(dc.vehicle, dc.request, dc.getPathToPickup(timer.getTimeOfDay()));
+
+			log.warn("CTudorache req planned, removing from unplanned");
+			unplannedRequests.remove(dc.request);
+			unplannedRequestRegistry.removeRequest(dc.request);
 		}
 	}
 
@@ -182,6 +229,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 				log.warn("ExpiredRequest: " + req);
 				reqIter.remove();
 				scheduler.requestExpired(req);
+				driverConfirmationRegistry.removeDriverConfirmation(req);
 			}
 		}
 	}

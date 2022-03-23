@@ -61,6 +61,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		install(new DvrpModeRoutingModule(getMode(), new SpeedyALTFactory()));
 
+		//install(new TaxiFleetModule(taxiCfg));
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 

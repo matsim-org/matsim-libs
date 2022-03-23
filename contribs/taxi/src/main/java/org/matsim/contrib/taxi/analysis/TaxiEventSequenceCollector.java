@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
@@ -89,6 +90,16 @@ public class TaxiEventSequenceCollector
 		public boolean isCompleted() {
 			return droppedOff != null;
 		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("submitted", submitted)
+					.add("scheduled", scheduled)
+					.add("pickedUp", pickedUp)
+					.add("droppedOff", droppedOff)
+					.toString();
+		}
 	}
 
 	private final String mode;
@@ -133,5 +144,17 @@ public class TaxiEventSequenceCollector
 	@Override
 	public void reset(int iteration) {
 		requestSequences.clear();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("TaxiEventSequenceCollector:");
+		sb.append("\n - mode: ").append(mode);
+		sb.append("\n - requests: #").append(requestSequences.size());
+		for (var entry : requestSequences.entrySet()) {
+			sb.append("\n   . ").append(entry.getKey()).append(": ").append(entry.getValue());
+		}
+		return sb.toString();
 	}
 }
