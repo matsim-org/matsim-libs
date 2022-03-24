@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+
+<population>
+
+	<!-- ====================================================================== -->
+
+	<person id="passenger_0" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="67" end_time="00:00:00"/>
+			<leg mode="taxi"> <!-- duration: reoptimizationTimeStep (10) + incoming taxi (100/15 = 7) + pickup (120) + drive (leave link: 2 + link_78=600/15=41 + link_84=100/15=7) + dropoff (60) => total: 247 -->
+			</leg>
+			<act type="dummy" link="84"/> <!-- dropoff ends: 03:57 + reoptimizationTimeStep (10) => 04:07 -->
+		</plan>
+	</person>
+
+	<person id="passenger_1" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="45" end_time="00:04:05"/> 
+			<leg mode="taxi">
+			</leg>
+			<act type="dummy" link="67"/>
+		</plan>
+	</person>
+
+	<person id="passenger_2" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="23" end_time="00:04:09"/>
+			<leg mode="taxi">
+			</leg>
+			<act type="dummy" link="45"/>
+		</plan>
+	</person>
+
+	<!-- ====================================================================== -->
+
+</population>
