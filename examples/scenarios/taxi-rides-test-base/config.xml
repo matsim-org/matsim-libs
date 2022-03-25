@@ -45,11 +45,6 @@
 		<param name="snapshotStyle" value="queue"/>
 	</module>
 
-	<module name="otfvis">
-		<param name="coloringScheme" value="taxicab"/>
-		<param name="drawNonMovingItems" value="true"/>
-	</module>
-
 	<module name="controler">
 		<param name="outputDirectory" value="output"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
