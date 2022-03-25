@@ -153,8 +153,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 					return;
 				}
 
-				driverConfirmationRegistry.addDriverConfirmation(req, best.vehicle, best.path);
-				continue;
+				dc = driverConfirmationRegistry.addDriverConfirmation(req, best.vehicle, best.path);
 			}
 
 			log.warn("CTudorache scheduleUnplannedRequestsImpl, waitingDriverConfirmation: " + dc);

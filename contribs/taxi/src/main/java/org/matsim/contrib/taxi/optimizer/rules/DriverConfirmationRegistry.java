@@ -23,10 +23,14 @@ public class DriverConfirmationRegistry {
 		this.timer = timer;
 	}
 
-	public void addDriverConfirmation(TaxiRequest request, DvrpVehicle vehicle, VrpPathWithTravelData pathToPickup) {
+	public DriverConfirmation addDriverConfirmation(TaxiRequest request, DvrpVehicle vehicle, VrpPathWithTravelData pathToPickup) {
 		DriverConfirmation dc = new DriverConfirmation(request, vehicle, pathToPickup, timer.getTimeOfDay() + taxiCfg.getRequestAcceptanceDelay());
-		log.warn("CTudorache addDriverConfirmation: " + dc);
-		confirmations.add(dc);
+		updateDriverConfirmation(dc);
+		if (!dc.isComplete()) {
+			log.warn("CTudorache addDriverConfirmation: " + dc);
+			confirmations.add(dc);
+		}
+		return dc;
 	}
 
 	public void removeDriverConfirmation(TaxiRequest req) {
@@ -64,12 +68,15 @@ public class DriverConfirmationRegistry {
 
 	// set decision for those that are due
 	public void updateForCurrentTime() {
-		double now = timer.getTimeOfDay();
 		for (DriverConfirmation dc : confirmations) {
-			if (!dc.isComplete() && dc.endTime <= now) {
-				dc.setComplete(true); // auto-accept
-				log.warn("CTudorache DriverConfirmation complete: " + dc);
-			}
+			updateDriverConfirmation(dc);
+		}
+	}
+
+	private void updateDriverConfirmation(DriverConfirmation dc) {
+		if (!dc.isComplete() && dc.endTime <= timer.getTimeOfDay()) {
+			dc.setComplete(true); // auto-accept
+			log.warn("CTudorache DriverConfirmation complete: " + dc);
 		}
 	}
 }
