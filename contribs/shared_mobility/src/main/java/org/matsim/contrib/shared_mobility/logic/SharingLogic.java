@@ -289,7 +289,7 @@ public class SharingLogic {
 		SharingVehicle vehicle = activeVehicles.get(agent.getId());
 		Verify.verifyNotNull(vehicle);
 
-		// Find closest place to drop off the vehicle and hope we're already there ...
+		// Find the closest place to drop off the vehicle and hope we're already there ...
 		InteractionPoint closestDropoffInteraction = service.findClosestDropoffLocation(vehicle, agent);
 
 		if (closestDropoffInteraction.getLinkId().equals(dropoffActivity.getLinkId())) {
@@ -299,6 +299,7 @@ public class SharingLogic {
 
 			eventsManager.processEvent(new SharingDropoffEvent(now, service.getId(), agent.getId(),
 					closestDropoffInteraction.getLinkId(), vehicle.getId(), closestDropoffInteraction.getStationId()));
+			service.releaseReservation(agent); // Release the reservation after successful drop off
 		} else {
 			// We cannot drop the vehicle here, so let's try the proposed place
 
