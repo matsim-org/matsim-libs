@@ -197,8 +197,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 				BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
 				log.warn("CTudorache scheduleIdleVehiclesImpl best dispatch: " + best);
 
-				driverConfirmationRegistry.addDriverConfirmation(best.destination, best.vehicle, best.path);
-				continue;
+				dc = driverConfirmationRegistry.addDriverConfirmation(best.destination, best.vehicle, best.path);
 			}
 
 			log.warn("CTudorache scheduleIdleVehiclesImpl, waitingDriverConfirmation: " + dc);
