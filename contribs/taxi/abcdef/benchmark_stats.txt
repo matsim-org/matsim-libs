@@ -1,2 +1,0 @@
-PassWaitTime_avg	PassWaitTime_95%ile	PassWaitTime_max	EmptyDriveRatio_fleetAvg	StayRatio_fleetAvg
-35.0	35	35	0.569	0.762
