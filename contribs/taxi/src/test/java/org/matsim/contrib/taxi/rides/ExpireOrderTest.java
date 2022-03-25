@@ -30,6 +30,15 @@ public class ExpireOrderTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
+	boolean eventMatches(Event actual, Event partial) {
+	  if (actual.getEventType() != partial.getEventType()) {
+	    return false;
+	  }
+	}
+	void expectEvents(List<Event> actual, List<Event> expected) {
+
+	}
+
 	@Test
 	public void testExpireOrder() {
 		final Logger logger = Logger.getLogger(ExpireOrderTest.class);
