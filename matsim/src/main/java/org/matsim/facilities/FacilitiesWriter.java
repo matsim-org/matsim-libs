@@ -62,19 +62,19 @@ public class FacilitiesWriter implements MatsimWriter {
 
     /**
      * Writes the activity facilities in the current default format
-     * (currently facilities_v1.dtd).
+     * (currently facilities_v2.dtd).
      */
     @Override
     public final void write(final String filename) {
-        writeV1(filename);
+        writeV2(filename);
     }
 
     /**
      * Writes the activity facilities in the current default format to the stream
-     * (currently facilities_v1.dtd).
+     * (currently facilities_v2.dtd).
      */
     public final void write(final OutputStream stream) {
-        FacilitiesWriterV1 writer = new FacilitiesWriterV1(coordinateTransformation, facilities);
+        FacilitiesWriterV2 writer = new FacilitiesWriterV2(coordinateTransformation, facilities);
         writer.putAttributeConverters(this.converters);
         writer.write(stream);
     }
@@ -93,5 +93,10 @@ public class FacilitiesWriter implements MatsimWriter {
         writer.write(filename);
     }
 
+    public final void writeV2(final String filename) {
+        FacilitiesWriterV2 writer = new FacilitiesWriterV2(coordinateTransformation, facilities);
+        writer.putAttributeConverters(this.converters);
+        writer.write(filename);
+    }
 
 }
