@@ -17,17 +17,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.etaxi.run.ETaxiConfigGroups;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
+import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
@@ -38,13 +38,12 @@ import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -57,7 +56,6 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.net.URL;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class ExpireOrderTest {
 	private final Logger logger = Logger.getLogger(ExpireOrderTest.class);
@@ -141,6 +139,7 @@ public class ExpireOrderTest {
 		// TODO(CTudorache): vehType needs to be constant
 		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("taxiType", VehicleType.class));
 		vehType.getCapacity().setSeats(4);
+		scenario.getVehicles().addVehicleType(vehType);
 
 		// TODO(CTudorache): utility method for generating vehicle id: "taxi_vehicle_%d"
 		Vehicle v = VehicleUtils.createVehicle(Id.create("taxi_vehicle_" + vehicleId, Vehicle.class), vehType);
@@ -176,11 +175,15 @@ public class ExpireOrderTest {
 		logger.warn("CTudorache modules: " + config.getModules().keySet());
 
 		config.controler().setOutputDirectory("test/output/abcdef");
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
 		config.controler().setDumpDataAtEnd(false);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+	  	config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+	  	config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		DvrpBenchmarks.adjustConfig(config);
 
 
@@ -197,21 +200,37 @@ public class ExpireOrderTest {
 		Controler controler = new Controler(scenario);
 		DvrpBenchmarks.initController(controler);
 
-		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
-
 		controler.addOverridingModule(new MultiModeTaxiModule());
-		// TODO(CTudorache): probably not required
-		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
-			@Override
-			public void install() {
-				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
-						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
-								getter.getModal(ExecutedScheduleCollector.class),
-								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
-				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
-			}
-		});
+
+		String mode = taxiCfg.getMode();
+		logger.warn("CTudorache mode: " + mode);
+	  	controler.addOverridingModule(new DvrpModule());
+	  	controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
+
+//		// TODO(CTudorache): probably not required
+//		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+//			@Override
+//			public void install() {
+//				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
+//						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+//								getter.getModal(ExecutedScheduleCollector.class),
+//								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+//				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+//			}
+//		});
+//		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+//		  @Override
+//		  public void install() {
+//			bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
+//					getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+//							getter.getModal(ExecutedScheduleCollector.class),
+//							getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+//			addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+//		  }
+//		});
+	    //controler.addOverridingModule(new FleetModule());
+		//controler.addOverridingModule(new TaxiModeAnalysisModule(taxiCfg));
+		//controler.setTerminationCriterion();
 
 		EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
