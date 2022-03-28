@@ -71,8 +71,7 @@ public class CollectionLSPMobsimTest {
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = scenario.getNetwork().getLinks().get(collectionLinkId );
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLink.getId());
-		carrierVehicle.setType( collectionType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLink.getId(), collectionType);
 
 		// define carrier:
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);

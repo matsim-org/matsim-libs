@@ -56,8 +56,7 @@ public class MainRunAdapterTest {
 		toLinkId = Id.createLinkId("(14 2) (14 3)");
 		fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("MainRunVehicle");
-		carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, fromLinkId);
-		carrierVehicle.setType( mainRunType );
+		carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, fromLinkId, mainRunType);
 
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();

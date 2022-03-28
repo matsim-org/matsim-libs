@@ -53,8 +53,7 @@ public class CompleteSolutionTest {
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setType( collectionType );
+		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addType(collectionType);
@@ -109,8 +108,7 @@ public class CompleteSolutionTest {
 
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId);
-		mainRunCarrierVehicle.setType( mainRunType );
+		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		mainRunCapabilitiesBuilder.addType(mainRunType);
@@ -164,10 +162,8 @@ public class CompleteSolutionTest {
 		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId,
-				distributionLinkId);
-		distributionCarrierVehicle.setType( distributionType );
+		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
+		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(distributionType);

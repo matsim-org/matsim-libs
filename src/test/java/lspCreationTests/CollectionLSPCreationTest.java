@@ -50,9 +50,7 @@ public class CollectionLSPCreationTest {
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		carrierVehicle.setType( collectionType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);

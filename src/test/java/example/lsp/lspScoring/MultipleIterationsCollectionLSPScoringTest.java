@@ -62,9 +62,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		if (collectionLink == null) {
 			System.exit(1);
 		}
-		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
-		carrierVehicle.setType( collectionType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);

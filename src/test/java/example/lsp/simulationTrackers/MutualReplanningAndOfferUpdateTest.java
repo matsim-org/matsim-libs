@@ -90,9 +90,7 @@ public class MutualReplanningAndOfferUpdateTest {
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
 				
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle collectionVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
-		collectionVehicle.setType( collectionType );
+		CarrierVehicle collectionVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addType(collectionType);

@@ -55,8 +55,7 @@ public class DistributionAdapterTest {
 			
 			distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 			Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-			distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-			distributionCarrierVehicle.setType( distributionType );
+			distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 			CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 			capabilitiesBuilder.addType(distributionType);
