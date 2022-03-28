@@ -29,11 +29,6 @@ public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShi
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakStart = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakEnd = new HashMap<>();
 
-	public BreakCorridorXY(DrtShiftsSpecification shiftsSpecification, EventsManager eventsManager) {
-        this(shiftsSpecification);
-        eventsManager.addHandler(this);
-    }
-
     public BreakCorridorXY(DrtShiftsSpecification shifts) {
         super();
         this.shifts = shifts;

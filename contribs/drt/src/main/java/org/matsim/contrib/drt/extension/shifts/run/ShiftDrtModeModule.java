@@ -96,13 +96,13 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		bindModal(ShiftDurationXY.class).toProvider(modalProvider(
-				getter -> new ShiftDurationXY(getter.getModal(DrtShiftsSpecification.class), getter.get(EventsManager.class)))).asEagerSingleton();
+				getter -> new ShiftDurationXY(getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
 
 		bindModal(BreakCorridorXY.class).toProvider(modalProvider(
-				getter -> new BreakCorridorXY(getter.getModal(DrtShiftsSpecification.class), getter.get(EventsManager.class)))).asEagerSingleton();
+				getter -> new BreakCorridorXY(getter.getModal(DrtShiftsSpecification.class)))).asEagerSingleton();
 
 		bindModal(ShiftHistogram.class).toProvider(modalProvider(
-				getter -> new ShiftHistogram(getter.get(Population.class), getter.get(EventsManager.class), getter.get(Config.class)))).asEagerSingleton();
+				getter -> new ShiftHistogram(getter.get(Population.class), getter.get(Config.class)))).asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(ShiftDurationXY.class));
 		addEventHandlerBinding().to(modalKey(BreakCorridorXY.class));

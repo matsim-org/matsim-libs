@@ -32,7 +32,7 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     private DataFrame data = null;
 
 
-    public ShiftHistogram(Population population, EventsManager eventsManager, Config config) {
+    public ShiftHistogram(Population population, Config config) {
 		super();
 		this.binSize = DEFAULT_BIN_SIZE;
 		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
@@ -40,7 +40,6 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
         if (population == null) {
             this.shiftIds = null;
         }
-        eventsManager.addHandler(this);
     }
 
     /**

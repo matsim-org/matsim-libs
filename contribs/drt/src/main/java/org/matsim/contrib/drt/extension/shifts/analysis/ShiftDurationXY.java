@@ -31,12 +31,6 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualDuration = new HashMap<>();
     private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakDuration = new HashMap<>();
 
-
-    public ShiftDurationXY(DrtShiftsSpecification drtShiftsSpecification, EventsManager eventsManager) {
-        this(drtShiftsSpecification);
-        eventsManager.addHandler(this);
-    }
-
     public ShiftDurationXY(DrtShiftsSpecification shifts) {
         super();
         this.shifts = shifts;
