@@ -1,11 +1,13 @@
-package org.matsim.application.prepare.freight;
+package org.matsim.application.prepare.freight.toBeDeleted;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,17 +32,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * This script is now outdated. Please use GenerateFreightPlans instead.
+ *
  * This code generates German wide long distance freight trip.
  * Input: Freight data; German major road network; NUTS3 shape file; Look up
  * table between NUTS zone ID and Verkehrszellen
  * <p>
  * Author: Chengqi Lu
+ *
+ * Design comments:<ul>
+ *         <li> The trips start and end at the German border.  The original data goes from/to international zones.  However, those zones are numbered
+ *         by some German scheme which we cannot find (and maybe they made up themselves).  The "Datensatzbeschreibung"
+ *         contains a drawing that maps it onto NUTS1 or NUTS2 zones.  However, we were not able to find an electronic version of that.  Hopefully,
+ *         eventually a student can extract a correspondence table for this (yy). </li>
+ * </ul>
  */
 @CommandLine.Command(
         name = "generate-german-freight-trips",
         description = "Generate german wide freight population",
         showDefaultValues = true
 )
+@Deprecated
 public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
     private static final Logger log = LogManager.getLogger(GenerateGermanWideFreightTrips.class);
@@ -54,14 +66,14 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--sample", defaultValue = "1", description = "Scaling factor of the freight traffic (0, 1)", required = true)
     private double sample;
 
-    @CommandLine.Option(names = "--truck-load", defaultValue = "7.0", description = "Average load of truck", required = true)
+    @CommandLine.Option(names = "--truck-load", defaultValue = "16.0", description = "Average load of truck", required = true)
     private double averageTruckLoad;
 
     @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year", required = true)
     private int workingDays;
 
-    @CommandLine.Option(names = "--output", description = "Path to output population", required = true)
-    private Path output;
+    @CommandLine.Option(names = "--output", description = "Path to output folder", required = true)
+    private Path outputFolder;
 
     @CommandLine.Option(names = "--boundary-links", description = "Path to boundary links for cross-broader traffic", required = false)
     private Path pathToBoundaryLinks;
@@ -73,6 +85,9 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
     private CrsOptions crs = new CrsOptions();
 
     private final SplittableRandom rnd = new SplittableRandom(4711);
+
+    private List<Coord> fromCoords = new ArrayList<>();
+    private List<Coord> toCoords = new ArrayList<>();
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new GenerateGermanWideFreightTrips()).execute(args));
@@ -173,7 +188,7 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
         List<Id<Link>> boundaryLinkIds = new ArrayList<>();
         if (pathToBoundaryLinks != null) {
             includeInternationalTrips = true;
-            try (BufferedReader csvReader = Files.newBufferedReader(pathToBoundaryLinks)){
+            try (BufferedReader csvReader = Files.newBufferedReader(pathToBoundaryLinks)) {
                 String[] linksIdStrings = csvReader.readLine().split(",");
                 for (String linkIdString : linksIdStrings) {
                     boundaryLinkIds.add(Id.createLinkId(linkIdString));
@@ -204,7 +219,6 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
                 String modeNL = record.get(8);
                 String originNL = record.get(3);
                 String destinationNL = record.get(1);
-
                 String tonNL = record.get(17);
 
                 if ((relevantRegionIds.contains(originVL) && relevantRegionIds.contains(destinationVL)) || includeInternationalTrips) {
@@ -285,8 +299,26 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
         log.info("Writing population file...");
         log.info("There are in total " + population.getPersons().keySet().size() + " freight trips");
 
-        PopulationUtils.writePopulation(population, output.toString());
-
+        if (!Files.exists(outputFolder)) {
+            Files.createDirectory(outputFolder);
+        }
+        String outputFreightPath = outputFolder.toString() + "/german-wide-freight-25pct.xml.gz";
+        PopulationUtils.writePopulation(population, outputFreightPath);
+        String resultSummaryPath = outputFolder.toString() + "/freight-trips-locations-summary.tsv";
+        CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(resultSummaryPath), CSVFormat.TDF);
+        tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
+        for (int i = 0; i < fromCoords.size(); i++) {
+            Coord fromCoord = fromCoords.get(i);
+            Coord toCoord = toCoords.get(i);
+            List<String> outputRow = new ArrayList<>();
+            outputRow.add(Integer.toString(i + 1));
+            outputRow.add(Double.toString(fromCoord.getX()));
+            outputRow.add(Double.toString(fromCoord.getY()));
+            outputRow.add(Double.toString(toCoord.getX()));
+            outputRow.add(Double.toString(toCoord.getY()));
+            tsvWriter.printRecord(outputRow);
+        }
+        tsvWriter.close();
         return 0;
     }
 
@@ -321,6 +353,9 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
             generated += 1;
             totalGeneratedPersons.increment();
+
+            fromCoords.add(act0.getCoord());
+            toCoords.add(act1.getCoord());
         }
     }
 }

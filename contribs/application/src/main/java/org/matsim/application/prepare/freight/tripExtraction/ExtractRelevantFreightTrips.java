@@ -1,5 +1,7 @@
-package org.matsim.application.prepare.freight;
+package org.matsim.application.prepare.freight.tripExtraction;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
@@ -26,6 +28,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import picocli.CommandLine;
 
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +57,16 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
 
-    @CommandLine.Option(names = "--output", description = "Output path", required = true)
-    private Path outputPath;
+    @CommandLine.Option(names = "--output", description = "Output folder", required = true)
+    private Path outputFolder;
 
     @CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
     private boolean cutOnBoundary;
 
     private final SplittableRandom rnd = new SplittableRandom(4711);
+
+    private final List<Coord> fromCoords = new ArrayList<>();
+    private final List<Coord> toCoords = new ArrayList<>();
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new ExtractRelevantFreightTrips()).execute(args));
@@ -126,7 +133,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             }
 
             Plan plan = person.getSelectedPlan();
-            String goodType = (String) person.getAttributes().getAttribute("type_of_good");
+//            String goodType = (String) person.getAttributes().getAttribute("type_of_good"); // TODO keep all the attribute from original population
             // By default, the plan of each freight person consist of only 3 elements:
             // startAct, leg, endAct
             Activity startActivity = (Activity) plan.getPlanElements().get(0);
@@ -261,7 +268,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             if (act0.getEndTime().orElse(86400) < 86400) {
                 Person freightPerson = populationFactory
                         .createPerson(Id.create("freight_" + generated, Person.class));
-                freightPerson.getAttributes().putAttribute("good_type", goodType);
                 freightPerson.getAttributes().putAttribute("subpopulation", "freight");
                 Plan freightPersonPlan = populationFactory.createPlan();
                 freightPersonPlan.addActivity(act0);
@@ -270,6 +276,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 freightPerson.addPlan(freightPersonPlan);
                 outputPlans.addPerson(freightPerson);
                 generated += 1;
+
+                fromCoords.add(act0.getCoord());
+                toCoords.add(act1.getCoord());
             }
         }
 
@@ -278,8 +287,28 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
         // Write population
         log.info("Writing population file...");
+        if (!Files.exists(outputFolder)) {
+            Files.createDirectory(outputFolder);
+        }
+        String extractedPopulationPath = outputFolder.toString() + "/extracted-population.xml.gz";
         PopulationWriter pw = new PopulationWriter(outputPlans);
-        pw.write(outputPath.toString());
+        pw.write(extractedPopulationPath);
+
+        String resultSummaryPath = outputFolder.toString() + "/extracted-freight-trips-locations-summary.tsv";
+        CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(resultSummaryPath), CSVFormat.TDF);
+        tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
+        for (int i = 0; i < fromCoords.size(); i++) {
+            Coord fromCoord = fromCoords.get(i);
+            Coord toCoord = toCoords.get(i);
+            List<String> outputRow = new ArrayList<>();
+            outputRow.add(Integer.toString(i + 1));
+            outputRow.add(Double.toString(fromCoord.getX()));
+            outputRow.add(Double.toString(fromCoord.getY()));
+            outputRow.add(Double.toString(toCoord.getX()));
+            outputRow.add(Double.toString(toCoord.getY()));
+            tsvWriter.printRecord(outputRow);
+        }
+        tsvWriter.close();
 
         return 0;
     }
