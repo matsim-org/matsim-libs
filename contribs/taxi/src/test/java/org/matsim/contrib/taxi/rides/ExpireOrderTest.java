@@ -150,11 +150,6 @@ public class ExpireOrderTest {
 
 	@Test
 	public void testExpireOrderGen() {
-//		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("taxi-rides-test-base"), "config.xml");
-//		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-//		TaxiConfigGroup taxiCfgLoaded = TaxiConfigGroup.getSingleModeTaxiConfig(config);
-//		log.warn("CTudorache taxiCfgLoaded: " + taxiCfgLoaded);
-
 		TaxiConfigGroup taxiCfgGen = new TaxiConfigGroup();
 		taxiCfgGen.setBreakSimulationIfNotAllRequestsServed(false);
 		taxiCfgGen.setDestinationKnown(false);
@@ -169,7 +164,6 @@ public class ExpireOrderTest {
 		RuleBasedTaxiOptimizerParams ruleParams = new RuleBasedTaxiOptimizerParams();
 		ruleParams.setReoptimizationTimeStep(1);
 		ruleParams.setNearestVehiclesLimit(30);
-		//taxiCfg.addOptimizerParamsDefinition(RuleBasedTaxiOptimizerParams.SET_NAME, () -> ruleParams);
 		taxiCfgGen.addParameterSet(ruleParams);
 		log.warn("CTudorache taxiCfgGen: " + taxiCfgGen);
 
@@ -225,53 +219,6 @@ public class ExpireOrderTest {
 		});
 
 
-//		DvrpBenchmarks.adjustConfig(config);
-//
-//		Scenario scenario = ScenarioUtils.createScenario(config);
-//		Network network = scenario.getNetwork();
-//		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-//
-//		GridNetworkGenerator gn = new GridNetworkGenerator(network, 3, 3);
-//		generatePassenger(scenario, gn, 1, gn.linkId(0, 1, 0, 0), gn.linkId(2, 0, 2, 1), 0.0);
-//		generatePassenger(scenario, gn, 2, gn.linkId(0, 1, 0, 2), gn.linkId(2, 2, 2, 1), 5.0);
-//		generateVehicle(scenario, gn, 1, gn.linkId(1, 2, 2, 2), 0.0, 1000.0);
-//
-//
-//		Controler controler = new Controler(scenario);
-//		DvrpBenchmarks.initController(controler);
-//
-//		controler.addOverridingModule(new MultiModeTaxiModule());
-//
-//		String mode = taxiCfg.getMode();
-//		logger.warn("CTudorache mode: " + mode);
-//	  	controler.addOverridingModule(new DvrpModule());
-//	  	controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
-
-//		// TODO(CTudorache): probably not required
-//		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
-//			@Override
-//			public void install() {
-//				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
-//						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
-//								getter.getModal(ExecutedScheduleCollector.class),
-//								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
-//				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
-//			}
-//		});
-//		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
-//		  @Override
-//		  public void install() {
-//			bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
-//					getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
-//							getter.getModal(ExecutedScheduleCollector.class),
-//							getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
-//			addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
-//		  }
-//		});
-	    //controler.addOverridingModule(new FleetModule());
-		//controler.addOverridingModule(new TaxiModeAnalysisModule(taxiCfg));
-		//controler.setTerminationCriterion();
-
 		EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 
@@ -289,9 +236,7 @@ public class ExpireOrderTest {
 	}
 
 	@Test
-	public void testExpireOrder() {
-		// TODO: create test scenario. Should be reserved for automated tests only.
-		//       Grid network, dynamic vehicles, dynamic orders.
+	public void testExpireOrderByStaticConfigExample() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("taxi-rides-test-base"), "config.xml");
 
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
