@@ -66,22 +66,10 @@ public class LinearOffer implements Offer{
 	public void update() {
 		for(LSPInfo info : solution.getInfos()) {
 			if(info instanceof CostInfo ) {
-//				CostInfo costInfo = (CostInfo) info;
-//				CostInfoFunction costFunction = (CostInfoFunction) costInfo.getAttributes();
-//				FixedCostFunctionValue fixedValue;
-//				LinearCostFunctionValue linearValue;
-//				for( LSPAttribute value : costFunction.getAttributes()) {
-//					if(value instanceof FixedCostFunctionValue) {
-//						fixedValue = (FixedCostFunctionValue) value;
-//						this.fix = fixedValue.getValue();
-//					}
-//					if(value instanceof LinearCostFunctionValue) {
-//						linearValue = (LinearCostFunctionValue) value;
-//						this.linear = linearValue.getValue();
-//					}
-//				}
+				CostInfo costInfo = (CostInfo) info;
+				this.fix = costInfo.getFixedCost();
+				this.linear = costInfo.getVariableCost();
 			}
-
 		}
 	}
 
