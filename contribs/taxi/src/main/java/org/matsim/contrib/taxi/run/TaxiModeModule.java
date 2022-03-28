@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
@@ -44,6 +45,7 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public final class TaxiModeModule extends AbstractDvrpModeModule {
+	private static final Logger log = Logger.getLogger(TaxiModeModule.class);
 	private final TaxiConfigGroup taxiCfg;
 
 	public TaxiModeModule(TaxiConfigGroup taxiCfg) {
@@ -53,6 +55,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		log.warn("CTudorache TaxiModeModule.install: " + taxiCfg);
 		DvrpModes.registerDvrpMode(binder(), getMode());
 
 		install(new DvrpModeRoutingNetworkModule(getMode(), taxiCfg.isUseModeFilteredSubnetwork()));

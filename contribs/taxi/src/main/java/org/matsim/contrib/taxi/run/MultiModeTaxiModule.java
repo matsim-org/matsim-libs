@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
 import org.matsim.core.controler.AbstractModule;
 
@@ -29,13 +30,16 @@ import com.google.inject.Inject;
  * @author Michal Maciejewski (michalm)
  */
 public class MultiModeTaxiModule extends AbstractModule {
+	private static final Logger log = Logger.getLogger(MultiModeTaxiModule.class);
 
 	@Inject
 	private MultiModeTaxiConfigGroup multiModeTaxiCfg;
 
 	@Override
 	public void install() {
+		log.warn("CTudorache MultiModeTaxiModule.install: #" + multiModeTaxiCfg.getModalElements().size());
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
+			log.warn("CTudorache MultiModeTaxiModule.install: >> taxiCfg: " + taxiCfg);
 			install(new TaxiModeModule(taxiCfg));
 			installQSimModule(new TaxiModeQSimModule(taxiCfg));
 			install(new TaxiModeAnalysisModule(taxiCfg));

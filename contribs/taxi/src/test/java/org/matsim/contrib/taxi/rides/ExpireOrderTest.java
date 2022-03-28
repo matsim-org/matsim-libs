@@ -17,17 +17,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
-import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
-import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
@@ -58,7 +55,7 @@ import java.net.URL;
 import java.util.List;
 
 public class ExpireOrderTest {
-	private final Logger logger = Logger.getLogger(ExpireOrderTest.class);
+	private static final Logger log = Logger.getLogger(ExpireOrderTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -144,35 +141,43 @@ public class ExpireOrderTest {
 		// TODO(CTudorache): utility method for generating vehicle id: "taxi_vehicle_%d"
 		Vehicle v = VehicleUtils.createVehicle(Id.create("taxi_vehicle_" + vehicleId, Vehicle.class), vehType);
 		// TODO(CTudorache): do these attributes work? could not find an example of generating vehicle with start_link, t_0, t_1
-		v.getAttributes().putAttribute("start_link", startLink.toString());
-		v.getAttributes().putAttribute("t_0", t0.toString());
-		v.getAttributes().putAttribute("t_1", t1.toString());
+		v.getAttributes().putAttribute("dvrpMode", "taxi");
+		v.getAttributes().putAttribute("startLink", startLink.toString());
+		v.getAttributes().putAttribute("serviceBeginTime", t0);
+		v.getAttributes().putAttribute("serviceEndTime", t1);
 		scenario.getVehicles().addVehicle(v);
 	}
 
 	@Test
 	public void testExpireOrderGen() {
-		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		taxiCfg.setBreakSimulationIfNotAllRequestsServed(false);
-		taxiCfg.setDestinationKnown(false);
-		taxiCfg.setVehicleDiversion(false);
-		taxiCfg.setPickupDuration(120);
-		taxiCfg.setDropoffDuration(60);
-		taxiCfg.setTimeProfiles(true);
-		taxiCfg.setDetailedStats(true);
-		taxiCfg.setMaxSearchDuration(65.0); // order should expire in 65 seconds
-		taxiCfg.setRequestAcceptanceDelay(0.0);
+//		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("taxi-rides-test-base"), "config.xml");
+//		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
+//		TaxiConfigGroup taxiCfgLoaded = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+//		log.warn("CTudorache taxiCfgLoaded: " + taxiCfgLoaded);
+
+		TaxiConfigGroup taxiCfgGen = new TaxiConfigGroup();
+		taxiCfgGen.setBreakSimulationIfNotAllRequestsServed(false);
+		taxiCfgGen.setDestinationKnown(false);
+		taxiCfgGen.setVehicleDiversion(false);
+		taxiCfgGen.setPickupDuration(120);
+		taxiCfgGen.setDropoffDuration(60);
+		taxiCfgGen.setTimeProfiles(true);
+		taxiCfgGen.setDetailedStats(true);
+		taxiCfgGen.setMaxSearchDuration(65.0); // order should expire in 65 seconds
+		taxiCfgGen.setRequestAcceptanceDelay(0.0);
 
 		RuleBasedTaxiOptimizerParams ruleParams = new RuleBasedTaxiOptimizerParams();
-		//logger.warn("CTudorache taxiCfg.getTaxiOptimizerParams(): " + taxiCfg.getTaxiOptimizerParams());
-		//RuleBasedTaxiOptimizerParams ruleParams = ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams());
 		ruleParams.setReoptimizationTimeStep(1);
 		ruleParams.setNearestVehiclesLimit(30);
 		//taxiCfg.addOptimizerParamsDefinition(RuleBasedTaxiOptimizerParams.SET_NAME, () -> ruleParams);
-		taxiCfg.addParameterSet(ruleParams);
+		taxiCfgGen.addParameterSet(ruleParams);
+		log.warn("CTudorache taxiCfgGen: " + taxiCfgGen);
 
-		Config config = ConfigUtils.createConfig(new MultiModeTaxiConfigGroup(() -> taxiCfg), new DvrpConfigGroup());
-		logger.warn("CTudorache modules: " + config.getModules().keySet());
+		MultiModeTaxiConfigGroup multiModeTaxiConfigGroup = new MultiModeTaxiConfigGroup();
+		multiModeTaxiConfigGroup.addParameterSet(taxiCfgGen);
+		Config config = ConfigUtils.createConfig(multiModeTaxiConfigGroup, new DvrpConfigGroup());
+		log.warn("CTudorache modules: " + config.getModules().keySet());
+
 
 		config.controler().setOutputDirectory("test/output/abcdef");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -184,28 +189,63 @@ public class ExpireOrderTest {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 	  	config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 	  	config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+		config.planCalcScore().addParam("activityType_0", "dummy");
+		config.planCalcScore().addParam("activityTypicalDuration_0", "24:00:00");
+		config.planCalcScore().addParam("traveling_taxi", "-6");
+		config.planCalcScore().addParam("activityTypicalDuration_1", "28800");
+
 		DvrpBenchmarks.adjustConfig(config);
 
-
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-
 		GridNetworkGenerator gn = new GridNetworkGenerator(network, 3, 3);
 		generatePassenger(scenario, gn, 1, gn.linkId(0, 1, 0, 0), gn.linkId(2, 0, 2, 1), 0.0);
 		generatePassenger(scenario, gn, 2, gn.linkId(0, 1, 0, 2), gn.linkId(2, 2, 2, 1), 5.0);
 		generateVehicle(scenario, gn, 1, gn.linkId(1, 2, 2, 2), 0.0, 1000.0);
 
-
 		Controler controler = new Controler(scenario);
 		DvrpBenchmarks.initController(controler);
 
+		final String mode = TransportMode.taxi;
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
+
 		controler.addOverridingModule(new MultiModeTaxiModule());
 
-		String mode = taxiCfg.getMode();
-		logger.warn("CTudorache mode: " + mode);
-	  	controler.addOverridingModule(new DvrpModule());
-	  	controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
+		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(TaxiBenchmarkStats.class).toProvider(modalProvider(
+						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class),
+								getter.getModal(ExecutedScheduleCollector.class),
+								getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(TaxiBenchmarkStats.class));
+			}
+		});
+
+
+//		DvrpBenchmarks.adjustConfig(config);
+//
+//		Scenario scenario = ScenarioUtils.createScenario(config);
+//		Network network = scenario.getNetwork();
+//		network.setCapacityPeriod(Time.parseTime("1:00:00"));
+//
+//		GridNetworkGenerator gn = new GridNetworkGenerator(network, 3, 3);
+//		generatePassenger(scenario, gn, 1, gn.linkId(0, 1, 0, 0), gn.linkId(2, 0, 2, 1), 0.0);
+//		generatePassenger(scenario, gn, 2, gn.linkId(0, 1, 0, 2), gn.linkId(2, 2, 2, 1), 5.0);
+//		generateVehicle(scenario, gn, 1, gn.linkId(1, 2, 2, 2), 0.0, 1000.0);
+//
+//
+//		Controler controler = new Controler(scenario);
+//		DvrpBenchmarks.initController(controler);
+//
+//		controler.addOverridingModule(new MultiModeTaxiModule());
+//
+//		String mode = taxiCfg.getMode();
+//		logger.warn("CTudorache mode: " + mode);
+//	  	controler.addOverridingModule(new DvrpModule());
+//	  	controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
 //		// TODO(CTudorache): probably not required
 //		controler.addOverridingModule(new AbstractDvrpModeModule(mode) {

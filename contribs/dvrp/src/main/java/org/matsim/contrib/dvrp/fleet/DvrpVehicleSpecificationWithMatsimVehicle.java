@@ -23,6 +23,8 @@ package org.matsim.contrib.dvrp.fleet;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.google.common.base.Joiner;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
@@ -32,6 +34,7 @@ import org.matsim.vehicles.Vehicles;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpecification {
+	private static final Logger log = Logger.getLogger(DvrpVehicleSpecificationWithMatsimVehicle.class);
 
 	public static final String DVRP_MODE = "dvrpMode";
 	public static final String START_LINK = "startLink";
@@ -39,6 +42,9 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 	public static final String SERVICE_END_TIME = "serviceEndTime";
 
 	public static FleetSpecification createFleetSpecificationFromMatsimVehicles(String mode, Vehicles vehicles) {
+		log.warn("CTudorache mode: " + mode
+				+ ", vehicleTypes: " + Joiner.on(",").withKeyValueSeparator("=").join(vehicles.getVehicleTypes())
+				+ ", vehicles: " + Joiner.on(",").withKeyValueSeparator("=").join(vehicles.getVehicles()));
 		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
 		vehicles.getVehicles()
 				.values()
@@ -47,6 +53,7 @@ public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpe
 						vehicle.getAttributes().getAttribute(DVRP_MODE)))
 				.map(DvrpVehicleSpecificationWithMatsimVehicle::new)
 				.forEach(fleetSpecification::addVehicleSpecification);
+		log.warn("CTudorache fleetSpecification: " + fleetSpecification.getVehicleSpecifications());
 		return fleetSpecification;
 	}
 

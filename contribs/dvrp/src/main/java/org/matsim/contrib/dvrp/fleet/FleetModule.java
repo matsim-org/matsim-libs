@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.fleet;
 
 import java.net.URL;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -39,6 +40,8 @@ import com.google.inject.Singleton;
  * @author Michal Maciejewski (michalm)
  */
 public class FleetModule extends AbstractDvrpModeModule {
+	private static final Logger log = Logger.getLogger(FleetModule.class);
+
 	private final URL fleetSpecificationUrl;
 	private final boolean updateVehicleStartLinkToLastLink;
 	private final VehicleType vehicleType;
@@ -65,6 +68,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		log.warn("CTudorache FleetModule.install, fleetSpecificationUrl: " + fleetSpecificationUrl);
 		// 3 options:
 		// - vehicle specifications provided in a separate XML file (http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd)
 		// - vehicle specifications derived from the "standard" matsim vehicles (only if they are read from a file,
