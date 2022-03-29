@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -33,22 +32,22 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.vehicles.Vehicle;
 
 
-//Achtung: Das darf nicht von LinkEnterEvent erben, weil sonst im CarrierResourceTracker immer wenn ein ein solches event hergestellt wird, der CarrierResourceAgent +
+//Achtung: Das darf nicht von LinkEnterEvent erben, weil sonst im CarrierResourceTracker immer wenn ein solches Event hergestellt wird, der CarrierResourceAgent +
 //denkt ein neues LinkEnterEvent waere geworfen worden -> Endlosschleife
 
 public final class LSPFreightLinkEnterEvent extends Event{
 
-	public static final String EVENT_TYPE = "freight vehicle entered link";
+	public static final String EVENT_TYPE = "LspFreightVehicleEnteredLink";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	public static final String ATTRIBUTE_DRIVER = "driver";
 	
-	private CarrierVehicle carrierVehicle;
-	private Id<Carrier> carrierId;
-	private Id<Person> driverId;
-	private Id<Vehicle> vehicleId; 
-	private Id<Link>linkId; 
+	private final CarrierVehicle carrierVehicle;
+	private final Id<Carrier> carrierId;
+	private final Id<Person> driverId;
+	private final Id<Vehicle> vehicleId;
+	private final Id<Link>linkId;
 	
 	public LSPFreightLinkEnterEvent(Id<Carrier>carrierId, Id<Vehicle> vehicleId, Id<Person>driverId, Id<Link>linkId, double time, CarrierVehicle vehicle) {
 		super(time);

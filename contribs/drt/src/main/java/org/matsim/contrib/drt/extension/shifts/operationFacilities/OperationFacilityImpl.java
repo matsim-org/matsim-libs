@@ -19,18 +19,18 @@ public class OperationFacilityImpl implements OperationFacility {
     private final Id<Link> linkId;
     private final Coord coord;
     private final int capacity;
-    private final Id<Charger> charger;
+    private final List<Id<Charger>> chargers;
     private final OperationFacilityType type;
 
     private final Set<Id<DvrpVehicle>> reservedVehicles = new LinkedHashSet<>();
 
     public OperationFacilityImpl(Id<OperationFacility> id, Id<Link> linkId, Coord coord, int capacity,
-                                 Id<Charger> charger, OperationFacilityType type) {
+                                 List<Id<Charger>> chargers, OperationFacilityType type) {
         this.id = id;
         this.linkId = linkId;
         this.coord = coord;
         this.capacity = capacity;
-        this.charger = charger;
+        this.chargers = Collections.unmodifiableList(chargers);
         this.type = type;
     }
 
@@ -79,8 +79,8 @@ public class OperationFacilityImpl implements OperationFacility {
     }
 
     @Override
-    public Optional<Id<Charger>> getCharger() {
-        return Optional.ofNullable(charger);
+    public List<Id<Charger>> getChargers() {
+        return chargers;
     }
 
     @Override

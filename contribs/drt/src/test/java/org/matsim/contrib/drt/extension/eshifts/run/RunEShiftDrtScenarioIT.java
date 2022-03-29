@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -137,6 +137,8 @@ public class RunEShiftDrtScenarioIT {
 		//e shifts
 		shiftDrtConfigGroup.setShiftAssignmentBatteryThreshold(0.6);
 		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
+		shiftDrtConfigGroup.setOutOfShiftChargerType("slow");
+		shiftDrtConfigGroup.setBreakChargerType("fast");
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setChargersFile(chargersFile);

@@ -1,2 +1,2 @@
 
-average trip duration: no trips!
+average legs duration: no legs!

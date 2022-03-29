@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -55,6 +56,9 @@ import java.util.TreeMap;
  */
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
+	public static final int DEFAULT_END_TIME = 30 * 3600;
+	public static final int DEFAULT_BIN_SIZE = 300;
+
 	private Set<Id<Person>> personIds;
 	private int iteration = 0;
 	private final int binSize;
@@ -62,8 +66,11 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private final Map<String, DataFrame> data = new TreeMap<>();
 
 	@Inject
-	LegHistogram(Population population, EventsManager eventsManager) {
-		this(300);
+	LegHistogram(Population population, EventsManager eventsManager, Config config) {
+		super();
+		this.binSize = DEFAULT_BIN_SIZE;
+		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
+		reset(0);
 		if (population == null) {
 			this.personIds = null;
 		} else {
@@ -91,7 +98,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @param binSize The size of a time bin in seconds.
 	 */
 	public LegHistogram(final int binSize) {
-		this(binSize, 30*3600/binSize + 1);
+		this(binSize, DEFAULT_END_TIME / binSize + 1);
 	}
 
 	/* Implementation of EventHandler-Interfaces */
