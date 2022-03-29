@@ -40,6 +40,7 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [protobuf](protobuf/README.md) | Protocol buffer implementation and converter for the MATSim event infrastructure
 | [pseudosimulation](pseudosimulation/README.md) | Pseudo-simulation to speed-up simulation times
 | [roadpricing](roadpricing/README.md) | Functionality to simulate different road-pricing scenarios in MATSim
+| [shared_mobility](shared_mobility/README.md) | Simulate human-driven shared mobility (i.e., micromobility)
 | [signals](signals/README.md) | Simulate traffic lights microscopically
 | [socnetsim](socnetsim/README.md) | Social network simulation
 | [sumo](sumo/README.md) | Converter and integrations for [SUMO](https://sumo.dlr.de/])

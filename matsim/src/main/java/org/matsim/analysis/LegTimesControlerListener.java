@@ -32,9 +32,9 @@ class LegTimesControlerListener implements AfterMobsimListener {
 
 	private static final  Logger log = Logger.getLogger(LegTimesControlerListener.class);
 	
-	private CalcLegTimes legTimes;
-	
-	private OutputDirectoryHierarchy controlerIO;
+	private final CalcLegTimes legTimes;
+
+	private final OutputDirectoryHierarchy controlerIO;
 	
 	@Inject
     LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
@@ -45,13 +45,13 @@ class LegTimesControlerListener implements AfterMobsimListener {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-			legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
-			// - print averages in log
-			log.info("[" + event.getIteration() + "] average trip (probably: leg) duration is: " + (int) legTimes.getAverageTripDuration()
-					+ " seconds = " + Time.writeTime(legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
-			// trips are from "true" activity to "true" activity.  legs may also go
-			// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
-			// kai, jul'11
+		legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
+		// - print averages in log
+		log.info("[" + event.getIteration() + "] average trip (probably: leg) duration is: " + (int) legTimes.getAverageLegDuration()
+				+ " seconds = " + Time.writeTime(legTimes.getAverageLegDuration(), Time.TIMEFORMAT_HHMMSS));
+		// trips are from "true" activity to "true" activity.  legs may also go
+		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
+		// kai, jul'11
 
 	}
 

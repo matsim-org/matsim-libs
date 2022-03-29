@@ -116,6 +116,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         assignShifts(timeStep);
         startShifts(timeStep);
         checkBreaks();
+		if(timeStep % configGroup.getLoggingInterval() == 0) {
+			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
+					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
+			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
+				logger.info(String.format("Idle vehicles at facility %s: %d", queueEntry.getKey().toString(), queueEntry.getValue().size()));
+			}
+		}
     }
 
     private void checkBreaks() {

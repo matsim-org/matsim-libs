@@ -21,13 +21,6 @@
  */
 package org.matsim.contrib.signals.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,8 +33,6 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.Signal;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -49,6 +40,12 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
+
+import javax.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Write a csv file for visualizing signals in via based on the events.
@@ -79,14 +76,14 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	private BufferedWriter signalsCSVWriter;
 	private SignalsData signalsData;
-	Scenario scenario;
+	private final Scenario scenario;
+	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
+	private boolean writeThisIteration = false;
 
 	@Inject
 	public SignalEvents2ViaCSVWriter(Scenario scenario) {
 		this.scenario = scenario;
 	}
-
-	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
 
 	@Override
 	public void reset(int iteration) {
@@ -101,19 +98,25 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 			init();
 		}
 
-		String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
+		// write signal events in the same interval als usual matsim events
+		if (event.isLastIteration() || (scenario.getConfig().controler().getWriteEventsInterval() != 0 && event.getIteration() % scenario.getConfig().controler().getWriteEventsInterval() == 0)) {
+			writeThisIteration = true;
+			String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
 
-		// log.info("Initializing SignalsCSVWriter ...");
-		signalsCSVWriter = IOUtils.getBufferedWriter(signalCSVFilename);
-		log.info("Writing signal events of iteration " + event.getIteration() + " as csv file for via to " + signalCSVFilename + " ...");
+			// log.info("Initializing SignalsCSVWriter ...");
+			signalsCSVWriter = IOUtils.getBufferedWriter(signalCSVFilename);
+			log.info("Writing signal events of iteration " + event.getIteration() + " as csv file for via to " + signalCSVFilename + " ...");
 
-		// create header
-		try {
-			signalsCSVWriter.write(SIGNAL_ID + ";" + X_COORD + ";" + Y_COORD + ";" + TIME + ";" + SIGNAL_STATE);
-			signalsCSVWriter.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-			log.error("Something went wrong while writing the header of the signals csv file.");
+			// create header
+			try {
+				signalsCSVWriter.write(SIGNAL_ID + ";" + X_COORD + ";" + Y_COORD + ";" + TIME + ";" + SIGNAL_STATE);
+				signalsCSVWriter.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.error("Something went wrong while writing the header of the signals csv file.");
+			}
+		} else {
+			writeThisIteration = false;
 		}
 	}
 
@@ -131,23 +134,25 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void handleEvent(SignalGroupStateChangedEvent event) {
-		if (signalsData == null){
-			if (countWarnings > 9){
-				log.warn("You are using the SignalsModule without Controler. No output is written out. (This warning is only given 10 times.)");
-				countWarnings++;
+		if (writeThisIteration) {
+			if (signalsData == null) {
+				if (countWarnings > 9) {
+					log.warn("You are using the SignalsModule without Controler. No output is written out. (This warning is only given 10 times.)");
+					countWarnings++;
+				}
+				return;
 			}
-			return;
-		}
-		SignalGroupData signalGroupData = signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(event.getSignalSystemId()).get(event.getSignalGroupId());
-		// write a line for each signal of the group
-		for (Id<Signal> signalId : signalGroupData.getSignalIds()) {
-			Coord signalCoord = signal2Coord.get(signalId);
-			try {
-				signalsCSVWriter.write(signalId + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + event.getTime() + ";" + event.getNewState());
-				signalsCSVWriter.newLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.error("Something went wrong while adding a line for the signal state switch of signal " + signalId);
+			SignalGroupData signalGroupData = signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(event.getSignalSystemId()).get(event.getSignalGroupId());
+			// write a line for each signal of the group
+			for (Id<Signal> signalId : signalGroupData.getSignalIds()) {
+				Coord signalCoord = signal2Coord.get(signalId);
+				try {
+					signalsCSVWriter.write(signalId + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + event.getTime() + ";" + event.getNewState());
+					signalsCSVWriter.newLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+					log.error("Something went wrong while adding a line for the signal state switch of signal " + signalId);
+				}
 			}
 		}
 	}
@@ -203,15 +208,17 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// close the stream of this iteration
-		try {
-			signalsCSVWriter.flush();
-			signalsCSVWriter.close();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			log.error("Something went wrong while closing the signals csv writer stream.");
+		if (writeThisIteration) {
+			// close the stream of this iteration
+			try {
+				signalsCSVWriter.flush();
+				signalsCSVWriter.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				log.error("Something went wrong while closing the signals csv writer stream.");
+			}
+			log.info("... done for this iteration");
 		}
-		log.info("... done for this iteration");
 	}
 
 }
