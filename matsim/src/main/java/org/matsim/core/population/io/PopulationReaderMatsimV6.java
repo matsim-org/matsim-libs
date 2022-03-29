@@ -270,7 +270,18 @@ import com.google.inject.Inject;
 	}
 
 	private void startAct(final Attributes atts) {
-		if (atts.getValue(ATTR_ACT_LINK) != null) {
+		if (atts.getValue(ATTR_ACT_FACILITY) != null) {
+			final Id<ActivityFacility> facilityId = Id.create(atts.getValue(ATTR_ACT_FACILITY), ActivityFacility.class);
+			this.curract = PopulationUtils.createAndAddActivityFromFacilityId(this.currplan, atts.getValue(ATTR_ACT_TYPE), facilityId);
+			if (atts.getValue(ATTR_ACT_LINK) != null) {
+				final Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
+				this.curract.setLinkId(linkId);
+			}
+			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
+				final Coord coord = parseCoord(atts);
+				this.curract.setCoord(coord);
+			}
+		} else if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			final Id<Link> linkId1 = linkId;
 			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
@@ -282,7 +293,7 @@ import com.google.inject.Inject;
 			final Coord coord = parseCoord( atts );
 			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
+			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords be specified for an Act.");
 		}
 
 		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
@@ -291,10 +302,6 @@ import com.google.inject.Inject;
 				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
 		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
 				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
-		String fId = atts.getValue(ATTR_ACT_FACILITY);
-		if (fId != null) {
-			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
-		}
 		if (this.routeDescription != null) {
 			finishLastRoute();
 		}
