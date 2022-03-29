@@ -780,6 +780,11 @@ public final class PopulationUtils {
 
 	// createAndAdd methods:
 
+	public static Activity createAndAddActivityFromFacilityId(Plan plan, String type, Id<ActivityFacility> facilityId) {
+		Activity act = getFactory().createActivityFromActivityFacilityId(type, facilityId);
+		plan.addActivity(act);
+		return act;
+	}
 	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		plan.addActivity(act);
