@@ -34,9 +34,8 @@ import org.matsim.vehicles.Vehicle;
 
 public final class LSPFreightVehicleLeavesTrafficEvent extends Event{
 
-	public static final String EVENT_TYPE = "freight vehicle leaves traffic";
+	public static final String EVENT_TYPE = "LspFreightVehicleLeavesTraffic";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
 	public static final String ATTRIBUTE_DRIVER = "driver";
@@ -44,12 +43,12 @@ public final class LSPFreightVehicleLeavesTrafficEvent extends Event{
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	
 
-	private Id<Person> driverId; 
-	private Id<Link> linkId; 
-	private Id<Vehicle> vehicleId;
-	private CarrierVehicle carrierVehicle;
-	private Id<Carrier> carrierId;
-	private VehicleLeavesTrafficEvent event;
+	private final Id<Person> driverId;
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehicleId;
+	private final CarrierVehicle carrierVehicle;
+	private final Id<Carrier> carrierId;
+	private final VehicleLeavesTrafficEvent event;
 	
 	public LSPFreightVehicleLeavesTrafficEvent(VehicleLeavesTrafficEvent event, Id<Carrier> carrierId, double time, Id<Person> driverId, Id<Link> linkId, Id<Vehicle> vehicleId, CarrierVehicle carrierVehicle) {
 		super(time);
@@ -83,7 +82,7 @@ public final class LSPFreightVehicleLeavesTrafficEvent extends Event{
 
 	@Override
 	public String getEventType() {
-		return "EVENT_TYPE";
+		return EVENT_TYPE;
 	}
 	
 	@Override
