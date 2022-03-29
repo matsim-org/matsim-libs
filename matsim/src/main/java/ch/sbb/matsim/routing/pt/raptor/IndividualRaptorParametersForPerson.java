@@ -23,17 +23,18 @@ public class IndividualRaptorParametersForPerson implements RaptorParametersForP
 	private final Config config;
 	private final SwissRailRaptorConfigGroup raptorConfig;
 	private final ScoringParametersForPerson parametersForPerson;
+	private final RaptorParameters raptorParameters;
 
 	@Inject
 	public IndividualRaptorParametersForPerson(Config config, ScoringParametersForPerson parametersForPerson) {
 		this.config = config;
 		this.raptorConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
 		this.parametersForPerson = parametersForPerson;
+		this.raptorParameters = RaptorUtils.createParameters(config);
 	}
 
 	@Override
 	public RaptorParameters getRaptorParameters(Person person) {
-		RaptorParameters raptorParameters = RaptorUtils.createParameters(config);
 		ScoringParameters scoringParameters = parametersForPerson.getScoringParameters(person);
 
 		double marginalUtilityOfPerforming = scoringParameters.marginalUtilityOfPerforming_s;
