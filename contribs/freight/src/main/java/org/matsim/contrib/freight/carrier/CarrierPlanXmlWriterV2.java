@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import java.io.BufferedWriter;
@@ -29,7 +50,7 @@ import org.matsim.vehicles.VehicleType;
  */
 public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierPlanXmlWriterV2.class);
+	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV2.class);
 
 	private Collection<Carrier> carriers;
 
@@ -111,7 +132,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
-			if(vehicleTypeId == null) vehicleTypeId = v.getType().getId();
+			if(vehicleTypeId == null) vehicleTypeId = v.getType() == null ? null : v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" depotLinkId=\"" + v.getLocation()  

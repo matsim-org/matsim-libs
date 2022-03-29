@@ -22,10 +22,10 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
 
 /**
  * <p>
@@ -42,7 +42,7 @@ import org.matsim.core.utils.collections.Tuple;
  * @author tkohl / Senozon
  *
  */
-public class ParkingProxyModule extends AbstractModule {
+public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModule {
 	
 	private final Scenario scenario;
 	
@@ -54,9 +54,7 @@ public class ParkingProxyModule extends AbstractModule {
 	public void install() {
 		ParkingProxyConfigGroup parkingConfig = ConfigUtils.addOrGetModule(getConfig(), ParkingProxyConfigGroup.class );
 		
-		InitialLoadGenerator loadGenerator = new InitialLoadGenerator(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor());
-//		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );
-		Collection<Tuple<Coord, Integer>> initialLoad = loadGenerator.calculateInitialCarPositions(parkingConfig.getCarsPer1000Persons());
+		Collection<Tuple<Coord, Integer>> initialLoad = calculateInitialLoad(parkingConfig);
 		int qsimEndTime = (int) getConfig().qsim().getEndTime().orElse(30*3600);
 		MovingEntityCounter carCounter = new MovingEntityCounter(
 				initialLoad, 
@@ -73,10 +71,31 @@ public class ParkingProxyModule extends AbstractModule {
 		case events:
 			ParkingVehiclesCountEventHandler parkingHandler = new ParkingVehiclesCountEventHandler(carCounter, scenario.getNetwork(), parkingConfig.getScenarioScaleFactor());
 			super.addEventHandlerBinding().toInstance(parkingHandler);
+			
+			CarEgressWalkObserver walkObserver;
+			switch (parkingConfig.getIter0Method()) {
+			case hourPenalty:
+				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyHourCalculator());
+				break;
+			case noPenalty:
+				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyZeroCalculator());
+				break;
+			case takeFromAttributes:
+				// CarEgressWalkChanger will handle this, we don't want to also change egress walks. Note that if it is observeOnly, the first iteration will put out zeros.
+				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, PenaltyCalculator.getDummyZeroCalculator());
+				break;
+			case estimateFromPlans:
+				ParkingCounterByPlans plansCounter = new ParkingCounterByPlans(carCounter, parkingConfig.getScenarioScaleFactor());
+				plansCounter.calculateByPopulation(scenario.getPopulation(), scenario.getNetwork());
+				walkObserver = new CarEgressWalkObserver(parkingHandler, penaltyFunction, plansCounter.generatePenaltyCalculator());
+				break;
+			default:
+				throw new RuntimeException("Unknown iter0 mode");
+			}
 			if (parkingConfig.getObserveOnly()) {
-				super.addControlerListenerBinding().toInstance(new CarEgressWalkObserver(parkingHandler, penaltyFunction));
+				super.addControlerListenerBinding().toInstance(walkObserver);
 			} else {
-				super.addControlerListenerBinding().toInstance(new CarEgressWalkChanger(parkingHandler, penaltyFunction));
+				super.addControlerListenerBinding().toInstance(new CarEgressWalkChanger(parkingHandler, penaltyFunction, walkObserver, parkingConfig.getIter0Method()));
 			}
 			break;
 		case plans:
@@ -93,6 +112,12 @@ public class ParkingProxyModule extends AbstractModule {
 		default:
 			throw new RuntimeException("Unsupported calculation method " + parkingConfig.getCalculationMethod());	
 		}
+	}
+	
+	protected Collection<Tuple<Coord, Integer>> calculateInitialLoad(ParkingProxyConfigGroup parkingConfig) {
+		InitialLoadGenerator loadGenerator = new InitialLoadGeneratorWithConstantShare(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor(), parkingConfig.getCarsPer1000Persons());
+//		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );
+		return loadGenerator.calculateInitialCarPositions();
 	}
 
 }

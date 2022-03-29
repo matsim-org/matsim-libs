@@ -42,8 +42,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
-import org.matsim.core.router.AStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -66,11 +67,13 @@ public class SetupParking {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(TravelTime.class).annotatedWith(DvrpModes.mode(TransportMode.car))
+						.to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 				bind(TravelDisutilityFactory.class).annotatedWith(DvrpModes.mode(TransportMode.car))
 						.toInstance(TimeAsTravelDisutility::new);
 				bind(Network.class).annotatedWith(DvrpModes.mode(TransportMode.car))
 						.to(Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
-				install(new DvrpModeRoutingModule(TransportMode.car, new AStarEuclideanFactory()));
+				install(new DvrpModeRoutingModule(TransportMode.car, new SpeedyALTFactory()));
 				bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 						.to(Network.class)
 						.asEagerSingleton();

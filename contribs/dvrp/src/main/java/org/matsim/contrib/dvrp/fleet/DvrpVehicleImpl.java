@@ -81,6 +81,10 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		return schedule;
 	}
 
+	public DvrpVehicleSpecification getSpecification() {
+		return specification;
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)

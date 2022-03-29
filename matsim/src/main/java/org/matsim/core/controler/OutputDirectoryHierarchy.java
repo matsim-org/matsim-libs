@@ -22,6 +22,8 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -40,7 +42,7 @@ public final class OutputDirectoryHierarchy {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
-	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
+	private static final  Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
 	
 	private String runId = null;
 	
@@ -52,10 +54,20 @@ public final class OutputDirectoryHierarchy {
 
 	@Inject
 	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+
 		this(config.getOutputDirectory(),
 				config.getRunId(),
 				config.getOverwriteFileSetting(),
 				config.getCompressionType());
+	}
+
+	/**
+	 * A constructor with a fairly powerful argument so that it can be adapted to functionality changes without having to change the API.
+	 *
+	 * @param config
+	 */
+	public OutputDirectoryHierarchy( Config config ) {
+		this( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting(), config.controler().getCompressionType() );
 	}
 
 	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {
@@ -203,6 +215,9 @@ public final class OutputDirectoryHierarchy {
 						// files!
 						throw new RuntimeException(
 								"The output directory " + outputPath
+								+ " (full path: "
+								+ outputDir.getAbsolutePath()
+								+")"
 								+ " already exists and is not empty!"
 								+ " Please either delete or empty the directory or"
 								+ " configure the services via setOverwriteFileSetting()"
@@ -212,6 +227,7 @@ public final class OutputDirectoryHierarchy {
 						log.warn("###########################################################");
 						log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
 						log.warn("### " + outputPath);
+						log.warn("### full path: " + outputDir.getAbsolutePath());
 						log.warn("###########################################################");
 						System.err.flush();
 						break;
@@ -223,6 +239,7 @@ public final class OutputDirectoryHierarchy {
 						log.info("###########################################################");
 						log.info("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
 						log.info("### " + outputPath);
+						log.warn("### full path: " + outputDir.getAbsolutePath());
 						log.info("###########################################################");
 						System.out.flush();
 						IOUtils.deleteDirectoryRecursively(outputDir.toPath());

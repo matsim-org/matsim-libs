@@ -1,6 +1,8 @@
 package org.matsim.contrib.noise;
 
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -10,16 +12,16 @@ import org.matsim.api.core.v01.Id;
 
     private final Id<NoiseBarrier> id;
 
-    private final Geometry geom;
+    private final PreparedGeometry geom;
     private final double height;
     public FeatureNoiseBarrierImpl(Id<NoiseBarrier> id, Geometry geom, double height) {
         this.id = id;
-        this.geom = geom;
+        this.geom = PreparedGeometryFactory.prepare(geom);
         this.height = height;
     }
 
     @Override
-    public Geometry getGeometry() {
+    public PreparedGeometry getGeometry() {
         return geom;
     }
 

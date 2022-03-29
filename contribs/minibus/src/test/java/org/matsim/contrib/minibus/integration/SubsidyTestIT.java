@@ -38,6 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -57,6 +58,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 	public final void testSubsidyPControler() {
 		
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 
 		PConfigGroup pConfig = (PConfigGroup) config.getModules().get(PConfigGroup.GROUP_NAME);
 		pConfig.setSubsidyApproach("perPassenger");
@@ -103,7 +105,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
 		// Check final iteration
-		Assert.assertEquals("Number of budget (final iteration)", "202320015.6112222400", this.pStatsResults.get(2)[9]);
+		Assert.assertEquals("Number of budget (final iteration)", "202319997.4909444700", this.pStatsResults.get(2)[9]);
 	}
 	
 	@Override

@@ -35,7 +35,7 @@ import javax.inject.Inject;
 public final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
 	private final RoadPricingScheme scheme;
 	private final double marginalUtilityOfMoney ;
-	private TravelDisutilityFactory previousTravelDisutilityFactory;
+	private final TravelDisutilityFactory previousTravelDisutilityFactory;
 	private double sigma = 3. ;
 
 	@Inject

@@ -10,10 +10,10 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.DefaultTourCand
 import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourEstimator;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripEstimator;
-import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * This tour estimator tries to resemble the MATSim scoring functions as closely
@@ -32,8 +32,8 @@ public class MATSimDayScoringEstimator implements TourEstimator {
 	private final ScoringParametersForPerson scoringParametersForPerson;
 
 	public MATSimDayScoringEstimator(TripEstimator tripEstimator, ScoringParametersForPerson scoringParametersForPerson,
-			TimeInterpreter.Factory timeInterpreterFactory) {
-		this.delegate = new CumulativeTourEstimator(tripEstimator, timeInterpreterFactory);
+			TimeInterpretation timeInterpretation) {
+		this.delegate = new CumulativeTourEstimator(tripEstimator, timeInterpretation);
 		this.scoringParametersForPerson = scoringParametersForPerson;
 	}
 

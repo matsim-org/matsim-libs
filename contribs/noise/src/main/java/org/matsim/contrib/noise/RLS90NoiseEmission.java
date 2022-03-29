@@ -3,7 +3,10 @@ package org.matsim.contrib.noise;
 import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 
 import static org.matsim.contrib.noise.RLS90VehicleType.car;
 import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
@@ -13,12 +16,12 @@ class RLS90NoiseEmission implements NoiseEmission {
     private final static Logger log = Logger.getLogger(RLS90NoiseEmission.class);
 
     private final NoiseConfigGroup noiseParams;
-    private final NoiseContext noiseContext;
+    private final Network network;
 
     @Inject
-    RLS90NoiseEmission(NoiseContext noiseContext) {
-        this.noiseContext = noiseContext;
-        noiseParams = noiseContext.getNoiseParams();
+    RLS90NoiseEmission(Scenario scenario) {
+        noiseParams = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
+        network = scenario.getNetwork();
     }
 
     @Override
@@ -142,12 +145,11 @@ class RLS90NoiseEmission implements NoiseEmission {
     }
 
     private double getV(NoiseLink noiseLink, NoiseVehicleType type) {
-        Link link = noiseContext.getScenario().getNetwork().getLinks().get(noiseLink.getId());
+        Link link = network.getLinks().get(noiseLink.getId());
 
         double velocity = (link.getFreespeed()) * 3.6;
 
         double freespeedCar = velocity;
-        final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
 
         if (noiseParams.isUseActualSpeedLevel()) {
 

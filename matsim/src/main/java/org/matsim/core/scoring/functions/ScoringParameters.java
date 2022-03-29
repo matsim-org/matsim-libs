@@ -81,8 +81,8 @@ public class ScoringParameters implements MatsimParameters {
 	}
 
 	public static final class Builder {
-		private final Map<String, ActivityUtilityParameters.Builder> utilParams;
-		private final Map<String, ModeUtilityParameters.Builder> modeParams;
+		private final Map<String, ActivityUtilityParameters> utilParams;
+		private final Map<String, ModeUtilityParameters> modeParams;
 
 		private double marginalUtilityOfWaiting_s;
 		private double marginalUtilityOfLateArrival_s;
@@ -96,6 +96,7 @@ public class ScoringParameters implements MatsimParameters {
 		private boolean usingOldScoringBelowZeroUtilityDuration;
 		private double simulationPeriodInDays = 1.0;
 
+		@Deprecated
 		public Builder(
 				final Scenario scenario,
 				final Person person ) {
@@ -105,6 +106,15 @@ public class ScoringParameters implements MatsimParameters {
 					scenario.getConfig().scenario() );
 		}
 
+		/**
+		 * This constructor makes defensive copies of both the activity and the mode params.
+		 * Rather use the other constructor.
+		 *
+		 * @param configGroup
+		 * @param scoringParameterSet
+		 * @param scenarioConfig
+		 */
+		@Deprecated
 		public Builder(
 				final PlanCalcScoreConfigGroup configGroup,
 				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
@@ -126,7 +136,7 @@ public class ScoringParameters implements MatsimParameters {
 			utilParams = new TreeMap<>() ;
 			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
 				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-				utilParams.put(params.getActivityType(), factory ) ;
+				utilParams.put(params.getActivityType(), factory.build() ) ;
 			}
 
 			modeParams = new TreeMap<>() ;
@@ -136,7 +146,7 @@ public class ScoringParameters implements MatsimParameters {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
 				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() / 3600. );
-				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ) );
+				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ).build() );
 			}
 
 			abortedPlanScore = Math.min(
@@ -149,21 +159,70 @@ public class ScoringParameters implements MatsimParameters {
 			// kai, feb'12
 		}
 
-		public Builder setActivityParameters(String activityType, ActivityUtilityParameters.Builder params) {
+
+		/**
+		 * This constructor does not make defensive copies of the activity params but it makes copies of the mode params
+		 *
+		 * @param configGroup
+		 * @param scoringParameterSet
+		 * @param scenarioConfig
+		 */
+		public Builder(
+				final PlanCalcScoreConfigGroup configGroup,
+				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
+				Map<String, ActivityUtilityParameters> activityParams,
+				final ScenarioConfigGroup scenarioConfig) {
+			this.simulationPeriodInDays = scenarioConfig.getSimulationPeriodInDays();
+
+			this.usingOldScoringBelowZeroUtilityDuration = configGroup.isUsingOldScoringBelowZeroUtilityDuration() ;
+
+			marginalUtilityOfWaiting_s = scoringParameterSet.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
+			marginalUtilityOfLateArrival_s = scoringParameterSet.getLateArrival_utils_hr() / 3600.0;
+			marginalUtilityOfEarlyDeparture_s = scoringParameterSet.getEarlyDeparture_utils_hr() / 3600.0;
+			marginalUtilityOfWaitingPt_s = scoringParameterSet.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
+			marginalUtilityOfPerforming_s = scoringParameterSet.getPerforming_utils_hr() / 3600.0;
+			utilityOfLineSwitch = scoringParameterSet.getUtilityOfLineSwitch() ;
+			marginalUtilityOfMoney = scoringParameterSet.getMarginalUtilityOfMoney() ;
+			scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
+					marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
+
+			utilParams = activityParams;
+
+			modeParams = new TreeMap<>() ;
+			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
+			double worstMarginalUtilityOfTraveling_s = 0.0;
+			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
+				String modeName = mode.getKey();
+				ModeParams params = mode.getValue();
+				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() / 3600. );
+				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ).build() );
+			}
+
+			abortedPlanScore = Math.min(
+					Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
+					Math.min(worstMarginalUtilityOfTraveling_s-marginalUtilityOfPerforming_s, marginalUtilityOfWaiting_s-marginalUtilityOfPerforming_s)
+			) * 3600.0 * 24.0; // SCENARIO_DURATION
+			// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
+			// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
+			// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.
+			// kai, feb'12
+		}
+
+		public Builder setActivityParameters(String activityType, ActivityUtilityParameters params) {
 			this.utilParams.put( activityType , params );
 			return this;
 		}
 
-		public ActivityUtilityParameters.Builder getActivityParameters(String activityType) {
+		public ActivityUtilityParameters getActivityParameters(String activityType) {
 			return this.utilParams.get( activityType );
 		}
 
-		public Builder setModeParameters(String mode, ModeUtilityParameters.Builder params) {
+		public Builder setModeParameters(String mode, ModeUtilityParameters params) {
 			this.modeParams.put( mode , params );
 			return this;
 		}
 
-		public ModeUtilityParameters.Builder getModeParameters(String mode) {
+		public ModeUtilityParameters getModeParameters(String mode) {
 			return this.modeParams.get( mode  );
 		}
 
@@ -218,19 +277,9 @@ public class ScoringParameters implements MatsimParameters {
 		}
 
 		public ScoringParameters build() {
-			final Map<String, ModeUtilityParameters> modes = modeParams.size() <= 20 ? new ArrayMap() : new TreeMap<>();
-			for ( Map.Entry<String, ModeUtilityParameters.Builder> e : modeParams.entrySet() ) {
-				modes.put( e.getKey() , e.getValue().build() );
-			}
-
-			final Map<String, ActivityUtilityParameters> acts = utilParams.size() <= 20 ? new ArrayMap() : new TreeMap<>();
-			for ( Map.Entry<String, ActivityUtilityParameters.Builder> e : utilParams.entrySet() ) {
-				acts.put( e.getKey() , e.getValue().build() );
-			}
-
 			return new ScoringParameters(
-					acts,
-					modes,
+					utilParams,
+					modeParams,
 					marginalUtilityOfWaiting_s,
 					marginalUtilityOfLateArrival_s,
 					marginalUtilityOfEarlyDeparture_s,

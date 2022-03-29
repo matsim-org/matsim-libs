@@ -55,7 +55,7 @@ import org.matsim.core.scoring.SumScoringFunction;
  */
 public class GroupCompositionPenalizerTest {
 	private static final Logger log = Logger.getLogger( GroupCompositionPenalizerTest.class );
-	private static final Id<Link> linkId = Id.createLinkId( 1 );
+	private final Id<Link> linkId = Id.createLinkId( 1 );
 	private final double utilOneCopart = 100;
 	private final double utilAlone = -1;
 
@@ -136,7 +136,7 @@ public class GroupCompositionPenalizerTest {
 				},
 				events );
 
-		eventsToScore.beginIteration( 1 );
+		eventsToScore.beginIteration( 1, false );
 
 		new QSimBuilder(sc.getConfig()) //
 				.useDefaults()

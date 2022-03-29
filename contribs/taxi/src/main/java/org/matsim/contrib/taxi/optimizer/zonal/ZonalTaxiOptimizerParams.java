@@ -59,11 +59,11 @@ public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams 
 		super.addParameterSet(set);
 	}
 
-	ZonalSystemParams getZonalSystemParams() {
+	public ZonalSystemParams getZonalSystemParams() {
 		return zonalSystemParams;
 	}
 
-	RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
+	public RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
 		return ruleBasedTaxiOptimizerParams;
 	}
 

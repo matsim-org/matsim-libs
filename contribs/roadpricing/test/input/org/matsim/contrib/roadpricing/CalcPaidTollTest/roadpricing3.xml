@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
 
-<roadpricing type="cordon" name="Kordonmaut Testnet">
+<roadpricing type="link" name="test case">
 
 	<description>Eine Kordonmaut für das einfache Test-Netzwerk.</description>
 

@@ -2,10 +2,17 @@ package org.matsim.contrib.noise;
 
 import com.google.common.collect.Range;
 import com.google.inject.Inject;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.matsim.contrib.noise.RLS19VehicleType.*;
 
@@ -14,30 +21,26 @@ import static org.matsim.contrib.noise.RLS19VehicleType.*;
  */
 class RLS19NoiseEmission implements NoiseEmission {
 
-    enum RLS19IntersectionType {
-
-        signalized(3),
-        roundabout(2),
-        other(0);
-
-        private final double correction;
-
-        RLS19IntersectionType(double correction) {
-            this.correction = correction;
-        }
-
-        public double getCorrection() {
-            return correction;
-        }
-    }
+    public static final String GRADIENT = "GRADIENT";
 
     private final NoiseConfigGroup noiseParams;
     private final Network network;
+    private final RoadSurfaceContext surfaceContext;
+    private final DEMContext demContext;
+    private CoordinateReferenceSystem crs;
 
     @Inject
-    RLS19NoiseEmission(Scenario scenario) {
-        noiseParams = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
+    RLS19NoiseEmission(Scenario scenario, RoadSurfaceContext surfaceContext, DEMContext demContext) {
+        Config config = scenario.getConfig();
+        try {
+            crs = CRS.decode(config.global().getCoordinateSystem());
+        } catch (FactoryException e) {
+            e.printStackTrace();
+        }
+        noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
         network = scenario.getNetwork();
+        this.surfaceContext = surfaceContext;
+        this.demContext = demContext;
     }
 
     /**
@@ -58,7 +61,6 @@ class RLS19NoiseEmission implements NoiseEmission {
         int nLkw2 = (int) ((noiseLink.getAgentsEntering(lkw2)
                 * (noiseParams.getScaleFactor()))
                 * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
-
 
         double vPkw = getV(noiseLink, pkw);
         double vLkw1 = getV(noiseLink, lkw1);
@@ -81,43 +83,44 @@ class RLS19NoiseEmission implements NoiseEmission {
 
     @Override
     public double calculateSingleVehicleLevel(NoiseVehicleType type, NoiseLink noiseLink) {
-        double g = 0;
-        final Object gradient = network.getLinks().get(noiseLink.getId()).getAttributes().getAttribute("GRADIENT");
-        if(gradient != null) {
-            g = (Double) gradient;
+        int nPkw = 0;
+        int nLkw1 = 0;
+        int nLkw2 = 0;
+
+        switch ((RLS19VehicleType) type) {
+            case pkw:
+                nPkw =1;
+                break;
+            case lkw1:
+                nLkw1 = 1;
+                break;
+            case lkw2:
+                nLkw2 = 1;
+                break;
         }
 
-        RLS19IntersectionType intersectionType = RLS19IntersectionType.other;
-        double intersectionDistance = 0;
-        double vehicleVelocity = getV(noiseLink, (RLS19VehicleType) type);
-        return calculateSingleVehicleEmission((RLS19VehicleType) type, vehicleVelocity, g, intersectionType, intersectionDistance);
-
+        return calculateEmission(noiseLink, getV(noiseLink, pkw),getV(noiseLink, lkw1), getV(noiseLink, lkw2),
+                nPkw, nLkw1, nLkw2);
     }
 
-    private double calculateEmission(NoiseLink noiseLink,
+    double calculateEmission(NoiseLink noiseLink,
                                      double vPkw, double vLkw1, double vLkw2,
                                      int nPkw, int nLkw1, int nLkw2) {
 
         int m = nPkw + nLkw1 + nLkw2;
+        if(m == 0) {
+            return 0;
+        }
 
         double pLkw1 = ((double) nLkw1) / m;
         double pLkw2 = ((double) nLkw2) / m;
 
-        double g = 0;
-        final Object gradient = network.getLinks().get(noiseLink.getId()).getAttributes().getAttribute("GRADIENT");
-        if(gradient != null) {
-            g = (Double) gradient;
-        }
-
-        RLS19IntersectionType intersectionType = RLS19IntersectionType.other;
-        double intersectionDistance = 0;
-
         double singlePkwEmission
-                = calculateSingleVehicleEmission(pkw, vPkw, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(noiseLink, pkw, vPkw);
         double singleLkw1Emission
-                = calculateSingleVehicleEmission(lkw1, vLkw1, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(noiseLink, lkw1, vLkw1);
         double singleLkw2Emission
-                = calculateSingleVehicleEmission(lkw2, vLkw2, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(noiseLink, lkw2, vLkw2);
 
         double partPkw = calculateVehicleTypeNoise(1 - pLkw1 - pLkw2, vPkw, singlePkwEmission);
         double partLkw1 = calculateVehicleTypeNoise(pLkw1, vLkw1, singleLkw1Emission);
@@ -126,7 +129,7 @@ class RLS19NoiseEmission implements NoiseEmission {
         return 10 * Math.log10(m) + 10 * Math.log10(partPkw + partLkw1 + partLkw2) - 30;
     }
 
-    private double calculateVehicleTypeNoise(double p, double v, double singleVehicleEmission) {
+    double calculateVehicleTypeNoise(double p, double v, double singleVehicleEmission) {
         return p * (Math.pow(10, 0.1 * singleVehicleEmission) / v);
     }
 
@@ -137,31 +140,14 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return emission in dB(A)
      */
-    private double calculateSingleVehicleEmission(RLS19VehicleType vehicleType, double v, double g,
-                                                  RLS19IntersectionType intersectionType, double intersectionDistance) {
+    double calculateSingleVehicleEmission(NoiseLink link, RLS19VehicleType vehicleType, double v) {
         double baseValue = calculateBaseVehicleTypeEmission(vehicleType, v);
-        double surfaceCorrection = calculateSurfaceCorrection();
-        double gradientCorrection = calculateGradientCorrection(g, v, vehicleType);
-        double intersectionCorrection = calculateIntersectionCorrection(intersectionType, intersectionDistance);
-        double reflectionCorrection = calculateReflectionCorrection();
+        double surfaceCorrection = calculateSurfaceCorrection(vehicleType, link, v);
+        double gradientCorrection = calculateGradientCorrection(link, v, vehicleType);
 
-        double emission = baseValue + surfaceCorrection + gradientCorrection + intersectionCorrection + reflectionCorrection;
-        return emission;
+        return baseValue + surfaceCorrection + gradientCorrection;
     }
 
-    /**
-     * Die Stoerwirkung durch das Anfahren und Bremsen der Fahrzeuge an Knotenpunkten wird in Abhaengigkeit
-     * vom Knotenpunkttyp {@link RLS19IntersectionType} und von der Entfernung zum Schnittpunkt von sich
-     * kreuzenden oder zusammentreffenden Quellinien bestimmt (=nodes)
-     *
-     * <p> The disturbance caused by the starting and braking of vehicles at junctions is determined
-     * according to the type of junction {@link RLS19IntersectionType} and the distance to the point of
-     * intersection of intersecting or converging source lines (=nodes)
-     */
-    private double calculateIntersectionCorrection(RLS19IntersectionType intersectionType, double distance) {
-        double correction = intersectionType.correction * Math.max(1 - (distance / 120.), 0);
-        return correction;
-    }
 
     /**
      * Auf Steigungs- und Gefaellestrecken treten erhoehte Schallemissionen auf.
@@ -170,7 +156,28 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return gradient correction in dB(A)
      */
-    private double calculateGradientCorrection(double g, double v, RLS19VehicleType vehicleType) {
+    double calculateGradientCorrection(NoiseLink link, double v, RLS19VehicleType vehicleType) {
+        double g = 0;
+        Link matsimLink = network.getLinks().get(link.getId());
+        if(noiseParams.isUseDEM()) {
+            Coord from = matsimLink.getFromNode().getCoord();
+            Coord to = matsimLink.getToNode().getCoord();
+
+            //MATSim coord's x/y are inversed to geotools/jts
+            DirectPosition positionFrom = new DirectPosition2D(crs, from.getY(), from.getX());
+            DirectPosition positionTo = new DirectPosition2D(crs, to.getY(), to.getX());
+
+            float elevationFrom = demContext.getElevation(positionFrom);
+            float elevationTo = demContext.getElevation(positionTo);
+
+            g = ((elevationTo - elevationFrom) / matsimLink.getLength()) * 100;
+        } else {
+            final Object gradient = matsimLink.getAttributes().getAttribute(GRADIENT);
+            if(gradient != null) {
+                g = (Double) gradient;
+            }
+        }
+
         double correction = 0;
         switch (vehicleType) {
             case pkw:
@@ -210,23 +217,17 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return emission in dB(A)
      */
-    private double calculateBaseVehicleTypeEmission(RLS19VehicleType vehicleType, double v) {
+    double calculateBaseVehicleTypeEmission(RLS19VehicleType vehicleType, double v) {
         double emission = vehicleType.getEmissionParameterA()
                 + 10 * Math.log10(1 + Math.pow(v / vehicleType.getEmissionParameterB(), vehicleType.getEmissionParameterC()));
         return emission;
     }
 
-    //TODO
-    private double calculateReflectionCorrection() {
-        return 0;
+    private double calculateSurfaceCorrection(RLS19VehicleType type, NoiseLink link, double velocity) {
+        return surfaceContext.calculateSurfaceCorrection(type, link, velocity);
     }
 
-    //TODO
-    private double calculateSurfaceCorrection() {
-        return 0;
-    }
-
-    private double getV(NoiseLink noiseLink, RLS19VehicleType type) {
+    double getV(NoiseLink noiseLink, RLS19VehicleType type) {
         Link link = network.getLinks().get(noiseLink.getId());
 
         double v = (link.getFreespeed()) * 3.6;

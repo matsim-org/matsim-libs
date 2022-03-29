@@ -26,14 +26,19 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.zone.skims.FreeSpeedTravelTimeMatrix;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 /**
@@ -41,6 +46,15 @@ import com.google.inject.name.Names;
  */
 public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	private final boolean useModeFilteredSubnetwork;
+
+	@Inject
+	private DvrpConfigGroup dvrpConfigGroup;
+
+	@Inject
+	private GlobalConfigGroup globalConfigGroup;
+
+	@Inject
+	private QSimConfigGroup qSimConfigGroup;
 
 	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork) {
 		super(mode);
@@ -50,18 +64,30 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		if (useModeFilteredSubnetwork) {
+			//filter out the subnetwork
 			checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
-			bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
-				Network subnetwork = NetworkUtils.createNetwork();
+			bindModal(Network.class).toProvider(modalProvider(getter -> {
+				Network subnetwork = NetworkUtils.createNetwork(getConfig().network());
 				new TransportModeNetworkFilter(
-						getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).
-						filter(subnetwork, Collections.singleton(getMode()));
+						getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).filter(
+						subnetwork, Collections.singleton(getMode()));
 				new NetworkCleaner().run(subnetwork);
 				return subnetwork;
 			})).asEagerSingleton();
+
+			//use mode-specific travel time matrix built for this subnetwork
+			//lazily initialised: optimisers may not need it
+			bindModal(TravelTimeMatrix.class).toProvider(modalProvider(
+					getter -> FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(getter.getModal(Network.class),
+							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads(),
+							qSimConfigGroup.getTimeStepSize()))).in(Singleton.class);
 		} else {
+			//use DVRP-routing (dvrp-global) network
 			bindModal(Network.class).to(
 					Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
+
+			//use dvrp-global travel time matrix
+			bindModal(TravelTimeMatrix.class).to(TravelTimeMatrix.class);
 		}
 	}
 

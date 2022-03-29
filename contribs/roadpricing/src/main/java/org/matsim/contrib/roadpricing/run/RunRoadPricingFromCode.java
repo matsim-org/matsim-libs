@@ -77,7 +77,7 @@ public class RunRoadPricingFromCode {
 		// prepare scenario:
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		RoadPricingUtils.loadRoadPricingScheme( sc );
+		RoadPricingUtils.loadRoadPricingSchemeAccordingToRoadPricingConfig( sc );
 
 		// prepare scenario:
 
@@ -90,7 +90,7 @@ public class RunRoadPricingFromCode {
 
 
 	private static void createCustomRoadPricingScheme( Scenario scenario){
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 
 		/* Configure roadpricing scheme. */
 		RoadPricingUtils.setName(scheme, "custom");

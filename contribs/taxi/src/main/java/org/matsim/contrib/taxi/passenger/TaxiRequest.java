@@ -54,6 +54,7 @@ public class TaxiRequest implements PassengerRequest {
 	private final Link fromLink;
 	private final Link toLink;
 
+	//TODO remove (request should be unmodifiable)
 	private TaxiPickupTask pickupTask;
 	private TaxiDropoffTask dropoffTask;
 
@@ -103,22 +104,15 @@ public class TaxiRequest implements PassengerRequest {
 		return mode;
 	}
 
-	public TaxiPickupTask getPickupTask() {
-		return pickupTask;
-	}
-
 	public void setPickupTask(TaxiPickupTask pickupTask) {
 		this.pickupTask = pickupTask;
-	}
-
-	public TaxiDropoffTask getDropoffTask() {
-		return dropoffTask;
 	}
 
 	public void setDropoffTask(TaxiDropoffTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
 	}
 
+	//TODO remove, replace with events analysis (request should be unmodifiable)
 	public TaxiRequestStatus getStatus() {
 		if (pickupTask == null) {
 			return TaxiRequestStatus.UNPLANNED;
@@ -158,8 +152,6 @@ public class TaxiRequest implements PassengerRequest {
 				.add("mode", mode)
 				.add("fromLink", fromLink)
 				.add("toLink", toLink)
-				.add("pickupTask", pickupTask)
-				.add("dropoffTask", dropoffTask)
 				.toString();
 	}
 }

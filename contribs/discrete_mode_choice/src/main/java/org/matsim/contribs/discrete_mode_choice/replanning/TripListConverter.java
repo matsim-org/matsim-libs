@@ -36,7 +36,7 @@ public final class TripListConverter {
 			String routingMode = TripStructureUtils.getRoutingMode(firstLeg);
 
 			trips.add(new DiscreteModeChoiceTrip(originActivity, destinationActivity, routingMode,
-					initialTrip.getTripElements(), plan.getPerson().hashCode(), index, index));
+					initialTrip.getTripElements(), plan.getPerson().hashCode(), index, index, initialTrip.getTripAttributes()));
 
 			index++;
 		}

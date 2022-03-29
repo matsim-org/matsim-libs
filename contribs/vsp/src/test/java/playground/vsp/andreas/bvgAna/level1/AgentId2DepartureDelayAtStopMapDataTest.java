@@ -29,7 +29,7 @@ public class AgentId2DepartureDelayAtStopMapDataTest {
         
 //        create Events
         
-        PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
+        PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt, TransportMode.pt);
         PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
         
         data.addAgentDepartureEvent(event3);

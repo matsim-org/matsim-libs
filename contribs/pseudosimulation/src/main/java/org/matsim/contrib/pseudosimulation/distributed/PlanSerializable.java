@@ -1,9 +1,5 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -22,8 +18,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.routes.DefaultTransitPassengerRouteFactory;
 import org.matsim.vehicles.Vehicle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 class PlanSerializable implements Serializable {
     public static boolean isUseTransit = false;
@@ -242,7 +242,7 @@ class PlanSerializable implements Serializable {
             Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
             Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
             if (mode.equals(TransportMode.pt) && isUseTransit) {
-                route = new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
+                route = new DefaultTransitPassengerRouteFactory().createRoute(startLinkId, endLinkId);
             } else {
                 route = RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
             }

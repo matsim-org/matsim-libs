@@ -23,61 +23,55 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.contrib.common.util.DistanceUtils;
 
 /**
+ * Computes inter-zonal flows at the zonal (aggregated) level (i.e. without looking into individual vehicles)
+ *
  * @author michalm
  */
-public class AggregatedMinCostRelocationCalculator implements MinCostRelocationCalculator {
-	private final DrtZonalSystem zonalSystem;
-	private final Network network;
+public class AggregatedMinCostRelocationCalculator implements ZonalRelocationCalculator {
+	public static class DrtZoneVehicleSurplus {
+		public final DrtZone zone;
+		public final int surplus;
 
-	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem, Network network) {
-		this.zonalSystem = zonalSystem;
-		this.network = network;
+		public DrtZoneVehicleSurplus(DrtZone zone, int surplus) {
+			this.zone = zone;
+			this.surplus = surplus;
+		}
+	}
+
+	private final DrtZoneTargetLinkSelector targetLinkSelector;
+
+	public AggregatedMinCostRelocationCalculator(DrtZoneTargetLinkSelector targetLinkSelector) {
+		this.targetLinkSelector = targetLinkSelector;
 	}
 
 	@Override
-	public List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
-			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<>(
-				this::calcStraightLineDistance).solve(supply, demand);
-		return calcRelocations(rebalancableVehiclesPerZone, interZonalRelocations);
+	public List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		return calcRelocations(rebalancableVehiclesPerZone, TransportProblem.solveForVehicleSurplus(vehicleSurplus));
 	}
 
-	private int calcStraightLineDistance(String zone1, String zone2) {
-		return (int)DistanceUtils.calculateDistance(zonalSystem.getZoneCentroid(zone1),
-				zonalSystem.getZoneCentroid(zone2));
-	}
-
-	private List<Relocation> calcRelocations(Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone,
-			List<Triple<String, String, Integer>> interZonalRelocations) {
+	private List<Relocation> calcRelocations(Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
+			List<TransportProblem.Flow<DrtZone, DrtZone>> flows) {
 		List<Relocation> relocations = new ArrayList<>();
-		for (Triple<String, String, Integer> r : interZonalRelocations) {
-			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
+		for (TransportProblem.Flow<DrtZone, DrtZone> flow : flows) {
+			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(flow.origin);
 
-			String toZone = r.getMiddle();
-			Geometry z = zonalSystem.getZone(toZone);
-			Coord zoneCentroid = MGC.point2Coord(z.getCentroid());
-			Link destinationLink = NetworkUtils.getNearestLink(network, zoneCentroid);
+			Link targetLink = targetLinkSelector.selectTargetLink(flow.destination);
 
-			int flow = r.getRight();
-			for (int f = 0; f < flow; f++) {
+			for (int f = 0; f < flow.amount; f++) {
 				// TODO use BestDispatchFinder (needs to be moved from taxi to dvrp) instead
-				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, destinationLink);
-				relocations.add(new Relocation(nearestVehicle, destinationLink));
+				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, targetLink);
+				relocations.add(new Relocation(nearestVehicle, targetLink));
 				rebalancableVehicles.remove(nearestVehicle);// TODO use map to have O(1) removal
 			}
 		}

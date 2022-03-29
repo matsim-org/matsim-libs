@@ -22,6 +22,7 @@
  package org.matsim.core.trafficmonitoring;
 
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +39,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,7 +70,14 @@ public class TravelTimeCalculatorModuleTest {
 		Id<Link> linkId = Id.createLinkId(0);
 		Link link = scenario.getNetwork().getFactory().createLink(linkId, node0, node1);
 		scenario.getNetwork().addLink(link);
-		com.google.inject.Injector injector = Injector.createInjector(config, new TravelTimeCalculatorModule(), new EventsManagerModule(), new ScenarioByInstanceModule(scenario));
+		var eventsManagerModule = new AbstractModule() {
+
+			@Override
+			public void install() {
+				bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
+			}
+		};
+		com.google.inject.Injector injector = Injector.createInjector(config, new TravelTimeCalculatorModule(), eventsManagerModule, new ScenarioByInstanceModule(scenario));
 		TravelTimeCalculator testee = injector.getInstance(TravelTimeCalculator.class);
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.processEvent(new VehicleEntersTrafficEvent(0.0, Id.createPersonId(0), linkId, Id.createVehicleId(0), "car", 0.0));
@@ -101,7 +111,14 @@ public class TravelTimeCalculatorModuleTest {
 		Id<Link> linkId = Id.createLinkId(0);
 		Link link = scenario.getNetwork().getFactory().createLink(linkId, node0, node1);
 		scenario.getNetwork().addLink(link);
-		com.google.inject.Injector injector = Injector.createInjector(config, new TravelTimeCalculatorModule(), new EventsManagerModule(), new ScenarioByInstanceModule(scenario));
+		var eventsManagerModule = new AbstractModule() {
+
+			@Override
+			public void install() {
+				bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
+			}
+		};
+		com.google.inject.Injector injector = Injector.createInjector(config, new TravelTimeCalculatorModule(), eventsManagerModule, new ScenarioByInstanceModule(scenario));
 		TravelTimeCalculator car = injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named("car")));
 		TravelTimeCalculator bike = injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named("bike")));
 		EventsManager events = injector.getInstance(EventsManager.class);

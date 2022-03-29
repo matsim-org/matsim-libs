@@ -34,6 +34,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.LanesUtils;
@@ -44,8 +45,10 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 public final class QLanesNetworkFactory implements QNetworkFactory {
 
 	private Lanes laneDefinitions;
-	
-	private final QNetworkFactory delegate ;
+
+	private QNetworkFactory delegate ;
+
+	private FlowEfficiencyCalculator flowEfficiencyCalculator;
 
 	private NetsimEngineContext context;
 
@@ -58,15 +61,15 @@ public final class QLanesNetworkFactory implements QNetworkFactory {
 	private Scenario scenario;
 
 	private NetsimInternalInterface netsimEngine;
-	
-	@Inject 
+
+	@Inject
 	public QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.qsimConfig = scenario.getConfig().qsim();
 		this.events = events ;
 		this.network = scenario.getNetwork() ;
 		this.scenario = scenario ;
 		this.laneDefinitions = scenario.getLanes();
-		delegate = new DefaultQNetworkFactory( events, scenario ) ;
+		this.delegate = new DefaultQNetworkFactory( events, scenario ) ;
 	}
 
 	@Override
@@ -93,6 +96,10 @@ public final class QLanesNetworkFactory implements QNetworkFactory {
 //			// yyyyyy I don't think that this was set correctly for this execution path before I refactored this.  kai, feb'18
 //			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine, linkSpeedCalculator);
 			QLinkLanesImpl.Builder builder = new QLinkLanesImpl.Builder(context, netsimEngine) ;
+
+			if (flowEfficiencyCalculator != null)
+				builder.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
+
 			ql = builder.build( link, queueNode, lanes ) ;
 		}
 		else {
@@ -106,4 +113,17 @@ public final class QLanesNetworkFactory implements QNetworkFactory {
 		return this.delegate.createNetsimNode(node);
 	}
 
+	/**
+	 * Set factory to create QLinks that are not lanes.
+	 */
+	public void setDelegate(QNetworkFactory delegate) {
+		this.delegate = delegate;
+	}
+
+	/**
+	 * Flow efficiency calculator to use for lanes.
+	 */
+	public void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
+		this.flowEfficiencyCalculator = flowEfficiencyCalculator;
+	}
 }

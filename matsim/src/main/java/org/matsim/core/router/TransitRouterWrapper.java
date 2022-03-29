@@ -36,6 +36,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Wraps a {@link TransitRouter}.
@@ -71,16 +72,8 @@ public class TransitRouterWrapper implements RoutingModule {
 	 * @return the list of legs returned by the transit router.
 	 */
 	@Override
-	public List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility,
-			final double departureTime,
-			final Person person) {
-		List<Leg> baseTrip = router.calcRoute(
-				fromFacility,
-				toFacility,
-				departureTime,
-				person);
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		List<? extends PlanElement> baseTrip = router.calcRoute(request);
 
 		// the previous approach was to return null when no trip was found and
 		// not to replace the trip if so.
@@ -88,7 +81,7 @@ public class TransitRouterWrapper implements RoutingModule {
 		// Thus, every module should return a valid trip. When available, the "main
 		// mode" flag should be put to the mode of the routing module.
 		return baseTrip != null ?
-				fillWithActivities(baseTrip, fromFacility, toFacility, departureTime, person) :
+				fillWithActivities(baseTrip, request) :
 					null;
 	}
 
@@ -97,25 +90,29 @@ public class TransitRouterWrapper implements RoutingModule {
 	 * must be filled in (distance, travel-time in routes).
 	 */
 	private List<PlanElement> fillWithActivities(
-			final List<Leg> baseTrip,
-			final Facility fromFacility,
-			final Facility toFacility, double departureTime, Person person) {
+			final List<? extends PlanElement> baseTrip, RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
+		
 		List<PlanElement> trip = new ArrayList<>();
 		Coord nextCoord = null;
 		int i = 0;
-		for (Leg leg : baseTrip) {
+		for (PlanElement pe : baseTrip) {
+			Leg leg = (Leg)pe;
 			if (i == 0) {
 				// (access leg)
 				Facility firstToFacility;
 				if (baseTrip.size() > 1) { // at least one pt leg available
-					TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(1).getRoute();
+					TransitPassengerRoute tRoute = (TransitPassengerRoute) ((Leg)baseTrip.get(1)).getRoute();
 					firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
 				} else {
 					firstToFacility = toFacility;
 				}
 				// (*)
 				Route route = createWalkRoute(fromFacility, departureTime, person,
-						leg.getTravelTime().seconds(), firstToFacility);
+						leg.getTravelTime().seconds(), firstToFacility, request.getAttributes());
 				leg.setRoute(route);
 			} else {
 				if (leg.getRoute() instanceof TransitPassengerRoute) {
@@ -134,11 +131,11 @@ public class TransitRouterWrapper implements RoutingModule {
 					if (i == baseTrip.size() - 1) {
 						// if this is the last leg, we don't believe the leg from the TransitRouter.  Why?
 
-						TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
+						TransitPassengerRoute tRoute = (TransitPassengerRoute) ((Leg)baseTrip.get(baseTrip.size() - 2)).getRoute();
 						Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
 
 						Route route = createWalkRoute(lastFromFacility, departureTime, person,
-								leg.getTravelTime().seconds(), toFacility);
+								leg.getTravelTime().seconds(), toFacility, request.getAttributes());
 						leg.setRoute(route);
 					}
 					Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(nextCoord, leg.getRoute().getStartLinkId(), TransportMode.pt);
@@ -151,13 +148,13 @@ public class TransitRouterWrapper implements RoutingModule {
 		return trip;
 	}
 
-	private Route createWalkRoute(final Facility fromFacility, double departureTime, Person person, double travelTime, Facility firstToFacility) {
+	private Route createWalkRoute(final Facility fromFacility, double departureTime, Person person, double travelTime, Facility firstToFacility, Attributes routingAttributes) {
 		// yyyy I extracted this method to make a bit more transparent that it is used twice.  But I don't know why it is done in this way
 		// (take distance from newly computed walk leg, but take travelTime from elsewhere).  Possibly, the problem is that the TransitRouter 
 		// historically just does not compute the distances.  kai, may'17
 		
 		Route route = RouteUtils.createGenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
-		final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(fromFacility, firstToFacility, departureTime, person);
+		final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, firstToFacility, departureTime, person, routingAttributes));
 		route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
 		route.setTravelTime(travelTime);
 		return route;

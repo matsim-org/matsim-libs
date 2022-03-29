@@ -279,7 +279,7 @@ final class SelectorUtils {
 	// may lead to better pruning, but implies computing incompatible
 	// plans for all plans, which is expensive.
 	// Not sorting at all should be OK for determinism, as a LinkedHashMap is used in the selector
-	private static boolean HEURISTIC_SORT = false;
+	private static final  boolean HEURISTIC_SORT = false;
 	public static List<PersonRecord> toSortedList(
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> personRecords) {

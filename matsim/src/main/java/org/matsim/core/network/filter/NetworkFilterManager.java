@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -50,9 +51,12 @@ public final class NetworkFilterManager {
 	private final List<NetworkLinkFilter> linkFilters;
 
 	private final List<NetworkNodeFilter> nodeFilters;
+	
+	private final NetworkConfigGroup networkConfigGroup;
 
-	public NetworkFilterManager(final Network net) {
+	public NetworkFilterManager(final Network net, NetworkConfigGroup networkConfigGroup) {
 		this.network = net;
+		this.networkConfigGroup = networkConfigGroup;
 		this.linkFilters = new ArrayList<>();
 		this.nodeFilters = new ArrayList<>();
 	}
@@ -112,31 +116,17 @@ public final class NetworkFilterManager {
 	public Network applyFilters() {
 		log.info("applying filters to network with " + network.getNodes().size() + " nodes and "
 				+ network.getLinks().size() + " links...");
-		Network net = NetworkUtils.createNetwork();
+		Network net = NetworkUtils.createNetwork(networkConfigGroup);
 		if (!this.nodeFilters.isEmpty()) {
 			for (Node n : this.network.getNodes().values()) {
-				boolean add = true;
-				for (NetworkNodeFilter f : nodeFilters) {
-					if (!f.judgeNode(n)) {
-						add = false;
-						break;
-					}
-				}
-				if (add) {
+				if (nodeFilters.stream().allMatch(f -> f.judgeNode(n))) {
 					this.addNode(net, n);
 				}
 			}
 		}
 		if (!this.linkFilters.isEmpty()) {
 			for (Link l : this.network.getLinks().values()) {
-				boolean add = true;
-				for (NetworkLinkFilter f : linkFilters) {
-					if (!f.judgeLink(l)) {
-						add = false;
-						break;
-					}
-				}
-				if (add) {
+				if (linkFilters.stream().allMatch(f -> f.judgeLink(l))) {
 					this.addLink(net, l);
 				}
 			}

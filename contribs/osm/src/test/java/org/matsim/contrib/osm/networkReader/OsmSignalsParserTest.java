@@ -5,6 +5,8 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Relation;
 import de.topobyte.osm4j.core.model.impl.RelationMember;
 import de.topobyte.osm4j.core.model.impl.Tag;
+
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -24,13 +26,18 @@ import static org.junit.Assert.assertTrue;
 
 public class OsmSignalsParserTest {
 
-	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
-	private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@After
+	public void shutDownExecutor() {
+		executor.shutdown();
+	}
 
 	@Test
 	public void parse_singleLinkWithCrossing() {

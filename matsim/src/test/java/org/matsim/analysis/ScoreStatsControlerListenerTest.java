@@ -45,10 +45,10 @@ public class ScoreStatsControlerListenerTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	private static int avgexecuted;
-	private static int avgworst;
-	private static int avgaverage;
-	private static int avgbest;
+	private int avgexecuted;
+	private int avgworst;
+	private int avgaverage;
+	private int avgbest;
 	
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Population population = scenario.getPopulation();
@@ -485,33 +485,33 @@ public class ScoreStatsControlerListenerTest {
 		StartupEvent eventStart = new StartupEvent(null);
 		scoreStatsControlerListener.notifyStartup(eventStart);
 		
-		IterationEndsEvent event0 = new IterationEndsEvent(null, 0);
+		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
 		scoreStatsControlerListener.notifyIterationEnds(event0);
 		
 		readAndValidateValues(0, population);
 		
 		population.getPersons().remove(Id.create("2", Person.class));
 		
-		IterationEndsEvent event1 = new IterationEndsEvent(null, 1);
+		IterationEndsEvent event1 = new IterationEndsEvent(null, 1, false);
 		scoreStatsControlerListener.notifyIterationEnds(event1);
 		
 		readAndValidateValues(1, population);
 		
 		population.getPersons().remove(Id.create("3", Person.class));
 		
-		IterationEndsEvent event2 = new IterationEndsEvent(null, 2);
+		IterationEndsEvent event2 = new IterationEndsEvent(null, 2, false);
 		scoreStatsControlerListener.notifyIterationEnds(event2);
 		
 		readAndValidateValues(2, population);
 		
 		population.getPersons().remove(Id.create("4", Person.class));
 		
-		IterationEndsEvent event3 = new IterationEndsEvent(null, 3);
+		IterationEndsEvent event3 = new IterationEndsEvent(null, 3, true);
 		scoreStatsControlerListener.notifyIterationEnds(event3);
 		
 		readAndValidateValues(3, population);
 		
-		ShutdownEvent eventShutdown = new ShutdownEvent(null, false);
+		ShutdownEvent eventShutdown = new ShutdownEvent(null, false, 3);
 		scoreStatsControlerListener.notifyShutdown(eventShutdown);
 
 	}
@@ -592,7 +592,7 @@ public class ScoreStatsControlerListenerTest {
 		return size;
 	}
 	
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

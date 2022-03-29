@@ -1,5 +1,20 @@
 package org.matsim.run.gui;
 
+import java.awt.HeadlessException;
+import java.io.File;
+
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -10,23 +25,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.utils.TransitScheduleValidator;
 
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
-import java.awt.HeadlessException;
-import java.io.File;
-
 /**
  * @author mrieser / Simunto GmbH
  */
-public class ScheduleValidatorWindow extends JFrame {
+public class ScheduleValidatorWindow extends JDialog {
 
 	private File lastUsedDirectory;
 	private final JTextField txtScheduleFilename;
@@ -35,8 +37,9 @@ public class ScheduleValidatorWindow extends JFrame {
 	private final JTable resultTable;
 	private final JButton btnValidate;
 
-	public ScheduleValidatorWindow() throws HeadlessException {
-		super("Transit Schedule Validator");
+	public ScheduleValidatorWindow(JFrame parent) throws HeadlessException {
+		super(parent);
+		setTitle("Transit Schedule Validator");
 
 		// UI elements
 		JLabel lblSchedule = new JLabel("Transit Schedule:");
@@ -54,8 +57,9 @@ public class ScheduleValidatorWindow extends JFrame {
 		this.resultTableModel = new DefaultTableModel(0, 2) {
 			@Override
 			public String getColumnName(int column) {
-				return new String[]{"Type", "Message"}[column];
+				return new String[] { "Type", "Message" }[column];
 			}
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -68,7 +72,7 @@ public class ScheduleValidatorWindow extends JFrame {
 
 		// behavior
 
-		this.lastUsedDirectory = new File( "." );
+		this.lastUsedDirectory = new File(".");
 
 		btnChooseSchedule.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
@@ -97,55 +101,40 @@ public class ScheduleValidatorWindow extends JFrame {
 		// layout
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout.setHorizontalGroup(
-				groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup()
-							.addGroup(groupLayout.createSequentialGroup()
-									.addGroup(groupLayout.createParallelGroup()
-											.addComponent(lblSchedule)
-											.addComponent(lblNetwork)
-											.addComponent(this.btnValidate)
-											.addComponent(lblOutput)
-									)
-									.addGroup(groupLayout.createParallelGroup()
-											.addComponent(this.txtScheduleFilename)
-											.addComponent(this.txtNetworkFilename)
-									)
-									.addGroup(groupLayout.createParallelGroup()
-											.addComponent(btnChooseSchedule)
-											.addComponent(btnChooseNetwork)
-									)
-							)
-							.addComponent(outputPane, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE, Short.MAX_VALUE)
-					)
-					.addContainerGap()
-		);
+		groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
+				.addContainerGap()
+				.addGroup(groupLayout.createParallelGroup()
+						.addGroup(groupLayout.createSequentialGroup()
+								.addGroup(groupLayout.createParallelGroup()
+										.addComponent(lblSchedule)
+										.addComponent(lblNetwork)
+										.addComponent(this.btnValidate)
+										.addComponent(lblOutput))
+								.addGroup(groupLayout.createParallelGroup()
+										.addComponent(this.txtScheduleFilename)
+										.addComponent(this.txtNetworkFilename))
+								.addGroup(groupLayout.createParallelGroup()
+										.addComponent(btnChooseSchedule)
+										.addComponent(btnChooseNetwork)))
+						.addComponent(outputPane, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE, Short.MAX_VALUE))
+				.addContainerGap());
 
-		groupLayout.setVerticalGroup(
-				groupLayout.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-								.addComponent(lblSchedule)
-								.addComponent(this.txtScheduleFilename)
-								.addComponent(btnChooseSchedule)
-						)
-						.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-								.addComponent(lblNetwork)
-								.addComponent(this.txtNetworkFilename)
-								.addComponent(btnChooseNetwork)
-						)
-						.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-								.addComponent(this.btnValidate)
-						)
-						.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-								.addComponent(lblOutput)
-						)
-						.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-								.addComponent(outputPane, 200, Short.MAX_VALUE, Short.MAX_VALUE)
-						)
-						.addContainerGap()
-		);
+		groupLayout.setVerticalGroup(groupLayout.createSequentialGroup()
+				.addContainerGap()
+				.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+						.addComponent(lblSchedule)
+						.addComponent(this.txtScheduleFilename)
+						.addComponent(btnChooseSchedule))
+				.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+						.addComponent(lblNetwork)
+						.addComponent(this.txtNetworkFilename)
+						.addComponent(btnChooseNetwork))
+				.addGroup(
+						groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(this.btnValidate))
+				.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(lblOutput))
+				.addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+						.addComponent(outputPane, 200, Short.MAX_VALUE, Short.MAX_VALUE))
+				.addContainerGap());
 
 		getContentPane().setLayout(groupLayout);
 
@@ -167,7 +156,7 @@ public class ScheduleValidatorWindow extends JFrame {
 	public void run() {
 		this.btnValidate.setEnabled(false);
 		this.resultTableModel.setRowCount(0);
-		this.resultTableModel.addRow(new Object[]{"", "Validating transit schedule..."});
+		this.resultTableModel.addRow(new Object[] { "", "Validating transit schedule..." });
 
 		new Thread(() -> {
 			String scheduleFilename = this.txtScheduleFilename.getText();
@@ -190,13 +179,13 @@ public class ScheduleValidatorWindow extends JFrame {
 			SwingUtilities.invokeLater(() -> {
 				this.resultTableModel.setRowCount(0);
 				if (result.isValid()) {
-					this.resultTableModel.addRow(new Object[]{"SUCCESS", "The schedule appears valid"});
+					this.resultTableModel.addRow(new Object[] { "SUCCESS", "The schedule appears valid" });
 				}
 				for (String message : result.getWarnings()) {
-					this.resultTableModel.addRow(new Object[]{"WARNING", message});
+					this.resultTableModel.addRow(new Object[] { "WARNING", message });
 				}
 				for (String message : result.getErrors()) {
-					this.resultTableModel.addRow(new Object[]{"ERROR", message});
+					this.resultTableModel.addRow(new Object[] { "ERROR", message });
 				}
 				this.btnValidate.setEnabled(true);
 			});
@@ -205,6 +194,6 @@ public class ScheduleValidatorWindow extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new ScheduleValidatorWindow().setVisible(true);
+		new ScheduleValidatorWindow(null).setVisible(true);
 	}
 }

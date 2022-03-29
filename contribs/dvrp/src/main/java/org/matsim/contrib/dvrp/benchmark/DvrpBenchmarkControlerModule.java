@@ -28,8 +28,9 @@ import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scoring.ExperiencedPlansModule;
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 public class DvrpBenchmarkControlerModule extends AbstractModule {
 	@Override
@@ -39,7 +40,7 @@ public class DvrpBenchmarkControlerModule extends AbstractModule {
 		// install(new TravelTimeCalculatorModule());
 		install(new TravelDisutilityModule());
 		install(new CharyparNagelScoringFunctionModule());
-		install(new ExperiencedPlansModule());
+		install(new StandaloneExperiencedPlansModule());
 		install(new TripRouterModule());
 		install(new StrategyManagerModule());
 		// install(new LinkStatsModule());
@@ -52,5 +53,6 @@ public class DvrpBenchmarkControlerModule extends AbstractModule {
 		// install(new PtCountsModule());
 		// install(new VspPlansCleanerModule());
 		// install(new SnapshotWritersModule());
+		install(new TimeInterpretationModule());
 	}
 }

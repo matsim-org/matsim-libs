@@ -30,18 +30,18 @@ import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
-	private final PassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
 	private final Map<Id<Request>, ? extends PassengerRequest> requests;
 	private final double expectedEndTime;
 
 	private int passengersPickedUp = 0;
 
-	public MultiPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
+	public MultiPassengerPickupActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask pickupTask,
 			Map<Id<Request>, ? extends PassengerRequest> requests, String activityType) {
 		super(activityType);
 
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.requests = requests;
 		this.expectedEndTime = pickupTask.getEndTime();
@@ -55,7 +55,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	@Override
 	protected void beforeFirstStep(double now) {
 		for (PassengerRequest request : requests.values()) {
-			if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+			if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
 				passengersPickedUp++;
 			}
 		}
@@ -64,7 +64,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
 		PassengerRequest request = getRequestForPassenger(passenger.getId());
-		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+		if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");

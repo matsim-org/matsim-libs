@@ -22,7 +22,9 @@ package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  *
@@ -40,17 +42,17 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private final Id<Person> agentId;
 	private int userDefined;
 	private double colorval;
-	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE;
-	private int intX;
-	private int intY;
+	private final AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE;
+	private final int intX;
+	private final int intY;
 	private final double endX;
 	private final double endY;
 	private final double travelTime;
 	private final static int offset = 100;
 
-	public TeleportationVisData(double now, Id<Person> personId, Coord fromCoord, Coord toCoord, double travelTime ) {
+	public TeleportationVisData(double now, Id<Person> personId, Coord fromCoord, Coord toCoord, double travelTime) {
 		this.starttime = now;
-		this.travelTime = travelTime ;
+		this.travelTime = travelTime;
 		this.agentId = personId;
 		this.startX = fromCoord.getX();
 		this.startY = fromCoord.getY();
@@ -58,7 +60,7 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		this.endY = toCoord.getY();
 		this.currentX = startX;
 		this.currentY = startY;
-		
+
 		// the following is there to somewhat shift teleported agents.  So that they are not exactly on top of each other when they have
 		// exactly the same dp time and destination ... as may happen e.g. for teleported transit walk and illustrative examples. kai, apr'16
 		String idstr = personId.toString();
@@ -84,10 +86,25 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		return this.agentId;
 	}
 
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		throw new RuntimeException("not yet implemented!");
+	}
+
+	@Override
+	public Id<Link> getLinkId() {
+		throw new RuntimeException("not yet implemented!");
+	}
+
+	@Override
+	public DrivingState getDrivingState() {
+		throw new RuntimeException("not yet implemented!");
+	}
+
 	public final void updatePosition(double time) {
-		double frac = (time - starttime) / travelTime ;
-		this.currentX = (1.-frac) * this.startX + frac * this.endX + 0.1*(intX-offset/2) ;
-		this.currentY = (1.-frac) * this.startY + frac * this.endY + 0.1*(intY-offset/2) ;
+		double frac = (time - starttime) / travelTime;
+		this.currentX = (1. - frac) * this.startX + frac * this.endX + 0.1 * (intX - offset / 2.);
+		this.currentY = (1. - frac) * this.startY + frac * this.endY + 0.1 * (intY - offset / 2.);
 	}
 
 	@Override
@@ -108,19 +125,5 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	@Override
 	public int getUserDefined() {
 		return this.userDefined;
-	}
-
-	@Override
-	public void setAgentState(AgentState state) {
-		this.state = state;
-	}
-
-	@Override
-	public void setColorValueBetweenZeroAndOne(double tmp) {
-		this.colorval = tmp;
-	}
-	@Override
-	public void setUserDefined(int tmp) {
-		this.userDefined = tmp;
 	}
 }

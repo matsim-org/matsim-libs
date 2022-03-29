@@ -22,8 +22,8 @@ package org.matsim.core.utils.io;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4FrameInputStream;
+import net.jpountz.lz4.LZ4FrameOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.log4j.Logger;
@@ -32,6 +32,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,6 +54,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -120,6 +123,34 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 final public class IOUtils {
+
+/*
+The following says something about URLs vs Strings as file"names" (by Marcel):
+
+Generell sollten File-Zugriffe entweder per URL oder per String erfolgen. Früher waren alles Strings, neu gibt es mit dem Config-Context auch URLs. Man sollte aber, wenn
+man URLs verwendet, möglichst die ganze Aufruf-Kette als URL durchziehen, da es ansonsten Probleme geben kann (und eben nicht versuchen, die URL in einen String
+umzuwandeln, wie ich in meiner Commit-Message geschrieben hatte).
+
+Da wird eine URL erzeugt und in einen String umgewandelt, was definitiv zu Problemen führen wird, wenn der Pfad Leerzeichen enthält.
+
+Zudem wird durch die Umwandlung in einen String dann im Code ein anderer Pfad aufgerufen (nämlich der für String-Pfade), welcher dann mit der verschachtelten URL für das File innerhalb eines Jars Probleme hat. In kurz:
+
+		String urlString = "jar:file:/Users/kainagel/.m2/repository/org/matsim/matsim-examples/12.0-SNAPSHOT/matsim-examples-12.0-SNAPSHOT.jar!/test/scenarios/equil/config.xml”;
+		URL url = new URL(urlString);
+		InputStream is = new FileInputStream(new File(url.toURI()); // produces an exception, as it cannot access the file inside a Jar.
+		InputStream is = url.openStream(); // this works
+		InputStream is = new FileInputStream(new File(“file:/Users/kainagel/.m2/repository/org/matsim/matsim-examples/12.0-SNAPSHOT/matsim-examples-12.0-SNAPSHOT.jar"); // this works, as it is an actual file on the file system
+
+In ConfigUtils.loadConfig( String[] ) wird nun IOUtils.resolveFileOrResource(String) aufgerufen, das unter der Annahme, dass weil das Argument ein String ist, es sich um ein File im Filesystem handeln muss, versucht mittels new File() darauf zuzugreifen. Da es sich aber eigentlich um eine URL handelt, die dazu noch ein File innerhalb eines Jar spezifiziert, schlägt das fehl.
+
+Ich habe nun IOUtils.resolveFileOrResource(String) so angepasst, dass es versucht zu erkennen, ob das String-Argument eine URL ist, und in diesem Falle dies einfach als URL
+zurückgibt und nicht noch all die anderen Tests durchführt, welche die Methode sonst macht.
+
+Damit scheint dann auch dein Test zu funktionieren.
+
+PR ist hier: https://github.com/matsim-org/matsim/pull/646
+*/
+
 	/**
 	 * This is only a static helper class.
 	 */
@@ -252,7 +283,7 @@ final public class IOUtils {
 						inputStream = new GZIPInputStream(inputStream);
 						break;
 					case LZ4:
-						inputStream = new LZ4BlockInputStream(inputStream);
+						inputStream = new LZ4FrameInputStream(inputStream);
 						break;
 					case BZIP2:
 						inputStream = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.BZIP2, inputStream);
@@ -321,7 +352,7 @@ final public class IOUtils {
 						outputStream = new GZIPOutputStream(outputStream);
 						break;
 					case LZ4:
-						outputStream = new LZ4BlockOutputStream(outputStream);
+						outputStream = new LZ4FrameOutputStream(outputStream);
 						break;
 					case BZIP2:
 						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);
@@ -431,18 +462,20 @@ final public class IOUtils {
 	 * @throws UncheckedIOException
 	 */
 	public static boolean isEqual(InputStream first, InputStream second) throws UncheckedIOException {
-		try {
-			while (true) {
-				int fr = first.read();
-				int tr = second.read();
-
-				if (fr != tr) {
+		byte[] buf1 = new byte[64 * 1024];
+		byte[] buf2 = new byte[64 * 1024];
+		try (first; second) {
+			DataInputStream d2 = new DataInputStream(second);
+			int len;
+			while ((len = first.read(buf1)) > 0) {
+				d2.readFully(buf2,0, len);
+				if (!Arrays.equals(buf1, 0, len, buf2, 0, len)) {
 					return false;
 				}
-				if (fr == -1) {
-					return true; // EOF on both sides
-				}
 			}
+			return d2.read() < 0; // is the end of the second file also.
+		} catch(EOFException ioe) {
+			return false;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

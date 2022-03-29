@@ -88,7 +88,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 		return mode;
 	}
 
-	static final class OneTaxiRequestCreator implements PassengerRequestCreator {
+	public static final class OneTaxiRequestCreator implements PassengerRequestCreator {
 		@Override
 		public OneTaxiRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink,
 				Link toLink, double departureTime, double submissionTime) {

@@ -5,6 +5,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
+import java.util.Objects;
 
 public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
 
@@ -32,16 +33,10 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 	}
 	@Override
 	public double getMaximumVelocityForLink(Link link, Vehicle vehicle) {
-		if (hasNotAttribute(link, BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR)) {
-			throw new RuntimeException("Infrastructure speed factors must be set for all links that allow the bicycle mode!");
-		}
-
-		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
-		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
 
 		// prior to matsim 12.0 routers would not pass a vehicle. This is why we have a fallback for a default value from the config
 		double maxBicycleSpeed = vehicle == null ? bicycleConfigGroup.getMaxBicycleSpeedForRouting() : vehicle.getType().getMaximumVelocity();
-		double bicycleInfrastructureFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
+		double bicycleInfrastructureFactor = computeInfrastructureFactor(link);
 		double surfaceFactor = computeSurfaceFactor(link);
 		double gradientFactor = computeGradientFactor(link);
 		double speed = maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
@@ -77,14 +72,15 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 	// TODO combine this with comfort
 	private double computeSurfaceFactor(Link link) {
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
-				|| BicycleUtils.CYCLEWAY.equals( link.getAttributes().getAttribute( BicycleUtils.WAY_TYPE ) )
+				|| BicycleUtils.CYCLEWAY.equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE))
 				|| hasNotAttribute(link, BicycleUtils.SURFACE)
 		) {
 			return 1.0;
 		}
+
 		//so, the link is NOT a cycleway, and has a surface attribute
-		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE );
-		switch (surface) {
+		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
+		switch (Objects.requireNonNull(surface)) {
 			case "paved":
 			case "asphalt":
 				return 1.0;
@@ -128,6 +124,11 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 			default:
 				return 0.5;
 		}
+	}
+
+	private double computeInfrastructureFactor(Link link) {
+		var speedFactor = link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR);
+		return speedFactor == null ? 1.0 : Double.parseDouble(speedFactor.toString());
 	}
 
 	private boolean hasNotAttribute(Link link, String attributeName) {

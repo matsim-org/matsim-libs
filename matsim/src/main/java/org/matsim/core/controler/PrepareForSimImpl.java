@@ -49,6 +49,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
@@ -59,6 +60,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -79,6 +82,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
 	private final PlansConfigGroup plansConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
@@ -89,7 +93,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
 				PlansConfigGroup plansConfigGroup, 
-				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
+				MainModeIdentifier backwardCompatibilityMainModeIdentifier,
+				TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -100,6 +105,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.plansConfigGroup = plansConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -114,7 +120,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			carOnlyNetwork = NetworkUtils.createNetwork();
+			carOnlyNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
 			HashSet<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
 			filter.filter(carOnlyNetwork, modes);
@@ -170,7 +176,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
+				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario, 
 						carOnlyNetwork)
 		);
 		
@@ -246,11 +252,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
 					type = VehicleUtils.getDefaultVehicleType();
-					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId()))
-						scenario.getVehicles().addVehicleType(type);
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId())){
+						scenario.getVehicles().addVehicleType( type );
+					}
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					type = scenario.getVehicles().getVehicleTypes().get(Id.create(mode, VehicleType.class));
+					if ( type==null ) {
+						log.fatal( "Could not find requested vehicle type =" + mode + ". With config setting " + modeVehicleTypesFromVehiclesData.toString() + ", you need");
+						log.fatal( "to add, for each mode that performs network routing and/or is used as network/main mode in the qsim, a vehicle type for that mode." );
+						throw new RuntimeException("Could not find requested vehicle type = " + mode + ". See above.");
+					}
 					break;
 				default:
 					throw new RuntimeException(qSimConfigGroup.getVehiclesSource().toString() + " is not implemented yet.");

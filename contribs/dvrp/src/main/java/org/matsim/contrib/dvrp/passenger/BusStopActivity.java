@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
  * @author michalm
  */
 public class BusStopActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
-	private final PassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
 	private final Map<Id<Request>, ? extends PassengerRequest> dropoffRequests;
 	private final Map<Id<Request>, ? extends PassengerRequest> pickupRequests;
@@ -43,11 +43,11 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 
 	private int passengersPickedUp = 0;
 
-	public BusStopActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask task,
+	public BusStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends PassengerRequest> dropoffRequests,
 			Map<Id<Request>, ? extends PassengerRequest> pickupRequests, String activityType) {
 		super(activityType);
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.dropoffRequests = dropoffRequests;
 		this.pickupRequests = pickupRequests;
@@ -63,7 +63,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	protected void beforeFirstStep(double now) {
 		// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
 		for (PassengerRequest request : dropoffRequests.values()) {
-			passengerEngine.dropOffPassenger(driver, request, now);
+			passengerHandler.dropOffPassenger(driver, request, now);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	protected void simStep(double now) {
 		if (now == expectedEndTime) {
 			for (PassengerRequest request : pickupRequests.values()) {
-				if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+				if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
 					passengersPickedUp++;
 				}
 			}
@@ -85,7 +85,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 		}
 
 		PassengerRequest request = getRequestForPassenger(passenger.getId());
-		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+		if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");

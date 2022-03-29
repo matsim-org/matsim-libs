@@ -79,7 +79,7 @@ public class FallbackRoutingModuleTest{
 			@Override public void install(){
 				this.addRoutingModuleBinding( "abcd" ).toInstance( new RoutingModule(){
 					@Override
-					public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
+					public List<? extends PlanElement> calcRoute( RoutingRequest request ){
 						return null;
 					}
 				} );

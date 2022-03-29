@@ -21,12 +21,12 @@ package org.matsim.contrib.taxi.schedule;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.PICKUP;
 
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 import com.google.common.base.MoreObjects;
 
-public class TaxiPickupTask extends StayTask {
+public class TaxiPickupTask extends DefaultStayTask {
 	public static final TaxiTaskType TYPE = new TaxiTaskType(PICKUP);
 
 	private final TaxiRequest request;

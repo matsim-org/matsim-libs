@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import org.apache.log4j.Logger;
@@ -12,7 +33,7 @@ import java.io.IOException;
 @Deprecated // only there if someone insists on writing V1
 public final class CarrierVehicleTypeWriterV1 extends MatsimXmlWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierVehicleTypeWriter.class );
+	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeWriter.class );
 
 	private CarrierVehicleTypes vehicleTypes;
 

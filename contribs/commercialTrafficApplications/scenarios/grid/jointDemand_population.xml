@@ -15,8 +15,8 @@
             <activity type="home" link="259" x="0.0" y="0.0" end_time="16:00:00">
                 <attributes>
                     <!-- the pattern is the following
-                    <attribute name="commercialJob[NUMBER]" class="java.lang.String">[TYPE];[OPERATOR];[CAPACITYDEMAND];[EARLIESTSTART];[LATESTSTART];[DURATION]</attribute> !-->
-                    <attribute name="commercialJob1" class="java.lang.String">salamiPizza;1;43200;46800;180</attribute>
+                    <attribute name="commercialJob[NUMBER]" class="java.util.Collection">["OPERATOR","CAPACITYDEMAND","EARLIESTSTART","LATESTSTART","DURATION"]</attribute> !-->
+                    <attribute name="commercialJob1" class="java.util.Collection">["salamiPizza","1","43200","46800","180"]</attribute>
                 </attributes>
             </activity>
             <leg mode="car">
@@ -35,7 +35,7 @@
             </leg>
             <activity type="home" x="-200.0" y="800.0" end_time="16:00:00">
                 <attributes>
-                    <attribute name="commercialJob1" class="java.lang.String">salamiPizza;1;43200;46800;180</attribute>
+                    <attribute name="commercialJob1" class="java.util.Collection">["salamiPizza","1","43200","46800","180"]</attribute>
                 </attributes>
             </activity>
             <leg mode="car">
@@ -54,7 +54,9 @@
             </leg>
             <activity type="home" link="259" x="0.0" y="0.0" end_time="16:00:00">
                 <attributes>
-                    <attribute name="commercialJob1" class="java.lang.String">salamiPizza;1;50000;51000;180</attribute>
+                    <!-- the pattern is the following
+                    <attribute name="commercialJob[NUMBER]" class="java.util.Collection">["TYPE","OPERATOR","CAPACITYDEMAND","EARLIESTSTART","LATESTSTART","DURATION"]</attribute> !-->
+                    <attribute name="commercialJob1" class="java.util.Collection">["salamiPizza","1","50000","51000","180"]</attribute>
                 </attributes>
             </activity>
             <leg mode="car">

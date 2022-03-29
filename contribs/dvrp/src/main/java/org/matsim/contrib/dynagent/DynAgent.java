@@ -98,6 +98,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 		computeNextAction(dynActivity, now);
 	}
 
+	//this method can be called for several agents at the same time
 	@Override
 	public void endLegAndComputeNextState(double now) {
 		events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));

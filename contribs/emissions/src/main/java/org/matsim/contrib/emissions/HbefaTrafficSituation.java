@@ -22,10 +22,11 @@ package org.matsim.contrib.emissions;
 /**
  * @author benjamin
  *
+ * The <code>STOPANDGO_HEAVY</code> was introduced from HBEFA 4.1 (jwj, Nov'2020).
  */
  enum HbefaTrafficSituation {
 	
-	FREEFLOW, HEAVY, SATURATED, STOPANDGO;
+	FREEFLOW, HEAVY, SATURATED, STOPANDGO, STOPANDGO_HEAVY;
 	
 	HbefaTrafficSituation(){
 	}

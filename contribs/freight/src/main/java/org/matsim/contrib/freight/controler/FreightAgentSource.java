@@ -34,6 +34,7 @@ import java.util.Collection;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -50,7 +51,7 @@ import org.matsim.vehicles.VehicleUtils;
  class FreightAgentSource implements AgentSource {
 	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
-	private static Logger log = Logger.getLogger(FreightAgentSource.class);
+	private static final  Logger log = Logger.getLogger(FreightAgentSource.class);
 	private final CarrierAgentTracker tracker;
 
 	private Collection<MobsimAgent> mobSimAgents;
@@ -69,18 +70,18 @@ import org.matsim.vehicles.VehicleUtils;
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for (MobSimVehicleRoute vRoute : tracker.createPlans()) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
+		for ( Plan vRoute : tracker.createPlans()) {
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPerson());
 			Vehicle vehicle = null;
-			if(vRoute.getVehicle() == null){
+			if( FreightControlerUtils.getVehicle( vRoute ) == null){
 				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-				log.warn("vehicle for agent "+vRoute.getPlan().getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
+				log.warn("vehicle for agent "+vRoute.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
 			}
-			else if(vRoute.getVehicle().getType() == null){
+			else if( FreightControlerUtils.getVehicle( vRoute ).getType() == null){
 				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-				log.warn("vehicleType for agent "+vRoute.getPlan().getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
+				log.warn("vehicleType for agent "+vRoute.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
 			}
-			else vehicle = vRoute.getVehicle();
+			else vehicle = FreightControlerUtils.getVehicle( vRoute );
 //			qsim.createAndParkVehicleOnLink(vehicle, agent.getCurrentLinkId());
 			
 			QVehicle qVehicle = new QVehicleImpl( vehicle ) ;

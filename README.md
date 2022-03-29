@@ -27,6 +27,13 @@ Build by running (from this directory, not any sub-directory):
 mvn package -DskipTests
 ```
 
+if you want to install the core only you can run
+
+```
+mvn install --also-make --projects matsim
+```
+
+
 ## Binaries
 
 Releases and release candidates, including information how to use them by Maven, Gradle, or similar, also for contribs, can be found at https://bintray.com/matsim/matsim/.

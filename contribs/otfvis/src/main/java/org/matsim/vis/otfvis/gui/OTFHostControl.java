@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 public class OTFHostControl implements GLEventListener {
 
-	private static Logger log = Logger.getLogger(OTFHostControl.class);
+	private static final Logger log = Logger.getLogger(OTFHostControl.class);
 	private final Component canvas;
 
 	private final BoundedRangeModel simTime;
@@ -66,12 +66,7 @@ public class OTFHostControl implements GLEventListener {
 			// Live mode without timesteps
 			simTime = new DefaultBoundedRangeModel(0 /* value */, 0 /* extent */, 0 /* value */, Integer.MAX_VALUE /* max */);
 		}
-		simTime.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				canvas.repaint();
-			}
-		});
+		simTime.addChangeListener(e -> canvas.repaint());
 		animator = new Animator();
 		animator.add(((GLAutoDrawable) canvas));
 		((GLAutoDrawable) canvas).addGLEventListener(this);
@@ -105,12 +100,7 @@ public class OTFHostControl implements GLEventListener {
 		log.debug("Pressed PLAY, creating animator.");
 		playing = true;
 		syncronizedPlay = synchronizedPlay;
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				animator.start();
-			}
-		}).start();
+		new Thread(animator::start).start();
 		if (!synchronizedPlay) {
 			((OTFLiveServer) server).play();
 		}

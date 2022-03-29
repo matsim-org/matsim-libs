@@ -20,7 +20,13 @@
 
 package org.matsim.core.network.algorithms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Map;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,21 +36,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class NetworkSimplifierTest {
 
-	@Test
-	public void testBuildNetwork(){
-		Network network = buildNetwork();
-		assertEquals("Wrong number of nodes.",  6, network.getNodes().size());
-		assertEquals("Wrong number of links.",  5, network.getLinks().size());
+	@Before
+	public void setUp() {
+		Id.resetCaches();
 	}
-	
-	
+
+	@Test
+	public void testBuildNetwork() {
+		Network network = buildNetwork();
+		assertEquals("Wrong number of nodes.", 6, network.getNodes().size());
+		assertEquals("Wrong number of links.", 5, network.getLinks().size());
+	}
+
 	@Test
 	public void testRun() {
 		Network network = buildNetwork();
@@ -98,7 +103,7 @@ public class NetworkSimplifierTest {
 		 */
 
 		Network network = NetworkUtils.createNetwork();
-		Node a = NetworkUtils.createAndAddNode(network, Id.create("A", Node.class), new Coord(0.0, 10.0));
+        Node a = NetworkUtils.createAndAddNode(network, Id.create("A", Node.class), new Coord(0.0, 10.0));
 		Node b = NetworkUtils.createAndAddNode(network, Id.create("B", Node.class), new Coord(0.0, -10.0));
 		Node c = NetworkUtils.createAndAddNode(network, Id.create("C", Node.class), new Coord(0.0, 0.0));
 		Node d = NetworkUtils.createAndAddNode(network, Id.create("D", Node.class), new Coord(10.0, 0.0));
@@ -206,8 +211,8 @@ public class NetworkSimplifierTest {
 	 * @return
 	 */
 	private Network buildNetwork(){
-		Network network = NetworkUtils.createNetwork();
-		Node a = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), CoordUtils.createCoord(0.0,  0.0));
+        Network network = NetworkUtils.createNetwork();
+        Node a = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), CoordUtils.createCoord(0.0, 0.0));
 		Node b = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), CoordUtils.createCoord(10.0,  0.0));
 		Node c = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), CoordUtils.createCoord(20.0,  0.0));
 		Node d = NetworkUtils.createAndAddNode(network, Id.createNodeId("D"), CoordUtils.createCoord(30.0,  0.0));

@@ -49,12 +49,18 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableListMultimap;
 
+/**
+ * This is an events based approach to trigger vehicle charging. Vehicles will be charged as soon as a person begins a charging activity.
+ * <p>
+ * Do not use this class for charging DVRP vehicles (DynAgents). In that case, vehicle charging is simulated with ChargingActivity (DynActivity)
+ */
 public class VehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
 		ChargingEndEventHandler, MobsimScopeEventHandler {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
-	public static final String CHARGING_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(CHARGING_IDENTIFIER);
+	public static final String CHARGING_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
+			CHARGING_IDENTIFIER);
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 

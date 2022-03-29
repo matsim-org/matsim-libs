@@ -62,8 +62,12 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			if (personMemmbership.getMembershipsPerCSType().containsKey("oneway"))
 				owcard = true;
 		}
+		// in case the person does not hold neither ff nor ow membership
+		// do not do anything
+		if (!ffcard && !owcard)
+			return;
 		
-		//don't change the trips between the same links
+		// don't change the trips between the same links
 		if (trips.get(rndIdx).getOriginActivity().getFacilityId()!=null) {
 			if (! trips.get(rndIdx).getOriginActivity().getFacilityId().toString().equals(trips.get(rndIdx).getDestinationActivity().getFacilityId().toString()))
 				setRandomTripMode(trips.get(rndIdx), plan, ffcard, owcard);
@@ -104,11 +108,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 						trip.getDestinationActivity());
 		}
 		else
-			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					trip.getTripElements(),
-					trip.getDestinationActivity());
+			return;
 		
 	}
 	

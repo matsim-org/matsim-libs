@@ -126,7 +126,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		return null;
 	}
 
-	V get(int index) {
+	public V get(int index) {
 		if (index < this.data.length) {
 			return (V) this.data[index];
 		}

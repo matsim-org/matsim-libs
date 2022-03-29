@@ -29,7 +29,12 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 	@Inject private Population population ;
 	@Inject private Network network ;
 
-	@Override public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
+	@Override public List<? extends PlanElement> calcRoute( RoutingRequest request ){
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
+		
 		Leg leg = population.getFactory().createLeg( TransportMode.walk ) ;
 		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network, config );
 		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;

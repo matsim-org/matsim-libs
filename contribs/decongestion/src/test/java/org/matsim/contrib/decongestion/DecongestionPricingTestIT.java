@@ -484,16 +484,16 @@ public class DecongestionPricingTestIT {
 			}
 		});
 		
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        controler.run();   
-        		
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+
 		final int index = config.controler().getLastIteration() - config.controler().getFirstIteration();
 		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index) ;
-		Assert.assertEquals("Wrong average executed score. The run output seems to have changed.", -11757.488437376147, avgScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong average executed score. The run output seems to have changed.", -11749.431349675931, avgScore, MatsimTestUtils.EPSILON);
 		
-        System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-		Assert.assertEquals("Wrong toll in time bin 61.", 12.695054408822529, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON);	
-		Assert.assertEquals("Wrong toll in time bin 73.", 16.77452194697956, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON);	
+		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
+		Assert.assertEquals("Wrong toll in time bin 61.", 12.600000000000009, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong toll in time bin 73.", 16.665000000000006, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON);
 	}
 	
 	/**

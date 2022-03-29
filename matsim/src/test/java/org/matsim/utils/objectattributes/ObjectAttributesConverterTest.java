@@ -25,6 +25,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.Month;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -59,6 +62,42 @@ public class ObjectAttributesConverterTest {
 		final var converter = new ObjectAttributesConverter();
 
 		Map<String, String> parsed = (Map<String, String>) converter.convert("java.util.Map", expectedString);
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testEmptyHashMap() {
+
+		var expectedString = "{}";
+		final var converter = new ObjectAttributesConverter();
+
+		Map<String, String> parsed = new HashMap<>();
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testCollection() {
+
+		var expectedString = "[\"a\",\"b\"]";
+		final var converter = new ObjectAttributesConverter();
+
+		Collection<String> parsed = (Collection<String>) converter.convert("java.util.Collection", expectedString);
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testEmptyCollection() {
+
+		var expectedString = "[]";
+		final var converter = new ObjectAttributesConverter();
+
+		Collection<String> parsed = Arrays.asList();
 		var serialized = converter.convertToString(parsed);
 
 		assertEquals(expectedString, serialized);

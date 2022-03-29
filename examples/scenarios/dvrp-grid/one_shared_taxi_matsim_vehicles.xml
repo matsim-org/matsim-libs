@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="conventional_vehicle">
+		<description>Conventional DRT</description>
+		<capacity seats="2"/>
+	</vehicleType>
+	<vehicleType id="autonomous_vehicle">
+		<description>Autonomous DRT</description>
+		<capacity seats="2"/>
+		<!-- speed limited to 5 m/s = 18 km/h -->
+		<maximumVelocity meterPerSecond="5"/>
+	</vehicleType>
+
+	<vehicle id="shared_manually_driven_taxi" type="conventional_vehicle">
+		<attributes>
+			<attribute name="dvrpMode" class="java.lang.String">drt_conventional</attribute>
+			<attribute name="startLink" class="java.lang.String">215</attribute>
+			<attribute name="serviceBeginTime" class="java.lang.Double">0</attribute>
+			<attribute name="serviceEndTime" class="java.lang.Double">8000</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="shared_autonomous_taxi" type="autonomous_vehicle">
+		<attributes>
+			<attribute name="dvrpMode" class="java.lang.String">drt_autonomous</attribute>
+			<attribute name="startLink" class="java.lang.String">215</attribute>
+			<attribute name="serviceBeginTime" class="java.lang.Double">0</attribute>
+			<attribute name="serviceEndTime" class="java.lang.Double">8000</attribute>
+		</attributes>
+	</vehicle>
+
+</vehicleDefinitions>

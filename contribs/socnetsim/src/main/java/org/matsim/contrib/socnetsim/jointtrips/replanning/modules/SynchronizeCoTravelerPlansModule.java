@@ -20,7 +20,7 @@
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
 import org.matsim.core.replanning.ReplanningContext;
-
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -29,14 +29,16 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultith
  * @author thibautd
  */
 public class SynchronizeCoTravelerPlansModule extends AbstractMultithreadedGenericStrategyModule<JointPlan> {
-
-	public SynchronizeCoTravelerPlansModule( final int nThreads ) {
+	private final TimeInterpretation timeInterpretation;
+	
+	public SynchronizeCoTravelerPlansModule( final int nThreads, TimeInterpretation timeInterpretation ) {
 		super( nThreads );
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
 	public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
-		return new SynchronizeCoTravelerPlansAlgorithm();
+		return new SynchronizeCoTravelerPlansAlgorithm(timeInterpretation);
 	}
 }
 

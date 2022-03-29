@@ -39,15 +39,12 @@ public abstract class AbstractRoutingNetworkLink implements RoutingNetworkLink {
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 	}
+
 	@Override
-	public double getFlowCapacityPerSec() {
-		return this.link.getFlowCapacityPerSec() ;
+	public double getCapacityPeriod() {
+		return link.getCapacityPeriod();
 	}
-	@Override
-	public double getFlowCapacityPerSec( double time ) {
-		return this.link.getFlowCapacityPerSec(time) ;
-	}
-	
+
 	@Override
 	public Link getLink() {
 		return link;

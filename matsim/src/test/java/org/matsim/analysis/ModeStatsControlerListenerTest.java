@@ -41,13 +41,13 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ModeStatsControlerListenerTest {
 
-	static int bike;
-	static int car;
-	static int pt;
-	static int other;
-	static int non_network_walk;
-	static int ride;
-	static int walk;
+	int bike;
+	int car;
+	int pt;
+	int other;
+	int non_network_walk;
+	int ride;
+	int walk;
 	HashMap<String, Integer> person3modes = new HashMap<String, Integer>();
 	HashMap<String, Integer> person1modes = new HashMap<String, Integer>();
 	HashMap<String, Integer> person2modes = new HashMap<String, Integer>();
@@ -364,7 +364,7 @@ public class ModeStatsControlerListenerTest {
 
 		HashMap<String, Integer> modesIter0 = new HashMap<String, Integer>();
 
-		IterationEndsEvent event0 = new IterationEndsEvent(null, 0);
+		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
 		modStatListner.notifyIterationEnds(event0);
 
 		//Merging 3 maps (modes of 3 persons) to a new single map and adding together the count of each mode of all 3 persons
@@ -385,7 +385,7 @@ public class ModeStatsControlerListenerTest {
 		leg.setMode(TransportMode.ride);
 		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) + 1);
 
-		IterationEndsEvent event1 = new IterationEndsEvent(null, 1);
+		IterationEndsEvent event1 = new IterationEndsEvent(null, 1, false);
 		modStatListner.notifyIterationEnds(event1);
 
 		HashMap<String, Integer> modesIter1 = new HashMap<String, Integer>();
@@ -399,7 +399,7 @@ public class ModeStatsControlerListenerTest {
 		//Remove one more person
 		population.getPersons().remove(Id.create("3", Person.class));
 
-		IterationEndsEvent event2 = new IterationEndsEvent(null, 2);
+		IterationEndsEvent event2 = new IterationEndsEvent(null, 2, false);
 		modStatListner.notifyIterationEnds(event2);
 
 		// in the last iteration check whether all iterations can still be found
@@ -468,7 +468,7 @@ public class ModeStatsControlerListenerTest {
 	}
 
 	//Identifying column numbers of each mode in the text file, if any one of the modes is not in the text file it will be assigned with default 0 value
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {
