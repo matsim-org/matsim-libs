@@ -260,10 +260,11 @@ import org.matsim.vehicles.VehicleType;
 	private Carrier createAuxiliaryCarrier( ArrayList<ShipmentWithTime> shipmentsInCurrentTour, double startTime ){
 		Carrier auxiliaryCarrier = CarrierUtils.createCarrier( carrier.getId() );
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
-		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLocation());
+		final VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
+
+		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLocation(), vehicleType);
 	    vBuilder.setEarliestStart(startTime);
 	    vBuilder.setLatestEnd(24*60*60);
-	    vBuilder.setType(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
 	    CarrierVehicle cv = vBuilder.build();
 	    auxiliaryCarrier.getCarrierCapabilities().getVehicleTypes().add(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
 	    auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);

@@ -59,9 +59,7 @@ public class CollectionLSPScoringTest {
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
-		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
-		carrierVehicle.setType( collectionType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);

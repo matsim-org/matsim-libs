@@ -55,8 +55,7 @@ public class FirstReloadLSPMobsimTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setType( collectionType );
+		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addType(collectionType);

@@ -54,9 +54,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		org.matsim.vehicles.VehicleType collectionType = collectionVehicleTypeBuilder.build();
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setType( collectionType );
+		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addType(collectionType);

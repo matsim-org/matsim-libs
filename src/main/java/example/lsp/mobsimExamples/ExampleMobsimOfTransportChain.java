@@ -45,8 +45,7 @@ import lsp.resources.LSPResource;
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		carrierVehicle.setType( collectionType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
@@ -109,8 +108,7 @@ import lsp.resources.LSPResource;
 		
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId);
-		mainRunCarrierVehicle.setType( mainRunType );
+		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		mainRunCapabilitiesBuilder.addType(mainRunType);
@@ -172,8 +170,7 @@ import lsp.resources.LSPResource;
 		
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-		distributionCarrierVehicle.setType( distributionType );
+		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder distributionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		distributionCapabilitiesBuilder.addType(distributionType);

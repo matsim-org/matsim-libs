@@ -48,8 +48,7 @@ public class MainRunElementTest {
 		
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId);
-		carrierVehicle.setType( mainRunType );
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId, mainRunType);
 
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();

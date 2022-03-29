@@ -60,8 +60,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setType( collectionType );
+		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addType(collectionType);
@@ -115,8 +114,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		toLinkId = Id.createLinkId("(14 2) (14 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
-		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId);
-		mainRunCarrierVehicle.setType( mainRunType );
+		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId, mainRunType);
 
 
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();

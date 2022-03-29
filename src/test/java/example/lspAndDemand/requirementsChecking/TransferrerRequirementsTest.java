@@ -59,8 +59,7 @@ public class TransferrerRequirementsTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
-		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId);
-		redVehicle.setType( collectionType );
+		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder redCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		redCapabilitiesBuilder.addType(collectionType);
@@ -96,8 +95,7 @@ public class TransferrerRequirementsTest {
 
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
-		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId);
-		blueVehicle.setType( collectionType );
+		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder blueCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		blueCapabilitiesBuilder.addType(collectionType);

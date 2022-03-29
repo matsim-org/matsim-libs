@@ -46,7 +46,7 @@ import java.util.*;
 	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
 	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub }
-	private static SolutionType solutionType = SolutionType.onePlan_withHub;
+	private static SolutionType solutionType = SolutionType.onePlan_direct;
 
 	public static void main (String [] args) throws CommandLine.ConfigurationException{
 
@@ -169,9 +169,7 @@ import java.util.*;
 					.setMaxVelocity( 50 / 3.6 )
 					.build();
 
-			CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance(Id.createVehicleId( "MainRunVehicle" ), depotLinkId)
-					.setType(mainRunVehicleType)
-					.build();
+			CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.Builder.newInstance(Id.createVehicleId( "MainRunVehicle" ), depotLinkId, mainRunVehicleType).build();
 
 			mainRunCarrier.setCarrierCapabilities(
 					CarrierCapabilities.Builder.newInstance()
@@ -230,9 +228,7 @@ import java.util.*;
 			//The Carrier for distribution from reloading Point is created
 			VehicleType distributionVehicleType = createCarrierVehicleType("DistributionCarrierVehicleType");
 
-			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), hubLinkId)
-					.setType(distributionVehicleType)
-					.build();
+			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance( Id.createVehicleId( "DistributionVehicle" ), hubLinkId, distributionVehicleType).build();
 
 			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create( "DistributionCarrier", Carrier.class ));
 			distributionCarrier.setCarrierCapabilities(
@@ -267,8 +263,7 @@ import java.util.*;
 			VehicleType directDistributionVehicleType = createCarrierVehicleType("DirectDistributionCarrierVehicleType");
 
 			CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.Builder.newInstance(
-						Id.createVehicleId("DirectDistributionVehicle"), depotLinkId)
-					.setType(directDistributionVehicleType)
+						Id.createVehicleId("DirectDistributionVehicle"), depotLinkId, directDistributionVehicleType)
 					.build();
 
 			CarrierCapabilities directDistributionCarrierCapabilities = CarrierCapabilities.Builder.newInstance()

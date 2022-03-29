@@ -47,9 +47,8 @@ public class DistributionElementTest {
 		VehicleType distributionType = vehicleTypeBuilder.build();
 		
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-		carrierVehicle.setType(distributionType);
+		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(distributionType);

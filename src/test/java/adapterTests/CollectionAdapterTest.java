@@ -56,8 +56,7 @@ public class CollectionAdapterTest {
 		
 		collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setType( collectionType );
+		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
