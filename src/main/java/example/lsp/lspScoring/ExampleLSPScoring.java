@@ -1,14 +1,11 @@
 package example.lsp.lspScoring;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
-import lsp.functions.LSPInfoFunctionUtils;
+import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningUtils;
+import lsp.resources.LSPResource;
 import lsp.scoring.LSPScoringUtils;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
@@ -17,6 +14,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -25,11 +23,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.functions.LSPInfoFunction;
-import lsp.resources.LSPResource;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 
 /* Example for customized scoring. Each customer that is visited will give a random tip between zero and five
  * 
@@ -109,8 +106,7 @@ import lsp.shipment.LSPShipment;
 		TipEventHandler handler = new TipEventHandler();
 		
 		//Create Info for the SimulationTracker which the scorer needs
-		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		TipInfo info = new TipInfo(function);
+		TipInfo info = new TipInfo();
 		
 		//Create SimulationTracker for the information that the Scorer needs
 		TipSimulationTracker tracker = new TipSimulationTracker(handler,info);

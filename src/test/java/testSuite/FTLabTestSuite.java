@@ -42,15 +42,15 @@ import lsp.usecase.MultipleShipmentsFirstReloadLSPSchedulingTest;
 import lsp.usecase.MultipleShipmentsMainRunLSPSchedulingTest;
 import lsp.usecase.MultipleShipmentsSecondReloadLSPSchedulingTest;
 import lsp.usecase.SecondReloadLSPSchedulingTest;
-import lspScoringTests.CollectionLSPScoringTest;
-import lspScoringTests.MultipleIterationsCollectionLSPScoringTest;
+import example.lsp.lspScoring.CollectionLSPScoringTest;
+import example.lsp.lspScoring.MultipleIterationsCollectionLSPScoringTest;
 import lspShipmentAssignmentTests.CollectionLSPShipmentAssigmentTest;
 import lspShipmentAssignmentTests.CompleteLSPShipmentAssignerTest;
 import lspShipmentTest.CollectionShipmentBuilderTest;
 import lspShipmentTest.CompleteShipmentBuilderTest;
 import lspShipmentTest.DistributionShipmentBuilderTest;
-import requirementsCheckerTests.AssignerRequirementsTest;
-import requirementsCheckerTests.TransferrerRequirementsTest;
+import example.lspAndDemand.requirementsChecking.AssignerRequirementsTest;
+import example.lspAndDemand.requirementsChecking.TransferrerRequirementsTest;
 import solutionElementTests.CollectionElementTest;
 import solutionElementTests.DistributionElementTest;
 import lsp.usecase.FirstReloadElementTest;
@@ -58,9 +58,9 @@ import solutionElementTests.MainRunElementTest;
 import solutionElementTests.SecondReloadElementTest;
 import solutionTests.CollectionSolutionTest;
 import solutionTests.CompleteSolutionTest;
-import testLSPWithCostTracker.CollectionTrackerTest;
-import testMutualReplanning.MutualReplanningTest;
-import testMutualreplanningWithOfferUpdate.MutualReplanningAndOfferUpdateTest;
+import example.lsp.simulationTrackers.CollectionTrackerTest;
+import example.lsp.simulationTrackers.MutualReplanningTest;
+import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

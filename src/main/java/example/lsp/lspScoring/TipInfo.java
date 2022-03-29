@@ -1,25 +1,16 @@
 package example.lsp.lspScoring;
 
 import lsp.functions.LSPInfo;
-import lsp.functions.LSPInfoFunction;
 
 /*package-private*/ class TipInfo extends LSPInfo {
 
-	private final LSPInfoFunction function;
-
-	/*package-private*/ TipInfo (LSPInfoFunction function) {
-		this.function = function;
+	/*package-private*/ TipInfo() {
 	}
 	
 	@Override
 	public String getName() {
 		String name = "TIPINFO";
 		return name;
-	}
-
-	@Override
-	public LSPInfoFunction getFunction() {
-		return function;
 	}
 
 	@Override

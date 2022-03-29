@@ -24,7 +24,6 @@ import org.matsim.vehicles.VehicleType;
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.functions.LSPInfo;
-import lsp.functions.LSPInfoFunctionValue;
 import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
@@ -181,11 +180,14 @@ import lsp.shipment.LSPShipment;
 		//Retrieve cost info from lsp
 		LSPInfo costInfo;
 		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getInfos()) {
-			if( Objects.equals( info.getName(), "cost_function" ) ) {
-				costInfo = info;
-				for(LSPInfoFunctionValue value : costInfo.getFunction().getValues()){
-					System.out.println(value.getName() + " " + value.getValue());
-				}
+//			if( Objects.equals( info.getName(), "cost_function" ) ) {
+//				costInfo = info;
+//				for(  Map.Entry value : costInfo.getAttributes().getAttributes().getAsMap().entrySet() ){
+//					System.out.println(value.getKey() + " " + value.getValue());
+//				}
+//			}
+			for( Map.Entry<String, Object> entry : info.getAttributes().getAsMap().entrySet() ){
+				System.out.println( entry.getKey() + " " + entry.getValue() );
 			}
 		}
 	}

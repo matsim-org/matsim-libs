@@ -1,25 +1,30 @@
 package example.lsp.simulationTrackers;
 
 import lsp.functions.LSPInfo;
-import lsp.functions.LSPInfoFunction;
 
 /*package-private*/ class CostInfo extends LSPInfo {
 
-	private final CostInfoFunction costFunction;
-
 	CostInfo() {
-		this.costFunction = new CostInfoFunction();
+		setFixedCost( null );
+		setVariableCost( null );
+	}
+	void setVariableCost( Double value ){
+		this.getAttributes().putAttribute( "variableCost", value );
+	}
+	void setFixedCost( Double value ){
+		this.getAttributes().putAttribute( "fixedCost", value );
+	}
+	Double getFixedCost() {
+		return (Double) this.getAttributes().getAttribute( "fixedCost" );
+	}
+	Double getVariableCost(){
+		return (Double) this.getAttributes().getAttribute( "variableCost" );
 	}
 
 
 	@Override
 	public String getName() {
 		return "cost_function";
-	}
-
-	@Override
-	public LSPInfoFunction getFunction() {
-		return costFunction;
 	}
 
 	@Override

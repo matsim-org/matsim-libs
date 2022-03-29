@@ -1,12 +1,9 @@
-package lspScoringTests;
+package example.lsp.lspScoring;
 
 import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.shipment.LSPShipmentImpl;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.functions.LSPInfoFunction;
-import lsp.functions.LSPInfoFunctionUtils;
-import lsp.functions.LSPInfoFunctionValue;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
@@ -109,10 +106,10 @@ public class CollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR");
-		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		function.getValues().add(value);
-		TipInfo info = new TipInfo(function);
+//		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+//		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
+//		function.getAttributes().add(value );
+		TipInfo info = new TipInfo();
 		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
 		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);

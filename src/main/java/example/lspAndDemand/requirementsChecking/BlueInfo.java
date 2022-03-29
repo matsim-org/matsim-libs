@@ -4,23 +4,17 @@ import lsp.functions.*;
 
 /*package-private*/ class BlueInfo extends LSPInfo {
 
-private final LSPInfoFunction blueInfoFunction;
-
 	/*package-private*/ BlueInfo() {
-		blueInfoFunction = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		LSPInfoFunctionValue<String> value = LSPInfoFunctionUtils.createInfoFunctionValue("blue" );
-		value.setValue("blue");
-		blueInfoFunction.getValues().add(value);
+//		blueInfoFunction = LSPInfoFunctionUtils.createDefaultInfoFunction();
+//		LSPInfoFunctionValue<String> value = LSPInfoFunctionUtils.createInfoFunctionValue("blue" );
+//		value.setValue("blue");
+//		blueInfoFunction.getValues().add(value);
+		this.getAttributes().putAttribute( "blue", null );
 	}
 	
 	@Override
 	public String getName() {
 		return "blue";
-	}
-
-	@Override
-	public LSPInfoFunction getFunction() {
-		return blueInfoFunction;
 	}
 
 	@Override

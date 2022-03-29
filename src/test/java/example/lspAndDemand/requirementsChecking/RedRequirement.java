@@ -1,4 +1,4 @@
-package requirementsCheckerTests;
+package example.lspAndDemand.requirementsChecking;
 
 import lsp.functions.LSPInfo;
 import lsp.LogisticsSolution;

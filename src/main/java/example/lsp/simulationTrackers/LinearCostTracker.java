@@ -1,14 +1,12 @@
 package example.lsp.simulationTrackers;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import lsp.controler.LSPSimulationTracker;
+import lsp.functions.LSPInfo;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.LSPInfo;
-import lsp.functions.LSPInfoFunctionValue;
-import lsp.controler.LSPSimulationTracker;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /*package-private*/ class LinearCostTracker implements LSPSimulationTracker{
 
@@ -28,7 +26,7 @@ import lsp.controler.LSPSimulationTracker;
 	
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
-		example.lsp.simulationTrackers.CostInfo costInfo = new example.lsp.simulationTrackers.CostInfo();
+		CostInfo costInfo = new CostInfo();
 		infos = new ArrayList<>();
 		infos.add(costInfo);
 		this.eventHandlers = new ArrayList<>();
@@ -48,17 +46,17 @@ import lsp.controler.LSPSimulationTracker;
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		for(EventHandler handler : eventHandlers) {
-			if(handler instanceof example.lsp.simulationTrackers.TourStartHandler) {
-				example.lsp.simulationTrackers.TourStartHandler startHandler = (example.lsp.simulationTrackers.TourStartHandler) handler;
+			if(handler instanceof TourStartHandler) {
+				TourStartHandler startHandler = (TourStartHandler) handler;
 				this.vehicleFixedCosts = startHandler.getVehicleFixedCosts();
 			}
-			if(handler instanceof example.lsp.simulationTrackers.DistanceAndTimeHandler) {
-				example.lsp.simulationTrackers.DistanceAndTimeHandler distanceHandler = (example.lsp.simulationTrackers.DistanceAndTimeHandler) handler;
+			if(handler instanceof DistanceAndTimeHandler) {
+				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
 				this.distanceCosts = distanceHandler.getDistanceCosts();
 				this.timeCosts = distanceHandler.getTimeCosts();
 			}
-			if(handler instanceof example.lsp.simulationTrackers.CollectionServiceHandler) {
-				example.lsp.simulationTrackers.CollectionServiceHandler collectionHandler = (example.lsp.simulationTrackers.CollectionServiceHandler) handler;
+			if(handler instanceof CollectionServiceHandler) {
+				CollectionServiceHandler collectionHandler = (CollectionServiceHandler) handler;
 				totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
 				System.out.println(totalNumberOfShipments);
 				totalWeightOfShipments = collectionHandler.getTotalWeightOfShipments();
@@ -70,15 +68,17 @@ import lsp.controler.LSPSimulationTracker;
 		fixedUnitCosts = (totalCosts * shareOfFixedCosts)/totalNumberOfShipments;
 		linearUnitCosts = (totalCosts * (1-shareOfFixedCosts))/totalWeightOfShipments;
 		
-		example.lsp.simulationTrackers.CostInfo info = (example.lsp.simulationTrackers.CostInfo) infos.iterator().next();
-		for(LSPInfoFunctionValue value : info.getFunction().getValues()) {
-			if(value instanceof example.lsp.simulationTrackers.FixedCostFunctionValue) {
-				((example.lsp.simulationTrackers.FixedCostFunctionValue)value).setValue(fixedUnitCosts);
-			}
-			if(value instanceof example.lsp.simulationTrackers.LinearCostFunctionValue) {
-				((example.lsp.simulationTrackers.LinearCostFunctionValue)value).setValue(linearUnitCosts);
-			}
-		}
+		CostInfo info = (CostInfo) infos.iterator().next();
+//		for(LSPInfoFunctionValue value : info.getFunction().getValues()) {
+//			if(value instanceof example.lsp.simulationTrackers.FixedCostFunctionValue) {
+//				((example.lsp.simulationTrackers.FixedCostFunctionValue)value).setValue(fixedUnitCosts);
+//			}
+//			if(value instanceof example.lsp.simulationTrackers.LinearCostFunctionValue) {
+//				((example.lsp.simulationTrackers.LinearCostFunctionValue)value).setValue(linearUnitCosts);
+//			}
+//		}
+		info.setFixedCost( fixedUnitCosts );
+		info.setVariableCost( linearUnitCosts );
 		
 		
 	}

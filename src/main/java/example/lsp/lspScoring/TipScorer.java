@@ -2,9 +2,10 @@ package example.lsp.lspScoring;
 
 import lsp.LSP;
 import lsp.functions.LSPInfo;
-import lsp.functions.LSPInfoFunction;
-import lsp.functions.LSPInfoFunctionValue;
 import lsp.scoring.LSPScorer;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.util.Map;
 
 /*package-private*/ class TipScorer implements LSPScorer {
 
@@ -19,9 +20,9 @@ import lsp.scoring.LSPScorer;
 		double score = 0;
 		for(LSPInfo info : tracker.getInfos()) {
 			if(info instanceof TipInfo) {
-				LSPInfoFunction function = info.getFunction();
-					for(LSPInfoFunctionValue value : function.getValues()) {
-						if(value.getName().equals("TIP IN EUR") && value.getValue() instanceof Double) {
+				Attributes function = info.getAttributes();
+					for(  Map.Entry value : function.getAsMap().entrySet() ) {
+						if(value.getKey().equals("TIP IN EUR") && value.getValue() instanceof Double) {
 							double trinkgeldValue = (Double) value.getValue();
 							score += trinkgeldValue;
 						}

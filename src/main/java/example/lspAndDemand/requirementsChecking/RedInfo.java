@@ -4,23 +4,17 @@ import lsp.functions.*;
 
 /*package-private*/ class RedInfo extends LSPInfo {
 
-private final LSPInfoFunction redInfoFunction;
-
 	/*package-private*/ RedInfo() {
-		redInfoFunction = LSPInfoFunctionUtils.createDefaultInfoFunction();
-		LSPInfoFunctionValue<String> value = LSPInfoFunctionUtils.createInfoFunctionValue("red" );
-		value.setValue("red");
-		redInfoFunction.getValues().add(value);
+//		redInfoFunction = LSPInfoFunctionUtils.createDefaultInfoFunction();
+//		LSPInfoFunctionValue<String> value = LSPInfoFunctionUtils.createInfoFunctionValue("red" );
+//		value.setValue("red");
+//		redInfoFunction.getValues().add(value);
+		this.getAttributes().putAttribute( "red", null );
 	}
 
 	@Override
 	public String getName() {
 		return "red";
-	}
-
-	@Override
-	public LSPInfoFunction getFunction() {
-		return redInfoFunction;
 	}
 
 	@Override
