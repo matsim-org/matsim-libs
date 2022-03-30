@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.LSPTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPCarrierResource;
+import lsp.LSPCarrierResource;
 
 /*package-private*/ class MainRunTourEndEventHandler implements LSPTourEndEventHandler {
 

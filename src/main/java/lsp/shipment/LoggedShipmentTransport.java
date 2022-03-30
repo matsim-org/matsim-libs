@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 public final class LoggedShipmentTransport implements ShipmentPlanElement {
 	// yyyy cannot make package-private since used outside package.  kai, jun'20

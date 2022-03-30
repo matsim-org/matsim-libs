@@ -3,7 +3,7 @@ package example.lsp.lspScoring;
 import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningUtils;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;

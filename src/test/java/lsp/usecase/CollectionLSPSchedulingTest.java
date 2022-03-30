@@ -20,10 +20,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 public class CollectionLSPSchedulingTest {
 

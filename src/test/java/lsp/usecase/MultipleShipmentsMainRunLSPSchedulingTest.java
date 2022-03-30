@@ -23,7 +23,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 

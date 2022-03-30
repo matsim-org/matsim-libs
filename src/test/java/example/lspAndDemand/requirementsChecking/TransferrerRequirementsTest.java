@@ -28,7 +28,7 @@ import demand.demandObject.DemandObjectImpl;
 import demand.offer.Offer;
 import demand.offer.OfferFactoryImpl;
 import demand.offer.OfferTransferrer;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.shipment.Requirement;
 import requirementsCheckerTests.NonsenseOffer;
 import requirementsCheckerTests.RequirementsTransferrer;

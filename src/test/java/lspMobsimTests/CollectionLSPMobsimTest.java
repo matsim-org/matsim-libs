@@ -32,8 +32,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 
 public class CollectionLSPMobsimTest {
 	private static final Logger log = Logger.getLogger( CollectionLSPMobsimTest.class );

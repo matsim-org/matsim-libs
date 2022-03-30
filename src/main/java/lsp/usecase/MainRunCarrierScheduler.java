@@ -2,7 +2,6 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
@@ -20,9 +19,9 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
 import lsp.LogisticsSolutionElement;
 import lsp.ShipmentWithTime;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
-import lsp.resources.LSPResourceScheduler;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
 
 /**

@@ -23,8 +23,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.functions.LSPInfo;
-import lsp.resources.LSPResource;
+import lsp.LSPInfo;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /*package-private*/ class ExampleSimulationTrackers {

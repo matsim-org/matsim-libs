@@ -1,6 +1,6 @@
 package example.lsp.lspScoring;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 
 /*package-private*/ class TipInfo extends LSPInfo {
 

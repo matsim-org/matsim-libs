@@ -1,8 +1,6 @@
 package lsp;
 
 import lsp.controler.LSPSimulationTracker;
-import lsp.functions.LSPInfo;
-import lsp.resources.LSPResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 

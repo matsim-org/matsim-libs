@@ -7,7 +7,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.events.LSPServiceStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPCarrierResource;
+import lsp.LSPCarrierResource;
 
 /*package-private*/  class DistributionServiceStartEventHandler implements LSPServiceStartEventHandler {
 

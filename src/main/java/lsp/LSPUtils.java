@@ -1,8 +1,6 @@
 package lsp;
 
-import lsp.functions.LSPInfo;
 import lsp.replanning.LSPReplanner;
-import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;

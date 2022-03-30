@@ -1,6 +1,6 @@
 package example.lspAndDemand.requirementsChecking;
 
-import lsp.functions.*;
+import lsp.LSPInfo;
 
 /*package-private*/ class RedInfo extends LSPInfo {
 

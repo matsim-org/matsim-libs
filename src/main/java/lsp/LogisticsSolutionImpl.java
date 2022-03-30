@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.LSPInfo;
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
 

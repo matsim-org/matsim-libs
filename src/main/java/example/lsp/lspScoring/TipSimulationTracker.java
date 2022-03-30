@@ -6,7 +6,7 @@ import java.util.Collection;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class TipSimulationTracker implements LSPSimulationTracker{

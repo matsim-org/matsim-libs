@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
 import lsp.ShipmentWithTime;
-import lsp.resources.LSPResource;
-import lsp.resources.LSPResourceScheduler;
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
 import lsp.shipment.ShipmentPlanElement;
 
 /*package-private*/ class ReloadingPointScheduler extends LSPResourceScheduler {

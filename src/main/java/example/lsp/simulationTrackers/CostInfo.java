@@ -1,6 +1,6 @@
 package example.lsp.simulationTrackers;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 
 /*package-private*/ class CostInfo extends LSPInfo {
 

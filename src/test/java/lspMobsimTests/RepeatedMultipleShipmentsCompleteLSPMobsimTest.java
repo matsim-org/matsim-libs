@@ -26,7 +26,7 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 
