@@ -15,22 +15,20 @@ import java.util.Set;
  *
  * Further, they can be valid only during a certain period of time.
  *
- * Every Info contains one {@link LSPAttributes}. An {@link LSPAttributes}.
  */
 public abstract class LSPInfo implements Attributable {
 
 	private final Attributes attributes = new Attributes();
 
-	protected final Set<LSPInfo> predecessorInfos;
+//	protected final Set<LSPInfo> predecessorInfos;
 	
 	protected LSPInfo() {
-		this.predecessorInfos = new HashSet<>();
+//		this.predecessorInfos = new HashSet<>();
 	}
-	
-	
-	public void addPredecessorInfo(LSPInfo info) {
-		predecessorInfos.add(info);
-	}
+
+//	public void addPredecessorInfo(LSPInfo info) {
+//		predecessorInfos.add(info);
+//	}
 	
 //	public void removePredecessorInfo(LSPInfo info) {
 //		if(predecessorInfos.contains(info)) {
@@ -38,9 +36,9 @@ public abstract class LSPInfo implements Attributable {
 //		}
 //	}
 	
-	public Set<LSPInfo> getPredecessorInfos() {
-		return predecessorInfos;
-	}
+//	public Set<LSPInfo> getPredecessorInfos() {
+//		return predecessorInfos;
+//	}
 	
 	public abstract void setName(String name);
 	public abstract String getName();

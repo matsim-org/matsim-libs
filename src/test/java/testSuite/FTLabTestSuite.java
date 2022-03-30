@@ -8,7 +8,6 @@ import adapterTests.DistributionAdapterTest;
 import lsp.usecase.FirstReloadAdapterTest;
 import adapterTests.MainRunAdapterTest;
 import lsp.usecase.SecondReloadAdapterTest;
-import cascadingInfoTest.CascadingInfoTest;
 import demandObjectTests.DemandObjectBuilderTest;
 import lspCreationTests.CollectionLSPCreationTest;
 import lspCreationTests.CompleteLSPCreationTest;
@@ -69,7 +68,7 @@ import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
 	FirstReloadAdapterTest.class,
 	MainRunAdapterTest.class,
 	SecondReloadAdapterTest.class,
-	CascadingInfoTest.class,
+//	CascadingInfoTest.class,
 	DemandObjectBuilderTest.class,
 	CompleteLSPCreationTest.class,
 	CollectionLSPCreationTest.class,
