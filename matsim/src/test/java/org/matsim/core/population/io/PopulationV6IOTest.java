@@ -39,9 +39,13 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -109,6 +113,10 @@ public class PopulationV6IOTest {
 		person.getAttributes().putAttribute( "brain" , false );
 		person.getAttributes().putAttribute( "party" , "republican" );
 
+		Map<String, Id<Vehicle>> vehiclesMap = new HashMap<>();
+		vehiclesMap.put("car", Id.createVehicleId("limo"));
+		VehicleUtils.insertVehicleIdsIntoAttributes(person, vehiclesMap);
+
 		final String file = utils.getOutputDirectory()+"/population.xml";
 		new PopulationWriter( population ).writeV6( file );
 
@@ -124,6 +132,10 @@ public class PopulationV6IOTest {
 		Assert.assertEquals( "Unexpected String attribute in " + readPerson.getAttributes(),
 				person.getAttributes().getAttribute( "party" ) ,
 				readPerson.getAttributes().getAttribute( "party" ) );
+
+		Assert.assertEquals( "Unexpected PersonVehicle attribute in " + readPerson.getAttributes(),
+				VehicleUtils.getVehicleIds(person) ,
+				VehicleUtils.getVehicleIds(readPerson) );
 	}
 
 	@Test
