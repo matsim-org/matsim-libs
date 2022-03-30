@@ -159,13 +159,15 @@ public final class VehicleUtils {
 	 */
 	public static void insertVehicleIdsIntoAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
 		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+		// copy in case it's a UnmodifiableMap
+		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
 		PersonVehicles personVehicles;
 		if (attr == null) {
-			personVehicles = new PersonVehicles(modeToVehicle);
+			personVehicles = new PersonVehicles(modeToVehicleCopy);
 		} else {
 			personVehicles = (PersonVehicles) attr;
 		}
-		personVehicles.addModeVehicleList(modeToVehicle);
+		personVehicles.addModeVehicleList(modeToVehicleCopy);
 		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
 	}
 	//******** general VehicleType attributes ************
