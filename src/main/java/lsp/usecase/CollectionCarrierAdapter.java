@@ -30,7 +30,6 @@ import lsp.controler.LSPSimulationTracker;
 
 	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
 		this.id = builder.id;
-		Id<Link> locationLinkId = builder.locationLinkId;
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;

@@ -35,13 +35,9 @@ public interface LSPShipment {
 	Collection<EventHandler> getEventHandlers();
 	
 	Collection<Requirement> getRequirements();
-	
-//	Collection<UtilityFunction> getUtilityFunctions();
-	
+
 	Collection<LSPInfo> getInfos();
 	
 	Id<LogisticsSolution> getSolutionId();
-	
-//	void setSolutionId(Id<LogisticsSolution> Id);
-	
+
 }

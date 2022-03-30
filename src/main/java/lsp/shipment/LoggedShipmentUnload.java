@@ -19,8 +19,6 @@ class LoggedShipmentUnload implements ShipmentPlanElement {
 		this.endTime = builder.endTime;
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
-		Id<Carrier> carrierId = builder.carrierId;
-		Id<Link> linkId = builder.linkId;
 	}
 	
 	

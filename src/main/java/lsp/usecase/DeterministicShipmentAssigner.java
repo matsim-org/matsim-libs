@@ -32,9 +32,5 @@ class DeterministicShipmentAssigner implements ShipmentAssigner {
 		singleSolution.assignShipment(shipment);
 	}
 
-//	@Override
-//	public LSP getLSP() {
-//		return lsp;
-//	}
 
 }

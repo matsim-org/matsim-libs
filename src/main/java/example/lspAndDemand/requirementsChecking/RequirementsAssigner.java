@@ -41,9 +41,4 @@ class RequirementsAssigner implements  ShipmentAssigner {
 		this.lsp = lsp;
 	}
 
-//	@Override
-//	public LSP getLSP() {
-//		return lsp;
-//	}
-
 }

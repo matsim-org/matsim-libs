@@ -146,10 +146,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}	
 	}
 	
-//	public LSPReplanner getReplanner() {
-//		return replanner;
-//	}
-
 
 	@Override
 	public void assignShipmentToLSP(LSPShipment shipment) {
@@ -164,11 +160,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 
-//	@Override
-//	public LSPScorer getScorer() {
-//		return scorer;
-//	}
-
 	@Override
 	public void setScorer(LSPScorer scorer) {
 		this.scorer =  scorer;
@@ -181,10 +172,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 
-//	@Override
-//	public SolutionScheduler getScheduler() {
-//		return solutionScheduler;
-//	}
 	
 	@Override
 	public Collection<LSPShipment> getShipments() {

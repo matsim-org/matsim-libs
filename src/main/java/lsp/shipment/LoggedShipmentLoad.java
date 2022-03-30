@@ -19,8 +19,6 @@ import lsp.LSPResource;
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
-		Id<Carrier> carrierId = builder.getCarrierId();
-		Id<Link> linkId = builder.getLinkId();
 	}
 	
 	
