@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -56,6 +57,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class PersonPrepareForSimTest {
 
+	//As the used network was switched from carOnly to multimodal, this test is pointless. Will keep it for now, though -sm march22
+	@Ignore
 	@Test
 	public void testRun_MultimodalNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -85,10 +88,11 @@ public class PersonPrepareForSimTest {
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
 		Assert.assertEquals(link1id, activity1.getLinkId());
-		//is this test even needed when switching to multimodal network in PersonPrepareForSim? - sm march22
-//		Assert.assertEquals(link1id, activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assert.assertEquals(link1id, activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 
+	//As the used network was switched from carOnly to multimodal, this test is pointless. Will keep it for now, though -sm march22
+	@Ignore
 	@Test
 	public void testRun_MultimodalScenario() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -118,8 +122,7 @@ public class PersonPrepareForSimTest {
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 		
 		Assert.assertEquals(link1id, a1.getLinkId());
-		//is this test even needed when switching to multimodal network in PersonPrepareForSim? - sm march22
-//		Assert.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assert.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 	
 	@Test
