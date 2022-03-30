@@ -18,11 +18,11 @@ jobs:
     - name: Checkout git repo
       uses: actions/checkout@v2
 
-    - name: Set up JDK 11
+    - name: Set up Java
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
-        distribution: 'adopt'
+        java-version: '17'
+        distribution: 'zulu'
         cache: maven
 
     - name: Build module (with dependencies)
