@@ -27,16 +27,6 @@ import lsp.LSPInfo;
 		return "cost_function";
 	}
 
-	@Override
-	public double getFromTime() {
-		return 0;
-	}
-
-	@Override
-	public double getToTime() {
-		return Double.MAX_VALUE;
-	}
-
 
 	@Override
 	public void update() {

@@ -14,16 +14,6 @@ import lsp.LSPInfo;
 	}
 
 	@Override
-	public double getFromTime() {
-		return 0;
-	}
-
-	@Override
-	public double getToTime() {
-		return Double.MAX_VALUE;
-	}
-
-	@Override
 	public void update() {
 		// TODO Auto-generated method stub
 		

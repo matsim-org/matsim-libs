@@ -42,8 +42,8 @@ public abstract class LSPInfo implements Attributable {
 	
 	public abstract void setName(String name);
 	public abstract String getName();
-	public abstract double getFromTime();
-	public abstract double getToTime();
+//	public abstract double getFromTime();
+//	public abstract double getToTime();
 	public abstract void update();
 
 	@Override
