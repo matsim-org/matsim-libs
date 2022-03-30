@@ -91,7 +91,7 @@ public class DrtLegsAnalyser {
 			int arrivalTimeBin = (int)((leg.arrivalTime - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
-				deboardings.put(leg.fromLinkId, deboard);
+				deboardings.put(leg.toLink, deboard);
 			}
 		}
 		writeBoardings(boardingsFile, network, boardings, startTime, timeBinSize, bins, delimiter);
