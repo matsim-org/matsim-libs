@@ -165,7 +165,7 @@ public final class VehicleUtils {
 		} else {
 			personVehicles = (PersonVehicles) attr;
 		}
-		personVehicles.addModeVehicleListIfAbsent(modeToVehicle);
+		personVehicles.addModeVehicleList(modeToVehicle);
 		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
 	}
 	//******** general VehicleType attributes ************
