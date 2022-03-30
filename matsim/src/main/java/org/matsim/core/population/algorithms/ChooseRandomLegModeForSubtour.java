@@ -52,8 +52,11 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private static final  Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
-	
-	private static class Candidate {
+
+	/**
+	 * Candidate to change mode-choice
+	 */
+	public static class Candidate {
 		final Subtour subtour;
 		final String newTransportMode;
 
@@ -79,7 +82,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private final double probaForChangeSingleTripMode;
 	private TripsToLegsAlgorithm tripsToLegs = null ;
 	private ChooseRandomSingleLegMode changeSingleLegMode = null ;
-	
+
 	public ChooseRandomLegModeForSubtour(
 			final MainModeIdentifier mainModeIdentifier,
 			final PermissibleModesCalculator permissibleModesCalculator,
@@ -93,7 +96,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		this.behavior = behavior;
 		this.probaForChangeSingleTripMode = probaForChooseRandomSingleTripMode;
 		this.singleTripSubtourModes = this.chainBasedModes;
-		
+
 		this.rng = rng;
 		logger.info("Chain based modes: " + this.chainBasedModes.toString());
 
@@ -119,13 +122,42 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	 * the modes should be available for such trips (e.g. car-sharing does not make much sense for such a trip),
 	 * thus the list of modes available for single-trip subtours can be specified independently. As mentioned,
 	 * it is initialized by the constructor to the full list of chain based modes.
-	 * 
+	 *
 	 * @param singleTripSubtourModes
 	 */
 	public void setSingleTripSubtourModes(final String[] singleTripSubtourModes) {
 		this.singleTripSubtourModes = Arrays.asList(singleTripSubtourModes);
 	}
-	
+
+	/**
+	 * Return all possible choices for a certain plan.
+	 */
+	public List<Candidate> determineChoiceSet(final Plan plan) {
+
+		final Id<? extends BasicLocation> homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId()!=null ?
+				((Activity) plan.getPlanElements().get(0)).getFacilityId() :
+				((Activity) plan.getPlanElements().get(0)).getLinkId();
+		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
+
+		return determineChoiceSet(
+						homeLocation,
+						TripStructureUtils.getTrips(plan),
+						TripStructureUtils.getSubtours(plan),
+						permissibleModesForThisPlan);
+	}
+
+	/**
+	 * Return whether a subtour is mass conservating according to configuration.
+	 */
+	public boolean isMassConserving(final Subtour subtour) {
+		for (String mode : chainBasedModes) {
+			if (!isMassConserving(subtour, mode)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public void run(final Plan plan) {
 		if (plan.getPlanElements().size() <= 1) {
@@ -134,7 +166,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		// with certain proba, do standard single leg mode choice for not-chain-based modes:
 		if ( this.changeSingleLegMode!=null && rng.nextDouble() < this.probaForChangeSingleTripMode ) {
 			// (the null check is for computational efficiency)
-			
+
 			this.tripsToLegs.run(plan);
 			this.changeSingleLegMode.run(plan);
 			return;
@@ -146,19 +178,19 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
 		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
-		
-			
+
+
 		List<Candidate> choiceSet =
 					determineChoiceSet(
 							homeLocation,
 							TripStructureUtils.getTrips(plan),
 							TripStructureUtils.getSubtours(plan),
 							permissibleModesForThisPlan);
-			
+
 		if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
 				// (means that in the end we are changing modes only for one subtour)
-				
+
 				applyChange(whatToDo, plan);
 		}
 	}
@@ -183,13 +215,13 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 					subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() !=null ?
 							subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
 							subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
-			
+
 			final Collection<String> testingModes =
 				subtour.getTrips().size() == 1 ?
 					singleTripSubtourModes :
 					chainBasedModes;
 			// I am not sure what the singleTripSubtourModes thing means.  But apart from that ...
-			
+
 			// ... test whether a vehicle was brought to the subtourStartLocation:
 			final Set<String> usableChainBasedModes = new LinkedHashSet<>();
 			for (String mode : testingModes) {
@@ -211,7 +243,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			// yy My intuition is that with the above condition, a switch of an all-car plan with at least
 			// one explicit sub-tour could switch to an all-bicycle plan only via first changing the
 			// explicit sub-tour first to a non-chain-based mode.  kai, jul'18
-			
+
 			Set<String> usableModes = new LinkedHashSet<>();
 			if (isMassConserving(subtour)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
 				for (String candidate : permissibleModesForThisPerson) {
@@ -224,12 +256,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 						// for non-chain-based modes, always add:
 						usableModes.add(candidate);
 					}
-				} 
+				}
 			}
-			
+
 			usableModes.remove(getTransportMode(subtour));
 			// (remove current mode so we don't get it again; note that the parent plan is kept anyways)
-			
+
 			for (String transportMode : usableModes) {
 				choiceSet.add(
 						new Candidate(
@@ -247,15 +279,6 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			}
 		}
 		return false;
-	}
-
-	private boolean isMassConserving(final Subtour subtour) {
-		for (String mode : chainBasedModes) {
-			if (!isMassConserving(subtour, mode)) {
-				return false;
-			} 
-		}
-		return true;
 	}
 
 	private boolean isMassConserving(
