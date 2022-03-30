@@ -33,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class TaxiControlerCreator {
 	/**
-	 * Creates a controller in one step. Assumes a single taxi service.
+	 * Creates a controller in one step.
 	 *
 	 * @param config
 	 * @param otfvis

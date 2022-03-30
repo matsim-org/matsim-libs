@@ -53,7 +53,6 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class DefaultRequestInsertionScheduler implements RequestInsertionScheduler {
 
-	private final Fleet fleet;
 	private final double stopDuration;
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
@@ -62,16 +61,15 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 	public DefaultRequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
 			TravelTime travelTime, ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory) {
-		this.fleet = fleet;
 		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
-		initSchedules();
+		initSchedules(fleet);
 	}
 
-	private void initSchedules() {
+	private void initSchedules(Fleet fleet) {
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
