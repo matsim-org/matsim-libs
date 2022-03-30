@@ -1,12 +1,16 @@
 package lsp.shipment;
 
 //import demand.UtilityFunction;
+import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+
+import java.util.ArrayList;
 
 public class ShipmentUtils{
 	private ShipmentUtils(){} // do not instantiate
@@ -441,6 +445,69 @@ public class ShipmentUtils{
 
 		public LoggedShipmentUnload build(){
 			return new LoggedShipmentUnload(this);
+		}
+	}
+
+	public static class LSPShipmentBuilder{
+		final Id<LSPShipment> id;
+		Id<Link> fromLinkId;
+		Id<Link> toLinkId;
+		TimeWindow startTimeWindow;
+		TimeWindow endTimeWindow;
+		int capacityDemand;
+		double deliveryServiceTime;
+		double pickupServiceTime;
+		final ArrayList<Requirement> requirements;
+		final ArrayList<LSPInfo> infos;
+
+		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
+			return new LSPShipmentBuilder(id);
+		}
+
+		private LSPShipmentBuilder( Id<LSPShipment> id ){
+			this.requirements = new ArrayList<>();
+			this.infos = new ArrayList<>();
+			this.id = id;
+		}
+
+		public void setFromLinkId(Id<Link> fromLinkId ){
+			this.fromLinkId = fromLinkId;
+		}
+
+		public void setToLinkId(Id<Link> toLinkId ){
+			this.toLinkId = toLinkId;
+		}
+
+		public void setStartTimeWindow(TimeWindow startTimeWindow ){
+			this.startTimeWindow = startTimeWindow;
+		}
+
+		public void setEndTimeWindow(TimeWindow endTimeWindow ){
+			this.endTimeWindow = endTimeWindow;
+		}
+
+		public void setCapacityDemand(int capacityDemand ){
+			this.capacityDemand = capacityDemand;
+		}
+
+		public void setDeliveryServiceTime(double serviceTime ){
+			this.deliveryServiceTime = serviceTime;
+		}
+		public LSPShipmentBuilder setPickupServiceTime( double serviceTime ){
+			this.pickupServiceTime = serviceTime;
+			return this;
+		}
+
+		public void addRequirement(Requirement requirement ) {
+			requirements.add(requirement);
+		}
+
+		public void addInfo(LSPInfo info ) {
+			infos.add(info);
+		}
+
+		public LSPShipment build(){
+			return new LSPShipmentImpl(this);
 		}
 	}
 }

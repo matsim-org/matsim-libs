@@ -11,7 +11,7 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.LogisticsSolution;
 import lsp.LSPInfo;
 
-public class LSPShipmentImpl implements LSPShipment {
+class LSPShipmentImpl implements LSPShipment {
 
 	private final Id<LSPShipment> id;
 	private final Id<Link> fromLinkId;
@@ -28,70 +28,7 @@ public class LSPShipmentImpl implements LSPShipment {
 	private final ArrayList<LSPInfo> infos;
 	private Id<LogisticsSolution> solutionId;
 
-	public static class LSPShipmentBuilder{
-		private final Id<LSPShipment> id;
-		private Id<Link> fromLinkId;
-		private Id<Link> toLinkId;
-		private TimeWindow startTimeWindow;
-		private TimeWindow endTimeWindow;
-		private int capacityDemand;
-		private double deliveryServiceTime;
-		private double pickupServiceTime;
-		private final ArrayList<Requirement> requirements;
-		private final ArrayList<LSPInfo> infos;
-
-		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
-			return new LSPShipmentBuilder(id);
-		}
-
-		private LSPShipmentBuilder( Id<LSPShipment> id ){
-			this.requirements = new ArrayList<>();
-			this.infos = new ArrayList<>();
-			this.id = id;
-		}
-
-		public void setFromLinkId(Id<Link> fromLinkId ){
-			this.fromLinkId = fromLinkId;
-		}
-
-		public void setToLinkId(Id<Link> toLinkId ){
-			this.toLinkId = toLinkId;
-		}
-
-		public void setStartTimeWindow(TimeWindow startTimeWindow ){
-			this.startTimeWindow = startTimeWindow;
-		}
-
-		public void setEndTimeWindow(TimeWindow endTimeWindow ){
-			this.endTimeWindow = endTimeWindow;
-		}
-
-		public void setCapacityDemand(int capacityDemand ){
-			this.capacityDemand = capacityDemand;
-		}
-
-		public void setDeliveryServiceTime(double serviceTime ){
-			this.deliveryServiceTime = serviceTime;
-		}
-		public LSPShipmentBuilder setPickupServiceTime( double serviceTime ){
-			this.pickupServiceTime = serviceTime;
-			return this;
-		}
-
-		public void addRequirement(Requirement requirement ) {
-			requirements.add(requirement);
-		}
-
-		public void addInfo(LSPInfo info ) {
-			infos.add(info);
-		}
-
-		public LSPShipment build(){
-			return new LSPShipmentImpl(this);
-		}
-	}
-
-	private LSPShipmentImpl( LSPShipmentBuilder builder ){
+	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
 		this.id = builder.id;
 		this.fromLinkId = builder.fromLinkId;
 		this.toLinkId = builder.toLinkId;

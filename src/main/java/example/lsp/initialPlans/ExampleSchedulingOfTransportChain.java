@@ -245,7 +245,7 @@ import lsp.LSPResource;
 		Random rand = new Random(1);
 		 for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 	        	int capacityDemand = rand.nextInt(10);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	

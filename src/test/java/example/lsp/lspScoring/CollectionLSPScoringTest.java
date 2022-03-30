@@ -2,7 +2,7 @@ package example.lsp.lspScoring;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.shipment.LSPShipmentImpl;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.LSPResource;
@@ -116,7 +116,7 @@ public class CollectionLSPScoringTest {
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);

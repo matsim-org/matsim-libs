@@ -163,7 +163,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		
 		 for(int i = 1; i < 100; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 	        	//Random random = new Random(1);
 	        	int capacityDemand = new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
