@@ -27,7 +27,7 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 
@@ -188,7 +188,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		int numberOfShipments = 1 + new Random().nextInt(50);
 		 for(int i = 1; i < 1 + numberOfShipments; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 	        	int capacityDemand = 1 + new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	

@@ -1,7 +1,7 @@
 package example.lsp.simulationTrackers;
 
 import lsp.controler.LSPSimulationTracker;
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 

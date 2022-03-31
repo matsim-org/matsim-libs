@@ -24,9 +24,9 @@ import com.graphhopper.jsprit.core.util.Solutions;
 
 import lsp.LogisticsSolutionElement;
 import lsp.ShipmentWithTime;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
-import lsp.resources.LSPResourceScheduler;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
 
 /**
  *  Schedules the {@link CollectionCarrierAdapter}.
@@ -56,32 +56,7 @@ import lsp.resources.LSPResourceScheduler;
 	CollectionCarrierScheduler(){
 		this.pairs = new ArrayList<>();
 	}
-	
-	
-	/*@Override
-	public void scheduleShipments(Resource resource) {
-		this.shipments = new ArrayList<ShipmentTuple>();
-		if(resource.getClass() == CollectionCarrierAdapter.class){
-			this.adapter = (CollectionCarrierAdapter) resource;
-			this.carrier = adapter.getCarrier();
-			presortIncomingShipments();	
-			
-			for(ShipmentTuple tupleToBeAssigned: shipments){
-				CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
-				carrier.getServices().add(carrierService);
-			}
-			
-			routeCarrier();
-			for(ShipmentTuple tupleToBeUpdated : shipments){
-				updateShipment(tupleToBeUpdated);
-				switchHandeledShipment(tupleToBeUpdated);
-			}
-			
-			shipments.clear();
-		}
 
-	}*/
-	
 	
 	@Override public void initializeValues( LSPResource resource ){
 		this.pairs = new ArrayList<>();

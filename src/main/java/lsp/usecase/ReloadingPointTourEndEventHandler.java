@@ -13,7 +13,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.LSPTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 /*package-private*/  class ReloadingPointTourEndEventHandler implements LSPTourEndEventHandler {
 

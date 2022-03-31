@@ -15,5 +15,4 @@ public interface ShipmentAssigner {
 
 	void assignToSolution(LSPShipment shipment);
 	void setLSP(LSP lsp);
-//	public LSP getLSP();
 }

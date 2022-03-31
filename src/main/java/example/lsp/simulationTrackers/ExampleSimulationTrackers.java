@@ -5,7 +5,7 @@ import java.util.*;
 import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.LSPShipmentImpl;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -23,8 +23,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.functions.LSPInfo;
-import lsp.resources.LSPResource;
+import lsp.LSPInfo;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /*package-private*/ class ExampleSimulationTrackers {
@@ -111,7 +111,7 @@ import lsp.shipment.LSPShipment;
 		//Create five LSPShipments that are located in the left half of the network.
 		for(int i = 1; i < 6; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(4);
 			builder.setCapacityDemand(capacityDemand);

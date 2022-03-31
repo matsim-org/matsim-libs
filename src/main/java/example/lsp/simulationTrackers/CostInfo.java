@@ -1,6 +1,6 @@
 package example.lsp.simulationTrackers;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 
 /*package-private*/ class CostInfo extends LSPInfo {
 
@@ -25,16 +25,6 @@ import lsp.functions.LSPInfo;
 	@Override
 	public String getName() {
 		return "cost_function";
-	}
-
-	@Override
-	public double getFromTime() {
-		return 0;
-	}
-
-	@Override
-	public double getToTime() {
-		return Double.MAX_VALUE;
 	}
 
 

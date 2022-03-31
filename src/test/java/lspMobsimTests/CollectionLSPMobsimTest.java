@@ -32,8 +32,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 
 public class CollectionLSPMobsimTest {
 	private static final Logger log = Logger.getLogger( CollectionLSPMobsimTest.class );
@@ -127,7 +127,7 @@ public class CollectionLSPMobsimTest {
 			ArrayList<Link> linkList = new ArrayList<>( scenario.getNetwork().getLinks().values() );
 			for( int i = 1 ; i < 2 ; i++ ){
 				Id<LSPShipment> id = Id.create( i, LSPShipment.class );
-				LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance( id );
+				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance( id );
 				//Random random = new Random(1);
 				int capacityDemand = 1 + new Random().nextInt( 4 );
 				builder.setCapacityDemand( capacityDemand );

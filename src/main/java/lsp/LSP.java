@@ -4,7 +4,6 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 
-import lsp.resources.LSPResource;
 import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
@@ -38,46 +37,21 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
 	 */
 	void scheduleSolutions();
 	
-	/**
-	 * @return
-	 *
-	 * yyyy does this have to be exposed?
-	 */
-//	ArrayList<LSPPlan> getPlans();
-	
+
 	/**
 	 * @return
 	 *
 	 * yyyy does this have to be exposed?
 	 */
 	Collection<LSPResource> getResources();
-	
-	/**
-	 * @return
-	 *
-	 * probably ok (at some point we either need to expose the next step, or the whole plan)
-	 */
-//	LSPPlan getSelectedPlan();
-	
-	/**
-	 * @param plan
-	 *
-	 * yy does it even make sense to expose this (should internally do this).  But probably easy to fix.
-	 */
-//	void setSelectedPlan( LSPPlan plan );
-	
+
+
 	/**
 	 * ok (behavioral method)
 	 */
 	void scoreSelectedPlan();
 	
-	/**
-	 * @return
-	 *
-	 * yyyy does this have to be exposed?
-	 */
-//	LSPReplanner getReplanner();
-	
+
 	/**
 	 * @param shipment
 	 *
@@ -86,13 +60,7 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
 	void assignShipmentToLSP( LSPShipment shipment );
 	
 	void replan( ReplanningEvent arg0 );
-	
-	/**
-	 * @return
-	 *
-	 * yyyy does this have to be exposed?
-	 */
-//	LSPScorer getScorer();
+
 	
 	/**
 	 * @param scorer
@@ -108,10 +76,5 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
 	 */
 	void setReplanner( LSPReplanner replanner );
 	
-	/**
-	 * @return
-	 *
-	 * yyyy does this have to be exposed?
-	 */
-//	SolutionScheduler getScheduler();
+
 }    

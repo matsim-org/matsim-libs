@@ -1,8 +1,6 @@
 package lsp;
 
-import lsp.functions.LSPInfo;
 import lsp.replanning.LSPReplanner;
-import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
@@ -68,15 +66,10 @@ public class LSPUtils{
 			return this;
 		}
 
-//		public LSPBuilder setId( Id<LSP> id ){
-//			this.id = id;
-//			return this;
-//		}
 
 		public LSP build(){
 			return new LSPImpl(this);
 		}
-
 	}
 
 	public static class LogisticsSolutionBuilder{
@@ -119,28 +112,8 @@ public class LSPUtils{
 		}
 
 		public LogisticsSolution build(){
-			//linkSolutionElements(elements);
 			return new LogisticsSolutionImpl(this);
 		}
-
-		/*private void linkSolutionElements(Collection<LogisticsSolutionElement> solutionElements){
-
-			LogisticsSolutionElement previousElement = null;
-			LogisticsSolutionElement currentElement = null;
-
-
-			for(LogisticsSolutionElement element : solutionElements){
-				if((previousElement == null) && (currentElement == null)){
-					previousElement = element;
-				}
-				else{
-					currentElement = element;
-					previousElement.connectWithNextElement(currentElement);
-					currentElement.setPreviousElement(previousElement);
-					previousElement = currentElement;
-				}
-			}
-		}*/
 	}
 
 	public static class LogisticsSolutionElementBuilder{

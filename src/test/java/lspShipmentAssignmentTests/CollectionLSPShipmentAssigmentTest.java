@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
-import lsp.shipment.LSPShipmentImpl;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,10 +20,9 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
 public class CollectionLSPShipmentAssigmentTest {
@@ -98,7 +97,7 @@ public class CollectionLSPShipmentAssigmentTest {
 
 		for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = new Random().nextInt(10);
         	builder.setCapacityDemand(capacityDemand);
         	

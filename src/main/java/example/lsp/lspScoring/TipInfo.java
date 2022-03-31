@@ -1,6 +1,6 @@
 package example.lsp.lspScoring;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 
 /*package-private*/ class TipInfo extends LSPInfo {
 
@@ -11,16 +11,6 @@ import lsp.functions.LSPInfo;
 	public String getName() {
 		String name = "TIPINFO";
 		return name;
-	}
-
-	@Override
-	public double getFromTime() {
-		return 0;
-	}
-
-	@Override
-	public double getToTime() {
-		return Double.MAX_VALUE;
 	}
 
 	@Override

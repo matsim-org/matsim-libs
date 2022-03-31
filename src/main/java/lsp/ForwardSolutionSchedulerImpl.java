@@ -2,7 +2,6 @@ package lsp;
 
 import java.util.ArrayList;
 
-import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /**
@@ -13,7 +12,7 @@ import lsp.shipment.LSPShipment;
  * 3.) the Resources are brought into the right sequence according to the algorithm.
  *
  * When traversing this list of {@link LSPResource}s, the operations in
- * each {@link LSPResource} are scheduled individually by calling their {@link lsp.resources.LSPResourceScheduler}.
+ * each {@link LSPResource} are scheduled individually by calling their {@link LSPResourceScheduler}.
  */
 /* package-private */ class ForwardSolutionSchedulerImpl implements SolutionScheduler {
 

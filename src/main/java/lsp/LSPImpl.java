@@ -7,7 +7,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
 
-import lsp.resources.LSPResource;
 import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
@@ -147,10 +146,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}	
 	}
 	
-//	public LSPReplanner getReplanner() {
-//		return replanner;
-//	}
-
 
 	@Override
 	public void assignShipmentToLSP(LSPShipment shipment) {
@@ -165,11 +160,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 
-//	@Override
-//	public LSPScorer getScorer() {
-//		return scorer;
-//	}
-
 	@Override
 	public void setScorer(LSPScorer scorer) {
 		this.scorer =  scorer;
@@ -182,10 +172,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 
-//	@Override
-//	public SolutionScheduler getScheduler() {
-//		return solutionScheduler;
-//	}
 	
 	@Override
 	public Collection<LSPShipment> getShipments() {

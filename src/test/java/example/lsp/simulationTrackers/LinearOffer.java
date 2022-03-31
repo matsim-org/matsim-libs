@@ -4,7 +4,7 @@ import demand.decoratedLSP.LSPDecorator;
 import demand.decoratedLSP.LogisticsSolutionDecorator;
 import demand.offer.Offer;
 import demand.offer.OfferVisitor;
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 
 import java.util.Random;
 

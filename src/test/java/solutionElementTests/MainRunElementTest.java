@@ -19,7 +19,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 public class MainRunElementTest {
 

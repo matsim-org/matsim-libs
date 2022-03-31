@@ -6,7 +6,7 @@ import lsp.LSP;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.SolutionScheduler;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /**

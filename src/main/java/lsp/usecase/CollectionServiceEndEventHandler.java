@@ -7,8 +7,8 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 
 class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 

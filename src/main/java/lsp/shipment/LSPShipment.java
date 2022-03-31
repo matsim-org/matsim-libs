@@ -8,7 +8,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LogisticsSolution;
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 
 public interface LSPShipment {
 
@@ -35,13 +35,9 @@ public interface LSPShipment {
 	Collection<EventHandler> getEventHandlers();
 	
 	Collection<Requirement> getRequirements();
-	
-//	Collection<UtilityFunction> getUtilityFunctions();
-	
+
 	Collection<LSPInfo> getInfos();
 	
 	Id<LogisticsSolution> getSolutionId();
-	
-//	void setSolutionId(Id<LogisticsSolution> Id);
-	
+
 }

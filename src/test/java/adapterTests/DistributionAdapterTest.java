@@ -17,8 +17,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 

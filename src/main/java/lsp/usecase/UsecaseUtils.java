@@ -1,8 +1,8 @@
 package lsp.usecase;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
-import lsp.resources.LSPResourceScheduler;
+import lsp.LSPResource;
+import lsp.LSPResourceScheduler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;

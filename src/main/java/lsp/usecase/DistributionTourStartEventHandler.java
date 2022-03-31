@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.LSPTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPCarrierResource;
+import lsp.LSPCarrierResource;
 
 /*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler {
 
@@ -30,7 +30,6 @@ import lsp.resources.LSPCarrierResource;
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -69,7 +68,7 @@ import lsp.resources.LSPCarrierResource;
 		builder.setLogisticsSolutionElement(element);
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());
-		LoggedShipmentTransport transport = builder.build();
+		ShipmentPlanElement transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);

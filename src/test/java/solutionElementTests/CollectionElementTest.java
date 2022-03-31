@@ -3,7 +3,7 @@ package solutionElementTests;
 import static org.junit.Assert.*;
 
 import lsp.LSPUtils;
-import lsp.resources.LSPCarrierResource;
+import lsp.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,11 +16,10 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 public class CollectionElementTest {
 

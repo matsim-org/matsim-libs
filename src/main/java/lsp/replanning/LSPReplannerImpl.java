@@ -19,7 +19,6 @@ class LSPReplannerImpl implements LSPReplanner{
 	}
 	
 	public LSPReplannerImpl() {
-		
 	}
 	
 	@Override

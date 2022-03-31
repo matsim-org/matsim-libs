@@ -8,9 +8,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
 /**

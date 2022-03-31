@@ -1,7 +1,7 @@
 package solutionElementTests;
 
 import lsp.LSPUtils;
-import lsp.resources.LSPCarrierResource;
+import lsp.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 import static org.junit.Assert.*;
 

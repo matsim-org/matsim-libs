@@ -6,7 +6,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 
 public final class ScheduledShipmentTransport implements ShipmentPlanElement {
 	// yyyy cannot make package-private since used in one instanceof outside package.  kai, jun'20

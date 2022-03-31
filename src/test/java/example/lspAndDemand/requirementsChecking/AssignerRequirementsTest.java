@@ -1,9 +1,9 @@
 package example.lspAndDemand.requirementsChecking;
 
 import lsp.*;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class AssignerRequirementsTest {
 	    
 	    for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = rand.nextInt(10);
         	builder.setCapacityDemand(capacityDemand);
         	

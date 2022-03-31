@@ -2,9 +2,9 @@ package lsp.controler;
 
 
 import lsp.*;
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 import lsp.replanning.LSPReplanningModule;
-import lsp.resources.LSPCarrierResource;
+import lsp.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
 import org.matsim.contrib.freight.carrier.Carrier;

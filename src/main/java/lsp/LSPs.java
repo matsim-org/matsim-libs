@@ -20,9 +20,6 @@ public class LSPs {
 		}
 	}
 
-//	public LSPs() {
-//
-//	}
 
 	public Map<Id<LSP>, LSP> getLSPs() {
 		return lsps;

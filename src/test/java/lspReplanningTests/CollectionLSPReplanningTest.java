@@ -10,7 +10,7 @@ import lsp.*;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.LSPShipmentImpl;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,12 +26,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.resources.LSPResource;
+import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
 public class CollectionLSPReplanningTest {
@@ -111,7 +110,7 @@ public class CollectionLSPReplanningTest {
 
 		for(int i = 1; i < 21; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	LSPShipmentImpl.LSPShipmentBuilder builder = LSPShipmentImpl.LSPShipmentBuilder.newInstance(id );
+        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	Random random = new Random(1);
         	int capacityDemand = random.nextInt(10);
         	builder.setCapacityDemand(capacityDemand);

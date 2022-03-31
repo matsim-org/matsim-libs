@@ -10,10 +10,10 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class MainRunCarrierAdapter implements LSPCarrierResource {

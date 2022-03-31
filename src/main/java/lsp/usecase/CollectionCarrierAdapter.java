@@ -11,10 +11,10 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.LSPInfo;
+import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.LSPCarrierResource;
-import lsp.resources.LSPResource;
+import lsp.LSPCarrierResource;
+import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class CollectionCarrierAdapter implements LSPCarrierResource {
@@ -30,7 +30,6 @@ import lsp.controler.LSPSimulationTracker;
 
 	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
 		this.id = builder.id;
-		Id<Link> locationLinkId = builder.locationLinkId;
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
