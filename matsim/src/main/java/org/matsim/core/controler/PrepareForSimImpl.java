@@ -114,20 +114,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
-		//As the routing modules find nearest links anyways, I do not think using a filtered carOnlyNetwork is needed anymore.
+
+		//As the routing modules find nearest links anyways, I do not think using a filtered single-mode network (in this case: carOnlyNetwork) is needed anymore.
 		//The routing modules even use the mode filtered networks for each mode, which seems to be way more useful e.g. for scenarios
 		//with superblocks -sm march22
 		final Network net = network;
-//		if (NetworkUtils.isMultimodal(network)) {
-//			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-//			carOnlyNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
-//			HashSet<String> modes = new HashSet<>();
-//			modes.add(TransportMode.car);
-//			filter.filter(carOnlyNetwork, modes);
-//		} else {
-//			carOnlyNetwork = network;
-//		}
 
 		//matsim-724
 		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
