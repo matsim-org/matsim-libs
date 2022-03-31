@@ -18,38 +18,50 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.drt.extension.preplanned.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import static org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDrtOptimizer.PreplannedSchedules;
+
+import java.net.URL;
+import java.util.Map;
+
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * @author michal.mac
  */
-public class TaxiControlerCreator {
-	/**
-	 * Creates a controller in one step.
-	 *
-	 * @param config
-	 * @param otfvis
-	 * @return
-	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+public class RunPreplannedDrtExample {
+	public static void run(URL configUrl, boolean otfvis, int lastIteration,
+			Map<String, PreplannedSchedules> preplannedSchedulesByMode) {
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
 
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeTaxiModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config)));
+		Controler controler = PreplannedDrtControlerCreator.createControler(config, otfvis);
+
+		MultiModeDrtConfigGroup.get(config)
+				.getModalElements()
+				.stream()
+				.map(DrtConfigGroup::getMode)
+				.forEach(mode -> controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(mode) {
+					@Override
+					protected void configureQSim() {
+						bindModal(PreplannedSchedules.class).toInstance(preplannedSchedulesByMode.get(mode));
+					}
+				}));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
-		return controler;
+
+		controler.run();
 	}
 }
