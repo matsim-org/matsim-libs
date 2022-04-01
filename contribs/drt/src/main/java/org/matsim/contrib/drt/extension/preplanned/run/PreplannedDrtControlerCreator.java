@@ -20,11 +20,14 @@
 /**
  *
  */
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.extension.preplanned.run;
+
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.routing.DrtRouteFactory;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -36,21 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
-public final class DrtControlerCreator {
-	/**
-	 * Creates a standard scenario and adds a DRT route factory to the route factories.
-	 *
-	 * @param config
-	 * @return
-	 */
-	public static Scenario createScenarioWithDrtRouteFactory(Config config) {
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		scenario.getPopulation()
-				.getFactory()
-				.getRouteFactories()
-				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		return scenario;
-	}
+public final class PreplannedDrtControlerCreator {
 
 	/**
 	 * Creates a controller in one step.
@@ -68,7 +57,7 @@ public final class DrtControlerCreator {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
+		controler.addOverridingModule(new MultiModePreplannedDrtModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
 		if (otfvis) {

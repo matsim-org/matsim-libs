@@ -38,6 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.ByteArrayInputStream;
@@ -321,4 +322,58 @@ public class PopulationV6IOTest {
 
 		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
+
+	@Test
+	public void testSingleActivityLocationInfoIO() {
+		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		PopulationFactory pf = population.getFactory();
+
+		Person person1 = pf.createPerson(Id.create("1", Person.class));
+		Plan plan = pf.createPlan();
+		Id<ActivityFacility> facilityId = Id.create("home_1", ActivityFacility.class);
+		Activity act1 = pf.createActivityFromActivityFacilityId("home", facilityId);
+		act1.setEndTime(8 * 3600);
+		Leg leg1 = pf.createLeg("car");
+		Coord coord = new Coord(1000, 1000);
+		Activity act2 = pf.createActivityFromCoord("work", coord);
+		act2.setEndTime(16 * 3600);
+		Leg leg2 = pf.createLeg("car");
+		Id<Link> linkId = Id.createLinkId("link_1");
+		Activity act3 = pf.createActivityFromLinkId("work", linkId);
+		act2.setEndTime(24 * 3600);
+
+		plan.addActivity(act1);
+		plan.addLeg(leg1);
+		plan.addActivity(act2);
+		plan.addLeg(leg2);
+		plan.addActivity(act3);
+		person1.addPlan(plan);
+		population.addPerson(person1);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		new PopulationWriter(population).write(out);
+
+		// ----
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+		new PopulationReader(scenario).parse(in);
+
+		Person p1 = scenario.getPopulation().getPersons().get(person1.getId());
+		Plan pp1 = p1.getPlans().get(0);
+
+		Assert.assertEquals(((Activity) pp1.getPlanElements().get(0)).getFacilityId(), facilityId);
+		Assert.assertNull(((Activity) pp1.getPlanElements().get(0)).getCoord());
+		Assert.assertNull(((Activity) pp1.getPlanElements().get(0)).getLinkId());
+
+		Assert.assertNull(((Activity) pp1.getPlanElements().get(2)).getFacilityId());
+		Assert.assertEquals(((Activity) pp1.getPlanElements().get(2)).getCoord(), coord);
+		Assert.assertNull(((Activity) pp1.getPlanElements().get(2)).getLinkId());
+
+		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getFacilityId());
+		Assert.assertNull(((Activity) pp1.getPlanElements().get(4)).getCoord());
+		Assert.assertEquals(((Activity) pp1.getPlanElements().get(4)).getLinkId(), linkId);
+	}
+
 }

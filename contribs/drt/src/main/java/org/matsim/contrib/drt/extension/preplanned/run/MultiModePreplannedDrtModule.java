@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,38 +18,36 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.drt.extension.preplanned.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDrtModeOptimizerQSimModule;
+import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtModeModule;
+import org.matsim.contrib.drt.run.DrtModeQSimModule;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.MainModeIdentifier;
+
+import com.google.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class TaxiControlerCreator {
-	/**
-	 * Creates a controller in one step.
-	 *
-	 * @param config
-	 * @param otfvis
-	 * @return
-	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+public class MultiModePreplannedDrtModule extends AbstractModule {
 
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeTaxiModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config)));
+	@Inject
+	private MultiModeDrtConfigGroup multiModeDrtCfg;
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
+	@Override
+	public void install() {
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+			install(new DrtModeModule(drtCfg));
+			installQSimModule(new DrtModeQSimModule(drtCfg, new PreplannedDrtModeOptimizerQSimModule(drtCfg)));
+			install(new DrtModeAnalysisModule(drtCfg));
 		}
-		return controler;
+
+		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 	}
 }
