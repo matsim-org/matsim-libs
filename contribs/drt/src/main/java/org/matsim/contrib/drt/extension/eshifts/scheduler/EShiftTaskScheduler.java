@@ -95,7 +95,11 @@ public class EShiftTaskScheduler {
 				veh.getSchedule()
 						.addTask(taskFactory.createWaitForShiftStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
 								veh.getStartLink(), operationFacility));
-				operationFacility.register(veh.getId());
+				boolean success = operationFacility.register(veh.getId());
+				if(!success) {
+					throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
+							"facility capacity and initial fleet distribution.", veh.getId().toString(), operationFacility.getId().toString()));
+				}
 			} catch (Throwable throwable) {
 				throwable.printStackTrace();
 			}
