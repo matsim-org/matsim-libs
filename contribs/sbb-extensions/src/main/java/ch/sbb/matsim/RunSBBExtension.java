@@ -38,7 +38,7 @@ public class RunSBBExtension {
 
         // To use the deterministic pt simulation (Part 2 of 2):
         controler.configureQSimComponents(components -> {
-            SBBTransitEngineQSimModule.configure(components);
+            new SBBTransitEngineQSimModule().configure(components);
 
             // if you have other extensions that provide QSim components, call their configure-method here
         });
