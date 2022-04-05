@@ -59,6 +59,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		builder.start = copy.getStartTime();
 		builder.end = copy.getEndTime();
 		builder.shiftBreak = copy.getBreak().orElse(null);
+		builder.operationFacilityId = copy.getOperationFacilityId().orElse(null);
 		return builder;
 	}
 
