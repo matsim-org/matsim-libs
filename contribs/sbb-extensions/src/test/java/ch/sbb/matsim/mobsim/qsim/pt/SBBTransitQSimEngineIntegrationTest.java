@@ -36,7 +36,7 @@ public class SBBTransitQSimEngineIntegrationTest {
         Controler controler = new Controler(f.scenario);
         controler.addOverridingModule(new SBBTransitModule());
         controler.configureQSimComponents(components -> {
-            new SBBTransitEngineQSimModule();
+            new SBBTransitEngineQSimModule().configure(components);
         });
 
         controler.run();
@@ -65,7 +65,7 @@ public class SBBTransitQSimEngineIntegrationTest {
         Controler controler = new Controler(f.scenario);
         controler.addOverridingModule(new SBBTransitModule());
         controler.configureQSimComponents(components -> {
-            new SBBTransitEngineQSimModule();
+            new SBBTransitEngineQSimModule().configure(components);
         });
 
         try {
