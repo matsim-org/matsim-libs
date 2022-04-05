@@ -92,21 +92,23 @@ import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
 /**
- * @author: Ricardo Ewert TODO
+ * @author: Ricardo Ewert. The class generates a freight demand based on the
+ *          selected input options and the read input files. The format and
+ *          column titles of the input csv should not be changed. The format of
+ *          these files are given in the example project. See: TODO
  */
-@CommandLine.Command(name = "generate-freight-demand", description = "Generate freigt demand", showDefaultValues = true)
+@CommandLine.Command(name = "generate-freight-demand", description = "The class generates a freight demand based on the\r\n"
+		+ " *          selected input options and the read input files. The format and\r\n"
+		+ " *          column titles of the input csv should not be changed. The format of\r\n"
+		+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
 public class FreightDemandGeneration implements Callable<Integer> {
 
-	private enum NetworkChoice {
-		grid9x9, berlinNetwork, otherNetwork
-	}
-
 	private enum CarrierInputOptions {
-		readCarrierFile, createFromCSV, addCSVDataToExistingCarrierFileData
+		readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData
 	}
 
 	private enum DemandGenerationOptions {
-		useDemandFromCarrierFile, createFromCSV, createFromCSVAndUsePopulation
+		useDemandFromCarrierFile, createDemandFromCSV, createDemandFromCSVAndUsePopulation
 	}
 
 	private enum PopulationOptions {
@@ -123,73 +125,68 @@ public class FreightDemandGeneration implements Callable<Integer> {
 	}
 
 	private static final Logger log = LogManager.getLogger(FreightDemandGeneration.class);
-	private static final String inputBerlinNetwork = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz";
-	private static final String inputGridNetwork = "https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 
-	@CommandLine.Option(names = "--carrierFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/carrier_berlin_noDemand.xml", description = "Location of the carrierFile.")
+	@CommandLine.Option(names = "--carrierFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/carrier_berlin_noDemand.xml", description = "Path to the carrierFile.")
 	private static Path carrierFilePath;
 
-	@CommandLine.Option(names = "--carrierVehicleFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/vehicleTypes_default.xml", description = "Location of the carrierVehcileFile.")
+	@CommandLine.Option(names = "--carrierVehicleFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/vehicleTypes_default.xml", description = "Path to the carrierVehcileFile.")
 	private static Path carrierVehicleFilePath;
 
-	@CommandLine.Option(names = "--shapeFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/shp/Berlin_Ortsteile.shp", description = "Location of the shape file.")
+	@CommandLine.Option(names = "--shapeFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/shp/Berlin_Ortsteile.shp", description = "Path to the shape file.")
 	private static Path shapeFilePath;
 
 	@CommandLine.Option(names = "--shapeCRS", defaultValue = "EPSG:3857", description = "CRS of the shape file.")
 	private static String shapeCRS;
 
-	@CommandLine.Option(names = "--populationFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/input/berlin-v5.5-1pct.plans.xml.gz", description = "Location of the population.")
+	@CommandLine.Option(names = "--populationFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/input/berlin-v5.5-1pct.plans.xml.gz", description = "Path to the population file.")
 	private static Path populationFilePath;
 
-	@CommandLine.Option(names = "--network", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz", description = "Path to desired network file", required = true)
+	@CommandLine.Option(names = "--network", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz", description = "Path to desired network file")
 	private static Path networkPath;
 
-	@CommandLine.Option(names = "--networkCRS", defaultValue = "EPSG:31468", description = "CRS of the network.")
+	@CommandLine.Option(names = "--networkCRS", defaultValue = "EPSG:31468", description = "CRS of the input network (e.g.\"EPSG:31468\"")
 	private static String networkCRS;
 
-	@CommandLine.Option(names = "--networkChangeEvents", defaultValue = "", description = "Path to desired networkChangeEventsFile")
+	@CommandLine.Option(names = "--networkChangeEvents", defaultValue = "", description = "Set path to desired networkChangeEvents file if you want to use network change Events")
 	private static Path networkChangeEventsPath;
 
 	@CommandLine.Option(names = "--output", defaultValue = "output/demandGeneration/", description = "Path to output folder", required = true)
 	private static Path outputLocation;
 
-	@CommandLine.Option(names = "--networkOption", defaultValue = "berlinNetwork", description = "Set the network choice.")
-	private static NetworkChoice selectedNetwork;
-
-	@CommandLine.Option(names = "--carrierOption", defaultValue = "createFromCSV", description = "Set the choice of getting/creating carrier.")
+	@CommandLine.Option(names = "--carrierOption", defaultValue = "createFromCSV", description = "Set the choice of getting/creating carrier. Options: readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData", required = true)
 	private static CarrierInputOptions selectedCarrierInputOption;
 
-	@CommandLine.Option(names = "--inputCarrierCSV", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/exampleCarrier.csv", description = "Path to input carrier CSV")
+	@CommandLine.Option(names = "--inputCarrierCSV", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/exampleCarrier.csv", description = "Path to input carrier CSV, if you want to read it.")
 	private static Path csvCarrierPath;
 
-	@CommandLine.Option(names = "--inputDemandCSV", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/exampleDemand.csv", description = "Path to input demand CSV")
+	@CommandLine.Option(names = "--inputDemandCSV", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/exampleDemand.csv", description = "Path to input demand CSV, if you want to create a new demand based on the csv.")
 	private static Path csvDemandPath;
 
-	@CommandLine.Option(names = "--demandOption", defaultValue = "createFromCSV", description = "Select the option of demand generation.")
+	@CommandLine.Option(names = "--demandOption", defaultValue = "createFromCSV", description = "Select the option of demand generation. Options: useDemandFromCarrierFile, createDemandFromCSV, createDemandFromCSVAndUsePopulation", required = true)
 	private static DemandGenerationOptions selectedDemandGenerationOption;
 
-	@CommandLine.Option(names = "--populationOption", defaultValue = "usePopulationInShape", description = "Select the option of using the population.")
+	@CommandLine.Option(names = "--populationOption", defaultValue = "usePopulationInShape", description = "Select the option of using the population. Options: usePopulationHolePopulation, usePopulationInShape", required = true)
 	private static PopulationOptions selectedPopulationOption;
 
-	@CommandLine.Option(names = "--populationSamplingOption", defaultValue = "createMoreLocations", description = "Select the option of sampling if using the population.")
+	@CommandLine.Option(names = "--populationSamplingOption", defaultValue = "createMoreLocations", description = "Select the option of sampling if using a population. Options: createMoreLocations, increaseDemandOnLocation", required = true)
 	private static PopulationSamplingOption selectedPopulationSamplingOption;
 
 	@CommandLine.Option(names = "--populationSample", defaultValue = "0.01", description = "Sample of the selected population.")
 	private static double sampleSizeInputPopulation;
 
-	@CommandLine.Option(names = "--populationSamplingTo", defaultValue = "0.1", description = "Sample the population to this value.")
+	@CommandLine.Option(names = "--populationSamplingTo", defaultValue = "0.1", description = "Set the sample of the gerated demand.")
 	private static double upSamplePopulationTo;
 
 	@CommandLine.Option(names = "--populationCRS", defaultValue = "DHDN_GK4", description = "CRS of the population.")
 	private static String populationCRS;
 
-	@CommandLine.Option(names = "--combineSimilarJobs", defaultValue = "false", description = "Select the option if created jobs of the same carrier with same location and time will be combined.")
+	@CommandLine.Option(names = "--combineSimilarJobs", defaultValue = "false", description = "Select the option if created jobs of the same carrier with same location and time will be combined. Options: true, false", required = true)
 	private static boolean combineSimilarJobs;
 
 	@CommandLine.Option(names = "--defaultJspriIterations", defaultValue = "3", description = "Set the default number of jsprit iterations.")
 	private static int defaultJspritIterations;
 
-	@CommandLine.Option(names = "--VRPSolutionsOption", defaultValue = "runJspritAndMATSim", description = "Select the option of solving the VRP.")
+	@CommandLine.Option(names = "--VRPSolutionsOption", defaultValue = "runJspritAndMATSim", description = "Select the option of solving the VRP. Options: runJspritAndMATSim, runJspritAndMATSimWithDistanceConstraint, runJsprit, runJspritWithDistanceConstraint, createNoSolutionAndOnlyWriteCarrierFile", required = true)
 	private static OptionsOfVRPSolutions selectedSolution;
 
 	public static void main(String[] args) {
@@ -217,8 +214,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 		// select network configurations
 		String networkPathOfOtherNetwork = networkPath.toString();
 		String networkChangeEventsFilePath = networkChangeEventsPath.toString();
-		setNetworkAndNetworkChangeEvents(config, selectedNetwork, networkPathOfOtherNetwork,
-				networkChangeEventsFilePath);
+		setNetworkAndNetworkChangeEvents(config, networkPathOfOtherNetwork, networkChangeEventsFilePath);
 
 		// load or create carrierVehicle
 		log.info("Start creating carriers. Selected option: " + selectedCarrierInputOption);
@@ -252,7 +248,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 		createDemandLocationsFile(controler);
 		solveSelectedSolution(selectedSolution, config, controler);
 
-		//TODO analyze results
+		// TODO analyze results
 
 		log.info("Finished");
 		return 0;
@@ -301,58 +297,29 @@ public class FreightDemandGeneration implements Callable<Integer> {
 	}
 
 	/**
-	 * Differs between the different options of the used network.
+	 * Sets the network and the networkChangeEvents if the are available.
 	 * 
 	 * @param config
-	 * @param networkChoice
 	 * @param networkPathOfOtherNetwork
 	 * @param networkChangeEventsFileLocation
 	 * @throws RuntimeException
 	 */
-	private static void setNetworkAndNetworkChangeEvents(Config config, NetworkChoice networkChoice,
-			String networkPathOfOtherNetwork, String networkChangeEventsFileLocation) throws RuntimeException {
-		switch (networkChoice) {
-		case grid9x9:
-			config.network().setInputFile(inputGridNetwork);
-			log.info("The following input network is selected: 9x9 grid network");
-			if (networkChangeEventsFileLocation.equals(""))
-				log.info("No networkChangeEvents selected");
-			else {
-				log.info("Setting networkChangeEventsInput file: " + networkChangeEventsFileLocation);
-				config.network().setTimeVariantNetwork(true);
-				config.network().setChangeEventsInputFile(networkChangeEventsFileLocation);
-			}
-			break;
-		case berlinNetwork:
-			config.network().setInputFile(inputBerlinNetwork);
-			log.info("The following input network is selected: Open Berlin network");
-			if (networkChangeEventsFileLocation.equals(""))
-				log.info("No networkChangeEvents selected");
-			else {
-				log.info("Setting networkChangeEventsInput file: " + networkChangeEventsFileLocation);
-				config.network().setTimeVariantNetwork(true);
-				config.network().setChangeEventsInputFile(networkChangeEventsFileLocation);
-			}
-			break;
-		case otherNetwork:
-			if (networkPathOfOtherNetwork.equals(""))
-				throw new RuntimeException("no correct network path network");
-			else {
-				config.network().setInputFile(networkPathOfOtherNetwork);
-				log.info("The following input network is selected: imported network from " + networkPathOfOtherNetwork);
-				if (networkChangeEventsFileLocation.equals(""))
-					log.info("No networkChangeEvents selected");
-				else {
-					log.info("Setting networkChangeEventsInput file: " + networkChangeEventsFileLocation);
-					config.network().setTimeVariantNetwork(true);
-					config.network().setChangeEventsInputFile(networkChangeEventsFileLocation);
-				}
-			}
-			break;
-		default:
-			throw new RuntimeException("no network selected.");
-		}
+	private static void setNetworkAndNetworkChangeEvents(Config config, String networkPathOfOtherNetwork,
+			String networkChangeEventsFileLocation) throws RuntimeException {
 
+		if (networkPathOfOtherNetwork.equals(""))
+			throw new RuntimeException("no correct network path network");
+		else {
+			config.network().setInputFile(networkPathOfOtherNetwork);
+			log.info("The following input network is selected: imported network from " + networkPathOfOtherNetwork);
+			if (networkChangeEventsFileLocation.equals(""))
+				log.info("No networkChangeEvents selected");
+			else {
+				log.info("Setting networkChangeEventsInput file: " + networkChangeEventsFileLocation);
+				config.network().setTimeVariantNetwork(true);
+				config.network().setChangeEventsInputFile(networkChangeEventsFileLocation);
+			}
+		}
 	}
 
 	/**
@@ -372,7 +339,9 @@ public class FreightDemandGeneration implements Callable<Integer> {
 		}
 	}
 
-	/** Differs between the different options of creating the carrier.
+	/**
+	 * Differs between the different options of creating the carrier.
+	 * 
 	 * @param scenario
 	 * @param selectedCarrierInputOption
 	 * @param carriersFileLocation
@@ -391,6 +360,8 @@ public class FreightDemandGeneration implements Callable<Integer> {
 				FreightConfigGroup.class);
 		switch (selectedCarrierInputOption) {
 		case addCSVDataToExistingCarrierFileData:
+			// reads an existing carrier file and adds the information based on the read csv
+			// carrier file
 			if (carriersFileLocation == "")
 				throw new RuntimeException("No path to the carrier file selected");
 			else {
@@ -402,6 +373,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 			}
 			break;
 		case readCarrierFile:
+			// reads only a carrier file as the carrier import.
 			if (carriersFileLocation == "")
 				throw new RuntimeException("No path to the carrier file selected");
 			else {
@@ -410,7 +382,8 @@ public class FreightDemandGeneration implements Callable<Integer> {
 				log.info("Load carriers from: " + carriersFileLocation);
 			}
 			break;
-		case createFromCSV:
+		case createCarriersFromCSV:
+			// creates all carriers based on the given information in the read carrier csv
 			readAndCreateCarrierFromCSV(scenario, allNewCarrier, freightConfigGroup, csvLocationCarrier,
 					polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape);
 			break;
@@ -419,7 +392,9 @@ public class FreightDemandGeneration implements Callable<Integer> {
 		}
 	}
 
-	/** Differs between the different options of creating the demand..
+	/**
+	 * Differs between the different options of creating the demand..
+	 * 
 	 * @param selectedDemandGenerationOption
 	 * @param scenario
 	 * @param csvLocationDemand
@@ -438,44 +413,65 @@ public class FreightDemandGeneration implements Callable<Integer> {
 
 		Set<NewDemand> demandInformation = new HashSet<>();
 		switch (selectedDemandGenerationOption) {
-		case createFromCSV:
+		case createDemandFromCSV:
+			// creates the demand by using the information given in the read csv file
 			demandInformation = readDemandInformation(csvLocationDemand, demandInformation, scenario, polygonsInShape);
 			createDemandForCarriers(scenario, polygonsInShape, demandInformation, null, combineSimilarJobs,
 					crsTransformationNetworkAndShape);
 			break;
-		case createFromCSVAndUsePopulation:
+		case createDemandFromCSVAndUsePopulation:
+			/*
+			 * Option creates the demand by using the information given in the read csv file
+			 * and uses a population for finding demand locations
+			 */
 			Population population = PopulationUtils.readPopulation(populationFile);
-
 			demandInformation = readDemandInformation(csvLocationDemand, demandInformation, scenario, polygonsInShape);
 			switch (selectedSamplingOption) {
+			/*
+			 * this option is important if the sample of the population and the sample of
+			 * the resulting demand is different. For example you can create with a 10pct
+			 * sample a 100pct demand modal for the waste collection.
+			 */
 			case createMoreLocations:
+				/*
+				 * If the demand sample is higher then the population sample, more demand
+				 * location are created related to the given share of persons of the population
+				 * with this demand.
+				 */
 				preparePopulation(population, sampleSizeInputPopulation, upSamplePopulationTo,
 						"changeNumberOfLocationsWithDemand");
 				break;
 			case increaseDemandOnLocation:
+				/*
+				 * If the demand sample is higher then the population sample, the demand per
+				 * person will be increased.
+				 */
 				preparePopulation(population, sampleSizeInputPopulation, upSamplePopulationTo,
 						"changeDemandOnLocation");
 				break;
 			default:
-				break;
+				throw new RuntimeException("No valid sampling option selected!");
 			}
 
 			switch (selectedPopulationOption) {
 			case usePopulationHolePopulation:
+				// uses the hole population as possible demand locations
 				createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, combineSimilarJobs,
 						crsTransformationNetworkAndShape);
 				break;
 			case usePopulationInShape:
+				// uses only the population with home location in the given shape file
 				CrsOptions populationCRSOptions = new CrsOptions(populationCRS, shapeCRS);
 				reducePopulationToShapeArea(population, populationCRSOptions.getTransformation(), polygonsInShape);
 				createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, combineSimilarJobs,
 						crsTransformationNetworkAndShape);
 				break;
 			default:
-				break;
+				throw new RuntimeException("No valid population option selected!");
 			}
 			break;
 		case useDemandFromCarrierFile:
+			// use only the given demand of the read carrier file
 			boolean oneCarrierHasJobs = false;
 			for (Carrier carrier : FreightUtils.getCarriers(scenario).getCarriers().values())
 				if (carrier.getServices().isEmpty() && carrier.getShipments().isEmpty())
@@ -488,7 +484,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 				throw new RuntimeException("Minimum one carrier has no jobs");
 			break;
 		default:
-			break;
+			throw new RuntimeException("No valid demand generation option selected!");
 		}
 	}
 
@@ -1548,6 +1544,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 			Controler controler) throws InvalidAttributeValueException, ExecutionException, InterruptedException {
 		switch (selectedSolution) {
 		case runJspritAndMATSim:
+			// solves the VRP with jsprit and runs MATSim afterwards
 			new CarrierPlanXmlWriterV2((Carriers) controler.getScenario().getScenarioElement("carriers"))
 					.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
 			runJsprit(controler, false);
@@ -1556,6 +1553,8 @@ public class FreightDemandGeneration implements Callable<Integer> {
 					.write(config.controler().getOutputDirectory() + "/output_carriersWithPlans.xml");
 			break;
 		case runJspritAndMATSimWithDistanceConstraint:
+			// solves the VRP with jsprit by using the distance constraint and runs MATSim
+			// afterwards
 			new CarrierPlanXmlWriterV2((Carriers) controler.getScenario().getScenarioElement("carriers"))
 					.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
 			runJsprit(controler, true);
@@ -1564,6 +1563,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 					.write(config.controler().getOutputDirectory() + "/output_carriersWithPlans.xml");
 			break;
 		case runJsprit:
+			// solves only the VRP with jsprit
 			new CarrierPlanXmlWriterV2((Carriers) controler.getScenario().getScenarioElement("carriers"))
 					.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
 			runJsprit(controler, false);
@@ -1574,6 +1574,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 			System.exit(0);
 			break;
 		case runJspritWithDistanceConstraint:
+			// solves only the VRP with jsprit by using the distance constraint
 			new CarrierPlanXmlWriterV2((Carriers) controler.getScenario().getScenarioElement("carriers"))
 					.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
 			runJsprit(controler, true);
@@ -1584,6 +1585,8 @@ public class FreightDemandGeneration implements Callable<Integer> {
 			System.exit(0);
 			break;
 		case createNoSolutionAndOnlyWriteCarrierFile:
+			// creates no solution of the VRP and only writes the carrier file with the
+			// generated carriers and demands
 			new CarrierPlanXmlWriterV2((Carriers) controler.getScenario().getScenarioElement("carriers"))
 					.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
 			log.warn(
