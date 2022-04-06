@@ -16,7 +16,7 @@ public class SharingPickupEvent extends AbstractSharingEvent {
 
 	public SharingPickupEvent(double time, Id<SharingService> serviceId, Id<Person> personId, Id<Link> linkId,
 			Id<SharingVehicle> vehicleId, Optional<Id<SharingStation>> stationId) {
-		super(time, serviceId, personId, linkId, Optional.of(vehicleId), stationId, Optional.ofNullable(null));
+		super(time, serviceId, personId, linkId, Optional.of(vehicleId), stationId, Optional.empty());
 		this.sharingVehicleId = vehicleId;
 	}
 
