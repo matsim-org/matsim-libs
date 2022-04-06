@@ -20,14 +20,8 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
@@ -54,7 +48,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private static final  Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
 
 	/**
-	 * Candidate to change mode-choice
+	 * Candidate to change mode-choice,
 	 */
 	public static class Candidate {
 		final Subtour subtour;
@@ -65,6 +59,19 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				final String newTransportMode) {
 			this.subtour = subtour;
 			this.newTransportMode = newTransportMode;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Candidate candidate = (Candidate) o;
+			return subtour.equals(candidate.subtour) && newTransportMode.equals(candidate.newTransportMode);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(subtour, newTransportMode);
 		}
 	}
 
@@ -147,7 +154,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	/**
-	 * Return whether a subtour is mass conservating according to configuration.
+	 * Return whether a subtour is mass conserving according to configuration.
 	 */
 	public boolean isMassConserving(final Subtour subtour) {
 		for (String mode : chainBasedModes) {

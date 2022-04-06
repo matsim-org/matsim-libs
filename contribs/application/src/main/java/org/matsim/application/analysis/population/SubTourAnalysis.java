@@ -25,11 +25,21 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(SubTourAnalysis.class);
 
-	@CommandLine.Parameters(arity = "1", description = "Path to population")
+	@CommandLine.Parameters(arity = "1", paramLabel = "POPULATION", description = "Path to population")
 	private Path input;
 
 	@CommandLine.Option(names = "--chain-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
-	private List<String> chainBasedModes;
+	private Set<String> chainBasedModes;
+
+	@CommandLine.Option(names = "--ignore-plans", description = "Ignore plans containing certain modes", defaultValue = "freight", split = ",")
+	private Set<String> ignoreModes;
+
+	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "fromAllModesToSpecifiedModes")
+	private SubtourModeChoice.Behavior behavior;
+
+	public static void main(String[] args) {
+		new SubTourAnalysis().execute(args);
+	}
 
 	@Override
 	public Integer call() throws Exception {
@@ -40,23 +50,42 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 		Set<String> modes = new HashSet<>();
 
+		outer:
 		for (Person agent : population.getPersons().values()) {
 			Plan plan = agent.getSelectedPlan();
 
 			List<Leg> legs = TripStructureUtils.getLegs(plan);
 
 			for (Leg leg : legs) {
+				if (ignoreModes.contains(leg.getMode()))
+					break outer;
+
 				modes.add(leg.getMode());
 			}
 
-			subtours.addAll(TripStructureUtils.getSubtours(plan));
+			Collection<TripStructureUtils.Subtour> subtour = TripStructureUtils.getSubtours(plan);
+			subtours.addAll(subtour);
 		}
 
 		log.info("Detected modes: {}", modes);
 
 		ChooseRandomLegModeForSubtour strategy = new ChooseRandomLegModeForSubtour(new DefaultAnalysisMainModeIdentifier(), plan -> modes,
-				modes.toArray(new String[0]), chainBasedModes.toArray(new String[0]), new Random(1234), SubtourModeChoice.Behavior.fromAllModesToSpecifiedModes, 0.0);
+				modes.toArray(new String[0]), chainBasedModes.toArray(new String[0]), new Random(1234), behavior, 0.0);
 
+		int closed = 0;
+		int massConserving = 0;
+
+		for (TripStructureUtils.Subtour st : subtours) {
+			if (st.isClosed())
+				closed++;
+			else
+				log.debug("test");
+
+			if (strategy.isMassConserving(st))
+				massConserving++;
+		}
+
+		log.info("Subtours: {} | closed: {}% | massConserving: {}%", subtours.size(), 100d * closed / subtours.size(), 100d * massConserving / subtours.size());
 
 		return 0;
 	}
