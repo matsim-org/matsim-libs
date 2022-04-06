@@ -67,6 +67,12 @@ public class RunMultiHubShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
+		ConfigGroup shiftDrt = drtConfigGroup.createParameterSet(DrtShiftParams.SET_NAME);
+		((DrtShiftParams) shiftDrt).setOperationFacilityInputFile(opFacilitiesFile);
+		((DrtShiftParams) shiftDrt).setShiftInputFile(shiftsFile);
+		((DrtShiftParams) shiftDrt).setAllowInFieldChangeover(true);
+		drtConfigGroup.addParameterSet(shiftDrt);
+
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
@@ -116,11 +122,6 @@ public class RunMultiHubShiftDrtScenarioIT {
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts_multiHub");
-
-		DrtShiftParams shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, DrtShiftParams.class);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();

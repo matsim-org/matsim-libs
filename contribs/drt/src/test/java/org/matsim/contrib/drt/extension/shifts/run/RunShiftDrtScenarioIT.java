@@ -73,12 +73,6 @@ public class RunShiftDrtScenarioIT {
 		((DrtShiftParams) shiftDrt).setAllowInFieldChangeover(true);
 		drtConfigGroup.addParameterSet(shiftDrt);
 
-//		DrtShiftParams drtShiftParams = new DrtShiftParams();
-//		drtShiftParams.setOperationFacilityInputFile(opFacilitiesFile);
-//		drtShiftParams.setShiftInputFile(shiftsFile);
-//		drtShiftParams.setAllowInFieldChangeover(true);
-//		drtConfigGroup.addParameterSet(drtShiftParams);
-
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
