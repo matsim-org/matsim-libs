@@ -123,13 +123,6 @@ public class RunShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
 
-//		DrtShiftParams shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, DrtShiftParams.class);
-//		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
-//		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-//		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
-
-
-
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();
 	}
