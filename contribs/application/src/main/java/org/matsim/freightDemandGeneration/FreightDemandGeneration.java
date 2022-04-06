@@ -416,9 +416,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 				break;
 			case usePopulationInShape:
 				// uses only the population with home location in the given shape file
-				CrsOptions populationCRSOptions = new CrsOptions(crs.getInputCRS(), shp.getShapeCrs());
-				FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
-						populationCRSOptions.getTransformation(), polygonsInShape);
+				FreightDemandGenerationUtils.reducePopulationToShapeArea(population, shp.createIndex(crs.getInputCRS(), "_"));
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
 						combineSimilarJobs, crsTransformationNetworkAndShape, population);
 				// demandInformation = readDemandInformation(csvLocationDemand,

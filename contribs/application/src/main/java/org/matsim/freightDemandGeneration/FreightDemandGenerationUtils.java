@@ -19,13 +19,6 @@
  * *********************************************************************** */
 package org.matsim.freightDemandGeneration;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -33,11 +26,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
@@ -46,6 +36,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Collection of different methods for the FreightDemandGeneration.
@@ -100,11 +97,8 @@ public class FreightDemandGenerationUtils {
 	static void createDemandLocationsFile(Controler controler) {
 
 		Network network = controler.getScenario().getNetwork();
-		FileWriter writer;
-		File file;
-		file = new File(controler.getConfig().controler().getOutputDirectory() + "/outputFacilitiesFile.tsv");
-		try {
-			writer = new FileWriter(file, true);
+		File file = new File(controler.getConfig().controler().getOutputDirectory() + "/outputFacilitiesFile.tsv");
+		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation\n");
 
 			for (Carrier thisCarrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
@@ -130,7 +124,7 @@ public class FreightDemandGenerationUtils {
 				}
 			}
 			writer.flush();
-			writer.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -141,28 +135,21 @@ public class FreightDemandGenerationUtils {
 	 * Reduces the population to all persons having their home in the shape
 	 * 
 	 * @param population
-	 * @param crsTransformationPopulationAndShape
-	 * @param polygonsInShape
+	 * @param index
 	 */
-	static void reducePopulationToShapeArea(Population population,
-			CoordinateTransformation crsTransformationPopulationAndShape, Collection<SimpleFeature> polygonsInShape) {
+	static void reducePopulationToShapeArea(Population population, ShpOptions.Index index) {
 
 		List<Id<Person>> personsToRemove = new ArrayList<>();
-		double x, y;
 		for (Person person : population.getPersons().values()) {
-			boolean isInShape = false;
-			x = (double) person.getAttributes().getAttribute("homeX");
-			y = (double) person.getAttributes().getAttribute("homeY");
-			Point point = MGC
-					.coord2Point(crsTransformationPopulationAndShape.transform(MGC.point2Coord(MGC.xy2Point(x, y))));
-			for (SimpleFeature singlePolygon : polygonsInShape)
-				if (((Geometry) singlePolygon.getDefaultGeometry()).contains(point)) {
-					isInShape = true;
-					break;
-				}
-			if (!isInShape)
+			// TODO: throws error when attribute not present
+
+			double x = (double) person.getAttributes().getAttribute("homeX");
+			double y = (double) person.getAttributes().getAttribute("homeY");
+
+			if (!index.contains(new Coord(x,y)))
 				personsToRemove.add(person.getId());
 		}
+
 		for (Id<Person> id : personsToRemove)
 			population.removePerson(id);
 	}
