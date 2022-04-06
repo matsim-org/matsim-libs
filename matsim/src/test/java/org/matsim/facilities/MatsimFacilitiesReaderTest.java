@@ -83,4 +83,54 @@ public class MatsimFacilitiesReaderTest {
 		ActivityFacility fac20 = facilities.getFacilities().get(Id.create(20, ActivityFacility.class));
 		Assert.assertNull(fac20.getLinkId());
 	}
+
+	@Test
+	public void testRead3DCoord() {
+		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+	"<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v2.dtd\">\n" +
+	"<facilities name=\"test facilities for triangle network\">\n" +
+	"\n" +
+	"	<facility id=\"1\" x=\"60.0\" y=\"110.0\" z=\"12.3\" linkId=\"Aa\">\n" +
+	"		<activity type=\"home\">\n" +
+	"			<capacity value=\"201.0\" />\n" +
+	"			<opentime start_time=\"00:00:00\" end_time=\"24:00:00\" />\n" +
+	"		</activity>\n" +
+	"		<attributes>" +
+	"			<attribute name=\"population\" class=\"java.lang.Integer\">1000</attribute>" +
+	"		</attributes>" +
+	"	</facility>\n" +
+	"\n" +
+	"	<facility id=\"10\" x=\"110.0\" y=\"270.0\" z=\"-4.2\" linkId=\"Bb\">\n" +
+	"		<activity type=\"education\">\n" +
+	"			<capacity value=\"201.0\" />\n" +
+	"			<opentime start_time=\"08:00:00\" end_time=\"12:00:00\" />\n" +
+	"		</activity>\n" +
+	"	</facility>\n" +
+	"\n" +
+	"	<facility id=\"20\" x=\"120.0\" y=\"240.0\">\n" +
+	"		<activity type=\"shop\">\n" +
+	"			<capacity value=\"50.0\" />\n" +
+	"			<opentime start_time=\"08:00:00\" end_time=\"20:00:00\" />\n" +
+	"		</activity>\n" +
+	"	</facility>\n" +
+	"</facilities>";
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		Assert.assertEquals(3, facilities.getFacilities().size());
+
+		ActivityFacility fac1 = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
+		Assert.assertTrue(fac1.getCoord().hasZ());
+		Assert.assertEquals(12.3, fac1.getCoord().getZ(), Double.MIN_NORMAL);
+
+		ActivityFacility fac10 = facilities.getFacilities().get(Id.create(10, ActivityFacility.class));
+		Assert.assertTrue(fac10.getCoord().hasZ());
+		Assert.assertEquals(-4.2, fac10.getCoord().getZ(), Double.MIN_NORMAL);
+
+		ActivityFacility fac20 = facilities.getFacilities().get(Id.create(20, ActivityFacility.class));
+		Assert.assertFalse(fac20.getCoord().hasZ());
+	}
 }
