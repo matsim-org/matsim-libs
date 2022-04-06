@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
@@ -41,7 +41,6 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.ev.charging.BatteryCharging;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -66,7 +65,7 @@ public class EShiftTaskScheduler {
     private final ShiftDrtTaskFactory taskFactory;
     private final LeastCostPathCalculator router;
 
-    private final ShiftDrtConfigGroup shiftConfig;
+    private final DrtShiftParams shiftConfig;
 
     private final Network network;
     private final ChargingInfrastructure chargingInfrastructure;
@@ -74,7 +73,7 @@ public class EShiftTaskScheduler {
 	private final Fleet fleet;
 
 	public EShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-							   MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftDrtConfigGroup shiftConfig,
+							   MobsimTimer timer, ShiftDrtTaskFactory taskFactory, DrtShiftParams shiftConfig,
 							   ChargingInfrastructure chargingInfrastructure, OperationFacilities operationFacilities, Fleet fleet) {
 		this.travelTime = travelTime;
 		this.timer = timer;

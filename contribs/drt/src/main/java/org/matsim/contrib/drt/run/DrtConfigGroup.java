@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
@@ -232,6 +233,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
+	@Nullable
+	private DrtShiftParams drtShiftParams;
+
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
 		initSingletonParameterSets();
@@ -266,6 +270,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
 				() -> drtRequestInsertionRetryParams,
 				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
+
+		//shift information
+		addDefinition(DrtShiftParams.SET_NAME, DrtShiftParams::new,
+				() -> drtShiftParams,
+				params -> drtShiftParams = (DrtShiftParams)params);
 	}
 
 	@Override
@@ -697,6 +706,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
+	}
+
+	public Optional<DrtShiftParams> getDrtShiftParams() {
+		return Optional.ofNullable(drtShiftParams);
 	}
 
 	/**

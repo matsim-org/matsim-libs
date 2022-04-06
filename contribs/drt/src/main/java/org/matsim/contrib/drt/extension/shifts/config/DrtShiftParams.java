@@ -10,9 +10,9 @@ import java.util.Map;
 /**
  * @author nkuehnel / MOIA
  */
-public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
+public class DrtShiftParams extends ReflectiveConfigGroup {
 
-    public static final String GROUP_NAME = "drtShifts";
+    public static final String SET_NAME = "drtShifts";
 
 	private static final String SHIFT_INPUT_FILE = "shiftInputFile";
     private static final String OPERATION_FACILITY_INPUT_FILE = "operationFacilityInputFile";
@@ -53,8 +53,8 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
 
 	private double loggingInterval = 600;
 
-	public ShiftDrtConfigGroup() {
-        super(GROUP_NAME);
+	public DrtShiftParams() {
+        super(SET_NAME);
     }
 
     @Override

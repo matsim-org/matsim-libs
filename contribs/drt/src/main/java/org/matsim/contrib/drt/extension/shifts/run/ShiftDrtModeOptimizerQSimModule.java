@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcherImpl;
 import org.matsim.contrib.drt.extension.shifts.fleet.DefaultShiftDvrpVehicle;
@@ -58,12 +58,12 @@ import org.matsim.core.router.util.TravelTime;
 public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 	private final DrtConfigGroup drtCfg;
-	private final ShiftDrtConfigGroup shiftConfigGroup;
+	private final DrtShiftParams shiftConfigGroup;
 
-	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftConfigGroup) {
+	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.shiftConfigGroup = shiftConfigGroup;
+		this.shiftConfigGroup = drtCfg.getDrtShiftParams().get();
 	}
 
 	@Override

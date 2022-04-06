@@ -6,7 +6,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -67,6 +67,18 @@ public class RunShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
+		ConfigGroup shiftDrt = drtConfigGroup.createParameterSet(DrtShiftParams.SET_NAME);
+		((DrtShiftParams) shiftDrt).setOperationFacilityInputFile(opFacilitiesFile);
+		((DrtShiftParams) shiftDrt).setShiftInputFile(shiftsFile);
+		((DrtShiftParams) shiftDrt).setAllowInFieldChangeover(true);
+		drtConfigGroup.addParameterSet(shiftDrt);
+
+//		DrtShiftParams drtShiftParams = new DrtShiftParams();
+//		drtShiftParams.setOperationFacilityInputFile(opFacilitiesFile);
+//		drtShiftParams.setShiftInputFile(shiftsFile);
+//		drtShiftParams.setAllowInFieldChangeover(true);
+//		drtConfigGroup.addParameterSet(drtShiftParams);
+
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
@@ -117,10 +129,12 @@ public class RunShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
 
-		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+//		DrtShiftParams shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, DrtShiftParams.class);
+//		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
+//		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
+//		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+
+
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();
