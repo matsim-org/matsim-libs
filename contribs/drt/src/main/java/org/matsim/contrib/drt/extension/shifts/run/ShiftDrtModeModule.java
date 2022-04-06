@@ -85,7 +85,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 			}).asEagerSingleton();
 		}
 
-		if (shiftConfig.getOperationFacilityInputFile() != null) {
+			if (shiftConfig.getOperationFacilityInputFile() != null) {
 			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
 				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
 				new OperationFacilitiesReader(operationFacilitiesSpecification).readURL(shiftConfig.getOperationFacilityInputUrl(getConfig().getContext()));
