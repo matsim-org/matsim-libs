@@ -35,7 +35,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * A helper class to define and execute MATSim scenarios, including a pipeline of prepare and analysis scripts.
@@ -100,6 +99,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 	@CommandLine.Option(names = "--output", description = "Overwrite output folder defined by the application")
 	protected Path output;
+
+	@CommandLine.Option(names = "--post-processing", description = "Option for post-processing", defaultValue = "enabled")
+	protected PostProcessOption post;
 
 	/**
 	 * This Map will never contain anything, because this argument is not parsed correctly, but instead will go into remainingArgs field.
@@ -191,7 +193,28 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		prepareControler(controler);
 
-		controler.run();
+		// Check if simulation needs to be run
+		if (post != PostProcessOption.post_process_only)
+			controler.run();
+
+		if (post != PostProcessOption.disabled) {
+
+			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controler().getOutputDirectory()), config.controler().getRunId());
+
+			for (MATSimAppCommand command : commands) {
+
+				try {
+					log.info("Running post-process command {}", command.getClass().getSimpleName());
+					command.call();
+				} catch (Exception e) {
+					log.error("Error running post-processing", e);
+				}
+
+			}
+
+		}
+
+
 		return 0;
 	}
 
@@ -319,9 +342,18 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
+	 * Preparation of {@link MATSimAppCommand} to run after the simulation has finished. The instances have to be fully constructed in this method
+	 * no further arguments are passed down to them.
+	 * @return list of commands to run.
+	 */
+	protected List<MATSimAppCommand> preparePostProcessing(Path outputFolder, String runId) {
+		return List.of();
+	}
+
+	/**
 	 * Add and an option and value to run id and output folder.
 	 */
-	protected void addRunOption(Config config, String option, Object value) {
+	protected final void addRunOption(Config config, String option, Object value) {
 
 		String postfix;
 		if ("".equals(value))
@@ -342,7 +374,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	/**
 	 * Add and an option to run id and output folder, delimited by "_".
 	 */
-	protected void addRunOption(Config config, String option) {
+	protected final void addRunOption(Config config, String option) {
 		addRunOption(config, option, "");
 	}
 
@@ -685,4 +717,22 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		Class<? extends MATSimAppCommand>[] value() default {};
 	}
 
+	/**
+	 * Option to switch post processing behavour
+	 */
+	public enum PostProcessOption {
+
+		enabled,
+
+		/**
+		 * Does not run the post-processing.
+		 */
+		disabled,
+
+		/**
+		 * Does not run the simulation, but only post-processing.
+		 */
+		post_process_only
+
+	}
 }
