@@ -15,7 +15,7 @@ public class SharingFailedDropoffEvent extends AbstractSharingEvent {
 
 	public SharingFailedDropoffEvent(double time, Id<SharingService> serviceId, Id<Person> personId, Id<Link> linkId,
 			Id<SharingVehicle> vehicleId, Optional<Id<SharingStation>> stationId) {
-		super(time, serviceId, personId, linkId, Optional.of(vehicleId), stationId);
+		super(time, serviceId, personId, linkId, Optional.of(vehicleId), stationId, Optional.empty());
 	}
 
 	@Override
