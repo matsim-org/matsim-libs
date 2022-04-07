@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.QSimConfigGroup;
 
-class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
+public class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
 
 	private final Network network;
 	private final int numSlots;
