@@ -34,7 +34,7 @@ class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
 	public TravelTimeDataArrayFactory(final Network network, final int numSlots) {
 		this.network = network;
 		this.numSlots = numSlots;
-		this.qSimTimeStepSize = 1.0;
+		this.qSimTimeStepSize = -1.0;
 	}
 
 	public TravelTimeDataArrayFactory(final Network network, final int numSlots, QSimConfigGroup qSimConfigGroup) {
