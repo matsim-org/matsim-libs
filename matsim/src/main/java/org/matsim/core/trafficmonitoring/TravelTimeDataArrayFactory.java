@@ -23,20 +23,29 @@ package org.matsim.core.trafficmonitoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.QSimConfigGroup;
 
 class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
 
 	private final Network network;
 	private final int numSlots;
+	private final double qSimTimeStepSize;
 	
 	public TravelTimeDataArrayFactory(final Network network, final int numSlots) {
 		this.network = network;
 		this.numSlots = numSlots;
+		this.qSimTimeStepSize = 1.0;
+	}
+
+	public TravelTimeDataArrayFactory(final Network network, final int numSlots, QSimConfigGroup qSimConfigGroup) {
+		this.network = network;
+		this.numSlots = numSlots;
+		this.qSimTimeStepSize = qSimConfigGroup.getTimeStepSize();
 	}
 	
 	@Override
 	public TravelTimeData createTravelTimeData(Id<Link> linkId) {
-		return new TravelTimeDataArray(this.network.getLinks().get(linkId), this.numSlots);
+		return new TravelTimeDataArray(this.network.getLinks().get(linkId), this.numSlots, qSimTimeStepSize);
 	}
 
 }

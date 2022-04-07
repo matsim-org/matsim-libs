@@ -58,10 +58,12 @@ class TravelTimeDataArray extends TravelTimeData {
 	 */
 	private final long[] data;
 	private final Link link;
+	private final double timeStepSize;
 
-	TravelTimeDataArray(final Link link, final int numSlots) {
+	TravelTimeDataArray(final Link link, final int numSlots, double qsimTimeStepSize) {
 		this.data = new long[numSlots];
 		this.link = link;
+		this.timeStepSize = qsimTimeStepSize;
 		resetTravelTimes();
 	}
 
@@ -111,10 +113,11 @@ class TravelTimeDataArray extends TravelTimeData {
 		double ttime = traveltime(val);
 		if (ttime >= 0.0) return ttime; // negative values are invalid.
 
-		// ttime can only be <0 if it never accumulated anything, i.e. if cnt == 9, so just use freespeed
-		double freespeed = this.link.getLength() / this.link.getFreespeed(now);
-		this.data[timeSlot] = encode(0, freespeed);
-		return freespeed;
+		// ttime can only be <0 if it never accumulated anything, i.e. if cnt == 9, so just use freeSpeedTravelTime
+		double freeSpeedTravelTime = this.link.getLength() / this.link.getFreespeed(now);
+		freeSpeedTravelTime = (Math.floor(freeSpeedTravelTime / timeStepSize) + 1) * timeStepSize;
+		this.data[timeSlot] = encode(0, freeSpeedTravelTime);
+		return freeSpeedTravelTime;
 	}
 
 	/* package-private for debugging */ String cntToString(){

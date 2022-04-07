@@ -21,7 +21,7 @@ public class TravelTimeDataArrayTest{
 		Node to = NetworkUtils.createNode( Id.createNodeId( "2" ) );
 		Link link = NetworkUtils.createLink( Id.createLinkId( "1-2" ), from, to, network, 10, 10, 10, 1 );
 		final int numSlots = 24;
-		TravelTimeDataArray abc = new TravelTimeDataArray( link, numSlots );
+		TravelTimeDataArray abc = new TravelTimeDataArray( link, numSlots, 1.0 );
 		log.info( abc.ttToString() );
 		log.info( abc.cntToString() );
 		abc.resetTravelTimes();
