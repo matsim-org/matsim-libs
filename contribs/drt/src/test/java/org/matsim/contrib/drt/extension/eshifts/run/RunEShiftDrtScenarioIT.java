@@ -129,16 +129,18 @@ public class RunEShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
 
-		DrtShiftParams shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, DrtShiftParams.class);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+		ConfigGroup shiftDrt = drtConfigGroup.createParameterSet(DrtShiftParams.SET_NAME);
+		((DrtShiftParams) shiftDrt).setOperationFacilityInputFile(opFacilitiesFile);
+		((DrtShiftParams) shiftDrt).setShiftInputFile(shiftsFile);
+		((DrtShiftParams) shiftDrt).setAllowInFieldChangeover(true);
 
 		//e shifts
-		shiftDrtConfigGroup.setShiftAssignmentBatteryThreshold(0.6);
-		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
-		shiftDrtConfigGroup.setOutOfShiftChargerType("slow");
-		shiftDrtConfigGroup.setBreakChargerType("fast");
+		((DrtShiftParams) shiftDrt).setShiftAssignmentBatteryThreshold(0.6);
+		((DrtShiftParams) shiftDrt).setChargeAtHubThreshold(0.8);
+		((DrtShiftParams) shiftDrt).setOutOfShiftChargerType("slow");
+		((DrtShiftParams) shiftDrt).setBreakChargerType("fast");
+
+		drtConfigGroup.addParameterSet(shiftDrt);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setChargersFile(chargersFile);
