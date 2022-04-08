@@ -297,7 +297,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 	 * @param crsTransformationNetworkAndShape
 	 * @throws IOException
 	 */
-	private static void createCarrier(Scenario scenario, CarrierInputOptions selectedCarrierInputOption,
+	private void createCarrier(Scenario scenario, CarrierInputOptions selectedCarrierInputOption,
 			String carriersFileLocation, String csvLocationCarrier, Collection<SimpleFeature> polygonsInShape,
 			int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
@@ -363,11 +363,6 @@ public class FreightDemandGeneration implements Callable<Integer> {
 
 			DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape, combineSimilarJobs,
 					crsTransformationNetworkAndShape, null);
-			// demandInformation = readDemandInformation(csvLocationDemand,
-			// demandInformation, scenario, polygonsInShape);
-			// createDemandForCarriers(scenario, polygonsInShape, demandInformation, null,
-			// combineSimilarJobs,
-			// crsTransformationNetworkAndShape);
 			break;
 		case createDemandFromCSVAndUsePopulation:
 			/*
@@ -408,22 +403,12 @@ public class FreightDemandGeneration implements Callable<Integer> {
 				// uses the hole population as possible demand locations
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
 						combineSimilarJobs, crsTransformationNetworkAndShape, population);
-				// demandInformation = readDemandInformation(csvLocationDemand,
-				// demandInformation, scenario, polygonsInShape);
-				// createDemandForCarriers(scenario, polygonsInShape, demandInformation,
-				// population, combineSimilarJobs,
-				// crsTransformationNetworkAndShape);
 				break;
 			case usePopulationInShape:
 				// uses only the population with home location in the given shape file
 				FreightDemandGenerationUtils.reducePopulationToShapeArea(population, shp.createIndex(crs.getInputCRS(), "_"));
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
 						combineSimilarJobs, crsTransformationNetworkAndShape, population);
-				// demandInformation = readDemandInformation(csvLocationDemand,
-				// demandInformation, scenario, polygonsInShape);
-				// createDemandForCarriers(scenario, polygonsInShape, demandInformation,
-				// population, combineSimilarJobs,
-				// crsTransformationNetworkAndShape);
 				break;
 			default:
 				throw new RuntimeException("No valid population option selected!");

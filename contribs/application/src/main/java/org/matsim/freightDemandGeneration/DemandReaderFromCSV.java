@@ -75,274 +75,254 @@ public final class DemandReaderFromCSV {
 		/**
 		 * Name of the carrier with this demand configuration.
 		 */
-		private String carrierName;
+		private final String carrierName;
 		/**
 		 * Sets the amount of demand which should be handled.
 		 */
-		private Integer demandToDistribute;
+		private final Integer demandToDistribute;
 		/**
 		 * Sets the number of jobs which should be handled.
 		 */
-		private Integer numberOfJobs;
+		private final Integer numberOfJobs;
 		/**
 		 * Sets the share of the population which has this service/pickup.
 		 */
-		private Double shareOfPopulationWithFirstJobElement;
+		private final Double shareOfPopulationWithFirstJobElement;
 		/**
 		 * Sets the areas where the services/pickups should be created. Therefore a
 		 * shape input is necessary.
 		 */
-		private String[] areasFirstJobElement;
+		private final String[] areasFirstJobElement;
 		/**
 		 * Sets the number of service/pickup locations.
 		 */
-		private Integer numberOfFirstJobElementLocations;
+		private final Integer numberOfFirstJobElementLocations;
 		/**
 		 * Sets the locations of the service/pickup job. This should be the linkIds as a
 		 * String[].
 		 */
-		private String[] locationsOfFirstJobElement;
+		private final String[] locationsOfFirstJobElement;
 		/**
 		 * Time unit for one demand unit for the services/pickups.
 		 */
-		private Integer firstJobElementTimePerUnit;
+		private final Integer firstJobElementTimePerUnit;
 		/**
 		 * TimeWindow for the services/pickups.
 		 */
-		private TimeWindow firstJobElementTimeWindow;
+		private final TimeWindow firstJobElementTimeWindow;
 		/**
 		 * Sets the share of the population which has this delivery.
 		 */
-		private Double shareOfPopulationWithSecondJobElement;
+		private final Double shareOfPopulationWithSecondJobElement;
 		/**
 		 * Sets the areas where the deliveries should be created. Therefore a shape
 		 * input is necessary.
 		 */
-		private String[] areasSecondJobElement;
+		private final String[] areasSecondJobElement;
 		/**
 		 * Sets the number of delivery locations.
 		 */
-		private Integer numberOfSecondJobElementLocations;
+		private final Integer numberOfSecondJobElementLocations;
 		/**
 		 * Sets the locations of the deliveries. This should be the linkIds as a
 		 * String[].
 		 */
-		private String[] locationsOfSecondJobElement;
+		private final String[] locationsOfSecondJobElement;
 		/**
 		 * Time unit for one demand unit for the deliveries.
 		 */
-		private Integer secondJobElementTimePerUnit;
+		private final Integer secondJobElementTimePerUnit;
 		/**
 		 * TimeWindow for the deliveries.
 		 */
-		private TimeWindow secondJobElementTimeWindow;
+		private final TimeWindow secondJobElementTimeWindow;
 		/**
 		 * Type of the demand information. Options: service or shipment
 		 */
-		private String typeOfDemand;
+		private final String typeOfDemand;
 
-		/**
-		 * Creates a new DemandInformationElement for a service.
-		 * 
-		 * @param carrierName
-		 * @param demandToDistribute
-		 * @param numberOfJobs
-		 * @param shareOfPopulationWithFirstJobElement
-		 * @param areasFirstJobElement
-		 * @param numberOfFirstJobElementLocations
-		 * @param locationsOfFirstJobElement
-		 * @param firstJobElementTimePerUnit
-		 * @param firstJobElementTimeWindow
-		 */
-		DemandInformationElement(String carrierName, Integer demandToDistribute, Integer numberOfJobs,
-				Double shareOfPopulationWithFirstJobElement, String[] areasFirstJobElement,
-				Integer numberOfFirstJobElementLocations, String[] locationsOfFirstJobElement,
-				Integer firstJobElementTimePerUnit, TimeWindow firstJobElementTimeWindow) {
-			this.setCarrierName(carrierName);
-			this.setDemandToDistribute(demandToDistribute);
-			this.setNumberOfJobs(numberOfJobs);
-			this.setShareOfPopulationWithFirstJobElement(shareOfPopulationWithFirstJobElement);
-			this.setAreasFirstJobElement(areasFirstJobElement);
-			this.setNumberOfFirstJobElementLocations(numberOfFirstJobElementLocations);
-			this.setLocationsOfFirstJobElement(locationsOfFirstJobElement);
-			this.setFirstJobElementTimePerUnit(firstJobElementTimePerUnit);
-			this.setFirstJobElementTimeWindow(firstJobElementTimeWindow);
-			this.setTypeOfDemand("service");
+		public static class Builder {
+			private final String carrierName;
+			private final Integer demandToDistribute;
+			private Integer numberOfJobs = null;
+			private Double shareOfPopulationWithFirstJobElement = null;
+			private String[] areasFirstJobElement = null;
+			private Integer numberOfFirstJobElementLocations = null;
+			private String[] locationsOfFirstJobElement = null;
+			private Integer firstJobElementTimePerUnit = null;
+			private TimeWindow firstJobElementTimeWindow = null;
+			private Double shareOfPopulationWithSecondJobElement = null;
+			private String[] areasSecondJobElement = null;
+			private Integer numberOfSecondJobElementLocations = null;
+			private String[] locationsOfSecondJobElement = null;
+			private Integer secondJobElementTimePerUnit = null;
+			private TimeWindow secondJobElementTimeWindow = null;
+			private String typeOfDemand = "service";
+
+			public static Builder newInstance(String carrierName, Integer demandToDistribute) {
+				return new Builder(carrierName, demandToDistribute);
+			}
+
+			private Builder(String carrierName, Integer demandToDistribute) {
+				super();
+				this.carrierName = carrierName;
+				this.demandToDistribute = demandToDistribute;
+			}
+
+			public void setNumberOfJobs(Integer numberOfJobs) {
+				this.numberOfJobs = numberOfJobs;
+			}
+
+			public void setShareOfPopulationWithFirstJobElement(Double shareOfPopulationWithFirstJobElement) {
+				this.shareOfPopulationWithFirstJobElement = shareOfPopulationWithFirstJobElement;
+			}
+
+			public void setAreasFirstJobElement(String[] areasFirstJobElement) {
+				this.areasFirstJobElement = areasFirstJobElement;
+			}
+
+			public void setNumberOfFirstJobElementLocations(Integer numberOfFirstJobElementLocations) {
+				this.numberOfFirstJobElementLocations = numberOfFirstJobElementLocations;
+			}
+
+			public void setLocationsOfFirstJobElement(String[] locationsOfFirstJobElement) {
+				this.locationsOfFirstJobElement = locationsOfFirstJobElement;
+			}
+
+			public void setFirstJobElementTimePerUnit(Integer firstJobElementTimePerUnit) {
+				this.firstJobElementTimePerUnit = firstJobElementTimePerUnit;
+			}
+
+			public void setFirstJobElementTimeWindow(TimeWindow firstJobElementTimeWindow) {
+				this.firstJobElementTimeWindow = firstJobElementTimeWindow;
+			}
+
+			public void setShareOfPopulationWithSecondJobElement(Double shareOfPopulationWithSecondJobElement) {
+				this.shareOfPopulationWithSecondJobElement = shareOfPopulationWithSecondJobElement;
+			}
+
+			public void setAreasSecondJobElement(String[] areasSecondJobElement) {
+				this.areasSecondJobElement = areasSecondJobElement;
+			}
+
+			public void setNumberOfSecondJobElementLocations(Integer numberOfSecondJobElementLocations) {
+				this.numberOfSecondJobElementLocations = numberOfSecondJobElementLocations;
+			}
+
+			public void setLocationsOfSecondJobElement(String[] locationsOfSecondJobElement) {
+				this.locationsOfSecondJobElement = locationsOfSecondJobElement;
+			}
+
+			public void setSecondJobElementTimePerUnit(Integer secondJobElementTimePerUnit) {
+				this.secondJobElementTimePerUnit = secondJobElementTimePerUnit;
+			}
+
+			public void setSecondJobElementTimeWindow(TimeWindow secondJobElementTimeWindow) {
+				this.secondJobElementTimeWindow = secondJobElementTimeWindow;
+			}
+
+			public void setTypeOfDemand(String typeOfDemand) {
+				this.typeOfDemand = typeOfDemand;
+			}
+
+			public DemandInformationElement build() {
+				return new DemandInformationElement(this);
+			}
 		}
 
-		/**
-		 * Creates a new DemandInformationElement for a shipment.
-		 * 
-		 * @param carrierName
-		 * @param demandToDistribute
-		 * @param numberOfJobs
-		 * @param shareOfPopulationWithFirstJobElement
-		 * @param areasFirstJobElement
-		 * @param numberOfFirstJobElementLocations
-		 * @param locationsOfFirstJobElement
-		 * @param firstJobElementTimePerUnit
-		 * @param firstJobElementTimeWindow
-		 * @param shareOfPopulationWithSecondJobElement
-		 * @param areasSecondJobElement
-		 * @param numberOfSecondJobElementLocations
-		 * @param locationsOfSecondJobElement
-		 * @param secondJobElementTimePerUnit
-		 * @param secondJobElementTimeWindow
-		 */
-		DemandInformationElement(String carrierName, Integer demandToDistribute, Integer numberOfJobs,
-				Double shareOfPopulationWithFirstJobElement, String[] areasFirstJobElement,
-				Integer numberOfFirstJobElementLocations, String[] locationsOfFirstJobElement,
-				Integer firstJobElementTimePerUnit, TimeWindow firstJobElementTimeWindow,
-				Double shareOfPopulationWithSecondJobElement, String[] areasSecondJobElement,
-				Integer numberOfSecondJobElementLocations, String[] locationsOfSecondJobElement,
-				Integer secondJobElementTimePerUnit, TimeWindow secondJobElementTimeWindow) {
-			this.setCarrierName(carrierName);
-			this.setDemandToDistribute(demandToDistribute);
-			this.setNumberOfJobs(numberOfJobs);
-			this.setShareOfPopulationWithFirstJobElement(shareOfPopulationWithFirstJobElement);
-			this.setAreasFirstJobElement(areasFirstJobElement);
-			this.setNumberOfFirstJobElementLocations(numberOfFirstJobElementLocations);
-			this.setLocationsOfFirstJobElement(locationsOfFirstJobElement);
-			this.setFirstJobElementTimePerUnit(firstJobElementTimePerUnit);
-			this.setFirstJobElementTimeWindow(firstJobElementTimeWindow);
-			this.setShareOfPopulationWithSecondJobElement(shareOfPopulationWithSecondJobElement);
-			this.setAreasSecondJobElement(areasSecondJobElement);
-			this.setNumberOfSecondJobElementLocations(numberOfSecondJobElementLocations);
-			this.setLocationsOfSecondJobElement(locationsOfSecondJobElement);
-			this.setSecondJobElementTimePerUnit(secondJobElementTimePerUnit);
-			this.setSecondJobElementTimeWindow(secondJobElementTimeWindow);
-			this.setTypeOfDemand("shipment");
+		private DemandInformationElement(Builder builder) {
+			carrierName = builder.carrierName;
+			demandToDistribute = builder.demandToDistribute;
+			numberOfJobs = builder.numberOfJobs;
+			shareOfPopulationWithFirstJobElement = builder.shareOfPopulationWithFirstJobElement;
+			areasFirstJobElement = builder.areasFirstJobElement;
+			numberOfFirstJobElementLocations = builder.numberOfFirstJobElementLocations;
+			locationsOfFirstJobElement = builder.locationsOfFirstJobElement;
+			firstJobElementTimePerUnit = builder.firstJobElementTimePerUnit;
+			firstJobElementTimeWindow = builder.firstJobElementTimeWindow;
+			shareOfPopulationWithSecondJobElement = builder.shareOfPopulationWithSecondJobElement;
+			areasSecondJobElement = builder.areasSecondJobElement;
+			numberOfSecondJobElementLocations = builder.numberOfSecondJobElementLocations;
+			locationsOfSecondJobElement = builder.locationsOfSecondJobElement;
+			secondJobElementTimePerUnit = builder.secondJobElementTimePerUnit;
+			secondJobElementTimeWindow = builder.secondJobElementTimeWindow;
+			typeOfDemand = builder.typeOfDemand;
 		}
 
 		public String getCarrierName() {
 			return carrierName;
 		}
 
-		public void setCarrierName(String carrierName) {
-			this.carrierName = carrierName;
-		}
-
 		public Integer getDemandToDistribute() {
 			return demandToDistribute;
-		}
-
-		public void setDemandToDistribute(Integer demandToDistribute) {
-			this.demandToDistribute = demandToDistribute;
 		}
 
 		public Integer getNumberOfJobs() {
 			return numberOfJobs;
 		}
 
-		public void setNumberOfJobs(Integer numberOfJobs) {
-			this.numberOfJobs = numberOfJobs;
-		}
-
-		public Integer getFirstJobElementTimePerUnit() {
-			return firstJobElementTimePerUnit;
-		}
-
-		public void setFirstJobElementTimePerUnit(Integer firstJobElementTimePerUnit) {
-			this.firstJobElementTimePerUnit = firstJobElementTimePerUnit;
+		public Double getShareOfPopulationWithFirstJobElement() {
+			return shareOfPopulationWithFirstJobElement;
 		}
 
 		public String[] getAreasFirstJobElement() {
 			return areasFirstJobElement;
 		}
 
-		public void setAreasFirstJobElement(String[] areasFirstJobElement) {
-			this.areasFirstJobElement = areasFirstJobElement;
-		}
-
-		public TimeWindow getFirstJobElementTimeWindow() {
-			return firstJobElementTimeWindow;
-		}
-
-		public void setFirstJobElementTimeWindow(TimeWindow firstJobElementTimeWindow) {
-			this.firstJobElementTimeWindow = firstJobElementTimeWindow;
-		}
-
-		public Double getShareOfPopulationWithFirstJobElement() {
-			return shareOfPopulationWithFirstJobElement;
-		}
-
-		public void setShareOfPopulationWithFirstJobElement(Double shareOfPopulationWithFirstJobElement) {
-			this.shareOfPopulationWithFirstJobElement = shareOfPopulationWithFirstJobElement;
-		}
-
-		public TimeWindow getSecondJobElementTimeWindow() {
-			return secondJobElementTimeWindow;
-		}
-
-		public void setSecondJobElementTimeWindow(TimeWindow secondJobElementTimeWindow) {
-			this.secondJobElementTimeWindow = secondJobElementTimeWindow;
-		}
-
-		public Integer getSecondJobElementTimePerUnit() {
-			return secondJobElementTimePerUnit;
-		}
-
-		public void setSecondJobElementTimePerUnit(Integer secondJobElementTimePerUnit) {
-			this.secondJobElementTimePerUnit = secondJobElementTimePerUnit;
-		}
-
 		public Integer getNumberOfFirstJobElementLocations() {
 			return numberOfFirstJobElementLocations;
-		}
-
-		public void setNumberOfFirstJobElementLocations(Integer numberOfFirstJobElementLocations) {
-			this.numberOfFirstJobElementLocations = numberOfFirstJobElementLocations;
 		}
 
 		public String[] getLocationsOfFirstJobElement() {
 			return locationsOfFirstJobElement;
 		}
 
-		public void setLocationsOfFirstJobElement(String[] locationsOfFirstJobElement) {
-			this.locationsOfFirstJobElement = locationsOfFirstJobElement;
+		public Integer getFirstJobElementTimePerUnit() {
+			return firstJobElementTimePerUnit;
 		}
 
-		public String[] getAreasSecondJobElement() {
-			return areasSecondJobElement;
-		}
-
-		public void setAreasSecondJobElement(String[] areasSecondJobElement) {
-			this.areasSecondJobElement = areasSecondJobElement;
-		}
-
-		public Integer getNumberOfSecondJobElementLocations() {
-			return numberOfSecondJobElementLocations;
-		}
-
-		public void setNumberOfSecondJobElementLocations(Integer numberOfSecondJobElementLocations) {
-			this.numberOfSecondJobElementLocations = numberOfSecondJobElementLocations;
-		}
-
-		public String[] getLocationsOfSecondJobElement() {
-			return locationsOfSecondJobElement;
-		}
-
-		public void setLocationsOfSecondJobElement(String[] locationsOfSecondJobElement) {
-			this.locationsOfSecondJobElement = locationsOfSecondJobElement;
-		}
-
-		public String getTypeOfDemand() {
-			return typeOfDemand;
-		}
-
-		public void setTypeOfDemand(String typeOfDemand) {
-			this.typeOfDemand = typeOfDemand;
+		public TimeWindow getFirstJobElementTimeWindow() {
+			return firstJobElementTimeWindow;
 		}
 
 		public Double getShareOfPopulationWithSecondJobElement() {
 			return shareOfPopulationWithSecondJobElement;
 		}
 
-		public void setShareOfPopulationWithSecondJobElement(Double shareOfPopulationWithSecondJobElement) {
-			this.shareOfPopulationWithSecondJobElement = shareOfPopulationWithSecondJobElement;
+		public String[] getAreasSecondJobElement() {
+			return areasSecondJobElement;
+		}
+
+		public Integer getNumberOfSecondJobElementLocations() {
+			return numberOfSecondJobElementLocations;
+		}
+
+		public String[] getLocationsOfSecondJobElement() {
+			return locationsOfSecondJobElement;
+		}
+
+		public Integer getSecondJobElementTimePerUnit() {
+			return secondJobElementTimePerUnit;
+		}
+
+		public TimeWindow getSecondJobElementTimeWindow() {
+			return secondJobElementTimeWindow;
+		}
+
+		public String getTypeOfDemand() {
+			return typeOfDemand;
 		}
 	}
 
+	/** Reads the csv with the demand information and adds this demand to the related carriers.
+	 * @param scenario
+	 * @param csvLocationDemand
+	 * @param polygonsInShape
+	 * @param combineSimilarJobs
+	 * @param crsTransformationNetworkAndShape
+	 * @param population
+	 * @throws IOException
+	 */
 	static void readAndCreateDemand(Scenario scenario, String csvLocationDemand,
 			Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
 			CoordinateTransformation crsTransformationNetworkAndShape, Population population) throws IOException {
@@ -372,76 +352,51 @@ public final class DemandReaderFromCSV {
 				.parse(IOUtils.getBufferedReader(csvLocationDemand));
 
 		for (CSVRecord record : parse) {
-			String carrierName = null;
-			if (!record.get("carrierName").isBlank())
-				carrierName = record.get("carrierName");
-			Integer demandToDistribute = null;
-			if (!record.get("demandToDistribute").isBlank())
-				demandToDistribute = Integer.parseInt(record.get("demandToDistribute"));
-			Integer numberOfJobs = null;
+			DemandInformationElement.Builder builder;
+			if (!record.get("carrierName").isBlank() && !record.get("demandToDistribute").isBlank())
+				builder = DemandInformationElement.Builder.newInstance(record.get("carrierName"),
+						Integer.parseInt(record.get("demandToDistribute")));
+			else
+				throw new RuntimeException(
+						"Minimum one DemandInformationElement has no name or demand. Both is necessary. Please check the input csv file!");
 			if (!record.get("numberOfJobs").isBlank())
-				numberOfJobs = Integer.parseInt(record.get("numberOfJobs"));
-			Double shareOfPopulationWithFirstJobElement = null;
+				builder.setNumberOfJobs(Integer.parseInt(record.get("numberOfJobs")));
 			if (!record.get("shareOfPopulationWithFirstJobElement").isBlank())
-				shareOfPopulationWithFirstJobElement = Double
-						.parseDouble(record.get("shareOfPopulationWithFirstJobElement"));
-			String[] areasFirstJobElement = null;
+				builder.setShareOfPopulationWithFirstJobElement(
+						Double.parseDouble(record.get("shareOfPopulationWithFirstJobElement")));
 			if (!record.get("areasFirstJobElement").isBlank())
-				areasFirstJobElement = record.get("areasFirstJobElement").split(",");
-			Integer numberOfFirstJobElementLocations = null;
+				builder.setAreasFirstJobElement(record.get("areasFirstJobElement").split(","));
 			if (!record.get("numberOfFirstJobElementLocations").isBlank())
-				numberOfFirstJobElementLocations = Integer.parseInt(record.get("numberOfFirstJobElementLocations"));
-			String[] locationsOfFirstJobElement = null;
+				builder.setNumberOfFirstJobElementLocations(
+						Integer.parseInt(record.get("numberOfFirstJobElementLocations")));
 			if (!record.get("locationsOfFirstJobElement").isBlank())
-				locationsOfFirstJobElement = record.get("locationsOfFirstJobElement").split(",");
-			Integer firstJobElementTimePerUnit = null;
+				builder.setLocationsOfFirstJobElement(record.get("locationsOfFirstJobElement").split(","));
 			if (!record.get("firstJobElementTimePerUnit").isBlank())
-				firstJobElementTimePerUnit = Integer.parseInt(record.get("firstJobElementTimePerUnit"));
-			TimeWindow firstJobElementTimeWindow = null;
+				builder.setFirstJobElementTimePerUnit(Integer.parseInt(record.get("firstJobElementTimePerUnit")));
 			if (!record.get("firstJobElementStartTime").isBlank() || !record.get("firstJobElementEndTime").isBlank())
-				firstJobElementTimeWindow = TimeWindow.newInstance(
-						Integer.parseInt(record.get("firstJobElementStartTime")),
-						Integer.parseInt(record.get("firstJobElementEndTime")));
-			Double shareOfPopulationWithSecondJobElement = null;
+				builder.setFirstJobElementTimeWindow(
+						TimeWindow.newInstance(Integer.parseInt(record.get("firstJobElementStartTime")),
+								Integer.parseInt(record.get("firstJobElementEndTime"))));
 			if (!record.get("shareOfPopulationWithSecondJobElement").isBlank())
-				shareOfPopulationWithSecondJobElement = Double
-						.parseDouble(record.get("shareOfPopulationWithSecondJobElement"));
-			String[] areasSecondJobElement = null;
+				builder.setShareOfPopulationWithSecondJobElement(
+						Double.parseDouble(record.get("shareOfPopulationWithSecondJobElement")));
 			if (!record.get("areasSecondJobElement").isBlank())
-				areasSecondJobElement = record.get("areasSecondJobElement").split(",");
-			Integer numberOfSecondJobElementLocations = null;
+				builder.setAreasSecondJobElement(record.get("areasSecondJobElement").split(","));
 			if (!record.get("numberOfSecondJobElementLocations").isBlank())
-				numberOfSecondJobElementLocations = Integer.parseInt(record.get("numberOfSecondJobElementLocations"));
-			String[] locationsOfSecondJobElement = null;
+				builder.setNumberOfSecondJobElementLocations(
+						Integer.parseInt(record.get("numberOfSecondJobElementLocations")));
 			if (!record.get("locationsOfSecondJobElement").isBlank())
-				locationsOfSecondJobElement = record.get("locationsOfSecondJobElement").split(",");
-			Integer secondJobElementTimePerUnit = null;
-			if (!record.get("secondJobElementTimePerUnit").isBlank())
-				secondJobElementTimePerUnit = Integer.parseInt(record.get("secondJobElementTimePerUnit"));
-			TimeWindow secondJobElementTimeWindow = null;
-			if (!record.get("secondJobElementStartTime").isBlank() || !record.get("secondJobElementEndTime").isBlank())
-				secondJobElementTimeWindow = TimeWindow.newInstance(
-						Integer.parseInt(record.get("secondJobElementStartTime")),
-						Integer.parseInt(record.get("secondJobElementEndTime")));
-
-			if (areasSecondJobElement != null || numberOfSecondJobElementLocations != null
-					|| locationsOfSecondJobElement != null || secondJobElementTimePerUnit != null
-					|| secondJobElementTimeWindow != null) {
-				DemandInformationElement newShipmentDemand = new DemandInformationElement(carrierName,
-						demandToDistribute, numberOfJobs, shareOfPopulationWithFirstJobElement, areasFirstJobElement,
-						numberOfFirstJobElementLocations, locationsOfFirstJobElement, firstJobElementTimePerUnit,
-						firstJobElementTimeWindow, shareOfPopulationWithSecondJobElement, areasSecondJobElement,
-						numberOfSecondJobElementLocations, locationsOfSecondJobElement, secondJobElementTimePerUnit,
-						secondJobElementTimeWindow);
-				demandInformation.add(newShipmentDemand);
-			} else {
-				DemandInformationElement newServiceDemand = new DemandInformationElement(carrierName,
-						demandToDistribute, numberOfJobs, shareOfPopulationWithFirstJobElement, areasFirstJobElement,
-						numberOfFirstJobElementLocations, locationsOfFirstJobElement, firstJobElementTimePerUnit,
-						firstJobElementTimeWindow);
-				demandInformation.add(newServiceDemand);
+				builder.setLocationsOfSecondJobElement(record.get("locationsOfSecondJobElement").split(","));
+			if (!record.get("secondJobElementTimePerUnit").isBlank()) {
+				builder.setSecondJobElementTimePerUnit(Integer.parseInt(record.get("secondJobElementTimePerUnit")));
+				builder.setTypeOfDemand("shipment");
 			}
-
+			if (!record.get("secondJobElementStartTime").isBlank() || !record.get("secondJobElementEndTime").isBlank())
+				builder.setSecondJobElementTimeWindow(
+						TimeWindow.newInstance(Integer.parseInt(record.get("secondJobElementStartTime")),
+								Integer.parseInt(record.get("secondJobElementEndTime"))));
+			DemandInformationElement newDemandInformationElement = builder.build();
+			demandInformation.add(newDemandInformationElement);
 		}
 		checkNewDemand(scenario, demandInformation, polygonsInShape);
 		return demandInformation;
@@ -459,17 +414,11 @@ public final class DemandReaderFromCSV {
 			Collection<SimpleFeature> polygonsInShape) {
 
 		for (DemandInformationElement newDemand : demandInformation) {
-			if (newDemand.getCarrierName() == null || newDemand.getCarrierName().isBlank())
-				throw new RuntimeException(
-						"Minimum one demand is not related to a carrier. Every demand information has to be related to one carrier. Please check the input csv file!");
 			Carriers carriers = (Carriers) scenario.getScenarioElement("carriers");
 			if (!carriers.getCarriers().containsKey(Id.create(newDemand.getCarrierName(), Carrier.class)))
 				throw new RuntimeException(
 						"The created demand is not created for an existing carrier. Please create the carrier "
 								+ newDemand.getCarrierName() + " first or relate the demand to another carrier");
-			if (newDemand.getDemandToDistribute() == null)
-				throw new RuntimeException("For the carrier " + newDemand.getCarrierName()
-						+ ": No demand information found. You must add 0 as demand if you want no demand. Please check!");
 			if (newDemand.getNumberOfJobs() != null && newDemand.getDemandToDistribute() != 0
 					&& newDemand.getDemandToDistribute() < newDemand.getNumberOfJobs())
 				throw new RuntimeException("For the carrier " + newDemand.getCarrierName()
