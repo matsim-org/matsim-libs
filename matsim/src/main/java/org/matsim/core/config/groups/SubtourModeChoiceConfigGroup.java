@@ -36,6 +36,8 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String MODES = "modes";
 	public final static String CHAINBASEDMODES = "chainBasedModes";
 	public final static String CARAVAIL = "considerCarAvailability";
+	public final static String SINGLE_PROBA = "probaForRandomSingleTripMode";
+
 	private static final String BEHAVIOR = "behavior";
 	
 	private String[] chainBasedModes = new String[] { TransportMode.car, TransportMode.bike };
@@ -100,6 +102,7 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(MODES, "Defines all the modes available, including chain-based modes, seperated by commas" );
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
 		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
+		comments.put(SINGLE_PROBA, "Defines the probability of changing a single trip for a unchained mode instead of subtour.");
 		{
 			StringBuilder msg = new StringBuilder("Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: ");
 			for ( SubtourModeChoice.Behavior behavior : SubtourModeChoice.Behavior.values() ) {
@@ -146,10 +149,13 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final SubtourModeChoice.Behavior getBehavior() {
 		return this.behavior ;
 	}
-	
+
+	@StringGetter(SINGLE_PROBA)
 	public double getProbaForRandomSingleTripMode() {
 		return this.probaForRandomSingleTripMode;
 	}
+
+	@StringSetter(SINGLE_PROBA)
 	public void setProbaForRandomSingleTripMode(double probaForRandomSingleTripMode) {
 		this.probaForRandomSingleTripMode = probaForRandomSingleTripMode;
 	}

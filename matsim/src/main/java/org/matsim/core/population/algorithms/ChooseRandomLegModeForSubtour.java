@@ -157,6 +157,13 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	 * Return whether a subtour is mass conserving according to configuration.
 	 */
 	public boolean isMassConserving(final Subtour subtour) {
+
+		// non-closed subtours without any parent do not necessarily violate mass conservation
+		if (behavior == SubtourModeChoice.Behavior.betweenAllLessConstraints &&
+				!subtour.isClosed() && subtour.getParent() == null) {
+			return true;
+		}
+
 		for (String mode : chainBasedModes) {
 			if (!isMassConserving(subtour, mode)) {
 				return false;
@@ -207,13 +214,15 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			final List<Trip> trips,
 			final Collection<Subtour> subtours,
 			final Collection<String> permissibleModesForThisPerson) {
-		final ArrayList<Candidate> choiceSet = new ArrayList<Candidate>();
+		final ArrayList<Candidate> choiceSet = new ArrayList<>();
 		for ( Subtour subtour : subtours ) {
-			if ( !subtour.isClosed() ) {
+
+			// If subtour is not closed, it will still be considered if constrains are disabled
+			if ( !subtour.isClosed() && behavior != SubtourModeChoice.Behavior.betweenAllLessConstraints) {
 				continue;
 			}
 
-			if ( containsUnknownMode( subtour ) ) {
+			if ( containsUnknownMode( subtour ) && behavior != SubtourModeChoice.Behavior.betweenAllLessConstraints) {
 				continue;
 			}
 
@@ -247,12 +256,17 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 					// can have more than one mode here when subtour starts at home.
 				}
 			}
+
 			// yy My intuition is that with the above condition, a switch of an all-car plan with at least
 			// one explicit sub-tour could switch to an all-bicycle plan only via first changing the
 			// explicit sub-tour first to a non-chain-based mode.  kai, jul'18
 
+			// The top-level subtour may use all chain-based modes freely for the whole plan
+			if (behavior == SubtourModeChoice.Behavior.betweenAllLessConstraints && subtour.getParent() == null)
+				usableChainBasedModes.addAll(chainBasedModes);
+
 			Set<String> usableModes = new LinkedHashSet<>();
-			if (isMassConserving(subtour)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
+			if (isMassConserving(subtour) || (behavior == SubtourModeChoice.Behavior.betweenAllLessConstraints && subtour.getParent() == null)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
 				for (String candidate : permissibleModesForThisPerson) {
 					if (chainBasedModes.contains(candidate)) {
 						// for chain-based modes, only add if vehicle is available:

@@ -34,8 +34,14 @@ public class SubTourAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--ignore-plans", description = "Ignore plans containing certain modes", defaultValue = "freight", split = ",")
 	private Set<String> ignoreModes;
 
-	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "fromAllModesToSpecifiedModes")
+	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "betweenAllLessConstraints")
 	private SubtourModeChoice.Behavior behavior;
+
+	@CommandLine.Option(names = "--st-proba", description = "Probability for single trip mode-choice", defaultValue = "0.2")
+	private double singleTrip;
+
+	@CommandLine.Option(names = "--iter", description = "Iterate strategy to output choice sets", defaultValue = "1")
+	private int iter;
 
 	public static void main(String[] args) {
 		new SubTourAnalysis().execute(args);
@@ -70,7 +76,7 @@ public class SubTourAnalysis implements MATSimAppCommand {
 		log.info("Detected modes: {}", modes);
 
 		ChooseRandomLegModeForSubtour strategy = new ChooseRandomLegModeForSubtour(new DefaultAnalysisMainModeIdentifier(), plan -> modes,
-				modes.toArray(new String[0]), chainBasedModes.toArray(new String[0]), new Random(1234), behavior, 0.0);
+				modes.toArray(new String[0]), chainBasedModes.toArray(new String[0]), new Random(1234), behavior, singleTrip);
 
 		int closed = 0;
 		int massConserving = 0;
@@ -78,14 +84,41 @@ public class SubTourAnalysis implements MATSimAppCommand {
 		for (TripStructureUtils.Subtour st : subtours) {
 			if (st.isClosed())
 				closed++;
-			else
-				log.debug("test");
 
 			if (strategy.isMassConserving(st))
 				massConserving++;
 		}
 
 		log.info("Subtours: {} | closed: {}% | massConserving: {}%", subtours.size(), 100d * closed / subtours.size(), 100d * massConserving / subtours.size());
+
+
+		// Iterate the strategy for testing purpose
+		for (int i = 0; i < iter; i++) {
+
+			Set<ChooseRandomLegModeForSubtour.Candidate> c = new HashSet<>();
+			int empty = 0;
+
+			for (Person p : population.getPersons().values()) {
+
+				Plan plan = p.getSelectedPlan();
+
+				List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
+				List<ChooseRandomLegModeForSubtour.Candidate> cs = strategy.determineChoiceSet(plan);
+
+				// person with no trips always have no choice set
+				if (cs.isEmpty() && !trips.isEmpty()) {
+						empty++;
+						strategy.determineChoiceSet(plan);
+				}
+
+				c.addAll(cs);
+				strategy.run(plan);
+			}
+
+			log.info("Total choice sets: {}, persons with no choices: {}", c.size(), empty);
+
+		}
+
 
 		return 0;
 	}
