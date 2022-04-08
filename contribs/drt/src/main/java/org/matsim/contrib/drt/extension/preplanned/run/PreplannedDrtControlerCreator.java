@@ -24,10 +24,13 @@ package org.matsim.contrib.drt.extension.preplanned.run;
 
 import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -40,6 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author michalm (Michal Maciejewski)
  */
 public final class PreplannedDrtControlerCreator {
+	private static final Logger log = Logger.getLogger(PreplannedDrtControlerCreator.class);
 
 	/**
 	 * Creates a controller in one step.
@@ -59,6 +63,21 @@ public final class PreplannedDrtControlerCreator {
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new MultiModePreplannedDrtModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+
+		// make sure rebalancing is OFF as this would interfere with simulation of pre-calculated vehicle schedules
+		MultiModeDrtConfigGroup.get(config).getModalElements().forEach(drtConfigGroup -> {
+			if (drtConfigGroup.getRebalancingParams().isPresent()) {
+				log.warn("The rebalancing parameter set is defined for drt mode: "
+						+ drtConfigGroup.getMode()
+						+ ". It will be ignored. No rebalancing will happen.");
+				controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtConfigGroup.getMode()) {
+					@Override
+					protected void configureQSim() {
+						bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
+					}
+				});
+			}
+		});
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
