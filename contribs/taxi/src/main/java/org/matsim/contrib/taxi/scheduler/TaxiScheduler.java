@@ -19,14 +19,23 @@
 
 package org.matsim.contrib.taxi.scheduler;
 
+import static java.util.stream.Collectors.toList;
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -35,7 +44,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
@@ -47,25 +55,50 @@ import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.util.ExecutorServiceWithResource;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.name.Named;
+import com.google.common.util.concurrent.Futures;
 
-public class TaxiScheduler {
+public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	protected final TaxiConfigGroup taxiCfg;
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 	private final TaxiScheduleInquiry taxiScheduleInquiry;
+	private final EventsManager eventsManager;
+	private final MobsimTimer mobsimTimer;
+
+	// Pre-computing paths (occupied drive tasks) when they are not needed immediately (destinationKnown is false):
+	// In some configurations, the taxi optimiser may not know the destination until the passenger is picked up.
+	// But we can obtain this information already on request submission and use it to pre-compute the origin-destination path in the background.
+	// If sufficiently many threads are used, all such paths are found before the pickup simulation ends.
+	// Consequently, QSim is not (directly) slowed down by computing these paths.
+	private final ConcurrentMap<Id<Request>, Future<VrpPathWithTravelData>> pathFutures = new ConcurrentHashMap<>();
+	private final ExecutorServiceWithResource<LeastCostPathCalculator> executorService;
 
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, LeastCostPathCalculator router) {
+			TravelTime travelTime, Supplier<LeastCostPathCalculator> routerCreator, EventsManager eventsManager,
+			MobsimTimer mobsimTimer) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.taxiScheduleInquiry = taxiScheduleInquiry;
 		this.travelTime = travelTime;
-		this.router = router;
+		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
+
+		router = routerCreator.get();
+
+		executorService = taxiCfg.isDestinationKnown() ?
+				null :
+				new ExecutorServiceWithResource<>(IntStream.range(0, taxiCfg.getNumberOfThreads())
+						.mapToObj(i -> routerCreator.get())
+						.collect(toList()));
 
 		initFleet();
 	}
@@ -95,10 +128,26 @@ public class TaxiScheduler {
 				+ taxiCfg.getPickupDuration();
 		schedule.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), pickupEndTime, request));
 
+		Link reqFromLink = request.getFromLink();
+		Link reqToLink = request.getToLink();
+		final double dropoffStartTime;
 		if (taxiCfg.isDestinationKnown()) {
-			appendOccupiedDriveAndDropoff(schedule);
+			// TODO use an estimate to set up the occupied drive task and then start computing the actual path in the background
+			VrpPathWithTravelData path = calcPath(reqFromLink, reqToLink, pickupEndTime);
+			appendOccupiedDriveAndDropoff(schedule, request, path);
 			appendTasksAfterDropoff(vehicle);
+			dropoffStartTime = path.getArrivalTime();
+		} else {
+			// pre-compute path for occupied drive; the occupied drive and subsequent tasks will be added after the pickup
+			var pathFuture = executorService.submitCallable(
+					router -> VrpPaths.calcAndCreatePath(reqFromLink, reqToLink, pickupEndTime, router, travelTime));
+			pathFutures.put(request.getId(), pathFuture);
+			dropoffStartTime = Double.NaN; // destination is unknown and so the arrival time
 		}
+
+		eventsManager.processEvent(
+				new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), request.getMode(), request.getId(),
+						request.getPassengerId(), vehicle.getId(), pickupEndTime, dropoffStartTime));
 	}
 
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {
@@ -197,27 +246,22 @@ public class TaxiScheduler {
 		if (!taxiCfg.isDestinationKnown()) {
 			Task currentTask = schedule.getCurrentTask();
 			if (PICKUP.isBaseTypeOf(currentTask)) {
-				appendOccupiedDriveAndDropoff(schedule);
+				// use pre-computed path (occupied drive)
+				var req = ((TaxiPickupTask)currentTask).getRequest();
+				var path = Futures.getUnchecked(pathFutures.remove(req.getId()))
+						.withDepartureTime(currentTask.getEndTime());
+				appendOccupiedDriveAndDropoff(schedule, req, path);
 				appendTasksAfterDropoff(vehicle);
 			}
 		}
 	}
 
-	protected void appendOccupiedDriveAndDropoff(Schedule schedule) {
-		TaxiPickupTask pickupStayTask = (TaxiPickupTask)Schedules.getLastTask(schedule);
-
-		// add DELIVERY after SERVE
-		TaxiRequest req = pickupStayTask.getRequest();
-		Link reqFromLink = req.getFromLink();
-		Link reqToLink = req.getToLink();
-		double t3 = pickupStayTask.getEndTime();
-
-		VrpPathWithTravelData path = calcPath(reqFromLink, reqToLink, t3);
+	protected void appendOccupiedDriveAndDropoff(Schedule schedule, TaxiRequest req, VrpPathWithTravelData path) {
 		schedule.addTask(new TaxiOccupiedDriveTask(path, req));
 
-		double t4 = path.getArrivalTime();
-		double t5 = t4 + taxiCfg.getDropoffDuration();
-		schedule.addTask(new TaxiDropoffTask(t4, t5, req));
+		double arrivalTime = path.getArrivalTime();
+		double departureTime = arrivalTime + taxiCfg.getDropoffDuration();
+		schedule.addTask(new TaxiDropoffTask(arrivalTime, departureTime, req));
 	}
 
 	protected VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime) {
@@ -372,6 +416,13 @@ public class TaxiScheduler {
 
 			default:
 				throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		if (executorService != null) {
+			executorService.shutdown();
 		}
 	}
 }

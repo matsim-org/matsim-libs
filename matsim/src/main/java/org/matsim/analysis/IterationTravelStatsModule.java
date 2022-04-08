@@ -33,6 +33,7 @@ public class IterationTravelStatsModule extends AbstractModule {
 		bind(PHbyModeCalculator.class).asEagerSingleton();
 		bind(TripsAndLegsCSVWriter.CustomTripsWriterExtension.class).to(TripsAndLegsCSVWriter.NoTripWriterExtension.class).asEagerSingleton();
 		bind(TripsAndLegsCSVWriter.CustomLegsWriterExtension.class).to(TripsAndLegsCSVWriter.NoLegsWriterExtension.class).asEagerSingleton();
+		bind(TripsAndLegsCSVWriter.CustomTimeWriter.class).to(TripsAndLegsCSVWriter.DefaultTimeWriter.class).asEagerSingleton();
 		addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
 	}
 

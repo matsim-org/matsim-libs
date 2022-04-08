@@ -24,9 +24,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import picocli.CommandLine;
-
 import javax.annotation.Nullable;
+import picocli.CommandLine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
@@ -64,6 +63,13 @@ public final class ShpOptions {
 		this.shp = shp;
 		this.shpCrs = shpCrs;
 		this.shpCharset = shpCharset;
+	}
+
+	/**
+	 * Return whether a shape was set.
+	 */
+	public boolean isDefined() {
+		return shp != null && !shp.toString().isBlank();
 	}
 
 	/**
@@ -143,6 +149,11 @@ public final class ShpOptions {
 		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		if (features.size() > 1) {
 			for (SimpleFeature simpleFeature : features) {
+				if (simpleFeature.getDefaultGeometry() == null) {
+					log.warn("Features {} has no geometry", simpleFeature);
+					continue;
+				}
+
 				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
 				geometry.union(subArea);
 			}
@@ -201,7 +212,7 @@ public final class ShpOptions {
 				shpCrs = "EPSG:" + CRS.lookupEpsgCode(crs, true);
 				log.info("Using detected crs for {}: {}", shp, shpCrs);
 
-			} catch (IOException | FactoryException e) {
+			} catch (IOException | FactoryException | NullPointerException e) {
 				throw new IllegalStateException("Could not determine crs of the shape file. Try to specify it manually using --shp-crs.", e);
 			}
 		}
@@ -209,6 +220,12 @@ public final class ShpOptions {
 		return shpCrs;
 	}
 
+	/**
+	 * Create an inverse coordinate transformation from the shape file crs. Tries to autodetect the crs of the shape file.
+	 */
+	public CoordinateTransformation createInverseTransformation(String toCRS) {
+		return TransformationFactory.getCoordinateTransformation(detectCRS(), toCRS);
+	}
 
 	/**
 	 * Helper class to provide an index for a shapefile lookup.
@@ -235,6 +252,11 @@ public final class ShpOptions {
 			FeatureReader<SimpleFeatureType, SimpleFeature> it = ds.getFeatureReader();
 			while (it.hasNext()) {
 				SimpleFeature ft = it.next();
+
+				if (ft.getDefaultGeometry() == null) {
+					log.warn("Feature {} has no geometry", ft);
+					continue;
+				}
 
 				if (filter != null && !filter.contains(ft.getAttribute(attr)))
 					continue;

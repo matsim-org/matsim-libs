@@ -32,6 +32,7 @@ import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -123,9 +124,9 @@ public class AccessibilityUtils {
 	}
 
 
-	public static Network createModeSpecificSubNetwork(Network network, String mode) {
+	public static Network createModeSpecificSubNetwork(Network network, String mode, NetworkConfigGroup networkConfigGroup) {
 		LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
-		Network subNetwork = NetworkUtils.createNetwork();
+		Network subNetwork = NetworkUtils.createNetwork(networkConfigGroup);
 		Set<String> modeSet = new HashSet<>();
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 		if (mode.equals(Modes4Accessibility.freespeed.name())) {

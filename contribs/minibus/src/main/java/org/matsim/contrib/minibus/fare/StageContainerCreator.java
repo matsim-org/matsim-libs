@@ -90,9 +90,7 @@ public final class StageContainerCreator implements TransitDriverStartsEventHand
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		this.vehId2TransitDriverStartsE.put(event.getVehicleId(), event);
-		if (this.vehId2StageContainerListMap.get(event.getVehicleId()) == null) {
-			this.vehId2StageContainerListMap.put(event.getVehicleId(), new LinkedList<StageContainer>());
-		}
+		this.vehId2StageContainerListMap.computeIfAbsent(event.getVehicleId(), k -> new LinkedList<>());
 	}
 
 	@Override

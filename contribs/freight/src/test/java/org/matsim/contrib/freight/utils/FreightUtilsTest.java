@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -110,7 +109,8 @@ public class FreightUtilsTest {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 
-		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType.getId()).build();
+		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)"),
+				carrierVehType ).setEarliestStart(0.0 ).setLatestEnd(36000.0 ).setTypeId(carrierVehType.getId() ).build();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
@@ -324,7 +324,7 @@ public class FreightUtilsTest {
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
 		CarrierUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
 
-		Network network = NetworkUtils.createNetwork();
+        Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 
 		MatsimJspritFactory.createRoutingProblemBuilder(carrierMixedWServicesAndShipments, network);

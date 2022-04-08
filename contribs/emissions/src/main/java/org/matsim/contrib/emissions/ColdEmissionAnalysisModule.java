@@ -35,8 +35,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.*;
-
 
 /**
  * 2 categories for distance driven AFTER coldstart:
@@ -157,49 +155,16 @@ final class ColdEmissionAnalysisModule {
 		//Mapping everything except "motorcycle" to "pass.car", since this was done in the last years for HGV.
 		//This may can be improved: What should be better set to LGV or zero???? kturner, may'20
 		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
-			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if (vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
+			changeVehCategory(key, HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, HbefaVehicleCategory.PASSENGER_CAR);
 		}
 		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)) {
-			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if (vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.URBAN_BUS +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
+			changeVehCategory(key, HbefaVehicleCategory.URBAN_BUS, HbefaVehicleCategory.PASSENGER_CAR );
 		}
 		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.COACH)) {
-			key.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if (vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.COACH +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
+			changeVehCategory(key, HbefaVehicleCategory.COACH, HbefaVehicleCategory.PASSENGER_CAR);
 		}
 		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)){
-			for ( Pollutant coldPollutant : coldPollutants) {
-				coldEmissionsOfEvent.put( coldPollutant, 0.0 );
-				// yyyyyy todo replace by something more meaningful. kai, jan'20
-			}
-			if(vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA does not provide cold start emission factors for " +
-						HbefaVehicleCategory.MOTORCYCLE +
-					//	". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-						"Currently, this code is setting the emissions of such vehicles to zero - as it was in the last years" +
-					"Might be necessary to find a better solution for this.  kturner, may'20" );
-				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
+			changeVehCategory(key, HbefaVehicleCategory.MOTORCYCLE, HbefaVehicleCategory.PASSENGER_CAR);
 			return coldEmissionsOfEvent;
 		}
 
@@ -227,6 +192,33 @@ final class ColdEmissionAnalysisModule {
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
 		}
 		return coldEmissionsOfEvent;
+	}
+
+	/**
+	 * Replace the vehicleCategory with HbefaVehicleCategory.PASSENGER_CAR
+	 * This is the old behaviour as it was until Aug 21.
+	 * (Aug'21, KMT) This does not help, since the emConcepts are not the same. So it is _not_ usable if using
+	 *  some kind of detailed values.
+	 * @param key
+	 * @param originVehCat
+	 * @param targetvehCat
+	 */
+	//TODO Mabe make the behaviour settable by an enum? -> keep some kind of backwards capability or just return a 0.0 as it is for motorcycle?
+	private void changeVehCategory(HbefaColdEmissionFactorKey key, HbefaVehicleCategory originVehCat, HbefaVehicleCategory targetvehCat) {
+//		key.setVehicleCategory(targetvehCat);
+//		if (vehInfoWarnHDVCnt < maxWarnCnt) {
+//			vehInfoWarnHDVCnt++;
+//			logger.warn("HBEFA does not provide cold start emission factors for " +
+//					originVehCat +
+//					". Setting vehicle category to " + targetvehCat + "...");
+//			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//		}
+		if (vehInfoWarnHDVCnt < maxWarnCnt) {
+			vehInfoWarnHDVCnt++;
+			logger.warn("Automagic changing of VehCategory is disabled. Please make sure that your table contains the " +
+					"necessary values for " + originVehCat.name());
+			if (vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+		}
 	}
 
 	private HbefaColdEmissionFactor getEmissionsFactor(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey efkey, Pollutant coldPollutant) {

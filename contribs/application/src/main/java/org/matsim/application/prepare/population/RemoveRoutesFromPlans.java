@@ -1,22 +1,15 @@
 package org.matsim.application.prepare.population;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
-
-import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import com.google.common.collect.Lists;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
-
-import com.google.common.collect.Lists;
-
 import picocli.CommandLine;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Removes route information from a plans file.
@@ -30,7 +23,7 @@ import picocli.CommandLine;
         showDefaultValues = true
 )
 @Deprecated
-public class RemoveRoutesFromPlans implements Callable<Integer> {
+public class RemoveRoutesFromPlans implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--plans", description = "Input original plan file", required = true)
     private Path plans;

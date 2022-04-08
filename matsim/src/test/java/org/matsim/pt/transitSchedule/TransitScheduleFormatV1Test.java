@@ -60,7 +60,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		Network network = NetworkUtils.createNetwork();
-		Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 0));
 		Node n3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 0, (double) 0));
 		Node n4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 0));

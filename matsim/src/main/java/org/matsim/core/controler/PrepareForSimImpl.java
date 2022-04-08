@@ -37,8 +37,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -49,6 +47,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
@@ -81,6 +80,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
 	private final PlansConfigGroup plansConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
+	private final TimeInterpretation timeInterpretation;
 
 	/**
 	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
@@ -91,7 +91,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
 				PlansConfigGroup plansConfigGroup, 
-				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
+				MainModeIdentifier backwardCompatibilityMainModeIdentifier,
+				TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -102,6 +103,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.plansConfigGroup = plansConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -112,17 +114,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
-		final Network carOnlyNetwork;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			carOnlyNetwork = NetworkUtils.createNetwork();
-			HashSet<String> modes = new HashSet<>();
-			modes.add(TransportMode.car);
-			filter.filter(carOnlyNetwork, modes);
-		} else {
-			carOnlyNetwork = network;
-		}
+
+		//As the routing modules find nearest links anyways, I do not think using a filtered single-mode network (in this case: carOnlyNetwork) is needed anymore.
+		//The routing modules even use the mode filtered networks for each mode, which seems to be way more useful e.g. for scenarios
+		//with superblocks -sm march22
+		final Network net = network;
 
 		//matsim-724
 		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
@@ -158,7 +154,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		// get links for facilities
 		// using car only network to get the links for facilities. Amit July'18
-		XY2LinksForFacilities.run(carOnlyNetwork, this.activityFacilities);
+		XY2LinksForFacilities.run(net, this.activityFacilities);
 
 		// yyyy from a behavioral perspective, the vehicle must be somehow linked to
 		// the person (maybe via the household).    kai, feb'18
@@ -172,8 +168,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
-						carOnlyNetwork)
+				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario,
+						net)
 		);
 		
 		if (scenario instanceof Lockable) {

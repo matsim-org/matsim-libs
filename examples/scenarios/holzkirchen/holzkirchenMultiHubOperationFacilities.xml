@@ -1,0 +1,4 @@
+<facilities>
+    <facility id="1" linkId="274110" x="4478595" y="5304631" chargerId="1" capacity="20" type="hub"/>
+    <facility id="2" linkId="452469" x="4475542" y="5304665.283009614" chargerId="1" capacity="20" type="hub"/>
+</facilities>

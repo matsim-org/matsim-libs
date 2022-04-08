@@ -117,6 +117,16 @@ public class SupersonicOsmNetworkReader {
                 .forEach(this::addLinkToNetwork);
     }
 
+    private ProcessedOsmNode getNodeFromWay(ProcessedOsmWay way, int index) {
+        long nodeId = way.getNodeIds().get(index);
+        ProcessedOsmNode node = nodes.get(nodeId);
+        if (node == null) {
+            throw new RuntimeException("A node with id: " + nodeId + " was null. " +
+                    "Ensure you pass the 'completeWays=yes' argument when executing osmosis commands.");
+        }
+        return node;
+    }
+
     Collection<WaySegment> createWaySegments(ProcessedOsmWay way) {
 
         List<WaySegment> segments = new ArrayList<>();
@@ -126,10 +136,10 @@ public class SupersonicOsmNetworkReader {
         for (int i = 1; i < way.getNodeIds().size(); i++) {
 
             // get the first node of the segment
-            ProcessedOsmNode fromNodeForSegment = nodes.get(way.getNodeIds().get(fromNodeForSegmentIndex));
+            ProcessedOsmNode fromNodeForSegment = getNodeFromWay(way, fromNodeForSegmentIndex);
             // get the from and to nodes for a sub segment of the current way
-            ProcessedOsmNode fromOsmNode = nodes.get(way.getNodeIds().get(i - 1));
-            ProcessedOsmNode toOsmNode = nodes.get(way.getNodeIds().get(i));
+            ProcessedOsmNode fromOsmNode = getNodeFromWay(way, i - 1);
+            ProcessedOsmNode toOsmNode = getNodeFromWay(way, i);
 
             // add the distance between those nodes to the overall length of segment
             segmentLength += CoordUtils.calcEuclideanDistance(fromOsmNode.getCoord(), toOsmNode.getCoord());
@@ -246,7 +256,10 @@ public class SupersonicOsmNetworkReader {
         link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), properties, adjustCapacityLength) * link.getNumberOfLanes());
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
         link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
-        if (storeOriginalGeometry)
+        link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, getMaxSpeed(segment.getTags(), link.getLength(), properties));
+        if (storeOriginalGeometry && segment.getNodesForSegment().size() > 2)
+            // this is optional functionality. Also, the first and last nodeforsegment are the from and to node of the simplified link
+            // it makes only sense to store more geometry information if there are intermediate nodes.
             link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, getOriginalGeometry(segment.getNodesForSegment(), direction));
         afterLinkCreated.accept(link, segment.getTags(), direction);
         return link;
@@ -282,6 +295,14 @@ public class SupersonicOsmNetworkReader {
         if (tags.containsKey(OsmTags.MAXSPEED)) {
             double maxSpeed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
             return LinkProperties.calculateSpeedIfSpeedTag(maxSpeed, freeSpeedFactor);
+        } else {
+            return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
+        }
+    }
+
+    private double getMaxSpeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
+        if (tags.containsKey(OsmTags.MAXSPEED)) {
+            return parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
         } else {
             return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
         }

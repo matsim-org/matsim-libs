@@ -60,10 +60,9 @@ public class QueueAgentSnapshotInfoBuilderTest {
         assertEquals(1, outCollection.size());
         AgentSnapshotInfo firstEntry = outCollection.iterator().next();
 
-        double travelTimeOnLink = setUp.linkLength / setUp.freespeed;
-        double distanceTravelledPerSecondAccountingForIntersectionSecond = setUp.linkLength / ( travelTimeOnLink + 1 );
+        double expectedEasting = setUp.freespeed * now;
 
-        assertEquals(distanceTravelledPerSecondAccountingForIntersectionSecond * ( now + 1 ), firstEntry.getEasting(), 0.00001); // +1 for the initila
+        assertEquals(expectedEasting, firstEntry.getEasting(), 0.00001);
         assertEquals(-18.75, firstEntry.getNorthing(), 0.00001); // the calculator assumes an offset to the right of the driving direction ...
 
         var vehicle = vehicles.iterator().next();
@@ -72,64 +71,6 @@ public class QueueAgentSnapshotInfoBuilderTest {
         assertEquals(vehicle.getId(), firstEntry.getVehicleId());
         assertEquals(1.0, firstEntry.getColorValueBetweenZeroAndOne(), 0.00001);
         assertEquals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, firstEntry.getAgentState());
-    }
-
-    private static Collection<QVehicle> createVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
-
-        VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) );
-        type.setMaximumVelocity(link.getFreespeed() + 10); // faster than link's freespeed
-        var exitTime = exitTimeOfFirstVehicle;
-
-        List<QVehicle> result = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-
-            var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
-            vehicle.setEarliestLinkExitTime(exitTime);
-            vehicle.setDriver(new TestDriverAgent(Id.createPersonId(1)));
-            vehicle.setCurrentLink(link);
-
-            result.add(vehicle);
-            exitTime += 5;
-        }
-        return result;
-    }
-
-    private static Queue<QVehicle> createTransitVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
-
-        VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.pt, VehicleType.class));
-        type.setMaximumVelocity(link.getFreespeed() + 10); // faster than link's freespeed
-        type.getCapacity().setSeats(10);
-        var exitTime = exitTimeOfFirstVehicle;
-
-        Queue<QVehicle> result = new LinkedList<>();
-
-        for (int i = 0; i < size; i++) {
-
-            var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
-            vehicle.setEarliestLinkExitTime(exitTime);
-            vehicle.setDriver(new TestTransitDriverAgent(Id.createPersonId(1)));
-            vehicle.setCurrentLink(link);
-
-            for (int b = 0; b < type.getCapacity().getSeats(); b++) {
-                vehicle.addPassenger(new TestPassengerAgent(Id.createPersonId(1)));
-            }
-
-            result.add(vehicle);
-            exitTime += 5;
-        }
-        return result;
-    }
-
-    private static Collection<TestDriverAgent> createAgents(int size) {
-
-        List<TestDriverAgent> result = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-
-            var driver = new TestDriverAgent(Id.createPersonId(1));
-            result.add(driver);
-        }
-        return result;
     }
 
     @Test
@@ -212,12 +153,12 @@ public class QueueAgentSnapshotInfoBuilderTest {
 
         // we expect 2 cars to be at freeflow somewhere on the link
         var vehicle4 = outCollection.get(3);
-        // linkLength 100, freespeed travel time 10s -> (100 m / (10 regular travel time + 1 extra intersection second redistributed)) * (5s time passed on link + 1) = (100 / 11) * (5 + 1)
-        assertEquals(54.54545454545455, vehicle4.getEasting(), 0.0001);
+        // linkLength 100, freespeed 10m/s, 5s till earliest exit time -> 100 - 10 * 5 = 50
+        assertEquals(50, vehicle4.getEasting(), 0.0001);
         assertEquals(1.0, vehicle4.getColorValueBetweenZeroAndOne(), 0.0001);
         var vehicle5 = outCollection.get(4);
-        // linkLength 100, freespeed travel time 10s -> (100 m / (10 regular travel time + 1 extra intersection second redistributed)) * (0s time passed on link + 1) = (100 / 11) * (0 + 1)
-        assertEquals(9.09090909090909, vehicle5.getEasting(), 0.0001);
+        // linkLength 100, freespeed 10m/s, 10s till earliest exit time -> 100 - 10 * 10 = 0
+        assertEquals(0, vehicle5.getEasting(), 0.0001);
         assertEquals(1.0, vehicle5.getColorValueBetweenZeroAndOne(), 0.0001);
     }
 
@@ -473,5 +414,63 @@ public class QueueAgentSnapshotInfoBuilderTest {
         public String getMode() {
             return TransportMode.pt;
         }
+    }
+
+    private static Collection<QVehicle> createVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
+
+        VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) );
+        type.setMaximumVelocity(link.getFreespeed() + 10); // faster than link's freespeed
+        var exitTime = exitTimeOfFirstVehicle;
+
+        List<QVehicle> result = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+
+            var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
+            vehicle.setEarliestLinkExitTime(exitTime);
+            vehicle.setDriver(new TestDriverAgent(Id.createPersonId(1)));
+            vehicle.setCurrentLink(link);
+
+            result.add(vehicle);
+            exitTime += 5;
+        }
+        return result;
+    }
+
+    private static Queue<QVehicle> createTransitVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
+
+        VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.pt, VehicleType.class));
+        type.setMaximumVelocity(link.getFreespeed() + 10); // faster than link's freespeed
+        type.getCapacity().setSeats(10);
+        var exitTime = exitTimeOfFirstVehicle;
+
+        Queue<QVehicle> result = new LinkedList<>();
+
+        for (int i = 0; i < size; i++) {
+
+            var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
+            vehicle.setEarliestLinkExitTime(exitTime);
+            vehicle.setDriver(new TestTransitDriverAgent(Id.createPersonId(1)));
+            vehicle.setCurrentLink(link);
+
+            for (int b = 0; b < type.getCapacity().getSeats(); b++) {
+                vehicle.addPassenger(new TestPassengerAgent(Id.createPersonId(1)));
+            }
+
+            result.add(vehicle);
+            exitTime += 5;
+        }
+        return result;
+    }
+
+    private static Collection<TestDriverAgent> createAgents(int size) {
+
+        List<TestDriverAgent> result = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+
+            var driver = new TestDriverAgent(Id.createPersonId(1));
+            result.add(driver);
+        }
+        return result;
     }
 }

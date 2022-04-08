@@ -35,6 +35,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -49,9 +50,11 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 		Logger.getLogger(SynchronizeCoTravelerPlansAlgorithm.class);
 
 	private final Set<String> stageTypes;
+	private final TimeInterpretation timeInterpretation;
 
-	public SynchronizeCoTravelerPlansAlgorithm() {
+	public SynchronizeCoTravelerPlansAlgorithm(TimeInterpretation timeInterpretation) {
 		this.stageTypes = JointActingTypes.JOINT_STAGE_ACTS;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -93,7 +96,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final OptionalTime legDur = PopulationUtils.decideOnTravelTimeForLeg(leg);
+				final OptionalTime legDur = timeInterpretation.decideOnLegTravelTime(leg);
 
 				if ( legDur.isDefined()) {
 					now -= legDur.seconds();
@@ -131,7 +134,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final OptionalTime legDur = PopulationUtils.decideOnTravelTimeForLeg(leg);
+				final OptionalTime legDur = timeInterpretation.decideOnLegTravelTime(leg);
 
 				if ( legDur.isDefined()) {
 					tt += legDur.seconds();

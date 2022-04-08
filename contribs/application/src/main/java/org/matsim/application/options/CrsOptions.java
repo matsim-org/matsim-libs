@@ -25,6 +25,14 @@ public final class CrsOptions {
     }
 
     /**
+     * Construct crs options with default input and target crs.
+     */
+    public CrsOptions(String inputCRS, String targetCRS) {
+        this.inputCRS = inputCRS;
+        this.targetCRS = targetCRS;
+    }
+
+    /**
      * Default with new predefined options.
      */
     public CrsOptions() { }
@@ -47,6 +55,12 @@ public final class CrsOptions {
      * Create coordinate transformation from the options.
      */
     public CoordinateTransformation getTransformation() {
+        if (inputCRS == null)
+            throw new IllegalArgumentException(("inputCRS not specified!"));
+
+        if (targetCRS == null)
+            throw new IllegalArgumentException(("targetCRS not specified!"));
+
         return TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
     }
 

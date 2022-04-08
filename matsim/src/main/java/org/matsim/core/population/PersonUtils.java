@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.population;
+package org.matsim.core.population;
 
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -29,147 +29,164 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 public final class PersonUtils {
-	private PersonUtils(){} // do not instantiate
-	
-	private final static String SEX_ATTRIBUTE="sex";
-	private final static String HAS_LICENSE= "hasLicense";
-	private static final String CAR_AVAIL = "carAvail";
-	private static final String EMPLOYED = "employed";
-	private static final String AGE = "age";
-	private static final String TRAVELCARDS = "travelcards";
-	private final static Logger log = Logger.getLogger(Person.class);
+    private PersonUtils() {
+    } // do not instantiate
 
-	@Deprecated // use methods of interface Person
-	public static Plan createAndAddPlan(Person person, final boolean selected) {
-		Plan p = PopulationUtils.createPlan(person);
-		person.addPlan(p);
-		if (selected) {
-			person.setSelectedPlan(p);
-		}
-		return p;
-	}
+    private final static String SEX_ATTRIBUTE = "sex";
+    private final static String HAS_LICENSE = "hasLicense";
+    private static final String CAR_AVAIL = "carAvail";
+    private static final String EMPLOYED = "employed";
+    private static final String AGE = "age";
+    private static final String TRAVEL_CARDS = "travelcards";
+    private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
+    private final static Logger log = Logger.getLogger(Person.class);
 
-	public static void removeUnselectedPlans(Person person) {
-		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
-			Plan plan = iter.next();
-			if (!PersonUtils.isSelected(plan)) {
-				iter.remove();
-			}
-		}
-	}
+    @Deprecated // use methods of interface Person
+    public static Plan createAndAddPlan(Person person, final boolean selected) {
+        Plan p = PopulationUtils.createPlan(person);
+        person.addPlan(p);
+        if (selected) {
+            person.setSelectedPlan(p);
+        }
+        return p;
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static String getSex(Person person) {
-		return (String) person.getAttributes().getAttribute(SEX_ATTRIBUTE);
-	}
+    public static void removeUnselectedPlans(Person person) {
+        for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
+            Plan plan = iter.next();
+            if (!PersonUtils.isSelected(plan)) {
+                iter.remove();
+            }
+        }
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static Integer getAge(Person person) {
-		return (Integer) person.getAttributes().getAttribute(AGE);
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static String getSex(Person person) {
+        return (String) person.getAttributes().getAttribute(SEX_ATTRIBUTE);
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static String getLicense(Person person) {
-		return (String) person.getAttributes().getAttribute(HAS_LICENSE);
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static Integer getAge(Person person) {
+        return (Integer) person.getAttributes().getAttribute(AGE);
+    }
 
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static String getLicense(Person person) {
+        return (String) person.getAttributes().getAttribute(HAS_LICENSE);
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static boolean hasLicense(Person person) {
-		return ("yes".equals(getLicense(person))) || ("true".equals(getLicense(person)));
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static Double getIncome(Person person) {
+        return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static String getCarAvail(Person person) {
-		return (String) person.getAttributes().getAttribute(CAR_AVAIL);
-		}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static boolean hasLicense(Person person) {
+        return ("yes".equals(getLicense(person))) || ("true".equals(getLicense(person)));
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static Boolean isEmployed(Person person) {
-		return (Boolean) person.getAttributes().getAttribute(EMPLOYED);	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static String getCarAvail(Person person) {
+        return (String) person.getAttributes().getAttribute(CAR_AVAIL);
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static void setAge(Person person, final Integer age) {
-		if (age!=null){
-		person.getCustomAttributes().put(AGE, age);
-		person.getAttributes().putAttribute(AGE,age ) ;
-		}
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static Boolean isEmployed(Person person) {
+        return (Boolean) person.getAttributes().getAttribute(EMPLOYED);
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static void setSex(Person person, final String sex) {
-		if (sex!=null){
-		person.getCustomAttributes().put(SEX_ATTRIBUTE, sex);
-		person.getAttributes().putAttribute( SEX_ATTRIBUTE, sex ) ;
-		}
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static void setAge(Person person, final Integer age) {
+        if (age != null) {
+            person.getCustomAttributes().put(AGE, age);
+            person.getAttributes().putAttribute(AGE, age);
+        }
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static void setLicence(Person person, final String licence) {
-		if (licence!=null){
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static void setSex(Person person, final String sex) {
+        if (sex != null) {
+            person.getCustomAttributes().put(SEX_ATTRIBUTE, sex);
+            person.getAttributes().putAttribute(SEX_ATTRIBUTE, sex);
+        }
+    }
 
-		person.getCustomAttributes().put(HAS_LICENSE, licence);
-		person.getAttributes().putAttribute(HAS_LICENSE, licence ) ;
-		}
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static void setLicence(Person person, final String licence) {
+        if (licence != null) {
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static void setCarAvail(Person person, final String carAvail) {
-		if (carAvail!=null){
-		person.getCustomAttributes().put(CAR_AVAIL, carAvail);
-		person.getAttributes().putAttribute(CAR_AVAIL,carAvail ) ;
-		}
-	}
+            person.getCustomAttributes().put(HAS_LICENSE, licence);
+            person.getAttributes().putAttribute(HAS_LICENSE, licence);
+        }
+    }
 
-	/**
-	 * convenience method for often used demographic attribute
-	 */
-	public static void setEmployed(Person person, final Boolean employed) {
-		if (employed!=null){
-		person.getCustomAttributes().put(EMPLOYED, employed);
-		person.getAttributes().putAttribute(EMPLOYED,employed ) ;
-		}
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static void setCarAvail(Person person, final String carAvail) {
+        if (carAvail != null) {
+            person.getCustomAttributes().put(CAR_AVAIL, carAvail);
+            person.getAttributes().putAttribute(CAR_AVAIL, carAvail);
+        }
+    }
 
-	@Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16
-	public static void addTravelcard(Person person, final String type) {
-		if (getTravelcards(person) == null) {
-			person.getCustomAttributes().put(TRAVELCARDS, new TreeSet<String>());
-		}
-		if (getTravelcards(person).contains(type)) {
-			log.info(person + "[type=" + type + " already exists]");
-		} else {
-			getTravelcards(person).add(type.intern());
-		}
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static void setEmployed(Person person, final Boolean employed) {
+        if (employed != null) {
+            person.getCustomAttributes().put(EMPLOYED, employed);
+            person.getAttributes().putAttribute(EMPLOYED, employed);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Deprecated // use PersonAttributes
-	public static TreeSet<String> getTravelcards(Person person) {
-		return (TreeSet<String>) person.getCustomAttributes().get(TRAVELCARDS);
-	}
+    /**
+     * convenience method for often used demographic attribute
+     */
+    public static void setIncome(Person person, final double income) {
+        person.getCustomAttributes().put(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+        person.getAttributes().putAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME, income);
+    }
 
-	public static boolean isSelected(Plan plan) {
-		return plan.getPerson().getSelectedPlan()==plan ;
-	}
+    @Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16
+    public static void addTravelcard(Person person, final String type) {
+        if (getTravelcards(person) == null) {
+            person.getCustomAttributes().put(TRAVEL_CARDS, new TreeSet<String>());
+        }
+        if (getTravelcards(person).contains(type)) {
+            log.info(person + "[type=" + type + " already exists]");
+        } else {
+            getTravelcards(person).add(type.intern());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Deprecated // use PersonAttributes
+    public static TreeSet<String> getTravelcards(Person person) {
+        return (TreeSet<String>) person.getCustomAttributes().get(TRAVEL_CARDS);
+    }
+
+    public static boolean isSelected(Plan plan) {
+        return plan.getPerson().getSelectedPlan() == plan;
+    }
 }

@@ -21,38 +21,25 @@
 
 package org.matsim.run.gui;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingUtilities;
-
+import com.google.common.base.Preconditions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.run.Controler;
+import org.matsim.run.RunMatsim;
 
-import com.google.common.base.Preconditions;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * @author mrieser / Senozon AG
@@ -550,14 +537,17 @@ public class Gui extends JFrame {
 		}
 	}
 
-	public static void show(final String title, final Class<?> mainClass) {
-		show(title, mainClass, null);
+	public static Future<Gui> show(final String title, final Class<?> mainClass) {
+		return show(title, mainClass, null);
 	}
 
-	public static void show(final String title, final Class<?> mainClass, File configFile) {
+	/**
+	 * Create the GUI and return it as future when created.
+	 */
+	public static Future<Gui> show(final String title, final Class<?> mainClass, File configFile) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-		SwingUtilities.invokeLater(() -> {
+		RunnableFuture<Gui> rf = new FutureTask<>(() -> {
 			Gui gui = new Gui(title, mainClass);
 			gui.createLayout();
 			gui.pack();
@@ -566,12 +556,17 @@ public class Gui extends JFrame {
 			if (configFile != null && configFile.exists()) {
 				gui.loadConfigFile(configFile);
 			}
+
+			return gui;
 		});
+
+		SwingUtilities.invokeLater(rf);
+		return rf;
 	}
 
 	public static void main(String[] args) {
 		Preconditions.checkArgument(args.length < 2);
-		Gui.show("MATSim", Controler.class, args.length == 1 ? new File(args[0]) : null);
+		Gui.show("MATSim", RunMatsim.class, args.length == 1 ? new File(args[0]) : null);
 	}
 
 	// Is it a problem to make the following available to the outside?  If so, why?  Would it

@@ -23,7 +23,7 @@ package org.matsim.contrib.util.stats;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.analysis.ExecutedTask;
 import org.matsim.contrib.util.stats.DurationStats.State;
 
 /**
@@ -31,8 +31,8 @@ import org.matsim.contrib.util.stats.DurationStats.State;
  */
 public class TimeBinSamples {
 
-	public static Stream<TimeBinSample<Task>> taskSamples(Task task, int binSize) {
-		return samples(task, task.getBeginTime(), task.getEndTime(), binSize);
+	public static Stream<TimeBinSample<ExecutedTask>> taskSamples(ExecutedTask task, int binSize) {
+		return samples(task, task.beginTime, task.endTime, binSize);
 	}
 
 	public static <V> Stream<TimeBinSample<State<V>>> stateSamples(State<V> state, int binSize) {

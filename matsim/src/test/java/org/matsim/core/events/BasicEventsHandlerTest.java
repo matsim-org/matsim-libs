@@ -42,7 +42,7 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		events.initProcessing();
 
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node from = node1;
 		final Node to = node2;

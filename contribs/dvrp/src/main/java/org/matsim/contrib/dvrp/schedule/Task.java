@@ -36,6 +36,9 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
  * @author (of documentation) nagel
  */
 public interface Task {
+	/**
+	 * TaskType implementations should be immutable.
+	 */
 	interface TaskType {
 		String name();
 	}

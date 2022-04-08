@@ -23,12 +23,12 @@ import java.awt.Color;
 
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.util.histogram.UniformHistogram;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.common.histogram.UniformHistogram;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.common.timeprofile.TimeProfileCharts.ChartType;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 

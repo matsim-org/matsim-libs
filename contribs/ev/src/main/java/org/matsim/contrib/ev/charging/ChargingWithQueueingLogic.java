@@ -33,6 +33,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import com.google.common.base.Preconditions;
+
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final ChargerSpecification charger;
 	private final ChargingStrategy chargingStrategy;
@@ -60,7 +62,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
-				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+				eventsManager.processEvent(
+						new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
 				listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 			}
 		}
@@ -89,21 +92,24 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	@Override
 	public void removeVehicle(ElectricVehicle ev, double now) {
 		if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
-			eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+			eventsManager.processEvent(
+					new ChargingEndEvent(now, charger.getId(), ev.getId(), ev.getBattery().getSoc()));
 			listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
 			if (!queuedVehicles.isEmpty()) {
 				plugVehicle(queuedVehicles.poll(), now);
 			}
-		} else if (queuedVehicles.remove(ev)) {//
-		} else {// neither plugged nor queued
-			throw new IllegalArgumentException(
-					"Vehicle: " + ev.getId() + " is neither queued nor plugged at charger: " + charger.getId());
+		} else {
+			// make sure ev was in the queue
+			Preconditions.checkState(queuedVehicles.remove(ev),
+					"Vehicle (%s) is neither queued nor plugged at charger (%s)", ev.getId(), charger.getId());
+			eventsManager.processEvent(new QuitQueueAtChargerEvent(now, charger.getId(), ev.getId()));
 		}
 	}
 
 	private void queueVehicle(ElectricVehicle ev, double now) {
 		queuedVehicles.add(ev);
+		eventsManager.processEvent(new QueuedAtChargerEvent(now, charger.getId(), ev.getId()));
 		listeners.get(ev.getId()).notifyVehicleQueued(ev, now);
 	}
 
@@ -111,7 +117,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		if (pluggedVehicles.put(ev.getId(), ev) != null) {
 			throw new IllegalArgumentException();
 		}
-		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType()));
+		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType(),
+				ev.getBattery().getSoc()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 

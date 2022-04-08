@@ -29,11 +29,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.common.util.DistanceUtils;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -66,7 +66,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	private final ControlerConfigGroup controlerConfig;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
-	private final DrtRequestAnalyzer drtRequestAnalyzer;
+	private final DrtEventSequenceCollector drtEventSequenceCollector;
 
 	private final SimpleRegression ridesPerVehicle2avgWaitingTimeRegression = new SimpleRegression();
 
@@ -77,13 +77,14 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	private double currentAvgInVehicleBeelineSpeed;
 
 	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
-			Network network, FleetSpecification fleetSpecification, DrtRequestAnalyzer drtRequestAnalyzer) {
+			Network network, FleetSpecification fleetSpecification,
+			DrtEventSequenceCollector drtEventSequenceCollector) {
 		this.mode = mode;
 		this.drtSpeedUpParams = drtSpeedUpParams;
 		this.controlerConfig = controlerConfig;
 		this.network = network;
 		this.fleetSpecification = fleetSpecification;
-		this.drtRequestAnalyzer = drtRequestAnalyzer;
+		this.drtEventSequenceCollector = drtEventSequenceCollector;
 
 		currentAvgWaitingTime = drtSpeedUpParams.getInitialWaitingTime();
 		currentAvgInVehicleBeelineSpeed = drtSpeedUpParams.getInitialInVehicleBeelineSpeed();
@@ -131,10 +132,10 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	}
 
 	private int completedTripCount() {
-		return (int)drtRequestAnalyzer.getPerformedRequestSequences()
+		return (int)drtEventSequenceCollector.getPerformedRequestSequences()
 				.values()
 				.stream()
-				.filter(DrtRequestAnalyzer.PerformedRequestEventSequence::isCompleted)
+				.filter(DrtEventSequenceCollector.EventSequence::isCompleted)
 				.count();
 	}
 
@@ -183,7 +184,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		Mean meanInVehicleBeelineSpeed = new Mean();
 		Mean meanWaitTime = new Mean();
 
-		for (var sequence : drtRequestAnalyzer.getPerformedRequestSequences().values()) {
+		for (var sequence : drtEventSequenceCollector.getPerformedRequestSequences().values()) {
 			if (!sequence.isCompleted()) {
 				continue;//skip incomplete sequences
 			}

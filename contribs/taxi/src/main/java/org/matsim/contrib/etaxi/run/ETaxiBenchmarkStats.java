@@ -1,38 +1,39 @@
 package org.matsim.contrib.etaxi.run;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.common.csv.CSVLineBuilder;
+import org.matsim.contrib.common.csv.CompactCSVWriter;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.etaxi.util.ETaxiStats;
 import org.matsim.contrib.etaxi.util.ETaxiStatsCalculator;
-import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
-import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.utils.io.IOUtils;
 
-import com.google.common.collect.ObjectArrays;
+public class ETaxiBenchmarkStats implements ShutdownListener, AfterMobsimListener {
+	public static final String[] HEADER = { "QueuedTimeRatio_fleetAvg" };
 
-public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
-	public static final String[] HEADER = ObjectArrays.concat(TaxiBenchmarkStats.HEADER, "QueuedTimeRatio_fleetAvg");
+	private final OutputDirectoryHierarchy controlerIO;
+	private final ChargingEventSequenceCollector chargingEventSequenceCollector;
+	private final FleetSpecification fleetSpecification;
 
 	private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
-	private Fleet fleet;
-
-	public ETaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO) {
-		super(controlerIO);
+	public ETaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO,
+			ChargingEventSequenceCollector chargingEventSequenceCollector, FleetSpecification fleetSpecification) {
+		this.controlerIO = controlerIO;
+		this.chargingEventSequenceCollector = chargingEventSequenceCollector;
+		this.fleetSpecification = fleetSpecification;
 	}
 
 	@Override
-	public void objectCreated(Fleet fleet) {
-		super.objectCreated(fleet);
-		this.fleet = fleet;
-	}
-
-	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		super.notifyMobsimBeforeCleanup(e);
-		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values()).getDailyEStats();
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(chargingEventSequenceCollector.getCompletedSequences(),
+				fleetSpecification).getDailyEStats();
 		singleRunEStats.getFleetQueuedTimeRatio().ifPresent(queuedTimeRatio::addValue);
 	}
 
@@ -41,7 +42,11 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 		writeFile("ebenchmark_stats.txt", HEADER);
 	}
 
-	protected CSVLineBuilder createAndInitLineBuilder() {
-		return super.createAndInitLineBuilder().addf("%.3f", queuedTimeRatio.getMean());
+	private void writeFile(String file, String[] header) {
+		try (CompactCSVWriter writer = new CompactCSVWriter(
+				IOUtils.getBufferedWriter(controlerIO.getOutputFilename(file)))) {
+			writer.writeNext(header);
+			writer.writeNext(new CSVLineBuilder().addf("%.3f", queuedTimeRatio.getMean()));
+		}
 	}
 }

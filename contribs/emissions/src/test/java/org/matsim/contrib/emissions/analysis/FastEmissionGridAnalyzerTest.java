@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.TestUtils;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -31,7 +32,7 @@ public class FastEmissionGridAnalyzerTest {
         final var linkLength = 99;
         final var expectedCellNumber = (int) (linkLength / cellSize) + 1;
 
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 0));
         var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(linkLength, 0));
         var link = network.getFactory().createLink(Id.createLinkId("link"), node1, node2);
@@ -58,7 +59,7 @@ public class FastEmissionGridAnalyzerTest {
         final var linkLength = 99;
         final var expectedCellNumber = (int) (linkLength / cellSize) + 1;
 
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 0));
         var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(linkLength, 0));
         var link = network.getFactory().createLink(Id.createLinkId("link"), node2, node1);
@@ -86,7 +87,7 @@ public class FastEmissionGridAnalyzerTest {
         final var linkLength = 99;
         final var expectedCellNumber = (int) (linkLength / cellSize) + 1;
 
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 0));
         var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(linkLength, 0));
         var node3 = network.getFactory().createNode(Id.createNodeId("node3"), new Coord(0, linkLength));
@@ -152,7 +153,7 @@ public class FastEmissionGridAnalyzerTest {
     @Test
     public void processLinkEmissions_twoLinks() {
 
-        var network = NetworkUtils.createNetwork();
+        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
         var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 49));
         var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(99, 49));
         var node3 = network.getFactory().createNode(Id.createNodeId("node3"), new Coord(49, 0));

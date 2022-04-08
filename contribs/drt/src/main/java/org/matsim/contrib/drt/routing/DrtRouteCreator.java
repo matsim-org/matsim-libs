@@ -21,19 +21,18 @@ package org.matsim.contrib.drt.routing;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.name.Named;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author jbischoff
@@ -46,8 +45,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	private final LeastCostPathCalculator router;
 
 	public DrtRouteCreator(DrtConfigGroup drtCfg, Network modalNetwork,
-			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
@@ -63,11 +61,11 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum travel time
 	 */
 	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+		return Math.min(unsharedRideTime + drtCfg.getMaxAbsoluteDetour(), drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta());
 	}
 
-	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink,
-			RouteFactories routeFactories) {
+	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
+			Attributes tripAttributes, RouteFactories routeFactories) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
@@ -79,6 +77,11 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		route.setTravelTime(maxTravelTime);
 		route.setDirectRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
+
+		if (this.drtCfg.getStoreUnsharedPath()) {
+			route.setUnsharedPath(unsharedPath);
+		}
+
 		return route;
 	}
 }

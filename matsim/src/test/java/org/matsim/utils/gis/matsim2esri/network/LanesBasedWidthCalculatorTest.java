@@ -36,7 +36,7 @@ public class LanesBasedWidthCalculatorTest {
 	@Test
 	public void testGetWidth_laneWidthNaN() {
 		Network net = NetworkUtils.createNetwork();
-		Node n1 = net.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+        Node n1 = net.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = net.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		net.addNode(n1);
 		net.addNode(n2);

@@ -73,7 +73,7 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, shp.getShapeFile(), crs.getInputCRS(), crs.getTargetCRS());
 
 		Network network = NetworkUtils.createNetwork();
-		Lanes lanes = LanesUtils.createLanesContainer();
+        Lanes lanes = LanesUtils.createLanesContainer();
 
 		SumoNetworkHandler handler = converter.convert(network, lanes);
 

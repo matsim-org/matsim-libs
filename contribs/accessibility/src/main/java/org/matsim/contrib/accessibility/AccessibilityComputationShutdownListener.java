@@ -174,7 +174,12 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 						 Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins,
 						 Collection<Id<? extends BasicLocation>> subsetOfNodes, ProgressBar progressBar) {
 
-		AccessibilityContributionCalculator calculator = calculators.get(mode).duplicate();
+		AccessibilityContributionCalculator calculator;
+		if (acg.isUseParallelization()) {
+			calculator = calculators.get(mode).duplicate();
+		} else {
+			calculator = calculators.get(mode);
+		}
 
 		// Go through all nodes that have a measuring point assigned
 		for (Id<? extends BasicLocation> fromNodeId : subsetOfNodes) {

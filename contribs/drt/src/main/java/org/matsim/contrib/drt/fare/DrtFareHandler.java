@@ -47,6 +47,9 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 	@Inject
 	private EventsManager events;
 
+	public static final String PERSON_MONEY_EVENT_PURPOSE_DRT_FARE = "drtFare";
+	public static final String PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE = "dailyFee";
+
 	private final double distanceFare_Meter;
 	private final double baseFare;
 	private final double minFarePerTrip;
@@ -62,7 +65,7 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 	public DrtFareHandler(String mode, DrtFareParams drtFareParams) {
 		this.mode = mode;
 		this.distanceFare_Meter = drtFareParams.getDistanceFare_m();
-		this.baseFare = drtFareParams.getBasefare();
+		this.baseFare = drtFareParams.getBaseFare();
 		this.minFarePerTrip = drtFareParams.getMinFarePerTrip();
 		this.dailyFee = drtFareParams.getDailySubscriptionFee();
 		this.timeFare_sec = drtFareParams.getTimeFare_h() / 3600.0;
@@ -85,7 +88,7 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 			if (!dailyFeeCharged.contains(event.getPersonId())) {
 				dailyFeeCharged.add(event.getPersonId());
 				events.processEvent(
-						new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "drtFare", mode));
+						new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, mode, PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE));
 			}
 
 			DrtRequestSubmittedEvent submission = requestSubmissions.get(event.getRequestId());
@@ -94,7 +97,7 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 					+ baseFare;
 			double actualFare = Math.max(fare, minFarePerTrip);
 			events.processEvent(
-					new PersonMoneyEvent(event.getTime(), event.getPersonId(), -actualFare, "drtFare", mode));
+					new PersonMoneyEvent(event.getTime(), event.getPersonId(), -actualFare, PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, mode, event.getRequestId().toString()));
 		}
 	}
 

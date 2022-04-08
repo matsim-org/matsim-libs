@@ -1,9 +1,29 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * The carrier vehicle type.
@@ -53,14 +73,11 @@ public class CarrierVehicleType {
 		 * @param carrierVehicleType
 		 * @param typeId
 		 * @return a type builder
+		 *
+		 * @deprecated Use {@link #newInstance(Id<VehicleType>)} instead 
 		 */
+		@Deprecated(since = "sep'19", forRemoval = true)
 		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
-//			return new Builder(typeId)
-//					.setDescription(carrierVehicleType.getDescription())
-//					.setEngineInformation(carrierVehicleType.getEngineInformation())
-//					.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
-//					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
-//					.setVehicleCostInformation(carrierVehicleType.getVehicleCostInformation());
 			throw new RuntimeException("not implemented") ;
 		}
 		

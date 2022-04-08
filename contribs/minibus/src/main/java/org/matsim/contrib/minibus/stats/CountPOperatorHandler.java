@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.minibus.operator.Operator;
+import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 

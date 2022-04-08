@@ -33,8 +33,8 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
 import org.matsim.contrib.taxi.schedule.TaxiTaskTypes;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.common.timeprofile.TimeProfiles;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

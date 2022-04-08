@@ -30,6 +30,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
 
@@ -70,6 +71,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                                 new TripRouterModule(),
                                 new TravelDisutilityModule(),
                                 new TravelTimeCalculatorModule(),
+                                new TimeInterpretationModule(),
                                 new EventsManagerModule()),
                         new AbstractModule() {
 							@Override
@@ -101,6 +103,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                 new TravelDisutilityModule(),
                 new TravelTimeCalculatorModule(),
                 new EventsManagerModule(),
+                new TimeInterpretationModule(),
                 new AbstractModule() {
                     @Override
                     public void install() {

@@ -13,6 +13,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import javax.inject.Provider;
 
@@ -21,13 +22,13 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 
 	private final PlanStrategyImpl strategy;
 	@Inject
-	public RandomTripToCarsharingStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships) {
+	public RandomTripToCarsharingStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships, TimeInterpretation timeInterpretation) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 		 	
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   //lets try without this, not sure if it is needed
 		CarsharingTripModeChoice smc = new CarsharingTripModeChoice(tripRouterProvider, scenario, memberships);
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(scenario, tripRouterProvider) );
+		addStrategyModule( new ReRoute(scenario, tripRouterProvider, timeInterpretation) );
 //		addStrategyModule(new ModeAndRouteConsistencyChecker()) ;
 	}
 	public void addStrategyModule(final PlanStrategyModule module) {

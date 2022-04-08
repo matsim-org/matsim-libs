@@ -1,11 +1,18 @@
 package org.matsim.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.options.SampleOptions;
-import org.matsim.application.prepare.freight.ExtractRelevantFreightTrips;
-import org.matsim.application.prepare.freight.GenerateGermanWideFreightTrips;
+import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
+import org.matsim.application.prepare.freight.toBeDeleted.GenerateGermanWideFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
 import org.matsim.application.prepare.population.MergePopulations;
 import org.matsim.application.prepare.population.TrajectoryToPlans;
@@ -13,14 +20,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
 import picocli.CommandLine;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 public class MATSimApplicationTest {
 
@@ -39,12 +42,13 @@ public class MATSimApplicationTest {
 	public void config() {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
-				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4");
+				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4", "--config:plans.inputCRS", "EPSG:1234");
 
 		Config config = controler.getConfig();
 
 		assertThat(config.controler().getRunId()).isEqualTo("Test123");
 		assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
+		assertThat(config.plans().getInputCRS()).isEqualTo("EPSG:1234");
 
 	}
 
@@ -78,10 +82,16 @@ public class MATSimApplicationTest {
 
 		assertThat(controler.getConfig().controler().getRunId())
 				.isEqualTo("run-10pct");
+
+		controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig());
+
+		assertThat(controler.getConfig().controler().getRunId())
+				.isEqualTo("run-25pct");
+
 	}
 
 	@Test
-	public void population() {
+	public void population() throws MalformedURLException {
 
 		Path input = Path.of(utils.getClassInputDirectory());
 		Path output = Path.of(utils.getOutputDirectory());
@@ -107,13 +117,12 @@ public class MATSimApplicationTest {
 				"--num-trips", "2"
 		);
 
+		var actualContent = IOUtils.getInputStream(
+				output.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
+		var expectedContent = IOUtils.getInputStream(
+				input.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
 
-		Path result = output.resolve("test-100pct.plans-with-trips.xml.gz");
-
-		assertThat(result)
-				.exists()
-				.hasSameBinaryContentAs(input.resolve("test-100pct.plans-with-trips.xml.gz"));
-
+		assertThat(IOUtils.isEqual(actualContent, expectedContent)).isTrue();
 	}
 
 	@Test
@@ -169,7 +178,7 @@ public class MATSimApplicationTest {
 		@Override
 		protected Config prepareConfig(Config config) {
 
-			config.controler().setRunId(sample.adjustName("run-1pct"));
+			config.controler().setRunId(sample.adjustName("run-25pct"));
 
 			return config;
 		}

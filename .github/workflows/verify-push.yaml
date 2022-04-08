@@ -3,14 +3,14 @@ name: verify-push
 on:
   push:
     branches-ignore:
-      - 'master' #no need to run after merging to master
+      - 'master' # no need to run after merging to master
     tags-ignore:
-      - '*' #do not run on pushing tags
+      - '*' # do not run on pushing tags (see deploy-on-release-created)
   pull_request:
 
 jobs:
   build:
-    #run if push or pull_requests from fork
+    # run if push or pull_requests from fork
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
 
     runs-on: ubuntu-latest
@@ -48,6 +48,7 @@ jobs:
           - contribs/integration
           - contribs/multimodal
           - contribs/protobuf
+          - contribs/shared_mobility
           - contribs/socnetsim
           - contribs/sumo
           - contribs/pseudosimulation
@@ -59,6 +60,7 @@ jobs:
           - contribs/osm
           - contribs/application
           - contribs/sbb-extensions
+          - benchmark
 
     steps:
       - name: Checkout git repo
@@ -87,8 +89,8 @@ jobs:
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
         uses: actions/setup-java@v2
         with:
-          java-version: 11
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'zulu'
 
       - name: Build module (with dependencies)
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
@@ -101,3 +103,25 @@ jobs:
 
     env:
       MAVEN_OPTS: -Xmx2g
+
+  verify-all-jobs-successful:
+    # always() - to ensure this job is executed (regardless of the status of the previous job)
+    # run if push or pull_requests from fork
+    if: always() && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository)
+    needs: build
+    runs-on: ubuntu-latest
+
+    # When running this workflow for internal PRs "verify-all-jobs-successful" is marked as skipped,
+    # which GitHub takes as a green flag and will allow merging before "verify-all-jobs-successful"
+    # is completed for the push event.
+    # One way to avoid this is to create a job from a matrix on the fly. They will be created for
+    # push events and PR events from forks (but not for PR events coming from internal forks),
+    # so we can safely add a check "verify-all-jobs-successful (push-or-external-PR)"
+    strategy:
+      matrix:
+        name: [ "push-or-external-PR" ]
+
+    steps:
+      - name: check if the whole job matrix is successful
+        if: needs.build.result != 'success'
+        run: exit 1 # fail if "build" was not successful

@@ -21,6 +21,7 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -35,6 +36,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -68,8 +71,12 @@ public final class NetworkRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime,
-			final Person person) {		
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		final Facility fromFacility = request.getFromFacility();
+		final Facility toFacility = request.getToFacility();
+		final double departureTime = request.getDepartureTime();
+		final Person person = request.getPerson();
+		
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 
 		Gbl.assertNotNull(fromFacility);
@@ -92,6 +99,12 @@ public final class NetworkRoutingModule implements RoutingModule {
 			// (a "true" route)
 			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
+
+			/* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
+			 * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
+			 * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
+			 * ts, june '21
+			 */
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
 			if (path == null)
 				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " by mode " + this.mode + ".");

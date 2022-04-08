@@ -98,7 +98,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	public void testPersonWithNegativeIncome(){
 		Id<Person> id = Id.createPersonId("negativeIncome");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
-		//person's attribute says it has 0 income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
+		//person's attribute says it has negative income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
 		makeAssert(params, 1d, 0.5d);
 	}
 

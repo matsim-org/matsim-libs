@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -301,6 +303,48 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(3,legs.size());
         Assert.equals(90.0,legs.get(0).getTravelTime().seconds());
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
+    }
+    
+    @Test
+    public void routingModeInEvents() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        // add persons
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        Activity h = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+        h.setCoord(NEARHOME);
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        
+        Set<String> legModes = new HashSet<>();
+        Set<String> routingModes = new HashSet<>();
+        
+        controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(new PersonDepartureEventHandler() {
+					@Override
+					public void handleEvent(PersonDepartureEvent event) {
+						legModes.add(event.getLegMode());
+						routingModes.add(event.getRoutingMode());
+					}
+				});
+			}
+		});
+        
+        controler.run();
+        
+        Assert.equals(2, legModes.size());
+        Assert.equals(1, routingModes.size());
+        Assert.isTrue(legModes.contains("walk"));
+        Assert.isTrue(legModes.contains("car"));
+        Assert.isTrue(routingModes.contains("car"));
     }
 
     @Test(expected = RuntimeException.class)

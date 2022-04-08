@@ -332,7 +332,7 @@ public class NetworkUtilsTest {
 		int numOfLinks = 5;
 
 		Network network = NetworkUtils.createNetwork();
-		Node[] nodes = new Node[numOfLinks+1];
+        Node[] nodes = new Node[numOfLinks + 1];
 		for (int i = 0; i <= numOfLinks; i++) {
 			nodes[i] = NetworkUtils.createAndAddNode(network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 		}
@@ -343,8 +343,8 @@ public class NetworkUtilsTest {
 	}
 
 	private static class MultimodalFixture {
-		/*package*/ final Network network = NetworkUtils.createNetwork();
-		Node[] nodes = new Node[6];
+        /*package*/ final Network network = NetworkUtils.createNetwork();
+        Node[] nodes = new Node[6];
 		Link[] links = new Link[this.nodes.length - 1];
 
 		public MultimodalFixture() {

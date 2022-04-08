@@ -3,6 +3,7 @@ package org.matsim.core.network;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 
 import java.util.Collection;
 import java.util.Set;
@@ -21,11 +22,13 @@ import java.util.stream.Stream;
  * The collector works fine with parallel streams.
  */
 public class NetworkCollector implements Collector<Link, Collection<Link>, Network> {
-
+	private final NetworkConfigGroup networkConfigGroup;
+	
     /**
      * Deliberately package private
      */
-    NetworkCollector() {
+    NetworkCollector(NetworkConfigGroup networkConfigGroup) {
+    	this.networkConfigGroup = networkConfigGroup;
     }
 
     private static void addNodeIfNecessary(Network network, Node node) {
@@ -67,7 +70,7 @@ public class NetworkCollector implements Collector<Link, Collection<Link>, Netwo
     public Function<Collection<Link>, Network> finisher() {
         return links -> {
 
-            var result = NetworkUtils.createNetwork();
+            var result = NetworkUtils.createNetwork(networkConfigGroup);
             for (var link : links) {
                 addNodeIfNecessary(result, link.getFromNode());
                 addNodeIfNecessary(result, link.getToNode());

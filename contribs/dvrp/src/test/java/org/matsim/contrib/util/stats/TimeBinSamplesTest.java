@@ -22,9 +22,11 @@ package org.matsim.contrib.util.stats;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.util.stats.TimeBinSamples.taskSamples;
+import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.analysis.ExecutedTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
@@ -33,30 +35,31 @@ import org.matsim.contrib.dvrp.schedule.Task;
 public class TimeBinSamplesTest {
 	@Test
 	public void taskSamples_zeroDuration() {
-		Task task = task(10, 10);
+		var task = task(10, 10);
 		assertThat(taskSamples(task, 100)).isEmpty();
 	}
 
 	@Test
 	public void taskSamples_oneSample() {
-		Task task = task(110, 190);
+		var task = task(110, 190);
 		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task));
 	}
 
 	@Test
 	public void taskSamples_threeSamples() {
-		Task task = task(110, 390);
+		var task = task(110, 390);
 		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task),
 				new TimeBinSample<>(3, task));
 	}
 
 	@Test
 	public void taskSamples_taskEndEqualToTimeBinEnd() {
-		Task task = task(110, 300);
+		var task = task(110, 300);
 		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task));
 	}
 
-	private Task task(double beginTime, double endTime) {
-		return new StayTask(() -> "name", beginTime, endTime, null);
+	private ExecutedTask task(double beginTime, double endTime) {
+		return new ExecutedTask(mock(Task.TaskType.class), beginTime, endTime, Id.createLinkId("a"),
+				Id.createLinkId("b"));
 	}
 }

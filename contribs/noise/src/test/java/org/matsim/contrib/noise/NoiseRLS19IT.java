@@ -80,9 +80,9 @@ public class NoiseRLS19IT {
         ShieldingContext context = new ShieldingContext(config, shieldingCorrection, barrierContext);
 
 
-        ReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
+        ReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0, 0));
         Network network = NetworkUtils.createNetwork();
-        Node from = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(6,7));
+        Node from = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(6, 7));
         Node to = NetworkUtils.createNode(Id.createNodeId("node1"), new Coord(7,6));
         Link link = NetworkUtils.createLink(Id.createLinkId("link"), from, to, network, 10, 0,0,0);
         final Coord coord = CoordUtils.orthogonalProjectionOnLineSegment(
@@ -104,7 +104,7 @@ public class NoiseRLS19IT {
 
         NoiseLink noiseLink = new NoiseLink(link.getId());
 
-        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network));
+        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network), new DEMContextImpl(scenario.getConfig()));
 
         final double basePkwEmission = emission.calculateBaseVehicleTypeEmission(RLS19VehicleType.pkw, 40);
         Assert.assertEquals("Wrong base pkw emission!", 97.70334139531323, basePkwEmission, MatsimTestUtils.EPSILON);
@@ -169,7 +169,7 @@ public class NoiseRLS19IT {
         noiseContext.getNoiseLinks().put(link.getId(), noiseLink);
         noiseContext.getNoiseLinks().put(link2.getId(), noiseLink2);
 
-        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network));
+        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network), new DEMContextImpl(scenario.getConfig()));
         for (int i = 0; i < 1800; i++) {
             noiseLink.addEnteringAgent(RLS19VehicleType.pkw);
             noiseLink2.addEnteringAgent(RLS19VehicleType.pkw);

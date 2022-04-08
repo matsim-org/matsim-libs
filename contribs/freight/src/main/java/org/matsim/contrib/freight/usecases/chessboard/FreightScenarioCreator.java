@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import org.matsim.api.core.v01.Id;
@@ -163,10 +184,10 @@ final class FreightScenarioCreator {
     }
 
     private static CarrierVehicle createLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
-        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_"+id.toString()+"_lightVehicle_" + depot) ,Vehicle.class), homeId);
+        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_"+id.toString()+"_lightVehicle_" + depot) ,Vehicle.class), homeId, createLightType() );
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
-        vBuilder.setType(createLightType());
+//        vBuilder.setType(createLightType());
         return vBuilder.build();
     }
 
@@ -180,10 +201,10 @@ final class FreightScenarioCreator {
     }
 
     private static CarrierVehicle createHeavyVehicle(Id<?> id, Id<Link> homeId, String depot) {
-        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create("carrier_" + id.toString() + "_heavyVehicle_" + depot, Vehicle.class), homeId);
+        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create("carrier_" + id.toString() + "_heavyVehicle_" + depot, Vehicle.class), homeId, createHeavyType() );
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
-        vBuilder.setType(createHeavyType());
+//        vBuilder.setType(createHeavyType());
         return vBuilder.build();
     }
 

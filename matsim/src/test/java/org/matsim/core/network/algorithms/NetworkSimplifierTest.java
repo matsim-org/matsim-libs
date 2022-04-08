@@ -103,7 +103,7 @@ public class NetworkSimplifierTest {
 		 */
 
 		Network network = NetworkUtils.createNetwork();
-		Node a = NetworkUtils.createAndAddNode(network, Id.create("A", Node.class), new Coord(0.0, 10.0));
+        Node a = NetworkUtils.createAndAddNode(network, Id.create("A", Node.class), new Coord(0.0, 10.0));
 		Node b = NetworkUtils.createAndAddNode(network, Id.create("B", Node.class), new Coord(0.0, -10.0));
 		Node c = NetworkUtils.createAndAddNode(network, Id.create("C", Node.class), new Coord(0.0, 0.0));
 		Node d = NetworkUtils.createAndAddNode(network, Id.create("D", Node.class), new Coord(10.0, 0.0));
@@ -211,8 +211,8 @@ public class NetworkSimplifierTest {
 	 * @return
 	 */
 	private Network buildNetwork(){
-		Network network = NetworkUtils.createNetwork();
-		Node a = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), CoordUtils.createCoord(0.0,  0.0));
+        Network network = NetworkUtils.createNetwork();
+        Node a = NetworkUtils.createAndAddNode(network, Id.createNodeId("A"), CoordUtils.createCoord(0.0, 0.0));
 		Node b = NetworkUtils.createAndAddNode(network, Id.createNodeId("B"), CoordUtils.createCoord(10.0,  0.0));
 		Node c = NetworkUtils.createAndAddNode(network, Id.createNodeId("C"), CoordUtils.createCoord(20.0,  0.0));
 		Node d = NetworkUtils.createAndAddNode(network, Id.createNodeId("D"), CoordUtils.createCoord(30.0,  0.0));

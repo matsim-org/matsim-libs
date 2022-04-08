@@ -677,7 +677,7 @@ public class DistanceConstraintTest {
 	static CarrierVehicle createCarrierVehicle(String vehicleName, double earliestStartingTime,
 											   double latestFinishingTime, VehicleType singleVehicleType) {
 
-		return CarrierVehicle.Builder.newInstance(Id.create(vehicleName, Vehicle.class), Id.createLinkId("i(1,8)"))
+		return CarrierVehicle.Builder.newInstance(Id.create(vehicleName, Vehicle.class), Id.createLinkId("i(1,8)"), singleVehicleType )
 				.setEarliestStart(earliestStartingTime).setLatestEnd(latestFinishingTime)
 				.setTypeId(singleVehicleType.getId()).setType(singleVehicleType).build();
 	}

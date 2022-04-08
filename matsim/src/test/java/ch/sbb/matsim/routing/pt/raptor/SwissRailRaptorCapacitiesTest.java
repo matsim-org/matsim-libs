@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -24,6 +25,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -67,23 +69,23 @@ public class SwissRailRaptorCapacitiesTest {
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<Leg> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route1 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assert.assertNotNull(route1);
 		System.out.println("uncongested route:");
-		for (Leg leg : route1) {
-			System.out.println(leg.toString() + "  > " + leg.getRoute().getRouteDescription());
+		for (PlanElement leg : route1) {
+			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
 		}
 		Assert.assertEquals(3, route1.size());
 
-		Leg leg1 = route1.get(0);
+		Leg leg1 = (Leg) route1.get(0);
 		Assert.assertEquals("walk", leg1.getMode());
 
-		Leg leg2 = route1.get(1);
+		Leg leg2 = (Leg) route1.get(1);
 		Assert.assertEquals("pt", leg2.getMode());
 		TransitPassengerRoute paxRoute1 = (TransitPassengerRoute) leg2.getRoute();
 		Assert.assertEquals(f.fastLineId, paxRoute1.getLineId());
 
-		Leg leg3 = route1.get(2);
+		Leg leg3 = (Leg) route1.get(2);
 		Assert.assertEquals("walk", leg3.getMode());
 
 		// with delays at entering
@@ -112,23 +114,23 @@ public class SwissRailRaptorCapacitiesTest {
 		Id<Person> person9 = Id.create(9, Person.class);
 
 		Id<Link> linkId = Id.create(1, Link.class);
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:51:00"), person1, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:52:00"), person2, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:53:00"), person3, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:54:00"), person4, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:55:00"), person5, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:56:00"), person6, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:57:00"), person7, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:58:00"), person8, f.stopAId, f.stopDId));
-		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, linkId, "pt"));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, linkId, "pt", "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:59:00"), person9, f.stopAId, f.stopDId));
 
 		Id<Person> driver1 = Id.create(1001, Person.class);
@@ -170,23 +172,23 @@ public class SwissRailRaptorCapacitiesTest {
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:25"), person9, vehicle3));
 		tracker.handleEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:30"), vehicle3, f.stopAId, 0));
 
-		List<Leg> route2 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<? extends PlanElement> route2 = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, Time.parseTime("07:00:00"), null));
 		Assert.assertNotNull(route2);
 		System.out.println("congested route:");
-		for (Leg leg : route2) {
-			System.out.println(leg.toString() + "  > " + leg.getRoute().getRouteDescription());
+		for (PlanElement leg : route2) {
+			System.out.println(leg.toString() + "  > " + ((Leg)leg).getRoute().getRouteDescription());
 		}
 		Assert.assertEquals(3, route2.size());
 
-		leg1 = route2.get(0);
+		leg1 = (Leg) route2.get(0);
 		Assert.assertEquals("walk", leg1.getMode());
 
-		leg2 = route2.get(1);
+		leg2 = (Leg) route2.get(1);
 		Assert.assertEquals("pt", leg2.getMode());
 		TransitPassengerRoute paxRoute2 = (TransitPassengerRoute) leg2.getRoute();
 		Assert.assertEquals(f.slowLineId, paxRoute2.getLineId());
 
-		leg3 = route2.get(2);
+		leg3 = (Leg) route2.get(2);
 		Assert.assertEquals("walk", leg3.getMode());
 	}
 

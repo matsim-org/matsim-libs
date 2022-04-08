@@ -89,8 +89,8 @@ import java.util.*;
 	private boolean locked = false ;
 	private final Attributes attributes = new Attributes();
 
-	NetworkImpl() {
-		this.factory = new NetworkFactoryImpl(this);
+	NetworkImpl(LinkFactory linkFactory) {
+		this.factory = new NetworkFactoryImpl(this, linkFactory);
 	}
 
 	@Override

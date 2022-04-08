@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector.ExecutedSchedule;
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
 
 import java.util.Collection;
@@ -27,10 +28,8 @@ import java.util.OptionalDouble;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector.RequestEventSequence;
 import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.stats.DurationStats;
@@ -45,17 +44,18 @@ public class TaxiStatsCalculator {
 	private final SortedMap<Integer, TaxiStats> hourlyStats = new TreeMap<>();
 	private final TaxiStats dailyStats = new TaxiStats(DAILY_STATS_ID);
 
-	public TaxiStatsCalculator(Collection<? extends DvrpVehicle> vehicles) {
-		for (DvrpVehicle vehicle : vehicles) {
-			DurationStats.taskDurationByTimeBinAndType(vehicle, 3600)
+	public TaxiStatsCalculator(Collection<ExecutedSchedule> executedSchedules,
+			Collection<RequestEventSequence> requestSequences) {
+		for (ExecutedSchedule schedule : executedSchedules) {
+			DurationStats.taskDurationByTimeBinAndType(schedule.getExecutedTasks().stream(), 3600)
 					.forEach((hour, taskTypeDurations) -> updateTaxiStats(getHourlyStats(hour), taskTypeDurations));
 
-			Map<TaskType, Double> dailyTaskTypeDuration = DurationStats.taskDurationByTimeBinAndType(vehicle,
-					Integer.MAX_VALUE).entrySet().iterator().next().getValue();
+			Map<TaskType, Double> dailyTaskTypeDuration = DurationStats.taskDurationByTimeBinAndType(
+					schedule.getExecutedTasks().stream(), Integer.MAX_VALUE).entrySet().iterator().next().getValue();
 			updateTaxiStats(dailyStats, dailyTaskTypeDuration);
-
-			updatePassengerWaitTimeStats(vehicle);
 		}
+
+		requestSequences.forEach(this::updatePassengerWaitTimeStats);
 	}
 
 	public ImmutableList<TaxiStats> getTaxiStats() {
@@ -106,13 +106,14 @@ public class TaxiStatsCalculator {
 				(taskType, duration) -> stats.taskTypeDurations.merge(taskType, duration, Double::sum));
 	}
 
-	private void updatePassengerWaitTimeStats(DvrpVehicle vehicle) {
-		vehicle.getSchedule().tasks().filter(task -> PICKUP.isBaseTypeOf(task)).forEach(task -> {
-			TaxiRequest req = ((TaxiPickupTask)task).getRequest();
-			double waitTime = Math.max(task.getBeginTime() - req.getEarliestStartTime(), 0);
-			int hour = (int)(req.getEarliestStartTime() / 3600);
+	private void updatePassengerWaitTimeStats(RequestEventSequence sequence) {
+		if (sequence.isCompleted()) {
+			// FIXME we should get earliest start time from request or the agent departure time
+			double submittedTime = sequence.getSubmitted().getTime();
+			double waitTime = sequence.getPickedUp().get().getTime() - submittedTime;
+			int hour = (int)(submittedTime / 3600);
 			getHourlyStats(hour).passengerWaitTime.addValue(waitTime);
 			dailyStats.passengerWaitTime.addValue(waitTime);
-		});
+		}
 	}
 }

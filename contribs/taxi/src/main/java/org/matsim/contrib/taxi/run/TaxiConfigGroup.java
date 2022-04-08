@@ -26,9 +26,9 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -105,7 +105,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	// input
 	public static final String TAXIS_FILE = "taxisFile";
 	static final String TAXIS_FILE_EXP = "An XML file specifying the taxi fleet."
-			+ " The file format according to dvrp_vehicles_v1.dtd";
+			+ " The file format according to dvrp_vehicles_v1.dtd."
+			+ " If not provided, the vehicle specifications will be created from matsim vehicle file or provided via a custom binding."
+			+ " See FleetModule.";
 
 	// output
 	public static final String TIME_PROFILES = "timeProfiles";
@@ -122,6 +124,13 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	static final String BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP =
 			"Specifies whether the simulation should interrupt if not all requests were performed when"
 					+ " an interation ends. Otherwise, a warning is given. True by default.";
+
+	public static final String NUMBER_OF_THREADS = "numberOfThreads";
+	static final String NUMBER_OF_THREADS_EXP =
+			"Number of threads used for parallel computation of paths (occupied drive tasks)."
+					+ " 4-6 threads is usually enough. It's recommended to specify a higher number than that if possible"
+					+ " - of course, threads will probably be not 100% busy."
+					+ " Default value is the number of cores available to JVM";
 
 	@NotBlank
 	private String mode = TransportMode.taxi; // travel mode (passengers'/customers' perspective)
@@ -147,6 +156,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	private boolean detailedStats = false;
 
 	private boolean breakSimulationIfNotAllRequestsServed = true;
+
+	@Positive
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@NotNull
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
@@ -180,10 +192,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (config.qsim().getNumberOfThreads() > 1) {
-			log.warn("EXPERIMENTAL FEATURE: Running taxi with a multi-threaded QSim");
-		}
-
 		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
 				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
 
@@ -207,6 +215,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
 		map.put(DETAILED_STATS, DETAILED_STATS_EXP);
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
+		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		return map;
 	}
 
@@ -413,6 +422,23 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	@StringSetter(BREAK_IF_NOT_ALL_REQUESTS_SERVED)
 	public TaxiConfigGroup setBreakSimulationIfNotAllRequestsServed(boolean breakSimulationIfNotAllRequestsServed) {
 		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
+		return this;
+	}
+
+	/**
+	 * @return {@value #NUMBER_OF_THREADS_EXP}
+	 */
+	@StringGetter(NUMBER_OF_THREADS)
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+
+	/**
+	 * @param numberOfThreads {@value #NUMBER_OF_THREADS_EXP}
+	 */
+	@StringSetter(NUMBER_OF_THREADS)
+	public TaxiConfigGroup setNumberOfThreads(int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
 		return this;
 	}
 

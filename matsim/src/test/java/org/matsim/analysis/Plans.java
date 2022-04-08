@@ -99,6 +99,7 @@ public class Plans {
 		leg3.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(3529.0, 3309.0));
 		leg3.setDepartureTime(23651.0);
 		leg3.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 23651.0);
+		leg3.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("car3"));
 		Route route3 = RouteUtils.createGenericRouteImpl(link1, link2);
 		route3.setDistance(5000);
 		route3.setTravelTime(1250.0);
@@ -151,6 +152,7 @@ public class Plans {
 		leg6.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(8478.0, 8258.0));
 		leg6.setDepartureTime(43503.0);
 		leg6.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 43503.0);
+		leg6.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("car6"));
 		Route route6 = RouteUtils.createGenericRouteImpl(link2, link3);
 		route6.setDistance(7000);
 		route6.setTravelTime(1750.0);
@@ -200,6 +202,7 @@ public class Plans {
 		leg9.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(12720.0, 12500.0));
 		leg9.setDepartureTime(47355.0);
 		leg9.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 47355.0);
+		leg9.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("car9"));
 		Route route9 = RouteUtils.createGenericRouteImpl(link3, link4);
 		route9.setDistance(6000);
 		route9.setTravelTime(1500.0);
@@ -253,6 +256,7 @@ public class Plans {
 		leg12.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(13916.0, 13696.0));
 		leg12.setDepartureTime(51357.0);
 		leg12.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 51367.0);
+		leg12.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("pt12"));
 		//Route route12 = RouteUtils.createGenericRouteImpl(link4, link5);
 		//pt route
 		TransitStopFacility egressFacility = sBuilder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), act12.getCoord(), false);
@@ -308,6 +312,7 @@ public class Plans {
 		leg15.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(13214.0, 12994.0));
 		leg15.setDepartureTime(53819.0);
 		leg15.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 53829.0);
+		leg15.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("pt15"));
 		leg15.setRoute(ptRoute);
 		leg15.setTravelTime(250.0);
 		plan.addLeg(leg15);
@@ -341,6 +346,7 @@ public class Plans {
 		leg17.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(206.0, 226.0));
 		leg17.setDepartureTime(54781.0);
 		leg17.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 54781.0);
+		leg17.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("car17"));
 		Route route17 = RouteUtils.createGenericRouteImpl(link4, link1);
 		route17.setDistance(18000);
 		route17.setTravelTime(4500.0);
@@ -416,6 +422,7 @@ public class Plans {
 		legp2_2.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(4342.0, 4362.0));
 		legp2_2.setDepartureTime(21701.0);
 		legp2_2.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 21701.0);
+		legp2_2.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("carp2_2"));
 		Route route2_2 = RouteUtils.createGenericRouteImpl(link1, link4);
 		route2_2.setDistance(6000);
 		route2_2.setTravelTime(1500.0);
@@ -498,6 +505,7 @@ public class Plans {
 		legp2_7.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(100.0, 120.0));
 		legp2_7.setDepartureTime(54703.0);
 		legp2_7.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 54703.0);
+		legp2_7.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("carp2_7"));
 		legp2_7.setRoute(route2_2);
 		legp2_7.setTravelTime(1500.0);
 		plan2.addLeg(legp2_7);
@@ -567,6 +575,7 @@ public class Plans {
 		legp3_2.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(5756.0, 5776.0));
 		legp3_2.setDepartureTime(21701.0);
 		legp3_2.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 21701.0);
+		legp3_2.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("carp3_2"));
 		Route route3_2 = RouteUtils.createGenericRouteImpl(link1, link5);
 		route3_2.setDistance(8000);
 		route3_2.setTravelTime(2000.0);
@@ -618,6 +627,7 @@ public class Plans {
 		legp3_5.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(100.0, 120.0));
 		legp3_5.setDepartureTime(26103.0);
 		legp3_5.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 26103.0);
+		legp3_5.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("carp3_5"));
 		legp3_5.setRoute(route3_2);
 		legp3_5.setTravelTime(2000.0);
 		plan3.addLeg(legp3_5);
@@ -687,6 +697,7 @@ public class Plans {
 		legp4_2.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(4873.0, 4893.0));
 		legp4_2.setDepartureTime(21951.0);
 		legp4_2.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 21961.0);
+		legp4_2.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("ptp4_2"));
 		//pt route
 		TransitStopFacility egressFacility = sBuilder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), actp4_2.getCoord(), false);
 		TransitStopFacility accessFacility = sBuilder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), actp4_2.getCoord(), false);
@@ -744,6 +755,7 @@ public class Plans {
 		legp4_5.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(277.0, 297.0));
 		legp4_5.setDepartureTime(25888.0);
 		legp4_5.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 25898.0);
+		legp4_5.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, Id.createVehicleId("ptp4_5"));
 		legp4_5.setRoute(ptRoute);
 		legp4_5.setTravelTime(1625.0);
 		plan4.addLeg(legp4_5);

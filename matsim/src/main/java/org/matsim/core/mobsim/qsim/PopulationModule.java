@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.config.TransitConfigGroup;
 
 public class PopulationModule extends AbstractQSimModule {
@@ -43,11 +44,11 @@ public class PopulationModule extends AbstractQSimModule {
 
 	@Provides
 	@Singleton
-	AgentFactory provideAgentFactory(TransitConfigGroup config, Netsim simulation) {
+	AgentFactory provideAgentFactory(TransitConfigGroup config, Netsim simulation, TimeInterpretation timeInterpretation) {
 		if (config.isUseTransit()) {
-			return new TransitAgentFactory(simulation);
+			return new TransitAgentFactory(simulation, timeInterpretation);
 		} else {
-			return new DefaultAgentFactory(simulation);
+			return new DefaultAgentFactory(simulation, timeInterpretation);
 		}
 	}
 	

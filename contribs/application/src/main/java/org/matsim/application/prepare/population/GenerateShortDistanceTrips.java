@@ -45,14 +45,14 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--output", description = "Output filename")
     private Path output;
 
-    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    @CommandLine.ArgGroup(multiplicity = "1")
     private Generate generate;
 
     @CommandLine.Mixin
-    private final ShpOptions shp = new ShpOptions();
+    private ShpOptions shp = new ShpOptions();
 
     @CommandLine.Mixin
-    private final CrsOptions crs = new CrsOptions();
+    private CrsOptions crs = new CrsOptions();
 
     @CommandLine.Option(names = "--range", description = "Maximum distance in meter", defaultValue = "1000")
     private double range;
@@ -86,7 +86,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
             log.info("Using shape file {}", shp.getShapeFile());
             HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp, crs.getInputCRS(), population);
             for (Person person : population.getPersons().values()) {
-                if (homeLocationFilter.considerAgent(person)) {
+                if (homeLocationFilter.test(person)) {
                     personsInCityBoundary.add(person.getId());
                 }
             }
@@ -169,9 +169,8 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                 var activities = TripStructureUtils.getActivities(plan.getPlanElements(),
                         TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
                 var filterActivities = activityFilter(activities);
-                List<Activity> markedActivities = new ArrayList<>();
 
-                markedActivities = filterActivities.stream().filter(x -> rnd.nextDouble() < probability)
+                List<Activity> markedActivities = filterActivities.stream().filter(x -> rnd.nextDouble() < probability)
                         .collect(Collectors.toList());
 
                 if (markedActivities.size() > 0) {
@@ -208,7 +207,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                             newPlan.addLeg(leg1);
 
                             Activity shortDistanceRangeActivity = population.getFactory().createActivityFromCoord(
-                                    "other_3600.0", getShortDistanceCoordinate(trip.getOriginActivity().getCoord(), range));
+                                    "other_3600", getShortDistanceCoordinate(trip.getOriginActivity().getCoord(), range));
                             shortDistanceRangeActivity.setMaximumDuration(duration);
                             shortDistanceRangeActivity.setStartTime(newEndTime + walkTime / 2);
                             shortDistanceRangeActivity.setEndTime(newEndTime + walkTime / 2 + duration);

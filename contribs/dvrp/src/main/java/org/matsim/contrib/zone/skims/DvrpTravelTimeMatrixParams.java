@@ -22,10 +22,11 @@ package org.matsim.contrib.zone.skims;
 
 import java.util.Map;
 
-import javax.validation.constraints.Positive;
-
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -40,6 +41,18 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 	@Positive
 	private int cellSize = 200; //[m]
 
+	public static final String MAX_NEIGHBOR_DISTANCE = "maxNeighborDistance";
+	private static final String MAX_NEIGHBOR_DISTANCE_EXP =
+			"Max network distance from node A to node B for B to be considered a neighbor of A."
+					+ " In such cases, a network travel time from A to B is calculated and stored in the sparse travel time matrix."
+					+ " Typically, 'maxNeighborDistance' should be higher than 'cellSize' (e.g. 5-10 times)"
+					+ " in order to reduce the impact of imprecise zonal travel times for short distances."
+					+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
+					+ " The unit is meters. Default value is 1000 m.";
+
+	@PositiveOrZero
+	private int maxNeighborDistance = 1000; //[m]
+
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
 	}
@@ -48,6 +61,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		var map = super.getComments();
 		map.put(CELL_SIZE, CELL_SIZE_EXP);
+		map.put(MAX_NEIGHBOR_DISTANCE, MAX_NEIGHBOR_DISTANCE_EXP);
 		return map;
 	}
 
@@ -63,8 +77,26 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 	 * @param cellSize {@value #CELL_SIZE_EXP}
 	 */
 	@StringSetter(CELL_SIZE)
-	public void setCellSize(int cellSize) {
+	public DvrpTravelTimeMatrixParams setCellSize(int cellSize) {
 		this.cellSize = cellSize;
+		return this;
+	}
+
+	/**
+	 * @return {@value #MAX_NEIGHBOR_DISTANCE_EXP}
+	 */
+	@StringGetter(MAX_NEIGHBOR_DISTANCE)
+	public int getMaxNeighborDistance() {
+		return maxNeighborDistance;
+	}
+
+	/**
+	 * @param maxNeighborDistance {@value #MAX_NEIGHBOR_DISTANCE_EXP}
+	 */
+	@StringSetter(MAX_NEIGHBOR_DISTANCE)
+	public DvrpTravelTimeMatrixParams setMaxNeighborDistance(int maxNeighborDistance) {
+		this.maxNeighborDistance = maxNeighborDistance;
+		return this;
 	}
 
 	@Override
