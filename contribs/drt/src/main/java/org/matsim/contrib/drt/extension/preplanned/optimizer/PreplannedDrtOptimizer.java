@@ -153,9 +153,12 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, nextLink, currentTime, router,
 					travelTime);
 			schedule.addTask(taskFactory.createDriveTask(vehicle, path, DrtDriveTask.TYPE));
-		} else if (nextStop.preplannedRequest.earliestStartTime > timer.getTimeOfDay()) {
+		} else if (nextStop.preplannedRequest.earliestStartTime >= timer.getTimeOfDay()) {
+			// we need to wait 1 time step to make sure we have already received the request submission event
+			// otherwise we may not be able to get the request and insert it to the stop task
+			// TODO currently assuming the mobsim time step is 1 s
 			schedule.addTask(
-					taskFactory.createStayTask(vehicle, currentTime, nextStop.preplannedRequest.earliestStartTime,
+					taskFactory.createStayTask(vehicle, currentTime, nextStop.preplannedRequest.earliestStartTime + 1,
 							currentLink));
 		} else {
 			nonVisitedPreplannedStops.poll();//remove this stop from queue
