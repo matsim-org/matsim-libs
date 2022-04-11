@@ -5,6 +5,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.shared_mobility.analysis.SharingLegCollectorImpl;
+import org.matsim.contrib.shared_mobility.analysis.VehicleStateCollector;
+import org.matsim.contrib.shared_mobility.analysis.VehicleStateCollectorImpl;
 import org.matsim.contrib.shared_mobility.io.DefaultSharingServiceSpecification;
 import org.matsim.contrib.shared_mobility.io.SharingServiceReader;
 import org.matsim.contrib.shared_mobility.io.SharingServiceSpecification;
@@ -105,6 +108,15 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 
 		addControlerListenerBinding().to(modalKey(ValidationListener.class));
 
+		bindModal(VehicleStateCollector.class).toProvider(modalProvider(getter -> {
+			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
+			return new VehicleStateCollectorImpl(specification);
+		})).in(Singleton.class);
+
+		addEventHandlerBinding().to(modalKey(VehicleStateCollector.class));
+		addControlerListenerBinding().to(modalKey(VehicleStateCollector.class));
+
+
 		// based on the underlying mode and how it is simulated
 		// teleported/network we need to bind different rental handler
 
@@ -124,16 +136,16 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 		}
 
 		switch (serviceConfig.getServiceScheme()) {
-		case Freefloating:
-			bindModal(InteractionFinder.class).to(modalKey(FreefloatingInteractionFinder.class));
-			bindModal(SharingServiceValidator.class).to(modalKey(FreefloatingServiceValidator.class));
-			break;
-		case StationBased:
-			bindModal(InteractionFinder.class).to(modalKey(StationBasedInteractionFinder.class));
-			bindModal(SharingServiceValidator.class).to(modalKey(StationBasedServiceValidator.class));
-			break;
-		default:
-			throw new IllegalStateException();
+			case Freefloating:
+				bindModal(InteractionFinder.class).to(modalKey(FreefloatingInteractionFinder.class));
+				bindModal(SharingServiceValidator.class).to(modalKey(FreefloatingServiceValidator.class));
+				break;
+			case StationBased:
+				bindModal(InteractionFinder.class).to(modalKey(StationBasedInteractionFinder.class));
+				bindModal(SharingServiceValidator.class).to(modalKey(StationBasedServiceValidator.class));
+				break;
+			default:
+				throw new IllegalStateException();
 		}
 	}
 }

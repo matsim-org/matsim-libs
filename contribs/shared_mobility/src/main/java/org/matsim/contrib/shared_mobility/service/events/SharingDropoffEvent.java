@@ -12,16 +12,19 @@ import org.matsim.contrib.shared_mobility.service.SharingVehicle;
 
 public class SharingDropoffEvent extends AbstractSharingEvent {
 	static public final String TYPE = "sharing vehicle dropoff";
-
+	Id<SharingVehicle> sharingVehicleId;
+	
 	public SharingDropoffEvent(double time, Id<SharingService> serviceId, Id<Person> personId, Id<Link> linkId,
 			Id<SharingVehicle> vehicleId, Optional<Id<SharingStation>> stationId) {
-		super(time, serviceId, personId, linkId, Optional.of(vehicleId), stationId);
+		super(time, serviceId, personId, linkId, Optional.of(vehicleId), stationId, Optional.empty());
+		this.sharingVehicleId = vehicleId;
 	}
 
 	@Override
 	public String getEventType() {
 		return TYPE;
 	}
+	
 
 	static public SharingDropoffEvent convert(GenericEvent event) {
 		return new SharingDropoffEvent(event.getTime(), //

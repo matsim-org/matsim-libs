@@ -75,16 +75,16 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	public PreplannedDrtOptimizer(DrtConfigGroup drtCfg, PreplannedSchedules preplannedSchedules, Network network,
 			TravelTime travelTime, TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory,
 			EventsManager eventsManager, Fleet fleet) {
+		Preconditions.checkArgument(
+				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
+				"Some schedules are preplanned for vehicles outside the fleet");
+
 		this.preplannedSchedules = preplannedSchedules;
 		this.network = network;
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
 		this.eventsManager = eventsManager;
-
-		Preconditions.checkArgument(
-				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
-				"Some schedules are preplanned for vehicles outside the fleet");
 
 		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 		stopDuration = drtCfg.getStopDuration();
@@ -153,9 +153,12 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, nextLink, currentTime, router,
 					travelTime);
 			schedule.addTask(taskFactory.createDriveTask(vehicle, path, DrtDriveTask.TYPE));
-		} else if (nextStop.preplannedRequest.earliestStartTime > timer.getTimeOfDay()) {
+		} else if (nextStop.preplannedRequest.earliestStartTime >= timer.getTimeOfDay()) {
+			// we need to wait 1 time step to make sure we have already received the request submission event
+			// otherwise we may not be able to get the request and insert it to the stop task
+			// TODO currently assuming the mobsim time step is 1 s
 			schedule.addTask(
-					taskFactory.createStayTask(vehicle, currentTime, nextStop.preplannedRequest.earliestStartTime,
+					taskFactory.createStayTask(vehicle, currentTime, nextStop.preplannedRequest.earliestStartTime + 1,
 							currentLink));
 		} else {
 			nonVisitedPreplannedStops.poll();//remove this stop from queue
@@ -225,18 +228,14 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			if (!(o instanceof PreplannedRequest))
 				return false;
 			PreplannedRequest that = (PreplannedRequest)o;
-			return Double.compare(that.earliestStartTime, earliestStartTime) == 0
-					&& Double.compare(that.latestStartTime, latestStartTime) == 0
-					&& Double.compare(that.latestArrivalTime, latestArrivalTime) == 0
-					&& Objects.equal(passengerId, that.passengerId)
+			return Objects.equal(passengerId, that.passengerId)
 					&& Objects.equal(fromLinkId, that.fromLinkId)
 					&& Objects.equal(toLinkId, that.toLinkId);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(passengerId, earliestStartTime, latestStartTime, latestArrivalTime, fromLinkId,
-					toLinkId);
+			return Objects.hashCode(passengerId, fromLinkId, toLinkId);
 		}
 
 		@Override

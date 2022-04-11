@@ -17,13 +17,15 @@ public abstract class AbstractSharingEvent extends Event implements HasPersonId,
 	private final Id<SharingService> serviceId;
 
 	private final Id<Link> linkId;
+
 	private final Id<Person> personId;
 
 	protected final Optional<Id<SharingVehicle>> vehicleId;
 	protected final Optional<Id<SharingStation>> stationId;
+	protected final Optional<Id<Link>> destinationLinkId;
 
 	public AbstractSharingEvent(double time, Id<SharingService> serviceId, Id<Person> personId, Id<Link> linkId,
-			Optional<Id<SharingVehicle>> vehicleId, Optional<Id<SharingStation>> stationId) {
+			Optional<Id<SharingVehicle>> vehicleId, Optional<Id<SharingStation>> stationId, Optional<Id<Link>> destinationLinkId) {
 		super(time);
 
 		this.serviceId = serviceId;
@@ -32,6 +34,7 @@ public abstract class AbstractSharingEvent extends Event implements HasPersonId,
 
 		this.vehicleId = vehicleId;
 		this.stationId = stationId;
+		this.destinationLinkId = destinationLinkId;
 	}
 
 	public Map<String, String> getAttributes() {
@@ -39,6 +42,7 @@ public abstract class AbstractSharingEvent extends Event implements HasPersonId,
 		attributes.put("service", serviceId.toString());
 		attributes.put("link", linkId.toString());
 		attributes.put("person", personId.toString());
+		attributes.put("destinationLinkId",destinationLinkId.toString());
 
 		if (vehicleId.isPresent()) {
 			attributes.put("vehicle", vehicleId.get().toString());
@@ -46,6 +50,10 @@ public abstract class AbstractSharingEvent extends Event implements HasPersonId,
 
 		if (stationId.isPresent()) {
 			attributes.put("station", stationId.get().toString());
+		}
+
+		if (destinationLinkId.isPresent()) {
+			attributes.put("destinationLinkId", destinationLinkId.get().toString());
 		}
 
 		return attributes;
@@ -63,5 +71,12 @@ public abstract class AbstractSharingEvent extends Event implements HasPersonId,
 	
 	public Id<SharingService> getServiceId() {
 		return serviceId;
+	}
+	
+	public Id<SharingVehicle> getSharingVehicleId() {
+		return vehicleId.get();
+	}
+	public Id<Link> getDestinationLinkId() {
+		return destinationLinkId.get();
 	}
 }
