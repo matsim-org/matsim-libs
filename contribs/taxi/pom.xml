@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>14.0-SNAPSHOT</version>
+		<version>15.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -28,12 +28,12 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>ev</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
