@@ -51,7 +51,7 @@ import java.util.List;
  *
  */
 public class FreightDemandGenerationUtils {
-	private static final Logger log = Logger.getLogger(CarrierReaderFromCSV.class);
+	private static final Logger log = Logger.getLogger(FreightDemandGenerationUtils.class);
 
 	/**
 	 * Adds the home coordinates to attributes and removes plans
@@ -141,12 +141,16 @@ public class FreightDemandGenerationUtils {
 
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		for (Person person : population.getPersons().values()) {
-			// TODO: throws error when attribute not present
+			
+			if (!person.getAttributes().getAsMap().containsKey("homeX")
+					|| !person.getAttributes().getAsMap().containsKey("homeY"))
+				throw new RuntimeException(
+						"The coordinates of the home facility are not part of the attributes a person. Please check!");
 
 			double x = (double) person.getAttributes().getAttribute("homeX");
 			double y = (double) person.getAttributes().getAttribute("homeY");
 
-			if (!index.contains(new Coord(x,y)))
+			if (!index.contains(new Coord(x, y)))
 				personsToRemove.add(person.getId());
 		}
 
