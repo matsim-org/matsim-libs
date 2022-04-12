@@ -241,9 +241,22 @@ public final class CarrierReaderFromCSV {
 			String csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
 			CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
+		Set<CarrierInformationElement> allNewCarrierInformation = ReadCarrierInformation(csvLocationCarrier);
+		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
+		log.info("The read carrier information from the csv are checked without errors.");
+		createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
+				defaultJspritIterations, crsTransformationNetworkAndShape);
+	}
+
+	/**
+	 * @param csvLocationCarrier
+	 * @return
+	 * @throws IOException
+	 */
+	static Set<CarrierInformationElement> ReadCarrierInformation(String csvLocationCarrier) throws IOException {
 		log.info("Start reading carrier csv file: " + csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
-		CSVParser parse = CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader()
+		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
 				.parse(IOUtils.getBufferedReader(csvLocationCarrier));
 		for (CSVRecord record : parse) {
 			CarrierInformationElement.Builder builder;
@@ -253,13 +266,13 @@ public final class CarrierReaderFromCSV {
 				throw new RuntimeException(
 						"Minimum one carrier has no name. Every carrier information has to be related to one carrier. Please check the input csv file!");
 			if (!record.get("vehicleTypes").isBlank())
-				builder.setVehicleTypes(record.get("vehicleTypes").split(","));
+				builder.setVehicleTypes(record.get("vehicleTypes").split(";"));
 			if (!record.get("numberOfDepots").isBlank())
 				builder.setNumberOfDepotsPerType(Integer.parseInt(record.get("numberOfDepots")));
 			if (!record.get("selectedVehicleDepots").isBlank())
-				builder.setVehicleDepots(record.get("selectedVehicleDepots").split(","));
+				builder.setVehicleDepots(record.get("selectedVehicleDepots").split(";"));
 			if (!record.get("areaOfAdditonalDepots").isBlank())
-				builder.setAreaOfAdditonalDepots(record.get("areaOfAdditonalDepots").split(","));
+				builder.setAreaOfAdditonalDepots(record.get("areaOfAdditonalDepots").split(";"));
 			if (!record.get("fixedNumberOfVehilcePerTypeAndLocation").isBlank())
 				builder.setFixedNumberOfVehilcePerTypeAndLocation(
 						Integer.parseInt(record.get("fixedNumberOfVehilcePerTypeAndLocation")));
@@ -279,10 +292,7 @@ public final class CarrierReaderFromCSV {
 			CarrierInformationElement newCarrierInformationElement = builder.build();
 			allNewCarrierInformation.add(newCarrierInformationElement);
 		}
-		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
-		log.info("The read carrier information from the csv are checked without errors.");
-		createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
-				defaultJspritIterations, crsTransformationNetworkAndShape);
+		return allNewCarrierInformation;
 	}
 
 	/**
@@ -293,7 +303,7 @@ public final class CarrierReaderFromCSV {
 	 * @param scenario
 	 * @param polygonsInShape
 	 */
-	private static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
+	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
 			FreightConfigGroup freightConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape) {
 
 		FreightUtils.addOrGetCarriers(scenario);
@@ -397,7 +407,7 @@ public final class CarrierReaderFromCSV {
 	 * @param defaultJspritIterations
 	 * @param crsTransformationNetworkAndShape
 	 */
-	private static void createNewCarrierAndAddVehilceTypes(Scenario scenario,
+	static void createNewCarrierAndAddVehilceTypes(Scenario scenario,
 			Set<CarrierInformationElement> allNewCarrierInformation, FreightConfigGroup freightConfigGroup,
 			Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
