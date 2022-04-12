@@ -141,6 +141,10 @@ public final class DemandReaderFromCSV {
 		 */
 		private final String typeOfDemand;
 
+		/**
+		 * @author Ricardo
+		 *
+		 */
 		public static class Builder {
 			private final String carrierName;
 			private final Integer demandToDistribute;
@@ -348,7 +352,7 @@ public final class DemandReaderFromCSV {
 			Set<DemandInformationElement> demandInformation, Scenario scenario,
 			Collection<SimpleFeature> polygonsInShape) throws IOException {
 
-		CSVParser parse = CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader()
+		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
 				.parse(IOUtils.getBufferedReader(csvLocationDemand));
 
 		for (CSVRecord record : parse) {
@@ -365,12 +369,12 @@ public final class DemandReaderFromCSV {
 				builder.setShareOfPopulationWithFirstJobElement(
 						Double.parseDouble(record.get("shareOfPopulationWithFirstJobElement")));
 			if (!record.get("areasFirstJobElement").isBlank())
-				builder.setAreasFirstJobElement(record.get("areasFirstJobElement").split(","));
+				builder.setAreasFirstJobElement(record.get("areasFirstJobElement").split(";"));
 			if (!record.get("numberOfFirstJobElementLocations").isBlank())
 				builder.setNumberOfFirstJobElementLocations(
 						Integer.parseInt(record.get("numberOfFirstJobElementLocations")));
 			if (!record.get("locationsOfFirstJobElement").isBlank())
-				builder.setLocationsOfFirstJobElement(record.get("locationsOfFirstJobElement").split(","));
+				builder.setLocationsOfFirstJobElement(record.get("locationsOfFirstJobElement").split(";"));
 			if (!record.get("firstJobElementTimePerUnit").isBlank())
 				builder.setFirstJobElementTimePerUnit(Integer.parseInt(record.get("firstJobElementTimePerUnit")));
 			if (!record.get("firstJobElementStartTime").isBlank() || !record.get("firstJobElementEndTime").isBlank())
@@ -381,12 +385,12 @@ public final class DemandReaderFromCSV {
 				builder.setShareOfPopulationWithSecondJobElement(
 						Double.parseDouble(record.get("shareOfPopulationWithSecondJobElement")));
 			if (!record.get("areasSecondJobElement").isBlank())
-				builder.setAreasSecondJobElement(record.get("areasSecondJobElement").split(","));
+				builder.setAreasSecondJobElement(record.get("areasSecondJobElement").split(";"));
 			if (!record.get("numberOfSecondJobElementLocations").isBlank())
 				builder.setNumberOfSecondJobElementLocations(
 						Integer.parseInt(record.get("numberOfSecondJobElementLocations")));
 			if (!record.get("locationsOfSecondJobElement").isBlank())
-				builder.setLocationsOfSecondJobElement(record.get("locationsOfSecondJobElement").split(","));
+				builder.setLocationsOfSecondJobElement(record.get("locationsOfSecondJobElement").split(";"));
 			if (!record.get("secondJobElementTimePerUnit").isBlank()) {
 				builder.setSecondJobElementTimePerUnit(Integer.parseInt(record.get("secondJobElementTimePerUnit")));
 				builder.setTypeOfDemand("shipment");
