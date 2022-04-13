@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import javax.management.InvalidAttributeValueException;
@@ -33,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.freight.Freight;
@@ -68,7 +68,7 @@ import picocli.CommandLine;
 		+ " *          selected input options and the read input files. The format and "
 		+ " *          column titles of the input csv should not be changed. The format of"
 		+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
-public class FreightDemandGeneration implements Callable<Integer> {
+public class FreightDemandGeneration implements MATSimAppCommand {
 
 	private enum CarrierInputOptions {
 		readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData
@@ -79,11 +79,11 @@ public class FreightDemandGeneration implements Callable<Integer> {
 	}
 
 	private enum PopulationOptions {
-		usePopulationHolePopulation, usePopulationInShape
+		usePopulationHolePopulation, usePopulationInShape, useNoPopulation
 	}
 
 	private enum PopulationSamplingOption {
-		createMoreLocations, increaseDemandOnLocation
+		createMoreLocations, increaseDemandOnLocation, noPopulationSampling
 	}
 
 	private enum OptionsOfVRPSolutions {
@@ -93,62 +93,68 @@ public class FreightDemandGeneration implements Callable<Integer> {
 
 	private static final Logger log = LogManager.getLogger(FreightDemandGeneration.class);
 
-	@CommandLine.Option(names = "--carrierFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/carrier_berlin_noDemand.xml", description = "Path to the carrierFile.")
-	private Path carrierFilePath;
-
-	@CommandLine.Option(names = "--carrierVehicleFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/vehicleTypes_default.xml", description = "Path to the carrierVehcileFile.")
-	private Path carrierVehicleFilePath;
-
-	@CommandLine.Mixin
-	private ShpOptions shp = new ShpOptions(Path.of("../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/shp/Berlin_Ortsteile.shp"), "EPSG:3857", null);
-
-	@CommandLine.Option(names = "--populationFileLocation", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/input/berlin-v5.5-1pct.plans.xml.gz", description = "Path to the population file.")
-	private Path populationFilePath;
-
-	@CommandLine.Option(names = "--network", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz", description = "Path to desired network file")
-	private Path networkPath;
-
-	@CommandLine.Option(names = "--networkCRS", defaultValue = "EPSG:31468", description = "CRS of the input network (e.g.\"EPSG:31468\"")
-	private String networkCRS;
-
-	@CommandLine.Option(names = "--networkChangeEvents", defaultValue = "", description = "Set path to desired networkChangeEvents file if you want to use network change Events")
-	private Path networkChangeEventsPath;
-
-	@CommandLine.Option(names = "--output", defaultValue = "output/demandGeneration/", description = "Path to output folder", required = true)
+	@CommandLine.Option(names = "--output", description = "Path to output folder", required = true)
 	private Path outputLocation;
 
-	@CommandLine.Option(names = "--carrierOption", defaultValue = "createCarriersFromCSV", description = "Set the choice of getting/creating carrier. Options: readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData", required = true)
+	@CommandLine.Option(names = "--carrierOption", description = "Set the choice of getting/creating carrier. Options: readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData", required = true)
 	private CarrierInputOptions selectedCarrierInputOption;
-
-	@CommandLine.Option(names = "--inputCarrierCSV", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/exampleCarrier.csv", description = "Path to input carrier CSV, if you want to read it.")
-	private Path csvCarrierPath;
-
-	@CommandLine.Option(names = "--inputDemandCSV", defaultValue = "../../../public-svn/matsim/scenarios/countries/de/freight-demand-generation/input_example/exampleDemand.csv", description = "Path to input demand CSV, if you want to create a new demand based on the csv.")
-	private Path csvDemandPath;
-
-	@CommandLine.Option(names = "--demandOption", defaultValue = "createDemandFromCSV", description = "Select the option of demand generation. Options: useDemandFromCarrierFile, createDemandFromCSV, createDemandFromCSVAndUsePopulation", required = true)
+	
+	@CommandLine.Option(names = "--demandOption", description = "Select the option of demand generation. Options: useDemandFromCarrierFile, createDemandFromCSV, createDemandFromCSVAndUsePopulation", required = true)
 	private DemandGenerationOptions selectedDemandGenerationOption;
 
-	@CommandLine.Option(names = "--populationOption", defaultValue = "usePopulationInShape", description = "Select the option of using the population. Options: usePopulationHolePopulation, usePopulationInShape", required = true)
+	@CommandLine.Option(names = "--populationOption", description = "Select the option of using the population. Options: usePopulationHolePopulation, usePopulationInShape, useNoPopulation", required = true)
 	private PopulationOptions selectedPopulationOption;
 
-	@CommandLine.Option(names = "--populationSamplingOption", defaultValue = "createMoreLocations", description = "Select the option of sampling if using a population. Options: createMoreLocations, increaseDemandOnLocation", required = true)
+	@CommandLine.Option(names = "--populationSamplingOption", description = "Select the option of sampling if using a population. Options: createMoreLocations, increaseDemandOnLocation, noPopulationSampling", required = true)
 	private PopulationSamplingOption selectedPopulationSamplingOption;
 
-	@CommandLine.Option(names = "--populationSample", defaultValue = "0.01", description = "Sample of the selected population.")
+	@CommandLine.Option(names = "--VRPSolutionsOption", description = "Select the option of solving the VRP. Options: runJspritAndMATSim, runJspritAndMATSimWithDistanceConstraint, runJsprit, runJspritWithDistanceConstraint, createNoSolutionAndOnlyWriteCarrierFile", required = true)
+	private OptionsOfVRPSolutions selectedSolution;
+	
+	@CommandLine.Option(names = "--combineSimilarJobs", defaultValue = "false", description = "Select the option if created jobs of the same carrier with same location and time will be combined. Options: true, false", required = true)
+	private String combineSimilarJobs;
+	
+	@CommandLine.Option(names = "--carrierFileLocation", description = "Path to the carrierFile.", defaultValue = "")
+	private Path carrierFilePath;
+
+	@CommandLine.Option(names = "--carrierVehicleFileLocation", description = "Path to the carrierVehcileFile.")
+	private Path carrierVehicleFilePath;
+
+	@CommandLine.Option(names = "--shapeFileLocation", description = "Path to the shape file.")
+	private static Path shapeFilePath;
+
+	@CommandLine.Option(names = "--shapeCRS", description = "CRS of the shape file.")
+	private static String shapeCRS;
+
+	@CommandLine.Mixin
+	private ShpOptions shp = new ShpOptions(shapeFilePath, shapeCRS, null);
+
+	@CommandLine.Option(names = "--populationFileLocation", description = "Path to the population file.", defaultValue = "")
+	private Path populationFilePath;
+
+	@CommandLine.Option(names = "--network", description = "Path to desired network file", defaultValue = "")
+	private String networkPath;
+
+	@CommandLine.Option(names = "--networkCRS", description = "CRS of the input network (e.g.\"EPSG:31468\")")
+	private String networkCRS;
+
+	@CommandLine.Option(names = "--networkChangeEvents", description = "Set path to desired networkChangeEvents file if you want to use network change Events", defaultValue = "")
+	private Path networkChangeEventsPath;
+
+	@CommandLine.Option(names = "--inputCarrierCSV", description = "Path to input carrier CSV, if you want to read it.")
+	private Path csvCarrierPath;
+
+	@CommandLine.Option(names = "--inputDemandCSV", description = "Path to input demand CSV, if you want to create a new demand based on the csv.")
+	private Path csvDemandPath;
+
+	@CommandLine.Option(names = "--populationSample", description = "Sample of the selected population.")
 	private double sampleSizeInputPopulation;
 
-	@CommandLine.Option(names = "--populationSamplingTo", defaultValue = "0.1", description = "Set the sample of the gerated demand.")
+	@CommandLine.Option(names = "--populationSamplingTo", description = "Set the sample of the gerated demand.")
 	private double upSamplePopulationTo;
 
-	@CommandLine.Option(names = "--combineSimilarJobs", defaultValue = "false", description = "Select the option if created jobs of the same carrier with same location and time will be combined. Options: true, false", required = true)
-	private boolean combineSimilarJobs;
-
-	@CommandLine.Option(names = "--defaultJspriIterations", defaultValue = "3", description = "Set the default number of jsprit iterations.")
+	@CommandLine.Option(names = "--defaultJspriIterations", description = "Set the default number of jsprit iterations.")
 	private int defaultJspritIterations;
-
-	@CommandLine.Option(names = "--VRPSolutionsOption", defaultValue = "runJspritAndMATSim", description = "Select the option of solving the VRP. Options: runJspritAndMATSim, runJspritAndMATSimWithDistanceConstraint, runJsprit, runJspritWithDistanceConstraint, createNoSolutionAndOnlyWriteCarrierFile", required = true)
-	private OptionsOfVRPSolutions selectedSolution;
 
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions("DHDN_GK4");
@@ -176,7 +182,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 		log.info("Starting class to create a freight scenario");
 
 		// select network configurations
-		String networkPathOfOtherNetwork = networkPath.toString();
+		String networkPathOfOtherNetwork = networkPath;
 		String networkChangeEventsFilePath = networkChangeEventsPath.toString();
 		setNetworkAndNetworkChangeEvents(config, networkPathOfOtherNetwork, networkChangeEventsFilePath);
 
@@ -203,7 +209,7 @@ public class FreightDemandGeneration implements Callable<Integer> {
 		// create the demand
 		log.info("Start creating the demand. Selected option: " + selectedCarrierInputOption);
 		createDemand(selectedDemandGenerationOption, scenario, csvLocationDemand, polygonsInShape, populationFile,
-				selectedPopulationSamplingOption, selectedPopulationOption, combineSimilarJobs,
+				selectedPopulationSamplingOption, selectedPopulationOption, Boolean.getBoolean(combineSimilarJobs),
 				crsTransformationFromNetworkToShape);
 
 		// prepare the VRP and get a solution
@@ -356,11 +362,9 @@ public class FreightDemandGeneration implements Callable<Integer> {
 			PopulationSamplingOption selectedSamplingOption, PopulationOptions selectedPopulationOption,
 			boolean combineSimilarJobs, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
-		// Set<NewDemand> demandInformation = new HashSet<>();
 		switch (selectedDemandGenerationOption) {
 		case createDemandFromCSV:
 			// creates the demand by using the information given in the read csv file
-
 			DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape, combineSimilarJobs,
 					crsTransformationNetworkAndShape, null);
 			break;
@@ -399,6 +403,8 @@ public class FreightDemandGeneration implements Callable<Integer> {
 			}
 
 			switch (selectedPopulationOption) {
+			case useNoPopulation:
+				break;
 			case usePopulationHolePopulation:
 				// uses the hole population as possible demand locations
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
