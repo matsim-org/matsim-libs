@@ -241,7 +241,7 @@ public final class CarrierReaderFromCSV {
 			String csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
 			CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
-		Set<CarrierInformationElement> allNewCarrierInformation = ReadCarrierInformation(csvLocationCarrier);
+		Set<CarrierInformationElement> allNewCarrierInformation = readCarrierInformation(csvLocationCarrier);
 		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape);
 		log.info("The read carrier information from the csv are checked without errors.");
 		createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
@@ -253,7 +253,7 @@ public final class CarrierReaderFromCSV {
 	 * @return
 	 * @throws IOException
 	 */
-	static Set<CarrierInformationElement> ReadCarrierInformation(String csvLocationCarrier) throws IOException {
+	static Set<CarrierInformationElement> readCarrierInformation(String csvLocationCarrier) throws IOException {
 		log.info("Start reading carrier csv file: " + csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
 		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()

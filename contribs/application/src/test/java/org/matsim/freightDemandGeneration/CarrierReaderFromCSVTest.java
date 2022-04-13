@@ -45,7 +45,7 @@ public class CarrierReaderFromCSVTest {
 				FreightConfigGroup.class);
 		freightConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
 		String carrierCSVLocation = utils.getPackageInputDirectory() + "testCarrierCSV.csv";
-		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV.ReadCarrierInformation(carrierCSVLocation);
+		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV.readCarrierInformation(carrierCSVLocation);
 		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, null);
 		CarrierReaderFromCSV.createNewCarrierAndAddVehilceTypes(scenario, allNewCarrierInformation, freightConfigGroup, null, 1, null);
 		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size());
@@ -130,7 +130,7 @@ public class CarrierReaderFromCSVTest {
 		
 		String carrierCSVLocation = utils.getPackageInputDirectory() + "testCarrierCSV.csv";
 		Set<CarrierInformationElement> allNewCarrierInformation = CarrierReaderFromCSV
-				.ReadCarrierInformation(carrierCSVLocation);
+				.readCarrierInformation(carrierCSVLocation);
 		Assert.assertEquals(3, allNewCarrierInformation.size());
 		
 		for (CarrierInformationElement carrierInformationElement : allNewCarrierInformation) {
@@ -170,7 +170,7 @@ public class CarrierReaderFromCSVTest {
 				Assert.assertEquals("testVehicle2", carrierInformationElement.getVehicleTypes()[0]);
 			}
 			else {
-				Assert.fail();
+				Assert.fail("No expected carrierInformationElement found");
 			}
 		}
 
