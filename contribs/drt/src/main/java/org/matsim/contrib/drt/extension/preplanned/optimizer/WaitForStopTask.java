@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,35 +18,22 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.extension.preplanned.run;
+package org.matsim.contrib.drt.extension.preplanned.optimizer;
 
-import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDrtModeOptimizerQSimModule;
-import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtModeQSimModule;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.MainModeIdentifier;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
-import com.google.inject.Inject;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModePreplannedDrtModule extends AbstractModule {
+public class WaitForStopTask extends DefaultStayTask {
 
-	@Inject
-	private MultiModeDrtConfigGroup multiModeDrtCfg;
+	public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_STOP", STAY);
 
-	@Override
-	public void install() {
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			install(new PreplannedDrtModeModule(drtCfg));
-			installQSimModule(new DrtModeQSimModule(drtCfg, new PreplannedDrtModeOptimizerQSimModule(drtCfg)));
-			install(new DrtModeAnalysisModule(drtCfg));
-		}
-
-		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
+	public WaitForStopTask(double beginTime, double endTime, Link link) {
+		super(TYPE, beginTime, endTime, link);
 	}
 }

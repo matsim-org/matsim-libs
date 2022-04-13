@@ -26,17 +26,26 @@ import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithD
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtDriveTask;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author jbischoff
@@ -77,6 +86,16 @@ public final class PreplannedDrtControlerCreator {
 					}
 				});
 			}
+			controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.getMode()) {
+				@Override
+				public void install() {
+					bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
+									getter -> new VehicleOccupancyProfileCalculator(getMode(),
+											getter.getModal(FleetSpecification.class), 300, getter.get(QSimConfigGroup.class),
+											ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE, WaitForStopTask.TYPE))))
+							.asEagerSingleton();
+				}
+			});
 		});
 
 		if (otfvis) {
