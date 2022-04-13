@@ -126,40 +126,52 @@ public final class CarrierReaderFromCSV {
 			public static Builder newInstance(String carrierName) {
 				return new Builder(carrierName);
 			}
+
 			private Builder(String carrierName) {
 				super();
 				this.carrierName = carrierName;
 			}
+
 			public String getCarrierName() {
 				return carrierName;
 			}
+
 			public void setVehicleTypes(String[] vehicleTypes) {
 				this.vehicleTypes = vehicleTypes;
 			}
+
 			public void setNumberOfDepotsPerType(int numberOfDepotsPerType) {
 				this.numberOfDepotsPerType = numberOfDepotsPerType;
 			}
+
 			public void setVehicleDepots(String[] vehicleDepots) {
 				this.vehicleDepots = vehicleDepots;
 			}
+
 			public void setAreaOfAdditonalDepots(String[] areaOfAdditonalDepots) {
 				this.areaOfAdditonalDepots = areaOfAdditonalDepots;
 			}
+
 			public void setFleetSize(FleetSize fleetSize) {
 				this.fleetSize = fleetSize;
 			}
+
 			public void setVehicleStartTime(int carrierStartTime) {
 				this.vehicleStartTime = carrierStartTime;
 			}
+
 			public void setVehicleEndTime(int vehicleEndTime) {
 				this.vehicleEndTime = vehicleEndTime;
 			}
+
 			public void setJspritIterations(int jspritIterations) {
 				this.jspritIterations = jspritIterations;
 			}
+
 			public void setFixedNumberOfVehilcePerTypeAndLocation(int fixedNumberOfVehilcePerTypeAndLocation) {
 				this.fixedNumberOfVehilcePerTypeAndLocation = fixedNumberOfVehilcePerTypeAndLocation;
 			}
+
 			public CarrierInformationElement build() {
 				return new CarrierInformationElement(this);
 			}
@@ -181,18 +193,23 @@ public final class CarrierReaderFromCSV {
 		public String getName() {
 			return carrierName;
 		}
+
 		public String[] getVehicleTypes() {
 			return vehicleTypes;
 		}
+
 		public int getNumberOfDepotsPerType() {
 			return numberOfDepotsPerType;
 		}
+
 		public String[] getVehicleDepots() {
 			return vehicleDepots;
 		}
+
 		public void setVehicleDepots(String[] vehicleDepots) {
 			this.vehicleDepots = vehicleDepots;
 		}
+
 		public void addVehicleDepots(String[] vehicleDepots, String newDepot) {
 			String[] newdepotList = new String[vehicleDepots.length + 1];
 			int count = 0;
@@ -202,24 +219,31 @@ public final class CarrierReaderFromCSV {
 			newdepotList[count] = newDepot;
 			this.vehicleDepots = newdepotList;
 		}
+
 		public String[] getAreaOfAdditonalDepots() {
 			return areaOfAdditonalDepots;
 		}
+
 		public FleetSize getFleetSize() {
 			return fleetSize;
 		}
+
 		public int getVehicleStartTime() {
 			return vehicleStartTime;
 		}
+
 		public int getVehicleEndTime() {
 			return vehicleEndTime;
 		}
+
 		public int getJspritIterations() {
 			return jspritIterations;
 		}
+
 		public int getFixedNumberOfVehilcePerTypeAndLocation() {
 			return fixedNumberOfVehilcePerTypeAndLocation;
 		}
+
 		public void setFixedNumberOfVehilcePerTypeAndLocation(int fixedNumberOfVehilcePerTypeAndLocation) {
 			this.fixedNumberOfVehilcePerTypeAndLocation = fixedNumberOfVehilcePerTypeAndLocation;
 		}
@@ -445,6 +469,7 @@ public final class CarrierReaderFromCSV {
 				Link link = scenario.getNetwork().getLinks().values().stream()
 						.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
 				if (!link.getId().toString().contains("pt")
+						&& !link.getAttributes().getAsMap().get("type").toString().contains("motorway")
 						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
 								singleNewCarrier.getAreaOfAdditonalDepots(), crsTransformationNetworkAndShape)) {
 					singleNewCarrier.addVehicleDepots(singleNewCarrier.getVehicleDepots(), link.getId().toString());

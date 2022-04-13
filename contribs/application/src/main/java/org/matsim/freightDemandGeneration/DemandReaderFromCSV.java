@@ -318,7 +318,10 @@ public final class DemandReaderFromCSV {
 		}
 	}
 
-	/** Reads the csv with the demand information and adds this demand to the related carriers.
+	/**
+	 * Reads the csv with the demand information and adds this demand to the related
+	 * carriers.
+	 * 
 	 * @param scenario
 	 * @param csvLocationDemand
 	 * @param polygonsInShape
@@ -1277,6 +1280,7 @@ public final class DemandReaderFromCSV {
 		HashMap<Id<Link>, Link> possibleLinks = new HashMap<Id<Link>, Link>();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (numberOfLocations == null && !link.getId().toString().contains("pt")
+					&& !link.getAttributes().getAsMap().get("type").toString().contains("motorway")
 					&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape, areasForLocations,
 							crsTransformationNetworkAndShape)) {
 				possibleLinks.put(link.getId(), link);
@@ -1406,7 +1410,7 @@ public final class DemandReaderFromCSV {
 					newLink = possibleLinks.get(findNearestLink(MGC.point2Coord(homePoint), middlePointsLinks));
 				}
 			}
-			if (!newLink.getId().toString().contains("pt")
+			if (!newLink.getId().toString().contains("pt") && !newLink.getAttributes().getAsMap().get("type").toString().contains("motorway")
 					&& (polygonsInShape == null || FreightDemandGenerationUtils.checkPositionInShape(newLink, null,
 							polygonsInShape, areasForTheDemand, crsTransformationNetworkAndShape)))
 				selectedlink = newLink;
