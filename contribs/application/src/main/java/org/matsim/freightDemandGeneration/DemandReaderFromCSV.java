@@ -330,9 +330,9 @@ public final class DemandReaderFromCSV {
 	static void readAndCreateDemand(Scenario scenario, String csvLocationDemand,
 			Collection<SimpleFeature> polygonsInShape, boolean combineSimilarJobs,
 			CoordinateTransformation crsTransformationNetworkAndShape, Population population) throws IOException {
-		Set<DemandInformationElement> demandInformation = new HashSet<>();
 
-		demandInformation = readDemandInformation(csvLocationDemand, demandInformation, scenario, polygonsInShape);
+		Set<DemandInformationElement> demandInformation = readDemandInformation(csvLocationDemand);
+		checkNewDemand(scenario, demandInformation, polygonsInShape);
 		createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, combineSimilarJobs,
 				crsTransformationNetworkAndShape);
 	}
@@ -348,10 +348,9 @@ public final class DemandReaderFromCSV {
 	 * @return
 	 * @throws IOException
 	 */
-	private static Set<DemandInformationElement> readDemandInformation(String csvLocationDemand,
-			Set<DemandInformationElement> demandInformation, Scenario scenario,
-			Collection<SimpleFeature> polygonsInShape) throws IOException {
+	static Set<DemandInformationElement> readDemandInformation(String csvLocationDemand) throws IOException {
 
+		Set<DemandInformationElement> demandInformation = new HashSet<>();
 		CSVParser parse = CSVFormat.DEFAULT.withDelimiter('\t').withFirstRecordAsHeader()
 				.parse(IOUtils.getBufferedReader(csvLocationDemand));
 
@@ -402,7 +401,6 @@ public final class DemandReaderFromCSV {
 			DemandInformationElement newDemandInformationElement = builder.build();
 			demandInformation.add(newDemandInformationElement);
 		}
-		checkNewDemand(scenario, demandInformation, polygonsInShape);
 		return demandInformation;
 	}
 
@@ -414,7 +412,7 @@ public final class DemandReaderFromCSV {
 	 * @param demandInformation
 	 * @param polygonsInShape
 	 */
-	private static void checkNewDemand(Scenario scenario, Set<DemandInformationElement> demandInformation,
+	static void checkNewDemand(Scenario scenario, Set<DemandInformationElement> demandInformation,
 			Collection<SimpleFeature> polygonsInShape) {
 
 		for (DemandInformationElement newDemand : demandInformation) {
@@ -550,7 +548,7 @@ public final class DemandReaderFromCSV {
 	 * @param combineSimilarJobs
 	 * @param crsTransformationNetworkAndShape
 	 */
-	private static void createDemandForCarriers(Scenario scenario, Collection<SimpleFeature> polygonsInShape,
+	static void createDemandForCarriers(Scenario scenario, Collection<SimpleFeature> polygonsInShape,
 			Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
@@ -743,7 +741,7 @@ public final class DemandReaderFromCSV {
 				if (demandToDistribute == 0)
 					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit();
 				else
-					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit() + demandForThisLink;
+					serviceTime = newDemandInformationElement.getFirstJobElementTimePerUnit() * demandForThisLink;
 				usedServiceLocations.add(link.getId().toString());
 
 				Id<CarrierService> idNewService = Id.create(
@@ -1285,7 +1283,7 @@ public final class DemandReaderFromCSV {
 			} else if (numberOfLocations != null) {
 				Link newPossibleLink = null;
 				while (possibleLinks.size() < numberOfLocations) {
-					newPossibleLink = findPossibleLinkForDemand(null, possiblePersons, middlePointsLinks,
+					newPossibleLink = findPossibleLinkForDemand(possibleLinks, possiblePersons, middlePointsLinks,
 							polygonsInShape, areasForLocations, numberOfLocations, scenario, setLocations,
 							crsTransformationNetworkAndShape);
 					if (!possibleLinks.containsKey(newPossibleLink.getId()))
@@ -1387,7 +1385,7 @@ public final class DemandReaderFromCSV {
 		if (selectedNumberOfLocations == null)
 			selectedNumberOfLocations = 0;
 		while (selectedlink == null) {
-			if (possibleLinks == null || possibleLinks.size() < selectedNumberOfLocations) {
+			if (possibleLinks.size() < selectedNumberOfLocations) {
 				if (selectedLocations != null && selectedLocations.length > possibleLinks.size()) {
 					newLink = scenario.getNetwork().getLinks()
 							.get(Id.createLinkId(selectedLocations[possibleLinks.size()]));
