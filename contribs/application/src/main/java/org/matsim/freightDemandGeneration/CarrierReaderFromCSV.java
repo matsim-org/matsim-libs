@@ -469,7 +469,8 @@ public final class CarrierReaderFromCSV {
 				Link link = scenario.getNetwork().getLinks().values().stream()
 						.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
 				if (!link.getId().toString().contains("pt")
-						&& !link.getAttributes().getAsMap().get("type").toString().contains("motorway")
+						&& (!link.getAttributes().getAsMap().containsKey("type")
+								|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
 						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
 								singleNewCarrier.getAreaOfAdditonalDepots(), crsTransformationNetworkAndShape)) {
 					singleNewCarrier.addVehicleDepots(singleNewCarrier.getVehicleDepots(), link.getId().toString());
