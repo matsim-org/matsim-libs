@@ -24,7 +24,6 @@ import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -43,7 +42,7 @@ public class MultiModePreplannedDrtModule extends AbstractModule {
 	@Override
 	public void install() {
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			install(new DrtModeModule(drtCfg));
+			install(new PreplannedDrtModeModule(drtCfg));
 			installQSimModule(new DrtModeQSimModule(drtCfg, new PreplannedDrtModeOptimizerQSimModule(drtCfg)));
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
