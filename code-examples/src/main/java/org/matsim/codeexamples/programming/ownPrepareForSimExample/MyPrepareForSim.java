@@ -21,11 +21,6 @@
  */
 package org.matsim.codeexamples.programming.ownPrepareForSimExample;
 
-import java.util.HashSet;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,7 +36,12 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.HashSet;
 
 /**
  * This class does the same as PrepareForSimImpl except for a point in run():
@@ -51,7 +51,7 @@ import org.matsim.facilities.ActivityFacilities;
  */
 public class MyPrepareForSim implements PrepareForSim {
 
-	private static Logger log = Logger.getLogger(PrepareForSim.class);
+	private static final Logger log = Logger.getLogger(PrepareForSim.class);
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;
@@ -59,15 +59,17 @@ public class MyPrepareForSim implements PrepareForSim {
 	private final Population population;
 	private final ActivityFacilities activityFacilities;
 	private final Provider<TripRouter> tripRouterProvider;
+	private final TimeInterpretation timeInterpretation;
 
 	@Inject
-	MyPrepareForSim(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network, Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+	MyPrepareForSim(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network, Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
 		this.population = population;
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 
@@ -100,7 +102,7 @@ public class MyPrepareForSim implements PrepareForSim {
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new MyPersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
+						return new MyPersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities, timeInterpretation), scenario, net);
 					}
 				});
 		if (population instanceof Lockable) {

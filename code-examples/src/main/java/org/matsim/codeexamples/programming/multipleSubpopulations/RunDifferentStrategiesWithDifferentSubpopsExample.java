@@ -19,6 +19,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
 import javax.inject.Inject;
@@ -59,18 +60,24 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 			@Override
 			public void install(){
 				// define second subtour mode choice strategy:
-				this.addPlanStrategyBinding( "subtourModeChoice2" ).toProvider( new Provider<PlanStrategy>(){
+				this.addPlanStrategyBinding( "subtourModeChoice2" ).toProvider(new Provider<>() {
 					@Inject
 					private Provider<TripRouter> tripRouterProvider;
-					@Inject private GlobalConfigGroup globalConfigGroup;
-					@Inject private ActivityFacilities facilities;
-					@Override public PlanStrategy get() {
-						PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<>() ) ;
-						SubtourModeChoiceConfigGroup modeChoiceConfig = new SubtourModeChoiceConfigGroup() ;
-						modeChoiceConfig.setModes( new String[] {TransportMode.car, TransportMode.bike} );
-						builder.addStrategyModule(new SubtourModeChoice(globalConfigGroup, modeChoiceConfig, new PermissibleModesCalculatorImpl(config)) );
-						builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup) );
-						return builder.build() ;
+					@Inject
+					private GlobalConfigGroup globalConfigGroup;
+					@Inject
+					private ActivityFacilities facilities;
+					@Inject
+					private TimeInterpretation timeInterpretation;
+
+					@Override
+					public PlanStrategy get() {
+						PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+						SubtourModeChoiceConfigGroup modeChoiceConfig = new SubtourModeChoiceConfigGroup();
+						modeChoiceConfig.setModes(new String[]{TransportMode.car, TransportMode.bike});
+						builder.addStrategyModule(new SubtourModeChoice(globalConfigGroup, modeChoiceConfig, new PermissibleModesCalculatorImpl(config)));
+						builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+						return builder.build();
 					}
 				} ) ;
 			}

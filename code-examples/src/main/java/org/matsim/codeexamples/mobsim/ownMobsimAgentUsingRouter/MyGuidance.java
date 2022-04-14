@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.List;
 
@@ -48,11 +48,10 @@ class MyGuidance {
 
     public Id<Link> getBestOutgoingLink(Id<Link> linkId, Id<Link> destinationLinkId, double now) {
         Person person = null; // does this work?
-        double departureTime = now;
         String mainMode = TransportMode.car;
         Facility fromFacility = new LinkWrapperFacility(this.scenario.getNetwork().getLinks().get(linkId));
         Facility toFacility = new LinkWrapperFacility(this.scenario.getNetwork().getLinks().get(destinationLinkId));
-        List<? extends PlanElement> trip = router.calcRoute(mainMode, fromFacility, toFacility, departureTime, person);
+        List<? extends PlanElement> trip = router.calcRoute(mainMode, fromFacility, toFacility, now, person, new Attributes());
 
         Leg leg = (Leg) trip.get(0);  // test: either plan element 0 or 1 will be a car leg
 

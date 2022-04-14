@@ -77,7 +77,6 @@ public class RunFreightWithEmissionExample {
 		emissionsConfigGroup.setAverageWarmEmissionFactorsFile("../emissions-sampleScenario/sample_41_EFA_HOT_vehcat_2020average.txt"); //has only limited entries for HGV.... is here, because file is needed :(
 		emissionsConfigGroup.setAverageColdEmissionFactorsFile("../emissions-sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.txt");
 		emissionsConfigGroup.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-		emissionsConfigGroup.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);
 
 		// load scenario (this is not loading the freight material):
 		Scenario scenario = ScenarioUtils.loadScenario( config );

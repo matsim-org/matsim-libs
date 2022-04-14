@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -17,14 +16,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.strategies.ChangeTripMode;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.withinday.utils.EditTrips;
-
-import java.util.List;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 class RunReducePopulationToAreaOfInterestExample{
 	// what I want to do: go throw all persons, take their selected plan, and then:
@@ -62,11 +58,15 @@ class RunReducePopulationToAreaOfInterestExample{
 	}
 
 	private static class MyControlerListener implements StartupListener {
+
 		@Inject Scenario scenario ;
 		@Inject TripRouter tripRouter ;
+		@Inject
+		TimeInterpretation timeInterpretation;
+
 		@Override public void notifyStartup( StartupEvent event ){
 
-			PlanRouter planRouter = new PlanRouter( tripRouter, scenario.getActivityFacilities() );
+			PlanRouter planRouter = new PlanRouter( tripRouter, scenario.getActivityFacilities(), timeInterpretation );
 
 			for( Person person : scenario.getPopulation().getPersons().values() ){
 				Plan plan = person.getSelectedPlan() ;

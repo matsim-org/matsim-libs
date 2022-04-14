@@ -31,8 +31,14 @@ public final class RunDiscreteModeChoiceExample{
 		String modeB = "modeB";
 		final String[] modes = {TransportMode.car, modeB};
 
-		config.plansCalcRoute().addModeRoutingParams( new PlansCalcRouteConfigGroup.ModeRoutingParams( modeB ).setTeleportedModeSpeed( 10. ) );
-		config.plansCalcRoute().addModeRoutingParams( new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.walk ).setTeleportedModeSpeed( 4./3.6 ) );
+		// we have to do this ugly cast because TeleportedModeParams extends ModeParams and the setter methods are part
+		// of ModeParams and the return signature is ModeParams :-/ . This has to be changed in the Config Group itself
+		var paramB = (PlansCalcRouteConfigGroup.TeleportedModeParams) new PlansCalcRouteConfigGroup.TeleportedModeParams(modeB).setTeleportedModeSpeed(10.);
+		var paramWalk = (PlansCalcRouteConfigGroup.TeleportedModeParams) new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk)
+				.setTeleportedModeSpeed(4./3.6);
+
+		config.plansCalcRoute().addTeleportedModeParams(paramB);
+		config.plansCalcRoute().addTeleportedModeParams(paramWalk);
 		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
 
 		// the following is first inlined and then adapted from DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement( config );

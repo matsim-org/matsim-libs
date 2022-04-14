@@ -39,16 +39,11 @@ import java.util.concurrent.ExecutionException;
  */
 public class RunFreightExample {
 
-	private static final URL scenarioUrl ;
-	static{
-		scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
-	}
-
 	public static void main(String[] args) throws ExecutionException, InterruptedException{
 
 		// ### config stuff: ###
 
-		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl(scenarioUrl, "config.xml" ) );
+		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
 
 		config.plans().setInputFile( null ); // remove passenger input
 

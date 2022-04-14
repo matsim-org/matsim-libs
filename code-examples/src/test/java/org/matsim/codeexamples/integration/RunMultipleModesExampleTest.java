@@ -16,7 +16,7 @@ public class RunMultipleModesExampleTest{
 	@Test
 	public void testRun() {
 		try{
-			Config config = RunMultipleModesExample.prepareConfig( null ) ;
+			Config config = RunMultipleModesExample.prepareConfig() ;
 
 			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );

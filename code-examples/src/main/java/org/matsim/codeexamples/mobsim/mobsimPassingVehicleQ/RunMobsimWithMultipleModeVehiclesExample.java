@@ -65,7 +65,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 		{
 			String mode = "bike" ;
 			// routing, qsim:
-			config.plansCalcRoute().removeModeRoutingParams( mode );
+			config.plansCalcRoute().removeTeleportedModeParams( mode );
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
@@ -74,7 +74,7 @@ final class RunMobsimWithMultipleModeVehiclesExample {
 		{
 			String mode = "walk" ;
 			// routing, qsim:
-			config.plansCalcRoute().removeModeRoutingParams( mode );
+			config.plansCalcRoute().removeTeleportedModeParams( mode );
 			networkModesAsSet.add(mode) ;
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;

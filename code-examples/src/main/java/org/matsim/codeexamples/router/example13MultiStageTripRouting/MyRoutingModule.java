@@ -19,20 +19,16 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.router.example13MultiStageTripRouting;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link RoutingModule} for a mode consisting in going to a teleportation
@@ -69,50 +65,33 @@ public class MyRoutingModule implements RoutingModule {
 			final Facility station) {
 		this.routingDelegate = routingDelegate;
 		this.populationFactory = populationFactory;
-		this.modeRouteFactory = ((PopulationFactory) populationFactory).getRouteFactories();
+		this.modeRouteFactory = populationFactory.getRouteFactories();
 		this.station = station;
 	}
 
 	@Override
-	public List<PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility,
-			final double departureTime,
-			final Person person) {
-		final List<PlanElement> trip = new ArrayList<PlanElement>();
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 
-		// route the access trip
-		trip.addAll(
-				routingDelegate.get().calcRoute(
-//						TransportMode.pt,
-						fromFacility,
-						station,
-						departureTime,
-						person) );
+		final List<PlanElement> trip = new ArrayList<>(routingDelegate.get().calcRoute(request));
 
 		// create a dummy activity at the teleportation origin
-		final Activity interaction =
-			populationFactory.createActivityFromLinkId(
-					STAGE,
-					station.getLinkId());
+		final Activity interaction = populationFactory.createActivityFromLinkId(
+						STAGE, station.getLinkId());
+
 		interaction.setMaximumDuration( 0 );
 		trip.add( interaction );
 
 		// create the teleportation leg
-		final Leg teleportationLeg =
-			populationFactory.createLeg( TELEPORTATION_LEG_MODE );
+		final Leg teleportationLeg = populationFactory.createLeg( TELEPORTATION_LEG_MODE );
 		teleportationLeg.setTravelTime( 0 );
-		final Route teleportationRoute =
-			modeRouteFactory.createRoute(
-					Route.class,
-					station.getLinkId(),
-					toFacility.getLinkId());
+		final Route teleportationRoute = modeRouteFactory.createRoute(
+						Route.class, station.getLinkId(), request.getToFacility().getLinkId());
+
 		teleportationRoute.setTravelTime( 0 );
 		teleportationLeg.setRoute( teleportationRoute );
 		trip.add( teleportationLeg );
 
 		return trip;
 	}
-
 }
 

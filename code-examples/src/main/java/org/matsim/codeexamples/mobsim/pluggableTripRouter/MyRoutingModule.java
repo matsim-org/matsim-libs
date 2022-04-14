@@ -16,21 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package org.matsim.codeexamples.mobsim.pluggableTripRouter;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.facilities.Facility;
+import org.matsim.core.router.RoutingRequest;
+
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * @author nagel
@@ -38,7 +31,7 @@ import org.matsim.facilities.Facility;
  */
 public class MyRoutingModule implements RoutingModule {
 
-	private Object iterationData;
+	private final Object iterationData;
 	
 	@Inject
 	public MyRoutingModule(MySimulationObserver observer) {
@@ -46,11 +39,8 @@ public class MyRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility fromFacility,
-			Facility toFacility, double departureTime, Person person) {
-		// calculate a route based on iterationData
-		System.out.println(iterationData);
-		return Collections.emptyList();
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+		 System.out.println(iterationData);
+		 return List.of();
 	}
-
 }

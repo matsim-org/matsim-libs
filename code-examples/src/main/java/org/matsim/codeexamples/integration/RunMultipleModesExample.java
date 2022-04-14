@@ -1,7 +1,6 @@
 package org.matsim.codeexamples.integration;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -14,23 +13,24 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode;
 
 final class RunMultipleModesExample{
 
 	private static final Logger log = Logger.getLogger(RunMultipleModesExample.class) ;
 
 	public static void main( String [] args ) {
-		Config config = prepareConfig( args ) ;
+		Config config = prepareConfig() ;
 
 		Scenario scenario = prepareScenario( config );
 
@@ -62,10 +62,10 @@ final class RunMultipleModesExample{
 		return scenario;
 	}
 
-	static final Config prepareConfig( String [] args ){
+	static Config prepareConfig(){
 		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
-		log.warn("url=" + url.toString() ) ;
-		Config config = ConfigUtils.loadConfig( url );;
+		log.warn("url=" + url) ;
+		Config config = ConfigUtils.loadConfig( url );
 
 		{ // add strategy that switches between car and bike:
 			StrategySettings stratSets = new StrategySettings(  ) ;
@@ -83,7 +83,7 @@ final class RunMultipleModesExample{
 			config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
 
 			// one also needs to remove the default teleportation bike router:
-			config.plansCalcRoute().removeModeRoutingParams( TransportMode.bike );
+			config.plansCalcRoute().removeTeleportedModeParams( TransportMode.bike );
 
 			// say that the the travel times need to be analyzed also for the bike mode:
 //			config.travelTimeCalculator().setAnalyzedModes( new LinkedHashSet<>( Arrays.asList( TransportMode.bike, TransportMode.car ) ) ) ;

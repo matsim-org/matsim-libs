@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -22,10 +21,8 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
-import static org.matsim.core.config.groups.StrategyConfigGroup.*;
+import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 public final class RunBicycleExample{
 
@@ -42,7 +39,7 @@ public final class RunBicycleExample{
 		config.controler().setLastIteration( 1 );
 
 		config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
-		config.plansCalcRoute().removeModeRoutingParams( TransportMode.bike );
+		config.plansCalcRoute().removeTeleportedModeParams( TransportMode.bike );
 		{
 			StrategySettings stratSets = new StrategySettings();
 			stratSets.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice );

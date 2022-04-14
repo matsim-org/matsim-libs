@@ -78,10 +78,12 @@ public class RunWithinDayReplanningAgentExample {
 		ctrl.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
+				bindMobsim().toProvider(new Provider<>() {
 
-					@Inject Scenario sc;
-					@Inject EventsManager ev;
+					@Inject
+					Scenario sc;
+					@Inject
+					EventsManager ev;
 
 					@Override
 					public Mobsim get() {
@@ -89,7 +91,7 @@ public class RunWithinDayReplanningAgentExample {
 						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(sc, ev);
 
 						// add my own agent(s):
-						qsim.addAgentSource(new AgentSource() {						
+						qsim.addAgentSource(new AgentSource() {
 							VehicleType basicVehicleType;
 
 							@Override
@@ -97,17 +99,17 @@ public class RunWithinDayReplanningAgentExample {
 								if (basicVehicleType == null) {
 									basicVehicleType = sc.getVehicles().getFactory().createVehicleType(Id.create("basicVehicleType", VehicleType.class));
 								}
-								final Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0];
-								final MobsimVehicle veh = new QVehicleImpl( VehicleUtils.createVehicle(Id.create("testVehicle", Vehicle.class ), basicVehicleType ));
+								final Id<Link> startLinkId = sc.getNetwork().getLinks().keySet().iterator().next();
+								final MobsimVehicle veh = new QVehicleImpl(VehicleUtils.createVehicle(Id.create("testVehicle", Vehicle.class), basicVehicleType));
 //								final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
 								qsim.addParkedVehicle(veh, startLinkId);
-								qsim.insertAgentIntoMobsim(new MyAgent(sc, ev, qsim, startLinkId, veh));
+								qsim.insertAgentIntoMobsim(new MyAgent(sc, qsim, startLinkId, veh));
 								// (the Id of the parked vehicle needs to be known to the agent, otherwise it will not work!)
 							}
 						});
 
 						// add otfvis live.  Can't do this in core since otfvis is not accessible from there.
-						 OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
+						OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
 
 						return qsim;
 					}
@@ -129,24 +131,22 @@ public class RunWithinDayReplanningAgentExample {
  *
  */
 class MyAgent implements MobsimDriverAgent {
-	private static Logger log = Logger.getLogger("MyAgent") ;
+	private static final Logger log = Logger.getLogger("MyAgent") ;
 
 	private MobsimVehicle vehicle;
-	private Scenario sc;
-	private EventsManager ev;
+	private final Scenario sc;
 	private Id<Link> currentLinkId;
-	private Id<Person> myId;
+	private final Id<Person> myId;
 	private State state = State.ACTIVITY;
-	private Netsim netsim;
+	private final Netsim netsim;
 	private Id<Link> destinationLinkId = Id.create("dummy", Link.class);
-	private Id<Vehicle> plannedVehicleId ;
+	private final Id<Vehicle> plannedVehicleId ;
 
 	private double activityEndTime = 1. ;
 
-	MyAgent( Scenario sc, EventsManager ev, Netsim netsim, Id<Link> startLinkId, MobsimVehicle veh ) {
+	MyAgent(Scenario sc, Netsim netsim, Id<Link> startLinkId, MobsimVehicle veh) {
 		log.info( "calling MyAgent" ) ;
 		this.sc = sc ;
-		this.ev = ev ;
 		this.myId = Id.create("testveh", Person.class) ;
 		this.netsim = netsim ;
 		this.currentLinkId = startLinkId ;

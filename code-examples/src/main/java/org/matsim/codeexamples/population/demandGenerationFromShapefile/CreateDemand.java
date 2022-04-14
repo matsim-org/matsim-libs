@@ -56,6 +56,11 @@ class CreateDemand {
 	private static final int WORK_END_TIME = 17 * 60 * 60;
 	private static final double SCALE_FACTOR = 0.1;
 	private static final GeometryFactory geometryFactory = new GeometryFactory();
+	private static final CSVFormat csvFormat = CSVFormat.Builder.create()
+			.setDelimiter(';')
+			.setHeader()
+			.setAllowMissingColumnNames(true)
+			.build();
 
 	private final Map<String, Geometry> regions;
 	private final EnumeratedDistribution<Geometry> landcover;
@@ -106,7 +111,7 @@ class CreateDemand {
 		logger.info("Create commuters from inter regional statistic");
 
 		// read the commuter csv file
-		try (CSVParser parser = CSVParser.parse(interRegionCommuterStatistic, StandardCharsets.UTF_8, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
+		try (CSVParser parser = CSVParser.parse(interRegionCommuterStatistic, StandardCharsets.UTF_8, csvFormat)) {
 
 			String currentHomeRegion = "";
 
@@ -130,7 +135,7 @@ class CreateDemand {
 	private void createInnerRegionCommuters() {
 
 		logger.info("Creating regional commuters.");
-		try (CSVParser parser = CSVParser.parse(innerRegionCommuterStatistic, StandardCharsets.UTF_8, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
+		try (CSVParser parser = CSVParser.parse(innerRegionCommuterStatistic, StandardCharsets.UTF_8, csvFormat)) {
 
 			for (CSVRecord record : parser) {
 

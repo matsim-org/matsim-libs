@@ -20,10 +20,7 @@
 package org.matsim.codeexamples.extensions.emissions;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.EmissionUtils;
-import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.example.CreateEmissionConfig;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -37,8 +34,6 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 
 /**
@@ -78,8 +73,6 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable );
 
-		emissionsConfig.setHbefaRoadTypeSource( EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
-
 		emissionsConfig.setNonScenarioVehicles( EmissionsConfigGroup.NonScenarioVehicles.abort );
 
 		// ---
@@ -116,7 +109,7 @@ public final class RunAverageEmissionToolOfflineExample{
 				bind( EventsManager.class ).toInstance( eventsManager );
 				bind( EmissionModule.class ) ;
 			}
-		};;
+		};
 
 		com.google.inject.Injector injector = Injector.createInjector( config, module );
 
