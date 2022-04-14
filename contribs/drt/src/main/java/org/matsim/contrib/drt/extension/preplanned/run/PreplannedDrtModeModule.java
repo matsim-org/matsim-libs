@@ -90,7 +90,9 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
 				drtCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty());
+		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
+				+ " It would interfere with simulation of pre-calculated vehicle schedules."
+				+ " Remove the rebalancing params from the drt config");
 
 		//this is a customised version of DvrpModeRoutingModule.install()
 		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
