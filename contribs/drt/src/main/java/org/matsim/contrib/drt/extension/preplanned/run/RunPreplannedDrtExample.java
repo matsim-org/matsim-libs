@@ -25,6 +25,7 @@ import static org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDr
 import java.net.URL;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -39,11 +40,22 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michal.mac
  */
 public class RunPreplannedDrtExample {
+	private static final Logger log = Logger.getLogger(RunPreplannedDrtExample.class);
+
 	public static void run(URL configUrl, boolean otfvis, int lastIteration,
 			Map<String, PreplannedSchedules> preplannedSchedulesByMode) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
+		for (DrtConfigGroup drtCfg : multiModeDrtConfigGroup.getModalElements()) {
+			if (drtCfg.getRebalancingParams().isPresent()) {
+				log.warn("The rebalancing parameter set is defined for drt mode: "
+						+ drtCfg.getMode()
+						+ ". It will be ignored. No rebalancing will happen.");
+				drtCfg.removeParameterSet(drtCfg.getRebalancingParams().get());
+			}
+		}
 
 		Controler controler = PreplannedDrtControlerCreator.createControler(config, otfvis);
 

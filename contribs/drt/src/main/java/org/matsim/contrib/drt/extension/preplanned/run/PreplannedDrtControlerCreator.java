@@ -79,11 +79,10 @@ public final class PreplannedDrtControlerCreator {
 				log.warn("The rebalancing parameter set is defined for drt mode: "
 						+ drtConfigGroup.getMode()
 						+ ". It will be ignored. No rebalancing will happen.");
-				drtConfigGroup.removeParameterSet(drtConfigGroup.getRebalancingParams().get());
 				controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtConfigGroup.getMode()) {
 					@Override
 					protected void configureQSim() {
-						bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
+						bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();  //TODO if we reach here, the run will fail (at line 93, PreplannedDrtModeModule)
 					}
 				});
 			}
