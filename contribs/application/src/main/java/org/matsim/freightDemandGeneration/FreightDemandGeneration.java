@@ -79,7 +79,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	}
 
 	private enum PopulationOptions {
-		usePopulationHolePopulation, usePopulationInShape, useNoPopulation
+		useHolePopulation, usePopulationInShape, useNoPopulation
 	}
 
 	private enum PopulationSamplingOption {
@@ -102,7 +102,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	@CommandLine.Option(names = "--demandOption", description = "Select the option of demand generation. Options: useDemandFromCarrierFile, createDemandFromCSV, createDemandFromCSVAndUsePopulation", required = true)
 	private DemandGenerationOptions selectedDemandGenerationOption;
 
-	@CommandLine.Option(names = "--populationOption", description = "Select the option of using the population. Options: usePopulationHolePopulation, usePopulationInShape, useNoPopulation", required = true)
+	@CommandLine.Option(names = "--populationOption", description = "Select the option of using the population. Options: useHolePopulation, usePopulationInShape, useNoPopulation", required = true)
 	private PopulationOptions selectedPopulationOption;
 
 	@CommandLine.Option(names = "--populationSamplingOption", description = "Select the option of sampling if using a population. Options: createMoreLocations, increaseDemandOnLocation, noPopulationSampling", required = true)
@@ -198,7 +198,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		Collection<SimpleFeature> polygonsInShape = null;
 		if (shp.getShapeFile() != null && Files.exists(shp.getShapeFile())) {
-			log.info("Use shpFile to find possible locations for the carriers and the demand: " + shp.getShapeFile());
+			log.warn("Use of shpFile. Locations for the carriers and the demand only in shp: " + shp.getShapeFile());
 			polygonsInShape = shp.readFeatures();
 			crsTransformationFromNetworkToShape = shp.createTransformation(networkCRS);
 		}
@@ -405,7 +405,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			switch (selectedPopulationOption) {
 			case useNoPopulation:
 				break;
-			case usePopulationHolePopulation:
+			case useHolePopulation:
 				// uses the hole population as possible demand locations
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
 						combineSimilarJobs, crsTransformationNetworkAndShape, population);
