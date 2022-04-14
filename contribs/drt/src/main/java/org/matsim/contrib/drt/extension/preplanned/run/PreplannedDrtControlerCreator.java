@@ -27,15 +27,12 @@ import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithD
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
-import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -45,6 +42,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -74,19 +72,12 @@ public final class PreplannedDrtControlerCreator {
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
 		// make sure rebalancing is OFF as this would interfere with simulation of pre-calculated vehicle schedules
-		MultiModeDrtConfigGroup.get(config).getModalElements().forEach(drtConfigGroup -> {
-			if (drtConfigGroup.getRebalancingParams().isPresent()) {
-				log.warn("The rebalancing parameter set is defined for drt mode: "
-						+ drtConfigGroup.getMode()
-						+ ". It will be ignored. No rebalancing will happen.");
-				controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtConfigGroup.getMode()) {
-					@Override
-					protected void configureQSim() {
-						bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
-					}
-				});
-			}
-			controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.getMode()) {
+		MultiModeDrtConfigGroup.get(config).getModalElements().forEach(drtCfg -> {
+			Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
+					+ " It would interfere with simulation of pre-calculated vehicle schedules."
+					+ " Remove the rebalancing params from the drt config");
+
+			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 				@Override
 				public void install() {
 					bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
