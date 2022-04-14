@@ -1168,5 +1168,28 @@ public final class PopulationUtils {
 		return person ;
 	}
 
+	public static Coord getCoordFromActivityOrNetwork(Scenario scenario, Activity activity) {
+		return getCoordFromActivityOrNetwork(scenario.getActivityFacilities(), activity, scenario.getNetwork());
+	}
 
+	public static Coord getCoordFromActivityOrNetwork(ActivityFacilities facilities, Activity activity, Network network) {
+		Coord coord = getCoordFromActivity(facilities, activity);
+		return coord != null ? coord : getCoordFromLink(network, activity.getLinkId());
+	}
+
+	public static Coord getCoordFromActivity(ActivityFacilities activityFacilities, Activity activity) {
+		Id<ActivityFacility> facilityId = activity.getFacilityId();
+		if (facilityId != null && activityFacilities != null) {
+			ActivityFacility activityFacility = activityFacilities.getFacilities().get(facilityId);
+			if(activityFacility!= null && activityFacility.getCoord() != null)
+			{
+				return activityFacility.getCoord();
+			}
+		}
+		return activity.getCoord();
+	}
+
+	public static Coord getCoordFromLink(Network network, Id<Link> linkId) {
+		return network.getLinks().get(linkId).getToNode().getCoord();
+	}
 }

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
@@ -149,8 +150,8 @@ public class TripsAndLegsCSVWriter {
             Id<ActivityFacility> toFacilityId = trip.getDestinationActivity().getFacilityId();
             Id<Link> fromLinkId = trip.getOriginActivity().getLinkId();
             Id<Link> toLinkId = trip.getDestinationActivity().getLinkId();
-            Coord fromCoord = getCoordFromActivity(trip.getOriginActivity());
-            Coord toCoord = getCoordFromActivity(trip.getDestinationActivity());
+            Coord fromCoord = PopulationUtils.getCoordFromActivityOrNetwork(scenario,trip.getOriginActivity());
+            Coord toCoord = PopulationUtils.getCoordFromActivityOrNetwork(scenario,trip.getDestinationActivity());
             int euclideanDistance = (int) CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
             String firstPtBoardingStop = null;
             String lastPtEgressStop = null;
@@ -271,8 +272,8 @@ public class TripsAndLegsCSVWriter {
         record.add(Integer.toString((int) leg.getRoute().getDistance()));
         record.add(leg.getMode());
         record.add(leg.getRoute().getStartLinkId().toString());
-        Coord startCoord = getCoordFromActivity(previousAct);
-        Coord endCoord = getCoordFromActivity(nextAct);
+        Coord startCoord = PopulationUtils.getCoordFromActivityOrNetwork(scenario,previousAct);
+        Coord endCoord = PopulationUtils.getCoordFromActivityOrNetwork(scenario,nextAct);
         record.add(Double.toString(startCoord.getX()));
         record.add(Double.toString(startCoord.getY()));
         record.add(leg.getRoute().getEndLinkId().toString());
@@ -321,20 +322,6 @@ public class TripsAndLegsCSVWriter {
         }
 
         return record;
-    }
-
-    private Coord getCoordFromActivity(Activity activity) {
-        if (activity.getCoord() != null) {
-            return activity.getCoord();
-        } else if (activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId())) {
-            Coord coord = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
-            return coord != null ? coord : getCoordFromLink(activity.getLinkId());
-        } else return getCoordFromLink(activity.getLinkId());
-    }
-
-    //this is the least desirable way
-    private Coord getCoordFromLink(Id<Link> linkId) {
-        return scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord();
     }
 
     public interface CustomTripsWriterExtension {
