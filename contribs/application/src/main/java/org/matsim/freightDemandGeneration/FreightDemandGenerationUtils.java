@@ -69,7 +69,8 @@ public class FreightDemandGenerationUtils {
 		population.getAttributes().putAttribute("samplingOption", samlingOption);
 
 		for (Person person : population.getPersons().values()) {
-			if (!person.getAttributes().getAttribute("subpopulation").toString().equals("person")) {
+			if (person.getAttributes().getAsMap().containsKey("subpopulation")
+					&& !person.getAttributes().getAttribute("subpopulation").toString().equals("person")) {
 				personsToRemove.add(person.getId());
 				continue;
 			}
@@ -141,7 +142,7 @@ public class FreightDemandGenerationUtils {
 
 		List<Id<Person>> personsToRemove = new ArrayList<>();
 		for (Person person : population.getPersons().values()) {
-			
+
 			if (!person.getAttributes().getAsMap().containsKey("homeX")
 					|| !person.getAttributes().getAsMap().containsKey("homeY"))
 				throw new RuntimeException(
@@ -176,7 +177,10 @@ public class FreightDemandGenerationUtils {
 		boolean isInShape = false;
 		Point p = null;
 		if (link != null && point == null) {
-			p = MGC.coord2Point(crsTransformationNetworkAndShape.transform(getCoordOfMiddlePointOfLink(link)));
+			if (crsTransformationNetworkAndShape != null)
+				p = MGC.coord2Point(crsTransformationNetworkAndShape.transform(getCoordOfMiddlePointOfLink(link)));
+			else
+				p = MGC.coord2Point(getCoordOfMiddlePointOfLink(link));
 		} else if (link == null && point != null)
 			p = point;
 		for (SimpleFeature singlePolygon : polygonsInShape) {
