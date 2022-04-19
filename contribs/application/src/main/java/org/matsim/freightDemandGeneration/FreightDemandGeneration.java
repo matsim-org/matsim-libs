@@ -58,8 +58,8 @@ import picocli.CommandLine;
 /**
  * The class generates a freight demand based on the selected input options and
  * the read input files. The format and column titles of both input csv should
- * not be changed. The format of these files are given in the example project.
- * See: TODO
+ * not be changed. The format of the files can be found in the test input of the
+ * package.
  * 
  * @author: Ricardo Ewert
  */
