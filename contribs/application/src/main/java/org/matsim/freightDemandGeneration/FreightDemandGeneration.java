@@ -33,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
@@ -98,7 +97,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--carrierOption", description = "Set the choice of getting/creating carrier. Options: readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData", required = true)
 	private CarrierInputOptions selectedCarrierInputOption;
-	
+
 	@CommandLine.Option(names = "--demandOption", description = "Select the option of demand generation. Options: useDemandFromCarrierFile, createDemandFromCSV, createDemandFromCSVAndUsePopulation", required = true)
 	private DemandGenerationOptions selectedDemandGenerationOption;
 
@@ -110,10 +109,10 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--VRPSolutionsOption", description = "Select the option of solving the VRP. Options: runJspritAndMATSim, runJspritAndMATSimWithDistanceConstraint, runJsprit, runJspritWithDistanceConstraint, createNoSolutionAndOnlyWriteCarrierFile", required = true)
 	private OptionsOfVRPSolutions selectedSolution;
-	
+
 	@CommandLine.Option(names = "--combineSimilarJobs", defaultValue = "false", description = "Select the option if created jobs of the same carrier with same location and time will be combined. Options: true, false", required = true)
 	private String combineSimilarJobs;
-	
+
 	@CommandLine.Option(names = "--carrierFileLocation", description = "Path to the carrierFile.", defaultValue = "")
 	private Path carrierFilePath;
 
@@ -131,6 +130,9 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--populationFileLocation", description = "Path to the population file.", defaultValue = "")
 	private Path populationFilePath;
+
+	@CommandLine.Option(names = "--populationCRS", description = "CRS of the input network (e.g.\"EPSG:31468\")")
+	private String populationCRS;
 
 	@CommandLine.Option(names = "--network", description = "Path to desired network file", defaultValue = "")
 	private String networkPath;
@@ -155,10 +157,6 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--defaultJspriIterations", description = "Set the default number of jsprit iterations.")
 	private int defaultJspritIterations;
-
-	@CommandLine.Mixin
-	private CrsOptions crs = new CrsOptions("DHDN_GK4");
-
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new FreightDemandGeneration()).execute(args));
@@ -197,6 +195,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		String csvLocationDemand = csvDemandPath.toString();
 
 		Collection<SimpleFeature> polygonsInShape = null;
+		shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 		if (shp.getShapeFile() != null && Files.exists(shp.getShapeFile())) {
 			log.warn("Use of shpFile. Locations for the carriers and the demand only in shp: " + shp.getShapeFile());
 			polygonsInShape = shp.readFeatures();
@@ -412,7 +411,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				break;
 			case usePopulationInShape:
 				// uses only the population with home location in the given shape file
-				FreightDemandGenerationUtils.reducePopulationToShapeArea(population, shp.createIndex(crs.getInputCRS(), "_"));
+				FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
+						shp.createIndex(populationCRS, "_"));
 				DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, polygonsInShape,
 						combineSimilarJobs, crsTransformationNetworkAndShape, population);
 				break;
