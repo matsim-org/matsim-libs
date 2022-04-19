@@ -25,28 +25,30 @@ public class FreightDemandGenerationTest {
 			Path vehicleFilePath = Path.of(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
 			Path carrierCSVLocation = Path.of(utils.getPackageInputDirectory() + "testCarrierCSV.csv");
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
-			String network = "https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
+			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
+			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			new FreightDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
-					"--demandOption", "createDemandFromCSV",
-					"--populationOption", "useNoPopulation",
-					"--populationSamplingOption", "noPopulationSampling",
+					"--demandOption", "createDemandFromCSVAndUsePopulation",
+					"--populationOption", "usePopulationInShape",
+					"--populationSamplingOption", "createMoreLocations",
 					"--VRPSolutionsOption", "runJspritAndMATSim",
 					"--combineSimilarJobs", "false",
 					"--carrierFileLocation", "",
 					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
-//					"--shapeFileLocation", "",
-//					"--shapeCRS", "",
-//					"--shp", "",
-					"--populationFileLocation", "",
+					"--shapeFileLocation", shapeFilePath.toString(),
+					"--shapeCRS", "WGS84",
+					"--populationFileLocation", populationLocation.toString(),
+					"--populationCRS", "WGS84",
 					"--network", network,
-					"--networkCRS", "",
+					"--networkCRS", "WGS84",
 					"--networkChangeEvents", "",
 					"--inputCarrierCSV", carrierCSVLocation.toString(),
 					"--inputDemandCSV", demandCSVLocation.toString(),
-//					"--populationSample", "",
-//					"--populationSamplingTo", "",
+					"--populationSample", "0.5",
+					"--populationSamplingTo", "1.0",
 					"--defaultJspriIterations", "3"
 			);
 		} catch (Exception ee) {
