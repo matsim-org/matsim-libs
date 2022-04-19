@@ -44,12 +44,12 @@ public class FreightDemandGenerationUtilsTest {
 		Assert.assertEquals(0, person.getPlans().size());
 		Assert.assertNull(person.getSelectedPlan());
 		person = population.getPersons().get(Id.createPersonId("person2"));
-		Assert.assertEquals(2800.0,person.getAttributes().getAttribute("homeX"));
+		Assert.assertEquals(2900.0,person.getAttributes().getAttribute("homeX"));
 		Assert.assertEquals(2800.0,person.getAttributes().getAttribute("homeY"));
 		Assert.assertEquals(0, person.getPlans().size());
 		Assert.assertNull(person.getSelectedPlan());
 		person = population.getPersons().get(Id.createPersonId("person3"));
-		Assert.assertEquals(4400.0,person.getAttributes().getAttribute("homeX"));
+		Assert.assertEquals(4200.0,person.getAttributes().getAttribute("homeX"));
 		Assert.assertEquals(4400.0,person.getAttributes().getAttribute("homeY"));
 		Assert.assertEquals(0, person.getPlans().size());
 		Assert.assertNull(person.getSelectedPlan());
