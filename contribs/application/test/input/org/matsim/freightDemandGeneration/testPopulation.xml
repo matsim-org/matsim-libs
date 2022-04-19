@@ -22,19 +22,19 @@
 
 	<person id="person2" sex="m" age="80" employed="no">
 		<plan selected="yes">
-			<act type="home" x="2800.0" y="2800.0" start_time="00:00:00" dur="10:09:48" end_time="10:09:48" />
+			<act type="home" x="2900.0" y="2800.0" start_time="00:00:00" dur="10:09:48" end_time="10:09:48" />
 			<leg mode="car" dep_time="10:09:48" trav_time="00:20:00" arr_time="10:29:48">
 			</leg>
 			<act type="work" x="51.0" y="338.0" start_time="10:29:48" end_time="11:13:55" />
 			<leg mode="car" dep_time="11:13:55" trav_time="00:30:00" arr_time="11:43:55">
 			</leg>
-			<act type="home" x="2800.0" y="2800.0" start_time="11:43:55" end_time="11:48:53" />
+			<act type="home" x="2900.0" y="2800.0" start_time="11:43:55" end_time="11:48:53" />
 			<leg mode="car" dep_time="11:48:53" trav_time="00:15:00" arr_time="12:03:53">
 			</leg>
 			<act type="work" x="797.0" y="213.0" start_time="12:03:53" end_time="12:29:00" />
 			<leg mode="car" dep_time="12:29:00" trav_time="00:20:00" arr_time="12:49:00">
 			</leg>
-			<act type="home" x="2800.0" y="2800.0" start_time="12:49:00" />
+			<act type="home" x="2900.0" y="2800.0" start_time="12:49:00" />
 		</plan>
 
 	</person>
@@ -43,19 +43,19 @@
 
 	<person id="person3" sex="m" age="80" employed="no">
 		<plan selected="yes">
-			<act type="home" x="4400.0" y="4400.0" start_time="00:00:00" dur="10:12:09" end_time="10:12:09" />
+			<act type="home" x="4200.0" y="4400.0" start_time="00:00:00" dur="10:12:09" end_time="10:12:09" />
 			<leg mode="car" dep_time="10:12:09" trav_time="00:20:00" arr_time="10:32:09">
 			</leg>
 			<act type="work" x="188.0" y="388.0" start_time="10:32:09" end_time="11:17:19" />
 			<leg mode="car" dep_time="11:17:19" trav_time="00:30:00" arr_time="11:47:19">
 			</leg>
-			<act type="home" x="4400.0" y="4400.0" start_time="11:47:19" end_time="12:14:55" />
+			<act type="home" x="4200.0" y="4400.0" start_time="11:47:19" end_time="12:14:55" />
 			<leg mode="car" dep_time="12:14:55" trav_time="00:15:00" arr_time="12:29:55">
 			</leg>
 			<act type="work" x="81.0" y="275.0" start_time="12:29:55" end_time="12:37:07" />
 			<leg mode="car" dep_time="12:37:07" trav_time="00:20:00" arr_time="12:57:07">
 			</leg>
-			<act type="home" x="4400.0" y="4400.0" start_time="12:57:07" />
+			<act type="home" x="4200.0" y="4400.0" start_time="12:57:07" />
 		</plan>
 
 	</person>
