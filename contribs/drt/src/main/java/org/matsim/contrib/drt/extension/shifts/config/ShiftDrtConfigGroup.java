@@ -24,6 +24,7 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     private static final String ALLOW_IN_FIELD_CHANGEOVER = "allowInFieldChangeover";
 
     private static final String CHARGE_AT_HUB_THRESHOLD = "chargeAtHubThreshold";
+    private static final String CHARGE_DURING_BREAK_THRESHOLD = "chargeDuringBreakThreshold";
     private static final String SHIFT_ASSIGNMENT_BATTERY_THRESHOLD = "shiftAssignmentBatteryThreshold";
 	private static final String LOGGING_INTERVAL = "loggingInterval";
 
@@ -44,6 +45,7 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
 
 	//electric shifts
     private double chargeAtHubThreshold = 0.5;
+    private double chargeDuringBreakThreshold = 0.6;
 	private double chargeAtHubInterval = 3 * 60;
     private double shiftAssignmentBatteryThreshold = 0.6;
 	private String breakChargerType = ChargerSpecification.DEFAULT_CHARGER_TYPE;
@@ -69,6 +71,8 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
                 " false if changerover is only allowed at hubs");
         map.put(CHARGE_AT_HUB_THRESHOLD, "defines the battery state of charge threshold at which vehicles will start charging" +
                 " at hubs when not in an active shift. values between [0,1)");
+		map.put(CHARGE_DURING_BREAK_THRESHOLD, "defines the battery state of charge threshold at which vehicles will start charging" +
+                " during breaks and shift changeovers. values between [0,1)");
 		map.put(CHARGE_AT_HUB_INTERVAL, "defines the interval at which idle vehicles at operation facilities are checked for whether" +
 				"they can and should start charging. In [seconds]");
         map.put(SHIFT_ASSIGNMENT_BATTERY_THRESHOLD, "defines the minimum battery state of charge threshold at which vehicles are available " +
@@ -118,6 +122,11 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     public void setChargeAtHubThreshold(final double chargeAtHubThreshold) {
         this.chargeAtHubThreshold = chargeAtHubThreshold;
     }
+
+	@StringSetter( CHARGE_DURING_BREAK_THRESHOLD )
+	public void setChargeDuringBreakThreshold(double chargeDuringBreakThreshold) {
+		this.chargeDuringBreakThreshold = chargeDuringBreakThreshold;
+	}
 
     @StringSetter( SHIFT_ASSIGNMENT_BATTERY_THRESHOLD )
     public void setShiftAssignmentBatteryThreshold(final double shiftAssignmentBatteryThreshold) {
@@ -191,6 +200,11 @@ public class ShiftDrtConfigGroup extends ReflectiveConfigGroup {
     @StringGetter( CHARGE_AT_HUB_THRESHOLD )
     public double getChargeAtHubThreshold() {
         return this.chargeAtHubThreshold;
+    }
+
+    @StringGetter( CHARGE_DURING_BREAK_THRESHOLD )
+    public double getChargeDuringBreakThreshold() {
+        return this.chargeDuringBreakThreshold;
     }
 
     @StringGetter( SHIFT_ASSIGNMENT_BATTERY_THRESHOLD )

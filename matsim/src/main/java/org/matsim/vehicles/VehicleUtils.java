@@ -121,14 +121,14 @@ public final class VehicleUtils {
 	 * @throws RuntimeException In case no vehicleIds were set
 	 */
 	public static Map<String, Id<Vehicle>> getVehicleIds(Person person) {
-		var vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
-		if (vehicleIds == null) {
+		var personVehicles = (PersonVehicles) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
+		if (personVehicles == null) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() +
 					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-					"a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+					"a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
 					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
 		}
-		return vehicleIds;
+		return personVehicles.getModeVehicles();
 	}
 
 	/**
@@ -142,7 +142,7 @@ public final class VehicleUtils {
 		if (!vehicleIds.containsKey(mode)) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
 					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-					"a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+					"a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
 					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
 			);
 		}
@@ -155,17 +155,20 @@ public final class VehicleUtils {
 	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
 	 *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
 	 *                      and provided values are merged into one map
+	 *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
 	 */
 	public static void insertVehicleIdsIntoAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
 		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
-		var toInsert = new HashMap<>(modeToVehicle);
-		if (attr != null) {
-			Map<String, Id<Vehicle>> attrMap = (Map<String, Id<Vehicle>>) attr;
-			for (var entry : attrMap.entrySet()) {
-				toInsert.putIfAbsent(entry.getKey(), entry.getValue());
-			}
+		// copy in case it's a UnmodifiableMap
+		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
+		PersonVehicles personVehicles;
+		if (attr == null) {
+			personVehicles = new PersonVehicles(modeToVehicleCopy);
+		} else {
+			personVehicles = (PersonVehicles) attr;
 		}
-		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, Collections.unmodifiableMap(toInsert));
+		personVehicles.addModeVehicleList(modeToVehicleCopy);
+		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
 	}
 	//******** general VehicleType attributes ************
 

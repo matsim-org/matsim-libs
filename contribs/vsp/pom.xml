@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>14.0-SNAPSHOT</version>
+		<version>15.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -15,54 +15,54 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>multimodal</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>taxi</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>parking</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>accessibility</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>minibus</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>common</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.processing</groupId>-->
@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.apache.commons</groupId>-->
@@ -92,12 +92,12 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>noise</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>signals</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
@@ -142,7 +142,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadyts-integration</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -171,12 +171,12 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>

@@ -95,7 +95,11 @@ public class EShiftTaskScheduler {
 				veh.getSchedule()
 						.addTask(taskFactory.createWaitForShiftStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
 								veh.getStartLink(), operationFacility));
-				operationFacility.register(veh.getId());
+				boolean success = operationFacility.register(veh.getId());
+				if(!success) {
+					throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
+							"facility capacity and initial fleet distribution.", veh.getId().toString(), operationFacility.getId().toString()));
+				}
 			} catch (Throwable throwable) {
 				throwable.printStackTrace();
 			}
@@ -200,9 +204,12 @@ public class EShiftTaskScheduler {
 		Optional<Charger> charger = charge(breakFacility, ev);
 		if (charger.isPresent()) {
             final Charger chargerImpl = charger.get();
-            ChargingStrategy strategy = chargerImpl.getLogic().getChargingStrategy();
 
-            if (strategy.isChargingCompleted(ev)) {
+			final double waitTime = ChargingEstimations
+					.estimateMaxWaitTimeForNextVehicle(chargerImpl);
+
+			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftConfig.getChargeDuringBreakThreshold() ||
+			waitTime > 0) {
                 dropoffStopTask = taskFactory.createShiftBreakTask(vehicle, startTime,
                         endTime, link, shiftBreak, breakFacility);
             } else {
@@ -346,10 +353,13 @@ public class EShiftTaskScheduler {
 		Optional<Charger> charger = charge(breakFacility, ev);
 		if (charger.isPresent()) {
 			Charger chargingImpl = charger.get();
-			ChargingStrategy strategy = chargingImpl.getLogic().getChargingStrategy();
 
-            if (strategy.isChargingCompleted(ev)
-                    || ((ChargingWithAssignmentLogic) chargingImpl.getLogic()).getAssignedVehicles().contains(ev)) {
+			final double waitTime = ChargingEstimations
+					.estimateMaxWaitTimeForNextVehicle(chargingImpl);
+
+			if (ev.getBattery().getSoc() / ev.getBattery().getCapacity() < shiftConfig.getChargeDuringBreakThreshold()
+                    || ((ChargingWithAssignmentLogic) chargingImpl.getLogic()).getAssignedVehicles().contains(ev)
+			|| waitTime >0) {
                 dropoffStopTask = taskFactory.createShiftChangeoverTask(vehicle, startTime,
                         endTime, link, shift, breakFacility);
             } else {

@@ -180,7 +180,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					leg.fromLinkId + "",//
 					format.format(leg.fromCoord.getX()),//
 					format.format(leg.fromCoord.getY()),//
-					leg.toLink + "",//
+					leg.toLinkId + "",//
 					format.format(leg.toCoord.getX()),//
 					format.format(leg.toCoord.getY()),//
 					leg.waitTime + "",//

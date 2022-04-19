@@ -31,6 +31,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 /**
  * Simplifies a given network, by merging links. All other criteria met, no 
@@ -66,6 +69,11 @@ public final class NetworkSimplifier {
 
 	private final Map<Id<Link>,List<Node>> mergedLinksToIntermediateNodes = new HashMap<>();
 
+	public static final BiPredicate<Link, Link> DEFAULT_IS_MERGEABLE_PREDICATE = (inLink, outLink) -> true;
+	public static final BiConsumer<Tuple<Link, Link>, Link> DEFAULT_TRANSFER_ATTRIBUTES_CONSUMER = (inOutLinks,
+			newLink) -> {
+		// do nothing
+	};
 
 	/**
 	 * Merges all qualifying links, ignoring length threshold.
@@ -74,8 +82,21 @@ public final class NetworkSimplifier {
 	public void run(final Network network){
 		run(network, Double.POSITIVE_INFINITY, ThresholdExceeded.EITHER);
 	}
-	
-	
+
+	/**
+	 * Merges all qualifying links, ignoring length threshold.
+	 * 
+	 * @param network
+	 * @param isMergeable        predicate(inLink, outLink) to decide whether links
+	 *                           shall be merged
+	 * @param transferAttributes consumer(Tuple.of(inLink, outLink), newLink) to
+	 *                           customize merging of non-standard attributes
+	 */
+	public void run(final Network network, final BiPredicate<Link, Link> isMergeable,
+			final BiConsumer<Tuple<Link, Link>, Link> transferAttributes) {
+		run(network, Double.POSITIVE_INFINITY, ThresholdExceeded.EITHER, isMergeable, transferAttributes);
+	}
+
 	/**
 	 * Merges all qualifying links while ensuring no link is shorter than the
 	 * given threshold.
@@ -106,6 +127,11 @@ public final class NetworkSimplifier {
 	}
 	
 	private void run(final Network network, double thresholdLength, ThresholdExceeded type) {
+		run(network, thresholdLength, type, DEFAULT_IS_MERGEABLE_PREDICATE, DEFAULT_TRANSFER_ATTRIBUTES_CONSUMER);
+	}
+
+	private void run(final Network network, double thresholdLength, ThresholdExceeded type,
+			final BiPredicate<Link, Link> isMergeable, final BiConsumer<Tuple<Link, Link>, Link> transferAttributes) {
 
 		if(this.nodeTopoToMerge.size() == 0){
 			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
@@ -128,7 +154,7 @@ public final class NetworkSimplifier {
 				for (Link inLink : iLinks) {
 					for (Link outLink : oLinks) {
 
-						if(  areLinksMergeable(inLink, outLink) ){
+						if(areLinksMergeable(inLink, outLink) && isMergeable.test(inLink, outLink)) {
 							if(this.mergeLinksWithDifferentAttributes){
 
 								// Only merge if threshold criteria is met.
@@ -177,9 +203,11 @@ public final class NetworkSimplifier {
 											+ outLink.getLength() * outLink.getNumberOfLanes())
 											/ (inLink.getLength() + outLink.getLength())
 											);
-
-//									inLink.getOrigId() + "-" + outLink.getOrigId(),
+									if (NetworkUtils.getOrigId(inLink) != null || NetworkUtils.getOrigId(outLink) != null) {
+										NetworkUtils.setOrigId(link, NetworkUtils.getOrigId(inLink) + "-" + NetworkUtils.getOrigId(outLink));
+									}
 									network.addLink(link);
+									transferAttributes.accept(Tuple.of(inLink, outLink), link);
 									network.removeLink(inLink.getId());
 									network.removeLink(outLink.getId());
 									removedLinks.add(inLink);
@@ -205,10 +233,14 @@ public final class NetworkSimplifier {
 									}
 
 									if(isHavingShortLinks){
-										Link newLink = NetworkUtils.createAndAddLink(network,Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ), null);
+										Link newLink = NetworkUtils.createAndAddLink(network,Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes());
+										if (NetworkUtils.getOrigId(inLink) != null || NetworkUtils.getOrigId(outLink) != null) {
+											NetworkUtils.setOrigId(newLink, NetworkUtils.getOrigId(inLink) + "-" + NetworkUtils.getOrigId(outLink));
+										}
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
+										transferAttributes.accept(Tuple.of(inLink, outLink), newLink);
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
 										removedLinks.add(inLink);

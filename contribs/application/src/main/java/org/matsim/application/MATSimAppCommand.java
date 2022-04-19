@@ -46,4 +46,18 @@ public interface MATSimAppCommand extends Callable<Integer> {
 
 		}
 	}
+
+	/**
+	 * Apply the given command line arguments to this instance and return it.
+	 */
+	default MATSimAppCommand withArgs(String... args) {
+		CommandLine cli = new CommandLine(this);
+		CommandLine.ParseResult parseResult = cli.parseArgs(args);
+
+		if (!parseResult.errors().isEmpty())
+			throw new IllegalStateException("Error parsing arguments", parseResult.errors().get(0));
+
+		return cli.getCommand();
+	}
+
 }

@@ -2,16 +2,18 @@ package ch.sbb.matsim.mobsim.qsim.pt;
 
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 
 /**
  * @author Sebastian Hörl / ETHZ
  */
-public class SBBTransitEngineQSimModule extends AbstractQSimModule {
+public class SBBTransitEngineQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
 
     public static final String COMPONENT_NAME = "SBBTransit";
 
-    static public void configure(QSimComponentsConfig components) {
+    @Override
+    public void configure(QSimComponentsConfig components) {
         if (components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME)) {
             components.removeNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
         }
