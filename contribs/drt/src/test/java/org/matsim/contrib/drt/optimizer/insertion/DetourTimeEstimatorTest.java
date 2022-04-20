@@ -55,7 +55,7 @@ public class DetourTimeEstimatorTest {
 		double expectedTT = 2 //first link TT
 				+ 1234 // TT between nodes
 				+ linkB.getLength() / linkB.getFreespeed();// last link TT
-		double adjustedTT = expectedTT / 1.5;// using speed factor
+		double adjustedTT = expectedTT * 1.5;// using speed factor
 		Assertions.assertThat(estimator.estimateTime(linkA, linkB, 345)).isEqualTo(adjustedTT);
 	}
 }
