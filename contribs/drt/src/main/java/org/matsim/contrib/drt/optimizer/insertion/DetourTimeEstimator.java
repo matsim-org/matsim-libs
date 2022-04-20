@@ -44,7 +44,7 @@ public interface DetourTimeEstimator {
 			double duration = FIRST_LINK_TT;
 			duration += matrix.getTravelTime(from.getToNode(), to.getFromNode(), departureTime + duration);
 			duration += VrpPaths.getLastLinkTT(travelTime, to, departureTime + duration);
-			return duration / speedFactor;
+			return duration * speedFactor;
 		};
 	}
 
