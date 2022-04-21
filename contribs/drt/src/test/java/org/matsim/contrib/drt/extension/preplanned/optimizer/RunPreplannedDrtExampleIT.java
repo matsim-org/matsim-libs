@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,8 +71,7 @@ public class RunPreplannedDrtExampleIT {
 		var preplannedRequest_9 = new PreplannedRequest(Id.createPersonId("passenger_9"), 2700.0, 3600.0, 3410.5,
 				Id.createLinkId("139"), Id.createLinkId("330"));
 		var preplannedRequests = List.of(preplannedRequest_0, preplannedRequest_1, preplannedRequest_2,
-				preplannedRequest_3, preplannedRequest_4, preplannedRequest_5, preplannedRequest_6, preplannedRequest_7,
-				preplannedRequest_8, preplannedRequest_9);
+				preplannedRequest_3, preplannedRequest_4, preplannedRequest_5, preplannedRequest_6);
 
 		// there is only one shared taxi
 		var taxiId = Id.create("shared_taxi_one", DvrpVehicle.class);
@@ -85,8 +85,11 @@ public class RunPreplannedDrtExampleIT {
 				.collect(Collectors.toList());
 		var preplannedStopsByVehicleId = Map.of(taxiId, (Queue<PreplannedStop>)new LinkedList<>(preplannedStops));
 
+		var unassignedRequests = Set.of(preplannedRequest_7, preplannedRequest_8, preplannedRequest_9);
+
 		// put all input data together
-		var preplannedSchedules = new PreplannedSchedules(preplannedRequestsToVehicleId, preplannedStopsByVehicleId);
+		var preplannedSchedules = new PreplannedSchedules(preplannedRequestsToVehicleId, preplannedStopsByVehicleId,
+				unassignedRequests);
 
 		// run simulation that re-plays the pre-computed vehicle schedules
 		RunPreplannedDrtExample.run(configUrl, false, 0, Map.of("drt", preplannedSchedules));
