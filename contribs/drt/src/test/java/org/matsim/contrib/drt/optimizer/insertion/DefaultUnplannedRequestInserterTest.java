@@ -270,7 +270,7 @@ public class DefaultUnplannedRequestInserterTest {
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, rule.forkJoinPool, insertionSearch);
+				vehicleEntryFactory, insertionRetryQueue, rule.forkJoinPool, insertionSearch, Double.POSITIVE_INFINITY);
 	}
 
 	private Link link(String id) {

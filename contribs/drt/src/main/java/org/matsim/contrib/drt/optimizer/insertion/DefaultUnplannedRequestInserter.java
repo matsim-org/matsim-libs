@@ -62,19 +62,21 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final ForkJoinPool forkJoinPool;
 	private final DrtInsertionSearch insertionSearch;
 
+	private double promisedPickupTimeWindow;
+
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
-				insertionRetryQueue, forkJoinPool, insertionSearch);
+				insertionRetryQueue, forkJoinPool, insertionSearch, drtCfg.getPromisedPickupTimeWindow());
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
 			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool,
-			DrtInsertionSearch insertionSearch) {
+			DrtInsertionSearch insertionSearch, double promisedPickupTimeWindow) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
@@ -84,6 +86,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.insertionRetryQueue = insertionRetryQueue;
 		this.forkJoinPool = forkJoinPool;
 		this.insertionSearch = insertionSearch;
+		this.promisedPickupTimeWindow = promisedPickupTimeWindow;
 	}
 
 	@Override
@@ -130,6 +133,14 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			}
 		} else {
 			InsertionWithDetourData insertion = best.get();
+
+			if(Double.isFinite(promisedPickupTimeWindow)) {
+				// re-create request with updated time windows
+				double updatedPickupTimeWindow = Math.min(insertion.detourTimeInfo.pickupDetourInfo.departureTime
+						+ promisedPickupTimeWindow, req.getLatestStartTime());
+				req = DrtRequest.newBuilder(req).latestStartTime(updatedPickupTimeWindow).build();
+			}
+
 			var vehicle = insertion.insertion.vehicleEntry.vehicle;
 			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
 
