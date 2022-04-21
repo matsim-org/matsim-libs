@@ -104,6 +104,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 					+ "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
 					+ "maxAbsoluteDetour should not be smaller than 0. and should be higher than the offset maxTravelTimeBeta.";
 
+	public static final String PROMISED_PICKUP_TIME_WINDOW = "promisedPickupTimeWindow";
+	static final String PROMISED_PICKUP_TIME_WINDOW_EXP =
+			"Defines the latest departure time offset in seconds for a request that has been assigned to a vehicle successfully. " +
+					"While the initial insertion search time windows depend on the defined optimization constraints, " +
+					"this offset ensures that a 'promised' pickup time (i.e., the one planned in the final insertion) may " +
+					"not be exceeded by the given amount of time. Future request insertions then have to respect the updated" +
+					"time window. Must be positive.";
+
 	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
 	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP =
 			"If true, the max travel and wait times of a submitted request"
@@ -178,6 +186,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	@PositiveOrZero
 	private double maxAbsoluteDetour = Double.POSITIVE_INFINITY;// [s]
+
+	@PositiveOrZero
+	private double promisedPickupTimeWindow = Double.POSITIVE_INFINITY;// [s]
 
 	private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;
 
@@ -326,6 +337,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAVEL_TIME_ALPHA_EXP);
 		map.put(MAX_TRAVEL_TIME_BETA, MAX_TRAVEL_TIME_BETA_EXP);
 		map.put(MAX_ABSOLUTE_DETOUR, MAX_ABSOLUTE_DETOUR_EXP);
+		map.put(PROMISED_PICKUP_TIME_WINDOW, PROMISED_PICKUP_TIME_WINDOW_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP);
 		map.put(VEHICLES_FILE, VEHICLES_FILE_EXP);
 		map.put(WRITE_DETAILED_CUSTOMER_STATS, WRITE_DETAILED_CUSTOMER_STATS_EXP);
@@ -479,6 +491,23 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@StringSetter(MAX_ABSOLUTE_DETOUR)
 	public DrtConfigGroup setMaxAbsoluteDetour(double maxAbsoluteDetour) {
 		this.maxAbsoluteDetour = maxAbsoluteDetour;
+		return this;
+	}
+
+	/**
+	 * @return -- {@value #PROMISED_PICKUP_TIME_WINDOW_EXP}
+	 */
+	@StringGetter(PROMISED_PICKUP_TIME_WINDOW)
+	public double getPromisedPickupTimeWindow() {
+		return promisedPickupTimeWindow;
+	}
+
+	/**
+	 * @param promisedPickupTimeWindow -- {@value #PROMISED_PICKUP_TIME_WINDOW_EXP}
+	 */
+	@StringSetter(PROMISED_PICKUP_TIME_WINDOW)
+	public DrtConfigGroup setPromisedPickupTimeWindow(double promisedPickupTimeWindow) {
+		this.promisedPickupTimeWindow = promisedPickupTimeWindow;
 		return this;
 	}
 
