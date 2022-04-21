@@ -55,7 +55,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>		
 
 		<dependency>
