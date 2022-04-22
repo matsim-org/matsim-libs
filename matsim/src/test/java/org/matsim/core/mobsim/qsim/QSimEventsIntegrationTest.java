@@ -23,7 +23,7 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.Map;
 
-import org.junit.Assert;
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -44,12 +44,11 @@ public class QSimEventsIntegrationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Rule
-	public Timeout globalTimeout = new Timeout(20000);
+	public Timeout globalTimeout = new Timeout(10000);
 
 	@Test
 	public void netsimEngineHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(1);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
@@ -63,29 +62,22 @@ public class QSimEventsIntegrationTest {
 		events.addHandler((LinkLeaveEventHandler)event -> {
 			throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
 		});
-		try {
-			new QSimBuilder(config).useDefaults().build(scenario, events).run();
-		} catch (RuntimeException e) {
-			// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
-			Assert.assertEquals("Haha, I hope the QSim exits cleanly.", e.getCause().getMessage());
-		}
+
+		// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
+		Assertions.assertThatThrownBy(new QSimBuilder(config).useDefaults().build(scenario, events)::run)
+				.hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
 	}
 
 	@Test
 	public void controlerHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(1);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
 			throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
 		});
-		try {
-			controler.run();
-		} catch (RuntimeException e) {
-			// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
-			Assert.assertEquals("Haha, I hope the QSim exits cleanly.", e.getMessage());
-		}
-	}
 
+		// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
+		Assertions.assertThatThrownBy(controler::run).hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
+	}
 }
