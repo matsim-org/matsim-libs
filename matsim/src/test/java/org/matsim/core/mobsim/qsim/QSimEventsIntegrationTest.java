@@ -49,6 +49,7 @@ public class QSimEventsIntegrationTest {
 	@Test
 	public void netsimEngineHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(1);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
@@ -73,6 +74,7 @@ public class QSimEventsIntegrationTest {
 	@Test
 	public void controlerHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(1);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
