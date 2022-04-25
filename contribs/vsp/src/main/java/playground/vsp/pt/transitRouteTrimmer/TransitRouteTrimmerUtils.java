@@ -202,7 +202,7 @@ public class TransitRouteTrimmerUtils {
 
     }
 
-    static Set<Id<TransitStopFacility>> getStopsInZone(TransitSchedule transitSchedule, URL zoneShpFileUrl) {
+    public static Set<Id<TransitStopFacility>> getStopsInZone(TransitSchedule transitSchedule, URL zoneShpFileUrl) {
         List<PreparedGeometry> geometries = ShpGeometryUtils.loadPreparedGeometries(zoneShpFileUrl);
         Set<Id<TransitStopFacility>> stopsInZone = new HashSet<>();
         for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
@@ -214,7 +214,7 @@ public class TransitRouteTrimmerUtils {
         return stopsInZone;
     }
 
-    static Set<Id<TransitStopFacility>> getStopsInZone(TransitSchedule transitSchedule, URL zoneShpFileUrl, CoordinateTransformation stopCoord2ShapeFileCrsTransformer) {
+    public static Set<Id<TransitStopFacility>> getStopsInZone(TransitSchedule transitSchedule, URL zoneShpFileUrl, CoordinateTransformation stopCoord2ShapeFileCrsTransformer) {
 
         List<PreparedGeometry> geometries = ShpGeometryUtils.loadPreparedGeometries(zoneShpFileUrl);
         Set<Id<TransitStopFacility>> stopsInZone = new HashSet<>();

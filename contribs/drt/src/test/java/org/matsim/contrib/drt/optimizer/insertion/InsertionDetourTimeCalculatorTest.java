@@ -194,7 +194,8 @@ public class InsertionDetourTimeCalculatorTest {
 				.put(stop0.getLink(), stop1.getLink(), dropoffDetourReplacedDriveEstimate)
 				.build();
 
-		var detourTimeCalculator = new InsertionDetourTimeCalculator(STOP_DURATION, replacedDriveTimeEstimates::get);
+		var detourTimeCalculator = new InsertionDetourTimeCalculator(STOP_DURATION,
+				(from, to, departureTime) -> replacedDriveTimeEstimates.get(from, to));
 		var actualDetourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion,
 				insertion.detourData);
 

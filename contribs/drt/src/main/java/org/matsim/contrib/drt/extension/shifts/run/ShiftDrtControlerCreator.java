@@ -16,7 +16,7 @@ import org.matsim.core.controler.Controler;
 public class ShiftDrtControlerCreator {
 
 	/**
-	 * Creates a controller in one step. Assumes a single DRT service.
+	 * Creates a controller in one step.
 	 *
 	 * @param config
 	 * @param otfvis

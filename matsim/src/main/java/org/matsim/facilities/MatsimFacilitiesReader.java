@@ -57,6 +57,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 
 
     private final static String FACILITIES_V1 = "facilities_v1.dtd";
+    private final static String FACILITIES_V2 = "facilities_v2.dtd";
 
     private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 
@@ -130,11 +131,14 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
     @Override
     protected void setDoctype(final String doctype) {
         super.setDoctype(doctype);
-        // Currently the only facilities-type is v1
         if (FACILITIES_V1.equals(doctype)) {
             this.delegate = new FacilitiesReaderMatsimV1(this.externalInputCRS, this.targetCRS, this.facilities);
             ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
             log.info("using facilities_v1-reader.");
+        } else if (FACILITIES_V2.equals(doctype)) { // v2 added support for 3D coordinates
+            this.delegate = new FacilitiesReaderMatsimV2(this.externalInputCRS, this.targetCRS, this.facilities);
+            ((FacilitiesReaderMatsimV2)this.delegate).putAttributeConverters(this.attributeConverters);
+            log.info("using facilities_v2-reader.");
         } else {
             throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
         }

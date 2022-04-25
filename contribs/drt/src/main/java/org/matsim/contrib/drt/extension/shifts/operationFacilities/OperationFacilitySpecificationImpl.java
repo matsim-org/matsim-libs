@@ -5,7 +5,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author nkuehnel / MOIA
@@ -16,7 +18,7 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 	private final Id<Link> linkId;
 	private final Coord coord;
 	private final int capacity;
-	private final Id<Charger> chargerId;
+	private final List<Id<Charger>> chargerIds;
 	private final OperationFacilityType type;
 
 	private OperationFacilitySpecificationImpl(Builder builder) {
@@ -24,7 +26,7 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 		this.linkId = builder.linkId;
 		this.coord = builder.coord;
 		this.capacity = builder.capacity;
-		this.chargerId = builder.chargerId;
+		this.chargerIds = builder.chargerIds == null ? Collections.EMPTY_LIST : builder.chargerIds;
 		this.type = builder.type;
 	}
 
@@ -38,7 +40,7 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 		builder.linkId = copy.linkId;
 		builder.coord = copy.coord;
 		builder.capacity = copy.capacity;
-		builder.chargerId = copy.chargerId;
+		builder.chargerIds = copy.chargerIds;
 		builder.type = copy.type;
 		return builder;
 	}
@@ -49,8 +51,8 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 	}
 
 	@Override
-	public Optional<Id<Charger>> getCharger() {
-		return Optional.ofNullable(chargerId);
+	public List<Id<Charger>> getChargers() {
+		return chargerIds;
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 		private Id<Link> linkId;
 		private Coord coord;
 		private int capacity;
-		private Id<Charger> chargerId;
+		private List<Id<Charger>> chargerIds;
 		private OperationFacilityType type;
 
 		private Builder() {
@@ -105,9 +107,11 @@ public class OperationFacilitySpecificationImpl implements OperationFacilitySpec
 			return this;
 		}
 
-
-		public Builder chargerId(Id<Charger> val) {
-			chargerId = val;
+		public Builder addChargerId(Id<Charger> val) {
+			if(chargerIds == null) {
+				chargerIds = new ArrayList<>();
+			}
+			chargerIds.add(val);
 			return this;
 		}
 

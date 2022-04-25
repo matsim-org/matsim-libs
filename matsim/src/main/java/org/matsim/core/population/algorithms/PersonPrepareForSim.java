@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
@@ -39,7 +37,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -58,7 +55,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
-	private final Network carOnlyNetwork;
+	private final Network network;
 	private final ActivityFacilities activityFacilities;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
@@ -69,14 +66,11 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	 * create multiple copies of a car-only-network. Instead, we can create that network once in
 	 * the Controller and re-use it for each new instance. cdobler, sep'15
 	 */
-	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
+	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network network) {
 		super();
 		this.router = router;
-		this.carOnlyNetwork = carOnlyNetwork ;
-		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
-			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
-		}
-		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
+		this.network = network ;
+		this.xy2links = new XY2Links(network, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;
 	}
@@ -84,16 +78,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
-		this.carOnlyNetwork = scenario.getNetwork();
-		Network net = this.carOnlyNetwork;
-		if (NetworkUtils.isMultimodal( carOnlyNetwork )) {
-			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( carOnlyNetwork );
-			net = NetworkUtils.createNetwork(scenario.getConfig().network());
-			HashSet<String> modes = new HashSet<String>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		}
+		this.network = scenario.getNetwork();
+		Network net = this.network;
 		
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();

@@ -358,7 +358,7 @@ public class InsertionGeneratorTest {
 		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
 
-		DetourTimeEstimator timeEstimator = (from, to) -> {
+		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> {
 			if (from == to) {
 				return 0;
 			} else if (to.equals(drtRequest.getFromLink())) {
@@ -384,7 +384,7 @@ public class InsertionGeneratorTest {
 		int endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy == 0);//make sure the input is valid
 
-		DetourTimeEstimator timeEstimator = (from, to) -> 0;
+		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> 0;
 
 		var actualInsertions = new InsertionGenerator(STOP_DURATION, timeEstimator).generateInsertions(drtRequest,
 				entry);

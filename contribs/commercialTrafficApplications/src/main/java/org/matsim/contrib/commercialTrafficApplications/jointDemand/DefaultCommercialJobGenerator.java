@@ -338,7 +338,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
                     double earliestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_START_IDX));
                     double latestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_END_IDX));
 
-                    CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, activity.getLinkId());
+                    CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, PopulationUtils.decideOnLinkIdForActivity(activity,scenario));
                     serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX)));
                     serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)));
                     serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));

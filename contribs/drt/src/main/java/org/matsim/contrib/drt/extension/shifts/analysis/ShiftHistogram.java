@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.shifts.events.*;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -21,6 +22,9 @@ import java.util.Set;
 public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEndedEventHandler,
 		DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
+	public static final int DEFAULT_END_TIME = 30 * 3600;
+	public static final int DEFAULT_BIN_SIZE = 300;
+
     private Set<Id<DrtShift>> shiftIds;
     private int iteration = 0;
     private final int binSize;
@@ -28,12 +32,14 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
     private DataFrame data = null;
 
 
-    public ShiftHistogram(Population population, EventsManager eventsManager) {
-        this(300);
+    public ShiftHistogram(Population population, Config config) {
+		super();
+		this.binSize = DEFAULT_BIN_SIZE;
+		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
+		reset(0);
         if (population == null) {
             this.shiftIds = null;
         }
-        eventsManager.addHandler(this);
     }
 
     /**
@@ -47,16 +53,6 @@ public class ShiftHistogram implements DrtShiftStartedEventHandler, DrtShiftEnde
         this.binSize = binSize;
         this.nofBins = nofBins;
         reset(0);
-    }
-
-    /**
-     * Creates a new LegHistogram with the specified binSize and a default number of bins, such
-     * that 30 hours are analyzed.
-     *
-     * @param binSize The size of a time bin in seconds.
-     */
-    public ShiftHistogram(final int binSize) {
-        this(binSize, 30 * 3600 / binSize + 1);
     }
 
     /* Implementation of EventHandler-Interfaces */
