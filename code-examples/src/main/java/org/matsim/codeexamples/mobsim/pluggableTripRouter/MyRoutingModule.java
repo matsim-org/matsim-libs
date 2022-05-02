@@ -33,8 +33,7 @@ public class MyRoutingModule implements RoutingModule {
 
 	private final Object iterationData;
 	
-	@Inject
-	public MyRoutingModule(MySimulationObserver observer) {
+	@Inject MyRoutingModule(MySimulationObserver observer) {
 		this.iterationData = observer.getIterationData();
 	}
 

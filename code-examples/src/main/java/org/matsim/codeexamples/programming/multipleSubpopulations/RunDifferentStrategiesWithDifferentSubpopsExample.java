@@ -76,7 +76,7 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 						SubtourModeChoiceConfigGroup modeChoiceConfig = new SubtourModeChoiceConfigGroup();
 						modeChoiceConfig.setModes(new String[]{TransportMode.car, TransportMode.bike});
 						builder.addStrategyModule(new SubtourModeChoice(globalConfigGroup, modeChoiceConfig, new PermissibleModesCalculatorImpl(config)));
-						builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+						builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation) );
 						return builder.build();
 					}
 				} ) ;
