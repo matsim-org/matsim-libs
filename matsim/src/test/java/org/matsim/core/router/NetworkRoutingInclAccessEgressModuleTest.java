@@ -248,10 +248,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Controler controler = createControler(scenario);
         controler.run();
 
-        Object map = person.getAttributes().getAttribute("vehicles");
-
-        assertNotNull(map);
-        Map<String, Id<Vehicle>> modeId = (Map<String, Id<Vehicle>>) map;
+        Map<String, Id<Vehicle>> modeId = VehicleUtils.getVehicleIds(person);
 
         // should be only one, but however
         for (Id<Vehicle> vehicleId : modeId.values()) {

@@ -25,6 +25,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +39,7 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -63,6 +65,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 
 	private final Map<PreplannedRequest, DrtRequest> openRequests = new HashMap<>();
 
+	private final String mode;
 	private final Network network;
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
@@ -75,16 +78,17 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	public PreplannedDrtOptimizer(DrtConfigGroup drtCfg, PreplannedSchedules preplannedSchedules, Network network,
 			TravelTime travelTime, TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory,
 			EventsManager eventsManager, Fleet fleet) {
+		Preconditions.checkArgument(
+				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
+				"Some schedules are preplanned for vehicles outside the fleet");
+
+		this.mode = drtCfg.getMode();
 		this.preplannedSchedules = preplannedSchedules;
 		this.network = network;
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
 		this.eventsManager = eventsManager;
-
-		Preconditions.checkArgument(
-				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
-				"Some schedules are preplanned for vehicles outside the fleet");
 
 		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 		stopDuration = drtCfg.getStopDuration();
@@ -106,9 +110,17 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		var preplannedRequest = PreplannedRequest.createFromRequest(drtRequest);
 		openRequests.put(preplannedRequest, drtRequest);
 
-		var vehicleId = Preconditions.checkNotNull(
-				preplannedSchedules.preplannedRequestToVehicle.get(preplannedRequest),
-				"No vehicle assigned to pre-planned request (%s)", preplannedRequest);
+		var vehicleId = preplannedSchedules.preplannedRequestToVehicle.get(preplannedRequest);
+
+		if (vehicleId == null) {
+			Preconditions.checkState(preplannedSchedules.unassignedRequests.contains(preplannedRequest),
+					"Pre-planned request (%s) not assigned to any vehicle and not marked as unassigned.",
+					preplannedRequest);
+			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), mode, request.getId(),
+					drtRequest.getPassengerId(), "Marked as unassigned"));
+			return;
+		}
+
 		var preplannedStops = preplannedSchedules.vehicleToPreplannedStops.get(vehicleId);
 
 		Preconditions.checkState(!preplannedStops.isEmpty(),
@@ -153,10 +165,12 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, nextLink, currentTime, router,
 					travelTime);
 			schedule.addTask(taskFactory.createDriveTask(vehicle, path, DrtDriveTask.TYPE));
-		} else if (nextStop.preplannedRequest.earliestStartTime > timer.getTimeOfDay()) {
+		} else if (nextStop.preplannedRequest.earliestStartTime >= timer.getTimeOfDay()) {
+			// we need to wait 1 time step to make sure we have already received the request submission event
+			// otherwise we may not be able to get the request and insert it to the stop task
+			// TODO currently assuming the mobsim time step is 1 s
 			schedule.addTask(
-					taskFactory.createStayTask(vehicle, currentTime, nextStop.preplannedRequest.earliestStartTime,
-							currentLink));
+					new WaitForStopTask(currentTime, nextStop.preplannedRequest.earliestStartTime + 1, currentLink));
 		} else {
 			nonVisitedPreplannedStops.poll();//remove this stop from queue
 
@@ -185,11 +199,14 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		private final Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle;
 		//TODO use (immutable)list instead of queue (queue assumes we modify this collection, but we should not - it's input data)
 		private final Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops;
+		private final Set<PreplannedRequest> unassignedRequests;
 
 		public PreplannedSchedules(Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle,
-				Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops) {
+				Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops,
+				Set<PreplannedRequest> unassignedRequests) {
 			this.preplannedRequestToVehicle = preplannedRequestToVehicle;
 			this.vehicleToPreplannedStops = vehicleToPreplannedStops;
+			this.unassignedRequests = unassignedRequests;
 		}
 	}
 
@@ -225,18 +242,14 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			if (!(o instanceof PreplannedRequest))
 				return false;
 			PreplannedRequest that = (PreplannedRequest)o;
-			return Double.compare(that.earliestStartTime, earliestStartTime) == 0
-					&& Double.compare(that.latestStartTime, latestStartTime) == 0
-					&& Double.compare(that.latestArrivalTime, latestArrivalTime) == 0
-					&& Objects.equal(passengerId, that.passengerId)
+			return Objects.equal(passengerId, that.passengerId)
 					&& Objects.equal(fromLinkId, that.fromLinkId)
 					&& Objects.equal(toLinkId, that.toLinkId);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(passengerId, earliestStartTime, latestStartTime, latestArrivalTime, fromLinkId,
-					toLinkId);
+			return Objects.hashCode(passengerId, fromLinkId, toLinkId);
 		}
 
 		@Override

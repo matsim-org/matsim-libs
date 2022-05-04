@@ -78,7 +78,7 @@ public class DrtLegsAnalyser {
 		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
-		int bins = (int)((endTime - startTime) / timeBinSize);
+		int bins = (int)Math.ceil((endTime - startTime) / timeBinSize);
 
 		for (DrtLeg leg : legs) {
 			int[] board = boardings.getOrDefault(leg.fromLinkId, new int[bins]);
