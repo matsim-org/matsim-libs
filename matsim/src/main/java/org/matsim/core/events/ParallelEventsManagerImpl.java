@@ -19,15 +19,15 @@
 package org.matsim.core.events;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
-
-import javax.inject.Inject;
 
 /**
  *
@@ -65,7 +65,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 	private ProcessEventThread[] eventsProcessThread = null;
 	private Thread[] threads = null;
 	private int numberOfAddedEventsHandler = 0;
-	private final AtomicBoolean hadException = new AtomicBoolean(false);
+	private final AtomicReference<Throwable> hadException = new AtomicReference<>();
 	private final ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException);
 
 	private final static Logger log = Logger.getLogger(ParallelEventsManagerImpl.class);
@@ -199,8 +199,10 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 
 		parallelMode = false;
 
-		if (this.hadException.get()) {
-			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
+		if (this.hadException.get() != null) {
+			throw new RuntimeException(
+					"Exception while processing events. Cannot guarantee that all events have been fully processed.",
+					uncaughtExceptionHandler.hadException.get());
 		}
 	}
 
@@ -225,16 +227,16 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 	 */
 	private static class ExceptionHandler implements UncaughtExceptionHandler {
 
-		private final AtomicBoolean hadException;
+		private final AtomicReference<Throwable> hadException;
 
-		public ExceptionHandler(final AtomicBoolean hadException) {
+		public ExceptionHandler(final AtomicReference<Throwable> hadException) {
 			this.hadException = hadException;
 		}
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
 			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
-			this.hadException.set(true);
+			this.hadException.set(e);
 		}
 
 	}
