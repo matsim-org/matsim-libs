@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2021 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,22 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.scheduler;
+package org.matsim.contrib.drt.passenger;
 
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
-import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import java.util.Optional;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface RequestInsertionScheduler {
-	class PickupDropoffTaskPair {
-		public final DrtStopTask pickupTask;
-		public final DrtStopTask dropoffTask;
+public interface DrtOfferAcceptor {
+	DrtOfferAcceptor DEFAULT_ACCEPTOR = (request, departureTime, arrivalTime) -> Optional.of(
+			AcceptedDrtRequest.createFromOriginalRequest(request));
 
-		public PickupDropoffTaskPair(DrtStopTask pickupTask, DrtStopTask dropoffTask) {
-			this.pickupTask = pickupTask;
-			this.dropoffTask = dropoffTask;
-		}
-	}
-
-	PickupDropoffTaskPair scheduleRequest(AcceptedDrtRequest request, InsertionWithDetourData insertion);
+	/**
+	 * @param request       drt request
+	 * @param departureTime offered departure time for the new request
+	 * @param arrivalTime   offered arrival time for the new request
+	 * @return accepted request (if accepted) or empty
+	 */
+	Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime);
 }

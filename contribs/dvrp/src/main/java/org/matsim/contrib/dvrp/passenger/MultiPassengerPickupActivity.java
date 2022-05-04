@@ -55,7 +55,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	@Override
 	protected void beforeFirstStep(double now) {
 		for (PassengerRequest request : requests.values()) {
-			if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+			if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
 				passengersPickedUp++;
 			}
 		}
@@ -64,7 +64,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
 		PassengerRequest request = getRequestForPassenger(passenger.getId());
-		if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+		if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
@@ -72,7 +72,8 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	}
 
 	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
-		return requests.values().stream()
+		return requests.values()
+				.stream()
 				.filter(r -> passengerId.equals(r.getPassengerId()))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));

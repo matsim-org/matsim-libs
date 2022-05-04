@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.shifts.schedule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -46,22 +46,22 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	}
 
 	@Override
-	public Map<Id<Request>, DrtRequest> getDropoffRequests() {
+	public Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests() {
 		return delegate.getDropoffRequests();
 	}
 
 	@Override
-	public Map<Id<Request>, DrtRequest> getPickupRequests() {
+	public Map<Id<Request>, AcceptedDrtRequest> getPickupRequests() {
 		return delegate.getPickupRequests();
 	}
 
 	@Override
-	public void addDropoffRequest(DrtRequest request) {
+	public void addDropoffRequest(AcceptedDrtRequest request) {
 		delegate.addDropoffRequest(request);
 	}
 
 	@Override
-	public void addPickupRequest(DrtRequest request) {
+	public void addPickupRequest(AcceptedDrtRequest request) {
 		delegate.addPickupRequest(request);
 	}
 }
