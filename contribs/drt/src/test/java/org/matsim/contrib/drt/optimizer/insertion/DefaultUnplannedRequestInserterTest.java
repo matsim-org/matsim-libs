@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -205,7 +206,10 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null, null)) :
+						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null,
+						new InsertionDetourTimeCalculator.DetourTimeInfo(
+								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
+								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class)))) :
 				fail("request1 expected");
 
 		double pickupEndTime = now + 20;
@@ -272,7 +276,8 @@ public class DefaultUnplannedRequestInserterTest {
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, rule.forkJoinPool, insertionSearch);
+				vehicleEntryFactory, insertionRetryQueue, insertionSearch, DrtOfferAcceptor.DEFAULT_ACCEPTOR,
+				rule.forkJoinPool);
 	}
 
 	private Link link(String id) {
