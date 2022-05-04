@@ -20,14 +20,16 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public interface PassengerHandler {
-	boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			PassengerRequest request, double now);
+	boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId,
+			double now);
 
-	void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now);
+	void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now);
 }

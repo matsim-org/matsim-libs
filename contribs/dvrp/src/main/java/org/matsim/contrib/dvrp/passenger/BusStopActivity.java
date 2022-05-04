@@ -63,7 +63,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	protected void beforeFirstStep(double now) {
 		// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
 		for (PassengerRequest request : dropoffRequests.values()) {
-			passengerHandler.dropOffPassenger(driver, request, now);
+			passengerHandler.dropOffPassenger(driver, request.getId(), now);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	protected void simStep(double now) {
 		if (now == expectedEndTime) {
 			for (PassengerRequest request : pickupRequests.values()) {
-				if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+				if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
 					passengersPickedUp++;
 				}
 			}
@@ -85,7 +85,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 		}
 
 		PassengerRequest request = getRequestForPassenger(passenger.getId());
-		if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+		if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
@@ -93,7 +93,8 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	}
 
 	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
-		return pickupRequests.values().stream()
+		return pickupRequests.values()
+				.stream()
 				.filter(r -> passengerId.equals(r.getPassengerId()))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));

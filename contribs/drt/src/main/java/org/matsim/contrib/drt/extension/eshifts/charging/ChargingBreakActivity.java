@@ -50,7 +50,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
     protected boolean isLastStep(double now) {
         if(chargingDelegate.getEndTime() < now && now >= endTime) {
             for (PassengerRequest request : pickupRequests.values()) {
-                if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+                if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
                     passengersPickedUp++;
                 }
             }
@@ -70,7 +70,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
         }
 
         PassengerRequest request = getRequestForPassenger(passenger.getId());
-        if (passengerHandler.tryPickUpPassenger(this, driver, request, now)) {
+        if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
             passengersPickedUp++;
         } else {
             throw new IllegalStateException("The passenger is not on the link or not available for departure!");
@@ -81,7 +81,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
     protected void beforeFirstStep(double now) {
         // TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
         for (PassengerRequest request : dropoffRequests.values()) {
-            passengerHandler.dropOffPassenger(driver, request, now);
+            passengerHandler.dropOffPassenger(driver, request.getId(), now);
         }
     }
 
