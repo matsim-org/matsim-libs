@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.extension.eshifts.charging;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.BusStopActivity;
+import org.matsim.contrib.drt.passenger.DrtStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class ChargingChangeoverActivity implements DynActivity {
 
     private final FixedTimeChargingActivity chargingDelegate;
-    private final BusStopActivity busStopDelegate;
+    private final DrtStopActivity busStopDelegate;
 	private final double endTime;
 
 	public ChargingChangeoverActivity(ChargingTask chargingTask, PassengerHandler passengerHandler,
@@ -26,7 +26,7 @@ public class ChargingChangeoverActivity implements DynActivity {
                                       Map<Id<Request>, ? extends PassengerRequest> dropoffRequests,
                                       Map<Id<Request>, ? extends PassengerRequest> pickupRequests) {
         chargingDelegate = new FixedTimeChargingActivity(chargingTask, task.getEndTime());
-        busStopDelegate = new BusStopActivity(passengerHandler, driver, task, dropoffRequests, pickupRequests, "");
+        busStopDelegate = new DrtStopActivity(passengerHandler, driver, task, dropoffRequests, pickupRequests, "");
 		endTime = task.getEndTime();
 	}
 

@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.eshifts.charging;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.BusStopActivity;
+import org.matsim.contrib.drt.passenger.DrtStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -18,7 +18,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import java.util.Map;
 
 /**
- * based on {@link BusStopActivity} and {@link ChargingActivity}
+ * based on {@link DrtStopActivity} and {@link ChargingActivity}
  * @author nkuehnel / MOIA
  */
 public class ChargingBreakActivity extends FirstLastSimStepDynActivity implements DynActivity, PassengerPickupActivity {
