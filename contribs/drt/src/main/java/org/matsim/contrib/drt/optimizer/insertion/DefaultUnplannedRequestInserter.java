@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -130,8 +131,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			}
 		} else {
 			InsertionWithDetourData insertion = best.get();
+
+			// accept offered drt ride
+			var acceptedRequest = Optional.of(AcceptedDrtRequest.createFromOriginalRequest(req));
+
 			var vehicle = insertion.insertion.vehicleEntry.vehicle;
-			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
+			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
 			VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 			if (newVehicleEntry != null) {

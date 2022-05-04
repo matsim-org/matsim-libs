@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -80,7 +81,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	@Override
-	public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData insertion) {
+	public PickupDropoffTaskPair scheduleRequest(AcceptedDrtRequest request, InsertionWithDetourData insertion) {
 		var pickupTask = insertPickup(request, insertion);
 		verifyTimes("Inconsistent pickup departure time", insertion.detourTimeInfo.pickupDetourInfo.departureTime,
 				pickupTask.getEndTime());
@@ -101,7 +102,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				timeFromInsertionData);
 	}
 
-	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData insertionWithDetourData) {
+	private DrtStopTask insertPickup(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData) {
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
@@ -246,7 +247,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		return pickupStopTask;
 	}
 
-	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData insertionWithDetourData,
+	private DrtStopTask insertDropoff(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData,
 			DrtStopTask pickupTask) {
 		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
