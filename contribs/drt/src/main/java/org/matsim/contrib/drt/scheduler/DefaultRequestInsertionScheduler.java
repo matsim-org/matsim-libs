@@ -48,6 +48,8 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.base.Verify;
+
 /**
  * @author michalm
  */
@@ -80,8 +82,23 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	@Override
 	public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData insertion) {
 		var pickupTask = insertPickup(request, insertion);
+		verifyTimes("Inconsistent pickup departure time", insertion.detourTimeInfo.pickupDetourInfo.departureTime,
+				pickupTask.getEndTime());
+
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
+		verifyTimes("Inconsistent dropoff arrival time", insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime,
+				dropoffTask.getBeginTime());
+
 		return new PickupDropoffTaskPair(pickupTask, dropoffTask);
+	}
+
+	private void verifyTimes(String messageStart, double timeFromInsertionData, double timeFromScheduler) {
+		// The source of discrepancies is the first link travel time (as it should be taken into consideration
+		// when a vehicle enters the traffic (a new drive task), but not when a vehicle is diverted (an ongoing drive task)
+		// In addition, there may be some small rounding errors (therefore 1e-10 is considered)
+		Verify.verify(Math.abs(timeFromInsertionData - timeFromScheduler) <= VrpPaths.FIRST_LINK_TT + 1e-10,
+				"%s: %s (insertion data) vs %s (scheduler)", messageStart, timeFromInsertionData,
+				timeFromInsertionData);
 	}
 
 	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData insertionWithDetourData) {
