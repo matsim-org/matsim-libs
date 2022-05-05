@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -178,11 +179,11 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 			if (nextStop.pickup) {
 				var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest),
 						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-				stopTask.addPickupRequest(request);
+				stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
 			} else {
 				var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest),
 						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-				stopTask.addDropoffRequest(request);
+				stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
 			}
 			schedule.addTask(stopTask);
 		}

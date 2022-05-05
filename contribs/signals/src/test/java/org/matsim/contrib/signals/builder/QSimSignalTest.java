@@ -100,7 +100,7 @@ public class QSimSignalTest implements
 	/**
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void testIntergreensAbortOneAgentDriving() {
 		//configure and load standard scenario
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(true );
@@ -116,7 +116,10 @@ public class QSimSignalTest implements
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
 		
-		Assert.assertFalse("The simulation should abort because of intergreens violation.", runQSimWithSignals(scenario, false));
+		runQSimWithSignals(scenario, false);
+
+		// if this code is reached, no exception has been thrown
+		Assert.fail("The simulation should abort because of intergreens violation.");
 	}
 	
 	/**
@@ -145,13 +148,15 @@ public class QSimSignalTest implements
 	/**
 	 * Tests the setup with two conflicting directions showing green together
 	 */
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void testConflictingDirectionsAbortOneAgentDriving() {
 		//configure and load test scenario with data about conflicting directions
 		Scenario scenario = fixture.createAndLoadTestScenarioTwoSignals(true );
 
 		runQSimWithSignals(scenario, false);
-		Assert.assertFalse("The simulation should abort because of intergreens violation.", runQSimWithSignals(scenario, false));
+
+		// if this code is reached, no exception has been thrown
+		Assert.fail("The simulation should abort because of intergreens violation.");
 	}
 	
 	/**
@@ -173,7 +178,7 @@ public class QSimSignalTest implements
 
 	
 	
-	private boolean runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException {
+	private void runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException {
 //		/*
 //		 * this is the old version how to build an injector without a controler and
 //		 * still be able to add a SignalsModule. A new version using Sebastians
@@ -217,7 +222,6 @@ public class QSimSignalTest implements
 				.addOverridingQSimModule( new SignalsQSimModule() )
 				.build(scenario, events)
 				.run();
-		return !events.hadException();
 	}
 
 
@@ -232,9 +236,6 @@ public class QSimSignalTest implements
 		}
 	}
 
-	@Override
-	public void reset(int iteration) {
-	}
 
 	@Override
 	public void handleEvent(SignalGroupStateChangedEvent event) {

@@ -27,6 +27,7 @@ import java.util.stream.DoubleStream;
 import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -186,13 +187,13 @@ public interface Waypoint {
 
 		private double calcLatestArrivalTime() {
 			return getMaxTimeConstraint(
-					task.getDropoffRequests().values().stream().mapToDouble(DrtRequest::getLatestArrivalTime),
+					task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
 					task.getBeginTime());
 		}
 
 		private double calcLatestDepartureTime() {
 			return getMaxTimeConstraint(
-					task.getPickupRequests().values().stream().mapToDouble(DrtRequest::getLatestStartTime),
+					task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
 					task.getEndTime());
 		}
 

@@ -56,7 +56,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
-public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
+public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
