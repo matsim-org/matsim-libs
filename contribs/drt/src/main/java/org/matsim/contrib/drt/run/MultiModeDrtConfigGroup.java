@@ -28,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Supplier;
 import com.google.common.base.Verify;
 
 /**
@@ -44,8 +45,15 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
 	}
 
+	private final Supplier<DrtConfigGroup> drtConfigSupplier;
+
 	public MultiModeDrtConfigGroup() {
+		this(DrtConfigGroup::new);
+	}
+
+	public MultiModeDrtConfigGroup(Supplier<DrtConfigGroup> drtConfigSupplier) {
 		super(GROUP_NAME);
+		this.drtConfigSupplier = drtConfigSupplier;
 	}
 
 	@Override
@@ -59,7 +67,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(DrtConfigGroup.GROUP_NAME)) {
-			return new DrtConfigGroup();
+			return drtConfigSupplier.get();
 		} else {
 			throw new IllegalArgumentException("Unsupported parameter set type: " + type);
 		}
@@ -74,8 +82,8 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		}
 	}
 
-	public final void addDrtConfig( DrtConfigGroup set ) {
-		addParameterSet( set );
+	public final void addDrtConfig(DrtConfigGroup set) {
+		addParameterSet(set);
 	}
 
 	@Override
