@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -41,7 +42,7 @@ import com.google.common.collect.ImmutableMap;
 
 public final class DrtEventsReaders {
 	public static final Map<String, DrtTaskType> TASK_TYPE_MAP = List.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE,
-					DrtStayTask.TYPE, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, EDrtChargingTask.TYPE)
+					DrtStayTask.TYPE, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, EDrtChargingTask.TYPE, WaitForStopTask.TYPE)
 			.stream()
 			.collect(toImmutableMap(DrtTaskType::name, type -> type));
 
