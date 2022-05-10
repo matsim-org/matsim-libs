@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.run;
 
+import static org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
+
 import java.net.URL;
 import java.util.List;
 
@@ -36,7 +38,6 @@ import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
-import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule.DefaultMainLegRouterProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
