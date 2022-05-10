@@ -1,0 +1,61 @@
+package org.matsim.core.router;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
+
+class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
+
+    private static final Logger log = Logger.getLogger( FacilitiesUtils.class ) ;
+
+    @Override
+    public Link decideOnLink(Facility facility, Network network) {
+        Link accessActLink = null ;
+
+        Id<Link> accessActLinkId = null ;
+        try {
+            accessActLinkId = facility.getLinkId() ;
+        } catch ( Exception ee ) {
+            // there are implementations that throw an exception here although "null" is, in fact, an interpretable value. kai, oct'18
+        }
+
+        if ( accessActLinkId!=null ) {
+            accessActLink = network.getLinks().get( facility.getLinkId() );
+            // i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
+            // other link.
+
+        }
+
+        if ( accessActLink==null ) {
+            // this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode,
+            // OR the facility does not have a street address link in the first place.
+
+            if( facility.getCoord()==null ) {
+                throw new RuntimeException("link for facility cannot be determined when neither facility link id nor facility coordinate given") ;
+            }
+
+            accessActLink = NetworkUtils.getNearestLink(network, facility.getCoord()) ;
+            if ( accessActLink == null ) {
+                int ii = 0 ;
+                for ( Link link : network.getLinks().values() ) {
+                    if ( ii==10 ) {
+                        break ;
+                    }
+                    ii++ ;
+                    log.warn( link );
+                }
+            }
+            Gbl.assertNotNull(accessActLink);
+        }
+        return accessActLink;
+
+        // I just found out that there are facilities that insist on links that may not be postal addresses since they cannot be reached by car.
+        // TransitStopFacility is an example.  kai, jun'19
+
+    }
+}

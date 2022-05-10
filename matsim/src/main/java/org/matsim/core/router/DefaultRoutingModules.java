@@ -73,10 +73,11 @@ public final class DefaultRoutingModules {
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
 											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter,
 											 TimeInterpretation timeInterpretation) {
+		MultimodalLinkChooser multimodalLinkChooser = null;
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,
-			  scenario, filteredNetwork, null, accessEgressToNetworkRouter, accessEgressToNetworkRouter, timeInterpretation );
+			  scenario, filteredNetwork, null, accessEgressToNetworkRouter, accessEgressToNetworkRouter, timeInterpretation, multimodalLinkChooser);
 	}
 
 	// TODO: make package private again
@@ -85,24 +86,26 @@ public final class DefaultRoutingModules {
 																 final LeastCostPathCalculator routeAlgo, Scenario scenario,
 																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
 																 TimeInterpretation timeInterpretation) {
+		MultimodalLinkChooser multimodalLinkChooser = null;
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
-				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation);
+				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation, multimodalLinkChooser);
 	}
 
 	/**
 	 * Creates a new access egress network router.
 	 *
-	 * @param invertedNetwork if not null, routing will be on the inverted network, in which case routeAlgo needs to be an {@link InvertedLeastPathCalculator}
+	 * @param invertedNetwork       if not null, routing will be on the inverted network, in which case routeAlgo needs to be an {@link InvertedLeastPathCalculator}
+	 * @param multimodalLinkChooser
 	 */
-	static RoutingModule createAccessEgressNetworkRouter( String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
-																 Network filteredNetwork, @Nullable Network invertedNetwork,
-																 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
-																 TimeInterpretation timeInterpretation) {
+	static RoutingModule createAccessEgressNetworkRouter(String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
+														 Network filteredNetwork, @Nullable Network invertedNetwork,
+														 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
+														 TimeInterpretation timeInterpretation, MultimodalLinkChooser multimodalLinkChooser) {
 		return new NetworkRoutingInclAccessEgressModule(
-				mode, routeAlgo, scenario, filteredNetwork, invertedNetwork, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation
-		);
+				mode, routeAlgo, scenario, filteredNetwork, invertedNetwork, accessToNetworkRouter, egressFromNetworkRouter, timeInterpretation,
+				multimodalLinkChooser);
 	}
 
 }
