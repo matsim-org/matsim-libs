@@ -20,7 +20,7 @@ package org.matsim.contrib.drt.routing;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -39,10 +39,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.util.concurrent.Futures;
@@ -57,23 +53,15 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final ExecutorServiceWithResource<? extends RouteCreator> executorService;
 
 	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, Population population, Config config,
-			Function<LeastCostPathCalculatorFactory, RouteCreator> drtRouteCreatorFactory) {
+			Supplier<RouteCreator> drtRouteCreatorSupplier) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.population = population;
 
-		var lcPathCalcFactory = new SpeedyALTFactory();
 		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> drtRouteCreatorFactory.apply(lcPathCalcFactory))
+				.mapToObj(i -> drtRouteCreatorSupplier.get())
 				.collect(Collectors.toList()));
-	}
-
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
-		this(drtCfg, network, population, config,
-				lcPathCalcFactory -> new DrtRouteCreator(drtCfg, network, lcPathCalcFactory, travelTime,
-						travelDisutilityFactory));
 	}
 
 	@Override
