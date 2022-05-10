@@ -9,7 +9,7 @@ public class DefaultRoutingRequest implements RoutingRequest {
 
 	private final Facility fromFactility;
 	private final Facility toFacility;
-	private double departureTime;
+	private final double departureTime;
 	private final Person person;
 
 	protected DefaultRoutingRequest(Facility fromFacility, Facility toFacility, double departureTime, Person person,

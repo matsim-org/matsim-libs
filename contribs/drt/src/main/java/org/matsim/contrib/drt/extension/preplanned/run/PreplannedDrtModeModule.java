@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.extension.preplanned.run;
 
+import static org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
+
 import java.net.URL;
 import java.util.List;
 
@@ -39,7 +41,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
-import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
@@ -99,8 +100,7 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
 						DvrpRoutingModuleProvider.Stage.MAIN)
 				.toProvider(new DvrpModeRoutingModule.DefaultMainLegRouterProvider(getMode()));// not singleton
-		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
-				new DrtRouteCreatorProvider(drtCfg));// not singleton
+		bindModal(RouteCreator.class).toProvider(new DrtRouteCreatorProvider(drtCfg));// not singleton
 
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
@@ -125,10 +125,9 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 
 			@Override
 			public DefaultDrtRouteUpdater get() {
-				var travelTime = getModalInstance(TravelTime.class);
-				Network network = getModalInstance(Network.class);
-				return new DefaultDrtRouteUpdater(drtCfg, network, travelTime,
-						getModalInstance(TravelDisutilityFactory.class), population, config);
+				var network = getModalInstance(Network.class);
+				var routeCreatorProvider = getModalProvider(RouteCreator.class);
+				return new DefaultDrtRouteUpdater(drtCfg, network, population, config, routeCreatorProvider::get);
 			}
 		}).asEagerSingleton();
 
