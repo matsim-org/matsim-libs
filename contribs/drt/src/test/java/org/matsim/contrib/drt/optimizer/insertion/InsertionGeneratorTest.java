@@ -20,14 +20,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,14 +31,20 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.testcases.fakes.FakeLink;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -373,7 +373,7 @@ public class InsertionGeneratorTest {
 			return TIME_REPLACED_DRIVE;
 		};
 
-		var actualInsertions = new InsertionGenerator(STOP_DURATION, timeEstimator).generateInsertions(drtRequest,
+		var actualInsertions = new InsertionGenerator(new DefaultIncrementalStopDurationEstimator(STOP_DURATION), timeEstimator).generateInsertions(drtRequest,
 				entry);
 		assertThat(actualInsertions).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyElementsOf(expectedInsertions);
@@ -386,7 +386,7 @@ public class InsertionGeneratorTest {
 
 		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> 0;
 
-		var actualInsertions = new InsertionGenerator(STOP_DURATION, timeEstimator).generateInsertions(drtRequest,
+		var actualInsertions = new InsertionGenerator(new DefaultIncrementalStopDurationEstimator(STOP_DURATION), timeEstimator).generateInsertions(drtRequest,
 				entry);
 		assertThat(actualInsertions.stream().map(i -> i.insertion)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(expectedInsertions);

@@ -23,6 +23,8 @@ package org.matsim.contrib.drt.run;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultIncrementalStopDurationEstimator;
+import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
@@ -72,5 +74,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
+
+		bindModal(IncrementalStopDurationEstimator.class).toInstance(new DefaultIncrementalStopDurationEstimator(drtCfg.getStopDuration()));
 	}
 }
