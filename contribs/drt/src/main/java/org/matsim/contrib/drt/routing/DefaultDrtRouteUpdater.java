@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.routing;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -29,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -52,19 +54,26 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final DrtConfigGroup drtCfg;
 	private final Network network;
 	private final Population population;
-	private final ExecutorServiceWithResource<DrtRouteCreator> executorService;
+	private final ExecutorServiceWithResource<? extends RouteCreator> executorService;
 
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
+	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, Population population, Config config,
+			Function<LeastCostPathCalculatorFactory, RouteCreator> drtRouteCreatorFactory) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.population = population;
 
-		LeastCostPathCalculatorFactory factory = new SpeedyALTFactory();
+		var lcPathCalcFactory = new SpeedyALTFactory();
 		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> new DrtRouteCreator(drtCfg, network, factory, travelTime, travelDisutilityFactory))
+				.mapToObj(i -> drtRouteCreatorFactory.apply(lcPathCalcFactory))
 				.collect(Collectors.toList()));
+	}
+
+	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, TravelTime travelTime,
+			TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
+		this(drtCfg, network, population, config,
+				lcPathCalcFactory -> new DrtRouteCreator(drtCfg, network, lcPathCalcFactory, travelTime,
+						travelDisutilityFactory));
 	}
 
 	@Override
@@ -85,7 +94,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		futures.forEach(Futures::getUnchecked);
 	}
 
-	private void updateDrtRoute(DrtRouteCreator drtRouteCreator, Person person, Attributes tripAttributes, Leg drtLeg) {
+	private void updateDrtRoute(RouteCreator drtRouteCreator, Person person, Attributes tripAttributes, Leg drtLeg) {
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
 		RouteFactories routeFactories = population.getFactory().getRouteFactories();
