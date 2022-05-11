@@ -81,7 +81,7 @@ public class InsertionDetourTimeCalculator {
 
 		if (dropoff.newWaypoint.getLink() == dropoff.previousWaypoint.getLink()) {
 			// no detour, no additional stop duration
-			double dropoffTimeLoss = 0;
+			double dropoffTimeLoss = calcAdditionalDropoffStopDurationIfSameLinkAsPrevious(vEntry, insertion.dropoff.index, drtRequest);
 			double arrivalTime = dropoff.previousWaypoint.getArrivalTime() + pickupDetourInfo.pickupTimeLoss;
 			return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
 		}
@@ -133,6 +133,23 @@ public class InsertionDetourTimeCalculator {
 			stopTask = vEntry.stops.get(insertionIdx - 1).task;
 		}
 		return stopDurationEstimator.calcForPickup(vEntry.vehicle, stopTask, drtRequest);
+	}
+
+	private double calcAdditionalDropoffStopDurationIfSameLinkAsPrevious(VehicleEntry vEntry, int insertionIdx, DrtRequest drtRequest) {
+		DrtStopTask stopTask;
+
+		if (insertionIdx == 0) {
+			var startTask = vEntry.start.task;
+
+			if (startTask.isPresent() && STOP.isBaseTypeOf(startTask.get())) {
+				stopTask = (DrtStopTask) startTask.get();
+			} else {
+				return stopDurationEstimator.calcForDropoff(vEntry.vehicle, null, drtRequest);
+			}
+		} else {
+			stopTask = vEntry.stops.get(insertionIdx - 1).task;
+		}
+		return stopDurationEstimator.calcForDropoff(vEntry.vehicle, stopTask, drtRequest);
 	}
 
 	private double calculateReplacedDriveDuration(VehicleEntry vEntry, int insertionIdx, double detourStartTime) {
