@@ -18,7 +18,7 @@ public class ShiftDrtOptimizer implements DrtOptimizer {
 
     private final DrtOptimizer optimizer;
 
-    private DrtShiftDispatcher dispatcher;
+    private final DrtShiftDispatcher dispatcher;
     private final ScheduleTimingUpdater scheduleTimingUpdater;
 
     public ShiftDrtOptimizer(DrtOptimizer optimizer,
