@@ -72,8 +72,7 @@ public final class DefaultRoutingModules {
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
 											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter,
-											 TimeInterpretation timeInterpretation) {
-		MultimodalLinkChooser multimodalLinkChooser = null;
+											 TimeInterpretation timeInterpretation, MultimodalLinkChooser multimodalLinkChooser) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,
@@ -85,8 +84,7 @@ public final class DefaultRoutingModules {
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 																 final LeastCostPathCalculator routeAlgo, Scenario scenario,
 																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
-																 TimeInterpretation timeInterpretation) {
-		MultimodalLinkChooser multimodalLinkChooser = null;
+																 TimeInterpretation timeInterpretation, MultimodalLinkChooser multimodalLinkChooser) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
