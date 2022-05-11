@@ -53,10 +53,6 @@ public class TaxiRequest implements PassengerRequest {
 	private final Link fromLink;
 	private final Link toLink;
 
-	//TODO remove (request should be unmodifiable)
-	private TaxiPickupTask pickupTask;
-	private TaxiDropoffTask dropoffTask;
-
 	public TaxiRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
 			double earliestStartTime, double submissionTime) {
 		this.id = id;
@@ -101,14 +97,6 @@ public class TaxiRequest implements PassengerRequest {
 	@Override
 	public String getMode() {
 		return mode;
-	}
-
-	public void setPickupTask(TaxiPickupTask pickupTask) {
-		this.pickupTask = pickupTask;
-	}
-
-	public void setDropoffTask(TaxiDropoffTask dropoffTask) {
-		this.dropoffTask = dropoffTask;
 	}
 
 	@Override
