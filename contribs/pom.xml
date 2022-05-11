@@ -85,6 +85,7 @@
 		<module>decongestion</module>
 		<module>discrete_mode_choice</module>
 		<module>drt</module>
+		<module>drt-extensions</module>
 		<module>dvrp</module>
 		<module>ev</module>
 		<module>emissions</module>
