@@ -46,7 +46,6 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
-import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
@@ -117,10 +116,6 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	// =========================================================================================
 
 	public void scheduleRequest(DvrpVehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath) {
-		if (request.getStatus() != TaxiRequestStatus.UNPLANNED) {
-			throw new IllegalStateException();
-		}
-
 		Schedule schedule = vehicle.getSchedule();
 		divertOrAppendDrive(schedule, vrpPath, TaxiEmptyDriveTask.TYPE);
 
@@ -285,7 +280,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	private List<TaxiRequest> removedRequests;
 
 	/**
-	 * Awaiting == unpicked-up, i.e. requests with status PLANNED or TAXI_DISPATCHED See {@link TaxiRequestStatus}
+	 * Awaiting == not picked-up (planned, but taxi may not yet be dispatched)
 	 */
 	public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules() {
 		removedRequests = new ArrayList<>();
@@ -293,12 +288,6 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 			removeAwaitingRequestsImpl(veh);
 		}
 
-		return removedRequests;
-	}
-
-	public List<TaxiRequest> removeAwaitingRequests(DvrpVehicle vehicle) {
-		removedRequests = new ArrayList<>();
-		removeAwaitingRequestsImpl(vehicle);
 		return removedRequests;
 	}
 

@@ -34,15 +34,14 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class TaxiRequest implements PassengerRequest {
-	public enum TaxiRequestStatus {
-		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
-		PLANNED, // planned - included into one of the routes
-		PICKUP, // being picked up
-		RIDE, // on board
-		DROPOFF, // being dropped off
-		PERFORMED, // completed
-		REJECTED // rejected by the DISPATCHER
-	}
+	// request is in one of the following states:
+	// UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
+	// PLANNED, // planned - included into one of the routes
+	// PICKUP, // being picked up
+	// RIDE, // on board
+	// DROPOFF, // being dropped off
+	// PERFORMED, // completed
+	// REJECTED // rejected by the DISPATCHER
 
 	private final Id<Request> id;
 	private final double submissionTime;
@@ -110,36 +109,6 @@ public class TaxiRequest implements PassengerRequest {
 
 	public void setDropoffTask(TaxiDropoffTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
-	}
-
-	//TODO remove, replace with events analysis (request should be unmodifiable)
-	public TaxiRequestStatus getStatus() {
-		if (pickupTask == null) {
-			return TaxiRequestStatus.UNPLANNED;
-		}
-
-		switch (pickupTask.getStatus()) {
-			case PLANNED:
-				return TaxiRequestStatus.PLANNED;
-
-			case STARTED:
-				return TaxiRequestStatus.PICKUP;
-
-			case PERFORMED:// continue
-		}
-
-		switch (dropoffTask.getStatus()) {
-			case PLANNED:
-				return TaxiRequestStatus.RIDE;
-
-			case STARTED:
-				return TaxiRequestStatus.DROPOFF;
-
-			case PERFORMED:
-				return TaxiRequestStatus.PERFORMED;
-		}
-
-		throw new IllegalStateException("Unreachable code");
 	}
 
 	@Override
