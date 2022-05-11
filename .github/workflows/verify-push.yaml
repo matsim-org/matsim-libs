@@ -30,6 +30,7 @@ jobs:
           - contribs/bicycle
           - contribs/cadytsIntegration
           - contribs/drt
+          - contribs/drt-extensions
           - contribs/discrete_mode_choice
           - contribs/carsharing
           - contribs/commercialTrafficApplications
