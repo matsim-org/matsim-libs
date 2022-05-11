@@ -28,16 +28,16 @@ public class SubTourAnalysis implements MATSimAppCommand {
 	@CommandLine.Parameters(arity = "1", paramLabel = "POPULATION", description = "Path to population")
 	private Path input;
 
-	@CommandLine.Option(names = "--chain-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
+	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
 	private Set<String> chainBasedModes;
 
 	@CommandLine.Option(names = "--ignore-plans", description = "Ignore plans containing certain modes", defaultValue = "freight", split = ",")
 	private Set<String> ignoreModes;
 
-	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "betweenAllLessConstraints")
+	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "betweenAllAndFewerConstraints")
 	private SubtourModeChoice.Behavior behavior;
 
-	@CommandLine.Option(names = "--st-proba", description = "Probability for single trip mode-choice", defaultValue = "0.2")
+	@CommandLine.Option(names = "--st-proba", description = "Probability for single trip mode-choice", defaultValue = "0.5")
 	private double singleTrip;
 
 	@CommandLine.Option(names = "--iter", description = "Iterate strategy to output choice sets", defaultValue = "1")
@@ -54,7 +54,7 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 		List<TripStructureUtils.Subtour> subtours = new ArrayList<>();
 
-		Set<String> modes = new HashSet<>();
+		Set<String> modes = new HashSet<>(chainBasedModes);
 
 		outer:
 		for (Person agent : population.getPersons().values()) {
@@ -97,28 +97,36 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 			Set<ChooseRandomLegModeForSubtour.Candidate> c = new HashSet<>();
 			int empty = 0;
+			int tripMissing = 0;
 
 			for (Person p : population.getPersons().values()) {
 
 				Plan plan = p.getSelectedPlan();
 
-				List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
-				List<ChooseRandomLegModeForSubtour.Candidate> cs = strategy.determineChoiceSet(plan);
+				List<TripStructureUtils.Trip> trips = new ArrayList<>(TripStructureUtils.getTrips(plan));
+				List<ChooseRandomLegModeForSubtour.Candidate> cset = strategy.determineChoiceSet(plan);
 
 				// person with no trips always have no choice set
-				if (cs.isEmpty() && !trips.isEmpty()) {
+				if (cset.isEmpty() && !trips.isEmpty()) {
 						empty++;
 						strategy.determineChoiceSet(plan);
 				}
 
-				c.addAll(cs);
+				// remove all trips that are considered for a change
+				for (ChooseRandomLegModeForSubtour.Candidate cs : cset) {
+					cs.getSubtour().getTrips().forEach(trips::remove);
+				}
+
+				// If áll trips are in one of the choice sets, this should be empty now
+				if (!trips.isEmpty())
+					tripMissing++;
+
+				c.addAll(cset);
 				strategy.run(plan);
 			}
 
-			log.info("Total choice sets: {}, persons with no choices: {}", c.size(), empty);
-
+			log.info("Total choice sets: {}, persons with no choices: {}, person with uncovered trips in choice-set: {}", c.size(), empty, tripMissing);
 		}
-
 
 		return 0;
 	}

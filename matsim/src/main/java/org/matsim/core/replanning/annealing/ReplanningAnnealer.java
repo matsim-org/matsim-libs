@@ -21,14 +21,7 @@ package org.matsim.core.replanning.annealing;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
@@ -163,7 +156,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 						Math.max(v, av.getEndValue()));
 			}
 			double annealValue = this.currentValues.get(av.getAnnealParameter());
-			annealStats.put(av.getAnnealParameter().name(), String.format("%.4f", annealValue));
+			annealStats.put(av.getAnnealParameter().name(), String.format(Locale.US, "%.4f", annealValue));
 			anneal(event, av, annealValue, annealStats);
 		}
 
@@ -203,11 +196,11 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 				int i = 0;
 				for (StrategyConfigGroup.StrategySettings ss : this.config.strategy().getStrategySettings()) {
 					if (Objects.equals(ss.getSubpopulation(), av.getDefaultSubpopulation())) {
-						annealStats.put(ss.getStrategyName(), String.format("%.4f", annealValues.get(i)));
+						annealStats.put(ss.getStrategyName(), String.format(Locale.US, "%.4f", annealValues.get(i)));
 						i++;
 					}
 				}
-				annealStats.put(av.getAnnealParameter().name(), String.format("%.4f", // update value in case of switchoff
+				annealStats.put(av.getAnnealParameter().name(), String.format(Locale.US, "%.4f", // update value in case of switchoff
 						getStrategyWeights(event.getServices().getStrategyManager(), av.getDefaultSubpopulation(), StratType.allInnovation)));
 				break;
 			default:

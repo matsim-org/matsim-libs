@@ -22,7 +22,8 @@ package org.matsim.core.population.algorithms;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -45,7 +46,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
  */
 public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
-	private static final  Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
+	private static final Logger logger = LogManager.getLogger(ChooseRandomLegModeForSubtour.class);
 
 	/**
 	 * Candidate to change mode-choice,
@@ -72,6 +73,14 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		@Override
 		public int hashCode() {
 			return Objects.hash(subtour, newTransportMode);
+		}
+
+		public Subtour getSubtour() {
+			return subtour;
+		}
+
+		public String getNewTransportMode() {
+			return newTransportMode;
 		}
 	}
 
@@ -154,15 +163,9 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	/**
-	 * Return whether a subtour is mass conserving according to configuration.
+	 * Return whether a subtour is mass conserving according to configuration. Ignoring if subtours are closed.
 	 */
 	public boolean isMassConserving(final Subtour subtour) {
-
-		// non-closed subtours without any parent do not necessarily violate mass conservation
-		if (behavior == SubtourModeChoice.Behavior.betweenAllLessConstraints &&
-				!subtour.isClosed() && subtour.getParent() == null) {
-			return true;
-		}
 
 		for (String mode : chainBasedModes) {
 			if (!isMassConserving(subtour, mode)) {
@@ -218,11 +221,11 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		for ( Subtour subtour : subtours ) {
 
 			// If subtour is not closed, it will still be considered if constrains are disabled
-			if ( !subtour.isClosed() && behavior != SubtourModeChoice.Behavior.betweenAllLessConstraints) {
+			if ( !subtour.isClosed() && behavior != SubtourModeChoice.Behavior.betweenAllAndFewerConstraints) {
 				continue;
 			}
 
-			if ( containsUnknownMode( subtour ) && behavior != SubtourModeChoice.Behavior.betweenAllLessConstraints) {
+			if ( containsUnknownMode( subtour ) ) {
 				continue;
 			}
 
@@ -262,11 +265,18 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			// explicit sub-tour first to a non-chain-based mode.  kai, jul'18
 
 			// The top-level subtour may use all chain-based modes freely for the whole plan
-			if (behavior == SubtourModeChoice.Behavior.betweenAllLessConstraints && subtour.getParent() == null)
-				usableChainBasedModes.addAll(chainBasedModes);
+
+			// TODO: check if this is needed ?
+			//if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints && subtour.getParent() == null)
+			//	usableChainBasedModes.addAll(chainBasedModes);
+
+			// the root subtour could
+
+			// TODO: Exception werfen, wenn Subtour nicht Masse erhaltend (gemischte modes) , da keine Möglichkeit zu diesem Zustand zurückzukehren
+			// TODO: Vsp Consistency CHeck: Proba für Change single trip muss größer 0 sein
 
 			Set<String> usableModes = new LinkedHashSet<>();
-			if (isMassConserving(subtour) || (behavior == SubtourModeChoice.Behavior.betweenAllLessConstraints && subtour.getParent() == null)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
+			if (isMassConserving(subtour) || (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints && subtour.getParent() == null)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
 				for (String candidate : permissibleModesForThisPerson) {
 					if (chainBasedModes.contains(candidate)) {
 						// for chain-based modes, only add if vehicle is available:
@@ -282,6 +292,9 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 			usableModes.remove(getTransportMode(subtour));
 			// (remove current mode so we don't get it again; note that the parent plan is kept anyways)
+
+			// TODO: Auswahl von guten Kombinationen?
+			// z.B. Walk hinzufügen dort wo es plausibel ist
 
 			for (String transportMode : usableModes) {
 				choiceSet.add(
@@ -368,22 +381,46 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private void applyChange(
 			final Candidate whatToDo,
-			final Plan plan)
-	{
+			final Plan plan) {
+
+		boolean containsChainBasedMode = false;
+		Set<String> originalModes = new HashSet<>();
+
+		// Trips that are not part of any child subtour
+		Set<Trip> childTrips = new HashSet<>(whatToDo.subtour.getTripsWithoutSubSubtours());
+
+
 		for (Trip trip : whatToDo.subtour.getTrips()) {
-			if ( behavior== SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ) {
-				if (!modes.contains(mainModeIdentifier.identifyMainMode(trip.getTripElements()))) {
+
+			String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+
+			if (childTrips.contains(trip) && chainBasedModes.contains(mainMode))
+				containsChainBasedMode = true;
+
+			if (childTrips.contains(trip))
+				originalModes.add(mainMode);
+
+			if (behavior == SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes) {
+				if (!modes.contains(mainMode)) {
 					// (ignore trips with modes that are not in "modes".   MATSIM-809)
 					continue;
 				}
 			}
-				
+
 			TripRouter.insertTrip(
-						plan,
-						trip.getOriginActivity(),
-						Collections.singletonList(PopulationUtils.createLeg(whatToDo.newTransportMode)),
-						trip.getDestinationActivity());
-			}
+					plan,
+					trip.getOriginActivity(),
+					Collections.singletonList(PopulationUtils.createLeg(whatToDo.newTransportMode)),
+					trip.getDestinationActivity());
+		}
+
+		if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints && containsChainBasedMode && originalModes.size() > 1) {
+
+
+			logger.error("Subtour of person {} contains a mix of chain- and non-chainbased modes: {}. " +
+					"Subtour mode-choice won't be able to go back to this state. You need to adjust the input beforehand or disable 'betweenAllAndFewerConstraints'.", plan.getPerson().getId(), originalModes);
+			throw new IllegalStateException("Subtour contains a mix of chain- and non-chainbased modes.");
+		}
 
 	}
 

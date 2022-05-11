@@ -22,12 +22,18 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.BasicPlan;
 
 public final class ReplanningUtils {
 
-	public static boolean isOnlySelector(GenericPlanStrategy<Plan, Person> planStrategy) {
+	/**
+	 * Return whether a strategy is innovative, i.e. is producing new plans.
+	 * */
+	public static <P extends BasicPlan, R> boolean isInnovativeStrategy(GenericPlanStrategy<P, R> planStrategy) {
+		return !isOnlySelector(planStrategy);
+	}
+
+	public static <P extends BasicPlan, R> boolean isOnlySelector(GenericPlanStrategy<P, R> planStrategy) {
 		if (planStrategy instanceof PlanStrategyImpl) {
 			return ((PlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
 		}
