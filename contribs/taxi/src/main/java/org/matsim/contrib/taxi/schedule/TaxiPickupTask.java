@@ -34,7 +34,6 @@ public class TaxiPickupTask extends DefaultStayTask {
 	public TaxiPickupTask(double beginTime, double endTime, TaxiRequest request) {
 		super(TYPE, beginTime, endTime, request.getFromLink());
 		this.request = request;
-		request.setPickupTask(this);
 	}
 
 	public TaxiRequest getRequest() {
