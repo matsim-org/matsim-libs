@@ -34,7 +34,6 @@ public class TaxiDropoffTask extends DefaultStayTask {
 	public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request) {
 		super(TYPE, beginTime, endTime, request.getToLink());
 		this.request = request;
-		request.setDropoffTask(this);
 	}
 
 	public TaxiRequest getRequest() {

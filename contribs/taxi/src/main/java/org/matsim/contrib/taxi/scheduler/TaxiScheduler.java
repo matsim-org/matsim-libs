@@ -20,7 +20,8 @@
 package org.matsim.contrib.taxi.scheduler;
 
 import static java.util.stream.Collectors.toList;
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.PICKUP;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.getBaseTypeOrElseThrow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,6 @@ import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -360,14 +360,9 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	}
 
 	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, Task task) {
-		TaxiTaskBaseType baseType = getBaseTypeOrElseThrow(task);
-		if (baseType == PICKUP) {
+		if (PICKUP.isBaseTypeOf(task)) {
 			TaxiRequest request = ((TaxiPickupTask)task).getRequest();
-			request.setPickupTask(null);
 			removedRequests.add(request);
-		} else if (baseType == DROPOFF) {
-			TaxiRequest request = ((TaxiDropoffTask)task).getRequest();
-			request.setDropoffTask(null);
 		}
 	}
 
