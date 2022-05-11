@@ -21,7 +21,8 @@ The MATSim core development team cannot make any guarantee that these extensions
 | common |
 | [decongestion](decongestion/README.md) | Compute tolls accordingly in order to reduce delays
 | [discrete_mode_choice](discrete_mode_choice/README.md)  |  Fine-grained and custom mode choice behaviour  
-| [drt](drt/README.md) |  Demand-responsive transport service functionality
+| [drt](drt/README.md) |  Demand-responsive transport simulation
+| [drt-extensions](drt-extensions/README.md) |  Extensions for demand-responsive transport simulation
 | [dvrp](dvrp/README.md) | Tool for solving (dynamic) vehicle routing problem
 | [emissions](emissions/README.md) | Tool for exhaust emission calculation
 | [ev](ev/README.md) | Electric Vehicle functionality
