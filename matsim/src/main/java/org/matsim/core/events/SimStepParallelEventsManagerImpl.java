@@ -20,14 +20,6 @@
 
 package org.matsim.core.events;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
-
-import javax.inject.Inject;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +27,17 @@ import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
@@ -97,8 +97,11 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		this.counter.incrementAndGet();
 
 		if (parallelMode) {
+			// pass it to the event queue of the first event processing thread, it will pass it further
 			runnables[0].processEvent(event);
-		} else delegate.processEvent(event);
+		} else {
+			delegate.processEvent(event);
+		}
 	}
 
 	@Override
@@ -189,13 +192,18 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * been stopped.
 		 * If not, it is waited until all threads have ended processing events.
 		 */
-		Throwable throwable = this.hadException.get();
-		if (throwable == null) {
+		if (hadException.get() == null) {
 			try {
 				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
 				iterationEndBarrier.await();
 			} catch (InterruptedException | BrokenBarrierException e) {
-				this.hadException.set(e);
+				// prefer storing the original exception and not the follow-up BrokenCyclicBarrier exceptions
+				if (hadException.get() == null) {
+					// let's log it as it may be superseded by exceptions thrown during finishProcessing() by
+					// the delegate or one of the eventManagers
+					log.error("Exception caught while finishing event processing at the iteration end.", e);
+					this.hadException.set(e);
+				}
 			}
         }
 
@@ -208,8 +216,8 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 */
 		this.parallelMode = false;
 
-		if (throwable != null) {
-			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
+		if (hadException.get() != null) {
+			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", hadException.get());
 		}
 	}
 
@@ -222,7 +230,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * CyclicBarrier.
 		 */
 		if (hadException.get() != null) {
-			return;
+			throw new RuntimeException(hadException.get());
 		}
 
 		try {
@@ -231,6 +239,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 			this.processEvent(new LastEventOfSimStep(time));
 			simStepEndBarrier.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
+			if (hadException.get() != null) {
+				throw new RuntimeException(hadException.get());
+			}
 			throw new RuntimeException(e);
 		}
     }
@@ -280,7 +291,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 						throw new RuntimeException("Events in the queue are not ordered chronologically. " +
 								"This should never happen. Is the SimTimeStepParallelEventsManager registered " +
 								"as a MobsimAfterSimStepListener?");
-					} else this.lastEventTime = event.getTime();
+					} else {
+						this.lastEventTime = event.getTime();
+					}
 
 					if (event instanceof LastEventOfSimStep) {
 						/*
@@ -416,9 +429,15 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
-			this.hadException.set(e);
-			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
-
+			if (hadException.get() == null) {
+				// store the original exception and not the follow-up BrokenCyclicBarrier exceptions
+				this.hadException.set(e);
+			}
+			if (!(e instanceof BrokenBarrierException)) {
+				// do not log BrokenBarrierException -- they are triggered by resetting the barrier due to
+				// another (original) exception
+				log.error("Thread " + t.getName() + " died with exception while handling events.", e);
+			}
 			/*
 			 * By reseting the barriers, they will throw a BrokenBarrierException
 			 * which again will stop the events processing threads.

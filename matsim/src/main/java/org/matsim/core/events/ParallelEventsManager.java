@@ -191,10 +191,6 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 	}
 
-	public boolean hadException() {
-		return this.uncaughtExceptionHandler.hadException;
-	}
-
 	@Override
 	public void initProcessing() {
 
