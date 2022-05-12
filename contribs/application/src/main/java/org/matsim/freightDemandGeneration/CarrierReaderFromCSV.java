@@ -458,8 +458,8 @@ public final class CarrierReaderFromCSV {
 			}
 			if (singleNewCarrier.getVehicleDepots() == null)
 				singleNewCarrier.setVehicleDepots(new ArrayList<String>());
+			Random rand = new Random(4711);
 			while (singleNewCarrier.getVehicleDepots().size() < singleNewCarrier.getNumberOfDepotsPerType()) {
-				Random rand = new Random();
 				Link link = scenario.getNetwork().getLinks().values().stream()
 						.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findAny().get();
 				if (!singleNewCarrier.getVehicleDepots().contains(link.getId().toString()) && !link.getId().toString().contains("pt")

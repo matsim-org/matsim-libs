@@ -59,6 +59,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public final class DemandReaderFromCSV {
 	private static final Logger log = Logger.getLogger(DemandReaderFromCSV.class);
+	private static Random rand = new Random(4711);
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -724,7 +725,6 @@ public final class DemandReaderFromCSV {
 								usedServiceLocations, possiblePersonsForService, nearestLinkPerPerson,
 								crsTransformationNetworkAndShape, i);
 				} else {
-					Random rand = new Random();
 					link = scenario.getNetwork().getLinks().get(Id.createLinkId(usedServiceLocations.stream()
 							.skip(rand.nextInt(usedServiceLocations.size() - 1)).findFirst().get()));
 				}
@@ -1325,7 +1325,6 @@ public final class DemandReaderFromCSV {
 							polygonsInShape, areasForLocations, selectedNumberOfLocations, scenario, selectedLocations,
 							crsTransformationNetworkAndShape);
 		} else {
-			Random rand = new Random();
 			link = scenario.getNetwork().getLinks()
 					.get(Id.createLinkId(usedLocations.get(rand.nextInt(usedLocations.size()))));
 		}
@@ -1408,7 +1407,6 @@ public final class DemandReaderFromCSV {
 			HashMap<Id<Person>, HashMap<Double, String>> nearestLinkPerPerson,
 			Collection<SimpleFeature> polygonsInShape, String[] areasForTheDemand, Integer selectedNumberOfLocations,
 			Scenario scenario, String[] selectedLocations, CoordinateTransformation crsTransformationNetworkAndShape) {
-		Random rand = new Random();
 		Link selectedlink = null;
 		Link newLink = null;
 		if (selectedNumberOfLocations == null)
@@ -1421,10 +1419,9 @@ public final class DemandReaderFromCSV {
 					selectedlink = newLink;
 					break;
 				} else {
-					Random randLink = new Random();
 					if (possiblePersons.isEmpty())
 						newLink = scenario.getNetwork().getLinks().values().stream()
-								.skip(randLink.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
+								.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
 					else {
 						Person person = possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
 								.findFirst().get();
