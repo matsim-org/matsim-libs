@@ -459,10 +459,14 @@ public final class CarrierReaderFromCSV {
 			if (singleNewCarrier.getVehicleDepots() == null)
 				singleNewCarrier.setVehicleDepots(new ArrayList<String>());
 			Random rand = new Random(singleNewCarrier.getName().hashCode());
+			int cnt = 0;
 			while (singleNewCarrier.getVehicleDepots().size() < singleNewCarrier.getNumberOfDepotsPerType()) {
 				Link link = scenario.getNetwork().getLinks().values().stream()
 						.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findAny().get();
-				if (!singleNewCarrier.getVehicleDepots().contains(link.getId().toString()) && !link.getId().toString().contains("pt")
+				cnt++;
+				if ((!singleNewCarrier.getVehicleDepots().contains(link.getId().toString())
+						|| cnt > scenario.getNetwork().getLinks().size())
+						&& !link.getId().toString().contains("pt")
 						&& (!link.getAttributes().getAsMap().containsKey("type")
 								|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
 						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
