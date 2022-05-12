@@ -20,8 +20,11 @@
 package org.matsim.freightDemandGeneration;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -82,7 +85,7 @@ public final class CarrierReaderFromCSV {
 		/**
 		 * Set locations for vehicle depots. This should be the linkIds as a String[].
 		 */
-		private String[] vehicleDepots;
+		private List<String> vehicleDepots;
 		/**
 		 * Sets the area where the created depots should be located. Therefore a shape
 		 * input is necessary.
@@ -115,7 +118,7 @@ public final class CarrierReaderFromCSV {
 			private final String carrierName;
 			private String[] vehicleTypes = null;
 			private int numberOfDepotsPerType = 0;
-			private String[] vehicleDepots = null;
+			private List<String> vehicleDepots = null;
 			private String[] areaOfAdditonalDepots = null;
 			private FleetSize fleetSize = null;
 			private int vehicleStartTime = 0;
@@ -144,7 +147,7 @@ public final class CarrierReaderFromCSV {
 				this.numberOfDepotsPerType = numberOfDepotsPerType;
 			}
 
-			public void setVehicleDepots(String[] vehicleDepots) {
+			public void setVehicleDepots(List<String> vehicleDepots) {
 				this.vehicleDepots = vehicleDepots;
 			}
 
@@ -202,22 +205,12 @@ public final class CarrierReaderFromCSV {
 			return numberOfDepotsPerType;
 		}
 
-		public String[] getVehicleDepots() {
+		public List<String> getVehicleDepots() {
 			return vehicleDepots;
 		}
 
-		public void setVehicleDepots(String[] vehicleDepots) {
+		public void setVehicleDepots(List<String> vehicleDepots) {
 			this.vehicleDepots = vehicleDepots;
-		}
-
-		public void addVehicleDepots(String[] vehicleDepots, String newDepot) {
-			String[] newdepotList = new String[vehicleDepots.length + 1];
-			int count = 0;
-			for (int cnt = 0; cnt < vehicleDepots.length; cnt++, count++) {
-				newdepotList[cnt] = vehicleDepots[cnt];
-			}
-			newdepotList[count] = newDepot;
-			this.vehicleDepots = newdepotList;
 		}
 
 		public String[] getAreaOfAdditonalDepots() {
@@ -294,7 +287,8 @@ public final class CarrierReaderFromCSV {
 			if (!record.get("numberOfDepots").isBlank())
 				builder.setNumberOfDepotsPerType(Integer.parseInt(record.get("numberOfDepots")));
 			if (!record.get("selectedVehicleDepots").isBlank())
-				builder.setVehicleDepots(record.get("selectedVehicleDepots").split(";"));
+				builder.setVehicleDepots(
+						new ArrayList<String>(Arrays.asList(record.get("selectedVehicleDepots").split(";"))));
 			if (!record.get("areaOfAdditonalDepots").isBlank())
 				builder.setAreaOfAdditonalDepots(record.get("areaOfAdditonalDepots").split(";"));
 			if (!record.get("fixedNumberOfVehilcePerTypeAndLocation").isBlank())
@@ -347,7 +341,7 @@ public final class CarrierReaderFromCSV {
 								+ " in the input file is not part of imported vehicle types. Please change the type or add the type in the vehicleTypes input file!");
 				}
 			if (carrierElement.getVehicleDepots() != null) {
-				if (carrierElement.getNumberOfDepotsPerType() < carrierElement.getVehicleDepots().length)
+				if (carrierElement.getNumberOfDepotsPerType() < carrierElement.getVehicleDepots().size())
 					throw new RuntimeException("For the carrier " + carrierElement.getName()
 							+ " more certain depots than the given number of depots are selected. (numberOfDepots < selectedVehicleDepots)");
 
@@ -363,7 +357,7 @@ public final class CarrierReaderFromCSV {
 						"If a vehicle type is selected in the input file, numberOfDepots or selectedVehicleDepots should be set. Please check carrier "
 								+ carrierElement.getName());
 			if (carrierElement.getVehicleDepots() != null
-					&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().length)
+					&& (carrierElement.getNumberOfDepotsPerType() > carrierElement.getVehicleDepots().size())
 					&& carrierElement.getAreaOfAdditonalDepots() == null)
 				log.warn(
 						"No possible area for addional depot given. Random choice in the hole network of a possible position");
@@ -463,17 +457,17 @@ public final class CarrierReaderFromCSV {
 				carriers.addCarrier(thisCarrier);
 			}
 			if (singleNewCarrier.getVehicleDepots() == null)
-				singleNewCarrier.setVehicleDepots(new String[] {});
-			while (singleNewCarrier.getVehicleDepots().length < singleNewCarrier.getNumberOfDepotsPerType()) {
+				singleNewCarrier.setVehicleDepots(new ArrayList<String>());
+			while (singleNewCarrier.getVehicleDepots().size() < singleNewCarrier.getNumberOfDepotsPerType()) {
 				Random rand = new Random();
 				Link link = scenario.getNetwork().getLinks().values().stream()
-						.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
-				if (!link.getId().toString().contains("pt")
+						.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findAny().get();
+				if (!singleNewCarrier.getVehicleDepots().contains(link.getId().toString()) && !link.getId().toString().contains("pt")
 						&& (!link.getAttributes().getAsMap().containsKey("type")
 								|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
 						&& FreightDemandGenerationUtils.checkPositionInShape(link, null, polygonsInShape,
 								singleNewCarrier.getAreaOfAdditonalDepots(), crsTransformationNetworkAndShape)) {
-					singleNewCarrier.addVehicleDepots(singleNewCarrier.getVehicleDepots(), link.getId().toString());
+					singleNewCarrier.getVehicleDepots().add(link.getId().toString());
 				}
 			}
 			for (String singleDepot : singleNewCarrier.getVehicleDepots()) {
