@@ -477,6 +477,7 @@ public final class CarrierReaderFromCSV {
 				}
 			}
 			for (String singleDepot : singleNewCarrier.getVehicleDepots()) {
+				int countDepots = 2;
 				for (String thisVehicleType : singleNewCarrier.getVehicleTypes()) {
 					VehicleType thisType = carrierVehicleTypes.getVehicleTypes()
 							.get(Id.create(thisVehicleType, VehicleType.class));
@@ -485,10 +486,18 @@ public final class CarrierReaderFromCSV {
 					if (singleNewCarrier.getFixedNumberOfVehilcePerTypeAndLocation() == 0)
 						singleNewCarrier.setFixedNumberOfVehilcePerTypeAndLocation(1);
 					for (int i = 0; i < singleNewCarrier.getFixedNumberOfVehilcePerTypeAndLocation(); i++) {
-						CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder.newInstance(Id.create(
+						Id<Vehicle> vehilcelId = Id.create(
 								thisType.getId().toString() + "_" + thisCarrier.getId().toString() + "_" + singleDepot
 										+ "_start" + singleNewCarrier.getVehicleStartTime() + "_" + (i + 1),
-								Vehicle.class), Id.createLinkId(singleDepot), thisType)
+								Vehicle.class);
+						while (carrierCapabilities.getCarrierVehicles().containsKey(vehilcelId)) {
+							vehilcelId = Id.create(thisType.getId().toString() + "_" + thisCarrier.getId().toString()
+									+ "_" + singleDepot + "_V" + countDepots + "_start"
+									+ singleNewCarrier.getVehicleStartTime() + "_" + (i + 1), Vehicle.class);
+							countDepots++;
+						}
+						CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder
+								.newInstance(vehilcelId, Id.createLinkId(singleDepot), thisType)
 								.setEarliestStart(singleNewCarrier.getVehicleStartTime())
 								.setLatestEnd(singleNewCarrier.getVehicleEndTime()).build();
 						carrierCapabilities.getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
