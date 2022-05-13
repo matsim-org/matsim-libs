@@ -98,7 +98,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		// In addition, there may be some small rounding errors (therefore 1e-10 is considered)
 		Verify.verify(Math.abs(timeFromInsertionData - timeFromScheduler) <= VrpPaths.FIRST_LINK_TT + 1e-10,
 				"%s: %s (insertion data) vs %s (scheduler)", messageStart, timeFromInsertionData,
-				timeFromInsertionData);
+				timeFromScheduler);
 	}
 
 	private DrtStopTask insertPickup(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData) {
