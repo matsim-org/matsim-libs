@@ -23,14 +23,13 @@ public class EvShiftDrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 
 		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
 
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg, shiftDrtConfigGroup));
-			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg, shiftDrtConfigGroup)));
-			controler.addOverridingQSimModule(new ShiftEDrtModeOptimizerQSimModule(drtCfg, shiftDrtConfigGroup));
+			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
+			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
+			controler.addOverridingQSimModule(new ShiftEDrtModeOptimizerQSimModule(drtCfg));
 			controler.addOverridingQSimModule(new EvShiftDvrpFleetQSimModule(drtCfg.getMode()));
 		}
 

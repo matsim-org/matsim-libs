@@ -47,10 +47,10 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
     private final DrtConfigGroup drtConfigGroup;
 	private final ShiftDrtConfigGroup shiftConfig;
 
-	public ShiftDrtModeModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftCfg) {
+	public ShiftDrtModeModule(DrtConfigGroup drtCfg) {
         super(drtCfg.getMode());
         this.drtConfigGroup = drtCfg;
-		this.shiftConfig = shiftCfg;
+		this.shiftConfig = (ShiftDrtConfigGroup) drtCfg.getParameterSets(ShiftDrtConfigGroup.GROUP_NAME);
 	}
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing((Task.TaskType type) -> {

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -38,7 +39,7 @@ public class RunEShiftDrtScenarioIT {
 	@Test
 	public void test() {
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithShiftsConfigGroup::new);
 
 		String fleetFile =  "holzkirchenFleet.xml";
 		String plansFile =  "holzkirchenPlans.xml.gz";
@@ -48,7 +49,9 @@ public class RunEShiftDrtScenarioIT {
 		String chargersFile =  "holzkirchenChargers.xml";
 		String evsFile =  "holzkirchenElectricFleet.xml";
 
-		DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
+		DrtWithShiftsConfigGroup drtWithShiftsConfigGroup = (DrtWithShiftsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+
+		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup.setMode(TransportMode.drt)
 				.setMaxTravelTimeAlpha(1.5)
 				.setMaxTravelTimeBeta(10. * 60.)
 				.setStopDuration(30.)
@@ -78,8 +81,6 @@ public class RunEShiftDrtScenarioIT {
 		drtZonalSystemParams.setCellSize(500.);
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
-
-		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
@@ -129,7 +130,7 @@ public class RunEShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
 
-		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
+		ShiftDrtConfigGroup shiftDrtConfigGroup = (ShiftDrtConfigGroup) drtWithShiftsConfigGroup.createParameterSet(ShiftDrtConfigGroup.GROUP_NAME);
 		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
 		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
 		shiftDrtConfigGroup.setAllowInFieldChangeover(true);

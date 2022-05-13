@@ -60,10 +60,10 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 	private final DrtConfigGroup drtCfg;
 	private final ShiftDrtConfigGroup shiftConfigGroup;
 
-	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftConfigGroup) {
+	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.shiftConfigGroup = shiftConfigGroup;
+		this.shiftConfigGroup = (ShiftDrtConfigGroup) drtCfg.getParameterSets(DrtConfigGroup.GROUP_NAME);
 	}
 
 	@Override
