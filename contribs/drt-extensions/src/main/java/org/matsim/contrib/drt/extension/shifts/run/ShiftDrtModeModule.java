@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.shifts.analysis.*;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
@@ -31,11 +32,13 @@ import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -50,7 +53,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 	public ShiftDrtModeModule(DrtConfigGroup drtCfg) {
         super(drtCfg.getMode());
         this.drtConfigGroup = drtCfg;
-		this.shiftConfig = (ShiftDrtConfigGroup) drtCfg.getParameterSets(ShiftDrtConfigGroup.GROUP_NAME);
+		this.shiftConfig = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing((Task.TaskType type) -> {

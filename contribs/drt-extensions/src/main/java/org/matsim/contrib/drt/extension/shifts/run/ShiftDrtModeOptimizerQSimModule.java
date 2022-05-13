@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcherImpl;
@@ -63,7 +64,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.shiftConfigGroup = (ShiftDrtConfigGroup) drtCfg.getParameterSets(DrtConfigGroup.GROUP_NAME);
+		this.shiftConfigGroup = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	@Override

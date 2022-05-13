@@ -70,6 +70,14 @@ public class RunShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
+		ShiftDrtConfigGroup shiftDrtConfigGroup = (ShiftDrtConfigGroup) drtWithShiftsConfigGroup.createParameterSet(ShiftDrtConfigGroup.GROUP_NAME);
+		shiftDrtConfigGroup.setShiftInputFile(opFacilitiesFile);
+		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
+		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+		drtWithShiftsConfigGroup.addParameterSet(shiftDrtConfigGroup);
+
+		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
+
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
@@ -89,7 +97,6 @@ public class RunShiftDrtScenarioIT {
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
-
 
 		final PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
 		home.setTypicalDuration(8 * 3600);
@@ -118,11 +125,6 @@ public class RunShiftDrtScenarioIT {
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
-
-		ShiftDrtConfigGroup shiftDrtConfigGroup = (ShiftDrtConfigGroup) drtWithShiftsConfigGroup.createParameterSet(ShiftDrtConfigGroup.GROUP_NAME);
-		shiftDrtConfigGroup.setShiftInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();

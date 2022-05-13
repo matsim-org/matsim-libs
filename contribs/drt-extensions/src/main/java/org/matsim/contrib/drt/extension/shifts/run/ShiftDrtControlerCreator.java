@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
