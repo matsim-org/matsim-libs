@@ -1,0 +1,100 @@
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** *
+ */
+
+package org.matsim.contrib.taxi.run;
+
+import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+
+import jakarta.validation.constraints.NotNull;
+
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class TaxiAsDrtConfigGroup extends DrtConfigGroup {
+	public static TaxiAsDrtConfigGroup convertTaxiToDrtCfg(TaxiConfigGroup taxiCfg) {
+
+		// Taxi specific settings, not applicable directly to DRT
+		// - destinationKnown
+		// - vehicleDiversion
+		// - onlineVehicleTracker
+		// - breakSimulationIfNotAllRequestsServed
+		// - taxiOptimizerParams
+
+		var drtCfg = new TaxiAsDrtConfigGroup();
+		drtCfg.addParameterSet(taxiCfg);
+
+		drtCfg.setMode(taxiCfg.getMode());
+		drtCfg.setUseModeFilteredSubnetwork(taxiCfg.isUseModeFilteredSubnetwork());
+		drtCfg.setStopDuration(Double.NaN);//used only inside the DRT optimiser
+
+		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
+		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
+		// manually after the TaxiAsDrtConfigGroup config is created.
+		drtCfg.setMaxWaitTime(3600);
+		drtCfg.setMaxTravelTimeAlpha(2);
+		drtCfg.setMaxTravelTimeBeta(3600);
+		drtCfg.setMaxAbsoluteDetour(Double.MAX_VALUE);
+
+		drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		drtCfg.setChangeStartLinkToLastLinkInSchedule(taxiCfg.isChangeStartLinkToLastLinkInSchedule());
+		drtCfg.setIdleVehiclesReturnToDepots(false);
+		drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtCfg.setMaxWalkDistance(Double.MAX_VALUE);
+		drtCfg.setVehiclesFile(taxiCfg.getTaxisFile());
+		drtCfg.setTransitStopFile(null);
+		drtCfg.setDrtServiceAreaShapeFile(null);
+		drtCfg.setPlotDetailedCustomerStats(taxiCfg.getDetailedStats() || taxiCfg.getTimeProfiles());
+		drtCfg.setNumberOfThreads(taxiCfg.getNumberOfThreads());
+		drtCfg.setAdvanceRequestPlanningHorizon(0);
+		drtCfg.setStoreUnsharedPath(false);
+
+		taxiCfg.getTaxiFareParams().ifPresent(taxiFareParams -> {
+			var drtFareParams = new DrtFareParams();
+			drtFareParams.setBaseFare(taxiFareParams.getBasefare());
+			drtFareParams.setDistanceFare_m(taxiFareParams.getDistanceFare_m());
+			drtFareParams.setTimeFare_h(taxiFareParams.getTimeFare_h());
+			drtFareParams.setDailySubscriptionFee(taxiFareParams.getDailySubscriptionFee());
+			drtFareParams.setMinFarePerTrip(taxiFareParams.getMinFarePerTrip());
+			drtCfg.addParameterSet(drtFareParams);
+		});
+
+		// DRT specific settings, not existing in taxi
+		// - drtCfg.drtInsertionSearchParams
+		// - drtCfg.zonalSystemParams
+		// - drtCfg.rebalancingParams
+		// - drtCfg.drtSpeedUpParams
+		// - drtCfg.drtRequestInsertionRetryParams
+
+		return drtCfg;
+	}
+
+	@NotNull
+	private TaxiConfigGroup taxiCfg;
+
+	public TaxiAsDrtConfigGroup() {
+		addDefinition(TaxiConfigGroup.GROUP_NAME, TaxiConfigGroup::new, () -> taxiCfg,
+				params -> taxiCfg = (TaxiConfigGroup)params);
+	}
+
+	public TaxiConfigGroup getTaxiCfg() {
+		return taxiCfg;
+	}
+}
