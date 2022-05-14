@@ -662,7 +662,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
 	 */
 	@StringSetter(STORE_UNSHARED_PATH)
-	void setStoreUnsharedPath(boolean storeUnsharedPath) {
+	public void setStoreUnsharedPath(boolean storeUnsharedPath) {
 		this.storeUnsharedPath = storeUnsharedPath;
 	}
 
