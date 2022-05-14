@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package org.matsim.contrib.drt.optimizer;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -40,7 +40,7 @@ public class DrtRequestInsertionRetryQueue {
 	//priority queue not needed - retry interval is equal for all requests
 	private final Deque<RequestRetryEntry> requestQueue = new LinkedList<>();
 
-	boolean tryAddFailedRequest(DrtRequest request, double now) {
+	public boolean tryAddFailedRequest(DrtRequest request, double now) {
 		if (request.getSubmissionTime() + params.getMaxRequestAge() < now + params.getRetryInterval()) {
 			return false;//request is too old, not eligible for retry
 		}
@@ -53,7 +53,7 @@ public class DrtRequestInsertionRetryQueue {
 		return !requestQueue.isEmpty() && requestQueue.getFirst().lastAttemptTime <= maxLastAttemptTimeForRetry;
 	}
 
-	List<DrtRequest> getRequestsToRetryNow(double now) {
+	public List<DrtRequest> getRequestsToRetryNow(double now) {
 		List<DrtRequest> requests = new ArrayList<>();
 		while (hasRequestsToRetryNow(now)) {
 			var entry = requestQueue.removeFirst();
