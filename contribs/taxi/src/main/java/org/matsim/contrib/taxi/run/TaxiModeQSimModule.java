@@ -27,10 +27,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.optimizer.TaxiModeOptimizerQSimModule;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.modal.ModalProviders;
@@ -72,9 +70,5 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				}).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
-
-		addModalQSimComponentBinding().toProvider(modalProvider(
-				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(TaxiEventSequenceCollector.class),
-						taxiCfg)));
 	}
 }
