@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import static org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
@@ -56,7 +58,7 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 		bindModal(RouteCreator.class).toProvider(
 				new GenericRouteCreatorProvider(getMode(), leastCostPathCalculatorFactory));// not singleton
 
-		bindModal(DvrpRoutingModule.AccessEgressFacilityFinder.class).toProvider(
+		bindModal(AccessEgressFacilityFinder.class).toProvider(
 						modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 				.asEagerSingleton();
 	}
