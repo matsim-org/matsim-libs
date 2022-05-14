@@ -32,6 +32,7 @@ import org.matsim.contrib.taxi.optimizer.TaxiModeOptimizerQSimModule;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.modal.ModalProviders;
 
 import com.google.inject.Inject;
@@ -41,17 +42,23 @@ import com.google.inject.Inject;
  */
 public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final TaxiConfigGroup taxiCfg;
+	private final AbstractQSimModule optimizerQSimModule;
 
 	public TaxiModeQSimModule(TaxiConfigGroup taxiCfg) {
+		this(taxiCfg, new TaxiModeOptimizerQSimModule(taxiCfg));
+	}
+
+	public TaxiModeQSimModule(TaxiConfigGroup taxiCfg, AbstractQSimModule optimizerQSimModule) {
 		super(taxiCfg.getMode());
 		this.taxiCfg = taxiCfg;
+		this.optimizerQSimModule = optimizerQSimModule;
 	}
 
 	@Override
 	protected void configureQSim() {
 		install(new VrpAgentSourceQSimModule(getMode()));
 		install(new PassengerEngineQSimModule(getMode()));
-		install(new TaxiModeOptimizerQSimModule(taxiCfg));
+		install(optimizerQSimModule);
 
 		bindModal(PassengerRequestCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
