@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2022 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,43 +15,34 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.etaxi.run;
+package org.matsim.contrib.etaxi.optimizer;
 
 import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
-import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -59,22 +50,21 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
-public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 	private final TaxiConfigGroup taxiCfg;
 
-	public ETaxiModeQSimModule(TaxiConfigGroup taxiCfg) {
+	public ETaxiModeOptimizerQSimModule(TaxiConfigGroup taxiCfg) {
 		super(taxiCfg.getMode());
 		this.taxiCfg = taxiCfg;
 	}
 
 	@Override
 	protected void configureQSim() {
-		install(new VrpAgentSourceQSimModule(getMode()));
-		install(new PassengerEngineQSimModule(getMode()));
-
 		addModalComponent(TaxiOptimizer.class,
 				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
 					@Inject
@@ -130,7 +120,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
 						new ETaxiStayTaskEndTimeCalculator(taxiCfg)))).asEagerSingleton();
 
-		bindModal(DynActionCreator.class).toProvider(
+		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
 					@Inject
 					private MobsimTimer timer;
@@ -145,23 +135,6 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 										dvrpCfg));
 					}
 				}).asEagerSingleton();
-
-		bindModal(PassengerRequestCreator.class).toProvider(
-				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-					@Inject
-					private EventsManager events;
-
-					@Override
-					public TaxiRequestCreator get() {
-						return new TaxiRequestCreator(getMode(), events);
-					}
-				}).asEagerSingleton();
-
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
-
-		addModalQSimComponentBinding().toProvider(modalProvider(
-				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(TaxiEventSequenceCollector.class),
-						taxiCfg)));
 
 		bindModal(VrpOptimizer.class).to(modalKey(TaxiOptimizer.class));
 	}
