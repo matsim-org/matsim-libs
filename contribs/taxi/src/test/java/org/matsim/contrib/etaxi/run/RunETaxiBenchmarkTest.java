@@ -35,5 +35,4 @@ public class RunETaxiBenchmarkTest {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml");
 		RunETaxiBenchmark.run(configUrl, 2);
 	}
-
 }
