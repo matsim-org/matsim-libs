@@ -223,7 +223,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			if ( !storeUnknownParameters ) {
 				throw new IllegalArgumentException(
 						"Module "+getName()+" of type "+getClass().getName()+
-						" doesn't accept unkown parameters. Parameter "+param_name+
+						" doesn't accept unknown parameters. Parameter "+param_name+
 						" is not part of the valid parameters: "+setters.keySet() );
 			}
 			log.warn( "unknown parameter "+param_name+" for group "+getName()+". Here are the valid parameter names: "+setters.keySet() );
@@ -396,7 +396,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		if ( !storeUnknownParameters ) {
 			throw new IllegalArgumentException(
 					"Module "+getName()+" of type "+getClass().getName()+
-					" doesn't store unkown parameters. Parameter "+param_name+
+					" doesn't store unknown parameters. Parameter "+param_name+
 					" is not part of the valid parameters: "+stringGetters.keySet() );
 		}
 
