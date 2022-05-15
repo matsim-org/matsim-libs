@@ -182,7 +182,7 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.5.0</version>
+			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -207,11 +207,6 @@
 			<artifactId>matsim-examples</artifactId>
 			<version>15.0-SNAPSHOT</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jfree</groupId>
-			<artifactId>jcommon</artifactId>
-			<version>1.0.24</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
