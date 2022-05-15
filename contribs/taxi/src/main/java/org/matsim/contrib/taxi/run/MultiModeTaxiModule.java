@@ -41,7 +41,6 @@ public class MultiModeTaxiModule extends AbstractModule {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			var drtCfg = TaxiAsDrtConfigGroup.convertTaxiToDrtCfg(taxiCfg);
 			install(new DrtModeModule(drtCfg));
-			install(new TaxiModeModule(taxiCfg));
 			installQSimModule(new DrtModeQSimModule(drtCfg, new TaxiModeOptimizerQSimModule(taxiCfg)));
 			install(new TaxiModeAnalysisModule(taxiCfg));
 		}

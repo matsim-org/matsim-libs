@@ -36,12 +36,15 @@ import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.contrib.taxi.util.stats.TaxiVehicleOccupancyProfiles;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -71,6 +74,12 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 				modalProvider(getter -> new ExecutedScheduleCollector(getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(ExecutedScheduleCollector.class));
 
+		bindModal(TaxiStatsDumper.class).toProvider(modalProvider(
+				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
+						getter.get(IterationCounter.class), getter.getModal(ExecutedScheduleCollector.class),
+						getter.getModal(TaxiEventSequenceCollector.class)))).asEagerSingleton();
+		addControlerListenerBinding().to(modalKey(TaxiStatsDumper.class));
+
 		if (taxiCfg.getTimeProfiles()) {
 			bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleOccupancyProfileCalculator(getMode(),
@@ -83,7 +92,6 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 					getter -> TaxiVehicleOccupancyProfiles.createProfileWriter(getter.get(MatsimServices.class),
 							getMode(), getter.getModal(VehicleOccupancyProfileCalculator.class))));
 
-
 			bindModal(VehicleTaskProfileCalculator.class).toProvider(modalProvider(
 					getter -> new VehicleTaskProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 							300, getter.get(QSimConfigGroup.class)))).asEagerSingleton();
@@ -91,11 +99,10 @@ public class TaxiModeAnalysisModule extends AbstractDvrpModeModule {
 			addControlerListenerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
 			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class),
-							getMode(), getter.getModal(VehicleTaskProfileCalculator.class),
-							Comparator.comparing(Task.TaskType::name), ImmutableMap.of(TaxiStayTask.TYPE,
-							Color.LIGHT_GRAY))));
-
+					getter -> new VehicleTaskProfileWriter(getter.get(MatsimServices.class), getMode(),
+							getter.getModal(VehicleTaskProfileCalculator.class),
+							Comparator.comparing(Task.TaskType::name),
+							ImmutableMap.of(TaxiStayTask.TYPE, Color.LIGHT_GRAY))));
 		}
 	}
 }
