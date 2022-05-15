@@ -36,9 +36,11 @@ import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
+import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -135,6 +137,10 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 										dvrpCfg));
 					}
 				}).asEagerSingleton();
+
+		addModalQSimComponentBinding().toProvider(modalProvider(
+				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(TaxiEventSequenceCollector.class),
+						taxiCfg)));
 
 		bindModal(VrpOptimizer.class).to(modalKey(TaxiOptimizer.class));
 	}

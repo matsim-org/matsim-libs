@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.taxi.run;
 
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -40,9 +42,10 @@ public class TaxiControlerCreator {
 	 * @return
 	 */
 	public static Controler createControler(Config config, boolean otfvis) {
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
+		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new MultiModeTaxiModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config)));
