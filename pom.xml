@@ -31,7 +31,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <argLine></argLine>
 
-        <log4j.version>2.17.1</log4j.version>
+        <log4j.version>2.17.2</log4j.version>
         <geotools.version>24.2</geotools.version>
         <jts.version>1.17.1</jts.version>
         <guice.version>5.0.1</guice.version>
