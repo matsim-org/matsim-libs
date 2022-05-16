@@ -34,11 +34,11 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
-	private final DrtShiftParams shiftConfigGroup;
+	private final DrtShiftParams drtShiftParams;
 
 	public ShiftEDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
-		this.shiftConfigGroup = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
+		this.drtShiftParams = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> new EDrtShiftDispatcherImpl(getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(EShiftTaskScheduler.class), getter.getModal(Network.class),
-						getter.getModal(ChargingInfrastructure.class), getter.get(EventsManager.class), shiftConfigGroup))
+						getter.getModal(ChargingInfrastructure.class), getter.get(EventsManager.class), drtShiftParams))
 		).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(
@@ -67,7 +67,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 		bindModal(EShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), taskFactory,	shiftConfigGroup, getter.getModal(ChargingInfrastructure.class),
+						getter.get(MobsimTimer.class), taskFactory, drtShiftParams, getter.getModal(ChargingInfrastructure.class),
 						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class))
 		)).asEagerSingleton();
 

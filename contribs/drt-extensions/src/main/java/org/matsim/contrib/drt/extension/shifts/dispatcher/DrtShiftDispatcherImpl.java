@@ -68,11 +68,11 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final EventsManager eventsManager;
 
-    private final DrtShiftParams configGroup;
+    private final DrtShiftParams drtShiftParams;
 
     public DrtShiftDispatcherImpl(DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
 								  OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
-								  Network network, EventsManager eventsManager, DrtShiftParams configGroup) {
+								  Network network, EventsManager eventsManager, DrtShiftParams drtShiftParams) {
         this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;
@@ -81,7 +81,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.shiftTaskScheduler = shiftTaskScheduler;
         this.network = network;
         this.eventsManager = eventsManager;
-        this.configGroup = configGroup;
+        this.drtShiftParams = drtShiftParams;
 
 		shiftTaskScheduler.initSchedules();
         createQueues();
@@ -115,7 +115,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         assignShifts(timeStep);
         startShifts(timeStep);
         checkBreaks();
-		if(timeStep % configGroup.getLoggingInterval() == 0) {
+		if(timeStep % drtShiftParams.getLoggingInterval() == 0) {
 			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
 					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
 			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
@@ -257,7 +257,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
             final ShiftEntry next = iterator.next();
 
-            if (timeStep + configGroup.getShiftEndLookAhead() < next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndLookAhead() < next.shift.getEndTime()) {
                 continue;
             }
 
@@ -272,13 +272,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 throw new IllegalStateException("Shifts don't match!");
             }
 
-            if (timeStep + configGroup.getShiftEndLookAhead() == next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndLookAhead() == next.shift.getEndTime()) {
                 logger.debug(
                         "Scheduling shift end for shift " + next.shift.getId() + " of vehicle " + next.vehicle.getId());
                 scheduleShiftEnd(next);
             }
 
-            if (timeStep + configGroup.getShiftEndRescheduleLookAhead() > next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndRescheduleLookAhead() > next.shift.getEndTime()) {
                 if (timer.getTimeOfDay() % (3 * 60) == 0) {
                     if (next.vehicle.getShifts().size() > 1) {
                         updateShiftEnd(next);
@@ -337,7 +337,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
 
         final OperationFacility shiftChangeFacility;
-        if (configGroup.isAllowInFieldChangeover()) {
+        if (drtShiftParams.isAllowInFieldChangeover()) {
             shiftChangeFacility = breakFacilityFinder.findFacility(start.link.getCoord());
         } else {
             shiftChangeFacility = breakFacilityFinder.findFacilityOfType(start.link.getCoord(),
@@ -431,15 +431,15 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final Iterator<DrtShift> iterator = vehicle.getShifts().iterator();
         DrtShift previous = iterator.next();
         if (!iterator.hasNext()) {
-            if (previous.getEndTime() + configGroup.getChangeoverDuration() < shift.getStartTime()) {
+            if (previous.getEndTime() + drtShiftParams.getChangeoverDuration() < shift.getStartTime()) {
                 return true;
             }
         }
 
         while (iterator.hasNext()) {
             DrtShift next = iterator.next();
-            if (shift.getEndTime() + configGroup.getChangeoverDuration() < next.getStartTime()
-                    && previous.getEndTime() + configGroup.getChangeoverDuration() < shift.getStartTime()) {
+            if (shift.getEndTime() + drtShiftParams.getChangeoverDuration() < next.getStartTime()
+                    && previous.getEndTime() + drtShiftParams.getChangeoverDuration() < shift.getStartTime()) {
                 return true;
             }
             previous = next;
@@ -508,7 +508,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private boolean isSchedulable(DrtShift shift, double timeStep) {
-        return shift.getStartTime() <= timeStep + configGroup.getShiftScheduleLookAhead(); // && shift.getEndTime() > timeStep;
+        return shift.getStartTime() <= timeStep + drtShiftParams.getShiftScheduleLookAhead(); // && shift.getEndTime() > timeStep;
     }
 
     private boolean shiftStarts(ShiftEntry peek) {
