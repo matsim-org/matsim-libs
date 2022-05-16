@@ -70,12 +70,6 @@ public class RunShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
-		ShiftDrtConfigGroup shiftDrtConfigGroup = (ShiftDrtConfigGroup) drtWithShiftsConfigGroup.createParameterSet(ShiftDrtConfigGroup.GROUP_NAME);
-		shiftDrtConfigGroup.setShiftInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
-		drtWithShiftsConfigGroup.addParameterSet(shiftDrtConfigGroup);
-
 		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
@@ -85,7 +79,6 @@ public class RunShiftDrtScenarioIT {
 		Set<String> modes = new HashSet<>();
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
-		config.qsim().setMainModes(modes);
 
 		PlanCalcScoreConfigGroup.ModeParams scoreParams = new PlanCalcScoreConfigGroup.ModeParams("drt");
 		config.planCalcScore().addModeParams(scoreParams);
@@ -125,6 +118,12 @@ public class RunShiftDrtScenarioIT {
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
+
+		ShiftDrtConfigGroup shiftDrtConfigGroup = (ShiftDrtConfigGroup) drtWithShiftsConfigGroup.createParameterSet(ShiftDrtConfigGroup.GROUP_NAME);
+		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
+		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
+		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+		drtWithShiftsConfigGroup.addParameterSet(shiftDrtConfigGroup);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();

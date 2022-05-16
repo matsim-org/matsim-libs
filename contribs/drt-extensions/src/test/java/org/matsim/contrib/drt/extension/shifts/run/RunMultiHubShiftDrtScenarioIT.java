@@ -70,6 +70,8 @@ public class RunMultiHubShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
+		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
+
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
@@ -122,6 +124,7 @@ public class RunMultiHubShiftDrtScenarioIT {
 		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
 		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
 		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+		drtWithShiftsConfigGroup.addParameterSet(shiftDrtConfigGroup);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();

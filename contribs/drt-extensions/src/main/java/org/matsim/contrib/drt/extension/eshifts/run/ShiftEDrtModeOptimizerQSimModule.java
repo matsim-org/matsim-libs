@@ -8,6 +8,7 @@ import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEn
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtActionCreator;
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
@@ -37,7 +38,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 
 	public ShiftEDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
-		this.shiftConfigGroup = (ShiftDrtConfigGroup) drtCfg.getParameterSets(ShiftDrtConfigGroup.GROUP_NAME);
+		this.shiftConfigGroup = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	@Override
