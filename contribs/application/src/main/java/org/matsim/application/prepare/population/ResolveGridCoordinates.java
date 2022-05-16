@@ -111,11 +111,11 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 						if (network != null) {
 							Link link = NetworkUtils.getNearestLink(network, act.getCoord());
-							if(link.getAllowedModes().contains(TransportMode.car)){
-								log.fatal("About to set linkId for activity" + act + "for person " + p + "to " + link.getId() + ".\n" +
+							if(! link.getAllowedModes().contains(TransportMode.car)){
+								throw new IllegalArgumentException("About to set linkId for activity" + act + "for person " + p + "to " + link.getId() + ".\n" +
 										"However, car is not permitted on this link.\n" +
 										"This might cause problems when running the scenario, especially if access/egress routing is not enabled.\n" +
-										"Please consider to use a car-network only here (i.e. a network where car is permitted on every link)");
+										"Please provide a car-network here (i.e. a network where car is permitted on every link)");
 							}
 							if (link != null)
 								act.setLinkId(link.getId());
