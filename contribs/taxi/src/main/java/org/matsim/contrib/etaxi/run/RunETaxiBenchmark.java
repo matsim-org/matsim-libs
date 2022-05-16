@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
+
 import java.net.URL;
 import java.util.List;
 
@@ -85,7 +87,9 @@ public class RunETaxiBenchmark {
 		config.controler().setCreateGraphs(false);
 		DvrpBenchmarks.adjustConfig(config);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
+
 		Controler controler = new Controler(scenario);
 		DvrpBenchmarks.initController(controler);
 

@@ -29,7 +29,6 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -99,7 +98,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		// In addition, there may be some small rounding errors (therefore 1e-10 is considered)
 		Verify.verify(Math.abs(timeFromInsertionData - timeFromScheduler) <= VrpPaths.FIRST_LINK_TT + 1e-10,
 				"%s: %s (insertion data) vs %s (scheduler)", messageStart, timeFromInsertionData,
-				timeFromInsertionData);
+				timeFromScheduler);
 	}
 
 	private DrtStopTask insertPickup(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData) {

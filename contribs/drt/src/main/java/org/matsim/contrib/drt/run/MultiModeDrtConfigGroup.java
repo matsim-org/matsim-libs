@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.run;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
@@ -28,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import com.google.common.base.Supplier;
 import com.google.common.base.Verify;
 
 /**
@@ -80,10 +80,6 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		} else {
 			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
 		}
-	}
-
-	public final void addDrtConfig(DrtConfigGroup set) {
-		addParameterSet(set);
 	}
 
 	@Override
