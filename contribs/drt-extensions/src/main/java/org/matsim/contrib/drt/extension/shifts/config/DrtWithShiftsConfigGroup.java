@@ -6,15 +6,15 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 public class DrtWithShiftsConfigGroup extends DrtConfigGroup {
 
 	@NotNull
-	private ShiftDrtConfigGroup drtShiftParams;
+	private DrtShiftParams drtShiftParams;
 
 	public DrtWithShiftsConfigGroup() {
-		addDefinition(ShiftDrtConfigGroup.GROUP_NAME, ShiftDrtConfigGroup::new,
+		addDefinition(DrtShiftParams.SET_NAME, DrtShiftParams::new,
 				() -> drtShiftParams,
-				params -> drtShiftParams = (ShiftDrtConfigGroup)params);
+				params -> drtShiftParams = (DrtShiftParams)params);
 	}
 
-	public ShiftDrtConfigGroup getDrtShiftParams() {
+	public DrtShiftParams getDrtShiftParams() {
 		return drtShiftParams;
 	}
 

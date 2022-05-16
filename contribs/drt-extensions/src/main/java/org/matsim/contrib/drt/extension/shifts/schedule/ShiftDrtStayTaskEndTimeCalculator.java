@@ -7,7 +7,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShiftBreak;
 
 import java.util.List;
@@ -19,10 +19,10 @@ public class ShiftDrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.
 
     public final static Logger logger = Logger.getLogger(ShiftDrtStayTaskEndTimeCalculator.class);
 
-    private final ShiftDrtConfigGroup config;
+    private final DrtShiftParams config;
     private final DrtStayTaskEndTimeCalculator delegate;
 
-    public ShiftDrtStayTaskEndTimeCalculator(ShiftDrtConfigGroup config, DrtStayTaskEndTimeCalculator delegate) {
+    public ShiftDrtStayTaskEndTimeCalculator(DrtShiftParams config, DrtStayTaskEndTimeCalculator delegate) {
         this.config = config;
         this.delegate = delegate;
     }

@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -132,18 +132,18 @@ public class RunEShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_eshifts");
 
-		ShiftDrtConfigGroup shiftDrtConfigGroup = (ShiftDrtConfigGroup) drtWithShiftsConfigGroup.createParameterSet(ShiftDrtConfigGroup.GROUP_NAME);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+		DrtShiftParams drtShiftParams = (DrtShiftParams) drtWithShiftsConfigGroup.createParameterSet(DrtShiftParams.SET_NAME);
+		drtShiftParams.setOperationFacilityInputFile(opFacilitiesFile);
+		drtShiftParams.setShiftInputFile(shiftsFile);
+		drtShiftParams.setAllowInFieldChangeover(true);
 
 		//e shifts
-		shiftDrtConfigGroup.setShiftAssignmentBatteryThreshold(0.6);
-		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
-		shiftDrtConfigGroup.setOutOfShiftChargerType("slow");
-		shiftDrtConfigGroup.setBreakChargerType("fast");
+		drtShiftParams.setShiftAssignmentBatteryThreshold(0.6);
+		drtShiftParams.setChargeAtHubThreshold(0.8);
+		drtShiftParams.setOutOfShiftChargerType("slow");
+		drtShiftParams.setBreakChargerType("fast");
 
-		drtWithShiftsConfigGroup.addParameterSet(shiftDrtConfigGroup);
+		drtWithShiftsConfigGroup.addParameterSet(drtShiftParams);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setChargersFile(chargersFile);

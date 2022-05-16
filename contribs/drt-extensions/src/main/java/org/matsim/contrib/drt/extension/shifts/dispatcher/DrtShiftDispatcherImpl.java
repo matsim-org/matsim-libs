@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.events.*;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
@@ -38,7 +38,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
@@ -69,11 +68,11 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final EventsManager eventsManager;
 
-    private final ShiftDrtConfigGroup configGroup;
+    private final DrtShiftParams configGroup;
 
     public DrtShiftDispatcherImpl(DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
 								  OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
-								  Network network, EventsManager eventsManager, ShiftDrtConfigGroup configGroup) {
+								  Network network, EventsManager eventsManager, DrtShiftParams configGroup) {
         this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;

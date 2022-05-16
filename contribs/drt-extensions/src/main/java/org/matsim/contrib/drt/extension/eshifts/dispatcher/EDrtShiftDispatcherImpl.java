@@ -32,7 +32,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.events.*;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
@@ -80,12 +80,12 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final EventsManager eventsManager;
 
-    private final ShiftDrtConfigGroup configGroup;
+    private final DrtShiftParams configGroup;
 
     public EDrtShiftDispatcherImpl(DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
 								   OperationFacilityFinder breakFacilityFinder, EShiftTaskScheduler shiftTaskScheduler,
 								   Network network, ChargingInfrastructure chargingInfrastructure,
-								   EventsManager eventsManager, ShiftDrtConfigGroup configGroup) {
+								   EventsManager eventsManager, DrtShiftParams configGroup) {
         this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;

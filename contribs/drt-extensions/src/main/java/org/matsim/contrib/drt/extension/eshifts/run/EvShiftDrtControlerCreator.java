@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.eshifts.run;
 import org.matsim.contrib.drt.extension.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.drt.extension.eshifts.charging.ShiftOperatingVehicleProvider;
 import org.matsim.contrib.drt.extension.eshifts.fleet.EvShiftDvrpFleetQSimModule;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
 import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtModeModule;
 import org.matsim.contrib.drt.extension.shifts.run.ShiftDrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -11,7 +10,6 @@ import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 

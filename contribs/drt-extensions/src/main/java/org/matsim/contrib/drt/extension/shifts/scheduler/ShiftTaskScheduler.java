@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
@@ -58,14 +58,14 @@ public class ShiftTaskScheduler {
     private final ShiftDrtTaskFactory taskFactory;
     private final LeastCostPathCalculator router;
 
-    private final ShiftDrtConfigGroup shiftConfig;
+    private final DrtShiftParams shiftConfig;
 	private final OperationFacilities operationFacilities;
 	private final Fleet fleet;
 
 	private final Network network;
 
 	public ShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-							  MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftDrtConfigGroup shiftConfig,
+							  MobsimTimer timer, ShiftDrtTaskFactory taskFactory, DrtShiftParams shiftConfig,
 							  OperationFacilities operationFacilities, Fleet fleet) {
 		this.travelTime = travelTime;
 		this.timer = timer;
