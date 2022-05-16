@@ -82,6 +82,8 @@ public class RunEShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
+		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
+
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
 		config.setContext(ExamplesUtils.getTestScenarioURL("holzkirchen"));
@@ -140,6 +142,8 @@ public class RunEShiftDrtScenarioIT {
 		shiftDrtConfigGroup.setChargeAtHubThreshold(0.8);
 		shiftDrtConfigGroup.setOutOfShiftChargerType("slow");
 		shiftDrtConfigGroup.setBreakChargerType("fast");
+
+		drtWithShiftsConfigGroup.addParameterSet(shiftDrtConfigGroup);
 
 		final EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setChargersFile(chargersFile);
