@@ -5,7 +5,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.shifts.analysis.*;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.io.DrtShiftsReader;
 import org.matsim.contrib.drt.extension.shifts.io.OperationFacilitiesReader;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilitiesSpecification;
@@ -29,7 +30,6 @@ import org.matsim.contrib.util.stats.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleOccupancyProfileWriter;
 import org.matsim.contrib.util.stats.VehicleTaskProfileCalculator;
 import org.matsim.contrib.util.stats.VehicleTaskProfileWriter;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -45,12 +45,12 @@ import java.util.Map;
 public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
     private final DrtConfigGroup drtConfigGroup;
-	private final ShiftDrtConfigGroup shiftConfig;
+	private final DrtShiftParams drtShiftParams;
 
-	public ShiftDrtModeModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftCfg) {
+	public ShiftDrtModeModule(DrtConfigGroup drtCfg) {
         super(drtCfg.getMode());
         this.drtConfigGroup = drtCfg;
-		this.shiftConfig = shiftCfg;
+		this.drtShiftParams = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing((Task.TaskType type) -> {
@@ -79,18 +79,18 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 	@Override
     public void install() {
-		if (shiftConfig.getShiftInputFile() != null) {
+		if (drtShiftParams.getShiftInputFile() != null) {
 			bindModal(DrtShiftsSpecification.class).toProvider(() -> {
 				DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
-				new DrtShiftsReader(drtShiftsSpecification).readURL(shiftConfig.getShiftInputUrl(getConfig().getContext()));
+				new DrtShiftsReader(drtShiftsSpecification).readURL(drtShiftParams.getShiftInputUrl(getConfig().getContext()));
 				return drtShiftsSpecification;
 			}).asEagerSingleton();
 		}
 
-		if (shiftConfig.getOperationFacilityInputFile() != null) {
+		if (drtShiftParams.getOperationFacilityInputFile() != null) {
 			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
 				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
-				new OperationFacilitiesReader(operationFacilitiesSpecification).readURL(shiftConfig.getOperationFacilityInputUrl(getConfig().getContext()));
+				new OperationFacilitiesReader(operationFacilitiesSpecification).readURL(drtShiftParams.getOperationFacilityInputUrl(getConfig().getContext()));
 				return operationFacilitiesSpecification;
 			}).asEagerSingleton();
 		}

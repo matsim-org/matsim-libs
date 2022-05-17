@@ -32,7 +32,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.events.*;
 import org.matsim.contrib.drt.extension.shifts.fleet.ShiftDvrpVehicle;
@@ -80,12 +80,12 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private final EventsManager eventsManager;
 
-    private final ShiftDrtConfigGroup configGroup;
+    private final DrtShiftParams drtShiftParams;
 
     public EDrtShiftDispatcherImpl(DrtShifts shifts, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
 								   OperationFacilityFinder breakFacilityFinder, EShiftTaskScheduler shiftTaskScheduler,
 								   Network network, ChargingInfrastructure chargingInfrastructure,
-								   EventsManager eventsManager, ShiftDrtConfigGroup configGroup) {
+								   EventsManager eventsManager, DrtShiftParams drtShiftParams) {
         this.shifts = shifts;
         this.fleet = fleet;
         this.timer = timer;
@@ -95,7 +95,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.network = network;
         this.chargingInfrastructure = chargingInfrastructure;
         this.eventsManager = eventsManager;
-        this.configGroup = configGroup;
+        this.drtShiftParams = drtShiftParams;
 		shiftTaskScheduler.initSchedules();
         createQueues();
     }
@@ -129,7 +129,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         startShifts(timeStep);
         checkBreaks();
         checkChargingAtHub();
-		if(timeStep % configGroup.getLoggingInterval() == 0) {
+		if(timeStep % drtShiftParams.getLoggingInterval() == 0) {
 			logger.info(String.format("Active shifts: %s | Assigned shifts: %s | Unscheduled shifts: %s",
 					activeShifts.size(), assignedShifts.size(), unscheduledShifts.size()));
 			for (Map.Entry<Id<OperationFacility>, Queue<ShiftDvrpVehicle>> queueEntry : idleVehiclesQueues.entrySet()) {
@@ -139,13 +139,13 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private void checkChargingAtHub() {
-        if (timer.getTimeOfDay() % (configGroup.getChargeAtHubInterval()) == 0) {
+        if (timer.getTimeOfDay() % (drtShiftParams.getChargeAtHubInterval()) == 0) {
 			for (Queue<ShiftDvrpVehicle> idleVehiclesQueue : idleVehiclesQueues.values()) {
 				for (ShiftDvrpVehicle vehicle : idleVehiclesQueue) {
 					if (vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
 						if (vehicle instanceof EvShiftDvrpVehicle) {
 							final ElectricVehicle electricVehicle = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle();
-							if (electricVehicle.getBattery().getSoc() / electricVehicle.getBattery().getCapacity() < configGroup.getChargeAtHubThreshold()) {
+							if (electricVehicle.getBattery().getSoc() / electricVehicle.getBattery().getCapacity() < drtShiftParams.getChargeAtHubThreshold()) {
 								final Task currentTask = vehicle.getSchedule().getCurrentTask();
 								if (currentTask instanceof EDrtWaitForShiftStayTask
 										&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
@@ -158,7 +158,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 									Optional<Charger> selectedCharger = chargerIds
 											.stream()
 											.map(id -> chargingInfrastructure.getChargers().get(id))
-											.filter(charger -> configGroup.getOutOfShiftChargerType().equals(charger.getChargerType()))
+											.filter(charger -> drtShiftParams.getOutOfShiftChargerType().equals(charger.getChargerType()))
 											.min((c1, c2) -> {
 												final double waitTime = ChargingEstimations
 														.estimateMaxWaitTimeForNextVehicle(c1);
@@ -327,7 +327,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
             final ShiftEntry next = iterator.next();
 
-            if (timeStep + configGroup.getShiftEndLookAhead() < next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndLookAhead() < next.shift.getEndTime()) {
                 continue;
             }
 
@@ -342,13 +342,13 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 throw new IllegalStateException("Shifts don't match!");
             }
 
-            if (timeStep + configGroup.getShiftEndLookAhead() == next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndLookAhead() == next.shift.getEndTime()) {
                 logger.debug(
                         "Scheduling shift end for shift " + next.shift.getId() + " of vehicle " + next.vehicle.getId());
                 scheduleShiftEnd(next);
             }
 
-            if (timeStep + configGroup.getShiftEndRescheduleLookAhead() > next.shift.getEndTime()) {
+            if (timeStep + drtShiftParams.getShiftEndRescheduleLookAhead() > next.shift.getEndTime()) {
                 if (timer.getTimeOfDay() % (3 * 60) == 0) {
                     if (next.vehicle.getShifts().size() > 1) {
                         updateShiftEnd(next);
@@ -407,7 +407,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
 
         final OperationFacility shiftChangeFacility;
-        if (configGroup.isAllowInFieldChangeover()) {
+        if (drtShiftParams.isAllowInFieldChangeover()) {
             shiftChangeFacility = breakFacilityFinder.findFacility(start.link.getCoord());
         } else {
             shiftChangeFacility = breakFacilityFinder.findFacilityOfType(start.link.getCoord(),
@@ -512,7 +512,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
         if (vehicle instanceof EvShiftDvrpVehicle) {
             final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
-            if (battery.getSoc() / battery.getCapacity() < configGroup.getShiftAssignmentBatteryThreshold()) {
+            if (battery.getSoc() / battery.getCapacity() < drtShiftParams.getShiftAssignmentBatteryThreshold()) {
                 return false;
             }
         }
@@ -525,15 +525,15 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final Iterator<DrtShift> iterator = vehicle.getShifts().iterator();
         DrtShift previous = iterator.next();
         if (!iterator.hasNext()) {
-            if (previous.getEndTime() + configGroup.getChangeoverDuration() < shift.getStartTime()) {
+            if (previous.getEndTime() + drtShiftParams.getChangeoverDuration() < shift.getStartTime()) {
                 return true;
             }
         }
 
         while (iterator.hasNext()) {
             DrtShift next = iterator.next();
-            if (shift.getEndTime() + configGroup.getChangeoverDuration() < next.getStartTime()
-                    && previous.getEndTime() + configGroup.getChangeoverDuration() < shift.getStartTime()) {
+            if (shift.getEndTime() + drtShiftParams.getChangeoverDuration() < next.getStartTime()
+                    && previous.getEndTime() + drtShiftParams.getChangeoverDuration() < shift.getStartTime()) {
                 return true;
             }
             previous = next;
@@ -603,7 +603,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
     }
 
     private boolean isSchedulable(DrtShift shift, double timeStep) {
-        return shift.getStartTime() <= timeStep + configGroup.getShiftScheduleLookAhead(); // && shift.getEndTime() > timeStep;
+        return shift.getStartTime() <= timeStep + drtShiftParams.getShiftScheduleLookAhead(); // && shift.getEndTime() > timeStep;
     }
 
     private boolean shiftStarts(ShiftEntry peek) {

@@ -6,7 +6,8 @@ import java.util.Set;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -28,7 +29,7 @@ public class RunShiftDrtScenarioIT {
 	@Test
 	public void test() {
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup(DrtWithShiftsConfigGroup::new);
 
 		String fleetFile = "holzkirchenFleet.xml";
 		String plansFile = "holzkirchenPlans.xml.gz";
@@ -36,7 +37,9 @@ public class RunShiftDrtScenarioIT {
 		String opFacilitiesFile = "holzkirchenOperationFacilities.xml";
 		String shiftsFile = "holzkirchenShifts.xml";
 
-		DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
+		DrtWithShiftsConfigGroup drtWithShiftsConfigGroup = (DrtWithShiftsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
+
+		DrtConfigGroup drtConfigGroup = drtWithShiftsConfigGroup.setMode(TransportMode.drt)
 				.setMaxTravelTimeAlpha(1.5)
 				.setMaxTravelTimeBeta(10. * 60.)
 				.setStopDuration(30.)
@@ -67,7 +70,7 @@ public class RunShiftDrtScenarioIT {
 		drtZonalSystemParams.setTargetLinkSelection(DrtZonalSystemParams.TargetLinkSelection.mostCentral);
 		drtConfigGroup.addParameterSet(drtZonalSystemParams);
 
-		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
 		final Config config = ConfigUtils.createConfig(multiModeDrtConfigGroup,
 				new DvrpConfigGroup());
@@ -87,7 +90,6 @@ public class RunShiftDrtScenarioIT {
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.minOfEndtimeAndMobsimFinished);
-
 
 		final PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
 		home.setTypicalDuration(8 * 3600);
@@ -117,10 +119,11 @@ public class RunShiftDrtScenarioIT {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
 
-		ShiftDrtConfigGroup shiftDrtConfigGroup = ConfigUtils.addOrGetModule(config, ShiftDrtConfigGroup.class);
-		shiftDrtConfigGroup.setOperationFacilityInputFile(opFacilitiesFile);
-		shiftDrtConfigGroup.setShiftInputFile(shiftsFile);
-		shiftDrtConfigGroup.setAllowInFieldChangeover(true);
+		DrtShiftParams drtShiftParams = (DrtShiftParams) drtWithShiftsConfigGroup.createParameterSet(DrtShiftParams.SET_NAME);
+		drtShiftParams.setOperationFacilityInputFile(opFacilitiesFile);
+		drtShiftParams.setShiftInputFile(shiftsFile);
+		drtShiftParams.setAllowInFieldChangeover(true);
+		drtWithShiftsConfigGroup.addParameterSet(drtShiftParams);
 
 		final Controler run = ShiftDrtControlerCreator.createControler(config, false);
 		run.run();

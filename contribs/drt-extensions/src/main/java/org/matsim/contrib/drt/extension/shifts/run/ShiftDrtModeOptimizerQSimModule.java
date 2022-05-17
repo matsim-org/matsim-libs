@@ -1,7 +1,8 @@
 package org.matsim.contrib.drt.extension.shifts.run;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcherImpl;
 import org.matsim.contrib.drt.extension.shifts.fleet.DefaultShiftDvrpVehicle;
@@ -58,12 +59,12 @@ import org.matsim.core.router.util.TravelTime;
 public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 	private final DrtConfigGroup drtCfg;
-	private final ShiftDrtConfigGroup shiftConfigGroup;
+	private final DrtShiftParams drtShiftParams;
 
-	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftConfigGroup) {
+	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.shiftConfigGroup = shiftConfigGroup;
+		this.drtShiftParams = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	@Override
@@ -87,7 +88,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				getter -> new DrtShiftDispatcherImpl(getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-						shiftConfigGroup))
+						drtShiftParams))
 		).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
@@ -104,7 +105,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				getter -> new ShiftTaskScheduler(getter.getModal(Network.class),
 						getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), taskFactory,	shiftConfigGroup,
+						getter.get(MobsimTimer.class), taskFactory, drtShiftParams,
 						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class)))
 		).asEagerSingleton();
 
@@ -117,7 +118,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new ShiftDrtStayTaskEndTimeCalculator(shiftConfigGroup,
+						new ShiftDrtStayTaskEndTimeCalculator(drtShiftParams,
 								new DrtStayTaskEndTimeCalculator(drtCfg))))
 		).asEagerSingleton();
 

@@ -8,7 +8,8 @@ import org.matsim.contrib.drt.extension.eshifts.optimizer.ShiftEDrtVehicleDataEn
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtActionCreator;
 import org.matsim.contrib.drt.extension.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.eshifts.scheduler.EShiftTaskScheduler;
-import org.matsim.contrib.drt.extension.shifts.config.ShiftDrtConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtWithShiftsConfigGroup;
+import org.matsim.contrib.drt.extension.shifts.config.DrtShiftParams;
 import org.matsim.contrib.drt.extension.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacilityFinder;
@@ -33,11 +34,11 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
-	private final ShiftDrtConfigGroup shiftConfigGroup;
+	private final DrtShiftParams drtShiftParams;
 
-	public ShiftEDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg, ShiftDrtConfigGroup shiftConfigGroup) {
+	public ShiftEDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
-		this.shiftConfigGroup = shiftConfigGroup;
+		this.drtShiftParams = ((DrtWithShiftsConfigGroup) drtCfg).getDrtShiftParams();
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 				getter -> new EDrtShiftDispatcherImpl(getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
 						getter.getModal(EShiftTaskScheduler.class), getter.getModal(Network.class),
-						getter.getModal(ChargingInfrastructure.class), getter.get(EventsManager.class), shiftConfigGroup))
+						getter.getModal(ChargingInfrastructure.class), getter.get(EventsManager.class), drtShiftParams))
 		).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(
@@ -66,7 +67,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 		bindModal(EShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new EShiftTaskScheduler(getter.getModal(Network.class), getter.getModal(TravelTime.class),
 						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), taskFactory,	shiftConfigGroup, getter.getModal(ChargingInfrastructure.class),
+						getter.get(MobsimTimer.class), taskFactory, drtShiftParams, getter.getModal(ChargingInfrastructure.class),
 						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class))
 		)).asEagerSingleton();
 
