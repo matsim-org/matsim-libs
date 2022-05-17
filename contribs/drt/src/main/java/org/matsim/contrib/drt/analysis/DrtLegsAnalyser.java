@@ -78,7 +78,7 @@ public class DrtLegsAnalyser {
 		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
-		int bins = (int)((endTime - startTime) / timeBinSize);
+		int bins = (int)Math.ceil((endTime - startTime) / timeBinSize);
 
 		for (DrtLeg leg : legs) {
 			int[] board = boardings.getOrDefault(leg.fromLinkId, new int[bins]);
@@ -87,11 +87,11 @@ public class DrtLegsAnalyser {
 				board[startTimeBin]++;
 				boardings.put(leg.fromLinkId, board);
 			}
-			int[] deboard = deboardings.getOrDefault(leg.toLink, new int[bins]);
+			int[] deboard = deboardings.getOrDefault(leg.toLinkId, new int[bins]);
 			int arrivalTimeBin = (int)((leg.arrivalTime - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
-				deboardings.put(leg.fromLinkId, deboard);
+				deboardings.put(leg.toLinkId, deboard);
 			}
 		}
 		writeBoardings(boardingsFile, network, boardings, startTime, timeBinSize, bins, delimiter);
@@ -137,7 +137,7 @@ public class DrtLegsAnalyser {
 		format.setGroupingUsed(false);
 
 		for (DrtLeg leg : legs) {
-			if (leg.toLink == null) {
+			if (leg.toLinkId == null) {
 				continue;
 			}
 			waitStats.addValue(leg.waitTime);
@@ -170,7 +170,7 @@ public class DrtLegsAnalyser {
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
 		for (DrtLeg leg : legs) {
-			if (leg.toLink == null) {
+			if (leg.toLinkId == null) {
 				continue;
 			}
 
@@ -185,20 +185,22 @@ public class DrtLegsAnalyser {
 			return;
 
 		List<String> detours = new ArrayList<>();
-		XYSeries distances = new XYSeries("distances");
-		XYSeries travelTimes = new XYSeries("travel times");
-		XYSeries rideTimes = new XYSeries("ride times");
+		XYSeries distances = new XYSeries("distances", false, true);
+		XYSeries travelTimes = new XYSeries("travel times", false, true);
+		XYSeries rideTimes = new XYSeries("ride times", false, true);
 
 		for (DrtLeg leg : legs) {
-			if (leg.toLink == null) {
+			if (leg.toLinkId == null) {
 				continue; // unfinished leg (simulation stopped before arrival)
 			}
 
 			double travelDistance = travelDistances.get(leg.request);
 			double travelTime = leg.arrivalTime - leg.departureTime;
-			distances.add(travelDistance, leg.unsharedDistanceEstimate_m);
-			travelTimes.add(travelTime, leg.unsharedTimeEstimate_m);
-			rideTimes.add(leg.arrivalTime - leg.departureTime - leg.waitTime, leg.unsharedTimeEstimate_m);
+			if (createGraphs) {
+				distances.add(travelDistance, leg.unsharedDistanceEstimate_m);
+				travelTimes.add(travelTime, leg.unsharedTimeEstimate_m);
+				rideTimes.add(leg.arrivalTime - leg.departureTime - leg.waitTime, leg.unsharedTimeEstimate_m);
+			}
 
 			double distanceDetour = travelDistance / leg.unsharedDistanceEstimate_m;
 			double timeDetour = travelTime / leg.unsharedTimeEstimate_m;
@@ -491,7 +493,7 @@ public class DrtLegsAnalyser {
 		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
 		return count * 100 / waitingTimes.length;
 	}
-	
+
 	public static void analyseConstraints(String fileName, List<DrtLeg> legs, boolean createGraphs) {
 		if (legs == null)
 			return;
@@ -499,15 +501,15 @@ public class DrtLegsAnalyser {
 		if (!createGraphs)
 			return;
 
-		XYSeries waitingTimes = new XYSeries("max_wait_times");
-		XYSeries travelTimes = new XYSeries("max_travel_times");
+		XYSeries waitingTimes = new XYSeries("max_wait_times", false, true);
+		XYSeries travelTimes = new XYSeries("max_travel_times", false, true);
 
 		for (DrtLeg leg : legs) {
 			double waitingTime = leg.waitTime;
 			double maximumWaitingTime = leg.latestDepartureTime - leg.departureTime;
 			waitingTimes.add(maximumWaitingTime, waitingTime);
 
-			if (leg.toLink != null) {
+			if (leg.toLinkId != null) {
 				double travelTime = leg.arrivalTime - leg.departureTime;
 				double maximumTravelTime = leg.latestArrivalTime - leg.departureTime;
 				travelTimes.add(maximumTravelTime, travelTime);

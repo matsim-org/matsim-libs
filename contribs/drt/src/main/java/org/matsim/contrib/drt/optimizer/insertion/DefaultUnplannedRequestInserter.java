@@ -31,7 +31,9 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -39,7 +41,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -58,24 +59,25 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final EventsManager eventsManager;
 	private final RequestInsertionScheduler insertionScheduler;
 	private final VehicleEntry.EntryFactory vehicleEntryFactory;
+	private final DrtInsertionSearch insertionSearch;
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
-
+	private final DrtOfferAcceptor drtOfferAcceptor;
 	private final ForkJoinPool forkJoinPool;
-	private final DrtInsertionSearch<PathData> insertionSearch;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
-			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool) {
+			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
+			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
+			ForkJoinPool forkJoinPool) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
-				insertionRetryQueue, forkJoinPool, insertionSearch);
+				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool);
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
 			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
-			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool,
-			DrtInsertionSearch<PathData> insertionSearch) {
+			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtInsertionSearch insertionSearch,
+			DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
@@ -83,8 +85,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.insertionScheduler = insertionScheduler;
 		this.vehicleEntryFactory = vehicleEntryFactory;
 		this.insertionRetryQueue = insertionRetryQueue;
-		this.forkJoinPool = forkJoinPool;
 		this.insertionSearch = insertionSearch;
+		this.drtOfferAcceptor = drtOfferAcceptor;
+		this.forkJoinPool = forkJoinPool;
 	}
 
 	@Override
@@ -115,7 +118,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 	private void scheduleUnplannedRequest(DrtRequest req, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
 			double now) {
-		Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req,
+		Optional<InsertionWithDetourData> best = insertionSearch.findBestInsertion(req,
 				Collections.unmodifiableCollection(vehicleEntries.values()));
 		if (best.isEmpty()) {
 			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
@@ -130,9 +133,15 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 						+ req.getFromLink().getId());
 			}
 		} else {
-			InsertionWithDetourData<PathData> insertion = best.get();
-			var vehicle = insertion.getInsertion().vehicleEntry.vehicle;
-			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
+			InsertionWithDetourData insertion = best.get();
+
+			// accept offered drt ride
+			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
+					insertion.detourTimeInfo.pickupDetourInfo.departureTime,
+					insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime);
+
+			var vehicle = insertion.insertion.vehicleEntry.vehicle;
+			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
 			VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 			if (newVehicleEntry != null) {

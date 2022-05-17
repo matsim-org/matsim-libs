@@ -69,12 +69,12 @@ public class DrtEventSequenceCollector
 
 	public static class EventSequence {
 		private final DrtRequestSubmittedEvent submitted;
-		
+
 		@Nullable
 		private PassengerRequestScheduledEvent scheduled;
 		@Nullable
 		private PassengerRequestRejectedEvent rejected;
-		
+
 		@Nullable
 		private PersonDepartureEvent departure;
 		@Nullable
@@ -87,13 +87,13 @@ public class DrtEventSequenceCollector
 		EventSequence(DrtRequestSubmittedEvent submitted) {
 			this.submitted = Objects.requireNonNull(submitted);
 		}
-		
-		public EventSequence(PersonDepartureEvent departed, DrtRequestSubmittedEvent submitted,
+
+		public EventSequence(PersonDepartureEvent departure, DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
 				PassengerDroppedOffEvent droppedOff, List<PersonMoneyEvent> drtFares) {
 			this.submitted = Objects.requireNonNull(submitted);
 			this.scheduled = scheduled;
-			this.departure = departed;
+			this.departure = departure;
 			this.pickedUp = pickedUp;
 			this.droppedOff = droppedOff;
 			this.drtFares = new ArrayList<>(drtFares);
@@ -106,12 +106,12 @@ public class DrtEventSequenceCollector
 		public Optional<PassengerRequestScheduledEvent> getScheduled() {
 			return Optional.ofNullable(scheduled);
 		}
-		
+
 		public Optional<PassengerRequestRejectedEvent> getRejected() {
 			return Optional.ofNullable(rejected);
 		}
-		
-		public Optional<PersonDepartureEvent> getDeparted() {
+
+		public Optional<PersonDepartureEvent> getDeparture() {
 			return Optional.ofNullable(departure);
 		}
 
@@ -133,10 +133,10 @@ public class DrtEventSequenceCollector
 	}
 
 	private final String mode;
-	
+
 	private final Map<Id<Request>, EventSequence> sequences = new HashMap<>();
 	private final List<PersonMoneyEvent> drtFarePersonMoneyEvents = new ArrayList<>();
-	
+
 	private final Map<Id<Person>, List<EventSequence>> sequencesWithoutDeparture = new HashMap<>();
 	private final Map<Id<Person>, List<PersonDepartureEvent>> departuresWithoutSequence = new HashMap<>();
 
@@ -178,9 +178,9 @@ public class DrtEventSequenceCollector
 		if (event.getMode().equals(mode)) {
 			EventSequence sequence = new EventSequence(event);
 			sequences.put(event.getRequestId(), sequence);
-			
+
 			PersonDepartureEvent departureEvent = popDepartureForSubmission(event);
-			
+
 			if (departureEvent == null) {
 				// We have a submitted request, but no departure event yet (i.e. a prebooking). We start the
 				// sequence and note down the person id to fill in the departure event later on.
@@ -190,12 +190,12 @@ public class DrtEventSequenceCollector
 			}
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(mode)) {
 			EventSequence sequence = popSequenceForDeparture(event);
-			
+
 			if (sequence == null) {
 				// We have a departure event, but no submission yet (i.e. and instant booking).
 				// We note down the departure event here to recover it later when the submission
@@ -268,16 +268,16 @@ public class DrtEventSequenceCollector
 			Iterator<PersonDepartureEvent> iterator = potentialDepartures.iterator();
 
 			while (iterator.hasNext()) {
-				PersonDepartureEvent departedEvent = iterator.next();
+				PersonDepartureEvent departureEvent = iterator.next();
 
-				if (event.getFromLinkId().equals(departedEvent.getLinkId())) {
+				if (event.getFromLinkId().equals(departureEvent.getLinkId())) {
 					if (result != null) {
 						throw new IllegalStateException(
 								"Ambiguous matching between submission and departure - not sure how to solve this");
 					}
 
 					iterator.remove();
-					result = departedEvent;
+					result = departureEvent;
 				}
 			}
 
@@ -288,7 +288,7 @@ public class DrtEventSequenceCollector
 
 		return result;
 	}
-	
+
 	/*
 	 * This function is helper that finds a sequence given a PersonDepartureEvent.
 	 * This means that a sequence has started (the request has been submitted)
@@ -319,7 +319,7 @@ public class DrtEventSequenceCollector
 				sequencesWithoutDeparture.remove(event.getPersonId());
 			}
 		}
-		
+
 		return result;
 	}
 }

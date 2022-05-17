@@ -61,7 +61,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum travel time
 	 */
 	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+		return Math.min(unsharedRideTime + drtCfg.getMaxAbsoluteDetour(), drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta());
 	}
 
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,

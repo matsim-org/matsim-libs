@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.events;
 
 import java.util.Map;
@@ -11,7 +32,7 @@ import org.matsim.contrib.freight.carrier.Tour;
 
 public final class LSPTourEndEvent extends Event{
 
-	public static final String EVENT_TYPE = "freight tour ended";
+	public static final String EVENT_TYPE = "LspFreightTourEnded";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
@@ -19,10 +40,10 @@ public final class LSPTourEndEvent extends Event{
 	public static final String ATTRIBUTE_TOUR = "tour";	
 	
 	
-	private Id<Carrier> carrierId;
-	private Id<Person> driverId;
-	private Tour tour;
-	private CarrierVehicle vehicle;
+	private final Id<Carrier> carrierId;
+	private final Id<Person> driverId;
+	private final Tour tour;
+	private final CarrierVehicle vehicle;
 	
 	public LSPTourEndEvent(Id<Carrier>  carrierId, Id<Person> driverId, Tour tour, double time, CarrierVehicle vehicle) {
 		super(time);

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
@@ -43,8 +43,8 @@ import com.google.common.base.MoreObjects;
 public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 	public static final DrtTaskType TYPE = new DrtTaskType(STOP);
 
-	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
-	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
+	private final Map<Id<Request>, AcceptedDrtRequest> dropoffRequests = new LinkedHashMap<>();
+	private final Map<Id<Request>, AcceptedDrtRequest> pickupRequests = new LinkedHashMap<>();
 
 	public DefaultDrtStopTask(double beginTime, double endTime, Link link) {
 		super(TYPE, beginTime, endTime, link);
@@ -54,7 +54,7 @@ public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 	 * @return requests associated with passengers being dropped off at this stop
 	 */
 	@Override
-	public Map<Id<Request>, DrtRequest> getDropoffRequests() {
+	public Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests() {
 		return Collections.unmodifiableMap(dropoffRequests);
 	}
 
@@ -62,17 +62,17 @@ public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 	 * @return requests associated with passengers being picked up at this stop
 	 */
 	@Override
-	public Map<Id<Request>, DrtRequest> getPickupRequests() {
+	public Map<Id<Request>, AcceptedDrtRequest> getPickupRequests() {
 		return Collections.unmodifiableMap(pickupRequests);
 	}
 
 	@Override
-	public void addDropoffRequest(DrtRequest request) {
+	public void addDropoffRequest(AcceptedDrtRequest request) {
 		dropoffRequests.put(request.getId(), request);
 	}
 
 	@Override
-	public void addPickupRequest(DrtRequest request) {
+	public void addPickupRequest(AcceptedDrtRequest request) {
 		pickupRequests.put(request.getId(), request);
 	}
 

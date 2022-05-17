@@ -70,6 +70,13 @@ class MovingEntityCounter implements PenaltyGenerator {
 	}
 	
 	/**
+	 * @see #handleArrival(int, double, double, int)
+	 */
+	public int handleArrival(int time, Coord coord, int weight) {
+		return handleArrival(time, coord.getX(), coord.getY(), weight);
+	}
+	
+	/**
 	 * Handles the arrival of an entity at a given time at a given spatial coordinate. The weight parameter
 	 * allows to account for samples that should represent the whole ensemble, i.e. one entity with weight 10
 	 * has the same effect as 10 entities with weight 1.
@@ -85,6 +92,13 @@ class MovingEntityCounter implements PenaltyGenerator {
 	 */
 	public int handleArrival(int time, double x, double y, int weight) {
 		return this.carArrivals[getTimeBin(time)].adjustOrPutValue(this.hectareMapper.getKey(x, y), weight, weight);
+	}
+	
+	/**
+	 * @see #handleDeparture(int, double, double, int)
+	 */
+	public int handleDeparture(int time, Coord coord, int weight) {
+		return handleDeparture(time, coord.getX(), coord.getY(), weight);
 	}
 	
 	/**

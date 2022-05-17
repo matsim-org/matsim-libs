@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.schedule;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
@@ -58,7 +58,7 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 				double maxEarliestPickupTime = ((DrtStopTask)task).getPickupRequests()
 						.values()
 						.stream()
-						.mapToDouble(DrtRequest::getEarliestStartTime)
+						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
 						.max()
 						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
 				return Math.max(newBeginTime + stopDuration, maxEarliestPickupTime);

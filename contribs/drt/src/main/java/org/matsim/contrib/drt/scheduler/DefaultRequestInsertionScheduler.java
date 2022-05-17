@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -36,7 +36,6 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -49,12 +48,13 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.base.Verify;
+
 /**
  * @author michalm
  */
 public class DefaultRequestInsertionScheduler implements RequestInsertionScheduler {
 
-	private final Fleet fleet;
 	private final double stopDuration;
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
@@ -63,16 +63,15 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 	public DefaultRequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
 			TravelTime travelTime, ScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory) {
-		this.fleet = fleet;
 		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
-		initSchedules();
+		initSchedules(fleet);
 	}
 
-	private void initSchedules() {
+	private void initSchedules(Fleet fleet) {
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
@@ -81,20 +80,35 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	@Override
-	public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+	public PickupDropoffTaskPair scheduleRequest(AcceptedDrtRequest request, InsertionWithDetourData insertion) {
 		var pickupTask = insertPickup(request, insertion);
+		verifyTimes("Inconsistent pickup departure time", insertion.detourTimeInfo.pickupDetourInfo.departureTime,
+				pickupTask.getEndTime());
+
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
+		verifyTimes("Inconsistent dropoff arrival time", insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime,
+				dropoffTask.getBeginTime());
+
 		return new PickupDropoffTaskPair(pickupTask, dropoffTask);
 	}
 
-	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertionWithDetourData) {
-		var insertion = insertionWithDetourData.getInsertion();
+	private void verifyTimes(String messageStart, double timeFromInsertionData, double timeFromScheduler) {
+		// The source of discrepancies is the first link travel time (as it should be taken into consideration
+		// when a vehicle enters the traffic (a new drive task), but not when a vehicle is diverted (an ongoing drive task)
+		// In addition, there may be some small rounding errors (therefore 1e-10 is considered)
+		Verify.verify(Math.abs(timeFromInsertionData - timeFromScheduler) <= VrpPaths.FIRST_LINK_TT + 1e-10,
+				"%s: %s (insertion data) vs %s (scheduler)", messageStart, timeFromInsertionData,
+				timeFromScheduler);
+	}
+
+	private DrtStopTask insertPickup(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData) {
+		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.pickup.index;
 		int dropoffIdx = insertion.dropoff.index;
-		var detourData = insertionWithDetourData.getDetourData();
+		var detourData = insertionWithDetourData.detourData;
 
 		ScheduleStatus scheduleStatus = schedule.getStatus();
 		Task currentTask = scheduleStatus == ScheduleStatus.PLANNED ? null : schedule.getCurrentTask();
@@ -232,15 +246,15 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		return pickupStopTask;
 	}
 
-	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertionWithDetourData,
+	private DrtStopTask insertDropoff(AcceptedDrtRequest request, InsertionWithDetourData insertionWithDetourData,
 			DrtStopTask pickupTask) {
-		var insertion = insertionWithDetourData.getInsertion();
+		var insertion = insertionWithDetourData.insertion;
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.pickup.index;
 		int dropoffIdx = insertion.dropoff.index;
-		var detourData = insertionWithDetourData.getDetourData();
+		var detourData = insertionWithDetourData.detourData;
 
 		Task driveToDropoffTask;
 		if (pickupIdx == dropoffIdx) { // no drive to dropoff

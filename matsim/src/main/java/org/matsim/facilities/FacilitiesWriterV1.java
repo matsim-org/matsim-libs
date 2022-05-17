@@ -93,7 +93,10 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
                 }
                 this.endActivity();
             }
-						this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes());
+            if (!f.getAttributes().isEmpty()) {
+                this.writer.write(NL);
+            }
+            this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes(), false);
             this.endFacility();
             this.writer.flush();
         } catch (IOException e) {
@@ -121,6 +124,13 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
             attributes.add(new Tuple<>("name", facilities.getName()));
         }
         writeStartTag("facilities", attributes);
+        if (!facilities.getAttributes().isEmpty()) {
+            try {
+                this.writer.write(NL);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         this.attributesWriter.writeAttributes("\t", out, facilities.getAttributes());
     }
 

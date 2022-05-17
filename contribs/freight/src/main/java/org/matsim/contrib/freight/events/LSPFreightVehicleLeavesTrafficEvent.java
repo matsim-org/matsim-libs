@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.events;
 
 import java.util.Map;
@@ -13,9 +34,8 @@ import org.matsim.vehicles.Vehicle;
 
 public final class LSPFreightVehicleLeavesTrafficEvent extends Event{
 
-	public static final String EVENT_TYPE = "freight vehicle leaves traffic";
+	public static final String EVENT_TYPE = "LspFreightVehicleLeavesTraffic";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
 	public static final String ATTRIBUTE_DRIVER = "driver";
@@ -23,12 +43,12 @@ public final class LSPFreightVehicleLeavesTrafficEvent extends Event{
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	
 
-	private Id<Person> driverId; 
-	private Id<Link> linkId; 
-	private Id<Vehicle> vehicleId;
-	private CarrierVehicle carrierVehicle;
-	private Id<Carrier> carrierId;
-	private VehicleLeavesTrafficEvent event;
+	private final Id<Person> driverId;
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehicleId;
+	private final CarrierVehicle carrierVehicle;
+	private final Id<Carrier> carrierId;
+	private final VehicleLeavesTrafficEvent event;
 	
 	public LSPFreightVehicleLeavesTrafficEvent(VehicleLeavesTrafficEvent event, Id<Carrier> carrierId, double time, Id<Person> driverId, Id<Link> linkId, Id<Vehicle> vehicleId, CarrierVehicle carrierVehicle) {
 		super(time);
@@ -62,7 +82,7 @@ public final class LSPFreightVehicleLeavesTrafficEvent extends Event{
 
 	@Override
 	public String getEventType() {
-		return "EVENT_TYPE";
+		return EVENT_TYPE;
 	}
 	
 	@Override

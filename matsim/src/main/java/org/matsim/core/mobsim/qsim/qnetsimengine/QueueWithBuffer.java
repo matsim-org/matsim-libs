@@ -372,12 +372,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
 		// I am currently not sure if this statement is correct. kai, feb'18
 		
-//		double now = context.getSimTimer().getTimeOfDay() ;
-
-		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
-//		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
-		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
+		flowCapacityPerTimeStep = unscaledFlowCapacity_s * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		
 		// start with the base assumption, might be adjusted below depending on the traffic dynamics
@@ -494,7 +490,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		
 		//this assumes that vehicles have the flowEfficiencyFactor of 1.0; the actual flow can be different
-		double tempStorageCapacity = freespeedTravelTime * unscaledFlowCapacity_s;
+		double tempStorageCapacity = freespeedTravelTime * unscaledFlowCapacity_s * context.qsimConfig.getFlowCapFactor();
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 

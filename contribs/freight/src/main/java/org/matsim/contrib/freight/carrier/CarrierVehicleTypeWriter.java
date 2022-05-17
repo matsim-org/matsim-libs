@@ -1,22 +1,44 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
- * A writer that writes carriers and their plans in an xml-file.
+ * A writer that writes carriers and their plans in a xml-file.
  * 
  * @author sschroeder
  *
  */
 public class CarrierVehicleTypeWriter implements MatsimWriter {
 
-	private MatsimVehicleWriter delegate ;
+	private final MatsimVehicleWriter delegate ;
 
 	public CarrierVehicleTypeWriter( CarrierVehicleTypes types ) {
 		// note: for reading, we do the automatic version handling.  for writing, we just always write the newest version; the older writer handlers are

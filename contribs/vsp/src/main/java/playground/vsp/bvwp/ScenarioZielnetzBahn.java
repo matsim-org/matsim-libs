@@ -1,7 +1,9 @@
 package playground.vsp.bvwp;
 
 import static playground.vsp.bvwp.Key.makeKey;
-import junit.framework.Assert;
+
+import java.util.Objects;
+
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
@@ -184,7 +186,7 @@ class ScenarioZielnetzBahn {
 
 		{
 			Values planfallValuesForOD = planfall.getByODRelation("induziert") ;
-			Assert.assertNotNull(planfallValuesForOD) ;
+			Objects.requireNonNull(planfallValuesForOD) ;
 			{
 				// modify the travel times for the rail mode:
 				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
@@ -208,7 +210,7 @@ class ScenarioZielnetzBahn {
 		}
 		{
 			Values planfallValuesForOD = planfall.getByODRelation("verlagert") ;
-			Assert.assertNotNull(planfallValuesForOD) ;
+			Objects.requireNonNull(planfallValuesForOD) ;
 			{
 				double xx_verlagert = 2.5 * 1000. * 1000. ;
 
@@ -240,7 +242,7 @@ class ScenarioZielnetzBahn {
 		}
 		{
 			Values planfallValuesForOD = planfall.getByODRelation("verbleibend") ;
-			Assert.assertNotNull(planfallValuesForOD) ;
+			Objects.requireNonNull(planfallValuesForOD) ;
 			{
 				// modify the travel times for the rail mode:
 				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;

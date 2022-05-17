@@ -95,10 +95,15 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 
     @Override
     public ScoringParameters getScoringParameters(Person person) {
+        // (as so often, this functionality is not attached to the person (i.e. person. get...), but "wrapped around" it (i.e. get...(person)). kai, apr'22)
 
+        // We check if we have this cached ...
         ScoringParameters scoringParametersForThisPerson = params.get(person.getId());
+
+        // ... if not, it is generated:
         if (scoringParametersForThisPerson == null) {
             final String subpopulation = PopulationUtils.getSubpopulation(person) == null ? "default" : PopulationUtils.getSubpopulation(person) ;
+            // (weird, but so be it.  kai, apr'22)
 
             //the following is a comment that was orinally put into SubpopulationScoringParams, which is the template for this class...
             /* lazy initialization of params. not strictly thread safe, as different threads could
@@ -108,6 +113,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
              */
 
             PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.
             this.activityParamsPerSubpopulation.computeIfAbsent(subpopulation, k -> {
@@ -118,12 +124,14 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
                 }
                 return activityParams;
             });
+            // (I think that this is just an adapter class, converting the representation in the config to some internal representation.  kai, apr'22)
 
             //use the builder that does not make defensive copies of the activity params
             ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScoringParams, this.activityParamsPerSubpopulation.get(subpopulation), scConfig);
+            // (odd that this now needs both the version from the config and the version from the adapter class.  kai, apr'22)
 
             if (transitConfigGroup.isUseTransit()) {
-
+                // this is the PT stage activity:
                 PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
                 transitActivityParams.setTypicalDuration(120.0);
                 transitActivityParams.setOpeningTime(0.);
@@ -136,9 +144,12 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
             if (PersonUtils.getIncome(person) != null) {
                 //here is where we put person-specific stuff
                 double personalIncome = PersonUtils.getIncome(person);
+                // (getIncome returns Double, i.e. "null" is an option.  Not sure what happens if this is now converted to the primitive type.  kai, apr'22)
+
                 if (personalIncome > 0) {
                     builder.setMarginalUtilityOfMoney(subpopulationScoringParams.getMarginalUtilityOfMoney() * globalAvgIncome / personalIncome);
                 } else {
+                    // (not sure what this means.  "null" would have been an option, but is made impossible, see above.  An income of 0 may be possible, but with the 1/y that we often use it should be avoided.)
                     log.warn("you have set income to " + personalIncome + " for person " + person + ". This is invalid and gets ignored." +
                             "Instead, the marginalUtilityOfMoney is derived from the subpopulation's scoring parameters.");
                 }

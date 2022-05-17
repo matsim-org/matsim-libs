@@ -164,12 +164,23 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
             for (Map.Entry<String, SumoNetworkHandler.Edge> e : handler.getEdges().entrySet()) {
 
-                if (e.getValue().shape.isEmpty())
-                    continue;
+                SumoNetworkHandler.Edge edge = e.getValue();
+
+                // Create straight line for edges without shape
+                if (edge.shape.isEmpty()) {
+
+                    SumoNetworkHandler.Junction f = handler.getJunctions().get(edge.from);
+                    SumoNetworkHandler.Junction t = handler.getJunctions().get(edge.to);
+                    if (f == null || t == null)
+                        continue;
+
+                    edge.shape.add(f.coord);
+                    edge.shape.add(t.coord);
+                }
 
                 printer.printRecord(
                         e.getKey(),
-                        e.getValue().shape.stream().map(d -> {
+                        edge.shape.stream().map(d -> {
                             Coord p = handler.createCoord(d);
                             return String.format(Locale.US,"(%f,%f)", p.getX(), p.getY());
                         }).collect(Collectors.joining(","))
@@ -232,7 +243,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
             if (edge.name != null)
                 link.getAttributes().putAttribute("name", edge.name);
 
-            link.getAttributes().putAttribute("type", edge.type);
+            link.getAttributes().putAttribute(NetworkUtils.TYPE, edge.type);
 
             link.setNumberOfLanes(edge.lanes.size());
             Set<String> modes = Sets.newHashSet(TransportMode.car, TransportMode.ride);
@@ -274,7 +285,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 }
             }
 
-            link.getAttributes().putAttribute("allowed_speed", speed);
+            link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, speed);
 
             if (prop == null) {
                 log.warn("Skipping unknown link type: {}", type.highway);

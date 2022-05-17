@@ -19,7 +19,6 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;

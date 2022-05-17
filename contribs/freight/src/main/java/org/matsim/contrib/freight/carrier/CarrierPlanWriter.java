@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.carrier;
 
 import com.google.inject.Inject;
@@ -26,10 +47,21 @@ public class CarrierPlanWriter {
 		this.writeV2(filename);
 	}
 
+	/**
+	 * @deprecated The underlining {@Link{CarrierPlanXmlWriterV1} is deprecated since April21
+	 */
+	@Deprecated
 	public void writeV1(String filename) {
 		new CarrierPlanXmlWriterV1(this.carriers.getCarriers().values()).write(filename);
 	}
 
+
+	/**
+	 * Writes out the Carriers file in version 2.
+//	 * Please use the method {@link #write(String)} instead to always ensure writing out to the newest format.
+	 *
+	 * @param filename Name of the file that should be written.
+	 */
 	public void writeV2(String filename) {
 		CarrierPlanXmlWriterV2 writer = new CarrierPlanXmlWriterV2(this.carriers);
 		if (this.attributeConverters != null) {
