@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
@@ -128,7 +129,12 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	private void checkConvertNullAnnotations() {
 		final Class<? extends ReflectiveConfigGroup> c = getClass();
 
-		final Method[] allMethods = c.getDeclaredMethods();
+		Method[] allMethods = c.getDeclaredMethods();
+		Class<?> superclass = c.getSuperclass();
+		if(superclass != ReflectiveConfigGroup.class
+				&& ReflectiveConfigGroup.class.isAssignableFrom(superclass)) {
+			allMethods = ArrayUtils.addAll(allMethods, superclass.getDeclaredMethods());
+		}
 
 		for (Method m : allMethods) {
 			final StringGetter annotation = m.getAnnotation( StringGetter.class );
@@ -146,7 +152,12 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		final Map<String, Method> gs = new HashMap<String, Method>();
 		final Class<? extends ReflectiveConfigGroup> c = getClass();
 
-		final Method[] allMethods = c.getDeclaredMethods();
+		Method[] allMethods = c.getDeclaredMethods();
+		Class<?> superclass = c.getSuperclass();
+		if(superclass != ReflectiveConfigGroup.class
+				&& ReflectiveConfigGroup.class.isAssignableFrom(superclass)) {
+			allMethods = ArrayUtils.addAll(allMethods, superclass.getDeclaredMethods());
+		}
 
 		for (Method m : allMethods) {
 			final StringGetter annotation = m.getAnnotation( StringGetter.class );
@@ -176,7 +187,12 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		final Map<String, Method> ss = new HashMap<String, Method>();
 		final Class<? extends ReflectiveConfigGroup> c = getClass();
 
-		final Method[] allMethods = c.getDeclaredMethods();
+		Method[] allMethods = c.getDeclaredMethods();
+		Class<?> superclass = c.getSuperclass();
+		if(superclass != ReflectiveConfigGroup.class
+				&& ReflectiveConfigGroup.class.isAssignableFrom(superclass)) {
+			allMethods = ArrayUtils.addAll(allMethods, superclass.getDeclaredMethods());
+		}
 
 		for (Method m : allMethods) {
 			final StringSetter annotation = m.getAnnotation( StringSetter.class );
