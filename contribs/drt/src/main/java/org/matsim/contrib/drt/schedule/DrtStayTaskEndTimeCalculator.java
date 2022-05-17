@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 
 public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
-	private StopDurationEstimator stopDurationEstimator;
+	private final StopDurationEstimator stopDurationEstimator;
 
 	public DrtStayTaskEndTimeCalculator(StopDurationEstimator stopDurationEstimator) {
 		this.stopDurationEstimator = stopDurationEstimator;

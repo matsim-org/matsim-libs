@@ -10,10 +10,10 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  */
 public class DefaultIncrementalStopDurationEstimator implements IncrementalStopDurationEstimator {
 
-	private final double staticStopDuration;
+	private final double fixedStopDuration;
 
-	public DefaultIncrementalStopDurationEstimator(double staticStopDuration) {
-		this.staticStopDuration = staticStopDuration;
+	public DefaultIncrementalStopDurationEstimator(double fixedStopDuration) {
+		this.fixedStopDuration = fixedStopDuration;
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public class DefaultIncrementalStopDurationEstimator implements IncrementalStopD
 		if(stopTask != null) {
 			return 0;
 		} else {
-			return staticStopDuration;
+			return fixedStopDuration;
 		}
 	}
 
@@ -30,7 +30,7 @@ public class DefaultIncrementalStopDurationEstimator implements IncrementalStopD
 		if(stopTask != null) {
 			return 0;
 		} else {
-			return staticStopDuration;
+			return fixedStopDuration;
 		}
 	}
 }

@@ -20,12 +20,15 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultIncrementalStopDurationEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
@@ -37,9 +40,6 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
