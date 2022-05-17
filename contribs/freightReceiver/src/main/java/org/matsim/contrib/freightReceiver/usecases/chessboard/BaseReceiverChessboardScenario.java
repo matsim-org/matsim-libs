@@ -280,12 +280,10 @@ public class BaseReceiverChessboardScenario {
                 .setCostPerDistanceUnit(7.34E-3)
                 .setCostPerTimeUnit(0.171)
                 .build();
-        CarrierVehicle.Builder carrierHVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("heavy"), carrierLocation);
+        CarrierVehicle.Builder carrierHVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("heavy"), carrierLocation, typeHeavy);
         CarrierVehicle heavy = carrierHVehicleBuilder
                 .setEarliestStart(Time.parseTime("06:00:00"))
                 .setLatestEnd(Time.parseTime("18:00:00"))
-                .setType(typeHeavy)
-                .setTypeId(typeHeavy.getId())
                 .build();
 
         /* Light vehicle. */
@@ -296,12 +294,10 @@ public class BaseReceiverChessboardScenario {
                 .setCostPerDistanceUnit(4.22E-3)
                 .setCostPerTimeUnit(0.089)
                 .build();
-        CarrierVehicle.Builder carrierLVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("light"), carrierLocation);
+        CarrierVehicle.Builder carrierLVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.createVehicleId("light"), carrierLocation, typeLight);
         CarrierVehicle light = carrierLVehicleBuilder
                 .setEarliestStart(Time.parseTime("06:00:00"))
                 .setLatestEnd(Time.parseTime("18:00:00"))
-                .setType(typeLight)
-                .setTypeId(typeLight.getId())
                 .build();
 
         /* Assign vehicles to carrier. */

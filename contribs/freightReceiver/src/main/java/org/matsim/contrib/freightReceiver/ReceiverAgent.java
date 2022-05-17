@@ -31,14 +31,14 @@ import org.matsim.core.scoring.ScoringFunction;
 class ReceiverAgent {
 
 	private final Receiver receiver;
-	private final ScoringFunction scorFunc;
+	private final ScoringFunction scoringFunction;
 	final private Logger log = Logger.getLogger(ReceiverAgent.class);
 	//private Id<Receiver> id;
 
 
 	public ReceiverAgent(Receiver receiver, ScoringFunction receiverScorFunc) {
 		this.receiver = receiver;
-		this.scorFunc = receiverScorFunc;
+		this.scoringFunction = receiverScorFunc;
 		//this.id = receiver.getId();		
 	}
 
@@ -51,8 +51,8 @@ class ReceiverAgent {
 	 * be changed in the future.
 	 *
 	 * FIXME: JWJ (23/6/2018): I'm not quite sure what the purpose of this 
-	 * method is. I've updated it so that the plan's cost is simply the sum
-	 * of all individual order's costs.
+	 *  method is. I've updated it so that the plan's cost is simply the sum
+	 *  of all individual order's costs.
 	 *
 	 * @author wlbean, jwjoubert
 	 */
@@ -67,11 +67,11 @@ class ReceiverAgent {
 
 		cost = receiver.getSelectedPlan().getScore();
 		
-		scorFunc.addMoney(cost);
-		scorFunc.finish();
+		scoringFunction.addMoney(cost);
+		scoringFunction.finish();
 		
-		receiver.getSelectedPlan().setScore(scorFunc.getScore());
-		receiver.getAttributes().putAttribute(ReceiverUtils.ATTR_RECEIVER_SCORE, scorFunc.getScore());
+		receiver.getSelectedPlan().setScore(scoringFunction.getScore());
+		receiver.getAttributes().putAttribute(ReceiverUtils.ATTR_RECEIVER_SCORE, scoringFunction.getScore());
 	}
 	
 
