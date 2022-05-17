@@ -174,7 +174,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	
 
 	@Override
-	public final void afterSim() {
+	public void afterSim() {
 
 		/*
 		 * Calling the afterSim Method of the QSimEngineThreads

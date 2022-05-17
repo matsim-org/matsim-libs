@@ -34,8 +34,20 @@ final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner
 	
 	private volatile boolean simulationRunning = true;
 	private boolean movingNodes;
+	private final Timing nodesTiming;
+	private final Timing linksTiming;
 
-	QNetsimEngineRunnerForThreadpool() {
+	public Timing getNodesTiming() {
+		return nodesTiming;
+	}
+
+	public Timing getLinksTiming() {
+		return linksTiming;
+	}
+
+	QNetsimEngineRunnerForThreadpool(String timingName) {
+		nodesTiming = new Timing(timingName + "_nodes");
+		linksTiming = new Timing(timingName + "_links");
 	}
 
 	@Override
@@ -46,9 +58,15 @@ final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner
 		}
 
 		if (this.movingNodes) {
+			var startTime = System.nanoTime();
 			moveNodes();
+			var duration = System.nanoTime() - startTime;
+			nodesTiming.addDuration(duration / Math.max(1, getNodeCounter()));
 		} else {
+			var startTime = System.nanoTime();
 			moveLinks();
+			var duration = System.nanoTime() - startTime;
+			linksTiming.addDuration(duration / Math.max(1, getLinkCounter()));
 		}
 		return true ;
 	}

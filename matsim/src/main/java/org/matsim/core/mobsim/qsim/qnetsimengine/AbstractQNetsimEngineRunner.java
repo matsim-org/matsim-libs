@@ -38,6 +38,8 @@ import org.matsim.core.mobsim.qsim.QSim;
  */
 abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry {
 
+
+
 	private double time = 0.0;
 
 	/*
@@ -70,6 +72,17 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	private boolean lockNodes = false;
 	private boolean lockLinks = false;
 
+	private int nodeCounter = 0;
+	private int linkCounter = 0;
+
+	public int getNodeCounter() {
+		return nodeCounter;
+	}
+
+	public int getLinkCounter() {
+		return linkCounter;
+	}
+
 	/*package*/ long[] runTimes;
 	private long startTime = 0;
 	{	
@@ -80,16 +93,19 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	/*package*/ final void setTime(final double t) {
 		time = t;
 	}
+	final double getTime() { return time; }
 
 	public abstract void afterSim() ;
 
 	protected void moveNodes() {
 		boolean remainsActive;
 		this.lockNodes = true;
+		nodeCounter = 0;
 		QNodeI node;
 		Iterator<QNodeI> simNodes = this.nodesQueue.iterator();
 		while (simNodes.hasNext()) {
 			node = simNodes.next();
+			nodeCounter++;
 			remainsActive = node.doSimStep(time);
 			if (!remainsActive) simNodes.remove();
 		}
@@ -99,11 +115,12 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	protected final void moveLinks() {
 		boolean remainsActive;
 		lockLinks = true;
+		linkCounter = 0;
 		QLinkI link;
 		ListIterator<QLinkI> simLinks = this.linksList.listIterator();
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
-
+			linkCounter++;
 			remainsActive = link.doSimStep();
 
 			if (!remainsActive) simLinks.remove();
