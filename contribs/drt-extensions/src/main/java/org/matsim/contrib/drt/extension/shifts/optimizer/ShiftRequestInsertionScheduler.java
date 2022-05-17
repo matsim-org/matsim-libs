@@ -4,6 +4,7 @@ import static org.matsim.contrib.drt.extension.shifts.scheduler.ShiftTaskSchedul
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
@@ -15,10 +16,10 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -36,20 +37,21 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler {
 
-    private final double stopDuration;
     private final MobsimTimer timer;
     private final TravelTime travelTime;
     private final ScheduleTimingUpdater scheduleTimingUpdater;
     private final ShiftDrtTaskFactory taskFactory;
+	private StopDurationEstimator stopDurationEstimator;
 
 
-    public ShiftRequestInsertionScheduler(DrtConfigGroup drtCfg, MobsimTimer timer, TravelTime travelTime,
-			ScheduleTimingUpdater scheduleTimingUpdater, ShiftDrtTaskFactory taskFactory) {
-		this.stopDuration = drtCfg.getStopDuration();
+	public ShiftRequestInsertionScheduler(MobsimTimer timer, TravelTime travelTime,
+			ScheduleTimingUpdater scheduleTimingUpdater, ShiftDrtTaskFactory taskFactory,
+										  StopDurationEstimator stopDurationEstimator) {
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
+		this.stopDurationEstimator = stopDurationEstimator;
 	}
 
 
@@ -118,6 +120,8 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
                         throw new RuntimeException("Cannot serve request!");
                     }
                 } else {
+					double stopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle,
+							stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
                     stopTask.setEndTime(Math.max(stopTask.getBeginTime() + stopDuration, request.getEarliestStartTime()));
                 }
 
@@ -216,6 +220,7 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
         // insert pickup stop task
         double startTime = beforePickupTask.getEndTime();
         int taskIdx = beforePickupTask.getTaskIdx() + 1;
+		double stopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, Collections.emptySet(), Collections.singleton(request));
         DrtStopTask pickupStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
                 Math.max(startTime + stopDuration, request.getEarliestStartTime()), request.getFromLink());
         schedule.addTask(taskIdx, pickupStopTask);
@@ -295,6 +300,7 @@ public class ShiftRequestInsertionScheduler implements RequestInsertionScheduler
         // insert dropoff stop task
         double startTime = driveToDropoffTask.getEndTime();
         int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
+		double stopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, Collections.singleton(request), Collections.emptySet());
         DrtStopTask dropoffStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
                 startTime + stopDuration, request.getToLink());
         schedule.addTask(taskIdx, dropoffStopTask);

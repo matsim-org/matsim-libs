@@ -46,6 +46,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
@@ -163,16 +164,17 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
-								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
+								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class),
+								getter.getModal(StopDurationEstimator.class))))
 				.asEagerSingleton();
 
 		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new EDrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
+						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopDurationEstimator.class))))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
 				getter -> new EDrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),

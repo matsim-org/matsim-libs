@@ -32,10 +32,7 @@ import java.util.Optional;
 
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -58,11 +55,11 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 
 	public SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
 			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			DrtConfigGroup drtCfg, MatsimServices matsimServices) {
+			DrtConfigGroup drtCfg, MatsimServices matsimServices, IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.insertionCostCalculator = insertionCostCalculator;
-		this.detourTimeCalculator = new InsertionDetourTimeCalculator(drtCfg.getStopDuration(), null);
+		this.detourTimeCalculator = new InsertionDetourTimeCalculator(incrementalStopDurationEstimator, null);
 		this.matsimServices = matsimServices;
 		this.mode = drtCfg.getMode();
 	}
@@ -78,7 +75,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 		var insertion = selectedInsertion.get().insertion;
 		var insertionDetourData = detourPathCalculator.calculatePaths(drtRequest, insertion);
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
-				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData));
+				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, drtRequest));
 
 		collectDifferences(drtRequest, selectedInsertion.get().detourTimeInfo, insertionWithDetourData.detourTimeInfo);
 

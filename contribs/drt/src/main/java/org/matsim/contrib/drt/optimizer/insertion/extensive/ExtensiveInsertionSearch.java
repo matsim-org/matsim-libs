@@ -24,11 +24,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
+import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -42,10 +38,10 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 
 	public ExtensiveInsertionSearch(ExtensiveInsertionProvider insertionProvider,
 			MultiInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			double stopDuration) {
+			IncrementalStopDurationEstimator incrementalStopDurationEstimator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
-		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopDuration, null);
+		this.detourTimeCalculator = new InsertionDetourTimeCalculator(incrementalStopDurationEstimator, null);
 		this.bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
 	}
 
@@ -61,7 +57,7 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
 			var insertionDetourData = pathData.createInsertionDetourData(i);
 			return new InsertionWithDetourData(i, insertionDetourData,
-					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData));
+					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, drtRequest));
 		}));
 	}
 }

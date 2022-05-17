@@ -30,10 +30,10 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 
 public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
-	final double stopDuration;
+	private final StopDurationEstimator stopDurationEstimator;
 
-	public DrtStayTaskEndTimeCalculator(DrtConfigGroup drtConfigGroup) {
-		this.stopDuration = drtConfigGroup.getStopDuration();
+	public DrtStayTaskEndTimeCalculator(StopDurationEstimator stopDurationEstimator) {
+		this.stopDurationEstimator = stopDurationEstimator;
 	}
 
 	@Override
@@ -61,6 +61,9 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
 						.max()
 						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
+				double stopDuration = stopDurationEstimator.calcDuration(vehicle,
+						((DrtStopTask) task).getDropoffRequests().values(),
+						((DrtStopTask) task).getPickupRequests().values());
 				return Math.max(newBeginTime + stopDuration, maxEarliestPickupTime);
 			}
 
