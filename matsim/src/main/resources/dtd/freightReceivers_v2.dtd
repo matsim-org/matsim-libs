@@ -4,8 +4,7 @@
 
 <!-- =============================================================== -->
 <!-- Author: jwjoubert, wlbean                                       -->
-<!-- first try to create a dtd-file for freight-contrib's receiver   -->
-<!-- agent                                                           -->
+<!-- Revised dtd-file for freight-contrib's receiver agent           -->
 <!-- =============================================================== -->
 
 <!ELEMENT freightReceivers  (attributes?, productTypes*, receiver*)> 
