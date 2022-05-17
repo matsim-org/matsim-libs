@@ -45,6 +45,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-io</artifactId>
 			<version>${jsprit.version}</version>
@@ -62,12 +68,6 @@
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-analysis</artifactId>
 			<version>${jsprit.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jfree</groupId>
-					<artifactId>jfreechart</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -92,12 +92,10 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.21</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.21</version>
 		</dependency>
 
 		<dependency>
