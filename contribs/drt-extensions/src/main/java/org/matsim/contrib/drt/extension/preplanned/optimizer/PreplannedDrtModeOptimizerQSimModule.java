@@ -23,14 +23,17 @@ package org.matsim.contrib.drt.extension.preplanned.optimizer;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -54,7 +57,8 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 				getter.getModal(PreplannedDrtOptimizer.PreplannedSchedules.class), getter.getModal(Network.class),
 				getter.getModal(TravelTime.class), getter.getModal(TravelDisutilityFactory.class)
 				.createTravelDisutility(getter.getModal(TravelTime.class)), getter.get(MobsimTimer.class),
-				getter.getModal(DrtTaskFactory.class), getter.get(EventsManager.class), getter.getModal(Fleet.class))));
+				getter.getModal(DrtTaskFactory.class), getter.get(EventsManager.class), getter.getModal(Fleet.class),
+				getter.getModal(ScheduleTimingUpdater.class))));
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
@@ -63,5 +67,9 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 						getter.get(DvrpConfigGroup.class)))).asEagerSingleton();
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
+
+		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
+				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
+						new DrtStayTaskEndTimeCalculator(getter.getModal(StopDurationEstimator.class))))).asEagerSingleton();
 	}
 }
