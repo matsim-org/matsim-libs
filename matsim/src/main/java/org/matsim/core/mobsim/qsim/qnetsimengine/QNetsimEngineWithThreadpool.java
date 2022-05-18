@@ -59,6 +59,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	private final Timing linksTiming = new Timing("NetsimeEngine_links");
 	private final DoubleList times = new DoubleArrayList();
 	private final String timingOutuputPath;
+	private final String runId;
 	private ExecutorService pool;
 	
 	public QNetsimEngineWithThreadpool(final QSim sim) {
@@ -69,6 +70,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	public QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
 		super(sim, netsimNetworkFactory);
 		timingOutuputPath = sim.getScenario().getConfig().controler().getOutputDirectory();
+		runId = sim.getScenario().getConfig().controler().getRunId();
 		this.numOfRunners = this.numOfThreads;
 	}
 
@@ -81,7 +83,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 
 		var ownTimings = List.of(overallTiming, nodesTiming, linksTiming);
 		timings.addAll(ownTimings);
-		var outputPath = Paths.get(timingOutuputPath).resolve("timings.csv");
+		var outputPath = Paths.get(timingOutuputPath).resolve(runId + "_timings.csv");
 
 		try (var writer = Files.newBufferedWriter(outputPath); var printer = CSVFormat.Builder.create().build().print(writer)) {
 
