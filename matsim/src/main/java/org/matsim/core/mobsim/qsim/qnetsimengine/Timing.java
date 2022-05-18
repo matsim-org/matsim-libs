@@ -1,16 +1,16 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.events.Event;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Timing {
 
 	private final String name;
-	private final List<Long> durations = new ArrayList<>();
+	private final LongList durations = new LongArrayList();
 
 	public Timing(String name) {
 		this.name = name;
@@ -24,7 +24,7 @@ public class Timing {
 		return name;
 	}
 
-	public List<Long> getDurations() {
+	public LongList getDurations() {
 		return this.durations;
 	}
 }

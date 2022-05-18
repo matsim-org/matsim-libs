@@ -307,6 +307,11 @@
 			<version>3.3.3</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>8.5.8</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

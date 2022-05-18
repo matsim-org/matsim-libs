@@ -31,9 +31,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.commons.csv.CSVFormat;
 import org.matsim.core.mobsim.qsim.QSim;
 
@@ -54,7 +57,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	private final Timing overallTiming = new Timing( "NetsimeEngine_overall");
 	private final Timing nodesTiming = new Timing("NetsimeEngine_nodes");
 	private final Timing linksTiming = new Timing("NetsimeEngine_links");
-	private final List<Double> times = new ArrayList<>();
+	private final DoubleList times = new DoubleArrayList();
 	private final String timingOutuputPath;
 	private ExecutorService pool;
 	
@@ -73,7 +76,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	public void afterSim() {
 
 		var timings = this.getQnetsimEngineRunner().stream()
-				.flatMap(runner -> List.of(runner.getLinksTiming(), runner.getNodesTiming()).stream())
+				.flatMap(runner -> Stream.of(runner.getLinksTiming(), runner.getNodesTiming()))
 				.collect(Collectors.toList());
 
 		var ownTimings = List.of(overallTiming, nodesTiming, linksTiming);
@@ -94,9 +97,9 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 			var firstTimingSize = timings.get(0).getDurations().size();
 			for(int i = 0; i < firstTimingSize; i++) {
 				// first the time step
-				printer.print(times.get(i));
+				printer.print(times.getDouble(i));
 				for (var timing : timings) {
-					var duration = timing.getDurations().get(i);
+					var duration = timing.getDurations().getLong(i);
 					printer.print(duration);
 				}
 				printer.println();
