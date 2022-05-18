@@ -23,9 +23,7 @@ package org.matsim.contrib.freight.carrier;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -36,6 +34,7 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -52,13 +51,14 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV2.class);
 
-	private Collection<Carrier> carriers;
+	private final Collection<Carrier> carriers;
 
-	private Map<CarrierShipment, Id<CarrierShipment>> registeredShipments = new HashMap<>();
+	private final Map<CarrierShipment, Id<CarrierShipment>> registeredShipments = new HashMap<>();
 	
-	private Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
+	private final Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
 
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
+	private final List<Tuple<String, String>> atts = new ArrayList<>();
 
 
 	/**
@@ -86,6 +86,12 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		try {
 			openFile(filename);
 			writeXmlHead();
+//			atts.clear();
+//			atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
+//			atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
+//			atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "carriersDefinitions_v2.0.xsd"));
+//			this.writeStartTag("carriers", atts);
+
 			startCarriers(this.writer);
 			for (Carrier carrier : carriers) {
 				startCarrier(carrier, this.writer);
@@ -118,13 +124,13 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer)throws IOException {
 		writer.write("\t\t\t<capabilities fleetSize=\""+ carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
 //		writer.write("\t\t\t\t<vehicleTypes>\n");
-//		for(CarrierVehicleType type : carrier.getCarrierCapabilities().getVehicleTypes()){
+//		for(VehicleType type : carrier.getCarrierCapabilities().getVehicleTypes()){
 //			writer.write("\t\t\t\t\t<vehicleType id=\"" + type.getId() + "\">\n");
 //			writer.write("\t\t\t\t\t\t<description>" + type.getDescription() + "</description>\n");
 //			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getFuelConsumption() + "\"/>\n");
-//			writer.write("\t\t\t\t\t\t<capacity>" + type.getCarrierVehicleCapacity() + "</capacity>\n");
-//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getCostInformation().fix + "\" perMeter=\"" + type.getCostInformation().perDistanceUnit +
-//					"\" perSecond=\"" + type.getCostInformation().perTimeUnit + "\"/>\n");
+//			writer.write("\t\t\t\t\t\t<capacity>" + type.getCapacity() + "</capacity>\n");
+//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getCostInformation().getFixedCosts() + "\" perMeter=\"" + type.getCostInformation().getCostsPerMeter() +
+//					"\" perSecond=\"" + type.getCostInformation().getCostsPerSecond() + "\"/>\n");
 //			writer.write("\t\t\t\t\t</vehicleType>\n");
 //		}
 //		writer.write("\t\t\t\t</vehicleTypes>\n\n");
