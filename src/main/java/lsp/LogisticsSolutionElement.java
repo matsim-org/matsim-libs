@@ -31,17 +31,28 @@ import lsp.controler.LSPSimulationTracker;
 public interface LogisticsSolutionElement {
 
 	Id<LogisticsSolutionElement> getId();
-	
+
+	/**
+	 * @param solution -- back pointer to embedding container
+	 */
 	void setLogisticsSolution(LogisticsSolution solution);
-	
+
+	/**
+	 * @return back pointer to embedding container
+	 */
 	LogisticsSolution getLogisticsSolution();
 
 	void connectWithNextElement(LogisticsSolutionElement element);
-	
+
+	/**
+	 * The logistics solution element wraps around a resource.  Don't know why we need this wrapping.
+	 *
+	 * @return the resource
+	 */
 	LSPResource getResource();
-	
+
 	LogisticsSolutionElement getPreviousElement();
-	
+
 	LogisticsSolutionElement getNextElement();
 
 	/**
@@ -58,11 +69,11 @@ public interface LogisticsSolutionElement {
 	WaitingShipments getOutgoingShipments();
 
 	void addSimulationTracker(LSPSimulationTracker tracker);
-    
-    Collection<LSPInfo> getInfos();
-    
-    Collection<EventHandler> getEventHandlers();
-    
-    Collection <LSPSimulationTracker> getSimulationTrackers();
+
+	Collection<LSPInfo> getInfos();
+
+	Collection<EventHandler> getEventHandlers();
+
+	Collection <LSPSimulationTracker> getSimulationTrackers();
 
 }
