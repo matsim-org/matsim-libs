@@ -76,11 +76,11 @@ import lsp.controler.LSPSimulationTracker;
 		return locationLinkId;
 	}
 
-	@Override
-	public Class<? extends ReloadingPoint> getClassOfResource() {
-		return this.getClass();
-	}
-
+//	@Override
+//	public Class<? extends ReloadingPoint> getClassOfResource() {
+//		return this.getClass();
+//	}
+//
 	@Override
 	public Id<Link> getEndLinkId() {
 		return locationLinkId;
@@ -109,7 +109,7 @@ import lsp.controler.LSPSimulationTracker;
 		return reloadingScheduler.getCapacityNeedLinear();
 	}
 
-	public Collection <EventHandler> getEventHandlers(){
+	@Override public Collection <EventHandler> getEventHandlers(){
 		return eventHandlers;
 	}
 

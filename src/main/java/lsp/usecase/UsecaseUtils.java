@@ -72,17 +72,20 @@ public class UsecaseUtils {
 				this.network = network;
 			}
 
-			public void setLocationLinkId(Id<Link> locationLinkId){
+			public CollectionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId){
 				this.locationLinkId = locationLinkId;
+				return this;
 			}
 
-			public void setCarrier(Carrier carrier){
+			public CollectionCarrierAdapterBuilder setCarrier(Carrier carrier){
 				this.carrier = carrier;
+				return this;
 			}
 
 
-			public void setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
+			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
 				this.collectionScheduler = collectionCarrierScheduler;
+				return this;
 			}
 
 			public CollectionCarrierAdapter build(){

@@ -60,11 +60,11 @@ import lsp.controler.LSPSimulationTracker;
 	}
 	
 	
-	@Override
-	public Class<? extends Carrier> getClassOfResource() {
-		return carrier.getClass();
-	}
-
+//	@Override
+//	public Class<? extends Carrier> getClassOfResource() {
+//		return carrier.getClass();
+//	}
+//
 	@Override
 	public Id<Link> getStartLinkId() {
 		Id<Link> depotLinkId = null;
@@ -117,7 +117,7 @@ import lsp.controler.LSPSimulationTracker;
 		return network;
 	}
 
-	public Collection <EventHandler> getEventHandlers(){
+	@Override public Collection <EventHandler> getEventHandlers(){
 		return eventHandlers;
 	}
 

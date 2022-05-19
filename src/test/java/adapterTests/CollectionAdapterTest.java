@@ -102,7 +102,7 @@ public class CollectionAdapterTest {
 		assertTrue(carrierResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass()));
 		if(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
-			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
+//			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
 			assertSame(carrierResource.getCarrier(), collectionCarrier);
 		}
 		assertSame(carrierResource.getEndLinkId(), collectionLinkId);

@@ -74,10 +74,10 @@ import lsp.controler.LSPSimulationTracker;
 		return fromLinkId;
 	}
 
-	@Override
-	public Class<?> getClassOfResource() {
-		return carrier.getClass();
-	}
+//	@Override
+//	public Class<?> getClassOfResource() {
+//		return carrier.getClass();
+//	}
 
 	@Override
 	public Id<Link> getEndLinkId() {
@@ -102,7 +102,7 @@ import lsp.controler.LSPSimulationTracker;
 		return network;
 	}
 
-	public Collection <EventHandler> getEventHandlers(){
+	@Override public Collection <EventHandler> getEventHandlers(){
 		return eventHandlers;
 	}
 
