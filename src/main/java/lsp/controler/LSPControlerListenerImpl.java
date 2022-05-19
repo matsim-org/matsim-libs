@@ -27,6 +27,7 @@ import lsp.replanning.LSPReplanningModule;
 import lsp.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
@@ -56,8 +57,8 @@ ReplanningListener, IterationStartsListener{
 
 	@Inject EventsManager eventsManager;
 
-	@Inject LSPControlerListenerImpl( LSPs lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators ) {
-	        this.lsps = lsps;
+	@Inject LSPControlerListenerImpl( Scenario scenario, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators ) {
+	        this.lsps = LSPUtils.getLSPs( scenario );
 	        this.replanningModule = replanningModule;
 	        this.scoringModule = scoringModule;
 	        this.creators = creators;

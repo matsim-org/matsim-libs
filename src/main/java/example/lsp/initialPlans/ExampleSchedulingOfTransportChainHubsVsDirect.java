@@ -22,9 +22,13 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.controler.LSPModule;
+import lsp.replanning.LSPReplanningModule;
+import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
+import lsp.scoring.LSPScoringModule;
+import lsp.scoring.LSPScoringModuleImpl;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.*;
 import lsp.usecase.UsecaseUtils;
@@ -39,6 +43,7 @@ import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -67,6 +72,7 @@ import java.util.*;
 
 	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub }
 	private static SolutionType solutionType = SolutionType.onePlan_direct;
+	// yyyy please avoid static nonfinal variables ... they are dangerous.  kai, may'22
 
 	public static void main (String [] args) throws CommandLine.ConfigurationException{
 
@@ -105,31 +111,37 @@ import java.util.*;
 
 		//########
 
-		//Create LSP and shipments
 		log.info("create LSP");
 		LSP lsp = createInitialLSP(network);
+
 		log.info("create initial LSPShipments");
 		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
 
-		//assign the shipments to the LSP
 		log.info("assign the shipments to the LSP");
 		for(LSPShipment shipment : shipments) {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
-		//schedule the LSP with the shipments and according to the scheduler of the Resource
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
 		lsp.scheduleSolutions();
 
-		//set up simulation controler and LSPModule
 		log.info("Set up simulation controler and LSPModule");
 		LinkedHashSet<LSP> lspList = new LinkedHashSet<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
-		LSPModule lspModule = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
+		LSPUtils.addLSPs( scenario, lsps );
+
+		// @KMT: LSPModule ist vom Design her nur im Zusammenhang mit dem Controler sinnvoll.  Damit kann man dann auch vollständig auf
+		// Injection setzen.
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(lspModule);
+		controler.addOverridingModule( new LSPModule() );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+			}
+		} );
 
 		log.info("Run MATSim");
 		controler.run();

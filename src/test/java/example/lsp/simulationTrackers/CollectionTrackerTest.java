@@ -22,6 +22,10 @@ package example.lsp.simulationTrackers;
 
 import lsp.*;
 import lsp.controler.LSPModule;
+import lsp.replanning.LSPReplanningModule;
+import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.scoring.LSPScoringModule;
+import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.LSPInfo;
@@ -43,6 +47,7 @@ import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.EventHandler;
@@ -181,9 +186,14 @@ public class CollectionTrackerTest {
 
 		Controler controler = new Controler(config);
 
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
-
-		controler.addOverridingModule(module);
+		LSPUtils.addLSPs( scenario, lsps );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				install( new LSPModule() );
+				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+			}
+		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

@@ -20,13 +20,20 @@
 
 package lsp.scoring;
 
+import com.google.inject.Inject;
 import lsp.LSP;
+import lsp.LSPUtils;
 import lsp.LSPs;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.ScoringEvent;
 
-class LSPScoringModuleImpl implements LSPScoringModule{
+public class LSPScoringModuleImpl implements LSPScoringModule{
 
 	private final LSPs lsps;
+
+	@Inject LSPScoringModuleImpl( Scenario scenario ) {
+		lsps = LSPUtils.getLSPs( scenario );
+	}
 	
 	LSPScoringModuleImpl(LSPs lsps) {
 		this.lsps = lsps;

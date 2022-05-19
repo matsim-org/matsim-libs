@@ -24,6 +24,7 @@ import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.ArrayList;
@@ -162,4 +163,28 @@ public class LSPUtils{
 			return new LogisticsSolutionElementImpl(this);
 		}
 	}
+	private static final String lspsString = "lsps";
+	public static void addLSPs( Scenario scenario, LSPs lsps ) {
+		scenario.addScenarioElement( lspsString, lsps );
+	}
+	public static LSPs getLSPs( Scenario scenario ) {
+		Object result = scenario.getScenarioElement( lspsString );
+		if ( result==null ) {
+			throw new RuntimeException( "there is no scenario element of type " + lspsString +
+								    ".  You will need something like LSPUtils.addLSPs( scenario, lsps) somewhere." );
+		}
+		return (LSPs) result;
+	}
+//	The following would be closer to how we have done it elsewhere (scenario containers are mutable).  kai, may'22'
+//	public static LSPs createOrGetLPSs( Scenario scenario ){
+//		Object result = scenario.getScenarioElement( lspsString );
+//		LSPs lsps;
+//		if ( result != null ) {
+//			lsps = (LSPs) result;
+//		} else {
+//			lsps = new LSPs(  );
+//			scenario.addScenarioElement( lspsString, lsps );
+//		}
+//		return lsps;
+//	}
 }

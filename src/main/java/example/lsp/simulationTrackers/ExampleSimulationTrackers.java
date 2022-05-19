@@ -23,7 +23,11 @@ package example.lsp.simulationTrackers;
 import java.util.*;
 
 import lsp.*;
+import lsp.replanning.LSPReplanningModule;
+import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
+import lsp.scoring.LSPScoringModule;
+import lsp.scoring.LSPScoringModuleImpl;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
@@ -34,6 +38,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -185,11 +190,17 @@ import lsp.shipment.LSPShipment;
 		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
+		LSPUtils.addLSPs( scenario, lsps );
 
 		//Start the Mobsim one iteration is sufficient for tracking
 		Controler controler = new Controler(config);
-		controler.addOverridingModule(module);
+		controler.addOverridingModule( new LSPModule() );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+			}
+		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

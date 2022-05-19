@@ -30,6 +30,7 @@ import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -42,45 +43,17 @@ import java.util.List;
 public class LSPModule extends AbstractModule {
 	private static final Logger log = org.apache.log4j.Logger.getLogger( LSPModule.class );
 
-	private final LSPs lsps;
-	private final LSPReplanningModule replanningModule;
-	private final LSPScoringModule scoringModule;
-	private final Collection<LSPEventCreator> creators;
-
 	private final FreightConfigGroup carrierConfig = new FreightConfigGroup();
-
-	public LSPModule(LSPs  lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators) {
-		// yyyy LSPReplanningModule & LSPScoringModule are bound later anyways, so we can as well bind them directly.
-		// Not sure about the other parameters.  kai, sep'20
-
-		this.lsps = lsps;
-		this.replanningModule = replanningModule;
-		this.scoringModule = scoringModule;
-		this.creators = creators;
-	}
-
 
 	@Override
 	public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
 		bind(FreightConfigGroup.class).toInstance(carrierConfig);
-		bind(LSPs.class).toInstance(lsps);
-		if(replanningModule != null) {
-			bind(LSPReplanningModule.class).toInstance(replanningModule);
-		}
-		if(scoringModule != null) {
-			bind(LSPScoringModule.class).toInstance(scoringModule);
-		}
+		// yyyyyy ????? doesn't this ignore the freightConfig that was just pulled out of config two lines earlier?  kai, may'22
 
 		bind( LSPControlerListenerImpl.class ).in( Singleton.class );
 		addControlerListenerBinding().to( LSPControlerListenerImpl.class );
-
-		// replace ...
-
-//		bindMobsim().toProvider( LSPQSimFactory.class );
-
-		// ... by ...
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
@@ -116,13 +89,11 @@ public class LSPModule extends AbstractModule {
 			}
 		} );
 
-		// ... up to here.  kai, sep'20
-
 	}
 
-	@Provides
-	Collection<LSPEventCreator> provideEventCreators(){
-		return this.creators;
+	@Provides Collection<LSPEventCreator> provideEventCreators(){
+		return LSPEventCreatorUtils.getStandardEventCreators();
+		// (if you do not like them, you will have to override the binding.  kai, may'22)
 	}
 
 	@Provides

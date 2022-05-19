@@ -28,7 +28,11 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.replanning.LSPReplanningModule;
+import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
+import lsp.scoring.LSPScoringModule;
+import lsp.scoring.LSPScoringModuleImpl;
 import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.*;
 import org.apache.log4j.Logger;
@@ -43,6 +47,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -188,8 +193,14 @@ public class CollectionLSPMobsimTest {
 			}
 		} );
 
-		controler.addOverridingModule( new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps ),
-				LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators()) );
+		LSPUtils.addLSPs( scenario, lsps );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				install( new LSPModule() );
+				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+			}
+		});
 
 		controler.run();
 	}
