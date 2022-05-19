@@ -21,7 +21,7 @@
 package org.matsim.contrib.drt.scheduler;
 
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 
 /**
@@ -38,5 +38,5 @@ public interface RequestInsertionScheduler {
 		}
 	}
 
-	PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData insertion);
+	PickupDropoffTaskPair scheduleRequest(AcceptedDrtRequest request, InsertionWithDetourData insertion);
 }

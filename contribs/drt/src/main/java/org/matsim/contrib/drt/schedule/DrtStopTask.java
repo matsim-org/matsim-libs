@@ -23,7 +23,7 @@ package org.matsim.contrib.drt.schedule;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
@@ -35,11 +35,11 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtStopTask extends StayTask {
-	Map<Id<Request>, DrtRequest> getDropoffRequests();
+	Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests();
 
-	Map<Id<Request>, DrtRequest> getPickupRequests();
+	Map<Id<Request>, AcceptedDrtRequest> getPickupRequests();
 
-	void addDropoffRequest(DrtRequest request);
+	void addDropoffRequest(AcceptedDrtRequest request);
 
-	void addPickupRequest(DrtRequest request);
+	void addPickupRequest(AcceptedDrtRequest request);
 }

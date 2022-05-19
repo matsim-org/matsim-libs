@@ -20,6 +20,7 @@
 package org.matsim.contrib.etaxi.run;
 
 import static java.util.stream.Collectors.toList;
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
 import java.net.URL;
 import java.util.List;
@@ -68,7 +69,8 @@ public class RunETaxiScenario {
 	public static Controler createControler(Config config, boolean otfvis) {
 		MultiModeTaxiConfigGroup multiModeTaxiConfig = MultiModeTaxiConfigGroup.get(config);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeETaxiModule());

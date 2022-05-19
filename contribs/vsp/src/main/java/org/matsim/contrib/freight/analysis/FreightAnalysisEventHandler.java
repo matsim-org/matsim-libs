@@ -51,11 +51,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 /*
-* EventHandler for analysis of matsim-freight runs. Tracks freight vehicles, carriers, shipments and services and is able to export results to TSV files.
-* Only uses information that is certain by default. Without LSP Events this means that the connection between Carrier-related Objects (Carriers, Shipments, Services) often cannot be made, but this Handles tries to make an educated guess which you can optionally include in the export. Guessed info will be preceeded by "##" in export.
-*
-* @author Jakob Harnisch (MATSim advanced class 2020/21)
-* */
+ * EventHandler for analysis of matsim-freight runs. Tracks freight vehicles, carriers, shipments and services and is able to export results to TSV files.
+ * Only uses information that is certain by default. Without LSP Events this means that the connection between Carrier-related Objects (Carriers, Shipments, Services) often cannot be made, but this Handles tries to make an educated guess which you can optionally include in the export. Guessed info will be preceeded by "##" in export.
+ *
+ * @author Jakob Harnisch (MATSim advanced class 2020/21)
+ * */
 
 class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
 	private final static Logger log = Logger.getLogger(FreightAnalysisEventHandler.class);
@@ -83,17 +83,14 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 			if (vehicle.getId().toString().contains("freight")) {
 				vehicleTracking.addTracker(vehicle);
 
-				// if the vehicleId contains its own vehicleType, it is likely that the naming scheme
-				// freight_$CARRIER_veh_$VEHICLETYPE_[...]
-				// is used, so we try to extract the CarrierId based on this scheme and see if it is indeed a carrier.
+				// The vehicleId is based on a scheme like "freight_" + <carrierId> + "_veh" + <vehicleNumber>
+				// we try to extract the CarrierId based on this scheme and see if it is indeed a carrier. TODO: Where do we check this? KMT Mai22
 				// If that is the case, it is used as a guess for the Carrier.
-				if(vehicle.getId().toString().contains(vehicle.getType().getId().toString())){
-					String carrierGuess = vehicleIdString.replaceAll("_veh.*","");
-					carrierGuess = carrierGuess.replaceAll("freight_", "");
-					for (Carrier carrier: carriers.getCarriers().values()){
-						if (carrier.getId().toString().equals(carrierGuess)){
-							vehicleTracking.addCarrierGuess(vehicle.getId(),carrier.getId());
-						}
+				String carrierGuess = vehicleIdString.replaceAll("_veh.*","");
+				carrierGuess = carrierGuess.replaceAll("freight_", "");
+				for (Carrier carrier: carriers.getCarriers().values()){
+					if (carrier.getId().toString().equals(carrierGuess)){
+						vehicleTracking.addCarrierGuess(vehicle.getId(),carrier.getId());
 					}
 				}
 				log.info("started tracking vehicle #" + vehicle.getId().toString());
@@ -101,7 +98,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 		}
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
-		// for all shipments and services of the carriers, tracking is started here.
+			// for all shipments and services of the carriers, tracking is started here.
 			for (CarrierShipment shipment : carrier.getShipments().values()) {
 				shipmentTracking.addTracker(shipment);
 			}
@@ -294,7 +291,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 			singleFile.write("carrierId	vehicleType	vehicleCount	totalDistance	totalServiceTime	totalRoadTime	totalCost");
 			singleFile.newLine();
 			for (Carrier carrier : carriers.getCarriers().values()) {
-			LinkedHashMap<String, CarrierVehicleTypeStats> vehicleTypeStatsMap = new LinkedHashMap<>();
+				LinkedHashMap<String, CarrierVehicleTypeStats> vehicleTypeStatsMap = new LinkedHashMap<>();
 				BufferedWriter out = new BufferedWriter(new FileWriter(path + "/carrier_" + carrier.getId().toString() + "_VehicleTypeStats.tsv"));
 				for (VehicleTracker tracker : vehicleTracking.getTrackers().values()) {
 					// if desired get carrierIdString, in which case the vehicleType gets the "##" prefix to separate guessed vehicle connections from non-guessed ones, even if they are of the same vehicle type
@@ -313,8 +310,8 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 						cVtStTr.totalServiceTime += tracker.usageTime;
 					}
 				}
-			out.write("carrierId	vehicleType	vehicleCount	totalDistance	totalServiceTime	totalRoadTime	totalCost");
-			out.newLine();
+				out.write("carrierId	vehicleType	vehicleCount	totalDistance	totalServiceTime	totalRoadTime	totalCost");
+				out.newLine();
 				for (String vt : vehicleTypeStatsMap.keySet()) {
 					CarrierVehicleTypeStats vts = vehicleTypeStatsMap.get(vt);
 					out.write(carrier.getId().toString() +"	" + vt + "	" + vts.vehicleCount.toString() + "	" + vts.totalDistance.toString() + "	" + vts.totalServiceTime + "	" + vts.totalRoadTime + "	" + vts.totalCost);
@@ -323,7 +320,7 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 					singleFile.newLine();
 				}
 				out.close();
-		}
+			}
 			singleFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();

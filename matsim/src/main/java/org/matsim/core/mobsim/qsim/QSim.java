@@ -230,12 +230,13 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	@Override
 	public void run() {
+		boolean tryBlockWithException = false;
 		try {
 			// Teleportation must be last (default) departure handler, so add it only before running:
 			this.departureHandlers.add(this.teleportationEngine);
 
 			// ActivityEngine must be last (=default) activity handler, so add it only before running:
-			this.activityHandlers.add( this.activityEngine ) ;
+			this.activityHandlers.add(this.activityEngine);
 
 			prepareSim();
 			this.listenerManager.fireQueueSimulationInitializedEvent();
@@ -256,15 +257,26 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			while (doContinue) {
 				doContinue = doSimStep();
 			}
+		} catch (RuntimeException tryBlockException) {
+			tryBlockWithException = true;
+			throw tryBlockException;
 		} finally {
 			// We really want to perform that. For instance, with QNetsimEngine, threads are cleaned up in this method.
 			// Without this finally, in case of a crash, threads are not closed, which lead to process hanging forever
 			// at least on the eth euler cluster (but not on our local machines at ivt!?) td oct 15
 			try {
 				cleanupSim();
-			} catch(Exception e) {
-				log.warn( "exception in finally block - " +
-						  "this may be a follow-up exception of an exception thrown in the try block.", e);
+			} catch (RuntimeException cleanupException) {
+				if (tryBlockWithException) {
+					// we want to log this exception thrown during the cleanup, but not to throw it
+					// since there is another (earlier) exception thrown in the try block
+					log.warn("exception in finally block - "
+									+ "this may be a follow-up exception of an exception thrown in the try block.",
+							cleanupException);
+				} else {
+					// no exception thrown in the try block, let's re-throw the exception from the cleanup step
+					throw cleanupException;
+				}
 			}
 		}
 	}

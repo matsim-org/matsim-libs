@@ -23,7 +23,9 @@ import java.util.List;
 
 import org.matsim.contrib.common.csv.CSVLineBuilder;
 import org.matsim.contrib.common.csv.CompactCSVWriter;
-import org.matsim.contrib.common.histogram.*;
+import org.matsim.contrib.common.histogram.BoundedHistogram;
+import org.matsim.contrib.common.histogram.Histogram;
+import org.matsim.contrib.common.histogram.UniformHistogram;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiHistogramsWriter {
