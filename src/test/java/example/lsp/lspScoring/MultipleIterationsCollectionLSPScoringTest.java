@@ -177,7 +177,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(scenario);
 
 		LSPUtils.addLSPs( scenario, lsps );
 		controler.addOverridingModule( new AbstractModule(){
