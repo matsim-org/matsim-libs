@@ -28,7 +28,8 @@ public class LSPReplanningUtils {
 		return new LSPReplannerImpl(lsp);
 	}
 
-	public static LSPReplanningModuleImpl createDefaultLSPReplanningModule(LSPs lsps) {
-		return new LSPReplanningModuleImpl(lsps);
-	}
+//	public static LSPReplanningModuleImpl createDefaultLSPReplanningModule(LSPs lsps) {
+//		return new LSPReplanningModuleImpl(lsps);
+//	}
+	// use bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
 }

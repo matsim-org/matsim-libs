@@ -22,8 +22,13 @@ package lsp.scoring;
 
 import lsp.LSPs;
 
+
+/**
+ * @deprecated -- can go.  Left here so that outside users of this code get some meaningful information.  kai, may'22
+ */
 public class LSPScoringUtils{
-	public static LSPScoringModuleImpl createDefaultLSPScoringModule(LSPs lsps) {
-		return new LSPScoringModuleImpl(lsps);
-	}
+//	public static LSPScoringModuleImpl createDefaultLSPScoringModule(LSPs lsps) {
+//		return new LSPScoringModuleImpl(lsps);
+//	}
+	// use bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
 }
