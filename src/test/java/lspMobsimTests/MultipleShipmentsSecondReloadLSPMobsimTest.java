@@ -259,7 +259,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
 		
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(scenario);
 
 		LSPUtils.addLSPs( scenario, lsps );
 		controler.addOverridingModule( new AbstractModule(){
@@ -272,7 +272,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(4);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 	}
 	

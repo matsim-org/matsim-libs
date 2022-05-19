@@ -135,9 +135,9 @@ import java.util.*;
 		// Injection setzen.
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
+				install( new LSPModule() );
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
 				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
 			}

@@ -29,15 +29,14 @@ import org.matsim.core.controler.events.ScoringEvent;
 
 public class LSPScoringModuleImpl implements LSPScoringModule{
 
-	private final LSPs lsps;
-
+	private final Scenario scenario;
 	@Inject LSPScoringModuleImpl( Scenario scenario ) {
-		lsps = LSPUtils.getLSPs( scenario );
+		this.scenario = scenario;
 	}
 	
-	LSPScoringModuleImpl(LSPs lsps) {
-		this.lsps = lsps;
-	}
+//	LSPScoringModuleImpl(LSPs lsps) {
+//		this.lsps = lsps;
+//	}
 		
 	@Override
 	public void notifyScoring(ScoringEvent event) {
@@ -46,6 +45,7 @@ public class LSPScoringModuleImpl implements LSPScoringModule{
 
 	@Override
 	public void scoreLSPs(ScoringEvent arg0) {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
 		for(LSP lsp : lsps.getLSPs().values()) {
 			lsp.scoreSelectedPlan();
 		}

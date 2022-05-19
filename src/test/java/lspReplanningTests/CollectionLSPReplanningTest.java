@@ -172,9 +172,10 @@ public class CollectionLSPReplanningTest {
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 
-		Controler controler = new Controler(config);
-
 		LSPUtils.addLSPs( scenario, lsps );
+
+		Controler controler = new Controler(scenario);
+
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
@@ -186,7 +187,7 @@ public class CollectionLSPReplanningTest {
 		config.controler().setFirstIteration( 0 );
 		config.controler().setLastIteration(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 	}
 

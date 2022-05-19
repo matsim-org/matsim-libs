@@ -30,15 +30,15 @@ import lsp.LSPs;
 
 public class LSPReplanningModuleImpl implements LSPReplanningModule{
 
-	private final LSPs lsps;
 
+	private final Scenario scenario;
 	@Inject LSPReplanningModuleImpl( Scenario scenario ){
-		lsps = LSPUtils.getLSPs( scenario );
+		this.scenario = scenario;
 	}
 	
-	LSPReplanningModuleImpl(LSPs lsps) {
-		this.lsps = lsps;
-	}
+//	LSPReplanningModuleImpl(LSPs lsps) {
+//		this.lsps = lsps;
+//	}
 		
 	@Override
 	public void notifyReplanning(ReplanningEvent arg0) {
@@ -48,6 +48,7 @@ public class LSPReplanningModuleImpl implements LSPReplanningModule{
 	
 	@Override
 	public void replanLSPs(ReplanningEvent arg0) {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
 		for(LSP lsp : lsps.getLSPs().values()) {
 			lsp.replan(arg0);
 		}

@@ -196,7 +196,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
 		
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(scenario);
 
 		LSPUtils.addLSPs( scenario, lsps );
 		controler.addOverridingModule( new AbstractModule(){
@@ -209,7 +209,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 	}
 	

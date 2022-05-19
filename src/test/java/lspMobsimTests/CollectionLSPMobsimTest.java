@@ -186,14 +186,13 @@ public class CollectionLSPMobsimTest {
 			lspList.add( collectionLSP );
 			lsps = new LSPs( lspList );
 		}
-		Controler controler = new Controler(config);
+		Controler controler = new Controler(scenario);
 		controler.getEvents().addHandler( new BasicEventHandler(){
 			@Override public void handleEvent( Event event ){
 				log.warn(event);
 			}
 		} );
 
-		LSPUtils.addLSPs( scenario, lsps );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
@@ -202,6 +201,7 @@ public class CollectionLSPMobsimTest {
 			}
 		});
 
+		LSPUtils.addLSPs( scenario, lsps );
 		controler.run();
 	}
 

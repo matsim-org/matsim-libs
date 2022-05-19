@@ -190,7 +190,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(10);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+//		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 	}
 

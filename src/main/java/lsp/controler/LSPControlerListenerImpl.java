@@ -48,7 +48,7 @@ ReplanningListener, IterationStartsListener{
 	
 	private CarrierAgentTracker carrierResourceTracker;
 	private final Carriers carriers;
-	private final LSPs lsps;
+	private final Scenario scenario;
 	private final LSPReplanningModule replanningModule;
 	private final LSPScoringModule scoringModule;
 	private final Collection<LSPEventCreator> creators;
@@ -58,8 +58,8 @@ ReplanningListener, IterationStartsListener{
 	@Inject EventsManager eventsManager;
 
 	@Inject LSPControlerListenerImpl( Scenario scenario, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators ) {
-	        this.lsps = LSPUtils.getLSPs( scenario );
-	        this.replanningModule = replanningModule;
+		this.scenario = scenario;
+		this.replanningModule = replanningModule;
 	        this.scoringModule = scoringModule;
 	        this.creators = creators;
 	        this.carriers = getCarriers();
@@ -67,6 +67,7 @@ ReplanningListener, IterationStartsListener{
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
 		
 		LSPRescheduler rescheduler = new LSPRescheduler(lsps);
 		rescheduler.notifyBeforeMobsim(event);
@@ -117,6 +118,8 @@ ReplanningListener, IterationStartsListener{
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
+
 		eventsManager.removeHandler(carrierResourceTracker);
 		
 		ArrayList<LSPSimulationTracker> alreadyUpdatedTrackers = new ArrayList<>();
@@ -155,6 +158,8 @@ ReplanningListener, IterationStartsListener{
 
 	
 	private Carriers getCarriers() {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
+
 		Carriers carriers = new Carriers();
 		for(LSP lsp : lsps.getLSPs().values()) {
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
@@ -180,6 +185,9 @@ ReplanningListener, IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
+
+
 		if(event.getIteration() > 0) {
 			for(EventHandler handler : registeredHandlers) {
 				eventsManager.removeHandler(handler);
