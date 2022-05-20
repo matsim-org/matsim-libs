@@ -25,7 +25,6 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
-import java.sql.Time;
 import java.util.Map;
 
 import javax.inject.Inject;
