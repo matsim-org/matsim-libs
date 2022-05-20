@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -26,9 +27,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author nagel
@@ -43,7 +41,7 @@ public class ReadFromURLIT {
 		MatsimNetworkReader reader = new MatsimNetworkReader(network) ;
 //		reader.parse(new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/matsim/examples/equil/network.xml"));
 		reader.parse( new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/equil/network.xml") ) ;
-		assertThat(network.getLinks().size(), equalTo(23));
+		Assertions.assertThat(network.getLinks().size()).isEqualTo(23);
 	}
 
 }

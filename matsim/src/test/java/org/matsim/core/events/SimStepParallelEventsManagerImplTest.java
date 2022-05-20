@@ -21,6 +21,7 @@
 
  package org.matsim.core.events;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -28,9 +29,6 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.testcases.utils.EventsCollector;
-
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.junit.Assert.assertThat;
 
 public class SimStepParallelEventsManagerImplTest {
 
@@ -62,14 +60,13 @@ public class SimStepParallelEventsManagerImplTest {
 		events.afterSimStep(1.0);
 		events.finishProcessing();
 
-		assertThat(collector.getEvents(),
-			contains(
+		Assertions.assertThat(collector.getEvents()).contains(
 					new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
 					new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
 					new PersonStuckEvent(0.0, Id.createPersonId(0), Id.createLinkId(0), "car"),
 					new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
 					new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new PersonStuckEvent(1.0, Id.createPersonId(0), Id.createLinkId(0), "car")));
+					new PersonStuckEvent(1.0, Id.createPersonId(0), Id.createLinkId(0), "car"));
 	}
 
 }
