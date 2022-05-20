@@ -28,7 +28,7 @@ import adapterTests.DistributionAdapterTest;
 import lsp.usecase.FirstReloadAdapterTest;
 import adapterTests.MainRunAdapterTest;
 import lsp.usecase.SecondReloadAdapterTest;
-import demandObjectTests.DemandObjectBuilderTest;
+//import demandObjectTests.DemandObjectBuilderTest;
 import lspCreationTests.CollectionLSPCreationTest;
 import lspCreationTests.CompleteLSPCreationTest;
 import lspMobsimTests.CollectionLSPMobsimTest;
@@ -69,7 +69,7 @@ import lspShipmentTest.CollectionShipmentBuilderTest;
 import lspShipmentTest.CompleteShipmentBuilderTest;
 import lspShipmentTest.DistributionShipmentBuilderTest;
 import example.lspAndDemand.requirementsChecking.AssignerRequirementsTest;
-import example.lspAndDemand.requirementsChecking.TransferrerRequirementsTest;
+//import example.lspAndDemand.requirementsChecking.TransferrerRequirementsTest;
 import solutionElementTests.CollectionElementTest;
 import solutionElementTests.DistributionElementTest;
 import lsp.usecase.FirstReloadElementTest;
@@ -78,8 +78,8 @@ import solutionElementTests.SecondReloadElementTest;
 import solutionTests.CollectionSolutionTest;
 import solutionTests.CompleteSolutionTest;
 import example.lsp.simulationTrackers.CollectionTrackerTest;
-import example.lsp.simulationTrackers.MutualReplanningTest;
-import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
+//import example.lsp.simulationTrackers.MutualReplanningTest;
+//import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -89,7 +89,7 @@ import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
 	MainRunAdapterTest.class,
 	SecondReloadAdapterTest.class,
 //	CascadingInfoTest.class,
-	DemandObjectBuilderTest.class,
+//	DemandObjectBuilderTest.class,
 	CompleteLSPCreationTest.class,
 	CollectionLSPCreationTest.class,
 	CollectionLSPMobsimTest.class,
@@ -111,7 +111,7 @@ import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
 	CompleteShipmentBuilderTest.class,
 	DistributionShipmentBuilderTest.class,
 	AssignerRequirementsTest.class,
-	TransferrerRequirementsTest.class,
+//	TransferrerRequirementsTest.class,
 	CollectionElementTest.class,
 	DistributionElementTest.class,
 	FirstReloadElementTest.class,
@@ -120,8 +120,8 @@ import example.lsp.simulationTrackers.MutualReplanningAndOfferUpdateTest;
 	CompleteSolutionTest.class,
 	CollectionSolutionTest.class,
 	CollectionTrackerTest.class,
-	MutualReplanningTest.class,
-	MutualReplanningAndOfferUpdateTest.class,
+//	MutualReplanningTest.class,
+//	MutualReplanningAndOfferUpdateTest.class,
 	CollectionLSPShipmentAssigmentTest.class,
 	CompleteLSPShipmentAssignerTest.class,
 	MultipleShipmentsCollectionLSPSchedulingTest.class,

@@ -110,8 +110,8 @@ import lsp.controler.LSPSimulationTracker;
 		return trackers;
 	}
 	
-	@Override
-	public void setEventsManager(EventsManager eventsManager) {
-	}
+//	@Override
+//	public void setEventsManager(EventsManager eventsManager) {
+//	}
 
 }	

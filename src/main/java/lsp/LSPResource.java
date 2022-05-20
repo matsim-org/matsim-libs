@@ -57,6 +57,6 @@ public interface LSPResource {
 
 	Collection<LSPSimulationTracker> getSimulationTrackers();
 
-	void setEventsManager(EventsManager eventsManager);
+//	void setEventsManager(EventsManager eventsManager);
 
 }

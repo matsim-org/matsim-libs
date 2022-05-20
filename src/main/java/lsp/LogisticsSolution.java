@@ -41,24 +41,24 @@ import lsp.controler.LSPSimulationTracker;
 public interface LogisticsSolution {
 
 	Id<LogisticsSolution> getId();
-	
+
 	void setLSP(LSP lsp);
-	
+
 	LSP getLSP();
-	
+
 	Collection<LogisticsSolutionElement> getSolutionElements();
-	
+
 	Collection<LSPShipment> getShipments();
-	
+
 	void assignShipment(LSPShipment shipment);
-	
+
 	Collection<LSPInfo> getInfos();
-	
-    Collection <EventHandler> getEventHandlers();
-        
-    void addSimulationTracker(LSPSimulationTracker tracker);
-    
-    Collection<LSPSimulationTracker> getSimulationTrackers();
-    
-    void setEventsManager(EventsManager eventsManager);
+
+	Collection <EventHandler> getEventHandlers();
+
+	void addSimulationTracker(LSPSimulationTracker tracker);
+
+	Collection<LSPSimulationTracker> getSimulationTrackers();
+
+//    void setEventsManager(EventsManager eventsManager);
 }
