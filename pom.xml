@@ -260,6 +260,9 @@
 								<exclude>org.matsim.contrib:*</exclude>
 							</excludes>
 						</requireReleaseDeps>
+                        <requireMavenVersion>
+                            <version>3.6.3</version>
+                        </requireMavenVersion>
                     </rules>
                 </configuration>
             </plugin>
@@ -294,17 +297,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.0.0-M6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.0.0-M6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -319,12 +322,31 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.4</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <doCheck>false</doCheck>
+                        <doUpdate>false</doUpdate>
+                        <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                        <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
