@@ -24,9 +24,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -126,10 +129,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private void checkConvertNullAnnotations() {
-		final Class<? extends ReflectiveConfigGroup> c = getClass();
-
-		final Method[] allMethods = c.getDeclaredMethods();
-
+		final var allMethods = getDeclaredMethodsInSubclasses();
 		for (Method m : allMethods) {
 			final StringGetter annotation = m.getAnnotation( StringGetter.class );
 			if ( annotation != null ) {
@@ -143,11 +143,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private Map<String, Method> getStringGetters() {
-		final Map<String, Method> gs = new HashMap<String, Method>();
-		final Class<? extends ReflectiveConfigGroup> c = getClass();
+		final Map<String, Method> gs = new HashMap<>();
 
-		final Method[] allMethods = c.getDeclaredMethods();
-
+		final var allMethods = getDeclaredMethodsInSubclasses();
 		for (Method m : allMethods) {
 			final StringGetter annotation = m.getAnnotation( StringGetter.class );
 			if ( annotation != null ) {
@@ -173,11 +171,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	}
 
 	private Map<String, Method> getSetters() {
-		final Map<String, Method> ss = new HashMap<String, Method>();
-		final Class<? extends ReflectiveConfigGroup> c = getClass();
+		final Map<String, Method> ss = new HashMap<>();
 
-		final Method[] allMethods = c.getDeclaredMethods();
-
+		final var allMethods = getDeclaredMethodsInSubclasses();
 		for (Method m : allMethods) {
 			final StringSetter annotation = m.getAnnotation( StringSetter.class );
 			if ( annotation != null ) {
@@ -190,6 +186,16 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		}
 
 		return ss;
+	}
+
+	private List<Method> getDeclaredMethodsInSubclasses() {
+		// in order to support multi-level inheritance of ReflectiveConfigGroup, we need to collect all methods from
+		// all levels of inheritance below ReflectiveConfigGroup
+		var methods = new ArrayList<Method>();
+		for (Class<?> c = getClass(); c != ReflectiveConfigGroup.class; c = c.getSuperclass()) {
+			Collections.addAll(methods, c.getDeclaredMethods());
+		}
+		return methods;
 	}
 
 	private static void checkSetterValidity(final Method m) {
