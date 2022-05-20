@@ -45,6 +45,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Tasks;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -72,13 +73,14 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	private final MobsimTimer timer;
 	private final DrtTaskFactory taskFactory;
 	private final EventsManager eventsManager;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	private final LeastCostPathCalculator router;
 	private final double stopDuration;
 
 	public PreplannedDrtOptimizer(DrtConfigGroup drtCfg, PreplannedSchedules preplannedSchedules, Network network,
 			TravelTime travelTime, TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory,
-			EventsManager eventsManager, Fleet fleet) {
+			EventsManager eventsManager, Fleet fleet, ScheduleTimingUpdater scheduleTimingUpdater) {
 		Preconditions.checkArgument(
 				fleet.getVehicles().keySet().equals(preplannedSchedules.vehicleToPreplannedStops.keySet()),
 				"Some schedules are preplanned for vehicles outside the fleet");
@@ -90,6 +92,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		this.timer = timer;
 		this.taskFactory = taskFactory;
 		this.eventsManager = eventsManager;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 
 		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
 		stopDuration = drtCfg.getStopDuration();
@@ -135,6 +138,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void nextTask(DvrpVehicle vehicle) {
+		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
 		var schedule = vehicle.getSchedule();
 
 		//TODO we could even skip adding this dummy task
