@@ -157,6 +157,8 @@ public class ScoringParameters implements MatsimParameters {
 			// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
 			// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.
 			// kai, feb'12
+			// yyyy given that there is now this.simulationPeriodInDays, one could just multiply with that.  Will probably fail a number
+			// of tests, thus I am not doing it right now.  kai, may'22
 		}
 
 
