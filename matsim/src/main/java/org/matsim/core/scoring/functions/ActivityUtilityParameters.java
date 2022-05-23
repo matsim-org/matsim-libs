@@ -33,13 +33,13 @@ import org.matsim.core.utils.misc.OptionalTime;
  *   Yet maybe one might be able to rework the approach so that the most
  * important params (such as typical duration, slope at typical duration, ...) become universal. kai, nov'12
  * </ul>
- * 
+ *
  * @author nagel
  *
  */
 public final class ActivityUtilityParameters implements MatsimParameters {
-	
-	public static interface ZeroUtilityComputation {
+
+	public interface ZeroUtilityComputation {
 		double computeZeroUtilityDuration_s( final double priority, final double typicalDuration_s ) ;
 	}
 	public static final class SameAbsoluteScore implements ZeroUtilityComputation {
@@ -50,7 +50,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			final double zeroUtilityDuration = typicalDuration_s1 * Math.exp( -10.0 / (typicalDuration_s1 / 3600.0) / priority1 );
 			// ( the 3600s are in there because the original formulation was in "hours".  So the values in seconds are first
 			// translated into hours.  kai, sep'12 )
-			
+
 			return zeroUtilityDuration;
 		}
 	}
@@ -60,7 +60,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			final double priority1 = priority;
 			final double typicalDuration_s1 = typicalDuration_s;
 			final double zeroUtilityDuration = typicalDuration_s1 * Math.exp( -1.0 / priority1 );
-			
+
 			return zeroUtilityDuration;
 		}
 	}
@@ -69,7 +69,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	/**
 	 * This is now deliberately an unmodifiable object which can only instantiated by a builder.  If you want/need to modify
 	 * this design, please talk to kai nagel or michael zilske or marcel rieser.  kai, nov'12
-	 * 
+	 *
 	 * @author nagel
 	 */
 	public final static class Builder {
@@ -81,8 +81,8 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		private OptionalTime latestStartTime = OptionalTime.undefined();
 		private OptionalTime minimalDuration = OptionalTime.undefined();
 		private OptionalTime openingTime = OptionalTime.undefined();
-		private boolean scoreAtAll;
-		private ZeroUtilityComputation zeroUtilityComputation ;
+		private boolean scoreAtAll = true;
+		private ZeroUtilityComputation zeroUtilityComputation = new SameRelativeScore();
 
 		/**
 		 * empty constructor; deliberately permitted
@@ -104,14 +104,14 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			this.openingTime = ppp.getOpeningTime();
 			this.scoreAtAll = ppp.isScoringThisActivityAtAll() ;
 			switch( ppp.getTypicalDurationScoreComputation() ) {
-			case relative:
-				this.zeroUtilityComputation = new SameRelativeScore() ;
-				break;
-			case uniform:
-				this.zeroUtilityComputation = new SameAbsoluteScore() ;
-				break;
-			default:
-				throw new RuntimeException("not defined");
+				case relative:
+					this.zeroUtilityComputation = new SameRelativeScore() ;
+					break;
+				case uniform:
+					this.zeroUtilityComputation = new SameAbsoluteScore() ;
+					break;
+				default:
+					throw new RuntimeException("not defined");
 			}
 			// seems to be somewhat overkill to set a computation method that is only used in the builder ... but the builder has a method to
 			// (re)set the 
@@ -165,9 +165,10 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 
 		public ActivityUtilityParameters build() {
 			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
-			params.setScoreAtAll(this.scoreAtAll) ;
-			this.typicalDuration_s.ifDefined(params::setTypicalDuration) ;
-			this.typicalDuration_s.ifDefined(duration-> params.setZeroUtilityDuration_s( this.zeroUtilityComputation.computeZeroUtilityDuration_s(priority, duration)));
+			params.scoreAtAll = this.scoreAtAll;
+			this.typicalDuration_s.ifDefined( duration -> params.typicalDuration_s = duration ) ;
+			this.typicalDuration_s.ifDefined( duration -> params.zeroUtilityDuration_h = this.zeroUtilityComputation.computeZeroUtilityDuration_s(priority, duration ) / 3600. );
+			// (I think that the only way in which the typical duration can be undefined is if the activity is not scored at all.  Maybe change the condition. kai, may'22)
 			params.closingTime = this.closingTime;
 			params.earliestEndTime = this.earliestEndTime;
 			params.latestStartTime = this.latestStartTime;
@@ -177,7 +178,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			return params ;
 		}
 
-		public final Builder setZeroUtilityComputation(ZeroUtilityComputation zeroUtilityComputation) {
+		public Builder setZeroUtilityComputation( ZeroUtilityComputation zeroUtilityComputation ) {
 			this.zeroUtilityComputation = zeroUtilityComputation;
 			return this;
 		}
@@ -199,56 +200,16 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	private OptionalTime earliestEndTime = OptionalTime.undefined();
 	private boolean scoreAtAll=true;
 
-	// use factory.  nov'12
-	/*package!*/ ActivityUtilityParameters(final String type) {
-		this.type = type;	
+	private ActivityUtilityParameters(final String type) {
+		this.type = type;
 	}
 
-	/*package!*/ final void checkConsistency() {
+	private void checkConsistency() {
 		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
 		// to have activities with a typical duration <=48 seconds (GL/June2011)
 		if (this.scoreAtAll && this.zeroUtilityDuration_h == 0.0) {
 			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
 		}
-	}
-	
-	/*package!*/ final void setScoreAtAll(boolean scoreAtAll) {
-		this.scoreAtAll = scoreAtAll;
-	}
-
-	/*package!*/ final void setTypicalDuration(final double typicalDuration_s) {
-		this.typicalDuration_s = typicalDuration_s;
-	}
-
-	/*package!*/ final void setZeroUtilityDuration_s(final double val) {
-
-
-		this.zeroUtilityDuration_h = val / 3600. ;
-
-		// example: pt interaction activity with typical duration = 120sec.
-		// 120/3600 * exp( -10 / (120 / 3600) ) =  1.7 x 10^(-132)  (!!!!!!!!!!)
-		// In consequence, even a pt interaction of one seconds causes a fairly large utility.
-
-	}
-	
-	/*package!*/ final void setMinimalDuration(final double dur) {
-		this.minimalDuration = OptionalTime.defined(dur);
-	}
-
-	/*package!*/ final void setOpeningTime(final double time) {
-		this.openingTime = OptionalTime.defined(time);
-	}
-
-	/*package!*/ final void setClosingTime(final double time) {
-		this.closingTime = OptionalTime.defined(time);
-	}
-
-	/*package!*/ final void setLatestStartTime(final double time) {
-		this.latestStartTime = OptionalTime.defined(time);
-	}
-
-	/*package!*/ final void setEarliestEndTime(final double time) {
-		this.earliestEndTime = OptionalTime.defined(time);
 	}
 
 	public final String getType() {
