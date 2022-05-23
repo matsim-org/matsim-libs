@@ -4,29 +4,18 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.projects</groupId>
-	<artifactId>freight-dfg17</artifactId>
+	<artifactId>logistics</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>freight-dfg17</name>
-	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
+	<name>logistics</name>
+	<description>Logistic Service Provider (LSP) and related code for simulation logistic chains.</description>
 
 	<properties>
-<!--		<matsim.version>14.0-SNAPSHOT</matsim.version>-->
-<!--		<matsim.version>13.0-2021w07-SNAPSHOT</matsim.version>-->
-		<matsim.version>14.0-PR1919</matsim.version>
+<!--		<matsim.version>15.0-SNAPSHOT</matsim.version>-->
+		<matsim.version>15.0-PR2000</matsim.version>
 	</properties>
 
 	<repositories>
-		<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
-<!--		<repository>-->
-<!--			<id>matsim</id>-->
-<!--			<url>https://dl.bintray.com/matsim/matsim</url>-->
-<!--		</repository>-->
-<!--		<repository>-->
-<!--			&lt;!&ndash; Required for MATSim snaphots &ndash;&gt;-->
-<!--			<id>ojo-snapshots</id>-->
-<!--			<url>http://oss.jfrog.org/libs-snapshot</url>-->
-<!--		</repository>-->
 		<repository>
 			<id>matsim</id>
 			<url>https://repo.matsim.org/repository/matsim</url>
@@ -77,23 +66,6 @@
 			<!--(not in weekly release!)-->
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>org.matsim</groupId>-->
-<!--			<artifactId>matsim</artifactId>-->
-<!--			<type>test-jar</type>-->
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<artifactId>jai_core</artifactId>-->
-<!--					<groupId>javax.media</groupId>-->
-<!--				</exclusion>-->
-<!--				<exclusion>-->
-<!--					<artifactId>jgridshift</artifactId>-->
-<!--					<groupId>jgridshift</groupId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
-<!--			<version>${matsim.version}</version>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
 
 		<!-- to get MatsimTestUtils -->
 		<dependency>
