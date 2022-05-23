@@ -29,11 +29,15 @@ import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -43,10 +47,13 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
-		lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
-		if (lookAhead < 0) {
-			throw new IllegalArgumentException(
+		if (drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated()) {
+			lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
+			Preconditions.checkArgument(lookAhead >= 0,
 					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+		} else {
+			// if no rejection due to max wait time, the look ahead is infinite
+			lookAhead = Double.POSITIVE_INFINITY;
 		}
 	}
 

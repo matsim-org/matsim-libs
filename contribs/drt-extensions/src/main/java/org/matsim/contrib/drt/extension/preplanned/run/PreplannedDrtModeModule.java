@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.extension.preplanned.run;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -54,6 +55,7 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
+		bindModal(StopDurationEstimator.class).toInstance((vehicle, dropoffRequests, pickupRequests) -> drtCfg.getStopDuration());
 
 		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
 				drtCfg.isChangeStartLinkToLastLinkInSchedule()));
