@@ -2,6 +2,7 @@ package org.matsim.application.prepare.population;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
@@ -10,17 +11,14 @@ import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.SplittableRandom;
+import java.util.*;
 
 @CommandLine.Command(
-		name = "normalize-subtour-modes",
+		name = "normalize-trip-modes",
 		description = "Adjust subtour modes so that one subtour can not mix chain-based with other modes and all subtours are mass-conserving.",
 		showDefaultValues = true
 )
-public class NormalizeSubtourModes implements MATSimAppCommand {
+public class NormalizeTripModes implements MATSimAppCommand {
 
 
 	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
@@ -32,11 +30,11 @@ public class NormalizeSubtourModes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
 	private Set<String> chainBasedModes;
 
-	@CommandLine.Option(names = "--modes", description = "New modes to choose from", defaultValue = "walk", split = ",")
+	@CommandLine.Option(names = "--modes", description = "Create a plan for each mode", defaultValue = "walk", split = ",")
 	private List<String> modes;
 
 	public static void main(String[] args) {
-		new NormalizeSubtourModes().execute(args);
+		new NormalizeTripModes().execute(args);
 	}
 
 	@Override
@@ -44,28 +42,33 @@ public class NormalizeSubtourModes implements MATSimAppCommand {
 
 		Population population = PopulationUtils.readPopulation(input.toString());
 
-		SplittableRandom rnd = new SplittableRandom(4117);
-
 		if (output.getParent() != null)
 			Files.createDirectories(output.getParent());
 
 		for (Person person : population.getPersons().values()) {
 
-			String mode = modes.get(rnd.nextInt(modes.size()));
+			Plan plan = person.getSelectedPlan();
 
-			Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(person.getSelectedPlan());
+			// remove all unselected plans
+			Set<Plan> plans = new HashSet<>(person.getPlans());
+			plans.remove(plan);
+			plans.forEach(person::removePlan);
 
-			for (TripStructureUtils.Subtour subtour : subtours) {
+			for (String mode : modes) {
 
-				for (TripStructureUtils.Trip trip : subtour.getTrips()) {
+				plan.setType(mode);
 
+				for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
 					for (Leg leg : trip.getLegsOnly()) {
 
 						leg.setRoute(null);
 						leg.setMode(mode);
 						TripStructureUtils.setRoutingMode(leg, mode);
 					}
+
 				}
+
+				plan = person.createCopyOfSelectedPlanAndMakeSelected();
 			}
 		}
 

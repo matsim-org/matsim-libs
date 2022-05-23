@@ -13,14 +13,31 @@ import org.matsim.core.replanning.ReplanningUtils;
 public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements StrategyChooser<PL, AG> {
 
 	private final int iter;
+	private final boolean permute;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param iter Force to use a innovative strategy every nth iteration
+	 * @param iter    Force to use an innovative strategy every nth iteration
+	 * @param permute Permute which agents are selected at which iteration.
+	 *                This requires a sufficiently large number of agents (> 10.000) or the amount of agents forced to innovate each iteration may deviate from the mean.
 	 */
-	public ForceInnovationStrategyChooser(int iter) {
+	public ForceInnovationStrategyChooser(int iter, boolean permute) {
 		this.iter = iter;
+		this.permute = permute;
+	}
+
+	/**
+	 * Hash function for an integer
+	 */
+	static int hash(final int value) {
+		int x = value;
+
+		x = ((x >>> 16) ^ x) * 0x119de1f3;
+		x = ((x >>> 16) ^ x) * 0x119de1f3;
+		x = (x >>> 16) ^ x;
+
+		return x;
 	}
 
 	@Override
@@ -29,10 +46,16 @@ public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends Has
 		double[] w = new double[weights.size()];
 		double total = 0;
 
+		// permutation term so the selection is different every nth iterations
+		int perm = (replanningContext.getIteration() / iter) % 32;
+
 		for (int i = 0; i < weights.size(); i++) {
 
 			// Use zero weight every nth iteration
-			if (person.getId().index() % iter == replanningContext.getIteration() % iter && ReplanningUtils.isOnlySelector(weights.getStrategy(i))) {
+			int term = (permute ? hash(person.getId().index()) >>> perm : person.getId().index()) % iter;
+			int mod = replanningContext.getIteration() % iter;
+
+			if ((term == mod || -term == mod) && ReplanningUtils.isOnlySelector(weights.getStrategy(i))) {
 				w[i] = 0;
 			} else
 				w[i] = weights.getWeight(i);
