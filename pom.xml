@@ -23,23 +23,7 @@
 	</repositories>
 
 	<dependencies>
-		<!-- This is the matsim "core": -->
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim</artifactId>
-			<version>${matsim.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jai_core</artifactId>
-					<groupId>javax.media</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jgridshift</artifactId>
-					<groupId>jgridshift</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
@@ -114,26 +98,6 @@
 				</configuration>
 			</plugin>
 
-<!--			<plugin>-->
-<!--				<artifactId>maven-assembly-plugin</artifactId>-->
-<!--				<version>2.2.1</version>-->
-<!--				&lt;!&ndash; Setting this to 2.2.1 because I want to be able to skip assembly -->
-<!--					from the command line. kai, jun'17 &ndash;&gt;-->
-<!--				<configuration>-->
-<!--					<descriptorRefs>-->
-<!--						<descriptorRef>jar-with-dependencies</descriptorRef>-->
-<!--					</descriptorRefs>-->
-<!--				</configuration>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>make-assembly</id>-->
-<!--						<phase>package</phase>-->
-<!--						<goals>-->
-<!--							<goal>single</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
