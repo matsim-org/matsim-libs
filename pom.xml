@@ -20,18 +20,6 @@
 			<id>matsim</id>
 			<url>https://repo.matsim.org/repository/matsim</url>
 		</repository>
-		<repository>
-			<!-- Geotools is not on Maven central -->
-			<id>osgeo</id>
-			<name>OSGeo Release Repository</name>
-			<url>https://repo.osgeo.org/repository/release/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
 	</repositories>
 
 	<dependencies>
@@ -66,7 +54,6 @@
 			<!--(not in weekly release!)-->
 		</dependency>
 
-
 		<!-- to get MatsimTestUtils -->
 		<dependency>
 			<groupId>org.matsim</groupId>
@@ -76,44 +63,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Include the JUnit testing library -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- OpenStreetMap and osmosis -->
-		<dependency>
-			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis-core</artifactId>
-			<version>0.46</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis-xml</artifactId>
-			<version>0.46</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis-pbf2</artifactId>
-			<version>0.46</version>
-		</dependency>
-
-		<!-- Used for DAssignemnt by Lei Zhang -->
-		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.17</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.17</version>
-		</dependency>
 
 	</dependencies>
 
@@ -165,26 +114,26 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<!-- Setting this to 2.2.1 because I want to be able to skip assembly 
-					from the command line. kai, jun'17 -->
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<artifactId>maven-assembly-plugin</artifactId>-->
+<!--				<version>2.2.1</version>-->
+<!--				&lt;!&ndash; Setting this to 2.2.1 because I want to be able to skip assembly -->
+<!--					from the command line. kai, jun'17 &ndash;&gt;-->
+<!--				<configuration>-->
+<!--					<descriptorRefs>-->
+<!--						<descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--					</descriptorRefs>-->
+<!--				</configuration>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>make-assembly</id>-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>single</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
