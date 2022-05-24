@@ -52,7 +52,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -242,20 +241,6 @@ CadytsContextI<TransitStopFacility> {
 		ccaOccupancy.calculateComparison();
 
 		String outputFormat = ptCountsConfig.getOutputFormat();
-		if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-			String filename = controlerIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
-			final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(scenario.getConfig()
-					.global().getCoordinateSystem(), TransformationFactory.WGS84);
-//			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
-//					null, ccaOccupancy.getComparison(), coordTransform, null, null, 
-//					this.occupCounts);
-
-			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), this.occupCounts, coordTransform, "ptCountsOccup") ;
-
-			kmlWriter.setIterationNumber(iter);
-			kmlWriter.writeFile(filename);
-		}
-
 		if (outputFormat.contains("txt") || outputFormat.contains("all")) {
 			//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
 			//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13

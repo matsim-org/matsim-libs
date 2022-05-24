@@ -86,7 +86,7 @@
 		<param name="inputBoardCountsFile" value="../matsim/test/input/org/matsim/pt/counts/board.xml" />
 		<param name="inputAlightCountsFile" value="../matsim/test/input/org/matsim/pt/counts/alight.xml" />
 		<param name="inputOccupancyCountsFile" value="../matsim/test/input/org/matsim/pt/counts/occupancy.xml" />
-		<param name="outputformat" value="kml" />
+		<param name="outputformat" value="txt" />
 		<param name="distanceFilter" value="300000" />
 		<param name="countsScaleFactor" value="10" />
 		<param name="distanceFilterCenterNode" value="11" />

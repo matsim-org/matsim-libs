@@ -40,9 +40,6 @@ public class SnapshotWritersModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (getConfig().controler().getSnapshotFormat().contains(SnapshotFormat.googleearth)) {
-			addSnapshotWriterBinding().toProvider(KMLSnapshotWriterFactory.class);
-		}
 		if (getConfig().controler().getSnapshotFormat().contains(SnapshotFormat.transims)) {
 			addSnapshotWriterBinding().toProvider(TransimsSnapshotWriterFactory.class);
 		}
