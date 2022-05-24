@@ -37,14 +37,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
  * 4. Coordinate carriers that are in charge of the physical transport.
  */
 public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
-	
-	/**
-	 * @return
-	 *
-	 * ok
-	 */
-	Id<LSP> getId();
-	
+
 	/**
 	 * @return
 	 *

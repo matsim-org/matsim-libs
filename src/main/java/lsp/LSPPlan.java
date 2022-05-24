@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.BasicPlan;
 /**
  * Was macht das hier?
  */
-public interface LSPPlan extends BasicPlan{
+public interface LSPPlan extends BasicPlan, HasBackpointer<LSP> {
 
 	LSPPlan addSolution( LogisticsSolution solution );
 	
@@ -36,9 +36,5 @@ public interface LSPPlan extends BasicPlan{
 	ShipmentAssigner getAssigner();
 
 	LSPPlan setAssigner( ShipmentAssigner assigner );
-
-	void setLSP(LSP lsp );
-	
-	LSP getLsp();
 
 }

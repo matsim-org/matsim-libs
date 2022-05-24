@@ -20,10 +20,9 @@
 
 package lsp.scoring;
 
+import lsp.HasBackpointer;
 import lsp.LSP;
 
-public interface LSPScorer {
-
+public interface LSPScorer extends HasBackpointer<LSP> {
 	double scoreCurrentPlan(LSP lsp);
-	void setLSP(LSP lsp);
 }

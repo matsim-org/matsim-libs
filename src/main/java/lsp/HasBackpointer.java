@@ -1,2 +1,6 @@
-package lsp;public interface HasBackpointer {
+package lsp;
+
+public interface HasBackpointer<T> {
+	void setEmbeddingContainer(T pointer);
+	T getEmbeddingContainer() ;
 }

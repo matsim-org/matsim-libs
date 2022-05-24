@@ -26,11 +26,9 @@ package lsp;
  * {@link LogisticsSolution}s, which, in turn, consist of several {@link LogisticsSolutionElement}s
  * and the corresponding {@link LSPResource}s.
  */
-public interface SolutionScheduler {
+public interface SolutionScheduler extends HasBackpointer<LSP> {
 
 	void scheduleSolutions();
 
-	void setLSP(LSP lsp);
-	
 	void setBufferTime(int bufferTime);
 }

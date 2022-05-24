@@ -229,7 +229,7 @@ public class CompleteSolutionTest {
 		assertTrue(solution.getEventHandlers().isEmpty());
 		assertNotNull(solution.getInfos());
 		assertTrue(solution.getInfos().isEmpty());
-		assertNull(solution.getLSP());
+		assertNull(solution.getEmbeddingContainer() );
 		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());
 		assertEquals(5, solution.getSolutionElements().size());
@@ -241,7 +241,7 @@ public class CompleteSolutionTest {
 				if(elements.indexOf(element) == (elements.size() -1)) {
 					assertNull(element.getNextElement());
 				}
-				assertSame(element.getLogisticsSolution(), solution);
+				assertSame(element.getEmbeddingContainer(), solution );
 			}
 		assertNull(collectionElement.getPreviousElement());
 		assertSame(collectionElement.getNextElement(), firstReloadElement);

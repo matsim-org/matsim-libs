@@ -23,6 +23,7 @@ package lsp;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
@@ -33,9 +34,7 @@ import lsp.controler.LSPSimulationTracker;
  *
  *
  */
-public interface LSPResource {
-
-	Id<LSPResource> getId();
+public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers, HasEventHandlers, HasInfos {
 
 	Id<Link> getStartLinkId();
 
@@ -48,14 +47,6 @@ public interface LSPResource {
 	Collection <LogisticsSolutionElement> getClientElements();
 
 	void schedule(int bufferTime);
-
-	Collection <EventHandler> getEventHandlers();
-
-	Collection <LSPInfo> getInfos();
-
-	void addSimulationTracker(LSPSimulationTracker tracker);
-
-	Collection<LSPSimulationTracker> getSimulationTrackers();
 
 //	void setEventsManager(EventsManager eventsManager);
 

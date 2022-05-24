@@ -103,7 +103,7 @@ public class CollectionLSPPlanTest {
 	public void collectionLSPPlanTest() {
 		assertSame(collectionPlan.getAssigner(), assigner);
 		assertEquals(0, (double) collectionPlan.getScore(), 0.0);
-		assertNull(collectionPlan.getLsp());
+		assertNull(collectionPlan.getEmbeddingContainer() );
 		assertEquals(1, collectionPlan.getSolutions().size());
 		assertSame(collectionPlan.getSolutions().iterator().next(), collectionSolution);
 	}

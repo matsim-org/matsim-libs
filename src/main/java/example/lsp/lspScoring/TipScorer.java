@@ -53,10 +53,13 @@ import java.util.Map;
 	}
 
 	@Override
-	public void setLSP(LSP lsp) {
+	public void setEmbeddingContainer( LSP lsp ) {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override public LSP getEmbeddingContainer(){
+		throw new RuntimeException( "not implemented" );
+	}
 
-		
+
 }
