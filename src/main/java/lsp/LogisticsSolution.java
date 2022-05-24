@@ -20,14 +20,11 @@
 
 package lsp;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.handler.EventHandler;
-
-import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
+import lsp.shipment.LSPShipment;
+import org.matsim.api.core.v01.Identifiable;
+
+import java.util.Collection;
 
 
 /**
@@ -38,13 +35,7 @@ import lsp.controler.LSPSimulationTracker;
  * {@link LSPResource}. This introduction of an intermediate layer allows physical Resources
  * to be used by several {@link LogisticsSolution}s and thus transport chains.
  */
-public interface LogisticsSolution {
-
-	Id<LogisticsSolution> getId();
-
-	void setLSP(LSP lsp);
-
-	LSP getLSP();
+public interface LogisticsSolution extends Identifiable<LogisticsSolution>, HasBackpointer<LSP>, HasEventHandlers, HasSimulationTrackers, HasInfos {
 
 	Collection<LogisticsSolutionElement> getSolutionElements();
 
@@ -52,13 +43,5 @@ public interface LogisticsSolution {
 
 	void assignShipment(LSPShipment shipment);
 
-	Collection<LSPInfo> getInfos();
-
-	Collection <EventHandler> getEventHandlers();
-
-	void addSimulationTracker(LSPSimulationTracker tracker);
-
-	Collection<LSPSimulationTracker> getSimulationTrackers();
-
-//    void setEventsManager(EventsManager eventsManager);
+	//    void setEventsManager(EventsManager eventsManager);
 }

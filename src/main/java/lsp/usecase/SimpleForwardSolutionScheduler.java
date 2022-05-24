@@ -72,11 +72,14 @@ import lsp.shipment.LSPShipment;
 	}
 
 	@Override
-	public void setLSP(LSP lsp) {
+	public void setEmbeddingContainer( LSP lsp ) {
 		this.lsp = lsp;
 	}
+	@Override public LSP getEmbeddingContainer(){
+		return this.lsp;
+	}
 
-	
+
 	private void insertShipmentsAtBeginning() {
 		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 			LogisticsSolutionElement firstElement = getFirstElement(solution);

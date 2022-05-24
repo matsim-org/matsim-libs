@@ -103,7 +103,7 @@ public class CollectionSolutionTest {
 		assertTrue(collectionSolution.getEventHandlers().isEmpty());
 		assertNotNull(collectionSolution.getInfos());
 		assertTrue(collectionSolution.getInfos().isEmpty());
-		assertNull(collectionSolution.getLSP());
+		assertNull(collectionSolution.getEmbeddingContainer() );
 		assertNotNull(collectionSolution.getShipments());
 		assertTrue(collectionSolution.getShipments().isEmpty());
 		assertEquals(1, collectionSolution.getSolutionElements().size());
@@ -115,7 +115,7 @@ public class CollectionSolutionTest {
 			if(elements.indexOf(element) == (elements.size() -1)) {
 				assertNull(element.getNextElement());
 			}
-			assertSame(element.getLogisticsSolution(), collectionSolution);
+			assertSame(element.getEmbeddingContainer(), collectionSolution );
 		}	
 	}
 	

@@ -20,16 +20,16 @@
 
 package lsp.replanning;
 
+import lsp.HasBackpointer;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 import lsp.LSP;
 import lsp.LSPPlan;
 
-public interface LSPReplanner {
+public interface LSPReplanner extends HasBackpointer<LSP> {
 
 	void replan(ReplanningEvent event);
 	GenericStrategyManager<LSPPlan,LSP> getStrategyManager();
 	void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager);
-	void setLSP(LSP lsp);
 }

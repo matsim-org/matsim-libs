@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.shipment.LSPShipment;
@@ -46,7 +45,7 @@ import lsp.controler.LSPSimulationTracker;
 		this.id = builder.id;
 		this.solutionElements = builder.elements;
 		for(LogisticsSolutionElement element : this.solutionElements) {
-			element.setLogisticsSolution(this);
+			element.setEmbeddingContainer(this );
 		}
 		this.shipments = new ArrayList<>();
 		this.solutionInfos = builder.solutionInfos;
@@ -61,12 +60,12 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public void setLSP(LSP lsp) {
+	public void setEmbeddingContainer( LSP lsp ) {
 		this.lsp = lsp;
 	}
 
 	@Override
-	public LSP getLSP() {
+	public LSP getEmbeddingContainer() {
 		return lsp;
 	}
 

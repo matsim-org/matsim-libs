@@ -241,12 +241,12 @@ public class CompleteLSPCreationTest {
 		assertNotNull(completeLSP.getResources());
 		LSPPlan selectedPlan = completeLSP.getSelectedPlan();
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
-		assertSame(selectedPlan.getLsp(), completeLSP);
+		assertSame(selectedPlan.getEmbeddingContainer(), completeLSP );
 		assertSame(selectedPlan.getAssigner(), assigner);
 		assertSame(selectedPlan.getSolutions().iterator().next(), completeSolution);
-		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), completeLSP);
+		assertSame(selectedPlan.getSolutions().iterator().next().getEmbeddingContainer(), completeLSP );
 //		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);
-		assertSame(selectedPlan.getLsp(), completeLSP);
+		assertSame(selectedPlan.getEmbeddingContainer(), completeLSP );
 	}
 
 }

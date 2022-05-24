@@ -56,7 +56,7 @@ public class TomorrowShipmentAssignerStrategyFactory  {
 			public void handlePlan(LSPPlan plan) {
 				plan.setAssigner(assigner);
 //				LSP lsp = assigner.getLSP();
-				LSP lsp = plan.getLsp();
+				LSP lsp = plan.getEmbeddingContainer();
 				Collection<LSPShipment> shipments = lsp.getShipments();
 				for (LSPShipment shipment : shipments) {
 					assigner.assignToSolution(shipment);

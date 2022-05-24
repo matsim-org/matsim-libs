@@ -65,7 +65,7 @@ public class SecondReloadElementTest {
 		assertTrue(reloadElement.getIncomingShipments().getSortedShipments().isEmpty());
 		assertNotNull(reloadElement.getInfos());
 		assertTrue(reloadElement.getInfos().isEmpty());
-		assertNull(reloadElement.getLogisticsSolution());
+		assertNull(reloadElement.getEmbeddingContainer() );
 		assertNull(reloadElement.getNextElement());
 		assertNotNull(reloadElement.getOutgoingShipments());
 		assertNotNull(reloadElement.getOutgoingShipments().getShipments());

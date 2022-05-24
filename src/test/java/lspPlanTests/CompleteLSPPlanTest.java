@@ -220,7 +220,7 @@ public class CompleteLSPPlanTest {
 	@Test
 	public void testCompleteLSPPlan() {
 		assertSame(completePlan.getAssigner(), assigner);
-		assertNull(completePlan.getLsp());
+		assertNull(completePlan.getEmbeddingContainer() );
 		assertEquals(0, (double) completePlan.getScore(), 0.0);
 		assertEquals(1, completePlan.getSolutions().size());
 		assertSame(completePlan.getSolutions().iterator().next(), completeSolution);

@@ -23,24 +23,13 @@ package lsp;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.controler.LSPSimulationTracker;
 
 
-public interface LogisticsSolutionElement {
-
-	Id<LogisticsSolutionElement> getId();
-
-	/**
-	 * @param solution -- back pointer to embedding container
-	 */
-	void setLogisticsSolution(LogisticsSolution solution);
-
-	/**
-	 * @return back pointer to embedding container
-	 */
-	LogisticsSolution getLogisticsSolution();
+public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasEventHandlers, HasSimulationTrackers, HasInfos {
 
 	void connectWithNextElement(LogisticsSolutionElement element);
 
@@ -67,13 +56,5 @@ public interface LogisticsSolutionElement {
 	 *  Shipments that have already been treated.
 	 */
 	WaitingShipments getOutgoingShipments();
-
-	void addSimulationTracker(LSPSimulationTracker tracker);
-
-	Collection<LSPInfo> getInfos();
-
-	Collection<EventHandler> getEventHandlers();
-
-	Collection <LSPSimulationTracker> getSimulationTrackers();
 
 }

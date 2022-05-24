@@ -42,10 +42,13 @@ class LSPReplannerImpl implements LSPReplanner{
 	}
 	
 	@Override
-	public void setLSP(LSP lsp) {
+	public void setEmbeddingContainer( LSP lsp ) {
 		this.lsp = lsp;
 	}
-	
+	@Override public LSP getEmbeddingContainer(){
+		return lsp;
+	}
+
 	@Override
 	public void replan(ReplanningEvent event) {
 		if(strategyManager != null) {

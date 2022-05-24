@@ -342,11 +342,13 @@ import lsp.LSPResource;
 		}
 
 
-		for (LSPResource lspResource : lsp.getResources()) {
-			if (lspResource instanceof Carrier ) {
-				((Carrier) lspResource).getShipments().toString();
-			}
-		}
+//		for (LSPResource lspResource : lsp.getResources()) {
+//			if (lspResource instanceof Carrier ) {
+//				((Carrier) lspResource).getShipments().toString();
+//			}
+//		}
+		// the above cast keeps complaining when I refactor; in consequence, I am becoming doubtful if this condition can ever be satisfied.
+		// also not sure what the code stub might be doing: It is converting to string, but not doing anything with it.  kai, may'22
 
 	
 	}

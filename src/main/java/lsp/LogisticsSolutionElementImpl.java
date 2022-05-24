@@ -91,12 +91,12 @@ import java.util.Collection;
 //	}
 
 	@Override
-	public void setLogisticsSolution(LogisticsSolution solution) {
+	public void setEmbeddingContainer( LogisticsSolution solution ) {
 		this.solution = solution;
 	}
 
 	@Override
-	public LogisticsSolution getLogisticsSolution() {
+	public LogisticsSolution getEmbeddingContainer() {
 		return solution;
 	}
 

@@ -22,7 +22,10 @@ package lsp.shipment;
 
 import java.util.Collection;
 
+import lsp.HasEventHandlers;
+import lsp.HasInfos;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
@@ -30,10 +33,8 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.LogisticsSolution;
 import lsp.LSPInfo;
 
-public interface LSPShipment {
+public interface LSPShipment extends Identifiable<LSPShipment>, HasInfos, HasEventHandlers {
 
-	Id<LSPShipment> getId(); // same as in CarrierShipment
-	
 	Id<Link> getFrom(); // same as in CarrierShipment
 	
 	Id<Link> getTo(); // same as in CarrierShipment
@@ -52,12 +53,8 @@ public interface LSPShipment {
 	
 	ShipmentPlan getLog();
 	
-	Collection<EventHandler> getEventHandlers();
-	
 	Collection<Requirement> getRequirements();
 
-	Collection<LSPInfo> getInfos();
-	
 	Id<LogisticsSolution> getSolutionId();
 
 }

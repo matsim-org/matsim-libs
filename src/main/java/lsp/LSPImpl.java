@@ -50,18 +50,18 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.plans= new ArrayList<>();
 		this.id = builder.id;
 		this.solutionScheduler = builder.solutionScheduler;
-		this.solutionScheduler.setLSP(this);
+		this.solutionScheduler.setEmbeddingContainer(this );
 		this.selectedPlan=builder.initialPlan;
-		this.selectedPlan.setLSP(this);
+		this.selectedPlan.setEmbeddingContainer(this );
 		this.plans.add(builder.initialPlan);
 		this.resources = builder.resources;
 		this.scorer = builder.scorer;
 		if(this.scorer != null) {
-			this.scorer.setLSP(this);
+			this.scorer.setEmbeddingContainer(this );
 		}	
 		this.replanner = builder.replanner;
 		if(this.replanner != null) {
-			this.replanner.setLSP(this);
+			this.replanner.setEmbeddingContainer(this );
 		}	
 	}
 	
@@ -146,7 +146,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
-		copiedPlan.setLSP(plan2copy.getLsp());
+		copiedPlan.setEmbeddingContainer(plan2copy.getEmbeddingContainer() );
 		double initialScoreOfCopiedPlan = plan2copy.getScore();
 		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		copiedPlan.getSolutions().addAll(copiedSolutions);
