@@ -163,7 +163,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		if(this.scorer != null) {
 			double score = scorer.scoreCurrentPlan(this);
 			this.selectedPlan.setScore(score);
-		}	
+		} else {
+			throw new RuntimeException( "trying to score the current LSP plan, but scorer is not set.  Aborting ..." );
+		}
 	}
 	
 
