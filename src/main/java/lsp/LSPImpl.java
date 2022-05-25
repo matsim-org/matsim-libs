@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
 
@@ -33,6 +34,7 @@ import lsp.shipment.LSPShipment;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* package-private */class LSPImpl implements LSP {
+	private static final Logger log = Logger.getLogger( LSPImpl.class );
 
 	private final Id<LSP> id;
 	private final Collection<LSPShipment> shipments;
@@ -164,10 +166,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			double score = scorer.scoreCurrentPlan(this);
 			this.selectedPlan.setScore(score);
 		} else {
-			throw new RuntimeException( "trying to score the current LSP plan, but scorer is not set.  Aborting ..." );
+			final String msg = "trying to score the current LSP plan, but scorer is not set.";
+//			throw new RuntimeException( msg + "  Aborting ..." );
+			log.fatal( msg );
 		}
 	}
-	
+
 
 	@Override
 	public void assignShipmentToLSP(LSPShipment shipment) {
