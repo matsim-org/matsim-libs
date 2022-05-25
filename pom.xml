@@ -32,7 +32,7 @@
         <argLine></argLine>
 
         <log4j.version>2.17.2</log4j.version>
-        <geotools.version>24.2</geotools.version>
+        <geotools.version>27.0</geotools.version>
         <jts.version>1.18.2</jts.version>
         <guice.version>5.1.0</guice.version>
         <jackson.version>2.13.3</jackson.version>
