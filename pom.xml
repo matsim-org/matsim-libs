@@ -32,7 +32,7 @@
         <argLine></argLine>
 
         <log4j.version>2.17.2</log4j.version>
-        <geotools.version>24.2</geotools.version>
+        <geotools.version>27.0</geotools.version>
         <jts.version>1.18.2</jts.version>
         <guice.version>5.1.0</guice.version>
         <jackson.version>2.13.3</jackson.version>
@@ -173,6 +173,18 @@
                 <version>2.3.4</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.11.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.re2j</groupId>
+                <artifactId>re2j</artifactId>
+                <version>1.6</version>
             </dependency>
 
             <dependency>
