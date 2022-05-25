@@ -50,6 +50,9 @@ import org.matsim.core.gbl.Gbl;
 		this.lsp = lsp;
 		
 	}
+	@Override public LSP getLSP(){
+		throw new RuntimeException( "not implemented" );
+	}
 
 //	@Override
 //	public LSP getLSP() {

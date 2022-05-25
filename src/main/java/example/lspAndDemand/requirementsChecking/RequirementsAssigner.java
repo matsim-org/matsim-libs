@@ -60,5 +60,8 @@ class RequirementsAssigner implements  ShipmentAssigner {
 	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
 	}
+	@Override public LSP getLSP(){
+		throw new RuntimeException( "not implemented" );
+	}
 
 }

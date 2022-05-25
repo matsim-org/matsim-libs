@@ -119,12 +119,12 @@ public class CollectionLSPCreationTest {
 		assertNotNull(collectionLSP.getResources());
 		LSPPlan selectedPlan = collectionLSP.getSelectedPlan();
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
-		assertSame(selectedPlan.getEmbeddingContainer(), collectionLSP );
+		assertSame(selectedPlan.getLSP(), collectionLSP );
 		assertSame(selectedPlan.getAssigner(), assigner);
 		assertSame(selectedPlan.getSolutions().iterator().next(), collectionSolution);
-		assertSame(selectedPlan.getSolutions().iterator().next().getEmbeddingContainer(), collectionLSP );
+		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), collectionLSP );
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
-		assertSame(selectedPlan.getEmbeddingContainer(), collectionLSP );
+		assertSame(selectedPlan.getLSP(), collectionLSP );
 	}
 
 }

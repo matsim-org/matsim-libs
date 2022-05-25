@@ -25,9 +25,15 @@ import java.util.Collection;
 import org.matsim.api.core.v01.population.BasicPlan;
 
 /**
- * Was macht das hier?
+ * This interface has the following properties:<ul>
+ * <li> As a {@link BasicPlan} it has a score, so it can be used for evolutionary learning.  kai, may'22 </li>
+ * </ul>
+ *
+ * Design questions:<ul>
+ *         <li> yyyy I do not understand why it makes sense to give a plan multiple solutions.  kai, may'22 </li>
+ * </ul>
  */
-public interface LSPPlan extends BasicPlan, HasBackpointer<LSP> {
+public interface LSPPlan extends BasicPlan, KnowsLSP {
 
 	LSPPlan addSolution( LogisticsSolution solution );
 	

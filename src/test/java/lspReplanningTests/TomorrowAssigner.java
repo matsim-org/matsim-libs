@@ -48,6 +48,9 @@ public class TomorrowAssigner implements ShipmentAssigner{
 		this.lsp = lsp;
 		
 	}
+	@Override public LSP getLSP(){
+		throw new RuntimeException( "not implemented" );
+	}
 
 //	@Override
 //	public LSP getLSP() {

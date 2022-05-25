@@ -229,7 +229,7 @@ public class CompleteSolutionTest {
 		assertTrue(solution.getEventHandlers().isEmpty());
 		assertNotNull(solution.getInfos());
 		assertTrue(solution.getInfos().isEmpty());
-		assertNull(solution.getEmbeddingContainer() );
+		assertNull(solution.getLSP() );
 		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());
 		assertEquals(5, solution.getSolutionElements().size());

@@ -56,7 +56,7 @@ import lsp.shipment.LSPShipment;
 			public void handlePlan(LSPPlan plan) {
 				plan.setAssigner(assigner);
 //				LSP lsp = assigner.getLSP();
-				LSP lsp = plan.getEmbeddingContainer();
+				LSP lsp = plan.getLSP();
 				Collection<LSPShipment> shipments = lsp.getShipments();
 				for (LSPShipment shipment : shipments) {
 					assigner.assignToSolution(shipment);

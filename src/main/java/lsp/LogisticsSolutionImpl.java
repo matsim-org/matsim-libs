@@ -60,12 +60,12 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public void setEmbeddingContainer( LSP lsp ) {
+	public void setLSP( LSP lsp ) {
 		this.lsp = lsp;
 	}
 
 	@Override
-	public LSP getEmbeddingContainer() {
+	public LSP getLSP() {
 		return lsp;
 	}
 

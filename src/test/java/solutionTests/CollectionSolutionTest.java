@@ -103,7 +103,7 @@ public class CollectionSolutionTest {
 		assertTrue(collectionSolution.getEventHandlers().isEmpty());
 		assertNotNull(collectionSolution.getInfos());
 		assertTrue(collectionSolution.getInfos().isEmpty());
-		assertNull(collectionSolution.getEmbeddingContainer() );
+		assertNull(collectionSolution.getLSP() );
 		assertNotNull(collectionSolution.getShipments());
 		assertTrue(collectionSolution.getShipments().isEmpty());
 		assertEquals(1, collectionSolution.getSolutionElements().size());

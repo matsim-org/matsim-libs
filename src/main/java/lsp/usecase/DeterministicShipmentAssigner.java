@@ -44,7 +44,10 @@ class DeterministicShipmentAssigner implements ShipmentAssigner {
 	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
 	}
-	
+	@Override public LSP getLSP(){
+		throw new RuntimeException( "not implemented" );
+	}
+
 	@Override
 	public void assignToSolution(LSPShipment shipment) {
 		Gbl.assertIf( lsp.getSelectedPlan().getSolutions().size()==1);

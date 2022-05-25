@@ -31,8 +31,8 @@ import lsp.shipment.LSPShipment;
  *
  * Weist {@link LSPShipment}s den {@link LogisticsSolution}s zu.
  */
-public interface ShipmentAssigner {
+public interface ShipmentAssigner extends KnowsLSP {
 
 	void assignToSolution(LSPShipment shipment);
-	void setLSP(LSP lsp);
+
 }

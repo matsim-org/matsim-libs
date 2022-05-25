@@ -60,6 +60,9 @@ import lsp.shipment.Requirement;
 	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
 	}
+		@Override public LSP getLSP(){
+			throw new RuntimeException( "not implemented" );
+		}
 
 //	@Override
 //	public LSP getLSP() {

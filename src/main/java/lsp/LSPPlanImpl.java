@@ -37,7 +37,7 @@ import java.util.Collection;
 	
 	@Override public LSPPlan addSolution( LogisticsSolution solution ) {
 		this.solutions.add(solution);
-		solution.setEmbeddingContainer(this.lsp );
+		solution.setLSP(this.lsp );
 		return this;
 	}
 	
@@ -65,17 +65,17 @@ import java.util.Collection;
 		this.score = score;
 	}
 
-	@Override public void setEmbeddingContainer( LSP lsp ) {
+	@Override public void setLSP( LSP lsp ) {
 		this.lsp = lsp;
 		if(assigner != null) {
 			this.assigner.setLSP(lsp);
 		}
 		for(LogisticsSolution solution : solutions) {
-			solution.setEmbeddingContainer(lsp );
+			solution.setLSP(lsp );
 		}
 	}
 	
-	@Override public LSP getEmbeddingContainer() {
+	@Override public LSP getLSP() {
 		return lsp;
 	}
 	

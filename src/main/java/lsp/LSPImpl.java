@@ -52,7 +52,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.solutionScheduler = builder.solutionScheduler;
 		this.solutionScheduler.setEmbeddingContainer(this );
 		this.selectedPlan=builder.initialPlan;
-		this.selectedPlan.setEmbeddingContainer(this );
+		this.selectedPlan.setLSP(this );
 		this.plans.add(builder.initialPlan);
 		this.resources = builder.resources;
 		this.scorer = builder.scorer;
@@ -146,7 +146,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
-		copiedPlan.setEmbeddingContainer(plan2copy.getEmbeddingContainer() );
+		copiedPlan.setLSP(plan2copy.getLSP() );
 		double initialScoreOfCopiedPlan = plan2copy.getScore();
 		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		copiedPlan.getSolutions().addAll(copiedSolutions);

@@ -35,7 +35,7 @@ import java.util.Collection;
  * {@link LSPResource}. This introduction of an intermediate layer allows physical Resources
  * to be used by several {@link LogisticsSolution}s and thus transport chains.
  */
-public interface LogisticsSolution extends Identifiable<LogisticsSolution>, HasBackpointer<LSP>, HasEventHandlers, HasSimulationTrackers, HasInfos {
+public interface LogisticsSolution extends Identifiable<LogisticsSolution>, KnowsLSP, HasEventHandlers, HasSimulationTrackers, HasInfos {
 
 	Collection<LogisticsSolutionElement> getSolutionElements();
 
@@ -44,4 +44,5 @@ public interface LogisticsSolution extends Identifiable<LogisticsSolution>, HasB
 	void assignShipment(LSPShipment shipment);
 
 	//    void setEventsManager(EventsManager eventsManager);
+
 }

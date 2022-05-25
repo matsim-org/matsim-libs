@@ -74,6 +74,8 @@ import java.util.*;
 	private static SolutionType solutionType = SolutionType.onePlan_direct;
 	// yyyy please avoid static nonfinal variables ... they are dangerous.  kai, may'22
 
+	private ExampleSchedulingOfTransportChainHubsVsDirect(){ } // so it cannot be instantiated
+
 	public static void main (String [] args) throws CommandLine.ConfigurationException{
 
 		for( String arg : args ){
@@ -128,7 +130,7 @@ import java.util.*;
 		log.info("Set up simulation controler and LSPModule");
 		LinkedHashSet<LSP> lspList = new LinkedHashSet<>();
 		lspList.add(lsp);
-		LSPs lsps = new LSPs(lspList);
+		var lsps = new LSPs(lspList);
 		LSPUtils.addLSPs( scenario, lsps );
 
 		// @KMT: LSPModule ist vom Design her nur im Zusammenhang mit dem Controler sinnvoll.  Damit kann man dann auch vollständig auf
@@ -320,12 +322,13 @@ import java.util.*;
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
 
+		LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
+		LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
+
 		switch (solutionType) {
 			case onePlan_withHub: {
 				// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
 				log.info("Creating LSP with one plan: reloading at hub");
-
-				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
 
 				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class))
 						.setInitialPlan(lspPlan_Reloading)
@@ -337,8 +340,6 @@ import java.util.*;
 				// ### This is the new solution with  directDistribution from the Depot.
 				log.info("Creating LSP with one plan: direct distribution from the depot");
 
-				LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
-
 				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
 						.setInitialPlan(lspPlan_direct)
 						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
@@ -349,9 +350,6 @@ import java.util.*;
 				log.info("Creating LSP with two plans: i) direct distribution from the depot ii) reloading at hub");
 
 				log.error("This is totally untested. I can neither say if it will work nor if it will do anything useful - kmt feb22");
-
-				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
-				LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
 
 				//TODO: Müsste nicht eigentlich der SolutionScheduler dann auf Ebene der einzelnen Pläne (mit ihren Solutions) sein?? kmt Feb22
 				//So muss ich erst die Ressourcen aus beiden hinzuzufügenden Plänen aufsammeln, damit die dann schon in den Builder können. Irgendwie unschön.
