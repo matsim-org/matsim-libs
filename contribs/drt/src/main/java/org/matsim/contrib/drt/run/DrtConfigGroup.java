@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -662,7 +662,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
 	 */
 	@StringSetter(STORE_UNSHARED_PATH)
-	void setStoreUnsharedPath(boolean storeUnsharedPath) {
+	public void setStoreUnsharedPath(boolean storeUnsharedPath) {
 		this.storeUnsharedPath = storeUnsharedPath;
 	}
 

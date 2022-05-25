@@ -31,12 +31,11 @@
         <maven.compiler.target>11</maven.compiler.target>
         <argLine></argLine>
 
-        <log4j.version>2.17.1</log4j.version>
+        <log4j.version>2.17.2</log4j.version>
         <geotools.version>24.2</geotools.version>
-        <jts.version>1.17.1</jts.version>
-        <guice.version>5.0.1</guice.version>
-        <guava.version>30.0-jre</guava.version>
-        <jackson.version>2.10.3</jackson.version>
+        <jts.version>1.18.2</jts.version>
+        <guice.version>5.1.0</guice.version>
+        <jackson.version>2.13.3</jackson.version>
     </properties>
 
     <scm>
@@ -82,12 +81,12 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>30.0-jre</version>
+                <version>31.1-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.11</version>
+                <version>3.12.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -122,7 +121,7 @@
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
-                <version>5.3</version>
+                <version>5.6</version>
             </dependency>
             <dependency>
                 <groupId>org.geotools</groupId>
@@ -179,14 +178,20 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13.1</version>
+                <version>4.13.2</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.30</version>
+                <version>1.7.36</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.7.36</version>
             </dependency>
 
             <dependency>
@@ -205,6 +210,26 @@
                 <groupId>org.jogamp.jogl</groupId>
                 <artifactId>jogl-all</artifactId>
                 <version>2.4.0-matsim-1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>3.22.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.22.0</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>4.5.1</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>
@@ -235,6 +260,9 @@
 								<exclude>org.matsim.contrib:*</exclude>
 							</excludes>
 						</requireReleaseDeps>
+                        <requireMavenVersion>
+                            <version>3.6.3</version>
+                        </requireMavenVersion>
                     </rules>
                 </configuration>
             </plugin>
@@ -269,17 +297,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.0.0-M6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.0.0-M6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -294,12 +322,31 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.4</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <doCheck>false</doCheck>
+                        <doUpdate>false</doUpdate>
+                        <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                        <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
