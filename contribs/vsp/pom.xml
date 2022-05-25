@@ -185,8 +185,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
-			<artifactId>graphhopper-reader-osm</artifactId>
-			<version>2.4</version>
+			<artifactId>graphhopper-core</artifactId>
+			<version>5.3</version>
 		</dependency>
 	</dependencies>
 </project>
