@@ -69,6 +69,8 @@ import java.util.Collection;
 		this.lsp = lsp;
 		if(assigner != null) {
 			this.assigner.setLSP(lsp);
+			// yy vom Design her wäre es vllt einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte.  Dann
+			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen.  kai, may'22
 		}
 		for(LogisticsSolution solution : solutions) {
 			solution.setLSP(lsp );

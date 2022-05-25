@@ -27,6 +27,7 @@ import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
+import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.scoring.LSPScoringUtils;
@@ -115,6 +116,21 @@ import java.util.*;
 
 		log.info("create LSP");
 		LSP lsp = createInitialLSP(network);
+		lsp.setScorer( new LSPScorer(){
+			private LSP lsp;
+			@Override public double scoreCurrentPlan( LSP lsp ){
+				lsp.getSelectedPlan().setScore( 0. );
+				return 0.;
+				// yyyy unclear if this is supposed to set the score.  Or just return it.  kai, may'22
+				// yyyyyy we need to look into matsim design and check how it is done there.  kai, may'22
+			}
+			@Override public void setEmbeddingContainer( LSP pointer ){
+				this.lsp = pointer;
+			}
+			@Override public LSP getEmbeddingContainer(){
+				return this.lsp;
+			}
+		} );
 
 		log.info("create initial LSPShipments");
 		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);

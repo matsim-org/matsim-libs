@@ -24,5 +24,6 @@ import lsp.HasBackpointer;
 import lsp.LSP;
 
 public interface LSPScorer extends HasBackpointer<LSP> {
+	// yyyy why lsp as argument if there is already a backpointer?  kai, may'22
 	double scoreCurrentPlan(LSP lsp);
 }
