@@ -41,22 +41,17 @@ import java.util.Map;
 		for(LSPInfo info : tracker.getInfos()) {
 			if(info instanceof TipInfo) {
 				Attributes function = info.getAttributes();
-					for(  Map.Entry value : function.getAsMap().entrySet() ) {
-						if(value.getKey().equals("TIP IN EUR") && value.getValue() instanceof Double) {
-							double trinkgeldValue = (Double) value.getValue();
-							score += trinkgeldValue;
-						}
+				for(  Map.Entry<String,Object> entry : function.getAsMap().entrySet() ) {
+					if(entry.getKey().equals("TIP IN EUR") && entry.getValue() instanceof Double) {
+						double trinkgeldValue = (Double) entry.getValue();
+						score += trinkgeldValue;
 					}
+				}
 			}
 		}
 		return score;
 	}
 
-	@Override
-	public void setEmbeddingContainer( LSP lsp ) {
-		// TODO Auto-generated method stub
-		
-	}
 	@Override public LSP getEmbeddingContainer(){
 		throw new RuntimeException( "not implemented" );
 	}

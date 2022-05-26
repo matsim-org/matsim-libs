@@ -81,7 +81,7 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
 	 * yyyy does it make sense to expose this (implies that scorer can be changed during iterations)?
 	 */
 	void setScorer( LSPScorer scorer );
-	
+
 	/**
 	 * @param replanner
 	 *
