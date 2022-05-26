@@ -5,5 +5,5 @@
 // Generated on: 2012.01.31 at 06:47:59 PM MEZ 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.matsim.org/files/dtd", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.matsim.org/files/dtd", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.matsim.jaxb.intergreenTimes10;
