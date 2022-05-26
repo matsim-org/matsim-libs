@@ -5,5 +5,5 @@
 // Generated on: 2011.09.19 at 03:18:45 PM MESZ 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.gexf.net/1.2draft/viz", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.gexf.net/1.2draft/viz", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package playground.vsp.gexf.viz;
