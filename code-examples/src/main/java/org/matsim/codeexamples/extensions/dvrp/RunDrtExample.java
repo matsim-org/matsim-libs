@@ -73,7 +73,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addDrtConfig(drtConfig);
+			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -82,7 +82,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addDrtConfig(drtConfig);
+			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -91,7 +91,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addDrtConfig(drtConfig);
+			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
