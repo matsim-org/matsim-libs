@@ -1,6 +1,10 @@
 package lsp;
 
 public interface HasBackpointer<T> {
-	void setEmbeddingContainer(T pointer);
-	T getEmbeddingContainer() ;
+
+	// yy maybe also have interface HasSettableBackpointer?
+	default void setEmbeddingContainer(T pointer) {};
+
+	T getEmbeddingContainer();
+
 }
