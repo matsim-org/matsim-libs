@@ -36,7 +36,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
@@ -46,6 +45,8 @@ import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 import javax.inject.Inject;
+
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -136,14 +137,6 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
                     cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
                     cgw.createHtmlAndGraphs();
                 }
-                if (this.config.getOutputFormat().contains("kml") ||
-                        this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.kmz");
-                    CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-                            cca.getComparison(), network, TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84));
-                    kmlWriter.setIterationNumber(event.getIteration());
-                    kmlWriter.writeFile(filename);
-                }
                 if (this.config.getOutputFormat().contains("txt") ||
                         this.config.getOutputFormat().contains("all")) {
                     String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.txt");
@@ -218,9 +211,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 	private void reset() {
 		this.iterationsUsed = 0;
 		for (double[] hours : this.linkStats.values()) {
-			for (int i = 0; i < hours.length; i++) {
-				hours[i] = 0.0;
-			}
+			Arrays.fill(hours, 0.0);
 		}
 	}
 
