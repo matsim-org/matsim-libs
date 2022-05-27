@@ -270,7 +270,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add dropoff request to stop task, and extend the stop task (when incremental stop task duration is used)
 				stopTask.addDropoffRequest(request);
-				double updatedStopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, stopTask.getDropoffRequests().values(), Collections.emptySet());
+				double updatedStopDuration = stopDurationEstimator.calcDuration(vehicleEntry.vehicle, stopTask.getDropoffRequests().values(), stopTask.getPickupRequests().values());
 				stopTask.setEndTime(stopTask.getBeginTime() + updatedStopDuration);
 				return stopTask;
 			} else { // add drive task to dropoff location
