@@ -20,7 +20,6 @@
 
 package example.lspAndDemand.requirementsChecking;
 
-import lsp.LSPInfo;
 import lsp.LogisticsSolution;
 import lsp.shipment.Requirement;
 

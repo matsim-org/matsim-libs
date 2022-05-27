@@ -30,7 +30,6 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LogisticsSolution;
-import lsp.LSPInfo;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class LSPShipmentImpl implements LSPShipment {
@@ -48,7 +47,6 @@ class LSPShipmentImpl implements LSPShipment {
 	private final ShipmentPlan log;
 	private final Collection<EventHandler> eventHandlers;
 	private final List<Requirement> requirements;
-	private final List<LSPInfo> infos;
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
@@ -65,8 +63,6 @@ class LSPShipmentImpl implements LSPShipment {
 		this.eventHandlers = new ArrayList<>();
 		this.requirements = new ArrayList<>();
 		this.requirements.addAll( builder.requirements );
-		this.infos = new ArrayList<>();
-		this.infos.addAll( builder.infos );
 	}
 
 

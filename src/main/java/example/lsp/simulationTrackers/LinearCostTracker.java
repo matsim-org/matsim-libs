@@ -22,7 +22,6 @@ package example.lsp.simulationTrackers;
 
 import lsp.LSPUtils;
 import lsp.controler.LSPSimulationTracker;
-import lsp.LSPInfo;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.utils.objectattributes.attributable.Attributes;

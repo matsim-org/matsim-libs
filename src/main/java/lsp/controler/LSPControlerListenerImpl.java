@@ -22,7 +22,6 @@ package lsp.controler;
 
 
 import lsp.*;
-import lsp.LSPInfo;
 import lsp.replanning.LSPReplanningModule;
 import lsp.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;

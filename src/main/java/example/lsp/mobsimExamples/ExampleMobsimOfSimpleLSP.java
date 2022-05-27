@@ -32,7 +32,6 @@ import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.*;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;

@@ -38,7 +38,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private LSP lsp;
 	private final Collection<LogisticsSolutionElement> solutionElements;
 	private final Collection<LSPShipment> shipments;
-	private final Collection<LSPInfo> solutionInfos;
 	private final Collection<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker>trackers;
 
@@ -50,8 +49,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			element.setEmbeddingContainer(this );
 		}
 		this.shipments = new ArrayList<>();
-		this.solutionInfos = builder.solutionInfos;
-		this.eventHandlers = builder.eventHandlers; 
+		this.eventHandlers = builder.eventHandlers;
 		this.trackers = builder.trackers;
 	}
 	

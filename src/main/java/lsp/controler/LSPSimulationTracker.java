@@ -21,13 +21,13 @@
 package lsp.controler;
 
 import lsp.HasEventHandlers;
-import lsp.HasInfos;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * @deprecated -- try to do without
  */
-public interface LSPSimulationTracker extends AfterMobsimListener, HasEventHandlers, HasInfos {
+public interface LSPSimulationTracker extends AfterMobsimListener, HasEventHandlers, Attributable{
 
 	/**
 	 * @deprecated -- try to do without

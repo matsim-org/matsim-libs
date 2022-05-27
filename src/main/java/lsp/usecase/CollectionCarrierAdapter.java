@@ -21,7 +21,6 @@
 package lsp.usecase;
 
 import lsp.LSPCarrierResource;
-import lsp.LSPInfo;
 import lsp.LSPResource;
 import lsp.LogisticsSolutionElement;
 import lsp.controler.LSPSimulationTracker;
@@ -35,6 +34,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /*package-private*/ class CollectionCarrierAdapter implements LSPCarrierResource {
@@ -42,11 +42,10 @@ import java.util.Map;
 	private final Attributes attributes = new Attributes();
 	private final Id<LSPResource>id;
 	private final Carrier carrier;
-	private final ArrayList<LogisticsSolutionElement> clientElements;
+	private final List<LogisticsSolutionElement> clientElements;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
 	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
 
 	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
@@ -56,7 +55,6 @@ import java.util.Map;
 		this.carrier = builder.carrier;
 		this.network = builder.network;
 		this.eventHandlers = new ArrayList<>();
-		this.infos = new ArrayList<>();
 		this.trackers = new ArrayList<>();
 	}
 	

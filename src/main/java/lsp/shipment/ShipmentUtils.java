@@ -21,7 +21,6 @@
 package lsp.shipment;
 
 //import demand.UtilityFunction;
-import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import org.matsim.api.core.v01.Id;
@@ -478,7 +477,6 @@ public final class ShipmentUtils{
 		double deliveryServiceTime;
 		double pickupServiceTime;
 		final ArrayList<Requirement> requirements;
-		final ArrayList<LSPInfo> infos;
 
 		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
 			return new LSPShipmentBuilder(id);
@@ -486,7 +484,6 @@ public final class ShipmentUtils{
 
 		private LSPShipmentBuilder( Id<LSPShipment> id ){
 			this.requirements = new ArrayList<>();
-			this.infos = new ArrayList<>();
 			this.id = id;
 		}
 
@@ -520,10 +517,6 @@ public final class ShipmentUtils{
 
 		public void addRequirement(Requirement requirement ) {
 			requirements.add(requirement);
-		}
-
-		public void addInfo(LSPInfo info ) {
-			infos.add(info);
 		}
 
 		public LSPShipment build(){

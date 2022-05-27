@@ -20,18 +20,15 @@
 
 package lsp.shipment;
 
-import java.util.Collection;
-
 import lsp.HasEventHandlers;
-import lsp.HasInfos;
+import lsp.LogisticsSolution;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
-import lsp.LogisticsSolution;
-import lsp.LSPInfo;
+import java.util.Collection;
 
 /**
  * This is, for example, a shipment that DHL moves from A to B.  It may use multiple carriers to achieve that.
@@ -40,7 +37,7 @@ import lsp.LSPInfo;
  *         <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not link IDs.</li>
  * </ul>
  */
-public interface LSPShipment extends Identifiable<LSPShipment>, HasInfos, HasEventHandlers {
+public interface LSPShipment extends Identifiable<LSPShipment>, HasEventHandlers, Attributable{
 
 	Id<Link> getFrom(); // same as in CarrierShipment
 	

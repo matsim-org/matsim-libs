@@ -28,7 +28,6 @@ import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import lsp.LSPInfo;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;

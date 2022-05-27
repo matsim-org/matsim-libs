@@ -31,7 +31,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
@@ -47,7 +46,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final DistributionCarrierScheduler distributionHandler;
 	private final Network network;
 	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
 
 	DistributionCarrierAdapter(UsecaseUtils.DistributionCarrierAdapterBuilder builder){
@@ -58,7 +56,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			this.carrier = builder.carrier;
 			this.network = builder.network;
 			this.eventHandlers = new ArrayList<>();
-			this.infos = new ArrayList<>();
 			this.trackers = new ArrayList<>();
 		}
 	

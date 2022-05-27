@@ -45,7 +45,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import lsp.LSPInfo;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 

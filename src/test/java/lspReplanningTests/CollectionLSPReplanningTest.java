@@ -20,22 +20,17 @@
 
 package lspReplanningTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -55,10 +50,11 @@ import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.LSPResource;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 public class CollectionLSPReplanningTest {
 	private LSP collectionLSP;

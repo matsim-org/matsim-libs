@@ -20,21 +20,16 @@
 
 package lspMobsimTests;
 
-import static lsp.usecase.UsecaseUtils.*;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.*;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentPlanElementComparator;
+import lsp.shipment.ShipmentUtils;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,10 +51,12 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.LSPCarrierResource;
-import lsp.LSPResource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+import static lsp.usecase.UsecaseUtils.*;
+import static org.junit.Assert.*;
 
 public class CollectionLSPMobsimTest {
 	private static final Logger log = Logger.getLogger( CollectionLSPMobsimTest.class );

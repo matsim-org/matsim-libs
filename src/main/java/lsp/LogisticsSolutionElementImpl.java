@@ -41,7 +41,6 @@ import java.util.Map;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
 	private final Collection<EventHandler> handlers;
 //	private EventsManager eventsManager;
@@ -53,7 +52,6 @@ import java.util.Map;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
 		this.handlers = new ArrayList<>();
-		this.infos = new ArrayList<>();
 		this.trackers = new ArrayList<>();
 	}
 	

@@ -30,7 +30,6 @@ import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.LSPInfo;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 

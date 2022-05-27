@@ -97,7 +97,6 @@ public final class LSPUtils{
 	public static final class LogisticsSolutionBuilder{
 		final Id<LogisticsSolution> id;
 		final Collection<LogisticsSolutionElement> elements;
-		final Collection<LSPInfo> solutionInfos;
 		final Collection<EventHandler> eventHandlers;
 		final Collection<LSPSimulationTracker>trackers;
 
@@ -107,7 +106,6 @@ public final class LSPUtils{
 
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
 			this.elements = new ArrayList<>();
-			this.solutionInfos = new ArrayList<>();
 			this.eventHandlers = new ArrayList<>();
 			this.trackers = new ArrayList<>();
 			this.id = id;
@@ -115,11 +113,6 @@ public final class LSPUtils{
 
 		public LogisticsSolutionBuilder addSolutionElement( LogisticsSolutionElement element ){
 			elements.add(element);
-			return this;
-		}
-
-		public LogisticsSolutionBuilder addInfo( LSPInfo info ) {
-			solutionInfos.add(info);
 			return this;
 		}
 

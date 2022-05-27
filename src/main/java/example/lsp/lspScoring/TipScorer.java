@@ -21,7 +21,6 @@
 package example.lsp.lspScoring;
 
 import lsp.LSP;
-import lsp.LSPInfo;
 import lsp.scoring.LSPScorer;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 

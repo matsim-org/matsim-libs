@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
@@ -55,7 +54,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final ReloadingPointScheduler reloadingScheduler;
 	private final ArrayList <LogisticsSolutionElement> clientElements;
 	private final ArrayList<EventHandler> eventHandlers;
-	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
 
@@ -68,7 +66,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		reloadingScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
 		this.eventHandlers = new ArrayList<>();
-		this.infos = new ArrayList<>();
 		this.trackers = new ArrayList<>();
 		eventHandlers.add(eventHandler);
 	}
