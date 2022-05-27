@@ -24,8 +24,14 @@ import lsp.HasEventHandlers;
 import lsp.HasInfos;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
+/**
+ * @deprecated -- try to do without
+ */
 public interface LSPSimulationTracker extends AfterMobsimListener, HasEventHandlers, HasInfos {
 
+	/**
+	 * @deprecated -- try to do without
+	 */
 	void reset();
 
 }
