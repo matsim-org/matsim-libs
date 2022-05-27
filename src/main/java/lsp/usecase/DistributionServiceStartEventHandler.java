@@ -61,8 +61,8 @@ import lsp.LSPCarrierResource;
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if(abstractPlanElement instanceof LoggedShipmentTransport) {
-			LoggedShipmentTransport transport = (LoggedShipmentTransport) abstractPlanElement;
+		if(abstractPlanElement instanceof ShipmentLeg) {
+			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
 			transport.setEndTime(event.getTime());
 		}		
 	}

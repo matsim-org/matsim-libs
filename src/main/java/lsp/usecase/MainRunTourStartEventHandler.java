@@ -102,7 +102,7 @@ import lsp.LSPCarrierResource;
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
-		LoggedShipmentTransport transport = builder.build();
+		ShipmentLeg transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);

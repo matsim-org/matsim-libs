@@ -30,7 +30,7 @@ import lsp.LSPResource;
 
 
 
-class ScheduledShipmentLoad implements ShipmentPlanElement {
+class ScheduledShipmentLoad implements ShipmentActivity {
 
 	private final double startTime;
 	private final double endTime;

@@ -80,7 +80,7 @@ class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 		builder.setResourceId(resource.getId());
 		builder.setFromLinkId(event.getService().getLocationLinkId());
 		builder.setCarrierId(event.getCarrierId());
-		LoggedShipmentTransport transport = builder.build();
+		ShipmentLeg transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);

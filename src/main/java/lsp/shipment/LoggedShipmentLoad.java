@@ -27,7 +27,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
-/*package-private*/ class LoggedShipmentLoad implements ShipmentPlanElement {
+/*package-private*/ class LoggedShipmentLoad implements ShipmentActivity {
 
 	private final double startTime;
 	private final double endTime;
@@ -68,4 +68,7 @@ import lsp.LSPResource;
 		return resourceId;
 	}
 
+	@Override public Id<Link> getLinkId(){
+		throw new RuntimeException( "not implemented" );
+	}
 }
