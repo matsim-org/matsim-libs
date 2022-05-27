@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
@@ -67,7 +68,7 @@ import java.util.*;
  * 1.) Simple: Nimm die mitgegebene Reihenfolge.
  * 2.)
  */
-/*package-private*/ class ExampleSchedulingOfTransportChainHubsVsDirect {
+/*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {
 
 	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
@@ -102,6 +103,9 @@ import java.util.*;
 
 		}
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
 
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
 
