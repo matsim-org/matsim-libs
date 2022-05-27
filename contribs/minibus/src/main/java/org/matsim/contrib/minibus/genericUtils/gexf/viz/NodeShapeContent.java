@@ -8,7 +8,7 @@
 
 package org.matsim.contrib.minibus.genericUtils.gexf.viz;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 import org.matsim.contrib.minibus.genericUtils.gexf.XMLSpellsContent;
 

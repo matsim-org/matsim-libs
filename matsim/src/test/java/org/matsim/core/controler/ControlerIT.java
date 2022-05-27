@@ -894,27 +894,6 @@ public class ControlerIT {
 	}
 
 	@Test
-	public void testKMLSnapshotWriterOnQSim() {
-		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
-		config.controler().setLastIteration(2);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.googleearth ) );
-		config.qsim().setSnapshotPeriod(600);
-		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
-
-		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "googleearth.kmz")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "googleearth.kmz")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "googleearth.kmz")).exists());
-	}
-
-	@Test
 	public void testOneSnapshotWriterInConfig() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);

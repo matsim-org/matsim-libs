@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.parking.parkingchoice.lib;
 
-import net.opengis.kml.v_2_2_0.DocumentType;
-import net.opengis.kml.v_2_2_0.KmlType;
-import net.opengis.kml.v_2_2_0.ObjectFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -50,7 +47,6 @@ import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.io.KmlNetworkWriter;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -60,13 +56,10 @@ import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.vis.kml.KMZWriter;
 
 import java.awt.*;
 import java.io.*;
@@ -743,34 +736,6 @@ public class GeneralLib {
 		newPerson.setSelectedPlan(newPlan);
 		PersonUtils.removeUnselectedPlans(newPerson);
 		return newPerson;
-	}
-
-	public static void convertMATSimNetworkToKmz(String matsimNetworkFileName,
-			String outputKmzFileName) throws IOException {
-		Network network = readNetwork(matsimNetworkFileName);
-
-		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		KMZWriter kmzWriter = new KMZWriter(outputKmzFileName);
-
-		KmlType mainKml = kmlObjectFactory.createKmlType();
-		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
-		mainKml.setAbstractFeatureGroup(kmlObjectFactory
-				.createDocument(mainDoc));
-
-		// KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new
-		// AtlantisToWGS84(), kmzWriter, mainDoc);
-		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,
-				new CH1903LV03toWGS84(), kmzWriter, mainDoc);
-		// KmlNetworkWriter kmlNetworkWriter = new
-		// KmlNetworkWriter(network,TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S,
-		// TransformationFactory.WGS84), kmzWriter, mainDoc);
-
-		mainDoc.getAbstractFeatureGroup().add(
-				kmlObjectFactory.createFolder(kmlNetworkWriter
-						.getNetworkFolder()));
-
-		kmzWriter.writeMainKml(mainKml);
-		kmzWriter.close();
 	}
 
 	// TODO: there are some classes (e.g.
