@@ -22,16 +22,18 @@ package lsp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* package-private */ class LogisticsSolutionImpl implements LogisticsSolution {
 
-	
+	private final Attributes attributes = new Attributes();
 	private final Id<LogisticsSolution> id;
 	private LSP lsp;
 	private final Collection<LogisticsSolutionElement> solutionElements;
@@ -85,12 +87,6 @@ import lsp.controler.LSPSimulationTracker;
 	}
 	
 	@Override
-	public Collection<LSPInfo> getInfos() {
-		return solutionInfos;
-	}
-
-
-	@Override
 	public Collection<EventHandler> getEventHandlers() {
 		return eventHandlers;
 	}
@@ -100,7 +96,11 @@ import lsp.controler.LSPSimulationTracker;
 	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
-		this.solutionInfos.addAll(tracker.getInfos());
+//		this.solutionInfos.addAll(tracker.getAttributes() );
+		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+			this.attributes.putAttribute( entry.getKey(), entry.getValue());
+		}
+
 	}
 
 
@@ -108,7 +108,16 @@ import lsp.controler.LSPSimulationTracker;
 	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
 	}
-	
+
+	@Override public Attributes getAttributes(){
+		for( LSPSimulationTracker tracker : this.trackers ){
+			for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+				this.attributes.putAttribute( entry.getKey(), entry.getValue());
+			}
+		}
+		return attributes;
+	}
+
 //	@Override
 //	public void setEventsManager(EventsManager eventsManager) {
 //	}

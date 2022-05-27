@@ -65,7 +65,7 @@ public class FirstReloadAdapterTest {
 		assertNotNull(reloadingPoint.getEventHandlers());
 		assertFalse(reloadingPoint.getEventHandlers().isEmpty());
 		assertEquals(1, reloadingPoint.getEventHandlers().size());
-		assertNotNull(reloadingPoint.getInfos());
-		assertTrue(reloadingPoint.getInfos().isEmpty());
+		assertNotNull(reloadingPoint.getAttributes() );
+		assertTrue(reloadingPoint.getAttributes().isEmpty() );
 	}
 }

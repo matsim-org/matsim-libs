@@ -25,10 +25,8 @@ import java.util.*;
 import lsp.*;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
@@ -47,7 +45,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.LSPInfo;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
@@ -208,17 +205,22 @@ import lsp.shipment.LSPShipment;
 		controler.run();
 
 		//Retrieve cost info from lsp
-		LSPInfo costInfo;
-		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getInfos()) {
+//		LSPInfo costInfo;
+//		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getAttributes()) {
 //			if( Objects.equals( info.getName(), "cost_function" ) ) {
 //				costInfo = info;
 //				for(  Map.Entry value : costInfo.getAttributes().getAttributes().getAsMap().entrySet() ){
 //					System.out.println(value.getKey() + " " + value.getValue());
 //				}
 //			}
-			for( Map.Entry<String, Object> entry : info.getAttributes().getAsMap().entrySet() ){
-				System.out.println( entry.getKey() + " " + entry.getValue() );
-			}
+//			for( Map.Entry<String, Object> entry : info.getAttributes().getAsMap().entrySet() ){
+//				System.out.println( entry.getKey() + " " + entry.getValue() );
+//			}
+//		}
+		for( LogisticsSolution solution : lsp.getSelectedPlan().getSolutions() ){
+			System.out.println( solution.getAttributes().getAttribute( "cost_function" ));
 		}
+
+
 	}
 }

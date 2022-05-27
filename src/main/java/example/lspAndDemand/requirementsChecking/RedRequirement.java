@@ -28,11 +28,14 @@ import lsp.shipment.Requirement;
 
 	@Override
 	public boolean checkRequirement(LogisticsSolution solution) {
-		for(LSPInfo info : solution.getInfos()) {
-			if(info instanceof RedInfo) {
-				return true;
-			}
-		}	
+//		for(LSPInfo info : solution.getAttributes()) {
+//			if(info instanceof RedInfo) {
+//				return true;
+//			}
+//		}
+		if ( solution.getAttributes().getAttribute( "color" ).equals( "blue" ) ) {
+			return true;
+		}
 		return false;
 	}
 

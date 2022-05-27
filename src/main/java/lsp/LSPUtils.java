@@ -26,6 +26,7 @@ import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -175,7 +176,7 @@ public final class LSPUtils{
 		}
 		return (LSPs) result;
 	}
-//	The following would be closer to how we have done it elsewhere (scenario containers are mutable).  kai, may'22'
+ //	The following would be closer to how we have done it elsewhere (scenario containers are mutable).  kai, may'22'
 //	public static LSPs createOrGetLPSs( Scenario scenario ){
 //		Object result = scenario.getScenarioElement( lspsString );
 //		LSPs lsps;
@@ -187,4 +188,18 @@ public final class LSPUtils{
 //		}
 //		return lsps;
 //	}
+
+	public static Double getVariableCost( Attributable attributable ) {
+		return (Double) attributable.getAttributes().getAttribute( "variableCost" );
+	}
+	public static void setVariableCost( Attributable attributable, Double variableCost ) {
+		attributable.getAttributes().putAttribute( "variableCost", variableCost );
+	}
+	public static Double getFixedCost( Attributable attributable ) {
+		return (Double) attributable.getAttributes().getAttribute( "fixedCost" );
+	}
+	public static void setFixedCost( Attributable attributable, Double fixedCost ) {
+		attributable.getAttributes().putAttribute( "fixedCost", fixedCost );
+	}
+
 }

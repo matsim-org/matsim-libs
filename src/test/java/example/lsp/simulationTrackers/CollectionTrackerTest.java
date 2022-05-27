@@ -28,11 +28,8 @@ import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.LSPInfo;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.LSPResource;
-import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
 import lsp.usecase.*;
@@ -307,14 +304,21 @@ public class CollectionTrackerTest {
 		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment)*0.01);
 		assertEquals(fixedScheduledCostsPerShipment, fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, fixedScheduledCostsPerShipment)*0.01);
 
-		assertEquals(1, collectionSolution.getInfos().size());
-		LSPInfo info = collectionSolution.getInfos().iterator().next();
-		assertTrue(info instanceof CostInfo );
-		CostInfo costInfo = (CostInfo) info;
+//		LSPInfo info = collectionSolution.getAttributes().iterator().next();
+//		assertTrue(info instanceof CostInfo );
+//		CostInfo costInfo = (CostInfo) info;
 
-		assertEquals(costInfo.getVariableCost() ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
-		assertEquals(costInfo.getVariableCost()  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
-		assertEquals(costInfo.getFixedCost() ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
-		assertEquals(costInfo.getFixedCost(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+//		assertEquals(costInfo.getVariableCost() ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
+//		assertEquals(costInfo.getVariableCost()  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
+//		assertEquals(costInfo.getFixedCost() ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+//		assertEquals(costInfo.getFixedCost(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+
+		// I cannot say how the above was supposed to work, since costInfo.getVariableCost() was the same in both cases.  kai, may'22
+
+		assertEquals(2, collectionSolution.getAttributes().size() );
+		assertEquals( LSPUtils.getVariableCost( collectionSolution ) ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,LSPUtils.getVariableCost( collectionSolution ) ) * 0.01 );
+		assertEquals( LSPUtils.getVariableCost( collectionSolution )  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,LSPUtils.getVariableCost( collectionSolution ) ) * 0.01 );
+		assertEquals( LSPUtils.getFixedCost( collectionSolution ) ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,LSPUtils.getFixedCost( collectionSolution )) * 0.01 );
+		assertEquals( LSPUtils.getFixedCost( collectionSolution ),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,LSPUtils.getFixedCost( collectionSolution )) * 0.01 );
 	}
 }

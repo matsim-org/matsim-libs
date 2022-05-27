@@ -227,8 +227,8 @@ public class CompleteSolutionTest {
 	public void testCompleteSolution() {
 		assertNotNull(solution.getEventHandlers());
 		assertTrue(solution.getEventHandlers().isEmpty());
-		assertNotNull(solution.getInfos());
-		assertTrue(solution.getInfos().isEmpty());
+		assertNotNull(solution.getAttributes() );
+		assertTrue(solution.getAttributes().isEmpty() );
 		assertNull(solution.getLSP() );
 		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());

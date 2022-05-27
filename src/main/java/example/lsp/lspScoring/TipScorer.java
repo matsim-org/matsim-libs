@@ -38,17 +38,23 @@ import java.util.Map;
 	@Override
 	public double scoreCurrentPlan(LSP lsp) {
 		double score = 0;
-		for(LSPInfo info : tracker.getInfos()) {
-			if(info instanceof TipInfo) {
-				Attributes function = info.getAttributes();
-				for(  Map.Entry<String,Object> entry : function.getAsMap().entrySet() ) {
-					if(entry.getKey().equals("TIP IN EUR") && entry.getValue() instanceof Double) {
-						double trinkgeldValue = (Double) entry.getValue();
-						score += trinkgeldValue;
-					}
-				}
-			}
+//		for(LSPInfo info : tracker.getAttributes()) {
+//			if(info instanceof TipInfo) {
+//				Attributes function = info.getAttributes();
+//				for(  Map.Entry<String,Object> entry : function.getAsMap().entrySet() ) {
+//					if(entry.getKey().equals("TIP IN EUR") && entry.getValue() instanceof Double) {
+//						double trinkgeldValue = (Double) entry.getValue();
+//						score += trinkgeldValue;
+//					}
+//				}
+//			}
+//		}
+
+		Double tip = (Double) tracker.getAttributes().getAttribute( "TIP IN EUR" );
+		if ( tip != null ){
+			score += tip;
 		}
+
 		return score;
 	}
 

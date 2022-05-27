@@ -111,8 +111,8 @@ public class MainRunAdapterTest {
 		assertSame(mainRunAdapter.getStartLinkId(), fromLinkId);
 		assertNotNull(mainRunAdapter.getEventHandlers());
 		assertTrue(mainRunAdapter.getEventHandlers().isEmpty());
-		assertNotNull(mainRunAdapter.getInfos());
-		assertTrue(mainRunAdapter.getInfos().isEmpty());
+		assertNotNull(mainRunAdapter.getAttributes() );
+		assertTrue(mainRunAdapter.getAttributes().isEmpty() );
 		if(mainRunAdapter.getCarrier() == carrier) {
 			assertSame(carrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));

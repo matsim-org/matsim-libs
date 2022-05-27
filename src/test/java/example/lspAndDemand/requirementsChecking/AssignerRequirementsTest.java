@@ -98,7 +98,8 @@ public class AssignerRequirementsTest {
 		LSPUtils.LogisticsSolutionBuilder redCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(redCollectionSolutionId );
 		redCollectionSolutionBuilder.addSolutionElement(redCollectionElement);
 		redSolution = redCollectionSolutionBuilder.build();
-		redSolution.getInfos().add(new RedInfo() );
+//		redSolution.getAttributes().add(new RedInfo() );
+		redSolution.getAttributes().putAttribute( "color", "red");
 
 		ShipmentAssigner assigner = new RequirementsAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
@@ -133,7 +134,8 @@ public class AssignerRequirementsTest {
 		LSPUtils.LogisticsSolutionBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(blueCollectionSolutionId );
 		blueCollectionSolutionBuilder.addSolutionElement(blueCollectionElement);
 		blueSolution = blueCollectionSolutionBuilder.build();
-		blueSolution.getInfos().add(new BlueInfo() );
+//		blueSolution.getAttributes().add(new BlueInfo() );
+		blueSolution.getAttributes().putAttribute( "color", "blue" );
 		collectionPlan.addSolution(blueSolution);
 		
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));

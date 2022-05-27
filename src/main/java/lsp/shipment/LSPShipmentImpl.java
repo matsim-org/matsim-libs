@@ -31,8 +31,10 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LogisticsSolution;
 import lsp.LSPInfo;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class LSPShipmentImpl implements LSPShipment {
+	private final Attributes attributes = new Attributes();
 
 	private final Id<LSPShipment> id;
 	private final Id<Link> fromLinkId;
@@ -124,11 +126,6 @@ class LSPShipmentImpl implements LSPShipment {
 		return requirements;
 	}
 
-	@Override
-	public Collection<LSPInfo> getInfos() {
-		return infos;
-	}
-
 	@Override public Id<LogisticsSolution> getSolutionId() {
 		return solutionId;
 	}
@@ -136,5 +133,8 @@ class LSPShipmentImpl implements LSPShipment {
 	@Override public double getPickupServiceTime(){
 		return pickupServiceTime;
 	}
-	
+
+	@Override public Attributes getAttributes(){
+		return attributes;
+	}
 }

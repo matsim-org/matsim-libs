@@ -32,11 +32,14 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LSPInfo;
 import lsp.controler.LSPSimulationTracker;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*package-private*/ class TipSimulationTracker implements LSPSimulationTracker{
 
+	private final Attributes attributes = new Attributes();
+
 	private final TipEventHandler handler = new TipEventHandler();
-	private final LSPInfo info = new TipInfo();
+//	private final LSPInfo info = new TipInfo();
 
 	@Override
 	public Collection<EventHandler> getEventHandlers() {
@@ -46,19 +49,12 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Collection<LSPInfo> getInfos() {
-		List<LSPInfo> infos = new ArrayList<>();
-		infos.add(info);
-		return infos;
-	}
-
-	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		double tip = handler.getTip();
 //		LSPInfoFunctionValueImpl<Object> value = LSPInfoFunctionUtils.createInfoFunctionValue( "TIP IN EUR" );
 //		value.setValue(tip);
 //		info.getAttributes().getAttributes().add(value );
-		info.getAttributes().putAttribute( "TIP IN EUR", tip );
+		this.getAttributes().putAttribute( "TIP IN EUR", tip );
 	}
 
 	@Override
@@ -66,4 +62,7 @@ import lsp.controler.LSPSimulationTracker;
 		// TODO Auto-generated method stub
 	}
 
+	@Override public Attributes getAttributes(){
+		return attributes;
+	}
 }

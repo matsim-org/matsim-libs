@@ -142,18 +142,18 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 			}
 		}
 
-		for(LSP lsp : lsps.getLSPs().values()) {
-			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for(LSPInfo info : element.getInfos()) {
-						info.update();
-					}
-				}
-				for(LSPInfo info : solution.getInfos()) {
-					info.update();
-				}
-			}
-		}
+//		for(LSP lsp : lsps.getLSPs().values()) {
+//			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+//				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+//					for(LSPInfo info : element.getAttributes()) {
+//						info.update();
+//					}
+//				}
+//				for(LSPInfo info : solution.getAttributes()) {
+//					info.update();
+//				}
+//			}
+//		}
 	}
 
 

@@ -87,7 +87,8 @@ class ExampleCheckRequirementsOfAssigner {
 		LogisticsSolution redSolution = redSolutionBuilder.build();
 		
 		//Add info that shows the world the color of the solution
-		redSolution.getInfos().add(new RedInfo());
+//		redSolution.getAttributes().add(new RedInfo() );
+		redSolution.getAttributes().putAttribute( "color", "red" );
 		
 		
 		//Create blue LogisticsSolution which has the corresponding info
@@ -121,7 +122,8 @@ class ExampleCheckRequirementsOfAssigner {
 		LogisticsSolution blueSolution = blueSolutionBuilder.build();
 		
 		//Add info that shows the world the color of the solution
-		blueSolution.getInfos().add(new BlueInfo());
+//		blueSolution.getAttributes().add(new BlueInfo() );
+		blueSolution.getAttributes().putAttribute( "color", "blue" );
 				
 		//Create the initial plan, add assigner that checks requirements of the shipments when assigning and add both solutions (red and blue) to the 
 		//plan.

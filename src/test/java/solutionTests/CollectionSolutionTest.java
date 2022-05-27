@@ -101,8 +101,8 @@ public class CollectionSolutionTest {
 	public void testCollectionSolution() {
 		assertNotNull(collectionSolution.getEventHandlers());
 		assertTrue(collectionSolution.getEventHandlers().isEmpty());
-		assertNotNull(collectionSolution.getInfos());
-		assertTrue(collectionSolution.getInfos().isEmpty());
+		assertNotNull(collectionSolution.getAttributes() );
+		assertTrue(collectionSolution.getAttributes().isEmpty() );
 		assertNull(collectionSolution.getLSP() );
 		assertNotNull(collectionSolution.getShipments());
 		assertTrue(collectionSolution.getShipments().isEmpty());
