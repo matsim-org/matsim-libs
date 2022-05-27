@@ -25,13 +25,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-import com.google.inject.Provides;
 import lsp.*;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.*;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +38,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -51,7 +48,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.LSPResource;
 
 /*package-private*/ class ExampleMobsimOfSimpleLSP {
@@ -191,7 +187,7 @@ import lsp.LSPResource;
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		} );
 		config.controler().setFirstIteration(0);
