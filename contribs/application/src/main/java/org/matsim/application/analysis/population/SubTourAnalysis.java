@@ -31,8 +31,8 @@ public class SubTourAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
 	private Set<String> chainBasedModes;
 
-	@CommandLine.Option(names = "--ignore-plans", description = "Ignore plans containing certain modes", defaultValue = "freight", split = ",")
-	private Set<String> ignoreModes;
+	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
+	private String subpopulation;
 
 	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "betweenAllAndFewerConstraints")
 	private SubtourModeChoice.Behavior behavior;
@@ -56,21 +56,23 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 		Set<String> modes = new HashSet<>(chainBasedModes);
 
-		outer:
+		List<Person> persons = new ArrayList<>();
+
 		for (Person agent : population.getPersons().values()) {
 			Plan plan = agent.getSelectedPlan();
+
+			String subpop = PopulationUtils.getSubpopulation(agent);
+			if (!subpop.equals(subpopulation)) continue;
 
 			List<Leg> legs = TripStructureUtils.getLegs(plan);
 
 			for (Leg leg : legs) {
-				if (ignoreModes.contains(leg.getMode()))
-					break outer;
-
 				modes.add(leg.getMode());
 			}
 
 			Collection<TripStructureUtils.Subtour> subtour = TripStructureUtils.getSubtours(plan);
 			subtours.addAll(subtour);
+			persons.add(agent);
 		}
 
 		log.info("Detected modes: {}", modes);
@@ -99,7 +101,7 @@ public class SubTourAnalysis implements MATSimAppCommand {
 			int empty = 0;
 			int tripMissing = 0;
 
-			for (Person p : population.getPersons().values()) {
+			for (Person p : persons) {
 
 				Plan plan = p.getSelectedPlan();
 
@@ -109,7 +111,6 @@ public class SubTourAnalysis implements MATSimAppCommand {
 				// person with no trips always have no choice set
 				if (cset.isEmpty() && !trips.isEmpty()) {
 						empty++;
-						strategy.determineChoiceSet(plan);
 				}
 
 				// remove all trips that are considered for a change

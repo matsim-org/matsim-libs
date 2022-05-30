@@ -19,20 +19,23 @@ public class ForceInnovationStrategyChooserTest {
 	public void permutation() {
 
 		List<Integer> collected = new ArrayList<>();
-		int lastPerm = -1;
 
-		for (int iter = 0; iter < 500; iter++) {
+		int lastPerm = 0;
+
+		for (int iter = 0; iter < 1000; iter++) {
 
 			List<Integer> selected = new ArrayList<>();
 
-			int perm = (iter / ITER) % 32;
+			int perm = (iter / ITER) % 16;
 
 			if (perm != lastPerm) {
 
 				lastPerm = perm;
 
 				collected.sort(Integer::compareTo);
-				System.out.println(collected.size());
+
+				// test that every person has been selected
+				assertEquals(N, collected.size());
 
 				collected = new ArrayList<>();
 			}
@@ -46,6 +49,11 @@ public class ForceInnovationStrategyChooserTest {
 					selected.add(i);
 
 			}
+
+			double size = N / (double) ITER;
+
+			// allow % of deviation
+			assertEquals(size, selected.size(), size * 0.1);
 
 			collected.addAll(selected);
 			//System.out.println("Iteration: " + iter + ", selection: " + selected.size());

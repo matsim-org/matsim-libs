@@ -1,5 +1,7 @@
 package org.matsim.application.prepare.population;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -13,13 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-@CommandLine.Command(
-		name = "normalize-trip-modes",
-		description = "Adjust subtour modes so that one subtour can not mix chain-based with other modes and all subtours are mass-conserving.",
-		showDefaultValues = true
-)
+@CommandLine.Command(name = "normalize-trip-modes", description = "Adjust trip modes to be the same throughout the day.", showDefaultValues = true)
 public class NormalizeTripModes implements MATSimAppCommand {
 
+	private static final Logger log = LogManager.getLogger(NormalizeTripModes.class);
 
 	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
 	private Path input;
@@ -27,11 +26,19 @@ public class NormalizeTripModes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--output", description = "Path for output population", required = true)
 	private Path output;
 
+	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
+	private String subpopulation;
+
 	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
 	private Set<String> chainBasedModes;
 
-	@CommandLine.Option(names = "--modes", description = "Create a plan for each mode", defaultValue = "walk", split = ",")
+	@CommandLine.Option(names = "--modes", description = "Modes to choose from.", defaultValue = "walk", split = ",")
 	private List<String> modes;
+
+	@CommandLine.Option(names = "--duplicate-per-mode", description = "Duplicate selected plan for each mode", defaultValue = "false")
+	private boolean perMode;
+
+	private final SplittableRandom rnd = new SplittableRandom(4117);
 
 	public static void main(String[] args) {
 		new NormalizeTripModes().execute(args);
@@ -42,39 +49,66 @@ public class NormalizeTripModes implements MATSimAppCommand {
 
 		Population population = PopulationUtils.readPopulation(input.toString());
 
-		if (output.getParent() != null)
-			Files.createDirectories(output.getParent());
+		if (output.getParent() != null) Files.createDirectories(output.getParent());
+
+		int processed = 0;
 
 		for (Person person : population.getPersons().values()) {
 
-			Plan plan = person.getSelectedPlan();
+			String subpop = PopulationUtils.getSubpopulation(person);
+			if (!subpop.equals(subpopulation)) continue;
 
-			// remove all unselected plans
-			Set<Plan> plans = new HashSet<>(person.getPlans());
-			plans.remove(plan);
-			plans.forEach(person::removePlan);
+			if (perMode) duplicatePlans(person);
+			else selectMode(person);
 
-			for (String mode : modes) {
-
-				plan.setType(mode);
-
-				for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
-					for (Leg leg : trip.getLegsOnly()) {
-
-						leg.setRoute(null);
-						leg.setMode(mode);
-						TripStructureUtils.setRoutingMode(leg, mode);
-					}
-
-				}
-
-				plan = person.createCopyOfSelectedPlanAndMakeSelected();
-			}
+			processed++;
 		}
+
+		log.info("Processed {} out of {} persons", processed, population.getPersons().size());
 
 		PopulationUtils.writePopulation(population, output.toString());
 
 		return 0;
 	}
 
+	private void duplicatePlans(Person person) {
+
+		Plan plan = person.getSelectedPlan();
+
+		// remove all unselected plans
+		Set<Plan> plans = new HashSet<>(person.getPlans());
+		plans.remove(plan);
+		plans.forEach(person::removePlan);
+
+		for (String mode : modes) {
+
+			plan.setType(mode);
+
+			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
+				for (Leg leg : trip.getLegsOnly()) {
+
+					leg.setRoute(null);
+					leg.setMode(mode);
+					TripStructureUtils.setRoutingMode(leg, mode);
+				}
+
+			}
+
+			plan = person.createCopyOfSelectedPlanAndMakeSelected();
+		}
+
+	}
+
+	private void selectMode(Person person) {
+
+		String mode = modes.get(rnd.nextInt(modes.size()));
+
+		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+			for (Leg leg : trip.getLegsOnly()) {
+				leg.setRoute(null);
+				leg.setMode(mode);
+				TripStructureUtils.setRoutingMode(leg, mode);
+			}
+		}
+	}
 }

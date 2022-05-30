@@ -157,8 +157,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 		return determineChoiceSet(
 						homeLocation,
-						TripStructureUtils.getTrips(plan),
-						TripStructureUtils.getSubtours(plan),
+						plan,
 						permissibleModesForThisPlan);
 	}
 
@@ -197,12 +196,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
 
 
-		List<Candidate> choiceSet =
-					determineChoiceSet(
-							homeLocation,
-							TripStructureUtils.getTrips(plan),
-							TripStructureUtils.getSubtours(plan),
-							permissibleModesForThisPlan);
+		List<Candidate> choiceSet = determineChoiceSet(homeLocation, plan, permissibleModesForThisPlan);
 
 		if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
@@ -214,10 +208,18 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private List<Candidate> determineChoiceSet(
 			final Id<? extends BasicLocation> homeLocation,
-			final List<Trip> trips,
-			final Collection<Subtour> subtours,
+			final Plan plan,
 			final Collection<String> permissibleModesForThisPerson) {
+
+		final List<Trip> trips = TripStructureUtils.getTrips(plan);
+		final List<Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan));
 		final ArrayList<Candidate> choiceSet = new ArrayList<>();
+
+		// there is no subtour containing all trips, so it will be added
+		if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints && trips.size() > 0 && subtours.stream().noneMatch(s -> s.getTrips().equals(trips))) {
+			subtours.add(0, TripStructureUtils.getUnclosedRootSubtour(plan));
+		}
+
 		for ( Subtour subtour : subtours ) {
 
 			// If subtour is not closed, it will still be considered if constrains are disabled
@@ -414,7 +416,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 					trip.getDestinationActivity());
 		}
 
-		if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints && containsChainBasedMode && originalModes.size() > 1) {
+
+		// If this is a subtour covering all trips, this constraint will not fail
+		if (behavior == SubtourModeChoice.Behavior.betweenAllAndFewerConstraints
+				&& containsChainBasedMode && originalModes.size() > 1
+				&& TripStructureUtils.getTrips(plan).size() != whatToDo.subtour.getTrips().size()
+		) {
 
 
 			logger.error("Subtour of person {} contains a mix of chain- and non-chainbased modes: {}. " +

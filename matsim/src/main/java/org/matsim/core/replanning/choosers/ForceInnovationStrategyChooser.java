@@ -47,7 +47,7 @@ public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends Has
 		double total = 0;
 
 		// permutation term so the selection is different every nth iterations
-		int perm = (replanningContext.getIteration() / iter) % 32;
+		int perm = (replanningContext.getIteration() / iter) % 16;
 
 		for (int i = 0; i < weights.size(); i++) {
 
