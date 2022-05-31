@@ -133,13 +133,6 @@
 			<version>0.48.3</version>
 		</dependency>
 		<dependency>
-			<groupId>de.micromata.jak</groupId>
-			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadyts-integration</artifactId>
 			<version>15.0-SNAPSHOT</version>
@@ -185,8 +178,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
-			<artifactId>graphhopper-reader-osm</artifactId>
-			<version>2.4</version>
+			<artifactId>graphhopper-core</artifactId>
+			<version>5.3</version>
 		</dependency>
 	</dependencies>
 </project>

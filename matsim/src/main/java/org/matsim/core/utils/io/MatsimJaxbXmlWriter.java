@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
 
 import org.matsim.core.api.internal.MatsimWriter;
 
