@@ -28,7 +28,6 @@ import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.ShipmentPlanElementComparator;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
@@ -207,9 +206,9 @@ public class MainRunOnlyLSPMobsimTest {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort(new ShipmentPlanElementComparator());
+			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort(new ShipmentPlanElementComparator());
+			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 
 			for(ShipmentPlanElement scheduleElement : scheduleElements){
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));

@@ -28,7 +28,6 @@ import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.ShipmentPlanElementComparator;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.matsim.api.core.v01.Id;
@@ -353,9 +352,9 @@ import java.util.Random;
 		for(LSPShipment shipment : lsp.getShipments()) {
 			System.out.println("Shipment: " + shipment.getId());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort(new ShipmentPlanElementComparator());
+			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort(new ShipmentPlanElementComparator());
+			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 
 			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());

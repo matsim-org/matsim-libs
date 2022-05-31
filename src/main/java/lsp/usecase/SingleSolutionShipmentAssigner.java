@@ -34,11 +34,11 @@ import org.matsim.core.gbl.Gbl;
  *
  * (Falls die Voraussetzung "exakt 1 Solution pro Plan" nicht erfüllt ist, kommt eine RuntimeException)
  */
-class DeterministicShipmentAssigner implements ShipmentAssigner {
+class SingleSolutionShipmentAssigner implements ShipmentAssigner {
 
 	private LSP lsp;
 
-	DeterministicShipmentAssigner() {
+	SingleSolutionShipmentAssigner() {
 	}
 
 	public void setLSP(LSP lsp) {

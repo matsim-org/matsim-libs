@@ -22,6 +22,8 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
@@ -72,7 +74,7 @@ import org.matsim.vehicles.VehicleType;
 	}
 	
 	private Carrier carrier;
-	private MainRunCarrierAdapter adapter;
+	private MainRunCarrierResource adapter;
 	private ArrayList<LSPCarrierPair>pairs;
 
 
@@ -82,8 +84,8 @@ import org.matsim.vehicles.VehicleType;
 	
 	@Override protected void initializeValues( LSPResource resource ) {
 		this.pairs = new ArrayList<>();
-		if(resource.getClass() == MainRunCarrierAdapter.class){
-			this.adapter = (MainRunCarrierAdapter) resource;
+		if(resource.getClass() == MainRunCarrierResource.class){
+			this.adapter = (MainRunCarrierResource) resource;
 			this.carrier = adapter.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
@@ -94,8 +96,8 @@ import org.matsim.vehicles.VehicleType;
 	
 	@Override protected void scheduleResource() {
 		int load = 0;
-		ArrayList<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
-		copyOfAssignedShipments.sort(new ShipmentComparator());
+		List<ShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(shipments);
+		copyOfAssignedShipments.sort( Comparator.comparingDouble( ShipmentWithTime::getTime ) );
 		ArrayList<ShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
 		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 
@@ -126,7 +128,7 @@ import org.matsim.vehicles.VehicleType;
 	
 	
 	
-	private CarrierPlan createPlan(Carrier carrier, ArrayList<ShipmentWithTime> tuples ){
+	private CarrierPlan createPlan(Carrier carrier, List<ShipmentWithTime> tuples ){
 		
 		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), adapter.getCarrier().getCarrierCapabilities().getVehicleTypes());
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();

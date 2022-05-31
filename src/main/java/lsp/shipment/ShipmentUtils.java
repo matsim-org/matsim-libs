@@ -30,6 +30,8 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public final class ShipmentUtils{
 	private ShipmentUtils(){} // do not instantiate
@@ -165,7 +167,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class LoggedShipmentTransportBuilder {
+	public static final class LoggedShipmentTransportBuilder {
 		private double startTime;
 		private LogisticsSolutionElement element;
 		private Id<LSPResource> resourceId;
@@ -234,7 +236,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class ScheduledShipmentUnloadBuilder{
+	public static final class ScheduledShipmentUnloadBuilder{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
@@ -283,7 +285,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class ScheduledShipmentTransportBuilder{
+	public static final class ScheduledShipmentTransportBuilder{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
@@ -337,7 +339,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class ScheduledShipmentLoadBuilder{
+	public static final class ScheduledShipmentLoadBuilder{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
@@ -386,7 +388,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class ScheduledShipmentHandleBuilder{
+	public static final class ScheduledShipmentHandleBuilder{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
@@ -423,7 +425,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class LoggedShipmentUnloadBuilder{
+	public static final class LoggedShipmentUnloadBuilder{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
@@ -467,7 +469,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static class LSPShipmentBuilder{
+	public static final class LSPShipmentBuilder{
 		final Id<LSPShipment> id;
 		Id<Link> fromLinkId;
 		Id<Link> toLinkId;
@@ -476,7 +478,7 @@ public final class ShipmentUtils{
 		int capacityDemand;
 		double deliveryServiceTime;
 		double pickupServiceTime;
-		final ArrayList<Requirement> requirements;
+		final List<Requirement> requirements;
 
 		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
 			return new LSPShipmentBuilder(id);
@@ -522,5 +524,8 @@ public final class ShipmentUtils{
 		public LSPShipment build(){
 			return new LSPShipmentImpl(this);
 		}
+	}
+	public static Comparator<ShipmentPlanElement> createShipmentPlanElementComparator(){
+		return new ShipmentPlanElementComparator();
 	}
 }

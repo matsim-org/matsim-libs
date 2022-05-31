@@ -37,7 +37,7 @@ import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/*package-private*/ class DistributionCarrierAdapter implements LSPCarrierResource {
+/*package-private*/ class DistributionCarrierResource implements LSPCarrierResource {
 
 	private final Attributes attributes = new Attributes();
 	private final Id<LSPResource>id;
@@ -48,7 +48,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Collection<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker> trackers;
 
-	DistributionCarrierAdapter(UsecaseUtils.DistributionCarrierAdapterBuilder builder){
+	DistributionCarrierResource( UsecaseUtils.DistributionCarrierAdapterBuilder builder ){
 			this.id = builder.id;
 		Id<Link> locationLinkId = builder.locationLinkId;
 			this.distributionHandler = builder.distributionHandler;

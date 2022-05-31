@@ -22,6 +22,7 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -45,6 +46,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * (i.e. crossdocking) of the shipment is entered. In the example, crossdocking
  * starts as soon as the considered LSPShipment arrives at the {@link ReloadingPoint}
  * and ends after a fixed and a size dependent amount of time.
+ * <p/>
+ * <ul>Discussion points:
+ * <li>yyyy Ich fände TransshipmentHub als Name besser.  kai, may'22 </li></ul>
  */
 /*package-private*/ class ReloadingPoint implements LSPResource {
 	private final Attributes attributes = new Attributes();
@@ -52,10 +56,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Id<LSPResource> id;
 	private final Id<Link> locationLinkId;
 	private final ReloadingPointScheduler reloadingScheduler;
-	private final ArrayList <LogisticsSolutionElement> clientElements;
-	private final ArrayList<EventHandler> eventHandlers;
+	private final List<LogisticsSolutionElement> clientElements;
+	private final List<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker> trackers;
-	private ReloadingPointTourEndEventHandler eventHandler;
 
 	ReloadingPoint(UsecaseUtils.ReloadingPointBuilder builder){
 		this.id = builder.getId();

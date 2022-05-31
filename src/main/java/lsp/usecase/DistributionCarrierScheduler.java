@@ -73,7 +73,7 @@ import org.matsim.vehicles.VehicleType;
 	
 	
 	private Carrier carrier;
-	private DistributionCarrierAdapter adapter;
+	private DistributionCarrierResource adapter;
 	private ArrayList<LSPCarrierPair>pairs;
 
 	
@@ -84,8 +84,8 @@ import org.matsim.vehicles.VehicleType;
 
 	@Override protected void initializeValues( LSPResource resource ) {
 		this.pairs = new ArrayList<>();
-		if(resource.getClass() == DistributionCarrierAdapter.class){
-			this.adapter = (DistributionCarrierAdapter) resource;
+		if(resource.getClass() == DistributionCarrierResource.class){
+			this.adapter = (DistributionCarrierResource) resource;
 			this.carrier = adapter.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();

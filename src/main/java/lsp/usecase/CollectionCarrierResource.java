@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/*package-private*/ class CollectionCarrierAdapter implements LSPCarrierResource {
+/*package-private*/ class CollectionCarrierResource implements LSPCarrierResource {
 
 	private final Attributes attributes = new Attributes();
 	private final Id<LSPResource>id;
@@ -48,7 +48,7 @@ import java.util.Map;
 	private final Collection<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker> trackers;
 
-	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
+	CollectionCarrierResource( UsecaseUtils.CollectionCarrierAdapterBuilder builder ){
 		this.id = builder.id;
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;

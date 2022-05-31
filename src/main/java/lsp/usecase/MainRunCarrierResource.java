@@ -36,7 +36,7 @@ import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/*package-private*/ class MainRunCarrierAdapter implements LSPCarrierResource {
+/*package-private*/ class MainRunCarrierResource implements LSPCarrierResource {
 	private final Attributes attributes = new Attributes();
 
 	private final Id<LSPResource>id;
@@ -50,7 +50,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Collection<LSPSimulationTracker> trackers;
 
 
-	MainRunCarrierAdapter(UsecaseUtils.MainRunCarrierAdapterBuilder builder){
+	MainRunCarrierResource( UsecaseUtils.MainRunCarrierAdapterBuilder builder ){
 			this.id = builder.getId();
 			this.carrier = builder.getCarrier();
 			this.fromLinkId = builder.getFromLinkId();

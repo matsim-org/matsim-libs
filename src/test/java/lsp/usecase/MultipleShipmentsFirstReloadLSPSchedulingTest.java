@@ -194,7 +194,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort(new ShipmentPlanElementComparator());
+			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			
 			System.out.println();
 			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
@@ -207,7 +207,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		for(LSPShipment shipment : lsp.getShipments()){
 			assertEquals(4, shipment.getShipmentPlan().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			planElements.sort(new ShipmentPlanElementComparator());
+			planElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			assertEquals("HANDLE", planElements.get(3).getElementType());
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
