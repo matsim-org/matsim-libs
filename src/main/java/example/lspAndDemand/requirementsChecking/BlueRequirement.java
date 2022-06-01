@@ -20,7 +20,6 @@
 
 package example.lspAndDemand.requirementsChecking;
 
-import lsp.LSPInfo;
 import lsp.LogisticsSolution;
 import lsp.shipment.Requirement;
 
@@ -28,11 +27,14 @@ import lsp.shipment.Requirement;
 
 	@Override
 	public boolean checkRequirement(LogisticsSolution solution) {
-		for(LSPInfo info : solution.getInfos()) {
-			if(info instanceof BlueInfo) {
-				return true;
-			}
-		}	
+//		for(LSPInfo info : solution.getAttributes()) {
+//			if(info instanceof BlueInfo) {
+//				return true;
+//			}
+//		}
+		if ( solution.getAttributes().getAttribute( "color" ).equals( "blue" ) ) {
+			return true;
+		}
 		return false;
 	}
 

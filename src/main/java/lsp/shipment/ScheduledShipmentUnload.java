@@ -28,7 +28,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
-class ScheduledShipmentUnload implements ShipmentPlanElement {
+class ScheduledShipmentUnload implements ShipmentActivity {
 
 	private final double startTime;
 	private final double endTime;

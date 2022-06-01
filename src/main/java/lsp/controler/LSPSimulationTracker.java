@@ -20,15 +20,18 @@
 
 package lsp.controler;
 
-import java.util.Collection;
-
 import lsp.HasEventHandlers;
-import lsp.HasInfos;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
-import lsp.LSPInfo;
+/**
+ * @deprecated -- try to do without
+ */
+public interface LSPSimulationTracker extends AfterMobsimListener, HasEventHandlers, Attributable{
 
-public interface LSPSimulationTracker extends AfterMobsimListener, HasEventHandlers, HasInfos {
+	/**
+	 * @deprecated -- try to do without
+	 */
 	void reset();
+
 }

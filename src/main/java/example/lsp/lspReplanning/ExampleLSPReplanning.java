@@ -20,21 +20,17 @@
 
 package example.lsp.lspReplanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.usecase.*;
+import lsp.usecase.UsecaseUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -51,11 +47,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.LSPResource;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 
 /*package-private*/ class ExampleLSPReplanning {
 
@@ -205,7 +200,7 @@ import lsp.shipment.LSPShipment;
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		} );
 		config.controler().setFirstIteration(0);

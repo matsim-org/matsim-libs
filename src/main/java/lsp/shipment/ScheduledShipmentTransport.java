@@ -28,8 +28,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
-public final class ScheduledShipmentTransport implements ShipmentPlanElement {
-	// yyyy cannot make package-private since used in one instanceof outside package.  kai, jun'20
+final class ScheduledShipmentTransport implements ShipmentLeg {
 
 	private final double startTime;
 	private final double endTime;
@@ -80,21 +79,27 @@ public final class ScheduledShipmentTransport implements ShipmentPlanElement {
 	}
 
 
-	public Id<Link> getToLinkId() {
+	@Override public Id<Link> getToLinkId() {
 		return toLinkId;
 	}
 
-	public Id<Carrier> getCarrierId() {
+	@Override public Id<Carrier> getCarrierId() {
 		return carrierId;
 	}
 
 
-	public Id<Link> getFromLinkId() {
+	@Override public Id<Link> getFromLinkId() {
 		return fromLinkId;
 	}
 
-	public CarrierService getCarrierService() {
+	@Override public CarrierService getCarrierService() {
 		return carrierService;
 	}
-	
+	@Override public void setEndTime( double time ){
+		throw new RuntimeException( "not implemented" );
+	}
+	@Override public void setToLinkId( Id<Link> endLinkId ){
+		throw new RuntimeException( "not implemented" );
+	}
+
 }

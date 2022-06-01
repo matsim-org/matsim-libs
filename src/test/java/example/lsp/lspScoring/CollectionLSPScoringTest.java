@@ -25,21 +25,18 @@ import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.ShipmentUtils;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.LSPResource;
 import lsp.scoring.LSPScorer;
-import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
-import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
@@ -47,13 +44,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 import static lsp.usecase.UsecaseUtils.*;
@@ -69,6 +64,11 @@ public class CollectionLSPScoringTest {
 	public void initialize() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile( "scenarios/2regions/2regions-network.xml" );
+
+		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
@@ -95,12 +95,12 @@ public class CollectionLSPScoringTest {
 						   .setInitialPlan( LSPUtils.createLSPPlan().setAssigner( createDeterministicShipmentAssigner() ).addSolution(collectionSolution ) )
 						   .setSolutionScheduler( createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( collectionAdapter ) ) ).build();
 
-		TipEventHandler handler = new TipEventHandler();
+//		TipEventHandler handler = new TipEventHandler();
 //		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
 //		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 //		function.getAttributes().add(value );
-		TipInfo info = new TipInfo();
-		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
+//		TipInfo info = new TipInfo();
+		TipSimulationTracker tipTracker = new TipSimulationTracker();
 		collectionAdapter.addSimulationTracker(tipTracker);
 		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
 		collectionLSP.setScorer(tipScorer);
@@ -150,7 +150,7 @@ public class CollectionLSPScoringTest {
 			@Override public void install(){
 				install( new LSPModule() );
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 		config.controler().setFirstIteration(0);

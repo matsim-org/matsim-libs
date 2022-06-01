@@ -49,7 +49,7 @@ import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
 
 /**
- *  Schedules the {@link CollectionCarrierAdapter}.
+ *  Schedules the {@link CollectionCarrierResource}.
  *
  * Converts the {@link LSPShipment}s into {@link CarrierService}s that are needed for the {@link Carrier}
  * from the freight contrib of MATSim and then routes the vehicles of this
@@ -69,7 +69,7 @@ import lsp.LSPResourceScheduler;
 	}
 		
 	private Carrier carrier;
-	private CollectionCarrierAdapter adapter;
+	private CollectionCarrierResource adapter;
 	private ArrayList<LSPCarrierPair>pairs;
 
 
@@ -80,8 +80,8 @@ import lsp.LSPResourceScheduler;
 	
 	@Override public void initializeValues( LSPResource resource ){
 		this.pairs = new ArrayList<>();
-		if(resource.getClass() == CollectionCarrierAdapter.class){
-			this.adapter = (CollectionCarrierAdapter) resource;
+		if(resource.getClass() == CollectionCarrierResource.class){
+			this.adapter = (CollectionCarrierResource) resource;
 			this.carrier = adapter.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();

@@ -24,30 +24,27 @@ import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.replanning.LSPReplanningUtils;
-import lsp.LSPResource;
-import lsp.LSPResourceScheduler;
 import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.*;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
@@ -67,7 +64,7 @@ import java.util.*;
  * 1.) Simple: Nimm die mitgegebene Reihenfolge.
  * 2.)
  */
-/*package-private*/ class ExampleSchedulingOfTransportChainHubsVsDirect {
+/*package-private*/ final class ExampleSchedulingOfTransportChainHubsVsDirect {
 
 	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
@@ -103,19 +100,22 @@ import java.util.*;
 		}
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
+		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
+
+		config.network().setInputFile( "scenarios/2regions/2regions-network.xml" );
 
 		log.info("Starting ...");
 		log.info("Set up required MATSim classes");
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-		Network network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//########
 
 		log.info("create LSP");
-		LSP lsp = createInitialLSP(network);
+		LSP lsp = createInitialLSP( scenario.getNetwork() );
 		lsp.setScorer( new LSPScorer(){
 			private LSP lsp;
 			@Override public double scoreCurrentPlan( LSP lsp ){
@@ -133,10 +133,8 @@ import java.util.*;
 		} );
 
 		log.info("create initial LSPShipments");
-		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
-
 		log.info("assign the shipments to the LSP");
-		for(LSPShipment shipment : shipments) {
+		for(LSPShipment shipment : createInitialLSPShipments( scenario.getNetwork() ) ) {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
@@ -144,10 +142,7 @@ import java.util.*;
 		lsp.scheduleSolutions();
 
 		log.info("Set up simulation controler and LSPModule");
-		LinkedHashSet<LSP> lspList = new LinkedHashSet<>();
-		lspList.add(lsp);
-		var lsps = new LSPs(lspList);
-		LSPUtils.addLSPs( scenario, lsps );
+		LSPUtils.addLSPs( scenario, new LSPs( Collections.singletonList( lsp ) ) );
 
 		// @KMT: LSPModule ist vom Design her nur im Zusammenhang mit dem Controler sinnvoll.  Damit kann man dann auch vollständig auf
 		// Injection setzen.
@@ -157,7 +152,7 @@ import java.util.*;
 			@Override public void install(){
 				install( new LSPModule() );
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		} );
 
@@ -513,7 +508,7 @@ import java.util.*;
 		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/schedules.txt" ) ){
 			for( LSPShipment shipment : lsp.getShipments() ){
 				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
-				elementList.sort( new ShipmentPlanElementComparator() );
+				elementList.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 				final String str1 = "Shipment: " + shipment.getId();
 				System.out.println( str1 );
 				writer.write( str1 + "\n");

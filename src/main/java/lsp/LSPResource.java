@@ -25,16 +25,14 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.handler.EventHandler;
 
-import lsp.controler.LSPSimulationTracker;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  *
  *
  */
-public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers, HasEventHandlers, HasInfos {
+public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers, HasEventHandlers, Attributable{
 
 	Id<Link> getStartLinkId();
 

@@ -85,8 +85,8 @@ import lsp.LSPResource;
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if(abstractPlanElement instanceof LoggedShipmentTransport) {
-			LoggedShipmentTransport transport = (LoggedShipmentTransport) abstractPlanElement;
+		if(abstractPlanElement instanceof ShipmentLeg) {
+			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
 			//Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
 //			transport.setEndTime(event.getTime());
 //			transport.setToLinkId(tour.getEndLinkId());

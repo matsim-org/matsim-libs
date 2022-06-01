@@ -18,42 +18,36 @@
  *  * ***********************************************************************
  */
 
-package lsp.usecase;
+package lsp.scoring;
 
+import com.google.inject.Inject;
 import lsp.LSP;
-import lsp.LogisticsSolution;
-import lsp.ShipmentAssigner;
-import lsp.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
+import lsp.LSPUtils;
+import lsp.LSPs;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.events.ScoringEvent;
 
-/**
- * Ganz einfacher {@link ShipmentAssigner}:
- * Voraussetzung: Der {@link lsp.LSPPlan} hat genau 1 {@link LogisticsSolution}.
- *
- * Dann wird das {@link  LSPShipment} diesem zugeordnet.
- *
- * (Falls die Voraussetzung "exakt 1 Solution pro Plan" nicht erfüllt ist, kommt eine RuntimeException)
- */
-class DeterministicShipmentAssigner implements ShipmentAssigner {
+public class LSPScoringModuleDefaultImpl implements LSPScoringModule{
 
-	private LSP lsp;
-
-	DeterministicShipmentAssigner() {
+	private final Scenario scenario;
+	@Inject LSPScoringModuleDefaultImpl( Scenario scenario ) {
+		this.scenario = scenario;
 	}
-
-	public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
-	@Override public LSP getLSP(){
-		throw new RuntimeException( "not implemented" );
+	
+//	LSPScoringModuleImpl(LSPs lsps) {
+//		this.lsps = lsps;
+//	}
+		
+	@Override
+	public void notifyScoring(ScoringEvent event) {
+		scoreLSPs(event);
 	}
 
 	@Override
-	public void assignToSolution(LSPShipment shipment) {
-		Gbl.assertIf( lsp.getSelectedPlan().getSolutions().size()==1);
-		LogisticsSolution singleSolution = lsp.getSelectedPlan().getSolutions().iterator().next();
-		singleSolution.assignShipment(shipment);
+	public void scoreLSPs(ScoringEvent arg0) {
+		LSPs lsps = LSPUtils.getLSPs( scenario );
+		for(LSP lsp : lsps.getLSPs().values()) {
+			lsp.scoreSelectedPlan();
+		}
 	}
-
-
 }

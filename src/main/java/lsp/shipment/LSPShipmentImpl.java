@@ -22,6 +22,7 @@ package lsp.shipment;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,9 +30,10 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LogisticsSolution;
-import lsp.LSPInfo;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class LSPShipmentImpl implements LSPShipment {
+	private final Attributes attributes = new Attributes();
 
 	private final Id<LSPShipment> id;
 	private final Id<Link> fromLinkId;
@@ -43,9 +45,8 @@ class LSPShipmentImpl implements LSPShipment {
 	private final double pickupServiceTime;
 	private final ShipmentPlan schedule;
 	private final ShipmentPlan log;
-	private final ArrayList<EventHandler> eventHandlers;
-	private final ArrayList<Requirement> requirements;
-	private final ArrayList<LSPInfo> infos;
+	private final Collection<EventHandler> eventHandlers;
+	private final List<Requirement> requirements;
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
@@ -62,8 +63,6 @@ class LSPShipmentImpl implements LSPShipment {
 		this.eventHandlers = new ArrayList<>();
 		this.requirements = new ArrayList<>();
 		this.requirements.addAll( builder.requirements );
-		this.infos = new ArrayList<>();
-		this.infos.addAll( builder.infos );
 	}
 
 
@@ -123,11 +122,6 @@ class LSPShipmentImpl implements LSPShipment {
 		return requirements;
 	}
 
-	@Override
-	public Collection<LSPInfo> getInfos() {
-		return infos;
-	}
-
 	@Override public Id<LogisticsSolution> getSolutionId() {
 		return solutionId;
 	}
@@ -135,5 +129,8 @@ class LSPShipmentImpl implements LSPShipment {
 	@Override public double getPickupServiceTime(){
 		return pickupServiceTime;
 	}
-	
+
+	@Override public Attributes getAttributes(){
+		return attributes;
+	}
 }

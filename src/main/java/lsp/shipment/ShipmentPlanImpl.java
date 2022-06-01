@@ -59,7 +59,7 @@ import org.matsim.api.core.v01.Id;
 	}
 	
 	@Override
-	public LSPShipment getShipment() {
+	public LSPShipment getEmbeddingContainer() {
 		return shipment;
 	}
 

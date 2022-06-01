@@ -20,10 +20,10 @@
 
 package lsp;
 
-import java.util.ArrayList;
-
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentComparator;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Resources are scheduled separately by calling their individual scheduling algorithm.
@@ -85,7 +85,7 @@ public abstract class LSPResourceScheduler {
 		for(LogisticsSolutionElement element : resource.getClientElements()){
 			shipments.addAll(element.getIncomingShipments().getShipments());		
 		}
-		shipments.sort( new ShipmentComparator() );
+		shipments.sort( Comparator.comparingDouble( ShipmentWithTime::getTime ) );
 	}
 	
 	

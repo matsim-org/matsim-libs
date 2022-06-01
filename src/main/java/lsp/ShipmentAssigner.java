@@ -23,13 +23,16 @@ package lsp;
 import lsp.shipment.LSPShipment;
 
 /**
- * Takes a {@link LSPShipment} and normally assigns it to something that belongs to an {@link LSP}.
- *
+ * Takes an {@link LSPShipment} and normally assigns it to something that belongs to an {@link LSP}.
+ * <br/><br/>
  * If there are several {@link LogisticsSolution}s, the {@link LSP} has to assign each {@link LSPShipment} to
  * the suitable one. For this purpose, each LSPPlan contains a pluggable strategy that
- * is contained in classes implementing the interface ShipmentAssigner.
- *
- * Weist {@link LSPShipment}s den {@link LogisticsSolution}s zu.
+ * is contained in classes implementing the interface {@link ShipmentAssigner}.
+ * <br/><br/>
+ * Discussion points:<ul>
+ *         <li> yyyy Shipments are normally assigned to the selected plan only.  I am not sure if this is what I would
+ *         expect from the outside. kai, may'22</li>
+ * </ul>
  */
 public interface ShipmentAssigner extends KnowsLSP {
 

@@ -20,21 +20,16 @@
 
 package example.lsp.mobsimExamples;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.*;
-import lsp.usecase.*;
-import org.checkerframework.checker.units.qual.A;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
+import lsp.usecase.UsecaseUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,9 +45,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.LSPResource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 
 /*package-private*/ class ExampleMobsimOfTransportChain {
 
@@ -344,7 +340,7 @@ import lsp.LSPResource;
 			@Override public void install(){
 				install( new LSPModule() ); // this is the better syntax, having everything in one module. kai, may'22
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		} );
 		config.controler().setFirstIteration(0);
@@ -356,9 +352,9 @@ import lsp.LSPResource;
 		for(LSPShipment shipment : lsp.getShipments()) {
 			System.out.println("Shipment: " + shipment.getId());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort(new ShipmentPlanElementComparator());
+			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort(new ShipmentPlanElementComparator());
+			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 
 			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());

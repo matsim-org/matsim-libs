@@ -23,14 +23,16 @@ package lsp;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
+import java.util.Map;
 
 
 /* package-private */ class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
 
+	private final Attributes attributes = new Attributes();
 	private final Id<LogisticsSolutionElement>id;
 	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
@@ -39,7 +41,6 @@ import java.util.Collection;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private final Collection<LSPInfo> infos;
 	private final Collection<LSPSimulationTracker> trackers;
 	private final Collection<EventHandler> handlers;
 //	private EventsManager eventsManager;
@@ -51,7 +52,6 @@ import java.util.Collection;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
 		this.handlers = new ArrayList<>();
-		this.infos = new ArrayList<>();
 		this.trackers = new ArrayList<>();
 	}
 	
@@ -113,13 +113,14 @@ import java.util.Collection;
 	@Override
 	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		trackers.add(tracker);
-		infos.addAll(tracker.getInfos());
-		handlers.addAll(tracker.getEventHandlers());
-	}
 
-	@Override
-	public Collection<LSPInfo> getInfos() {
-		return infos;
+		// can't say if this hierarchical design is useful or confusing. kai, may'22
+		// yy should maybe check for overwriting?  However, did also not check in original design. kai, may'22
+		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+			attributes.putAttribute( entry.getKey(), entry.getValue() );
+		}
+
+		handlers.addAll(tracker.getEventHandlers());
 	}
 
 	public Collection<EventHandler> getEventHandlers(){
@@ -129,6 +130,9 @@ import java.util.Collection;
 	@Override
 	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
+	}
+	@Override public Attributes getAttributes(){
+		return attributes;
 	}
 
 //	@Override

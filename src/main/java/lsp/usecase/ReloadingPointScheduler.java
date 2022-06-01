@@ -49,9 +49,9 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 	
 	@Override protected void initializeValues( LSPResource resource ) {
-		if(resource.getClass() == ReloadingPoint.class){
+//		if(resource.getClass() == ReloadingPoint.class){
 			this.reloadingPoint = (ReloadingPoint) resource;
-		}
+//		}
 	}
 	
 	@Override protected void scheduleResource() {
@@ -108,9 +108,9 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 
 
-	public ReloadingPoint getReloadingPoint() {
-		return reloadingPoint;
-	}
+//	public ReloadingPoint getReloadingPoint() {
+//		return reloadingPoint;
+//	}
 
 
 	public void setReloadingPoint(ReloadingPoint reloadingPoint) {

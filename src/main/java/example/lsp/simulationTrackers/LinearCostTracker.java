@@ -20,18 +20,20 @@
 
 package example.lsp.simulationTrackers;
 
+import lsp.LSPUtils;
 import lsp.controler.LSPSimulationTracker;
-import lsp.LSPInfo;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /*package-private*/ class LinearCostTracker implements LSPSimulationTracker{
 
+	private final Attributes attributes = new Attributes();
 	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPInfo> infos;
+//	private final Collection<LSPInfo> infos;
 	private double distanceCosts;
 	private double timeCosts;
 	private double loadingCosts;
@@ -46,9 +48,9 @@ import java.util.Collection;
 	
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
-		CostInfo costInfo = new CostInfo();
-		infos = new ArrayList<>();
-		infos.add(costInfo);
+//		CostInfo costInfo = new CostInfo();
+//		infos = new ArrayList<>();
+//		infos.add(costInfo);
 		this.eventHandlers = new ArrayList<>();
 	}
 	
@@ -56,11 +58,6 @@ import java.util.Collection;
 	@Override
 	public Collection<EventHandler> getEventHandlers() {
 		return eventHandlers;
-	}
-
-	@Override
-	public Collection<LSPInfo> getInfos() {
-		return infos;
 	}
 
 	@Override
@@ -88,7 +85,7 @@ import java.util.Collection;
 		fixedUnitCosts = (totalCosts * shareOfFixedCosts)/totalNumberOfShipments;
 		linearUnitCosts = (totalCosts * (1-shareOfFixedCosts))/totalWeightOfShipments;
 		
-		CostInfo info = (CostInfo) infos.iterator().next();
+//		CostInfo info = (CostInfo) infos.iterator().next();
 //		for(LSPInfoFunctionValue value : info.getFunction().getValues()) {
 //			if(value instanceof example.lsp.simulationTrackers.FixedCostFunctionValue) {
 //				((example.lsp.simulationTrackers.FixedCostFunctionValue)value).setValue(fixedUnitCosts);
@@ -97,8 +94,10 @@ import java.util.Collection;
 //				((example.lsp.simulationTrackers.LinearCostFunctionValue)value).setValue(linearUnitCosts);
 //			}
 //		}
-		info.setFixedCost( fixedUnitCosts );
-		info.setVariableCost( linearUnitCosts );
+//		info.setFixedCost( fixedUnitCosts );
+//		info.setVariableCost( linearUnitCosts );
+		LSPUtils.setFixedCost( this, fixedUnitCosts );
+		LSPUtils.setVariableCost( this, linearUnitCosts );
 		
 		
 	}
@@ -117,6 +116,8 @@ import java.util.Collection;
 		
 	}
 
-	
-	
+
+	@Override public Attributes getAttributes(){
+		return attributes;
+	}
 }

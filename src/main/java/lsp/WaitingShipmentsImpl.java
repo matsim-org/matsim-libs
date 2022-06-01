@@ -20,17 +20,17 @@
 
 package lsp;
 
+import lsp.shipment.LSPShipment;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-
-import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentComparator;
+import java.util.Comparator;
+import java.util.List;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
 		
-	private final ArrayList<ShipmentWithTime> shipments;
+	private final List<ShipmentWithTime> shipments;
 	
 	WaitingShipmentsImpl() {
 		this.shipments = new ArrayList<>();
@@ -41,12 +41,12 @@ import lsp.shipment.ShipmentComparator;
 	public void addShipment(double time, LSPShipment shipment) {
 		ShipmentWithTime tuple = new ShipmentWithTime(time, shipment);
 		this.shipments.add(tuple);
-		shipments.sort(new ShipmentComparator());
+		shipments.sort( Comparator.comparingDouble( ShipmentWithTime::getTime ) );;
 	}
 
 	@Override
 	public Collection <ShipmentWithTime> getSortedShipments() {
-		shipments.sort(new ShipmentComparator());
+		shipments.sort( Comparator.comparingDouble( ShipmentWithTime::getTime ) );
 		return shipments;
 	}
 

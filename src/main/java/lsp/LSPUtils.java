@@ -26,11 +26,12 @@ import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LSPUtils{
+public final class LSPUtils{
 	public static LSPPlan createLSPPlan(){
 		return new LSPPlanImpl();
 	}
@@ -41,7 +42,7 @@ public class LSPUtils{
 		return new WaitingShipmentsImpl();
 	}
 	private LSPUtils(){} // do not instantiate
-	public static class LSPBuilder{
+	public static final class LSPBuilder{
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
@@ -55,8 +56,8 @@ public class LSPUtils{
 		}
 
 		private LSPBuilder(Id<LSP> id){
+			this.id = id; // this line was not there until today.  kai, may'22
 			this.resources = new ArrayList<>();
-
 		}
 
 		public LSPBuilder setSolutionScheduler( SolutionScheduler solutionScheduler ){
@@ -93,10 +94,9 @@ public class LSPUtils{
 		}
 	}
 
-	public static class LogisticsSolutionBuilder{
+	public static final class LogisticsSolutionBuilder{
 		final Id<LogisticsSolution> id;
 		final Collection<LogisticsSolutionElement> elements;
-		final Collection<LSPInfo> solutionInfos;
 		final Collection<EventHandler> eventHandlers;
 		final Collection<LSPSimulationTracker>trackers;
 
@@ -106,7 +106,6 @@ public class LSPUtils{
 
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
 			this.elements = new ArrayList<>();
-			this.solutionInfos = new ArrayList<>();
 			this.eventHandlers = new ArrayList<>();
 			this.trackers = new ArrayList<>();
 			this.id = id;
@@ -114,11 +113,6 @@ public class LSPUtils{
 
 		public LogisticsSolutionBuilder addSolutionElement( LogisticsSolutionElement element ){
 			elements.add(element);
-			return this;
-		}
-
-		public LogisticsSolutionBuilder addInfo( LSPInfo info ) {
-			solutionInfos.add(info);
 			return this;
 		}
 
@@ -137,7 +131,7 @@ public class LSPUtils{
 		}
 	}
 
-	public static class LogisticsSolutionElementBuilder{
+	public static final class LogisticsSolutionElementBuilder{
 		final Id<LogisticsSolutionElement>id;
 		LSPResource resource;
 		final WaitingShipments incomingShipments;
@@ -175,7 +169,7 @@ public class LSPUtils{
 		}
 		return (LSPs) result;
 	}
-//	The following would be closer to how we have done it elsewhere (scenario containers are mutable).  kai, may'22'
+ //	The following would be closer to how we have done it elsewhere (scenario containers are mutable).  kai, may'22'
 //	public static LSPs createOrGetLPSs( Scenario scenario ){
 //		Object result = scenario.getScenarioElement( lspsString );
 //		LSPs lsps;
@@ -187,4 +181,18 @@ public class LSPUtils{
 //		}
 //		return lsps;
 //	}
+
+	public static Double getVariableCost( Attributable attributable ) {
+		return (Double) attributable.getAttributes().getAttribute( "variableCost" );
+	}
+	public static void setVariableCost( Attributable attributable, Double variableCost ) {
+		attributable.getAttributes().putAttribute( "variableCost", variableCost );
+	}
+	public static Double getFixedCost( Attributable attributable ) {
+		return (Double) attributable.getAttributes().getAttribute( "fixedCost" );
+	}
+	public static void setFixedCost( Attributable attributable, Double fixedCost ) {
+		attributable.getAttributes().putAttribute( "fixedCost", fixedCost );
+	}
+
 }

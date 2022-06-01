@@ -25,13 +25,10 @@ import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.ShipmentUtils;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.LSPInfo;
-import lsp.replanning.LSPReplanningUtils;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import lsp.LSPResource;
-import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
 import lsp.usecase.*;
@@ -47,6 +44,7 @@ import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -78,6 +76,11 @@ public class CollectionTrackerTest {
 
 		Config config = new Config();
 		config.addCoreModules();
+
+		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		this.network = scenario.getNetwork();
@@ -192,7 +195,7 @@ public class CollectionTrackerTest {
 			@Override public void install(){
 				install( new LSPModule() );
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 		config.controler().setFirstIteration(0);
@@ -300,14 +303,21 @@ public class CollectionTrackerTest {
 		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment)*0.01);
 		assertEquals(fixedScheduledCostsPerShipment, fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, fixedScheduledCostsPerShipment)*0.01);
 
-		assertEquals(1, collectionSolution.getInfos().size());
-		LSPInfo info = collectionSolution.getInfos().iterator().next();
-		assertTrue(info instanceof CostInfo );
-		CostInfo costInfo = (CostInfo) info;
+//		LSPInfo info = collectionSolution.getAttributes().iterator().next();
+//		assertTrue(info instanceof CostInfo );
+//		CostInfo costInfo = (CostInfo) info;
 
-		assertEquals(costInfo.getVariableCost() ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
-		assertEquals(costInfo.getVariableCost()  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
-		assertEquals(costInfo.getFixedCost() ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
-		assertEquals(costInfo.getFixedCost(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+//		assertEquals(costInfo.getVariableCost() ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
+//		assertEquals(costInfo.getVariableCost()  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,costInfo.getVariableCost() ) * 0.01 );
+//		assertEquals(costInfo.getFixedCost() ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+//		assertEquals(costInfo.getFixedCost(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,costInfo.getFixedCost()) * 0.01 );
+
+		// I cannot say how the above was supposed to work, since costInfo.getVariableCost() was the same in both cases.  kai, may'22
+
+		assertEquals(2, collectionSolution.getAttributes().size() );
+		assertEquals( LSPUtils.getVariableCost( collectionSolution ) ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,LSPUtils.getVariableCost( collectionSolution ) ) * 0.01 );
+		assertEquals( LSPUtils.getVariableCost( collectionSolution )  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,LSPUtils.getVariableCost( collectionSolution ) ) * 0.01 );
+		assertEquals( LSPUtils.getFixedCost( collectionSolution ) ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,LSPUtils.getFixedCost( collectionSolution )) * 0.01 );
+		assertEquals( LSPUtils.getFixedCost( collectionSolution ),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,LSPUtils.getFixedCost( collectionSolution )) * 0.01 );
 	}
 }

@@ -20,9 +20,9 @@
 
 package lsp;
 
-import lsp.controler.LSPSimulationTracker;
 import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.Collection;
 
@@ -35,7 +35,7 @@ import java.util.Collection;
  * {@link LSPResource}. This introduction of an intermediate layer allows physical Resources
  * to be used by several {@link LogisticsSolution}s and thus transport chains.
  */
-public interface LogisticsSolution extends Identifiable<LogisticsSolution>, KnowsLSP, HasEventHandlers, HasSimulationTrackers, HasInfos {
+public interface LogisticsSolution extends Identifiable<LogisticsSolution>, KnowsLSP, HasEventHandlers, HasSimulationTrackers, Attributable{
 
 	Collection<LogisticsSolutionElement> getSolutionElements();
 

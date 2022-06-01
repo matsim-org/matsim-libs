@@ -49,8 +49,8 @@ public class UsecaseUtils {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 
-	public static DeterministicShipmentAssigner createDeterministicShipmentAssigner() {
-		return new DeterministicShipmentAssigner();
+	public static SingleSolutionShipmentAssigner createDeterministicShipmentAssigner() {
+		return new SingleSolutionShipmentAssigner();
 	}
 
 	public static class CollectionCarrierAdapterBuilder {
@@ -88,8 +88,8 @@ public class UsecaseUtils {
 				return this;
 			}
 
-			public CollectionCarrierAdapter build(){
-				return new CollectionCarrierAdapter(this);
+			public CollectionCarrierResource build(){
+				return new CollectionCarrierResource(this);
 			}
 
 		}
@@ -130,8 +130,8 @@ public class UsecaseUtils {
 				return this;
 			}
 
-			public DistributionCarrierAdapter build(){
-				return new DistributionCarrierAdapter(this);
+			public DistributionCarrierResource build(){
+				return new DistributionCarrierResource(this);
 			}
 
 		}
@@ -176,8 +176,8 @@ public class UsecaseUtils {
 				return this;
 			}
 
-			public MainRunCarrierAdapter build(){
-				return new MainRunCarrierAdapter(this);
+			public MainRunCarrierResource build(){
+				return new MainRunCarrierResource(this);
 			}
 
 		//--- Getter ---

@@ -27,7 +27,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
-class LoggedShipmentUnload implements ShipmentPlanElement {
+class LoggedShipmentUnload implements ShipmentActivity {
 
 	private final double startTime;
 	private final double endTime;
@@ -68,4 +68,7 @@ class LoggedShipmentUnload implements ShipmentPlanElement {
 		return endTime;
 	}
 
+	@Override public Id<Link> getLinkId(){
+		throw new RuntimeException( "not implemented" );
+	}
 }

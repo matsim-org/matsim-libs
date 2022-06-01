@@ -22,16 +22,17 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.LSPInfo;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.
@@ -45,17 +46,19 @@ import lsp.controler.LSPSimulationTracker;
  * (i.e. crossdocking) of the shipment is entered. In the example, crossdocking
  * starts as soon as the considered LSPShipment arrives at the {@link ReloadingPoint}
  * and ends after a fixed and a size dependent amount of time.
+ * <p/>
+ * <ul>Discussion points:
+ * <li>yyyy Ich fände TransshipmentHub als Name besser.  kai, may'22 </li></ul>
  */
 /*package-private*/ class ReloadingPoint implements LSPResource {
+	private final Attributes attributes = new Attributes();
 
 	private final Id<LSPResource> id;
 	private final Id<Link> locationLinkId;
 	private final ReloadingPointScheduler reloadingScheduler;
-	private final ArrayList <LogisticsSolutionElement> clientElements;
-	private final ArrayList<EventHandler> eventHandlers;
-	private final Collection<LSPInfo> infos;
+	private final List<LogisticsSolutionElement> clientElements;
+	private final List<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker> trackers;
-	private ReloadingPointTourEndEventHandler eventHandler;
 
 	ReloadingPoint(UsecaseUtils.ReloadingPointBuilder builder){
 		this.id = builder.getId();
@@ -66,7 +69,6 @@ import lsp.controler.LSPSimulationTracker;
 		reloadingScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
 		this.eventHandlers = new ArrayList<>();
-		this.infos = new ArrayList<>();
 		this.trackers = new ArrayList<>();
 		eventHandlers.add(eventHandler);
 	}
@@ -114,20 +116,21 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Collection<LSPInfo> getInfos() {
-		return infos;
-	}
-
-	@Override
 	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
-		this.infos.addAll(tracker.getInfos());	
+//		this.infos.addAll(tracker.getAttributes() );
+		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+			this.attributes.putAttribute( entry.getKey(), entry.getValue());
+		}
 	}
 
 	@Override
 	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
+	}
+	@Override public Attributes getAttributes(){
+		return attributes;
 	}
 
 //	@Override

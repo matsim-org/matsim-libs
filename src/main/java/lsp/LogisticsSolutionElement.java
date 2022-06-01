@@ -20,16 +20,12 @@
 
 package lsp;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.events.handler.EventHandler;
 
-import lsp.controler.LSPSimulationTracker;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 
-public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasEventHandlers, HasSimulationTrackers, HasInfos {
+public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasEventHandlers, HasSimulationTrackers, Attributable{
 
 	void connectWithNextElement(LogisticsSolutionElement element);
 

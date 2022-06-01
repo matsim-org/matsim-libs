@@ -20,28 +20,27 @@
 
 package lspMobsimTests;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleImpl;
-import lsp.scoring.LSPScoringUtils;
-import lsp.shipment.*;
-import lsp.usecase.*;
+import lsp.scoring.LSPScoringModuleDefaultImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -50,9 +49,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
-import lsp.LSPResource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -63,7 +62,12 @@ public class CompleteLSPMobsimTest {
 	public void initialize() {
 		Config config = new Config();
         config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
+
+		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
@@ -300,7 +304,7 @@ public class CompleteLSPMobsimTest {
 			@Override public void install(){
 				install( new LSPModule() );
 				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleImpl.class );
+				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 
@@ -318,9 +322,9 @@ public class CompleteLSPMobsimTest {
 		for(LSPShipment shipment : completeLSP.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort(new ShipmentPlanElementComparator());
+			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort(new ShipmentPlanElementComparator());
+			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 		
 			for(ShipmentPlanElement scheduleElement : scheduleElements){
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));

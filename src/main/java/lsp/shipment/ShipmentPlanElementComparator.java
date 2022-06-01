@@ -22,7 +22,9 @@ package lsp.shipment;
 
 import java.util.Comparator;
 
-public final class ShipmentPlanElementComparator implements Comparator<ShipmentPlanElement>{
+final class ShipmentPlanElementComparator implements Comparator<ShipmentPlanElement>{
+
+	ShipmentPlanElementComparator(){}
 
 	public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
 		if(o1.getStartTime() > o2.getStartTime()){

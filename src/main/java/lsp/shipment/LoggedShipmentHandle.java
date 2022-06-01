@@ -28,7 +28,7 @@ import lsp.LSPResource;
 
 
 
-/*package*/ class LoggedShipmentHandle implements ShipmentPlanElement {
+/*package*/ class LoggedShipmentHandle implements ShipmentActivity {
 
 	private final double startTime;
 	private final double endTime;
@@ -70,7 +70,7 @@ import lsp.LSPResource;
 		return endTime;
 	}
 
-	public Id<Link> getLinkId() {
+	@Override public Id<Link> getLinkId() {
 		return linkId;
 	}
 
