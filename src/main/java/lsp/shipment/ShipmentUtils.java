@@ -32,10 +32,10 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 
 import java.util.ArrayList;
 
-public final class ShipmentUtils{
+public class ShipmentUtils{
 	private ShipmentUtils(){} // do not instantiate
 
-	public static final class LoggedShipmentHandleBuilder {
+	public static class LoggedShipmentHandleBuilder {
 		private double startTime;
 		private double endTime;
 		private LogisticsSolutionElement element;
@@ -96,7 +96,7 @@ public final class ShipmentUtils{
 		}
 	}
 
-	public static final class LoggedShipmentLoadBuilder {
+	public static class LoggedShipmentLoadBuilder {
 		private double startTime;
 		private double endTime;
 		private LogisticsSolutionElement element;
