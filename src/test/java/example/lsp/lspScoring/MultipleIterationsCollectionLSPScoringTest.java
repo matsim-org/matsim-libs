@@ -29,8 +29,10 @@ import java.util.Random;
 import lsp.*;
 import lsp.replanning.LSPReplanningModule;
 import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleImpl;
+import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.junit.Before;
@@ -50,6 +52,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.LSPResource;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
@@ -127,12 +130,12 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 
-//		TipEventHandler handler = new TipEventHandler();
+		TipEventHandler handler = new TipEventHandler();
 //		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
 //		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 //		function.getAttributes().add(value );
-//		TipInfo info = new TipInfo();
-		TipSimulationTracker tipTracker = new TipSimulationTracker();
+		TipInfo info = new TipInfo();
+		TipSimulationTracker tipTracker = new TipSimulationTracker(handler, info);
 		collectionAdapter.addSimulationTracker(tipTracker);
 		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
 		collectionLSP.setScorer(tipScorer);

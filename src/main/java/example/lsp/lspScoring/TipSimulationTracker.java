@@ -22,11 +22,7 @@ package example.lsp.lspScoring;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -35,19 +31,24 @@ import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class TipSimulationTracker implements LSPSimulationTracker{
 
-	private final TipEventHandler handler = new TipEventHandler();
-	private final LSPInfo info = new TipInfo();
+	private final TipEventHandler handler;
+	private final LSPInfo info;
 
+	/*package-private*/ TipSimulationTracker(TipEventHandler handler, LSPInfo info) {
+		this.info = info;
+		this.handler = handler;
+	}
+	
 	@Override
 	public Collection<EventHandler> getEventHandlers() {
-		List<EventHandler> handlers = new ArrayList<>();
+		ArrayList<EventHandler> handlers = new ArrayList<>();
 		handlers.add(handler);
 		return handlers;
 	}
 
 	@Override
 	public Collection<LSPInfo> getInfos() {
-		List<LSPInfo> infos = new ArrayList<>();
+		ArrayList<LSPInfo> infos = new ArrayList<>();
 		infos.add(info);
 		return infos;
 	}
@@ -66,4 +67,5 @@ import lsp.controler.LSPSimulationTracker;
 		// TODO Auto-generated method stub
 	}
 
+	
 }

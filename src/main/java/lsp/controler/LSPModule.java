@@ -43,13 +43,13 @@ import java.util.List;
 public class LSPModule extends AbstractModule {
 	private static final Logger log = org.apache.log4j.Logger.getLogger( LSPModule.class );
 
-//	private final FreightConfigGroup carrierConfig = new FreightConfigGroup();
+	private final FreightConfigGroup carrierConfig = new FreightConfigGroup();
 
 	@Override
 	public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
-//		bind(FreightConfigGroup.class).toInstance(carrierConfig);
+		bind(FreightConfigGroup.class).toInstance(carrierConfig);
 		// yyyyyy ????? doesn't this ignore the freightConfig that was just pulled out of config two lines earlier?  kai, may'22
 
 		bind( LSPControlerListenerImpl.class ).in( Singleton.class );
