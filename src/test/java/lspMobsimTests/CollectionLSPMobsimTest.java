@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
@@ -79,9 +78,6 @@ public class CollectionLSPMobsimTest {
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setFirstIteration( 0 );
 		config.controler().setLastIteration( 0 );
-
-		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
 
 		// load scenario:
 		Scenario scenario = ScenarioUtils.loadScenario(config);
