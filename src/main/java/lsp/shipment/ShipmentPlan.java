@@ -22,12 +22,11 @@ package lsp.shipment;
 
 import java.util.Map;
 
-import lsp.HasBackpointer;
 import org.matsim.api.core.v01.Id;
 
-public interface ShipmentPlan extends HasBackpointer<LSPShipment> {
+public interface ShipmentPlan {
 
-	LSPShipment getEmbeddingContainer();
+	LSPShipment getShipment();
 
 	Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
 

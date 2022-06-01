@@ -30,7 +30,7 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public final class LSPUtils{
+public class LSPUtils{
 	public static LSPPlan createLSPPlan(){
 		return new LSPPlanImpl();
 	}
@@ -41,7 +41,7 @@ public final class LSPUtils{
 		return new WaitingShipmentsImpl();
 	}
 	private LSPUtils(){} // do not instantiate
-	public static final class LSPBuilder{
+	public static class LSPBuilder{
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
@@ -55,8 +55,8 @@ public final class LSPUtils{
 		}
 
 		private LSPBuilder(Id<LSP> id){
-			this.id = id; // this line was not there until today.  kai, may'22
 			this.resources = new ArrayList<>();
+
 		}
 
 		public LSPBuilder setSolutionScheduler( SolutionScheduler solutionScheduler ){
@@ -93,7 +93,7 @@ public final class LSPUtils{
 		}
 	}
 
-	public static final class LogisticsSolutionBuilder{
+	public static class LogisticsSolutionBuilder{
 		final Id<LogisticsSolution> id;
 		final Collection<LogisticsSolutionElement> elements;
 		final Collection<LSPInfo> solutionInfos;
@@ -137,7 +137,7 @@ public final class LSPUtils{
 		}
 	}
 
-	public static final class LogisticsSolutionElementBuilder{
+	public static class LogisticsSolutionElementBuilder{
 		final Id<LogisticsSolutionElement>id;
 		LSPResource resource;
 		final WaitingShipments incomingShipments;

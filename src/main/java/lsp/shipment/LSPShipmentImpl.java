@@ -22,7 +22,6 @@ package lsp.shipment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,9 +43,9 @@ class LSPShipmentImpl implements LSPShipment {
 	private final double pickupServiceTime;
 	private final ShipmentPlan schedule;
 	private final ShipmentPlan log;
-	private final Collection<EventHandler> eventHandlers;
-	private final List<Requirement> requirements;
-	private final List<LSPInfo> infos;
+	private final ArrayList<EventHandler> eventHandlers;
+	private final ArrayList<Requirement> requirements;
+	private final ArrayList<LSPInfo> infos;
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){

@@ -103,10 +103,10 @@ public class CollectionShipmentBuilderTest {
 			assertNotNull(shipment.getEventHandlers());
 			
 			assertTrue(shipment.getEventHandlers().isEmpty());
-			assertEquals(shipment.getLog().getEmbeddingContainer(), shipment );
+			assertEquals(shipment.getLog().getShipment(), shipment);
 			assertTrue(shipment.getLog().getPlanElements().isEmpty());
 			
-			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment );
+			assertEquals(shipment.getShipmentPlan().getShipment(), shipment);
 			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());
 			
 			Link link = network.getLinks().get(shipment.getFrom() );

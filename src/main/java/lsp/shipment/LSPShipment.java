@@ -33,13 +33,6 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.LogisticsSolution;
 import lsp.LSPInfo;
 
-/**
- * This is, for example, a shipment that DHL moves from A to B.  It may use multiple carriers to achieve that.
- *
- * Questions/comments:<ul>
- *         <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not link IDs.</li>
- * </ul>
- */
 public interface LSPShipment extends Identifiable<LSPShipment>, HasInfos, HasEventHandlers {
 
 	Id<Link> getFrom(); // same as in CarrierShipment

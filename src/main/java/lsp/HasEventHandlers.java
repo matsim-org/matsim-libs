@@ -27,5 +27,4 @@ import org.matsim.core.events.handler.EventHandler;
 public interface HasEventHandlers {
 
 	Collection<EventHandler>getEventHandlers();
-
 }

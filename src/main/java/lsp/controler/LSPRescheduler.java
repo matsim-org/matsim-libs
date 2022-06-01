@@ -56,17 +56,16 @@ import lsp.shipment.LSPShipment;
  * network, for example passenger traffic, and the network conditions change between
  * subsequent iterations of the simulation due to congestion.
  */
-final class LSPRescheduler {
-	private LSPRescheduler(){ }
+class LSPRescheduler implements BeforeMobsimListener{
 
-
-//	private final LSPs lsps;
-//
-//	public LSPRescheduler(LSPs lsps) {
-//		this.lsps = lsps;
-//	}
 	
-	static void notifyBeforeMobsim( LSPs lsps, BeforeMobsimEvent arg0) {
+	private final LSPs lsps;
+	
+	public LSPRescheduler(LSPs lsps) {
+		this.lsps = lsps;
+	}
+	
+	public void notifyBeforeMobsim(BeforeMobsimEvent arg0) {
 		if(arg0.getIteration() !=  0) {
 			for(LSP lsp : lsps.getLSPs().values()){
 				for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
