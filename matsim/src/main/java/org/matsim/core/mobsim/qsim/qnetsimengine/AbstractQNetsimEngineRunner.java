@@ -106,8 +106,14 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 		while (simNodes.hasNext()) {
 			node = simNodes.next();
 			nodeCounter++;
-			remainsActive = node.doSimStep(time);
+			//remainsActive = node.doSimStep(time);
+			remainsActive = true;
 			if (!remainsActive) simNodes.remove();
+		}
+		try {
+			Thread.sleep(nodeCounter);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 		this.lockNodes = false;
 	}
