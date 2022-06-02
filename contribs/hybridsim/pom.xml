@@ -10,7 +10,7 @@
   <name>hybridsim</name>
 
   <properties>
-    <protobuf.version>3.20.1</protobuf.version>
+    <protobuf.version>3.21.1</protobuf.version>
     <grpc.version>1.46.0</grpc.version>
   </properties>
 
@@ -36,15 +36,6 @@
 
   </dependencies>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.google.errorprone</groupId>
-        <artifactId>error_prone_annotations</artifactId>
-        <version>2.11.0</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <build>
     <extensions>
       <!-- Provides operation system information as property -->
