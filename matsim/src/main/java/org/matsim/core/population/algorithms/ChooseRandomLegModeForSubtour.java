@@ -21,6 +21,7 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,12 +53,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	 * Candidate to change mode-choice,
 	 */
 	public static class Candidate {
-		final Subtour subtour;
-		final String newTransportMode;
+		private final List<Trip> plan;
+		private final Subtour subtour;
+		private final String newTransportMode;
 
-		public Candidate(
-				final Subtour subtour,
-				final String newTransportMode) {
+		public Candidate(List<Trip> plan, final Subtour subtour, final String newTransportMode) {
+			this.plan = plan;
 			this.subtour = subtour;
 			this.newTransportMode = newTransportMode;
 		}
@@ -73,6 +74,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		@Override
 		public int hashCode() {
 			return Objects.hash(subtour, newTransportMode);
+		}
+
+		@Override
+		public String toString() {
+			String trips = subtour.getTrips().stream().map(plan::indexOf).map(String::valueOf).collect(Collectors.joining(","));
+			return "Candidate[Trips: " + trips + " -> " + newTransportMode + "}";
 		}
 
 		public Subtour getSubtour() {
@@ -96,8 +103,8 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private PermissibleModesCalculator permissibleModesCalculator;
 
 	private final double probaForChangeSingleTripMode;
-	private TripsToLegsAlgorithm tripsToLegs = null ;
-	private ChooseRandomSingleLegMode changeSingleLegMode = null ;
+	private TripsToLegsAlgorithm tripsToLegs = null;
+	private ChooseRandomSingleLegMode changeSingleLegMode = null;
 
 	public ChooseRandomLegModeForSubtour(
 			final MainModeIdentifier mainModeIdentifier,
@@ -118,7 +125,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 		// also set up the standard change single leg mode, in order to alternatively randomize modes in
 		// subtours.  kai, may'18
-		if ( this.probaForChangeSingleTripMode>0. ) {
+		if (this.probaForChangeSingleTripMode > 0.) {
 			Collection<String> notChainBasedModes = new ArrayList<>(this.modes);
 			notChainBasedModes.removeAll(this.chainBasedModes);
 			final String[] possibleModes = notChainBasedModes.toArray(new String[]{});
@@ -150,15 +157,15 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	 */
 	public List<Candidate> determineChoiceSet(final Plan plan) {
 
-		final Id<? extends BasicLocation> homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId()!=null ?
+		final Id<? extends BasicLocation> homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId() != null ?
 				((Activity) plan.getPlanElements().get(0)).getFacilityId() :
 				((Activity) plan.getPlanElements().get(0)).getLinkId();
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
 
 		return determineChoiceSet(
-						homeLocation,
-						plan,
-						permissibleModesForThisPlan);
+				homeLocation,
+				plan,
+				permissibleModesForThisPlan);
 	}
 
 	/**
@@ -180,7 +187,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			return;
 		}
 		// with certain proba, do standard single leg mode choice for not-chain-based modes:
-		if ( this.changeSingleLegMode!=null && rng.nextDouble() < this.probaForChangeSingleTripMode ) {
+		if (this.changeSingleLegMode != null && rng.nextDouble() < this.probaForChangeSingleTripMode) {
 			// (the null check is for computational efficiency)
 
 			this.tripsToLegs.run(plan);
@@ -188,9 +195,9 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			return;
 		}
 
-		final Id<? extends BasicLocation> homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId()!=null ?
-			((Activity) plan.getPlanElements().get(0)).getFacilityId() :
-			((Activity) plan.getPlanElements().get(0)).getLinkId();
+		final Id<? extends BasicLocation> homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId() != null ?
+				((Activity) plan.getPlanElements().get(0)).getFacilityId() :
+				((Activity) plan.getPlanElements().get(0)).getLinkId();
 
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
 		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
@@ -199,10 +206,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		List<Candidate> choiceSet = determineChoiceSet(homeLocation, plan, permissibleModesForThisPlan);
 
 		if (!choiceSet.isEmpty()) {
-				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-				// (means that in the end we are changing modes only for one subtour)
+			Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
+			// (means that in the end we are changing modes only for one subtour)
 
-				applyChange(whatToDo, plan);
+			applyChange(whatToDo, plan);
 		}
 	}
 
@@ -220,27 +227,27 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			subtours.add(0, TripStructureUtils.getUnclosedRootSubtour(plan));
 		}
 
-		for ( Subtour subtour : subtours ) {
+		for (Subtour subtour : subtours) {
 
 			// If subtour is not closed, it will still be considered if constrains are disabled
-			if ( !subtour.isClosed() && behavior != SubtourModeChoice.Behavior.betweenAllAndFewerConstraints) {
+			if (!subtour.isClosed() && behavior != SubtourModeChoice.Behavior.betweenAllAndFewerConstraints) {
 				continue;
 			}
 
-			if ( containsUnknownMode( subtour ) ) {
+			if (containsUnknownMode(subtour)) {
 				continue;
 			}
 
 			final Id<? extends BasicLocation> subtourStartLocation =
 //					anchorAtFacilities ?
-					subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() !=null ?
-							subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
-							subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
+					subtour.getTrips().get(0).getOriginActivity().getFacilityId() != null ?
+							subtour.getTrips().get(0).getOriginActivity().getFacilityId() :
+							subtour.getTrips().get(0).getOriginActivity().getLinkId();
 
 			final Collection<String> testingModes =
-				subtour.getTrips().size() == 1 ?
-					singleTripSubtourModes :
-					chainBasedModes;
+					subtour.getTrips().size() == 1 ?
+							singleTripSubtourModes :
+							chainBasedModes;
 			// I am not sure what the singleTripSubtourModes thing means.  But apart from that ...
 
 			// ... test whether a vehicle was brought to the subtourStartLocation:
@@ -248,13 +255,13 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			for (String mode : testingModes) {
 				Id<? extends BasicLocation> vehicleLocation = homeLocation;
 				Activity lastDestination =
-					findLastDestinationOfMode(
-						trips.subList(
-							0,
-							trips.indexOf( subtour.getTrips().get( 0 ) )),
-						mode);
+						findLastDestinationOfMode(
+								trips.subList(
+										0,
+										trips.indexOf(subtour.getTrips().get(0))),
+								mode);
 				if (lastDestination != null) {
-					vehicleLocation = getLocationId( lastDestination );
+					vehicleLocation = getLocationId(lastDestination);
 				}
 				if (vehicleLocation.equals(subtourStartLocation)) {
 					usableChainBasedModes.add(mode);
@@ -300,9 +307,9 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 			for (String transportMode : usableModes) {
 				choiceSet.add(
-						new Candidate(
-							subtour,
-							transportMode ));
+						new Candidate(trips,
+								subtour,
+								transportMode));
 			}
 		}
 		return choiceSet;
@@ -310,7 +317,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private boolean containsUnknownMode(final Subtour subtour) {
 		for (Trip trip : subtour.getTrips()) {
-			if (!modes.contains( mainModeIdentifier.identifyMainMode( trip.getTripElements() ))) {
+			if (!modes.contains(mainModeIdentifier.identifyMainMode(trip.getTripElements()))) {
 				return true;
 			}
 		}
@@ -321,55 +328,55 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			final Subtour subtour,
 			final String mode) {
 		final Activity firstOrigin =
-			findFirstOriginOfMode(
-					subtour.getTrips(),
-					mode);
+				findFirstOriginOfMode(
+						subtour.getTrips(),
+						mode);
 
 		if (firstOrigin == null) {
 			return true;
 		}
 
 		final Activity lastDestination =
-			findLastDestinationOfMode(
-					subtour.getTrips(),
-					mode);
+				findLastDestinationOfMode(
+						subtour.getTrips(),
+						mode);
 
 		return atSameLocation(firstOrigin, lastDestination);
 	}
 
 	private Id<? extends BasicLocation> getLocationId(Activity activity) {
-		return activity.getFacilityId()!=null ?
-			activity.getFacilityId() :
-			activity.getLinkId();
+		return activity.getFacilityId() != null ?
+				activity.getFacilityId() :
+				activity.getLinkId();
 	}
-	
+
 	private boolean atSameLocation(Activity firstLegUsingMode,
-			Activity lastLegUsingMode) {
-		return firstLegUsingMode.getFacilityId()!=null ?
-			firstLegUsingMode.getFacilityId().equals(
-					lastLegUsingMode.getFacilityId() ) :
-			firstLegUsingMode.getLinkId().equals(
-					lastLegUsingMode.getLinkId() );
+	                               Activity lastLegUsingMode) {
+		return firstLegUsingMode.getFacilityId() != null ?
+				firstLegUsingMode.getFacilityId().equals(
+						lastLegUsingMode.getFacilityId()) :
+				firstLegUsingMode.getLinkId().equals(
+						lastLegUsingMode.getLinkId());
 	}
 
 	private Activity findLastDestinationOfMode(
 			final List<Trip> tripsToSearch,
 			final String mode) {
 		final List<Trip> reversed = new ArrayList<>(tripsToSearch);
-		Collections.reverse( reversed );
+		Collections.reverse(reversed);
 		for (Trip trip : reversed) {
-			if ( mode.equals( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ) {
+			if (mode.equals(mainModeIdentifier.identifyMainMode(trip.getTripElements()))) {
 				return trip.getDestinationActivity();
 			}
 		}
 		return null;
 	}
-	
+
 	private Activity findFirstOriginOfMode(
 			final List<Trip> tripsToSearch,
 			final String mode) {
 		for (Trip trip : tripsToSearch) {
-			if ( mode.equals( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ) {
+			if (mode.equals(mainModeIdentifier.identifyMainMode(trip.getTripElements()))) {
 				return trip.getOriginActivity();
 			}
 		}
@@ -378,7 +385,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private String getTransportMode(final Subtour subtour) {
 		return mainModeIdentifier.identifyMainMode(
-				subtour.getTrips().get( 0 ).getTripElements() );
+				subtour.getTrips().get(0).getTripElements());
 	}
 
 	private void applyChange(

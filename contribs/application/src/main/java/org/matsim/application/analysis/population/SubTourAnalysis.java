@@ -1,5 +1,8 @@
 package org.matsim.application.analysis.population;
 
+import com.google.common.math.Quantiles;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,6 +37,9 @@ public class SubTourAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
 	private String subpopulation;
 
+	@CommandLine.Option(names = "--person", description = "Filter single person")
+	private String person;
+
 	@CommandLine.Option(names = "--behaviour", description = "Subtour mode-choice behaviour", defaultValue = "betweenAllAndFewerConstraints")
 	private SubtourModeChoice.Behavior behavior;
 
@@ -62,13 +68,16 @@ public class SubTourAnalysis implements MATSimAppCommand {
 			Plan plan = agent.getSelectedPlan();
 
 			String subpop = PopulationUtils.getSubpopulation(agent);
-			if (!subpop.equals(subpopulation)) continue;
+			if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) continue;
 
 			List<Leg> legs = TripStructureUtils.getLegs(plan);
 
 			for (Leg leg : legs) {
 				modes.add(leg.getMode());
 			}
+
+			if (person != null && !agent.getId().toString().equals(person))
+				continue;
 
 			Collection<TripStructureUtils.Subtour> subtour = TripStructureUtils.getSubtours(plan);
 			subtours.addAll(subtour);
@@ -93,6 +102,7 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 		log.info("Subtours: {} | closed: {}% | massConserving: {}%", subtours.size(), 100d * closed / subtours.size(), 100d * massConserving / subtours.size());
 
+		DoubleList nChoices = new DoubleArrayList(persons.size());
 
 		// Iterate the strategy for testing purpose
 		for (int i = 0; i < iter; i++) {
@@ -110,7 +120,7 @@ public class SubTourAnalysis implements MATSimAppCommand {
 
 				// person with no trips always have no choice set
 				if (cset.isEmpty() && !trips.isEmpty()) {
-						empty++;
+					empty++;
 				}
 
 				// remove all trips that are considered for a change
@@ -122,11 +132,23 @@ public class SubTourAnalysis implements MATSimAppCommand {
 				if (!trips.isEmpty())
 					tripMissing++;
 
+				if (person != null) {
+
+					log.info("Choices:");
+					for (ChooseRandomLegModeForSubtour.Candidate cs : cset) {
+						log.info(cs);
+					}
+				}
+
+				nChoices.add(cset.size());
 				c.addAll(cset);
 				strategy.run(plan);
 			}
 
-			log.info("Total choice sets: {}, persons with no choices: {}, person with uncovered trips in choice-set: {}", c.size(), empty, tripMissing);
+			OptionalDouble avg = nChoices.doubleStream().average();
+
+			log.info("Total choice sets: {}, persons with no choices: {}, (avg: {}, q90: {}), person with uncovered trips in choice-set: {}",
+					c.size(), empty, avg.orElse(0), Quantiles.percentiles().index(90).compute(nChoices), tripMissing);
 		}
 
 		return 0;

@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
@@ -52,6 +53,7 @@ public class NormalizeTripModes implements MATSimAppCommand {
 		if (output.getParent() != null) Files.createDirectories(output.getParent());
 
 		int processed = 0;
+		int skipped = 0;
 
 		for (Person person : population.getPersons().values()) {
 
@@ -59,12 +61,15 @@ public class NormalizeTripModes implements MATSimAppCommand {
 			if (!subpop.equals(subpopulation)) continue;
 
 			if (perMode) duplicatePlans(person);
-			else selectMode(person);
+			else skipped += selectMode(person) ? 0 : 1;
 
 			processed++;
 		}
 
 		log.info("Processed {} out of {} persons", processed, population.getPersons().size());
+
+		if (skipped > 0)
+			log.warn("Skipped {} persons due to car availability", skipped);
 
 		PopulationUtils.writePopulation(population, output.toString());
 
@@ -81,6 +86,9 @@ public class NormalizeTripModes implements MATSimAppCommand {
 		plans.forEach(person::removePlan);
 
 		for (String mode : modes) {
+
+			if (!PersonUtils.canUseCar(person) && mode.equals("car"))
+				continue;
 
 			plan.setType(mode);
 
@@ -99,9 +107,19 @@ public class NormalizeTripModes implements MATSimAppCommand {
 
 	}
 
-	private void selectMode(Person person) {
+	private boolean selectMode(Person person) {
 
-		String mode = modes.get(rnd.nextInt(modes.size()));
+		List<String> select = new ArrayList<>(modes);
+
+		if (!PersonUtils.canUseCar(person))
+			select.removeIf(m -> m.equals("car"));
+
+		if (select.isEmpty()) {
+			// No modes to select from. Probably tried to set to all car plans, but person is not allowed to use car."
+			return false;
+		}
+
+		String mode = select.get(rnd.nextInt(select.size()));
 
 		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 			for (Leg leg : trip.getLegsOnly()) {
@@ -110,5 +128,7 @@ public class NormalizeTripModes implements MATSimAppCommand {
 				TripStructureUtils.setRoutingMode(leg, mode);
 			}
 		}
+
+		return true;
 	}
 }

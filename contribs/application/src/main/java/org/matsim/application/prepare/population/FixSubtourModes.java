@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
@@ -54,8 +55,7 @@ public class FixSubtourModes implements MATSimAppCommand {
 		for (Person person : population.getPersons().values()) {
 
 			String subpop = PopulationUtils.getSubpopulation(person);
-			if (!subpop.equals(subpopulation)) continue;
-
+			if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) continue;
 
 			for (TripStructureUtils.Subtour st : TripStructureUtils.getSubtours(person.getSelectedPlan())) {
 
@@ -81,7 +81,7 @@ public class FixSubtourModes implements MATSimAppCommand {
 				// don't mix chain-based with other modes in one subtour
 				if (containsChainBasedMode && originalModes.size() > 1) {
 					fixed++;
-					selectMode(st);
+					selectMode(person, st);
 				}
 			}
 
@@ -95,10 +95,13 @@ public class FixSubtourModes implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void selectMode(TripStructureUtils.Subtour st) {
+	private void selectMode(Person p, TripStructureUtils.Subtour st) {
 
 		List<String> modes = st.getTrips().stream().map(t -> TripStructureUtils.identifyMainMode(t.getTripElements()))
 				.collect(Collectors.toList());
+
+		if (!PersonUtils.canUseCar(p) && modes.contains("car"))
+			throw new IllegalStateException("Person " + p.getId() + " uses car as mode, which should not be allowed.");
 
 		String mode = modes.get(rnd.nextInt(modes.size()));
 
