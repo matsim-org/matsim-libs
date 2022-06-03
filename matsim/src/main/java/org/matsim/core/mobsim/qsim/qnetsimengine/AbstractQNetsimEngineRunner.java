@@ -100,7 +100,12 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	protected void moveNodes() {
 		boolean remainsActive;
 		this.lockNodes = true;
-		nodeCounter = 0;
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	/*	nodeCounter = 0;
 		QNodeI node;
 		Iterator<QNodeI> simNodes = this.nodesQueue.iterator();
 		while (simNodes.hasNext()) {
@@ -115,13 +120,20 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+
+	 */
 		this.lockNodes = false;
 	}
 	
 	protected final void moveLinks() {
 		boolean remainsActive;
 		lockLinks = true;
-		linkCounter = 0;
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	/*	linkCounter = 0;
 		QLinkI link;
 		ListIterator<QLinkI> simLinks = this.linksList.listIterator();
 		while (simLinks.hasNext()) {
@@ -131,6 +143,8 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 
 			if (!remainsActive) simLinks.remove();
 		}
+
+	 */
 		lockLinks = false;
 	}
 
