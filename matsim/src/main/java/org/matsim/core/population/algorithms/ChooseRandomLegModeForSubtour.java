@@ -186,8 +186,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		if (plan.getPlanElements().size() <= 1) {
 			return;
 		}
+
 		// with certain proba, do standard single leg mode choice for not-chain-based modes:
-		if (this.changeSingleLegMode != null && rng.nextDouble() < this.probaForChangeSingleTripMode) {
+		// if a plan consist of only chain based modes, change single trip won't be able to do anything, in this case it will be ignored
+		if (this.changeSingleLegMode != null && rng.nextDouble() < this.probaForChangeSingleTripMode && hasSingleTripChoice(plan)) {
 			// (the null check is for computational efficiency)
 
 			this.tripsToLegs.run(plan);
@@ -211,6 +213,15 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 			applyChange(whatToDo, plan);
 		}
+	}
+
+	/**
+	 * Checks if change single trip mode would have an option to choose from. That is when not all trips are chain based.
+	 */
+	private boolean hasSingleTripChoice(Plan plan) {
+		return !TripStructureUtils.getTrips(plan).stream().map(
+				t -> mainModeIdentifier.identifyMainMode(t.getTripElements())
+		).allMatch(chainBasedModes::contains);
 	}
 
 	private List<Candidate> determineChoiceSet(
