@@ -32,7 +32,7 @@ import lsp.shipment.Requirement;
 //				return true;
 //			}
 //		}
-		if ( solution.getAttributes().getAttribute( "color" ).equals( "blue" ) ) {
+		if ( solution.getAttributes().getAttribute( "color" ).equals( "red" ) ) {
 			return true;
 		}
 		return false;
