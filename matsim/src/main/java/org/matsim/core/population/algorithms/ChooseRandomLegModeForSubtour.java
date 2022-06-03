@@ -165,6 +165,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		return determineChoiceSet(
 				homeLocation,
 				plan,
+				TripStructureUtils.getTrips(plan),
 				permissibleModesForThisPlan);
 	}
 
@@ -187,9 +188,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			return;
 		}
 
+		// trips are used multiple times
+		List<Trip> trips = TripStructureUtils.getTrips(plan);
+
 		// with certain proba, do standard single leg mode choice for not-chain-based modes:
 		// if a plan consist of only chain based modes, change single trip won't be able to do anything, in this case it will be ignored
-		if (this.changeSingleLegMode != null && rng.nextDouble() < this.probaForChangeSingleTripMode && hasSingleTripChoice(plan)) {
+		if (this.changeSingleLegMode != null && rng.nextDouble() < this.probaForChangeSingleTripMode && hasSingleTripChoice(trips)) {
 			// (the null check is for computational efficiency)
 
 			this.tripsToLegs.run(plan);
@@ -205,7 +209,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
 
 
-		List<Candidate> choiceSet = determineChoiceSet(homeLocation, plan, permissibleModesForThisPlan);
+		List<Candidate> choiceSet = determineChoiceSet(homeLocation, plan, trips, permissibleModesForThisPlan);
 
 		if (!choiceSet.isEmpty()) {
 			Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
@@ -216,10 +220,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	/**
-	 * Checks if change single trip mode would have an option to choose from. That is when not all trips are chain based.
+	 * Checks if change single trip mode would have an option to choose from. That is the case, when not all trips are chain based.
 	 */
-	private boolean hasSingleTripChoice(Plan plan) {
-		return !TripStructureUtils.getTrips(plan).stream().map(
+	private boolean hasSingleTripChoice(List<Trip> trips) {
+		return !trips.stream().map(
 				t -> mainModeIdentifier.identifyMainMode(t.getTripElements())
 		).allMatch(chainBasedModes::contains);
 	}
@@ -227,9 +231,9 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private List<Candidate> determineChoiceSet(
 			final Id<? extends BasicLocation> homeLocation,
 			final Plan plan,
+			final List<Trip> trips,
 			final Collection<String> permissibleModesForThisPerson) {
 
-		final List<Trip> trips = TripStructureUtils.getTrips(plan);
 		final List<Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan));
 		final ArrayList<Candidate> choiceSet = new ArrayList<>();
 
