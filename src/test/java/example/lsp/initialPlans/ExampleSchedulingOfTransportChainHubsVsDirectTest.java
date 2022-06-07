@@ -24,8 +24,6 @@ import example.lsp.initialPlans.ExampleSchedulingOfTransportChainHubsVsDirect.So
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import static org.junit.Assert.fail;
