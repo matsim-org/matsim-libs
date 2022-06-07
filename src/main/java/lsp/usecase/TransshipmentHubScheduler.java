@@ -32,16 +32,16 @@ import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
 import lsp.shipment.ShipmentPlanElement;
 
-/*package-private*/ class ReloadingPointScheduler extends LSPResourceScheduler {
+/*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 
-	final Logger log = Logger.getLogger(ReloadingPointScheduler.class);
+	final Logger log = Logger.getLogger(TransshipmentHubScheduler.class);
 
-	private ReloadingPoint reloadingPoint;
+	private TransshipmentHub transshipmentHub;
 	private final double capacityNeedLinear;
 	private final double capacityNeedFixed;
-	private ReloadingPointTourEndEventHandler eventHandler;
+	private TranshipmentHubTourEndEventHandler eventHandler;
 
-	ReloadingPointScheduler(UsecaseUtils.ReloadingPointSchedulerBuilder builder){
+	TransshipmentHubScheduler(UsecaseUtils.TranshipmentHubSchedulerBuilder builder){
 		this.shipments = new ArrayList<>();
 		this.capacityNeedLinear = builder.getCapacityNeedLinear();
 		this.capacityNeedFixed = builder.getCapacityNeedFixed();
@@ -50,7 +50,7 @@ import lsp.shipment.ShipmentPlanElement;
 	
 	@Override protected void initializeValues( LSPResource resource ) {
 //		if(resource.getClass() == ReloadingPoint.class){
-			this.reloadingPoint = (ReloadingPoint) resource;
+			this.transshipmentHub = (TransshipmentHub) resource;
 //		}
 	}
 	
@@ -76,13 +76,13 @@ import lsp.shipment.ShipmentPlanElement;
 		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize() );
-		builder.setResourceId(reloadingPoint.getId());
-		for(LogisticsSolutionElement element : reloadingPoint.getClientElements()){
+		builder.setResourceId(transshipmentHub.getId());
+		for(LogisticsSolutionElement element : transshipmentHub.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				builder.setLogisticsSolutionElement(element);
 			}
 		}
-		builder.setLinkId(reloadingPoint.getStartLinkId());
+		builder.setLinkId(transshipmentHub.getStartLinkId());
 		ShipmentPlanElement  handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
@@ -90,7 +90,7 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 	
 	private void addShipmentToEventHandler( ShipmentWithTime tuple ){
-		for(LogisticsSolutionElement element : reloadingPoint.getClientElements()){
+		for(LogisticsSolutionElement element : transshipmentHub.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				eventHandler.addShipment(tuple.getShipment(), element);
 				break;
@@ -113,11 +113,11 @@ import lsp.shipment.ShipmentPlanElement;
 //	}
 
 
-	public void setReloadingPoint(ReloadingPoint reloadingPoint) {
-		this.reloadingPoint = reloadingPoint;
+	public void setReloadingPoint(TransshipmentHub transshipmentHub) {
+		this.transshipmentHub = transshipmentHub;
 	}
 	
-	public void setEventHandler(ReloadingPointTourEndEventHandler eventHandler) {
+	public void setEventHandler(TranshipmentHubTourEndEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
 	

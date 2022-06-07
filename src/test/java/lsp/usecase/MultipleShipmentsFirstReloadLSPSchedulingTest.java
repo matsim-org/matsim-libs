@@ -97,7 +97,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		collectionBuilder.setResource(collectionAdapter);
 		collectionElement = collectionBuilder.build();
 		
-		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
@@ -105,9 +105,9 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
         Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
-        UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
-        firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+        UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
+        firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
+        firstReloadingPointAdapter = firstTransshipmentHubBuilder.build();
         
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstReloadingElementId );
@@ -254,10 +254,10 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 
 		assertEquals(1, firstReloadingPointAdapter.getEventHandlers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstReloadingPointAdapter.getEventHandlers());
-		assertTrue(eventHandlers.iterator().next() instanceof ReloadingPointTourEndEventHandler);
-		ReloadingPointTourEndEventHandler reloadEventHandler = (ReloadingPointTourEndEventHandler) eventHandlers.iterator().next();
+		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
+		TranshipmentHubTourEndEventHandler reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 
-		for (Entry<CarrierService, ReloadingPointTourEndEventHandler.ReloadingPointEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
+		for (Entry<CarrierService, TranshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;

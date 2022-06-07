@@ -35,28 +35,28 @@ import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
-/*package-private*/  class ReloadingPointTourEndEventHandler implements LSPTourEndEventHandler {
+/*package-private*/  class TranshipmentHubTourEndEventHandler implements LSPTourEndEventHandler {
 
-	static class ReloadingPointEventHandlerPair{
+	static class TransshipmentHubEventHandlerPair {
 		public final LSPShipment shipment;
 		public final LogisticsSolutionElement element;
 				
-		public ReloadingPointEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element){
+		public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element){
 			this.shipment = shipment;
 			this.element = element;
 		}	
 	}
 	
 	
-	private final HashMap<CarrierService, ReloadingPointEventHandlerPair> servicesWaitedFor;
-	private final ReloadingPoint reloadingPoint;
+	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
+	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
 	
-	ReloadingPointTourEndEventHandler(ReloadingPoint reloadingPoint){
-		this.reloadingPoint = reloadingPoint;
-		this.linkId = reloadingPoint.getEndLinkId();
-		this.resourceId = reloadingPoint.getId();
+	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub){
+		this.transshipmentHub = transshipmentHub;
+		this.linkId = transshipmentHub.getEndLinkId();
+		this.resourceId = transshipmentHub.getId();
 		this.servicesWaitedFor = new HashMap<>();
 	}
 	
@@ -66,7 +66,7 @@ import lsp.LSPResource;
 	}
 
 	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement){
-		ReloadingPointEventHandlerPair pair = new ReloadingPointEventHandlerPair(shipment, solutionElement);
+		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
 		
 		for(ShipmentPlanElement planElement: shipment.getShipmentPlan().getPlanElements().values()){
 			if(planElement instanceof ShipmentLeg){
@@ -85,9 +85,9 @@ import lsp.LSPResource;
 			for(TourElement tourElement : event.getTour().getTourElements()){
 				if(tourElement instanceof ServiceActivity){
 					ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-					if(serviceActivity.getLocation() == reloadingPoint.getStartLinkId()
+					if(serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
 							&& allServicesAreInOnePoint(event.getTour())
-							&& (event.getTour().getStartLinkId() != reloadingPoint.getStartLinkId())) {
+							&& (event.getTour().getStartLinkId() != transshipmentHub.getStartLinkId())) {
 						logReloadAfterMainRun(serviceActivity.getService(), event);
 					}
 					else {
@@ -122,7 +122,7 @@ import lsp.LSPResource;
 		builder.setResourceId(resourceId);
 		double startTime = event.getTime() + getUnloadEndTime(event.getTour());
 		builder.setStartTime(startTime);
-		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getSize();
+		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
 		ShipmentPlanElement loggedShipmentHandle = builder.build();
@@ -153,7 +153,7 @@ import lsp.LSPResource;
 		builder.setResourceId(resourceId);
 		double startTime = event.getTime();
 		builder.setStartTime(startTime);
-		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getSize();
+		double handlingTime = transshipmentHub.getCapacityNeedFixed() + transshipmentHub.getCapacityNeedLinear() * lspShipment.getSize();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
 		ShipmentPlanElement handle = builder.build();
@@ -177,12 +177,12 @@ import lsp.LSPResource;
 	}
 	
 	
-	public HashMap<CarrierService, ReloadingPointEventHandlerPair> getServicesWaitedFor() {
+	public HashMap<CarrierService, TransshipmentHubEventHandlerPair> getServicesWaitedFor() {
 		return servicesWaitedFor;
 	}
 
-	public ReloadingPoint getReloadingPoint() {
-		return reloadingPoint;
+	public TransshipmentHub getReloadingPoint() {
+		return transshipmentHub;
 	}
 
 	public Id<LSPResource> getResourceId() {

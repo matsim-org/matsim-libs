@@ -44,29 +44,26 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * and the client element are entered, so that the way that the {@link lsp.shipment.LSPShipment}
  * takes is specified. In addition, the planned start and end time of the handling
  * (i.e. crossdocking) of the shipment is entered. In the example, crossdocking
- * starts as soon as the considered LSPShipment arrives at the {@link ReloadingPoint}
+ * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHub}
  * and ends after a fixed and a size dependent amount of time.
- * <p/>
- * <ul>Discussion points:
- * <li>yyyy Ich fände TransshipmentHub als Name besser.  kai, may'22 </li></ul>
  */
-/*package-private*/ class ReloadingPoint implements LSPResource {
+/*package-private*/ class TransshipmentHub implements LSPResource {
 	private final Attributes attributes = new Attributes();
 
 	private final Id<LSPResource> id;
 	private final Id<Link> locationLinkId;
-	private final ReloadingPointScheduler reloadingScheduler;
+	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
 	private final List<EventHandler> eventHandlers;
 	private final Collection<LSPSimulationTracker> trackers;
 
-	ReloadingPoint(UsecaseUtils.ReloadingPointBuilder builder){
+	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder){
 		this.id = builder.getId();
 		this.locationLinkId = builder.getLocationLinkId();
-		this.reloadingScheduler = builder.getReloadingScheduler();
-		reloadingScheduler.setReloadingPoint(this);
-		ReloadingPointTourEndEventHandler eventHandler = new ReloadingPointTourEndEventHandler(this);
-		reloadingScheduler.setEventHandler(eventHandler);
+		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
+		transshipmentHubScheduler.setReloadingPoint(this);
+		TranshipmentHubTourEndEventHandler eventHandler = new TranshipmentHubTourEndEventHandler(this);
+		transshipmentHubScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
 		this.eventHandlers = new ArrayList<>();
 		this.trackers = new ArrayList<>();
@@ -100,15 +97,15 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public void schedule(int bufferTime) {
-		reloadingScheduler.scheduleShipments(this, bufferTime);	
+		transshipmentHubScheduler.scheduleShipments(this, bufferTime);
 	}
 
 	public double getCapacityNeedFixed(){
-		return reloadingScheduler.getCapacityNeedFixed();
+		return transshipmentHubScheduler.getCapacityNeedFixed();
 	}
 
 	public double getCapacityNeedLinear(){
-		return reloadingScheduler.getCapacityNeedLinear();
+		return transshipmentHubScheduler.getCapacityNeedLinear();
 	}
 
 	@Override public Collection <EventHandler> getEventHandlers(){

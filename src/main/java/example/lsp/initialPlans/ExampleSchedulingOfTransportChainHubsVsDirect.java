@@ -180,14 +180,14 @@ import java.util.*;
 			log.info( "Create depot" );
 
 			//The scheduler for the first reloading point is created --> this will be the depot in this use case
-			LSPResourceScheduler depotScheduler = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance()
+			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
 													 .setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
 													 .setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
 													 .build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource depotResource = UsecaseUtils.ReloadingPointBuilder.newInstance( Id.create( "Depot", LSPResource.class ), depotLinkId )
-										      .setReloadingScheduler( depotScheduler )
+			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Depot", LSPResource.class ), depotLinkId )
+										      .setTransshipmentHubScheduler( depotScheduler )
 										      .build();
 
 			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
@@ -240,7 +240,7 @@ import java.util.*;
 			log.info( "" );
 			log.info( "The second reloading adapter (hub) i.e. the Resource is created" );
 			//The scheduler for the second reloading point is created
-			LSPResourceScheduler hubScheduler = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance()
+			LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed( 10 )
 					.setCapacityNeedLinear( 1 )
 					.build();
@@ -248,8 +248,8 @@ import java.util.*;
 			//The scheduler is added to the Resource and the Resource is created
 			//The second reloading adapter i.e. the Resource is created
 			Id<LSPResource> secondReloadingId = Id.create( "ReloadingPoint2", LSPResource.class );
-			LSPResource hubResource = UsecaseUtils.ReloadingPointBuilder.newInstance( secondReloadingId, hubLinkId )
-										    .setReloadingScheduler( hubScheduler )
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( secondReloadingId, hubLinkId )
+										    .setTransshipmentHubScheduler( hubScheduler )
 										    .build();
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP

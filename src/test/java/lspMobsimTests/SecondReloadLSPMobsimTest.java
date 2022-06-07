@@ -108,7 +108,7 @@ public class SecondReloadLSPMobsimTest {
 		collectionBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
-		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
@@ -116,9 +116,9 @@ public class SecondReloadLSPMobsimTest {
         Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
-        UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
-        firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        LSPResource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+        UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
+        firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
+        LSPResource firstReloadingPointAdapter = firstTransshipmentHubBuilder.build();
         
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstReloadingElementId );
@@ -163,7 +163,7 @@ public class SecondReloadLSPMobsimTest {
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
-		UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
         secondSchedulerBuilder.setCapacityNeedFixed(10);
         secondSchedulerBuilder.setCapacityNeedLinear(1);
        
@@ -171,9 +171,9 @@ public class SecondReloadLSPMobsimTest {
         Id<LSPResource> secondReloadingId = Id.create("ReloadingPoint2", LSPResource.class);
         Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
-        UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId, secondReloadingLinkId);
-        secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
-        LSPResource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
+        UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondReloadingId, secondReloadingLinkId);
+        secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
+        LSPResource secondReloadingPointAdapter = secondTransshipmentHubBuilder.build();
         
         Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder secondReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondReloadingElementId );

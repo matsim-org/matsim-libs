@@ -34,38 +34,38 @@ import lsp.LSPResource;
 public class FirstReloadAdapterTest {
 
 	private Id<Link> reloadingLinkId;
-	private ReloadingPoint reloadingPoint;
+	private TransshipmentHub transshipmentHub;
 	
 	@Before
 	public void initialize(){
 		
         
-        UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+        UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
-        UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
-        reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
-        reloadingPoint = reloadingPointBuilder.build();
+        UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId);
+        transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
+        transshipmentHub = transshipmentHubBuilder.build();
 	}
 	
 	@Test
 	public void reloadingPointTest() {
-		assertEquals(10, reloadingPoint.getCapacityNeedFixed(), 0.0);
-		assertEquals(1, reloadingPoint.getCapacityNeedLinear(), 0.0);
-		assertFalse(LSPCarrierResource.class.isAssignableFrom(reloadingPoint.getClass()));
+		assertEquals(10, transshipmentHub.getCapacityNeedFixed(), 0.0);
+		assertEquals(1, transshipmentHub.getCapacityNeedLinear(), 0.0);
+		assertFalse(LSPCarrierResource.class.isAssignableFrom(transshipmentHub.getClass()));
 //		assertSame(reloadingPoint.getClassOfResource(), ReloadingPoint.class);
-		assertNotNull(reloadingPoint.getClientElements());
-		assertTrue(reloadingPoint.getClientElements().isEmpty());
-		assertSame(reloadingPoint.getEndLinkId(), reloadingLinkId);
-		assertSame(reloadingPoint.getStartLinkId(), reloadingLinkId);
-		assertNotNull(reloadingPoint.getEventHandlers());
-		assertFalse(reloadingPoint.getEventHandlers().isEmpty());
-		assertEquals(1, reloadingPoint.getEventHandlers().size());
-		assertNotNull(reloadingPoint.getAttributes() );
-		assertTrue(reloadingPoint.getAttributes().isEmpty() );
+		assertNotNull(transshipmentHub.getClientElements());
+		assertTrue(transshipmentHub.getClientElements().isEmpty());
+		assertSame(transshipmentHub.getEndLinkId(), reloadingLinkId);
+		assertSame(transshipmentHub.getStartLinkId(), reloadingLinkId);
+		assertNotNull(transshipmentHub.getEventHandlers());
+		assertFalse(transshipmentHub.getEventHandlers().isEmpty());
+		assertEquals(1, transshipmentHub.getEventHandlers().size());
+		assertNotNull(transshipmentHub.getAttributes() );
+		assertTrue(transshipmentHub.getAttributes().isEmpty() );
 	}
 }
