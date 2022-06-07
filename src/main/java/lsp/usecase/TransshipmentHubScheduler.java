@@ -49,7 +49,7 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 	
 	@Override protected void initializeValues( LSPResource resource ) {
-//		if(resource.getClass() == ReloadingPoint.class){
+//		if(resource.getClass() == TranshipmentHub.class){
 			this.transshipmentHub = (TransshipmentHub) resource;
 //		}
 	}
@@ -108,12 +108,12 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 
 
-//	public ReloadingPoint getReloadingPoint() {
-//		return reloadingPoint;
+//	public TranshipmentHub getTranshipmentHub() {
+//		return TranshipmentHub;
 //	}
 
 
-	public void setReloadingPoint(TransshipmentHub transshipmentHub) {
+	public void setTranshipmentHub(TransshipmentHub transshipmentHub) {
 		this.transshipmentHub = transshipmentHub;
 	}
 	

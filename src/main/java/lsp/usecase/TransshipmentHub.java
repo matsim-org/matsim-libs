@@ -37,7 +37,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.
  *
- * Thus, these activities are entered directly in the Schedule of the LSPShipments that pass through the ReloadingPoint.
+ * Thus, these activities are entered directly in the Schedule of the LSPShipments that pass through the TranshipmentHub.
  *
  * An entry is added to the schedule of the shipments that is an instance of
  * {@link lsp.shipment.ScheduledShipmentHandle}. There, the name of the Resource
@@ -61,7 +61,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.id = builder.getId();
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
-		transshipmentHubScheduler.setReloadingPoint(this);
+		transshipmentHubScheduler.setTranshipmentHub(this);
 		TranshipmentHubTourEndEventHandler eventHandler = new TranshipmentHubTourEndEventHandler(this);
 		transshipmentHubScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
@@ -76,7 +76,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 //	@Override
-//	public Class<? extends ReloadingPoint> getClassOfResource() {
+//	public Class<? extends TranshipmentHub> getClassOfResource() {
 //		return this.getClass();
 //	}
 //

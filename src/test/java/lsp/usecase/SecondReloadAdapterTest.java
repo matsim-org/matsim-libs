@@ -42,7 +42,7 @@ public class SecondReloadAdapterTest {
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
 
-		Id<LSPResource> reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
+		Id<LSPResource> reloadingId = Id.create("TranshipmentHub2", LSPResource.class);
         reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
         UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId);
@@ -52,11 +52,11 @@ public class SecondReloadAdapterTest {
 	}
 
 	@Test
-	public void reloadingPointTest() {
+	public void TranshipmentHubTest() {
 		assertEquals(10, transshipmentHub.getCapacityNeedFixed(), 0.0);
 		assertEquals(1, transshipmentHub.getCapacityNeedLinear(), 0.0);
 		assertFalse(LSPCarrierResource.class.isAssignableFrom(transshipmentHub.getClass()));
-//		assertSame(reloadingPoint.getClassOfResource(), ReloadingPoint.class);
+//		assertSame(TranshipmentHub.getClassOfResource(), TranshipmentHub.class);
 		assertNotNull(transshipmentHub.getClientElements());
 		assertTrue(transshipmentHub.getClientElements().isEmpty());
 		assertSame(transshipmentHub.getEndLinkId(), reloadingLinkId);

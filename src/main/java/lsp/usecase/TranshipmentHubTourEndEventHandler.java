@@ -181,7 +181,7 @@ import lsp.LSPResource;
 		return servicesWaitedFor;
 	}
 
-	public TransshipmentHub getReloadingPoint() {
+	public TransshipmentHub getTranshipmentHub() {
 		return transshipmentHub;
 	}
 

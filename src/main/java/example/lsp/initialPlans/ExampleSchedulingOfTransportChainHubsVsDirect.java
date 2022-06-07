@@ -247,13 +247,13 @@ import java.util.*;
 
 			//The scheduler is added to the Resource and the Resource is created
 			//The second reloading adapter i.e. the Resource is created
-			Id<LSPResource> secondReloadingId = Id.create( "ReloadingPoint2", LSPResource.class );
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( secondReloadingId, hubLinkId )
+			Id<LSPResource> secondTransshipmentHubId = Id.create( "TranshipmentHub2", LSPResource.class );
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( secondTransshipmentHubId, hubLinkId )
 										    .setTransshipmentHubScheduler( hubScheduler )
 										    .build();
 
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-			hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "SecondReloadElement", LogisticsSolutionElement.class ))
+			hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "SecondHubElement", LogisticsSolutionElement.class ))
 					.setResource( hubResource )
 					.build();
 		}
@@ -335,7 +335,7 @@ import java.util.*;
 
 		switch (solutionType) {
 			case onePlan_withHub: {
-				// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
+				// ### This is the original solution with mainRun - TranshipmentHub - distributionRun
 				log.info("Creating LSP with one plan: reloading at hub");
 
 				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
@@ -439,7 +439,7 @@ import java.util.*;
 		hubElement.connectWithNextElement(distributionElement);
 
 		LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
-				Id.create("SolutionWithReloadingId", LogisticsSolution.class))
+				Id.create("SolutionWithTransshipmentHubId", LogisticsSolution.class))
 				.addSolutionElement(depotElement)
 				.addSolutionElement(mainRunElement)
 				.addSolutionElement(hubElement)

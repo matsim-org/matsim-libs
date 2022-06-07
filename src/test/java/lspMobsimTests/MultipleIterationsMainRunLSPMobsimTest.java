@@ -112,17 +112,17 @@ public class MultipleIterationsMainRunLSPMobsimTest {
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
         
-        Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
-        Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
+        Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
+        Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
         
-        UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
+        UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
         firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
-        LSPResource firstReloadingPointAdapter = firstTransshipmentHubBuilder.build();
+        LSPResource firstTranshipmentHubAdapter = firstTransshipmentHubBuilder.build();
         
-        Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstReloadingElementId );
-		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
-		LogisticsSolutionElement firstReloadElement = firstReloadingElementBuilder.build();
+        Id<LogisticsSolutionElement> firstHubElementId = Id.create("FirstHubElement", LogisticsSolutionElement.class);
+		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId );
+		firstHubElementBuilder.setResource(firstTranshipmentHubAdapter);
+		LogisticsSolutionElement firstHubElement = firstHubElementBuilder.build();
 		
 		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
@@ -162,13 +162,13 @@ public class MultipleIterationsMainRunLSPMobsimTest {
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
-		collectionElement.connectWithNextElement(firstReloadElement);
-		firstReloadElement.connectWithNextElement(mainRunElement);
+		collectionElement.connectWithNextElement(firstHubElement);
+		firstHubElement.connectWithNextElement(mainRunElement);
 
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
-		completeSolutionBuilder.addSolutionElement(firstReloadElement);
+		completeSolutionBuilder.addSolutionElement(firstHubElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		LogisticsSolution completeSolution = completeSolutionBuilder.build();
 
@@ -181,7 +181,7 @@ public class MultipleIterationsMainRunLSPMobsimTest {
 		completeLSPBuilder.setInitialPlan(completePlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
-		resourcesList.add(firstReloadingPointAdapter);
+		resourcesList.add(firstTranshipmentHubAdapter);
 		resourcesList.add(mainRunAdapter);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);

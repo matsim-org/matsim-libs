@@ -263,8 +263,8 @@ public class UsecaseUtils {
 			this.locationLinkId = locationLinkId;
 		}
 
-		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler reloadingPointScheduler){
-			this.transshipmentHubScheduler = (TransshipmentHubScheduler) reloadingPointScheduler;
+		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler){
+			this.transshipmentHubScheduler = (TransshipmentHubScheduler) TranshipmentHubScheduler;
 			return this;
 		}
 
