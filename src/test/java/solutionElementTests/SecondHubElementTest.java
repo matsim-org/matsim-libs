@@ -18,51 +18,57 @@
  *  * ***********************************************************************
  */
 
-package lsp.usecase;
+package solutionElementTests;
 
 import static org.junit.Assert.*;
 
+import lsp.LSPUtils;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
-import lsp.LSPCarrierResource;
+import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
+public class SecondHubElementTest {
 
-public class FirstReloadAdapterTest {
-
-	private final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");;
-	private TransshipmentHub transshipmentHub;
+	private LSPResource point;
+	private LogisticsSolutionElement hubElement;
 
 	@Before
-	public void initialize(){
-
-
+	public void initialize() {
 		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
-		transshipmentHub = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("TranshipmentHub1", LSPResource.class), hubLinkId)
+
+
+		point = UsecaseUtils.TransshipmentHubBuilder
+				.newInstance(Id.create("TranshipmentHub2", LSPResource.class), Id.createLinkId("(14 2) (14 3)"))
 				.setTransshipmentHubScheduler(schedulerBuilder.build())
+				.build();
+
+		hubElement = LSPUtils.LogisticsSolutionElementBuilder
+				.newInstance(Id.create("SecondHubElement", LogisticsSolutionElement.class))
+				.setResource(point)
 				.build();
 	}
 
 	@Test
-	public void TranshipmentHubTest() {
-		assertEquals(10, transshipmentHub.getCapacityNeedFixed(), 0.0);
-		assertEquals(1, transshipmentHub.getCapacityNeedLinear(), 0.0);
-		assertFalse(LSPCarrierResource.class.isAssignableFrom(transshipmentHub.getClass()));
-//		assertSame(TranshipmentHub.getClassOfResource(), TranshipmentHub.class);
-		assertNotNull(transshipmentHub.getClientElements());
-		assertTrue(transshipmentHub.getClientElements().isEmpty());
-		assertSame(transshipmentHub.getEndLinkId(), hubLinkId);
-		assertSame(transshipmentHub.getStartLinkId(), hubLinkId);
-		assertNotNull(transshipmentHub.getEventHandlers());
-		assertFalse(transshipmentHub.getEventHandlers().isEmpty());
-		assertEquals(1, transshipmentHub.getEventHandlers().size());
-		assertNotNull(transshipmentHub.getAttributes() );
-		assertTrue(transshipmentHub.getAttributes().isEmpty() );
+	public void testDistributionElement() {
+		assertNotNull(hubElement.getIncomingShipments());
+		assertNotNull(hubElement.getIncomingShipments().getShipments());
+		assertTrue(hubElement.getIncomingShipments().getSortedShipments().isEmpty());
+		assertNotNull(hubElement.getAttributes() );
+		assertTrue(hubElement.getAttributes().isEmpty() );
+		assertNull(hubElement.getEmbeddingContainer() );
+		assertNull(hubElement.getNextElement());
+		assertNotNull(hubElement.getOutgoingShipments());
+		assertNotNull(hubElement.getOutgoingShipments().getShipments());
+		assertTrue(hubElement.getOutgoingShipments().getSortedShipments().isEmpty());
+		assertNull(hubElement.getPreviousElement());
+		assertSame(hubElement.getResource(), point);
+		assertSame(hubElement.getResource().getClientElements().iterator().next(), hubElement);
 	}
 }

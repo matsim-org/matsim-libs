@@ -45,9 +45,9 @@ import lsp.LSPResource;
 public class CompleteSolutionTest {
 
 	private LogisticsSolutionElement collectionElement;
-	private LogisticsSolutionElement firstReloadElement;
+	private LogisticsSolutionElement firstHubElement;
 	private LogisticsSolutionElement mainRunElement;
-	private LogisticsSolutionElement secondReloadElement;
+	private LogisticsSolutionElement secondHubElement;
 	private LogisticsSolutionElement distributionElement;
 	private LogisticsSolution solution;
 	
@@ -97,23 +97,23 @@ public class CompleteSolutionTest {
 		collectionBuilder.setResource(collectionAdapterBuilder.build());
 		collectionElement = collectionBuilder.build();
 
-		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
 		firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
-		Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
-		Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<LSPResource> firstTransshipmentHubId = Id.create("TranshipmentHub1", LSPResource.class);
+		Id<Link> firstTransshipmentHub_LinkId = Id.createLinkId("(4 2) (4 3)");
 
-		UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId,
-				firstReloadingLinkId);
-		firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
+		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId,
+				firstTransshipmentHub_LinkId);
+		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
 
-		Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FiretReloadElement",
+		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FiretHubElement",
 				LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance(firstReloadingElementId);
-		firstReloadingElementBuilder.setResource(firstReloadingPointBuilder.build());
-		firstReloadElement = firstReloadingElementBuilder.build();
+		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
+				.newInstance(firstHubElementId);
+		firstHubElementBuilder.setResource(firstTransshipmentHubBuilder.build());
+		firstHubElement = firstHubElementBuilder.build();
 
 		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
@@ -152,23 +152,23 @@ public class CompleteSolutionTest {
 		mainRunBuilder.setResource(mainRunAdapterBuilder.build());
 		mainRunElement = mainRunBuilder.build();
 
-		UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
 		secondSchedulerBuilder.setCapacityNeedLinear(1);
 
-		Id<LSPResource> secondReloadingId = Id.create("ReloadingPoint2", LSPResource.class);
-		Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
+		Id<LSPResource> secondTransshipmentHubId = Id.create("TranshipmentHub2", LSPResource.class);
+		Id<Link> secondTransshipmentHub_LinkId = Id.createLinkId("(14 2) (14 3)");
 
-		UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId,
-				secondReloadingLinkId);
-		secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
+		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId,
+				secondTransshipmentHub_LinkId);
+		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
 
-		Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement",
+		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement",
 				LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder secondReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance(secondReloadingElementId);
-		secondReloadingElementBuilder.setResource(secondReloadingPointBuilder.build());
-		secondReloadElement = secondReloadingElementBuilder.build();
+		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
+				.newInstance(secondHubElementId);
+		secondHubElementBuilder.setResource(secondTransshipmentHubBuilder.build());
+		secondHubElement = secondHubElementBuilder.build();
 
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
@@ -207,17 +207,17 @@ public class CompleteSolutionTest {
 		distributionBuilder.setResource(distributionAdapterBuilder.build());
 		distributionElement = distributionBuilder.build();
 
-		collectionElement.connectWithNextElement(firstReloadElement);
-		firstReloadElement.connectWithNextElement(mainRunElement);
-		mainRunElement.connectWithNextElement(secondReloadElement);
-		secondReloadElement.connectWithNextElement(distributionElement);
+		collectionElement.connectWithNextElement(firstHubElement);
+		firstHubElement.connectWithNextElement(mainRunElement);
+		mainRunElement.connectWithNextElement(secondHubElement);
+		secondHubElement.connectWithNextElement(distributionElement);
 
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
-		completeSolutionBuilder.addSolutionElement(firstReloadElement);
+		completeSolutionBuilder.addSolutionElement(firstHubElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolutionBuilder.addSolutionElement(secondReloadElement);
+		completeSolutionBuilder.addSolutionElement(secondHubElement);
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		solution = completeSolutionBuilder.build();
 
@@ -244,14 +244,14 @@ public class CompleteSolutionTest {
 				assertSame(element.getEmbeddingContainer(), solution );
 			}
 		assertNull(collectionElement.getPreviousElement());
-		assertSame(collectionElement.getNextElement(), firstReloadElement);
-		assertSame(firstReloadElement.getPreviousElement(), collectionElement);
-		assertSame(firstReloadElement.getNextElement(), mainRunElement);
-		assertSame(mainRunElement.getPreviousElement(), firstReloadElement);
-		assertSame(mainRunElement.getNextElement(), secondReloadElement);
-		assertSame(secondReloadElement.getPreviousElement(), mainRunElement);
-		assertSame(secondReloadElement.getNextElement(), distributionElement);
-		assertSame(distributionElement.getPreviousElement(), secondReloadElement);
+		assertSame(collectionElement.getNextElement(), firstHubElement);
+		assertSame(firstHubElement.getPreviousElement(), collectionElement);
+		assertSame(firstHubElement.getNextElement(), mainRunElement);
+		assertSame(mainRunElement.getPreviousElement(), firstHubElement);
+		assertSame(mainRunElement.getNextElement(), secondHubElement);
+		assertSame(secondHubElement.getPreviousElement(), mainRunElement);
+		assertSame(secondHubElement.getNextElement(), distributionElement);
+		assertSame(distributionElement.getPreviousElement(), secondHubElement);
 		assertNull(distributionElement.getNextElement());
 	}
 		

@@ -51,7 +51,7 @@ import org.matsim.vehicles.VehicleType;
  * together until their total weight exceeds the capacity of the deployed vehicle
  * type. Then, this bundle of LSPShipments is converted to a scheduled tour
  * from the freight contrib of MATSim. The start of this tour is located at
- * the first ReloadingPoint and the end at the second one. All LSPShipments
+ * the first TranshipmentHub and the end at the second one. All LSPShipments
  * are converted to services that take place at the end point of the tour.
  *
  * Tour is routed by MATSim Network Router.

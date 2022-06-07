@@ -210,30 +210,30 @@ public class UsecaseUtils {
 		}
 		}
 
-	public static class ReloadingPointSchedulerBuilder {
+	public static class TranshipmentHubSchedulerBuilder {
 		private double capacityNeedLinear;
 		private double capacityNeedFixed;
 
-		private ReloadingPointSchedulerBuilder(){
+		private TranshipmentHubSchedulerBuilder(){
 		}
 
-		public static ReloadingPointSchedulerBuilder newInstance(){
-			return new ReloadingPointSchedulerBuilder();
+		public static TranshipmentHubSchedulerBuilder newInstance(){
+			return new TranshipmentHubSchedulerBuilder();
 		}
 
 
-		public ReloadingPointSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear){
+		public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear){
 			this.capacityNeedLinear = capacityNeedLinear;
 			return this;
 		}
 
-		public ReloadingPointSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed){
+		public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed){
 			this.capacityNeedFixed = capacityNeedFixed;
 			return this;
 		}
 
-		public ReloadingPointScheduler build(){
-			return new ReloadingPointScheduler(this);
+		public TransshipmentHubScheduler build(){
+			return new TransshipmentHubScheduler(this);
 		}
 
 		//--- Getters ---
@@ -246,30 +246,30 @@ public class UsecaseUtils {
 		}
 	}
 
-	public static class ReloadingPointBuilder {
+	public static class TransshipmentHubBuilder {
 
 		private final Id<LSPResource> id;
 		private final Id<Link> locationLinkId;
-		private ReloadingPointScheduler reloadingScheduler;
+		private TransshipmentHubScheduler transshipmentHubScheduler;
 		private final ArrayList <LogisticsSolutionElement> clientElements;
 
-		public static ReloadingPointBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId){
-			return new ReloadingPointBuilder(id,locationLinkId);
+		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId){
+			return new TransshipmentHubBuilder(id,locationLinkId);
 		}
 
-		private ReloadingPointBuilder(Id<LSPResource> id, Id<Link> locationLinkId){
+		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId){
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.locationLinkId = locationLinkId;
 		}
 
-		public ReloadingPointBuilder setReloadingScheduler( LSPResourceScheduler reloadingPointScheduler){
-			this.reloadingScheduler = (ReloadingPointScheduler) reloadingPointScheduler;
+		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler){
+			this.transshipmentHubScheduler = (TransshipmentHubScheduler) TranshipmentHubScheduler;
 			return this;
 		}
 
-		public ReloadingPoint build(){
-			return new ReloadingPoint(this);
+		public TransshipmentHub build(){
+			return new TransshipmentHub(this);
 		}
 
 		//--- Getters ---
@@ -281,8 +281,8 @@ public class UsecaseUtils {
 			return locationLinkId;
 		}
 
-		ReloadingPointScheduler getReloadingScheduler() {
-			return reloadingScheduler;
+		TransshipmentHubScheduler getTransshipmentHubScheduler() {
+			return transshipmentHubScheduler;
 		}
 
 		ArrayList<LogisticsSolutionElement> getClientElements() {
