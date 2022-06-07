@@ -26,34 +26,31 @@ import lsp.LSPUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
-public class FirstReloadElementTest {
+public class FirstHubElementTest {
 
-	private ReloadingPoint point;
+	private TransshipmentHub point;
 	private LogisticsSolutionElement reloadingElement;
 
 	@Before
 	public void initialize() {
-			UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
-	        schedulerBuilder.setCapacityNeedFixed(10);
-	        schedulerBuilder.setCapacityNeedLinear(1);
+		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		schedulerBuilder.setCapacityNeedFixed(10);
+		schedulerBuilder.setCapacityNeedLinear(1);
 
 
-		Id<LSPResource> reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
-		Id<Link> reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
-	        
-	        UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
-	        reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
-	        point = reloadingPointBuilder.build();
+		point = UsecaseUtils.TransshipmentHubBuilder
+				.newInstance(Id.create("TranshipmentHub1", LSPResource.class), Id.createLinkId("(4 2) (4 3)"))
+				.setTransshipmentHubScheduler(schedulerBuilder.build())
+				.build();
 
-		Id<LogisticsSolutionElement> elementId = Id.create("FiretReloadElement", LogisticsSolutionElement.class);
-			LSPUtils.LogisticsSolutionElementBuilder reloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-			reloadingElementBuilder.setResource(point);
-			reloadingElement  = reloadingElementBuilder.build();
+		reloadingElement = LSPUtils.LogisticsSolutionElementBuilder
+				.newInstance(Id.create("FirstHubElement", LogisticsSolutionElement.class))
+				.setResource(point)
+				.build();
 	}
 
 	@Test

@@ -72,9 +72,9 @@ import example.lspAndDemand.requirementsChecking.AssignerRequirementsTest;
 //import example.lspAndDemand.requirementsChecking.TransferrerRequirementsTest;
 import solutionElementTests.CollectionElementTest;
 import solutionElementTests.DistributionElementTest;
-import lsp.usecase.FirstReloadElementTest;
+import lsp.usecase.FirstHubElementTest;
 import solutionElementTests.MainRunElementTest;
-import solutionElementTests.SecondReloadElementTest;
+import solutionElementTests.SecondHubElementTest;
 import solutionTests.CollectionSolutionTest;
 import solutionTests.CompleteSolutionTest;
 import example.lsp.simulationTrackers.CollectionTrackerTest;
@@ -114,9 +114,9 @@ import example.lsp.simulationTrackers.CollectionTrackerTest;
 //	TransferrerRequirementsTest.class,
 	CollectionElementTest.class,
 	DistributionElementTest.class,
-	FirstReloadElementTest.class,
+	FirstHubElementTest.class,
 	MainRunElementTest.class,
-	SecondReloadElementTest.class,
+	SecondHubElementTest.class,
 	CompleteSolutionTest.class,
 	CollectionSolutionTest.class,
 	CollectionTrackerTest.class,
