@@ -1,12 +1,10 @@
 package org.matsim.application.options;
 
-import org.geotools.data.FeatureWriter;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -93,7 +91,7 @@ public class ShpOptionsTest {
 			}
 		}
 
-		Assert.assertFalse(geometry1.equalsExact(geometry3));
+		Assert.assertFalse(geometry1.equals(geometry3));
 		Assert.assertTrue(geometry1.equals(geometry2));
 	}
 }
