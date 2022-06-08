@@ -1,10 +1,12 @@
 package org.matsim.application.options;
 
+import org.geotools.data.FeatureWriter;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -72,13 +74,16 @@ public class ShpOptionsTest {
 						.replace("options", "prepare"))
 				.resolve("andorra-latest-free.shp.zip");
 
-//		Assume.assumeTrue(Files.exists(input));
+		Assume.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 		Geometry geometry1 = shp.getGeometry() ;
 		Geometry geometry2 = null ;
+		Geometry geometry3 = null ;
 
 		List<SimpleFeature> features = shp.readFeatures();
+
+		geometry3 = (Geometry) features.get(0).getDefaultGeometry();
 
 		for(SimpleFeature feature : features) {
 			if(geometry2 == null) {
@@ -88,10 +93,7 @@ public class ShpOptionsTest {
 			}
 		}
 
-
-
-		//read in shp with getGeometry and with readFeatures and then compare
-		Assert.assertEquals(geometry1, geometry2);
-
+		Assert.assertFalse(geometry1.equalsExact(geometry3));
+		Assert.assertTrue(geometry1.equals(geometry2));
 	}
 }
