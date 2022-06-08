@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.qsim;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -28,7 +29,7 @@ public class QsimTimingTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
+	@Test@Ignore
 	public void test_with_analyzeRuntimes() {
 
 		var config = ConfigUtils.createConfig();
