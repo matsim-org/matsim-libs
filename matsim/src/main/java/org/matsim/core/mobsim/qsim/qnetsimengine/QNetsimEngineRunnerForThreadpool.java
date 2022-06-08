@@ -61,12 +61,12 @@ final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner
 			var startTime = System.nanoTime();
 			moveNodes();
 			var duration = System.nanoTime() - startTime;
-			nodesTiming.addDuration(duration / Math.max(1, getNodeCounter()));
+			nodesTiming.addDuration(duration);
 		} else {
 			var startTime = System.nanoTime();
 			moveLinks();
 			var duration = System.nanoTime() - startTime;
-			linksTiming.addDuration(duration / Math.max(1, getLinkCounter()));
+			linksTiming.addDuration(duration);
 		}
 		return true ;
 	}

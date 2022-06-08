@@ -162,10 +162,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 
 			}
 			var nodesDuration = System.nanoTime() - nodesStartTime;
-			int nodeCount = this.getQnetsimEngineRunner().stream()
-					.mapToInt(AbstractQNetsimEngineRunner::getNodeCounter)
-					.sum();
-			nodesTiming.addDuration(nodesDuration / Math.max(1, nodeCount));
+			nodesTiming.addDuration(nodesDuration);
 
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(false);
@@ -177,10 +174,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 			}
 			var afterLinksTime = System.nanoTime();
 			var linksDuration = afterLinksTime - linksStartTime;
-			var linkCount = this.getQnetsimEngineRunner().stream()
-					.mapToInt(AbstractQNetsimEngineRunner::getLinkCounter)
-					.sum();
-			linksTiming.addDuration(linksDuration / Math.max(1, linkCount));
+			linksTiming.addDuration(linksDuration);
 
 			var overallDuration = afterLinksTime - overallStartTime;
 			overallTiming.addDuration(overallDuration);
