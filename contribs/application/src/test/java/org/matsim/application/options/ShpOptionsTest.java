@@ -5,6 +5,7 @@ import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -75,23 +76,16 @@ public class ShpOptionsTest {
 		Assume.assumeTrue(Files.exists(input));
 
 		ShpOptions shp = new ShpOptions(input, null, null);
-		Geometry geometry1 = shp.getGeometry() ;
-		Geometry geometry2 = null ;
-		Geometry geometry3 = null ;
+		Geometry geometry = shp.getGeometry() ;
+		Geometry expectedGeometry = new GeometryFactory().createEmpty(2);
 
 		List<SimpleFeature> features = shp.readFeatures();
 
-		geometry3 = (Geometry) features.get(0).getDefaultGeometry();
-
 		for(SimpleFeature feature : features) {
-			if(geometry2 == null) {
-				geometry2 = (Geometry) feature.getDefaultGeometry();
-			} else {
-				geometry2 = geometry2.union((Geometry) feature.getDefaultGeometry());
-			}
+			Geometry geometryToJoin = (Geometry) feature.getDefaultGeometry();
+			expectedGeometry = expectedGeometry.union(geometryToJoin);
 		}
 
-		Assert.assertFalse(geometry1.equals(geometry3));
-		Assert.assertTrue(geometry1.equals(geometry2));
+		Assert.assertTrue(geometry.equals(expectedGeometry));
 	}
 }
