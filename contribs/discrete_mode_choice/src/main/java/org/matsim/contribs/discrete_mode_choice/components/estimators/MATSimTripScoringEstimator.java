@@ -19,6 +19,8 @@ import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.routes.TransitPassengerRoute;
+import playground.vsp.pt.fare.DistanceBasedPtFareHandler;
+import playground.vsp.pt.fare.DistanceBasedPtFareParams;
 
 /**
  * This trip estimator tries to resemble the MATSim scoring functions as closely
@@ -32,6 +34,8 @@ public class MATSimTripScoringEstimator extends AbstractTripRouterEstimator {
 	private final PTWaitingTimeEstimator waitingTimeEstimator;
 	private final Collection<String> ptLegModes;
 
+	private DistanceBasedPtFareParams ptFare;
+
 	public MATSimTripScoringEstimator(ActivityFacilities facilities, TripRouter tripRouter,
 			PTWaitingTimeEstimator waitingTimeEstimator, ScoringParametersForPerson scoringParametersForPerson,
 			TimeInterpretation timeInterpretation, Collection<String> ptModes) {
@@ -39,6 +43,10 @@ public class MATSimTripScoringEstimator extends AbstractTripRouterEstimator {
 		this.waitingTimeEstimator = waitingTimeEstimator;
 		this.scoringParametersForPerson = scoringParametersForPerson;
 		this.ptLegModes = ptModes;
+	}
+
+	public void setPtFare(DistanceBasedPtFareParams ptFare) {
+		this.ptFare = ptFare;
 	}
 
 	@Override
@@ -125,6 +133,16 @@ public class MATSimTripScoringEstimator extends AbstractTripRouterEstimator {
 					totalWaitingTime += waitingTimeEstimator.estimateWaitingTime(time, route);
 
 					numberOfVehicularLegs++;
+
+					if (ptFare != null) {
+
+						double fare = DistanceBasedPtFareHandler.computeFare(leg.getRoute().getDistance(), ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
+								ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
+
+						result.utility -= parameters.marginalUtilityOfMoney * fare;
+
+					}
+
 				}
 
 				time += leg.getTravelTime().seconds();

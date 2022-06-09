@@ -76,4 +76,14 @@ public final class DiscreteModeChoiceTrip {
 	public Attributes getTripAttributes() {
 		return tripAttributes;
 	}
+
+	@Override
+	public String toString() {
+		return "DiscreteModeChoiceTrip{" +
+				"originActivity=" + originActivity +
+				", destinationActivity=" + destinationActivity +
+				", initialMode='" + initialMode + '\'' +
+				", departureTime=" + departureTime +
+				'}';
+	}
 }

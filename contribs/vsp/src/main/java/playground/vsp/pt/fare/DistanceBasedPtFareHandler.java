@@ -51,12 +51,7 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
                 double distance = CoordUtils.calcEuclideanDistance
                         (personDepartureCoordMap.get(personId), personArrivalCoordMap.get(personId));
 
-                double fare = 0;
-                if (distance <= longTripThreshold) {
-                    fare = Math.max(minFare, shortTripIntercept + shortTripSlope * distance);
-                } else {
-                    fare = Math.max(minFare, longTripIntercept + longTripSlope * distance);
-                }
+                double fare = computeFare(distance, longTripThreshold, minFare, shortTripIntercept, shortTripSlope, longTripIntercept, longTripSlope);
                 // charge fare to the person
                 events.processEvent(
                         new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare,
@@ -65,6 +60,16 @@ public class DistanceBasedPtFareHandler implements ActivityStartEventHandler {
                 personDepartureCoordMap.remove(personId);
                 personArrivalCoordMap.remove(personId);
             }
+        }
+    }
+
+    public static double computeFare(double distance, double longTripThreshold, double minFare,
+                                     double shortTripIntercept, double shortTripSlope,
+                                     double longTripIntercept, double longTripSlope) {
+        if (distance <= longTripThreshold) {
+            return Math.max(minFare, shortTripIntercept + shortTripSlope * distance);
+        } else {
+            return Math.max(minFare, longTripIntercept + longTripSlope * distance);
         }
     }
 
