@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.qsim.QSim;
  */
 abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry {
 
-	private double time = 0.0;
+	protected double time = 0.0;
 
 	/*
 	 * This needs to be thread-safe since QNodes could be activated concurrently
@@ -70,11 +70,15 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	private boolean lockNodes = false;
 	private boolean lockLinks = false;
 
-	/*package*/ long[] runTimes;
-	private long startTime = 0;
+	/*package*/ long[] nodeTimes;
+				long[] linkTimes;
+
+
 	{	
-		if (QSim.analyzeRunTimes) runTimes = new long[QNetsimEngineWithThreadpool.numObservedTimeSteps];
-		else runTimes = null;
+		if (QSim.analyzeRunTimes) {
+			nodeTimes = new long[QNetsimEngineWithThreadpool.numObservedTimeSteps];
+			linkTimes = new long[QNetsimEngineWithThreadpool.numObservedTimeSteps];
+		}
 	}
 
 	/*package*/ final void setTime(final double t) {
@@ -147,17 +151,5 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	@Override
 	public final int getNumberOfSimulatedNodes() {
 		return this.nodesQueue.size();
-	}
-
-	protected final void startMeasure() {
-		if (QSim.analyzeRunTimes) this.startTime = System.nanoTime();		
-	}
-
-	protected final void endMeasure() {
-		if (QSim.analyzeRunTimes) {
-			long end = System.nanoTime();
-			int bin = (int) this.time;
-			if (bin < this.runTimes.length) this.runTimes[bin] = end - this.startTime;
-		}
 	}
 }

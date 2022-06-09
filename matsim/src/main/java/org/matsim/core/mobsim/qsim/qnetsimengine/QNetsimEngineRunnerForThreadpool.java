@@ -46,10 +46,21 @@ final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner
 			return 0;
 		}
 
-		else if (state == State.MOVE_NODES) {
+		long startTime = System.nanoTime();
+
+		if (state == State.MOVE_NODES) {
 			moveNodes();
+
+			long end = System.nanoTime();
+			int bin = (int) this.time;
+			if (bin < this.nodeTimes.length) this.nodeTimes[bin] = end - startTime;
+
 		} else if (state == State.MOVE_LINKS){
 			moveLinks();
+
+			long end = System.nanoTime();
+			int bin = (int) this.time;
+			if (bin < this.linkTimes.length) this.linkTimes[bin] = end - startTime;
 		}
 
 		state = State.IDLE;

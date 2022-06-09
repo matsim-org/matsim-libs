@@ -20,11 +20,15 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -78,7 +82,6 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 	// for detailed run time analysis - used in combination with QSim.analyzeRunTimes
 	public static int numObservedTimeSteps = 24*3600;
-	public static boolean printRunTimesPerTimeStep = false;
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 	private final QSim qsim;
@@ -307,49 +310,41 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	public final void printEngineRunTimes() {
 		if (!QSim.analyzeRunTimes) return;
 		
-		if (printRunTimesPerTimeStep) log.info("detailed QNetsimEngineRunner run times per time step:");
-		{
-			StringBuffer sb = new StringBuffer();
-			sb.append("\t");
-			sb.append("time");
-			for (int i = 0; i < this.engines.size(); i++) {
-				sb.append("\t");
-				sb.append("thread_");
-				sb.append(Integer.toString(i));
-			}
-			sb.append("\t");
-			sb.append("min");
-			sb.append("\t");
-			sb.append("max");
-			if (printRunTimesPerTimeStep) log.info(sb.toString());
-		}
-		long sum = 0;
-		long sumMin = 0;
-		long sumMax = 0;
-		for (int i = 0; i < numObservedTimeSteps; i++) {
-			StringBuffer sb = new StringBuffer();
-			sb.append("\t" + i);
-			long min = Long.MAX_VALUE;
-			long max = Long.MIN_VALUE;
+		log.info("detailed QNetsimEngineRunner run times per time step:");
+
+
+		try (CSVPrinter printer = new CSVPrinter(new FileWriter("runtTimes.csv"), CSVFormat.DEFAULT)) {
+
+			printer.printRecord("thread", "task");
+
+			int i = 0;
 			for (AbstractQNetsimEngineRunner runner : this.engines) {
-				long runTime = runner.runTimes[i];
-				sum += runTime;
-				if (runTime < min) min = runTime;
-				if (runTime > max) max = runTime;
-				sb.append("\t");
-				sb.append(Long.toString(runTime));
+
+				printer.print(i);
+				printer.print("nodes");
+
+				for (int t = 0; t < numObservedTimeSteps; t++) {
+					printer.print(runner.nodeTimes[t]);
+				}
+
+				printer.println();
+
+				printer.print(i);
+				printer.print("links");
+
+				for (int t = 0; t < numObservedTimeSteps; t++) {
+					printer.print(runner.linkTimes[t]);
+				}
+
+				printer.println();
+
+				i++;
 			}
-			sb.append("\t");
-			sb.append(Long.toString(min));
-			sb.append("\t");
-			sb.append(Long.toString(max));
-			if (printRunTimesPerTimeStep) log.info(sb.toString());
-			sumMin += min;
-			sumMax += max;
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		log.info("sum min run times: " + sumMin);
-		log.info("sum max run times: " + sumMax);
-		log.info("sum all run times / num threads: " + sum / this.numOfThreads);
+
 	}
 
 	@Override
