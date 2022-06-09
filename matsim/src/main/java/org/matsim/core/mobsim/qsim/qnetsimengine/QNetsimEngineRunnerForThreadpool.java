@@ -20,8 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.concurrent.Callable;
-
+import org.agrona.ErrorHandler;
+import org.agrona.concurrent.Agent;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -30,34 +30,68 @@ import org.matsim.core.gbl.Gbl;
  * 
  * @author droeder @ Senozon Deutschland GmbH
  */
-final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Callable<Boolean>{
-	
-	private volatile boolean simulationRunning = true;
-	private boolean movingNodes;
+final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Agent, ErrorHandler {
+// Note that this agent interface has nothing to do with MATSim
+
+	private volatile State state;
+	private volatile Throwable t;
 
 	QNetsimEngineRunnerForThreadpool() {
 	}
 
 	@Override
-	public Boolean call() {
-		if (!this.simulationRunning) {
-			Gbl.printCurrentThreadCpuTime();
-			return false;
+	public int doWork() throws Exception {
+
+		if (state == State.FINISHED || state == State.IDLE || state == State.ERROR) {
+			return 0;
 		}
 
-		if (this.movingNodes) {
+		else if (state == State.MOVE_NODES) {
 			moveNodes();
-		} else {
+		} else if (state == State.MOVE_LINKS){
 			moveLinks();
 		}
-		return true ;
+
+		state = State.IDLE;
+
+		return 1;
+	}
+
+	@Override
+	public String roleName() {
+		return "QNetsimEngineRunner";
 	}
 
 	public final void afterSim() {
-		this.simulationRunning  = false;
+		this.state  = State.FINISHED;
 	}
 
-	public final void setMovingNodes(boolean movingNodes) {
-		this.movingNodes = movingNodes;
+	public final void setState(State state) {
+		this.state = state;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	@Override
+	public void onError(Throwable throwable) {
+		this.state = State.ERROR;
+		this.t = throwable;
+	}
+
+	public Throwable getError() {
+		return t;
+	}
+
+	public static enum State {
+
+		MOVE_NODES,
+		MOVE_LINKS,
+		IDLE,
+		FINISHED,
+
+		ERROR,
+
 	}
 }

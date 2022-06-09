@@ -23,13 +23,12 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Inject;
 
+import org.agrona.concurrent.*;
+import org.agrona.concurrent.status.AtomicCounter;
 import org.matsim.core.mobsim.qsim.QSim;
 
 /**
@@ -38,7 +37,6 @@ import org.matsim.core.mobsim.qsim.QSim;
  * 2 different approaches parallel.
  *
  * @author droeder@Senozon after
- * 
  * @author mrieser
  * @author dgrether
  * @author dstrippgen
@@ -46,8 +44,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEngineRunnerForThreadpool> {
 
 	private final int numOfRunners;
-	private ExecutorService pool;
-	
+
+	private AgentRunner[] runners;
+	private final AtomicCounter counter;
+
+	private final IdleStrategy idle = new BusySpinIdleStrategy();
+
 	public QNetsimEngineWithThreadpool(final QSim sim) {
 		this(sim, null);
 	}
@@ -56,11 +58,15 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	public QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
 		super(sim, netsimNetworkFactory);
 		this.numOfRunners = this.numOfThreads;
+
+		counter = new AtomicCounter(new UnsafeBuffer(new byte[8]), 0);
 	}
 
 	@Override
 	public void finishMultiThreading() {
-		this.pool.shutdown();
+		for (AgentRunner runner : runners) {
+			runner.close();
+		}
 	}
 
 	protected void run(double time) {
@@ -89,36 +95,57 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 		// as input for the domain decomposition under (b).
 
 		// set current Time
-		for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
+		List<QNetsimEngineRunnerForThreadpool> engines = this.getQnetsimEngineRunner();
+
+		for (AbstractQNetsimEngineRunner engine : engines) {
 			engine.setTime(time);
 		}
 
 		try {
-			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
-				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(true);
+			for (AbstractQNetsimEngineRunner engine : engines) {
+				((QNetsimEngineRunnerForThreadpool) engine).setState(QNetsimEngineRunnerForThreadpool.State.MOVE_NODES);
 			}
-			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
-				future.get();
+
+			join(engines);
+
+			for (AbstractQNetsimEngineRunner engine : engines) {
+				((QNetsimEngineRunnerForThreadpool) engine).setState(QNetsimEngineRunnerForThreadpool.State.MOVE_LINKS);
 			}
-			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
-				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(false);
-			}
-			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
-				future.get();
-			}
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e) ;
+
+			join(engines);
+
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e.getCause());
 		}
 	}
-	
+
+	private void join(List<QNetsimEngineRunnerForThreadpool> engines) throws ExecutionException {
+		while (true) {
+			boolean done = true;
+
+			for (QNetsimEngineRunnerForThreadpool engine : engines) {
+				if (engine.getState() == QNetsimEngineRunnerForThreadpool.State.ERROR)
+					throw new ExecutionException(engine.getError());
+
+				if (engine.getState() != QNetsimEngineRunnerForThreadpool.State.IDLE)
+					done = false;
+			}
+
+			if (done)
+				break;
+
+			idle.idle();
+		}
+
+		idle.reset();
+	}
+
 	private static class NamedThreadFactory implements ThreadFactory {
 		private int count = 0;
 
 		@Override
 		public Thread newThread(Runnable r) {
-			return new Thread( r , "QNetsimEngine_PooledThread_" + count++);
+			return new Thread(r, "QNetsimEngine_PooledThread_" + count++);
 		}
 	}
 
@@ -134,8 +161,22 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 
 	@Override
 	protected void initMultiThreading() {
-		this.pool = Executors.newFixedThreadPool(
-				this.numOfThreads,
-				new NamedThreadFactory());		
+
+		NamedThreadFactory tf = new NamedThreadFactory();
+
+		List<QNetsimEngineRunnerForThreadpool> engines = this.getQnetsimEngineRunner();
+
+		runners = new AgentRunner[engines.size()];
+		int i = 0;
+		for (QNetsimEngineRunnerForThreadpool engine : engines) {
+
+			AgentRunner runner = new AgentRunner(new BusySpinIdleStrategy(), engine, counter, engine);
+
+			runners[i] = runner;
+
+			AgentRunner.startOnThread(runner, tf);
+			i++;
+		}
+
 	}
 }
