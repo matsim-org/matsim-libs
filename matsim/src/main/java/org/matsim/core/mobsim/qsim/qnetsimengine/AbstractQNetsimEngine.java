@@ -315,7 +315,14 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 
 		try (CSVPrinter printer = new CSVPrinter(new FileWriter("runTimes.csv"), CSVFormat.DEFAULT)) {
 
-			printer.printRecord("thread", "task");
+			printer.print("thread");
+			printer.print("task");
+
+			for (int t = 0; t < numObservedTimeSteps; t++) {
+				printer.print("t" + t);
+			}
+
+			printer.println();
 
 			int i = 0;
 			for (AbstractQNetsimEngineRunner runner : this.engines) {
