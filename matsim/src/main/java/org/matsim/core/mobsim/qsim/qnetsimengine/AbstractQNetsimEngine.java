@@ -313,7 +313,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		log.info("detailed QNetsimEngineRunner run times per time step:");
 
 
-		try (CSVPrinter printer = new CSVPrinter(new FileWriter("runtTimes.csv"), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(new FileWriter("runTimes.csv"), CSVFormat.DEFAULT)) {
 
 			printer.printRecord("thread", "task");
 
