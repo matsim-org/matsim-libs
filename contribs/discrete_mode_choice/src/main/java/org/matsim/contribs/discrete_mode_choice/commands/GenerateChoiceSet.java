@@ -227,6 +227,7 @@ public class GenerateChoiceSet implements MATSimAppCommand {
 		for (PlanCandidate c : candidates) {
 
 			plan.setType("candidate_" + i);
+			plan.setScore(null);
 
 			int k = 0;
 			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
