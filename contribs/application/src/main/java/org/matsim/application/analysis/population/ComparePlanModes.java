@@ -1,5 +1,6 @@
 package org.matsim.application.analysis.population;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -12,9 +13,7 @@ import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "compare-plan-modes", description = "Compare plans between two populations")
@@ -39,7 +38,7 @@ public class ComparePlanModes implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		List<Population> populations = input.stream()
+		List<Population> populations = input.parallelStream()
 				.map(p -> PopulationUtils.readPopulation(p.toString()))
 				.collect(Collectors.toList());
 
@@ -60,7 +59,7 @@ public class ComparePlanModes implements MATSimAppCommand {
 
 		try (CSVPrinter printer = csv.createPrinter(output)) {
 
-			printer.printRecord("person", "p1_score", "p2_score", "p1_modes", "p2_modes");
+			printer.printRecord("person", "trips_to_subtours", "p1_score", "p2_score", "p1_modes", "p2_modes");
 
 			for (Id<Person> id : persons) {
 
@@ -73,6 +72,8 @@ public class ComparePlanModes implements MATSimAppCommand {
 				if (!m0.equals(m1)) {
 
 					printer.print(id.toString());
+					printer.print(getSubtourString(p0));
+
 					printer.print(p0.getScore());
 					printer.print(p1.getScore());
 					printer.print(m0);
@@ -95,4 +96,32 @@ public class ComparePlanModes implements MATSimAppCommand {
 		).collect(Collectors.joining("-"));
 	}
 
+	/**
+	 * String representation of subtour relation.
+	 */
+	private String getSubtourString(Plan p) {
+
+		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(p);
+
+		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(p);
+
+		List<String> all = new ArrayList<>();
+
+		for (TripStructureUtils.Trip t : trips) {
+
+			List<String> contains = new ArrayList<>();
+
+			int i = 0;
+			for (TripStructureUtils.Subtour st : subtours) {
+				if (st.getTrips().contains(t))
+					contains.add(String.valueOf(i));
+
+				i++;
+			}
+
+			all.add(Joiner.on("|").join(contains));
+		}
+
+		return Joiner.on("-").join(all);
+	}
 }
