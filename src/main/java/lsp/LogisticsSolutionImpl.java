@@ -99,6 +99,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
 			this.attributes.putAttribute( entry.getKey(), entry.getValue());
 		}
+		tracker.setEmbeddingContainer( this );
 
 	}
 

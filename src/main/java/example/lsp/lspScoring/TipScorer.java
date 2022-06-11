@@ -31,7 +31,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.*;
 
-/*package-private*/ class TipScorer implements LSPScorer, LSPSimulationTracker, LSPServiceEndEventHandler
+/*package-private*/ class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
 {
 
 	private final Random tipRandom;

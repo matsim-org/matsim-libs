@@ -120,4 +120,7 @@ import java.util.Collection;
 	@Override public Attributes getAttributes(){
 		return attributes;
 	}
+	@Override public Object getEmbeddingContainer(){
+		throw new RuntimeException( "not implemented" );
+	}
 }
