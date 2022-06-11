@@ -95,11 +95,11 @@ import java.util.Map;
 		this.solution = solution;
 	}
 
-	@Override
-	public LogisticsSolution getEmbeddingContainer() {
-		return solution;
-	}
-
+//	@Override
+//	public LogisticsSolution getEmbeddingContainer() {
+//		return solution;
+//	}
+//
 	@Override
 	public LogisticsSolutionElement getPreviousElement() {
 		return previousElement;

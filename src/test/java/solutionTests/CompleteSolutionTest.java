@@ -241,7 +241,7 @@ public class CompleteSolutionTest {
 				if(elements.indexOf(element) == (elements.size() -1)) {
 					assertNull(element.getNextElement());
 				}
-				assertSame(element.getEmbeddingContainer(), solution );
+//				assertSame(element.getEmbeddingContainer(), solution );
 			}
 		assertNull(collectionElement.getPreviousElement());
 		assertSame(collectionElement.getNextElement(), firstHubElement);

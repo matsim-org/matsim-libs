@@ -125,7 +125,7 @@ import java.util.Collection;
 	@Override public void setEmbeddingContainer( LogisticsSolution pointer ){
 		this.logisticsSolution = pointer;
 	}
-	@Override public LogisticsSolution getEmbeddingContainer(){
-		throw new RuntimeException( "not implemented" );
-	}
+//	@Override public LogisticsSolution getEmbeddingContainer(){
+//		throw new RuntimeException( "not implemented" );
+//	}
 }

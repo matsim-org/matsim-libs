@@ -128,9 +128,9 @@ import java.util.*;
 			@Override public void setEmbeddingContainer( LSP pointer ){
 				this.lsp = pointer;
 			}
-			@Override public LSP getEmbeddingContainer(){
-				return this.lsp;
-			}
+//			@Override public LSP getEmbeddingContainer(){
+//				return this.lsp;
+//			}
 		} );
 
 		log.info("create initial LSPShipments");

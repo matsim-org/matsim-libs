@@ -51,9 +51,9 @@ import java.util.*;
 	@Override public void setEmbeddingContainer( LSP pointer ){
 		throw new RuntimeException( "not implemented" );
 	}
-	@Override public LSP getEmbeddingContainer(){
-		throw new RuntimeException( "not implemented" );
-	}
+//	@Override public LSP getEmbeddingContainer(){
+//		throw new RuntimeException( "not implemented" );
+//	}
 
 	@Override public Collection<EventHandler> getEventHandlers() {
 		return this.eventHandlers;

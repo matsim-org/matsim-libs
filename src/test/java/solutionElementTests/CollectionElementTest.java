@@ -97,7 +97,7 @@ public class CollectionElementTest {
 		assertTrue(collectionElement.getIncomingShipments().getSortedShipments().isEmpty());
 		assertNotNull(collectionElement.getAttributes() );
 		assertTrue(collectionElement.getAttributes().isEmpty() );
-		assertNull(collectionElement.getEmbeddingContainer() );
+//		assertNull(collectionElement.getEmbeddingContainer() );
 		assertNull(collectionElement.getNextElement());
 		assertNotNull(collectionElement.getOutgoingShipments());
 		assertNotNull(collectionElement.getOutgoingShipments().getShipments());
