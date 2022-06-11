@@ -21,22 +21,30 @@
 package example.lsp.lspScoring;
 
 import lsp.LSP;
+import lsp.controler.LSPSimulationTracker;
 import lsp.scoring.LSPScorer;
+import org.checkerframework.checker.units.qual.A;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-/*package-private*/ class TipScorer implements LSPScorer {
+/*package-private*/ class TipScorer implements LSPScorer, LSPSimulationTracker
+{
+	private final Attributes attributes = new Attributes();
 
-	private final TipSimulationTracker tracker;
-
-	/*package-private*/ TipScorer(LSP lsp, TipSimulationTracker tracker) {
-		this.tracker = tracker;
+	private final LSP lsp;
+	/*package-private*/ TipScorer( LSP lsp ) {
+		this.lsp = lsp;
 	}
 	
 	@Override
 	public double scoreCurrentPlan(LSP lsp) {
-		double score = 0;
+//		double score = 0;
 //		for(LSPInfo info : tracker.getAttributes()) {
 //			if(info instanceof TipInfo) {
 //				Attributes function = info.getAttributes();
@@ -49,17 +57,39 @@ import java.util.Map;
 //			}
 //		}
 
-		Double tip = (Double) tracker.getAttributes().getAttribute( "TIP IN EUR" );
-		if ( tip != null ){
-			score += tip;
-		}
+//		Double tip = (Double) tracker.getAttributes().getAttribute( "TIP IN EUR" );
+//		if ( tip != null ){
+//			score += tip;
+//		}
 
-		return score;
+		return handler.getTip();
 	}
 
 	@Override public LSP getEmbeddingContainer(){
 		throw new RuntimeException( "not implemented" );
 	}
 
+	private final TipEventHandler handler = new TipEventHandler();
+//	private final LSPInfo info = new TipInfo();
 
+	@Override
+	public Collection<EventHandler> getEventHandlers() {
+		return Collections.singletonList( handler );
+	}
+
+	@Override
+	public void notifyAfterMobsim( AfterMobsimEvent event ) {
+		double tip = handler.getTip();
+//		LSPInfoFunctionValueImpl<Object> value = LSPInfoFunctionUtils.createInfoFunctionValue( "TIP IN EUR" );
+//		value.setValue(tip);
+//		info.getAttributes().getAttributes().add(value );
+//		this.getAttributes().putAttribute( "TIP IN EUR", tip );
+	}
+
+
+	@Override public void reset(){
+	}
+	@Override public Attributes getAttributes(){
+		return attributes;
+	}
 }

@@ -102,7 +102,8 @@ public class CollectionLSPScoringTest {
 //		TipInfo info = new TipInfo();
 		TipSimulationTracker tipTracker = new TipSimulationTracker();
 		collectionAdapter.addSimulationTracker(tipTracker);
-		LSPScorer tipScorer = new TipScorer(collectionLSP, tipTracker);
+		TipScorer tipScorer = new TipScorer(collectionLSP);
+		collectionAdapter.addSimulationTracker( tipScorer );
 		collectionLSP.setScorer(tipScorer);
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
