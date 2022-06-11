@@ -93,17 +93,26 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 			for(LSPShipment shipment : lsp.getShipments()) {
 				for(EventHandler handler : shipment.getEventHandlers()) {
-					eventsManager.addHandler(handler);
+					if ( !registeredHandlers.contains( handler ) ){
+						eventsManager.addHandler( handler );
+						registeredHandlers.add( handler );
+					}
 				}
 			}
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
 			for(LogisticsSolution solution : selectedPlan.getSolutions()) {
 				for(EventHandler handler : solution.getEventHandlers()) {
-					eventsManager.addHandler(handler);
+					if ( !registeredHandlers.contains( handler ) ){
+						eventsManager.addHandler( handler );
+						registeredHandlers.add( handler );
+					}
 				}
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
 					for(EventHandler handler : element.getEventHandlers()) {
-						eventsManager.addHandler(handler);
+						if ( !registeredHandlers.contains( handler ) ){
+							eventsManager.addHandler(handler);
+							registeredHandlers.add( handler );
+						}
 					}
 					for(EventHandler handler : element.getResource().getEventHandlers() ) {
 						if(!registeredHandlers.contains(handler)) {
