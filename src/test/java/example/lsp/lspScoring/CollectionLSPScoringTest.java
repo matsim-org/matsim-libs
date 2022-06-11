@@ -28,7 +28,6 @@ import lsp.scoring.LSPScoringModule;
 import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.ShipmentUtils;
 import lsp.LSPResource;
-import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,9 +99,9 @@ public class CollectionLSPScoringTest {
 //		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 //		function.getAttributes().add(value );
 //		TipInfo info = new TipInfo();
-		TipSimulationTracker tipTracker = new TipSimulationTracker();
-		collectionAdapter.addSimulationTracker(tipTracker);
-		TipScorer tipScorer = new TipScorer(collectionLSP);
+//		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
+//		collectionAdapter.addSimulationTracker(tipTracker);
+		TipScorer tipScorer = new TipScorer();
 		collectionAdapter.addSimulationTracker( tipScorer );
 		collectionLSP.setScorer(tipScorer);
 

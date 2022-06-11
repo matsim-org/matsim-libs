@@ -124,10 +124,11 @@ import java.util.Map;
 	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
+		this.eventHandlers.add( tracker );
 //		this.infos.addAll(tracker.getAttributes() );
-		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-			this.attributes.putAttribute( entry.getKey(), entry.getValue() );
-		}
+//		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+//			this.attributes.putAttribute( entry.getKey(), entry.getValue() );
+//		}
 	}
 
 

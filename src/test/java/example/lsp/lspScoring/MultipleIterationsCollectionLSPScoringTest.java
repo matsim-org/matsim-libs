@@ -53,7 +53,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import lsp.LSPResource;
-import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 
 public class MultipleIterationsCollectionLSPScoringTest {
@@ -139,9 +138,9 @@ public class MultipleIterationsCollectionLSPScoringTest {
 //		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 //		function.getAttributes().add(value );
 //		TipInfo info = new TipInfo();
-		TipSimulationTracker tipTracker = new TipSimulationTracker();
-		collectionAdapter.addSimulationTracker(tipTracker);
-		TipScorer tipScorer = new TipScorer(collectionLSP);
+//		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
+//		collectionAdapter.addSimulationTracker(tipTracker);
+		TipScorer tipScorer = new TipScorer();
 		collectionAdapter.addSimulationTracker( tipScorer );
 		collectionLSP.setScorer(tipScorer);
 

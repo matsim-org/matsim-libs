@@ -189,6 +189,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void setScorer(LSPScorer scorer) {
 		this.scorer =  scorer;
+
 	}
 
 

@@ -93,6 +93,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
+		this.eventHandlers.add( tracker );
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 //		this.solutionInfos.addAll(tracker.getAttributes() );
 		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
