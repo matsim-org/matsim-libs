@@ -77,6 +77,20 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 		registeredHandlers = new ArrayList<>();
 
 		for(LSP lsp : lsps.getLSPs().values()) {
+
+			for( LSPSimulationTracker<LSP> simulationTracker : lsp.getSimulationTrackers() ){
+				if ( !registeredHandlers.contains( simulationTracker ) ){
+					eventsManager.addHandler( simulationTracker );
+					registeredHandlers.add( simulationTracker );
+				}
+				for( EventHandler eventHandler : simulationTracker.getEventHandlers() ){
+					if ( !registeredHandlers.contains( eventHandler ) ){
+						eventsManager.addHandler( eventHandler );
+						registeredHandlers.add( eventHandler );
+					}
+				}
+			}
+
 			for(LSPShipment shipment : lsp.getShipments()) {
 				for(EventHandler handler : shipment.getEventHandlers()) {
 					eventsManager.addHandler(handler);
@@ -123,15 +137,20 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 		Collection<LSPSimulationTracker> alreadyUpdatedTrackers = new ArrayList<>();
 		for(LSP lsp : lsps.getLSPs().values()) {
+
+			for( LSPSimulationTracker<LSP> simulationTracker : lsp.getSimulationTrackers() ){
+				simulationTracker.notifyAfterMobsim( event );
+			}
+
 			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for( LSPSimulationTracker tracker : element.getResource().getSimulationTrackers()) {
+				for(LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+					for( LSPSimulationTracker<LSPResource> tracker : solutionElement.getResource().getSimulationTrackers()) {
 						if(!alreadyUpdatedTrackers.contains(tracker)) {
 							tracker.notifyAfterMobsim(event);
 							alreadyUpdatedTrackers.add(tracker);
 						}
 					}
-					for( LSPSimulationTracker tracker : element.getSimulationTrackers()) {
+					for( LSPSimulationTracker<LogisticsSolutionElement> tracker : solutionElement.getSimulationTrackers()) {
 						tracker.notifyAfterMobsim(event);
 					}
 				}
@@ -193,6 +212,12 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 			}
 
 			for(LSP lsp : lsps.getLSPs().values()) {
+
+				for( LSPSimulationTracker<LSP> simulationTracker : lsp.getSimulationTrackers() ){
+					simulationTracker.reset( );
+				}
+
+
 				for(LSPShipment shipment : lsp.getShipments()) {
 					shipment.getEventHandlers().clear();
 				}

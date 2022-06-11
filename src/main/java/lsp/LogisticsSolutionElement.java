@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 
-public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasEventHandlers, HasSimulationTrackers, Attributable{
+public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasEventHandlers, HasSimulationTrackers<LogisticsSolutionElement>, Attributable{
 
 	void connectWithNextElement(LogisticsSolutionElement element);
 

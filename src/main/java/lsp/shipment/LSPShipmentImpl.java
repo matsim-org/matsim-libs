@@ -22,8 +22,10 @@ package lsp.shipment;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
@@ -48,6 +50,7 @@ class LSPShipmentImpl implements LSPShipment {
 	private final Collection<EventHandler> eventHandlers;
 	private final List<Requirement> requirements;
 	private Id<LogisticsSolution> solutionId;
+	private Collection<LSPSimulationTracker> trackers = new ArrayList<>();
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
 		this.id = builder.id;
@@ -132,5 +135,13 @@ class LSPShipmentImpl implements LSPShipment {
 
 	@Override public Attributes getAttributes(){
 		return attributes;
+	}
+
+	@Override public void addSimulationTracker( LSPSimulationTracker tracker ){
+		this.trackers.add( tracker );
+		tracker.setEmbeddingContainer( this );
+	}
+	@Override public Collection<LSPSimulationTracker> getSimulationTrackers(){
+		return Collections.unmodifiableCollection( this.trackers );
 	}
 }

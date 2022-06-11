@@ -141,7 +141,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 //		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
 //		collectionAdapter.addSimulationTracker(tipTracker);
 		TipScorer tipScorer = new TipScorer();
-		collectionAdapter.addSimulationTracker( tipScorer );
+		collectionLSP.addSimulationTracker( tipScorer );
 		collectionLSP.setScorer(tipScorer);
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
@@ -200,10 +200,9 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 	@Test
 	public void testCollectionLSPScoring() {
-		System.out.println(collectionLSP.getSelectedPlan().getScore());
+		System.out.println("score=" + collectionLSP.getSelectedPlan().getScore());
 		assertEquals(numberOfShipments, collectionLSP.getShipments().size());
-		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments()
-				.size());
+		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size());
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
 	}

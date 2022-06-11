@@ -46,7 +46,7 @@ import java.util.Map;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
 	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker> trackers;
+	private final Collection<LSPSimulationTracker<LSPResource>> trackers;
 
 	CollectionCarrierResource( UsecaseUtils.CollectionCarrierAdapterBuilder builder ){
 		this.id = builder.id;
@@ -121,7 +121,7 @@ import java.util.Map;
 	}
 
 	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
+	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 		this.eventHandlers.add( tracker );
@@ -133,7 +133,7 @@ import java.util.Map;
 
 
 	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker<LSPResource>> getSimulationTrackers() {
 		return trackers;
 	}
 	@Override public Attributes getAttributes(){

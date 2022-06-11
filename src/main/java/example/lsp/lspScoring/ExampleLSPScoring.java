@@ -105,7 +105,7 @@ import java.util.*;
 
 		//Create the Scorer and add it to the lsp
 		final TipScorer scorer = new TipScorer();
-		lspResource.addSimulationTracker( scorer );
+		lsp.addSimulationTracker( scorer );
 		lsp.setScorer( scorer );
 
 		// yyyyyy there is almost surely something wrong with the design if you cannot set the

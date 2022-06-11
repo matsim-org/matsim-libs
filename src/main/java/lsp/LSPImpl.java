@@ -22,8 +22,10 @@ package lsp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import lsp.controler.LSPSimulationTracker;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -45,6 +47,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
 	private final Attributes attributes = new Attributes();
+	private final Collection<LSPSimulationTracker<LSP>> trackers = new ArrayList<>();
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){
@@ -137,6 +140,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 		this.selectedPlan = selectedPlan;
 		
+	}
+	@Override public void addSimulationTracker( LSPSimulationTracker<LSP> tracker ){
+		this.trackers.add( tracker );
+		tracker.setEmbeddingContainer( this );
+	}
+	@Override public Collection<LSPSimulationTracker<LSP>> getSimulationTrackers(){
+		return Collections.unmodifiableCollection( this.trackers );
 	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {

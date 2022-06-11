@@ -39,7 +39,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Collection<LogisticsSolutionElement> solutionElements;
 	private final Collection<LSPShipment> shipments;
 	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker>trackers;
+	private final Collection<LSPSimulationTracker<LogisticsSolution>>trackers;
 
 
 	LogisticsSolutionImpl( LSPUtils.LogisticsSolutionBuilder builder ){
@@ -91,7 +91,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
+	public void addSimulationTracker( LSPSimulationTracker<LogisticsSolution> tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.add( tracker );
 		this.eventHandlers.addAll(tracker.getEventHandlers());
@@ -105,7 +105,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker<LogisticsSolution>> getSimulationTrackers() {
 		return trackers;
 	}
 

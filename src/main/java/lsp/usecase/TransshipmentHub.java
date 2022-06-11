@@ -55,7 +55,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
 	private final List<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker> trackers;
+	private final Collection<LSPSimulationTracker<LSPResource>> trackers;
 
 	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder){
 		this.id = builder.getId();
@@ -113,7 +113,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
+	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 //		this.infos.addAll(tracker.getAttributes() );
@@ -123,7 +123,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker<LSPResource>> getSimulationTrackers() {
 		return trackers;
 	}
 	@Override public Attributes getAttributes(){

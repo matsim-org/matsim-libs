@@ -41,7 +41,7 @@ import java.util.Map;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private final Collection<LSPSimulationTracker> trackers;
+	private final Collection<LSPSimulationTracker<LogisticsSolutionElement>> trackers;
 	private final Collection<EventHandler> handlers;
 //	private EventsManager eventsManager;
 
@@ -111,7 +111,7 @@ import java.util.Map;
 	}
 
 	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
+	public void addSimulationTracker( LSPSimulationTracker<LogisticsSolutionElement> tracker ) {
 		trackers.add(tracker);
 
 		// can't say if this hierarchical design is useful or confusing. kai, may'22
@@ -128,7 +128,7 @@ import java.util.Map;
 	}
 
 	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker<LogisticsSolutionElement>> getSimulationTrackers() {
 		return trackers;
 	}
 	@Override public Attributes getAttributes(){

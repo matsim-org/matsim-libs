@@ -98,7 +98,7 @@ public final class LSPUtils{
 		final Id<LogisticsSolution> id;
 		final Collection<LogisticsSolutionElement> elements;
 		final Collection<EventHandler> eventHandlers;
-		final Collection<LSPSimulationTracker>trackers;
+		final Collection<LSPSimulationTracker<LogisticsSolution>> trackers;
 
 		public static LogisticsSolutionBuilder newInstance( Id<LogisticsSolution>id ){
 			return new LogisticsSolutionBuilder(id);
@@ -107,7 +107,7 @@ public final class LSPUtils{
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
 			this.elements = new ArrayList<>();
 			this.eventHandlers = new ArrayList<>();
-			this.trackers = new ArrayList<>();
+			this.trackers = new ArrayList<LSPSimulationTracker<LogisticsSolution>>();
 			this.id = id;
 		}
 
@@ -121,7 +121,7 @@ public final class LSPUtils{
 			return this;
 		}
 
-		public LogisticsSolutionBuilder addTracker( LSPSimulationTracker tracker ) {
+		public LogisticsSolutionBuilder addTracker( LSPSimulationTracker<LogisticsSolution> tracker ) {
 			trackers.add(tracker);
 			return this;
 		}

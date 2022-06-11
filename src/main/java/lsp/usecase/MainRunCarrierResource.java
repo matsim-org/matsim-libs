@@ -47,7 +47,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final MainRunCarrierScheduler mainRunScheduler;
 	private final Network network;
 	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker> trackers;
+	private final Collection<LSPSimulationTracker<LSPResource>> trackers;
 
 
 	MainRunCarrierResource( UsecaseUtils.MainRunCarrierAdapterBuilder builder ){
@@ -106,7 +106,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
+	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 //		this.infos.addAll(tracker.getAttributes() );
@@ -116,7 +116,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker<LSPResource>> getSimulationTrackers() {
 		return trackers;
 	}
 	@Override public Attributes getAttributes(){
