@@ -24,9 +24,9 @@ import lsp.HasBackpointer;
 import lsp.HasEventHandlers;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface LSPSimulationTracker<T> extends AfterMobsimListener, HasEventHandlers, Attributable, EventHandler, HasBackpointer<T> {
+public interface LSPSimulationTracker<T> extends AfterMobsimListener, HasEventHandlers, EventHandler, HasBackpointer<T> {
+	// In general, we set backpointers when we add to the container.  So specifically, we set the backpointer to which the tracker points when the tracker is added.
 
 	/**
 	 * @deprecated -- try to do without

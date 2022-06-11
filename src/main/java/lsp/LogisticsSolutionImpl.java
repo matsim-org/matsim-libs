@@ -96,9 +96,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.eventHandlers.add( tracker );
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 //		this.solutionInfos.addAll(tracker.getAttributes() );
-		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-			this.attributes.putAttribute( entry.getKey(), entry.getValue());
-		}
+//		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+//			this.attributes.putAttribute( entry.getKey(), entry.getValue());
+//		}
 		tracker.setEmbeddingContainer( this );
 
 	}
@@ -110,11 +110,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override public Attributes getAttributes(){
-		for( LSPSimulationTracker tracker : this.trackers ){
-			for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-				this.attributes.putAttribute( entry.getKey(), entry.getValue());
-			}
-		}
+//		for( LSPSimulationTracker tracker : this.trackers ){
+//			for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+//				this.attributes.putAttribute( entry.getKey(), entry.getValue());
+//			}
+//		}
 		return attributes;
 	}
 

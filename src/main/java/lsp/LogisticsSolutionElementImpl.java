@@ -116,9 +116,9 @@ import java.util.Map;
 
 		// can't say if this hierarchical design is useful or confusing. kai, may'22
 		// yy should maybe check for overwriting?  However, did also not check in original design. kai, may'22
-		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-			attributes.putAttribute( entry.getKey(), entry.getValue() );
-		}
+//		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
+//			attributes.putAttribute( entry.getKey(), entry.getValue() );
+//		}
 
 		handlers.addAll(tracker.getEventHandlers());
 	}

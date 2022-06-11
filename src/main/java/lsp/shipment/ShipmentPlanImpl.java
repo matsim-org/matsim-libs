@@ -57,7 +57,10 @@ import org.matsim.api.core.v01.Id;
 		this.shipment = shipment;
 		this.logElements = new HashMap<>();
 	}
-	
+
+	@Override public void setEmbeddingContainer( LSPShipment pointer ){
+		throw new RuntimeException( "not implemented" );
+	}
 	@Override
 	public LSPShipment getEmbeddingContainer() {
 		return shipment;

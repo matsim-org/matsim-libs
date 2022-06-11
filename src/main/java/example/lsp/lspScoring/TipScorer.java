@@ -48,6 +48,9 @@ import java.util.*;
 		return tipSum;
 	}
 
+	@Override public void setEmbeddingContainer( LSP pointer ){
+		throw new RuntimeException( "not implemented" );
+	}
 	@Override public LSP getEmbeddingContainer(){
 		throw new RuntimeException( "not implemented" );
 	}
@@ -69,9 +72,9 @@ import java.util.*;
 	@Override public void reset(){
 		tipSum = 0.;
 	}
-	@Override public Attributes getAttributes(){
-		return null;
-	}
+//	@Override public Attributes getAttributes(){
+//		return null;
+//	}
 
 
 }

@@ -21,6 +21,7 @@
 package example.lsp.simulationTrackers;
 
 import lsp.LSPUtils;
+import lsp.LogisticsSolution;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
@@ -29,7 +30,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/ class LinearCostTracker implements LSPSimulationTracker{
+/*package-private*/ class LinearCostTracker implements LSPSimulationTracker<LogisticsSolution> {
 
 	private final Attributes attributes = new Attributes();
 	private final Collection<EventHandler> eventHandlers;
@@ -45,7 +46,8 @@ import java.util.Collection;
 	private double linearUnitCosts;
 	
 	private final double shareOfFixedCosts;
-	
+	private LogisticsSolution logisticsSolution;
+
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
 //		CostInfo costInfo = new CostInfo();
@@ -96,8 +98,8 @@ import java.util.Collection;
 //		}
 //		info.setFixedCost( fixedUnitCosts );
 //		info.setVariableCost( linearUnitCosts );
-		LSPUtils.setFixedCost( this, fixedUnitCosts );
-		LSPUtils.setVariableCost( this, linearUnitCosts );
+		LSPUtils.setFixedCost( this.logisticsSolution, fixedUnitCosts );
+		LSPUtils.setVariableCost( this.logisticsSolution, linearUnitCosts );
 		
 		
 	}
@@ -117,10 +119,13 @@ import java.util.Collection;
 	}
 
 
-	@Override public Attributes getAttributes(){
-		return attributes;
+//	@Override public Attributes getAttributes(){
+//		return attributes;
+//	}
+	@Override public void setEmbeddingContainer( LogisticsSolution pointer ){
+		this.logisticsSolution = pointer;
 	}
-	@Override public Object getEmbeddingContainer(){
+	@Override public LogisticsSolution getEmbeddingContainer(){
 		throw new RuntimeException( "not implemented" );
 	}
 }
