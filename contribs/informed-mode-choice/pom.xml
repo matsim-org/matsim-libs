@@ -18,6 +18,19 @@
 			<artifactId>application</artifactId>
 			<version>15.0-SNAPSHOT</version>
 		</dependency>
+
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>8.5.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 </project>
