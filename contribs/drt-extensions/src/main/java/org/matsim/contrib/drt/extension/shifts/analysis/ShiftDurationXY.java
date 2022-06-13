@@ -73,7 +73,9 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
     @Override
     public void reset(final int iter) {
         this.shift2plannedVsActualDuration.clear();
+		this.shift2plannedVsActualBreakDuration.clear();
         this.shift2StartTime.clear();
+		this.shift2BreakStartTime.clear();
     }
 
     /**
