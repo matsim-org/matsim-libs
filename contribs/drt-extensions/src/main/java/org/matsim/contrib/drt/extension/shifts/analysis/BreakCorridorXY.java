@@ -53,6 +53,7 @@ public class BreakCorridorXY implements DrtShiftBreakStartedEventHandler, DrtShi
 
     @Override
     public void reset(final int iter) {
+		this.shift2plannedVsActualBreakStart.clear();
         this.shift2plannedVsActualBreakEnd.clear();
     }
 
