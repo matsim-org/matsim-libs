@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.contrib.zone.ZonalSystems;
 import org.matsim.contrib.zone.Zone;
@@ -36,7 +36,7 @@ import org.matsim.contrib.zone.Zone;
 public class UnplannedRequestZonalRegistry {
 	private final ZonalSystem zonalSystem;
 	private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
-	private final Map<Id<Zone>, Map<Id<Request>, TaxiRequest>> requestsInZones;
+	private final Map<Id<Zone>, Map<Id<Request>, DrtRequest>> requestsInZones;
 
 	private int requestCount = 0;
 
@@ -51,7 +51,7 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	// after submitted
-	public void addRequest(TaxiRequest request) {
+	public void addRequest(DrtRequest request) {
 		Id<Zone> zoneId = getZoneId(request);
 
 		if (requestsInZones.get(zoneId).put(request.getId(), request) != null) {
@@ -62,7 +62,7 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	// after scheduled
-	public void removeRequest(TaxiRequest request) {
+	public void removeRequest(DrtRequest request) {
 		Id<Zone> zoneId = getZoneId(request);
 
 		if (requestsInZones.get(zoneId).remove(request.getId()) == null) {
@@ -72,14 +72,14 @@ public class UnplannedRequestZonalRegistry {
 		requestCount--;
 	}
 
-	public Stream<TaxiRequest> findNearestRequests(Node node, int minCount) {
+	public Stream<DrtRequest> findNearestRequests(Node node, int minCount) {
 		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
 				.stream()
 				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
 				.limit(minCount);
 	}
 
-	private Id<Zone> getZoneId(TaxiRequest request) {
+	private Id<Zone> getZoneId(DrtRequest request) {
 		return zonalSystem.getZone(request.getFromLink().getFromNode()).getId();
 	}
 

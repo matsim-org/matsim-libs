@@ -28,6 +28,7 @@ import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -51,10 +52,10 @@ public class StrategyManager implements MatsimManager {
 
 	@Inject
 	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup,
-					ControlerConfigGroup controlerConfigGroup,
+					ControlerConfigGroup controlerConfigGroup, StrategyChooser<Plan, Person> strategyChooser,
 					Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
 
-		this();
+		this(strategyChooser);
 		setMaxPlansPerAgent(strategyConfigGroup.getMaxAgentPlanMemorySize());
 
 		int globalInnovationDisableAfter = (int) ((controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration())
@@ -89,6 +90,10 @@ public class StrategyManager implements MatsimManager {
 
 	public StrategyManager() {
 		this.delegate = new GenericStrategyManager<>();
+	}
+
+	StrategyManager(StrategyChooser<Plan, Person> strategyChooser) {
+		this.delegate = new GenericStrategyManager<>(strategyChooser);
 	}
 
 //	/**
@@ -206,8 +211,8 @@ public class StrategyManager implements MatsimManager {
 	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation) {
-		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(person, subpopulation);
+	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation, ReplanningContext replanningContext) {
+		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(person, subpopulation, replanningContext);
 		return strategy;
 	}
 

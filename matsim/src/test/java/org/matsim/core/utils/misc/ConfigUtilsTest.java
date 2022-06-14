@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.hamcrest.core.AnyOf;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

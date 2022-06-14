@@ -24,6 +24,7 @@ package org.matsim.core.replanning;
 
 import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +33,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.replanning.choosers.StrategyChooser;
+import org.matsim.core.replanning.choosers.WeightedStrategyChooser;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -49,6 +52,7 @@ public class StrategyManagerModule extends AbstractModule {
 		// plan strategies can be looked up under their names (*))
 		
 		bind(StrategyManager.class).in(Singleton.class);
+		bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).to(new TypeLiteral<WeightedStrategyChooser<Plan, Person>>() {}).asEagerSingleton();
 		bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
 		
 		MapBinder<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), StrategyConfigGroup.StrategySettings.class, PlanStrategy.class);

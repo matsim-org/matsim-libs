@@ -96,6 +96,15 @@ public class ScoringParameters implements MatsimParameters {
 		private boolean usingOldScoringBelowZeroUtilityDuration;
 		private double simulationPeriodInDays = 1.0;
 
+		// This is an error-prone design.  In the original design, there were defensive copies of the activity parameters for each individual
+		// person.  So in situations where there are many activity parameters (e.g. for home_30, home_60, home_120, etc.), this resulted in
+		// N(activityTypes) x N(persons) many objects of type ActivityUtilityParameters, which became fairly large.  Tilmann has now changed
+		// it such that the ActivityUtilityParameters can be externally set, meaning that one can externally program something that re-uses
+		// them. However, one still has to pass the embedding objects ScoringParameters and PlanCalcScoreConfig group, since one can also set
+		// things at that upper level.  Conceptually, one _always_ makes a copy of PlanCalcScoreConfig group, but then partially fills it with
+		// references to already existing objects (i.e. the ActivityUtilityParameters).  However, the code design does not make this very
+		// clear.  kai, may'22
+
 		@Deprecated
 		public Builder(
 				final Scenario scenario,
@@ -157,6 +166,8 @@ public class ScoringParameters implements MatsimParameters {
 			// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
 			// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.
 			// kai, feb'12
+			// yyyy given that there is now this.simulationPeriodInDays, one could just multiply with that.  Will probably fail a number
+			// of tests, thus I am not doing it right now.  kai, may'22
 		}
 
 

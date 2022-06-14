@@ -20,9 +20,8 @@
 
 package org.matsim.population.algorithms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,11 +40,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -61,6 +56,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -257,6 +253,36 @@ public class ChooseRandomLegModeForSubtourTest {
 					(hasWalk ? " walk" : " NO walk"),
 					!hasCar && hasPt && hasWalk);
 		}
+
+	}
+
+
+	@Test
+	public void testUnclosedSubtour() {
+
+		String[] modes = new String[] {"car", "pt", "walk"};
+
+		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( new MainModeIdentifierImpl() , new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011), SubtourModeChoice.Behavior.betweenAllAndFewerConstraints, probaForRandomSingleTripMode);
+
+		PopulationFactory fact = PopulationUtils.getFactory();
+
+		Person person = fact.createPerson(Id.create("1000", Person.class));
+		final Plan plan = fact.createPlan();
+
+		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
+
+		plan.addLeg(fact.createLeg("car"));
+
+		plan.addActivity(fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
+
+		plan.addLeg(fact.createLeg("car"));
+
+		plan.addActivity(fact.createActivityFromActivityFacilityId("leisure", Id.create(2, ActivityFacility.class)));
+
+		List<ChooseRandomLegModeForSubtour.Candidate> candidates = testee.determineChoiceSet(plan);
+
+		assertThat(candidates)
+				.isNotEmpty();
 
 	}
 

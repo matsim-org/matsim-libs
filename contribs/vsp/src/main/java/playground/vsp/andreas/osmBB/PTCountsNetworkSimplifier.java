@@ -137,15 +137,14 @@ public class PTCountsNetworkSimplifier {
 		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.netInFile);
 
-		MutableScenario osmScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config osmConfig = osmScenario.getConfig();
+		Config osmConfig = ConfigUtils.createConfig();
 		if(this.usePT){
 			osmConfig.transit().setUseTransit(true);
 			osmConfig.transit().setTransitScheduleFile(this.scheduleInFile);
 			osmConfig.transit().setVehiclesFile(this.vehiclesInFile);
 		}
 		osmConfig.network().setInputFile(this.netInFile);
-		ScenarioUtils.loadScenario(osmScenario);
+		Scenario osmScenario = ScenarioUtils.loadScenario( osmConfig );
 
 		if(this.usePT){
 			log.info("Running cleaner first...");

@@ -231,7 +231,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
-		ScenarioUtils.loadScenario(config);
+//		ScenarioUtils.loadScenario(config);
 		config.controler().setOutputDirectory(outputLocation.toString());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),

@@ -20,8 +20,11 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import static org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -52,10 +55,10 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 						DvrpRoutingModuleProvider.Stage.MAIN)
 				.toProvider(new DefaultMainLegRouterProvider(getMode()));// not singleton
 
-		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
-				new GenericRouteCreatorProvider(getMode(), leastCostPathCalculatorFactory));
+		bindModal(RouteCreator.class).toProvider(
+				new GenericRouteCreatorProvider(getMode(), leastCostPathCalculatorFactory));// not singleton
 
-		bindModal(DvrpRoutingModule.AccessEgressFacilityFinder.class).toProvider(
+		bindModal(AccessEgressFacilityFinder.class).toProvider(
 						modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 				.asEagerSingleton();
 	}
@@ -71,7 +74,7 @@ public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
 		@Override
 		public RoutingModule get() {
 			return new DefaultMainLegRouter(getMode(), getModalInstance(Network.class),
-					scenario.getPopulation().getFactory(), getModalInstance(DefaultMainLegRouter.RouteCreator.class));
+					scenario.getPopulation().getFactory(), getModalInstance(RouteCreator.class));
 		}
 	}
 
