@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Interface to generate candidates
+ * Interface to generate plan candidates.
  */
 @FunctionalInterface
 public interface CandidateGenerator {

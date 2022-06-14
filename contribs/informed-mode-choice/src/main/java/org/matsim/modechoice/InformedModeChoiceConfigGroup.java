@@ -23,7 +23,6 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String CONFIG_PARAM_MODES = "modes";
 
 	private Set<String> modes = Set.of(TransportMode.car, TransportMode.pt, TransportMode.bike);
-	private Object2ByteMap<String> mapping = new Object2ByteArrayMap<>();
 
 	public InformedModeChoiceConfigGroup() {
 		super(NAME);
@@ -41,24 +40,8 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public void setModes(Iterable<String> modes) {
 		this.modes = Set.copyOf(Sets.newHashSet(modes));
-
-		Object2ByteMap<String> map = new Object2ByteArrayMap<>();
-		byte b = 1;
-		for (String mode : modes) {
-			map.put(mode, b);
-			b++;
-		}
-
-		mapping = Object2ByteMaps.unmodifiable(map);
 	}
 
-	// TODO: rather use .intern() mode string instead
-	/**
-	 * Return unmodifiable mapping of modes to byte value.
-	 */
-	public Object2ByteMap<String> getMapping() {
-		return mapping;
-	}
 
 	public Set<String> getModes() {
 		return modes;

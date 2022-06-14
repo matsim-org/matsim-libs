@@ -13,6 +13,7 @@ public final class PlanCandidate {
 		utility = 0;
 	}
 
+	// TODO: subclass of plan model ?
 	// TODO: apply function ?
 
 }

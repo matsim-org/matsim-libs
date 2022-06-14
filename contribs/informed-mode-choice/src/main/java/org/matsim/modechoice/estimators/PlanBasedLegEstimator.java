@@ -11,7 +11,7 @@ import org.matsim.modechoice.PlanModel;
 public interface PlanBasedLegEstimator<T extends Enum<?>>{
 
 	/**
-	 * Estimate the utility for all legs that uses this mode in {@link PlanModel}.
+	 * Estimate the total utility for all legs that uses this mode in {@link PlanModel}.
 	 */
 	double estimate(EstimatorContext context, String mode, PlanModel plan, T option);
 
