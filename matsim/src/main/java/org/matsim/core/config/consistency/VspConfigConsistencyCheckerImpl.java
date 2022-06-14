@@ -341,10 +341,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 		if (usingSMC) {
-			if (config.subtourModeChoice().getProbaForRandomSingleTripMode() <= 0) {
+			if (config.subtourModeChoice().getProbaForRandomSingleTripMode() < 0.2) {
 				problem = true;
 				System.out.flush();
-				log.log(lvl, "SubTourModeChoice 'probaForRandomSingleTripMode' is 0. This probability should be at least above 0.5");
+				log.log(lvl, "SubTourModeChoice 'probaForRandomSingleTripMode' is very small and below 0.2. Recommendation is, to set this to a value around 0.5.");
 			}
 		}
 
