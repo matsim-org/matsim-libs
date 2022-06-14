@@ -206,6 +206,15 @@ public final class TripStructureUtils {
 		return getSubtours(planElements, TripStructureUtils::isStageActivityType );
 	}
 
+	/**
+	 * Returns the top-level tour as {@link Subtour} object even if it is unclosed. This subtour will always
+	 * contain all trips of a plan. Child tours will not be set.
+	 * @see Subtour
+	 */
+	public static Subtour getUnclosedRootSubtour(final Plan plan) {
+		return new Subtour(TripStructureUtils.getTrips(plan), false);
+	}
+
 	// for contrib socnetsim only
 	// I think now that we should actually keep this.  kai, jan'20
 	@Deprecated
