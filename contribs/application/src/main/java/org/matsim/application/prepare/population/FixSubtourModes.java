@@ -59,30 +59,9 @@ public class FixSubtourModes implements MATSimAppCommand {
 
 			for (TripStructureUtils.Subtour st : TripStructureUtils.getSubtours(person.getSelectedPlan())) {
 
-				boolean containsChainBasedMode = false;
-				Set<String> originalModes = new HashSet<>();
-
-				// Trips that are not part of any child subtour
-				Set<TripStructureUtils.Trip> childTrips = new HashSet<>(st.getTripsWithoutSubSubtours());
-
-				for (TripStructureUtils.Trip trip : st.getTrips()) {
-
-					String mainMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
-
-					if (childTrips.contains(trip) && chainBasedModes.contains(mainMode))
-						containsChainBasedMode = true;
-
-					// if trips are part of another subtour, they are allowed to have different modes
-					if (childTrips.contains(trip))
-						originalModes.add(mainMode);
-
-				}
-
-				// don't mix chain-based with other modes in one subtour
-				if (containsChainBasedMode && originalModes.size() > 1) {
+				if (fixSubtour(person, st))
 					fixed++;
-					selectMode(person, st);
-				}
+
 			}
 
 			processed++;
@@ -93,6 +72,39 @@ public class FixSubtourModes implements MATSimAppCommand {
 		PopulationUtils.writePopulation(population, output.toString());
 
 		return 0;
+	}
+
+	/**
+	 * Fix a subtour if it violates the constraints.
+	 * @return whether subtour was adjusted
+	 */
+	public boolean fixSubtour(Person person, TripStructureUtils.Subtour st) {
+		boolean containsChainBasedMode = false;
+		Set<String> originalModes = new HashSet<>();
+
+		// Trips that are not part of any child subtour
+		Set<TripStructureUtils.Trip> childTrips = new HashSet<>(st.getTripsWithoutSubSubtours());
+
+		for (TripStructureUtils.Trip trip : st.getTrips()) {
+
+			String mainMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
+
+			if (childTrips.contains(trip) && chainBasedModes.contains(mainMode))
+				containsChainBasedMode = true;
+
+			// if trips are part of another subtour, they are allowed to have different modes
+			if (childTrips.contains(trip))
+				originalModes.add(mainMode);
+
+		}
+
+		// don't mix chain-based with other modes in one subtour
+		if (containsChainBasedMode && originalModes.size() > 1) {
+			selectMode(person, st);
+			return true;
+		}
+
+		return false;
 	}
 
 	private void selectMode(Person p, TripStructureUtils.Subtour st) {
