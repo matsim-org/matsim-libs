@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.SplittableRandom;
 import java.util.stream.Collectors;
 
-@CommandLine.Command(name = "fix-subtour-modes", description = "Fix modes for subtours that contain chain and non-chain based modes.", showDefaultValues = true)
+@CommandLine.Command(name = "fix-subtour-modes", description = "Fix modes for subtours that contain chain and non-chain based modes, by choosing one of the found modes randomly.", showDefaultValues = true)
 public class FixSubtourModes implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(FixSubtourModes.class);
