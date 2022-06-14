@@ -332,6 +332,22 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
+		// added jun'22
+		boolean usingSMC = false ;
+		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
+			if ( DefaultStrategy.SubtourModeChoice.equals( it.getName() ) ) {
+				usingSMC = true ;
+				break ;
+			}
+		}
+		if (usingSMC) {
+			if (config.subtourModeChoice().getProbaForRandomSingleTripMode() < 0.2) {
+				problem = true;
+				System.out.flush();
+				log.log(lvl, "SubTourModeChoice 'probaForRandomSingleTripMode' is very small and below 0.2. Recommendation is, to set this to a value around 0.5.");
+			}
+		}
+
 		// === travelTimeCalculator:
 
 		// added feb'19

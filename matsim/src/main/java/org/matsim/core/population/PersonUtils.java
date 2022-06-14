@@ -103,11 +103,20 @@ public final class PersonUtils {
     }
 
     /**
+     * Car is not available if Person.getLicense gives "no" or if
+     * PersonUtils.getCarAvail returns "never".
+     */
+    public static boolean canUseCar(Person person) {
+        return !"no".equals(PersonUtils.getLicense(person)) && !"never".equals(PersonUtils.getCarAvail(person));
+    }
+
+    /**
      * convenience method for often used demographic attribute
      */
     public static Boolean isEmployed(Person person) {
         return (Boolean) person.getAttributes().getAttribute(EMPLOYED);
     }
+
 
     /**
      * convenience method for often used demographic attribute
