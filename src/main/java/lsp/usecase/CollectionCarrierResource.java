@@ -123,7 +123,7 @@ import java.util.List;
 	@Override
 	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
 		this.trackers.add(tracker);
-		this.eventHandlers.addAll(tracker.getEventHandlers() );
+//		this.eventHandlers.addAll(tracker.getEventHandlers() );
 		this.eventHandlers.add( tracker );
 //		this.infos.addAll(tracker.getAttributes() );
 //		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){

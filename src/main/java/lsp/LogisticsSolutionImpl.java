@@ -96,10 +96,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.trackers.add(tracker);
 		this.eventHandlers.add( tracker );
 
-		for( EventHandler handler : tracker.getEventHandlers() ){
-			this.eventHandlers.add( handler );
-			log.warn( "handler=" + handler );
-		}
+//		for( EventHandler handler : tracker.getEventHandlers() ){
+//			this.eventHandlers.add( handler );
+//			log.warn( "handler=" + handler );
+//		}
 //		this.eventHandlers.addAll(tracker.getEventHandlers() );
 
 //		this.solutionInfos.addAll(tracker.getAttributes() );

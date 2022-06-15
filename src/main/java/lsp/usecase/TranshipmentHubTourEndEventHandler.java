@@ -46,11 +46,11 @@ import org.matsim.core.events.handler.EventHandler;
 	@Override public void setEmbeddingContainer( LSPResource pointer ){
 		throw new RuntimeException( "not implemented" );
 	}
-	@Override public void reset(){
-	}
-	@Override public Collection<? extends EventHandler> getEventHandlers(){
-		return this.eventHandlers;
-	}
+//	@Override public void reset(){
+//	}
+//	@Override public Collection<? extends EventHandler> getEventHandlers(){
+//		return this.eventHandlers;
+//	}
 	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
 	}
 	static class TransshipmentHubEventHandlerPair {

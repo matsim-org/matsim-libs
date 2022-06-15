@@ -59,9 +59,9 @@ import java.util.Random;
 //		throw new RuntimeException( "not implemented" );
 //	}
 
-	@Override public Collection<EventHandler> getEventHandlers() {
-		return this.eventHandlers;
-	}
+//	@Override public Collection<EventHandler> getEventHandlers() {
+//		return this.eventHandlers;
+//	}
 
 	@Override
 	public void handleEvent( LSPServiceEndEvent event ) {
@@ -71,14 +71,17 @@ import java.util.Random;
 	}
 
 	@Override public void notifyAfterMobsim( AfterMobsimEvent event ) {
+//		log.warn("just called reset on tipSum=" + tipSum );
+//		tipSum = 0.;
 	}
 
 
-	@Override public void reset(){
+	@Override public void reset( int iteration ){
 		log.warn("just called reset on tipSum=" + tipSum );
 		tipSum = 0.;
 //		throw new RuntimeException( "just called reset" );
 	}
+
 //	@Override public Attributes getAttributes(){
 //		return null;
 //	}

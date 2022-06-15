@@ -120,7 +120,7 @@ import java.util.Collections;
 //			attributes.putAttribute( entry.getKey(), entry.getValue() );
 //		}
 
-		handlers.addAll(tracker.getEventHandlers() );
+//		handlers.addAll(tracker.getEventHandlers() );
 	}
 
 //	public Collection<EventHandler> getSimulationTrackers(){
