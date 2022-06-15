@@ -20,8 +20,11 @@
 
 package lsp.usecase;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
+import lsp.controler.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,9 +37,22 @@ import org.matsim.contrib.freight.events.LSPTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-/*package-private*/  class TranshipmentHubTourEndEventHandler implements LSPTourEndEventHandler {
+/*package-private*/  class TranshipmentHubTourEndEventHandler implements LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
 
+	private final Collection<? extends EventHandler> eventHandlers = new ArrayList<>();
+	@Override public void setEmbeddingContainer( LSPResource pointer ){
+		throw new RuntimeException( "not implemented" );
+	}
+	@Override public void reset(){
+	}
+	@Override public Collection<? extends EventHandler> getEventHandlers(){
+		return this.eventHandlers;
+	}
+	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+	}
 	static class TransshipmentHubEventHandlerPair {
 		public final LSPShipment shipment;
 		public final LogisticsSolutionElement element;

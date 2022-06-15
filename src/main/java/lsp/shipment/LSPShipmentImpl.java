@@ -50,7 +50,7 @@ class LSPShipmentImpl implements LSPShipment {
 	private final Collection<EventHandler> eventHandlers;
 	private final List<Requirement> requirements;
 	private Id<LogisticsSolution> solutionId;
-	private Collection<LSPSimulationTracker> trackers = new ArrayList<>();
+	private Collection<LSPSimulationTracker<LSPShipment>> trackers = new ArrayList<>();
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
 		this.id = builder.id;
@@ -114,10 +114,9 @@ class LSPShipmentImpl implements LSPShipment {
 		return deliveryServiceTime;
 	}
 
-	@Override
-	public Collection<EventHandler> getEventHandlers() {
-		return eventHandlers;
-	}
+//	public Collection<EventHandler> getSimulationTrackers() {
+//		return eventHandlers;
+//	}
 
 
 	@Override
@@ -137,11 +136,14 @@ class LSPShipmentImpl implements LSPShipment {
 		return attributes;
 	}
 
-	@Override public void addSimulationTracker( LSPSimulationTracker tracker ){
+	@Override public void addSimulationTracker( LSPSimulationTracker<LSPShipment> tracker ){
 		this.trackers.add( tracker );
 		tracker.setEmbeddingContainer( this );
 	}
-	@Override public Collection<LSPSimulationTracker> getSimulationTrackers(){
+	@Override public Collection<LSPSimulationTracker<LSPShipment>> getSimulationTrackers(){
 		return Collections.unmodifiableCollection( this.trackers );
+	}
+	@Override public void clearSimulationTrackers(){
+		this.trackers.clear();
 	}
 }

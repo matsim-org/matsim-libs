@@ -33,7 +33,7 @@ import lsp.LSPResource;
 
 public class FirstReloadAdapterTest {
 
-	private final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");;
+	private static final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");;
 	private TransshipmentHub transshipmentHub;
 
 	@Before
@@ -59,9 +59,9 @@ public class FirstReloadAdapterTest {
 		assertTrue(transshipmentHub.getClientElements().isEmpty());
 		assertSame(transshipmentHub.getEndLinkId(), hubLinkId);
 		assertSame(transshipmentHub.getStartLinkId(), hubLinkId);
-		assertNotNull(transshipmentHub.getEventHandlers());
-		assertFalse(transshipmentHub.getEventHandlers().isEmpty());
-		assertEquals(1, transshipmentHub.getEventHandlers().size());
+		assertNotNull(transshipmentHub.getSimulationTrackers() );
+		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty() );
+		assertEquals(1, transshipmentHub.getSimulationTrackers().size() );
 		assertNotNull(transshipmentHub.getAttributes() );
 		assertTrue(transshipmentHub.getAttributes().isEmpty() );
 	}

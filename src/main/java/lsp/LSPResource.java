@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  *
  *
  */
-public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers<LSPResource>, HasEventHandlers, Attributable{
+public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers<LSPResource>, Attributable{
 
 	Id<Link> getStartLinkId();
 

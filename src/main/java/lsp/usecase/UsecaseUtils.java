@@ -246,7 +246,7 @@ public class UsecaseUtils {
 		}
 	}
 
-	public static class TransshipmentHubBuilder {
+	public static final class TransshipmentHubBuilder {
 
 		private final Id<LSPResource> id;
 		private final Id<Link> locationLinkId;

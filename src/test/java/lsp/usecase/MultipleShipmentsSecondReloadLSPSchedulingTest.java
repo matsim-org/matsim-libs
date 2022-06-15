@@ -362,8 +362,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 		}
 
-		assertEquals(1, firstTranshipmentHubAdapter.getEventHandlers().size());
-		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubAdapter.getEventHandlers());
+		assertEquals(1, firstTranshipmentHubAdapter.getSimulationTrackers().size() );
+		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubAdapter.getSimulationTrackers());
 		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
 		TranshipmentHubTourEndEventHandler reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 		Iterator<Entry<CarrierService, TranshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair>>  iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
@@ -388,8 +388,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertFalse(element.getIncomingShipments().getShipments().contains(shipment));	
 		}
 
-		assertEquals(1, secondTranshipmentHubAdapter.getEventHandlers().size());
-		eventHandlers = new ArrayList<>(secondTranshipmentHubAdapter.getEventHandlers());
+		assertEquals(1, secondTranshipmentHubAdapter.getSimulationTrackers().size() );
+		eventHandlers = new ArrayList<>(secondTranshipmentHubAdapter.getSimulationTrackers());
 		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
 		reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 		iter = reloadEventHandler.getServicesWaitedFor().entrySet().iterator();
@@ -415,8 +415,8 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		}
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
-			assertEquals(4, shipment.getEventHandlers().size());
-			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
+			assertEquals(4, shipment.getSimulationTrackers().size() );
+			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			planElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			ArrayList<LogisticsSolutionElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements());

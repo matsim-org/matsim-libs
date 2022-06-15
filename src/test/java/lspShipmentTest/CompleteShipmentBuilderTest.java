@@ -114,9 +114,9 @@ public class CompleteShipmentBuilderTest {
 			assertNotNull(shipment.getPickupTimeWindow() );
 			assertNotNull(shipment.getShipmentPlan());
 			assertNotNull(shipment.getLog());
-			assertNotNull(shipment.getEventHandlers());
+			assertNotNull(shipment.getSimulationTrackers() );
 			
-			assertTrue(shipment.getEventHandlers().isEmpty());
+			assertTrue(shipment.getSimulationTrackers().isEmpty() );
 			assertEquals(shipment.getLog().getEmbeddingContainer(), shipment );
 			assertTrue(shipment.getLog().getPlanElements().isEmpty());
 			

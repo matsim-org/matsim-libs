@@ -194,8 +194,8 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			assertSame(planElements.get(0).getResourceId(), collectionAdapter.getId());
 			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 
-			assertEquals(2, shipment.getEventHandlers().size());
-			ArrayList<EventHandler> eventHandlers = new ArrayList<>(shipment.getEventHandlers());
+			assertEquals(2, shipment.getSimulationTrackers().size() );
+			ArrayList<EventHandler> eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);

@@ -22,8 +22,9 @@ package lsp;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -32,6 +33,7 @@ import lsp.controler.LSPSimulationTracker;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* package-private */ class LogisticsSolutionImpl implements LogisticsSolution {
+	private static final Logger log = Logger.getLogger( LogisticsSolutionImpl.class );
 
 	private final Attributes attributes = new Attributes();
 	private final Id<LogisticsSolution> id;
@@ -84,17 +86,22 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		shipments.add(shipment);	
 	}
 	
-	@Override
-	public Collection<EventHandler> getEventHandlers() {
-		return eventHandlers;
-	}
+//	public Collection<EventHandler> getSimulationTrackers() {
+//		return eventHandlers;
+//	}
 
 
 	@Override
 	public void addSimulationTracker( LSPSimulationTracker<LogisticsSolution> tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.add( tracker );
-		this.eventHandlers.addAll(tracker.getEventHandlers());
+
+		for( EventHandler handler : tracker.getEventHandlers() ){
+			this.eventHandlers.add( handler );
+			log.warn( "handler=" + handler );
+		}
+//		this.eventHandlers.addAll(tracker.getEventHandlers() );
+
 //		this.solutionInfos.addAll(tracker.getAttributes() );
 //		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
 //			this.attributes.putAttribute( entry.getKey(), entry.getValue());
@@ -106,7 +113,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public Collection<LSPSimulationTracker<LogisticsSolution>> getSimulationTrackers() {
-		return trackers;
+		return Collections.unmodifiableCollection( trackers );
+	}
+	@Override public void clearSimulationTrackers(){
+		this.trackers.clear();
 	}
 
 	@Override public Attributes getAttributes(){

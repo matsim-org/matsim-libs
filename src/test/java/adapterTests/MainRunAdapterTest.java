@@ -109,8 +109,8 @@ public class MainRunAdapterTest {
 		}
 		assertSame(mainRunAdapter.getEndLinkId(), toLinkId);
 		assertSame(mainRunAdapter.getStartLinkId(), fromLinkId);
-		assertNotNull(mainRunAdapter.getEventHandlers());
-		assertTrue(mainRunAdapter.getEventHandlers().isEmpty());
+		assertNotNull(mainRunAdapter.getSimulationTrackers() );
+		assertTrue(mainRunAdapter.getSimulationTrackers().isEmpty() );
 		assertNotNull(mainRunAdapter.getAttributes() );
 		assertTrue(mainRunAdapter.getAttributes().isEmpty() );
 		if(mainRunAdapter.getCarrier() == carrier) {

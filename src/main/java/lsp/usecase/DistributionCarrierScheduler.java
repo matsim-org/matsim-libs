@@ -325,7 +325,7 @@ import org.matsim.vehicles.VehicleType;
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				DistributionServiceStartEventHandler handler = new DistributionServiceStartEventHandler(carrierService, tuple.getShipment(), element, resource);
-				tuple.getShipment().getEventHandlers().add(handler);
+				tuple.getShipment().addSimulationTracker( handler );
 				break;
 			}
 		}		
@@ -335,7 +335,7 @@ import org.matsim.vehicles.VehicleType;
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource);
-				tuple.getShipment().getEventHandlers().add(handler);
+				tuple.getShipment().addSimulationTracker( handler );
 				break;
 			}
 		}

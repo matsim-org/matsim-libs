@@ -106,8 +106,8 @@ public class DistributionAdapterTest {
 			}
 			assertSame(distributionAdapter.getEndLinkId(), distributionLinkId);
 			assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
-			assertNotNull(distributionAdapter.getEventHandlers());
-			assertTrue(distributionAdapter.getEventHandlers().isEmpty());
+			assertNotNull(distributionAdapter.getSimulationTrackers() );
+			assertTrue(distributionAdapter.getSimulationTrackers().isEmpty() );
 			assertNotNull(distributionAdapter.getAttributes() );
 			assertTrue(distributionAdapter.getAttributes().isEmpty() );
 			assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);

@@ -32,7 +32,6 @@ import java.util.Collection;
 
 /*package-private*/ class LinearCostTracker implements LSPSimulationTracker<LogisticsSolution> {
 
-	private final Attributes attributes = new Attributes();
 	private final Collection<EventHandler> eventHandlers;
 //	private final Collection<LSPInfo> infos;
 	private double distanceCosts;

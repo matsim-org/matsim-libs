@@ -20,6 +20,7 @@
 
 package lsp.usecase;
 
+import lsp.controler.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
@@ -31,14 +32,20 @@ import org.matsim.contrib.freight.events.LSPTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-/*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler {
+import java.util.ArrayList;
+import java.util.Collection;
+
+/*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler, LSPSimulationTracker<LSPShipment>{
 
 	private final CarrierService carrierService;
-	private final LSPShipment lspShipment;
+	private LSPShipment lspShipment;
 	private final LogisticsSolutionElement element;
 	private final LSPCarrierResource resource;
-	
+	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+
 	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
@@ -126,4 +133,16 @@ import lsp.LSPCarrierResource;
 	}
 
 
+	@Override public void setEmbeddingContainer( LSPShipment pointer ){
+		this.lspShipment = pointer;
+	}
+	@Override public Collection<EventHandler> getEventHandlers(){
+		return this.eventHandlers;
+	}
+	@Override public void reset(){
+		throw new RuntimeException( "not implemented" );
+	}
+	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+		throw new RuntimeException( "not implemented" );
+	}
 }

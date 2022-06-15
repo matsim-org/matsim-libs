@@ -148,6 +148,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override public Collection<LSPSimulationTracker<LSP>> getSimulationTrackers(){
 		return Collections.unmodifiableCollection( this.trackers );
 	}
+	@Override public void clearSimulationTrackers() {
+		trackers.clear();
+	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
 		List<LogisticsSolution> copiedSolutions = new ArrayList<>();

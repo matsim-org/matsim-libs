@@ -12,4 +12,5 @@ public interface HasSimulationTrackers<T>{
 
 	Collection<LSPSimulationTracker<T>> getSimulationTrackers();
 
+	void clearSimulationTrackers();
 }

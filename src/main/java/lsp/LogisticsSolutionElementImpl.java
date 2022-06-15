@@ -27,7 +27,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
 
 
 /* package-private */ class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
@@ -120,16 +120,19 @@ import java.util.Map;
 //			attributes.putAttribute( entry.getKey(), entry.getValue() );
 //		}
 
-		handlers.addAll(tracker.getEventHandlers());
+		handlers.addAll(tracker.getEventHandlers() );
 	}
 
-	public Collection<EventHandler> getEventHandlers(){
-		return handlers;
-	}
+//	public Collection<EventHandler> getSimulationTrackers(){
+//		return handlers;
+//	}
 
 	@Override
 	public Collection<LSPSimulationTracker<LogisticsSolutionElement>> getSimulationTrackers() {
-		return trackers;
+		return Collections.unmodifiableCollection( trackers );
+	}
+	@Override public void clearSimulationTrackers(){
+		this.trackers.clear();
 	}
 	@Override public Attributes getAttributes(){
 		return attributes;

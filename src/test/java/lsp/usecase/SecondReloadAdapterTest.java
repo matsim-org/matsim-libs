@@ -61,9 +61,9 @@ public class SecondReloadAdapterTest {
 		assertTrue(transshipmentHub.getClientElements().isEmpty());
 		assertSame(transshipmentHub.getEndLinkId(), reloadingLinkId);
 		assertSame(transshipmentHub.getStartLinkId(), reloadingLinkId);
-		assertNotNull(transshipmentHub.getEventHandlers());
-		assertFalse(transshipmentHub.getEventHandlers().isEmpty());
-		assertEquals(1, transshipmentHub.getEventHandlers().size());
+		assertNotNull(transshipmentHub.getSimulationTrackers() );
+		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty() );
+		assertEquals(1, transshipmentHub.getSimulationTrackers().size() );
 		assertNotNull(transshipmentHub.getAttributes() );
 		assertTrue(transshipmentHub.getAttributes().isEmpty() );
 	}

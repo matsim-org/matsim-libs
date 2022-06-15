@@ -34,8 +34,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /*package-private*/ class CollectionCarrierResource implements LSPCarrierResource {
 
@@ -116,14 +116,14 @@ import java.util.Map;
 		return network;
 	}
 
-	@Override public Collection <EventHandler> getEventHandlers(){
-		return eventHandlers;
-	}
+//	public Collection <EventHandler> getSimulationTrackers(){
+//		return eventHandlers;
+//	}
 
 	@Override
 	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
 		this.trackers.add(tracker);
-		this.eventHandlers.addAll(tracker.getEventHandlers());
+		this.eventHandlers.addAll(tracker.getEventHandlers() );
 		this.eventHandlers.add( tracker );
 //		this.infos.addAll(tracker.getAttributes() );
 //		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
@@ -134,7 +134,10 @@ import java.util.Map;
 
 	@Override
 	public Collection<LSPSimulationTracker<LSPResource>> getSimulationTrackers() {
-		return trackers;
+		return Collections.unmodifiableCollection( trackers );
+	}
+	@Override public void clearSimulationTrackers(){
+		this.trackers.clear();
 	}
 	@Override public Attributes getAttributes(){
 		return attributes;

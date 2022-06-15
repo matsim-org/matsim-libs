@@ -20,7 +20,6 @@
 
 package lsp.shipment;
 
-import lsp.HasEventHandlers;
 import lsp.HasSimulationTrackers;
 import lsp.LogisticsSolution;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +37,7 @@ import java.util.Collection;
  *         <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not link IDs.</li>
  * </ul>
  */
-public interface LSPShipment extends Identifiable<LSPShipment>, HasEventHandlers, Attributable, HasSimulationTrackers {
+public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, HasSimulationTrackers<LSPShipment> {
 
 	Id<Link> getFrom(); // same as in CarrierShipment
 	

@@ -22,7 +22,6 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -116,14 +115,14 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return carrier;
 	}
 
-	@Override public Collection <EventHandler> getEventHandlers(){
-		return eventHandlers;
-	}
+//	public Collection <EventHandler> getSimulationTrackers(){
+//		return eventHandlers;
+//	}
 
 	@Override
 	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
 		this.trackers.add(tracker);
-		this.eventHandlers.addAll(tracker.getEventHandlers());
+		this.eventHandlers.addAll(tracker.getEventHandlers() );
 //		this.infos.addAll(tracker.getAttributes() );
 //		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
 //			this.attributes.putAttribute( entry.getKey(), entry.getValue());
@@ -133,6 +132,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public Collection<LSPSimulationTracker<LSPResource>> getSimulationTrackers() {
 		return trackers;
+	}
+	@Override public void clearSimulationTrackers(){
+		this.trackers.clear();
 	}
 	@Override public Attributes getAttributes(){
 		return attributes;

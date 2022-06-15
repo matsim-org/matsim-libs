@@ -187,7 +187,7 @@ import lsp.LSPResourceScheduler;
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
-				tuple.getShipment().getEventHandlers().add(endHandler);
+				tuple.getShipment().addSimulationTracker( endHandler );
 				break;
 			}
 		}
@@ -198,7 +198,7 @@ import lsp.LSPResourceScheduler;
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource);
-				tuple.getShipment().getEventHandlers().add(handler);
+				tuple.getShipment().addSimulationTracker( handler );
 				break;
 			}
 		}
