@@ -31,12 +31,13 @@ import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
+class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private LSPShipment lspShipment;

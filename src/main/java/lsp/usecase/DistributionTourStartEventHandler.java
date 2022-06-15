@@ -142,7 +142,7 @@ import java.util.Collection;
 //	@Override public void reset(){
 //		throw new RuntimeException( "not implemented" );
 //	}
-	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
-		throw new RuntimeException( "not implemented" );
-	}
+//	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+//		throw new RuntimeException( "not implemented" );
+//	}
 }

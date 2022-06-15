@@ -38,9 +38,10 @@ import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 
-/*package-private*/  class TranshipmentHubTourEndEventHandler implements LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
+/*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
 
 	private final Collection<? extends EventHandler> eventHandlers = new ArrayList<>();
 	@Override public void setEmbeddingContainer( LSPResource pointer ){

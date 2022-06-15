@@ -26,6 +26,7 @@ import lsp.controler.LSPSimulationTracker;
 import org.matsim.contrib.freight.events.*;
 import org.matsim.contrib.freight.events.eventhandler.*;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/*package-private*/ class LinearCostTracker implements LSPSimulationTracker<LogisticsSolution>,
+/*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
 								       LSPLinkEnterEventHandler,
 								       LSPVehicleLeavesTrafficEventHandler,
 								       LSPTourStartEventHandler,

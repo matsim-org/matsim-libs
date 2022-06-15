@@ -30,12 +30,13 @@ import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandle
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/  class DistributionServiceStartEventHandler implements LSPServiceStartEventHandler, LSPSimulationTracker<LSPShipment>{
+/*package-private*/  class DistributionServiceStartEventHandler implements AfterMobsimListener, LSPServiceStartEventHandler, LSPSimulationTracker<LSPShipment>{
 
 	private final CarrierService carrierService;
 	private LSPShipment lspShipment;

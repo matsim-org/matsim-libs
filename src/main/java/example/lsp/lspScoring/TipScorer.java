@@ -27,13 +27,14 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
-/*package-private*/ class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
+/*package-private*/ class TipScorer implements AfterMobsimListener, LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
 {
 	private static final Logger log = Logger.getLogger( TipScorer.class );
 
