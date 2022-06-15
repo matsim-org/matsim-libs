@@ -21,6 +21,7 @@
 package lsp.usecase;
 
 import lsp.LSPCarrierResource;
+import lsp.LSPDataObject;
 import lsp.LSPResource;
 import lsp.LogisticsSolutionElement;
 import lsp.controler.LSPSimulationTracker;
@@ -37,16 +38,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-/*package-private*/ class CollectionCarrierResource implements LSPCarrierResource {
+/*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
-	private final Attributes attributes = new Attributes();
 	private final Id<LSPResource>id;
 	private final Carrier carrier;
 	private final List<LogisticsSolutionElement> clientElements;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
-	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker<LSPResource>> trackers;
 
 	CollectionCarrierResource( UsecaseUtils.CollectionCarrierAdapterBuilder builder ){
 		this.id = builder.id;
@@ -54,16 +52,8 @@ import java.util.List;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
 		this.network = builder.network;
-		this.eventHandlers = new ArrayList<>();
-		this.trackers = new ArrayList<>();
 	}
 	
-	
-//	@Override
-//	public Class<? extends Carrier> getClassOfResource() {
-//		return carrier.getClass();
-//	}
-//
 	@Override
 	public Id<Link> getStartLinkId() {
 		Id<Link> depotLinkId = null;
@@ -91,8 +81,7 @@ import java.util.List;
 		return depotLinkId;
 	
 	}
-		
-	
+
 	@Override
 	public Collection<LogisticsSolutionElement> getClientElements() {
 		return clientElements;
@@ -115,36 +104,5 @@ import java.util.List;
 	public Network getNetwork(){
 		return network;
 	}
-
-//	public Collection <EventHandler> getSimulationTrackers(){
-//		return eventHandlers;
-//	}
-
-	@Override
-	public void addSimulationTracker( LSPSimulationTracker<LSPResource> tracker ) {
-		this.trackers.add(tracker);
-//		this.eventHandlers.addAll(tracker.getEventHandlers() );
-		this.eventHandlers.add( tracker );
-//		this.infos.addAll(tracker.getAttributes() );
-//		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-//			this.attributes.putAttribute( entry.getKey(), entry.getValue() );
-//		}
-	}
-
-
-	@Override
-	public Collection<LSPSimulationTracker<LSPResource>> getSimulationTrackers() {
-		return Collections.unmodifiableCollection( trackers );
-	}
-	@Override public void clearSimulationTrackers(){
-		this.trackers.clear();
-	}
-	@Override public Attributes getAttributes(){
-		return attributes;
-	}
-
-//	@Override
-//	public void setEventsManager(EventsManager eventsManager) {
-//	}
 
 }

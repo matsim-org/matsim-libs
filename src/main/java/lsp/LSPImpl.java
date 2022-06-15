@@ -35,7 +35,7 @@ import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/* package-private */class LSPImpl implements LSP {
+/* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger( LSPImpl.class );
 
 	private final Id<LSP> id;
@@ -46,8 +46,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Collection<LSPResource> resources;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
-	private final Attributes attributes = new Attributes();
-	private final Collection<LSPSimulationTracker<LSP>> trackers = new ArrayList<>();
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){
@@ -141,16 +139,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.selectedPlan = selectedPlan;
 		
 	}
-	@Override public void addSimulationTracker( LSPSimulationTracker<LSP> tracker ){
-		this.trackers.add( tracker );
-		tracker.setEmbeddingContainer( this );
-	}
-	@Override public Collection<LSPSimulationTracker<LSP>> getSimulationTrackers(){
-		return Collections.unmodifiableCollection( this.trackers );
-	}
-	@Override public void clearSimulationTrackers() {
-		trackers.clear();
-	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
 		List<LogisticsSolution> copiedSolutions = new ArrayList<>();
@@ -216,11 +204,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public Collection<LSPShipment> getShipments() {
 		return this.shipments ;
-	}
-
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
 	}
 
 }

@@ -30,9 +30,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 
-/* package-private */ class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
+/* package-private */ class LogisticsSolutionElementImpl extends LSPDataObject<LogisticsSolutionElement> implements LogisticsSolutionElement {
 
-	private final Attributes attributes = new Attributes();
 	private final Id<LogisticsSolutionElement>id;
 	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
@@ -41,9 +40,6 @@ import java.util.Collections;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private final Collection<LSPSimulationTracker<LogisticsSolutionElement>> trackers;
-	private final Collection<EventHandler> handlers;
-//	private EventsManager eventsManager;
 
 	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
 		this.id = builder.id;
@@ -51,15 +47,11 @@ import java.util.Collections;
 		this.incomingShipments = builder.incomingShipments;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
-		this.handlers = new ArrayList<>();
-		this.trackers = new ArrayList<>();
 	}
 	
-	@Override
-	public Id<LogisticsSolutionElement> getId() {
+	@Override public Id<LogisticsSolutionElement> getId() {
 		return id;
 	}
-
 
 	@Override
 	public void connectWithNextElement(LogisticsSolutionElement element) {
@@ -95,11 +87,6 @@ import java.util.Collections;
 		this.solution = solution;
 	}
 
-//	@Override
-//	public LogisticsSolution getEmbeddingContainer() {
-//		return solution;
-//	}
-//
 	@Override
 	public LogisticsSolutionElement getPreviousElement() {
 		return previousElement;
@@ -109,39 +96,5 @@ import java.util.Collections;
 	public LogisticsSolutionElement getNextElement() {
 		return nextElement;
 	}
-
-	@Override
-	public void addSimulationTracker( LSPSimulationTracker<LogisticsSolutionElement> tracker ) {
-		trackers.add(tracker);
-
-		// can't say if this hierarchical design is useful or confusing. kai, may'22
-		// yy should maybe check for overwriting?  However, did also not check in original design. kai, may'22
-//		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-//			attributes.putAttribute( entry.getKey(), entry.getValue() );
-//		}
-
-//		handlers.addAll(tracker.getEventHandlers() );
-	}
-
-//	public Collection<EventHandler> getSimulationTrackers(){
-//		return handlers;
-//	}
-
-	@Override
-	public Collection<LSPSimulationTracker<LogisticsSolutionElement>> getSimulationTrackers() {
-		return Collections.unmodifiableCollection( trackers );
-	}
-	@Override public void clearSimulationTrackers(){
-		this.trackers.clear();
-	}
-	@Override public Attributes getAttributes(){
-		return attributes;
-	}
-
-//	@Override
-//	public void setEventsManager(EventsManager eventsManager) {
-//		this.eventsManager = eventsManager;
-//	}
-	
 
 }

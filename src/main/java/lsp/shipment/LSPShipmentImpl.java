@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import lsp.LSPDataObject;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,8 +35,7 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.LogisticsSolution;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-class LSPShipmentImpl implements LSPShipment {
-	private final Attributes attributes = new Attributes();
+class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment {
 
 	private final Id<LSPShipment> id;
 	private final Id<Link> fromLinkId;
@@ -47,10 +47,8 @@ class LSPShipmentImpl implements LSPShipment {
 	private final double pickupServiceTime;
 	private final ShipmentPlan schedule;
 	private final ShipmentPlan log;
-	private final Collection<EventHandler> eventHandlers;
 	private final List<Requirement> requirements;
 	private Id<LogisticsSolution> solutionId;
-	private Collection<LSPSimulationTracker<LSPShipment>> trackers = new ArrayList<>();
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
 		this.id = builder.id;
@@ -63,7 +61,6 @@ class LSPShipmentImpl implements LSPShipment {
 		this.pickupServiceTime = builder.pickupServiceTime;
 		this.schedule = new ShipmentPlanImpl(this);
 		this.log = new ShipmentPlanImpl(this);
-		this.eventHandlers = new ArrayList<>();
 		this.requirements = new ArrayList<>();
 		this.requirements.addAll( builder.requirements );
 	}
@@ -114,11 +111,6 @@ class LSPShipmentImpl implements LSPShipment {
 		return deliveryServiceTime;
 	}
 
-//	public Collection<EventHandler> getSimulationTrackers() {
-//		return eventHandlers;
-//	}
-
-
 	@Override
 	public Collection<Requirement> getRequirements() {
 		return requirements;
@@ -132,18 +124,4 @@ class LSPShipmentImpl implements LSPShipment {
 		return pickupServiceTime;
 	}
 
-	@Override public Attributes getAttributes(){
-		return attributes;
-	}
-
-	@Override public void addSimulationTracker( LSPSimulationTracker<LSPShipment> tracker ){
-		this.trackers.add( tracker );
-		tracker.setEmbeddingContainer( this );
-	}
-	@Override public Collection<LSPSimulationTracker<LSPShipment>> getSimulationTrackers(){
-		return Collections.unmodifiableCollection( this.trackers );
-	}
-	@Override public void clearSimulationTrackers(){
-		this.trackers.clear();
-	}
 }
