@@ -147,6 +147,5 @@ import java.util.Collection;
 //		throw new RuntimeException( "not implemented" );
 //	}
 	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
-		throw new RuntimeException( "not implemented" );
 	}
 }
