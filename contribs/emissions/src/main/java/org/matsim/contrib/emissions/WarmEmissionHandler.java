@@ -68,11 +68,6 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleLeavesTraffic = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
 
-	// todo:
-	//  (1a) ADD emissions calculation on VehicleLeaveTrafficEvent (but only with LinkEnterEvent) and
-	//  (1b) on LinkLeaveEvent (but only with LinkEnterEvent).
-	//  (2) REMOVE emissions calculation on LinkLeaveEvent with a VehicleEntersTrafficEvent ~rjg/kmt 06/22
-
 	/*package-private*/ WarmEmissionHandler( Scenario scenario, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 				    Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 				    Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds, Set<Pollutant> warmPollutants,
@@ -139,98 +134,105 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		// todo: is this the code block for "calculating emissions"?
-		//  Can we put it in a separate method before we add the same
-		//  logic to VehicleLeavesTrafficEvent?
+		Id<Vehicle> vehicleId = event.getVehicleId();
+		Id<Link> linkId = event.getLinkId();
+		double leaveTime = event.getTime();
+		Link link = this.scenario.getNetwork().getLinks().get(linkId);
+		double linkLength = link.getLength();
 
-		{ // code block start
-			Id<Vehicle> vehicleId = event.getVehicleId();
-			Id<Link> linkId = event.getLinkId();
-			double leaveTime = event.getTime();
-			Link link = this.scenario.getNetwork().getLinks().get(linkId);
-			double linkLength = link.getLength();
+		if (linkLength == 0.) {
+			if (zeroLinkLengthWarnCnt == 0) {
+				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+				logger.warn(Gbl.ONLYONCE);
+				zeroLinkLengthWarnCnt++;
+			}
+			return;
+		}
 
-			if (linkLength == 0.) {
-				if (zeroLinkLengthWarnCnt == 0) {
-					logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
-					logger.warn(Gbl.ONLYONCE);
-					zeroLinkLengthWarnCnt++;
-				}
-				return;
+		// excluding links with zero lengths from leaveCnt. Amit July'17
+		linkLeaveCnt++;
+
+		if (!this.linkenter.containsKey(vehicleId)) {
+			int maxLinkLeaveFirstActWarnCnt = 3;
+			if (linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt) {
+				logger.info("Vehicle " + vehicleId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
+				logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
+				logger.info("Thus, no emissions are calculated for this link leave event.");
+				if (linkLeaveFirstActWarnCnt == maxLinkLeaveFirstActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+			linkLeaveFirstActWarnCnt++;
+		} else if (!this.linkenter.get(vehicleId).getFirst().equals(linkId)) {
+			int maxLinkLeaveSomeActWarnCnt = 3;
+			if (linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt) {
+				logger.warn("Vehicle " + vehicleId + " is ending an activity other than the first and leaving link " + linkId + " without having entered.");
+				logger.warn("This indicates that there is some inconsistency in vehicle use; please check your inital plans file for consistency.");
+				logger.warn("Thus, no emissions are calculated neither for this link leave event nor for the last link that was entered.");
+				if (linkLeaveSomeActWarnCnt == maxLinkLeaveSomeActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+			linkLeaveSomeActWarnCnt++;
+		} else {
+			double enterTime = this.linkenter.get(vehicleId).getSecond();
+			double travelTime;
+			if (!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)) {
+				travelTime = leaveTime - enterTime; // todo ASK kmt: the VEHICLE did not enter or leave traffic from this link i.e. still commuting? ~rjg
+			} else if (!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
+					|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
+				travelTime = leaveTime - enterTime; // todo ASK kmt: the LINK was not used to enter of leave traffic i.e. still commuting? ... both the same? ~rjg
+			} else {
+				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
+				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond();
+				travelTime = leaveTime - enterTime - departureTime + arrivalTime;
+
+				// now that we subtracted the time spent on the link outside of the vehicle
+				// we delete these events (so that when the link gets crossed once more
+				// the departure/arrival time are not wrongly taken into account)
+				// Thanks @markusstraub for providing this
+				this.vehicleLeavesTraffic.remove(vehicleId);
+				this.vehicleEntersTraffic.remove(vehicleId);
 			}
 
-			// excluding links with zero lengths from leaveCnt. Amit July'17
-			linkLeaveCnt++;
+			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 
-			if (!this.linkenter.containsKey(vehicleId)) {
-				int maxLinkLeaveFirstActWarnCnt = 3;
-				if (linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt) {
-					logger.info("Vehicle " + vehicleId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
-					logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
-					logger.info("Thus, no emissions are calculated for this link leave event.");
-					if (linkLeaveFirstActWarnCnt == maxLinkLeaveFirstActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-				}
-				linkLeaveFirstActWarnCnt++;
-			} else if (!this.linkenter.get(vehicleId).getFirst().equals(linkId)) {
-				int maxLinkLeaveSomeActWarnCnt = 3;
-				if (linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt) {
-					logger.warn("Vehicle " + vehicleId + " is ending an activity other than the first and leaving link " + linkId + " without having entered.");
-					logger.warn("This indicates that there is some inconsistency in vehicle use; please check your inital plans file for consistency.");
-					logger.warn("Thus, no emissions are calculated neither for this link leave event nor for the last link that was entered.");
-					if (linkLeaveSomeActWarnCnt == maxLinkLeaveSomeActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-				}
-				linkLeaveSomeActWarnCnt++;
-			} else {
-				double enterTime = this.linkenter.get(vehicleId).getSecond();
-				double travelTime;
-				if (!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)) {
-					travelTime = leaveTime - enterTime;
-				} else if (!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
-						|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
+			if (vehicle == null) {
+				ColdEmissionHandler.handleNullVehicle(vehicleId, emissionsConfigGroup);
 
-					travelTime = leaveTime - enterTime;
-				} else {
-					double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
-					double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond();
-					travelTime = leaveTime - enterTime - departureTime + arrivalTime;
-
-					// now that we subtracted the time spent on the link outside of the vehicle
-					// we delete these events (so that when the link gets crossed once more
-					// the departure/arrival time are not wrongly taken into account)
-					// Thanks @markusstraub for providing this
-					this.vehicleLeavesTraffic.remove(vehicleId);
-					this.vehicleEntersTraffic.remove(vehicleId);
-				}
-
-				Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-
-				if (vehicle == null) {
-					ColdEmissionHandler.handleNullVehicle(vehicleId, emissionsConfigGroup);
-
-					if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
-						throw new RuntimeException(
-								"No vehicle defined for id " + vehicleId + ". " +
-										"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-										+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-										+ " Aborting...");
-					} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
-						if (noVehWarnCnt < 10) {
-							logger.warn(
-									"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
-							noVehWarnCnt++;
-							if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
-						}
-					} else {
-						throw new RuntimeException("Not yet implemented. Aborting...");
+				if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
+					throw new RuntimeException(
+							"No vehicle defined for id " + vehicleId + ". " +
+									"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+									+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+									+ " Aborting...");
+				} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
+					if (noVehWarnCnt < 10) {
+						logger.warn(
+								"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
+						noVehWarnCnt++;
+						if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
-
 				} else {
+					throw new RuntimeException("Not yet implemented. Aborting...");
+				}
+
+			} else {
+
+				// todo:
+				//  (1a) ADD emissions calculation for VehicleLeaveTrafficEvent (but only with LinkEnterEvent) and
+				//  (1b) on LinkLeaveEvent (but only with LinkEnterEvent).
+				//  (2) NO emissions calculation on LinkLeaveEvent with a VehicleEntersTrafficEvent ~rjg/kmt 06/22
+
+				if ((this.vehicleLeavesTraffic.containsKey(vehicleId) && this.linkenter.containsKey(vehicleId)) && !this.vehicleEntersTraffic.containsKey(vehicleId) ||
+						this.linkenter.containsKey(vehicleId) && !this.vehicleEntersTraffic.containsKey(vehicleId)) {
+
+					//  if conditions 1a, 2a, and 3 are met, calculate emissions
 					VehicleType vehicleType = vehicle.getType();
 					Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
 					warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
+
 				}
+
 			}
-		} // code block end
+		}
+
 	}
 
 	/*package-private*/ int getLinkLeaveCnt() {
