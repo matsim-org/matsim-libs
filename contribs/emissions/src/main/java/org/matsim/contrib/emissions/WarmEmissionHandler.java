@@ -69,9 +69,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
 
 	/*package-private*/ WarmEmissionHandler( Scenario scenario, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				    Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
-				    Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds, Set<Pollutant> warmPollutants,
-				    EventsManager eventsManager ){
+											 Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
+											 Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds, Set<Pollutant> warmPollutants,
+											 EventsManager eventsManager ){
 
 		this.scenario = scenario;
 		this.emissionsConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), EmissionsConfigGroup.class );
@@ -103,14 +103,51 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				nonCarWarn++;
 			}
 		}
-		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( event.getLinkId(), event.getTime() );
-		this.vehicleLeavesTraffic.put(event.getVehicleId(), linkId2Time);
+		final double arrivalTime = event.getTime();
 
-		// yyyyyy This event should also trigger an emissions calculation, from link entry up to here.  Probably not done since this particular
-		// event did not exist when the emissions contrib was programmed.  Would be easy to do: calculate the emission and remove
-		// the vehicle from the linkenter data structure so that no second emission event is computed for travel from parking to
-		// link leave.  (This could also be done, but the excellent should not be in the way of the good.)  kai, may'16
-	}
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( event.getLinkId(), arrivalTime);
+		final Id<Vehicle> vehicleId = event.getVehicleId();
+		this.vehicleLeavesTraffic.put(vehicleId, linkId2Time);
+
+		double enterTime = this.linkenter.get(vehicleId).getSecond();
+		double travelTime = arrivalTime - enterTime;
+
+		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
+
+		//Todo @rjg: extract method for douplicadet code?
+		if (vehicle == null) {
+			ColdEmissionHandler.handleNullVehicle(vehicleId, emissionsConfigGroup);
+
+			if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
+				throw new RuntimeException(
+						"No vehicle defined for id " + vehicleId + ". " +
+								"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+								+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+								+ " Aborting...");
+			} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
+				if (noVehWarnCnt < 10) {
+					logger.warn(
+							"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
+					noVehWarnCnt++;
+					if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+			} else {
+				throw new RuntimeException("Not yet implemented. Aborting...");
+			}
+
+		} else {
+			VehicleType vehicleType = vehicle.getType();
+			Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
+			warmEmissionAnalysisModule.throwWarmEmissionEvent(arrivalTime, linkId, vehicleId, warmEmissions);
+		}
+
+	//Todo: @rjg: decide wheter to remove entries from one or more "lists"....
+
+	// yyyyyy This event should also trigger an emissions calculation, from link entry up to here.  Probably not done since this particular
+	// event did not exist when the emissions contrib was programmed.  Would be easy to do: calculate the emission and remove
+	// the vehicle from the linkenter data structure so that no second emission event is computed for travel from parking to
+	// link leave.  (This could also be done, but the excellent should not be in the way of the good.)  kai, may'16
+}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
@@ -180,13 +217,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				travelTime = leaveTime - enterTime; // todo ASK kmt: the LINK was not used to enter of leave traffic i.e. still commuting? ... both the same? ~rjg
 			} else {
 				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
-				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond();
-				travelTime = leaveTime - enterTime - departureTime + arrivalTime;
+//				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); //Not needed any more
+				travelTime = arrivalTime - enterTime; //Vehicle leaves traffic on the Link
 
-				// now that we subtracted the time spent on the link outside of the vehicle
-				// we delete these events (so that when the link gets crossed once more
-				// the departure/arrival time are not wrongly taken into account)
-				// Thanks @markusstraub for providing this
 				this.vehicleLeavesTraffic.remove(vehicleId);
 				this.vehicleEntersTraffic.remove(vehicleId);
 			}
@@ -214,22 +247,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				}
 
 			} else {
-
-				// todo:
-				//  (1a) ADD emissions calculation for VehicleLeaveTrafficEvent (but only with LinkEnterEvent) and
-				//  (1b) on LinkLeaveEvent (but only with LinkEnterEvent).
-				//  (2) NO emissions calculation on LinkLeaveEvent with a VehicleEntersTrafficEvent ~rjg/kmt 06/22
-
-				if ((this.vehicleLeavesTraffic.containsKey(vehicleId) && this.linkenter.containsKey(vehicleId)) && !this.vehicleEntersTraffic.containsKey(vehicleId) ||
-						this.linkenter.containsKey(vehicleId) && !this.vehicleEntersTraffic.containsKey(vehicleId)) {
-
-					//  if conditions 1a, 2a, and 3 are met, calculate emissions
-					VehicleType vehicleType = vehicle.getType();
-					Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
-					warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
-
-				}
-
+				VehicleType vehicleType = vehicle.getType();
+				Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
+				warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 			}
 		}
 
