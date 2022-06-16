@@ -78,7 +78,6 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 		carrierResourceTracker = new CarrierAgentTracker(carriers, creators, eventsManager );
 		eventsManager.addHandler(carrierResourceTracker);
-//		registeredHandlers = new ArrayList<>();
 
 		for(LSP lsp : lsps.getLSPs().values()) {
 
@@ -119,13 +118,6 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 			} else {
 				log.warn("not adding eventsHandler since already added: " + simulationTracker );
 			}
-			// ... and register all attached event handlers:
-//			for( EventHandler eventHandler : simulationTracker.getEventHandlers() ){
-//				if ( !registeredHandlers.contains( eventHandler ) ){
-//					eventsManager.addHandler( eventHandler );
-//					registeredHandlers.add( eventHandler );
-//				}
-//			}
 		}
 	}
 
@@ -144,47 +136,7 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-//		LSPs lsps = LSPUtils.getLSPs( scenario );
-
 		eventsManager.removeHandler(carrierResourceTracker);
-
-//		Collection<LSPSimulationTracker> alreadyUpdatedTrackers = new ArrayList<>();
-//		for(LSP lsp : lsps.getLSPs().values()) {
-
-//			for( LSPSimulationTracker<LSP> simulationTracker : lsp.getSimulationTrackers() ){
-//				simulationTracker.notifyAfterMobsim( event );
-//			}
-
-//			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-//				for(LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
-//					for( LSPSimulationTracker<LSPResource> tracker : solutionElement.getResource().getSimulationTrackers()) {
-//						if(!alreadyUpdatedTrackers.contains(tracker)) {
-//							tracker.notifyAfterMobsim(event);
-//							alreadyUpdatedTrackers.add(tracker);
-//						}
-//					}
-//					for( LSPSimulationTracker<LogisticsSolutionElement> tracker : solutionElement.getSimulationTrackers()) {
-//						tracker.notifyAfterMobsim(event);
-//					}
-//				}
-//				for( LSPSimulationTracker tracker : solution.getSimulationTrackers()) {
-//					tracker.notifyAfterMobsim(event);
-//				}
-//			}
-//		}
-
-//		for(LSP lsp : lsps.getLSPs().values()) {
-//			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-//				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-//					for(LSPInfo info : element.getAttributes()) {
-//						info.update();
-//					}
-//				}
-//				for(LSPInfo info : solution.getAttributes()) {
-//					info.update();
-//				}
-//			}
-//		}
 	}
 
 
@@ -216,44 +168,5 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-//		LSPs lsps = LSPUtils.getLSPs( scenario );
-
-//		if(event.getIteration() > 0) {
-//			for(EventHandler handler : registeredHandlers) {
-//				eventsManager.removeHandler(handler);
-//			}
-
-//			for(LSP lsp : lsps.getLSPs().values()) {
-//				for( LSPSimulationTracker<LSP> simulationTracker : lsp.getSimulationTrackers() ){
-//					simulationTracker.reset( );
-//				}
-//				for(LSPShipment shipment : lsp.getShipments()) {
-//					shipment.clearSimulationTrackers();
-//				}
-//				for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-//					for(EventHandler handler : solution.getSimulationTrackers()) {
-//						handler.reset(event.getIteration());
-//					}
-//					for( LSPSimulationTracker tracker : solution.getSimulationTrackers()) {
-//						tracker.reset();
-//					}
-//					for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-//						for(EventHandler handler : element.getSimulationTrackers()) {
-//							handler.reset(event.getIteration());
-//						}
-//						for( LSPSimulationTracker tracker : element.getSimulationTrackers()) {
-//							tracker.reset();
-//						}
-//						for(EventHandler handler : element.getResource().getSimulationTrackers()) {
-//							handler.reset(event.getIteration());
-//						}
-//						for( LSPSimulationTracker tracker : element.getResource().getSimulationTrackers()) {
-//							tracker.reset();
-//						}
-//					}
-//				}
-//			}
-
-//		}
 	}
 }

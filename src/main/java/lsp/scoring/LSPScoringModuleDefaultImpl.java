@@ -33,10 +33,6 @@ public class LSPScoringModuleDefaultImpl implements LSPScoringModule{
 	@Inject LSPScoringModuleDefaultImpl( Scenario scenario ) {
 		this.scenario = scenario;
 	}
-	
-//	LSPScoringModuleImpl(LSPs lsps) {
-//		this.lsps = lsps;
-//	}
 		
 	@Override
 	public void notifyScoring(ScoringEvent event) {

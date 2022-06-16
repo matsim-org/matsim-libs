@@ -46,6 +46,4 @@ public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTra
 
 	void schedule(int bufferTime);
 
-//	void setEventsManager(EventsManager eventsManager);
-
 }

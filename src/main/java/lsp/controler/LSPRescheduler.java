@@ -59,13 +59,6 @@ import lsp.shipment.LSPShipment;
 final class LSPRescheduler {
 	private LSPRescheduler(){ }
 
-
-//	private final LSPs lsps;
-//
-//	public LSPRescheduler(LSPs lsps) {
-//		this.lsps = lsps;
-//	}
-	
 	static void notifyBeforeMobsim( LSPs lsps, BeforeMobsimEvent arg0) {
 		if(arg0.getIteration() !=  0) {
 			for(LSP lsp : lsps.getLSPs().values()){

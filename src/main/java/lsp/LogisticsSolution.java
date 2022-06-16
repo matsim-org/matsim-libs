@@ -43,6 +43,4 @@ public interface LogisticsSolution extends Identifiable<LogisticsSolution>, Know
 
 	void assignShipment(LSPShipment shipment);
 
-	//    void setEventsManager(EventsManager eventsManager);
-
 }

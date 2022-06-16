@@ -65,7 +65,6 @@ import lsp.LSPResourceScheduler;
 			this.tuple = tuple;
 			this.service = service;
 		}
-		
 	}
 		
 	private Carrier carrier;
@@ -260,8 +259,7 @@ import lsp.LSPResourceScheduler;
 				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
 			}
 		}
-	
-		
+
 		return unloadEndTime;
 	}
 }

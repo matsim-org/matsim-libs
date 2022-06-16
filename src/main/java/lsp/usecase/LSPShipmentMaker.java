@@ -67,7 +67,6 @@ class LSPShipmentMaker {
 					toLinkId = link.getId();
 					builder.setToLinkId(toLinkId);
 				}
-
 			}
 			shipments.add(builder.build());
 		}

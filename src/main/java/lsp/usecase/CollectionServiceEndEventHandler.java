@@ -118,12 +118,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 	@Override public void setEmbeddingContainer( LSPShipment pointer ){
 		this.lspShipment = pointer;
 	}
-//	@Override public Collection<EventHandler> getEventHandlers(){
-//		return this.eventHandlers;
-//	}
-//	@Override public void reset(){
-//		throw new RuntimeException( "not implemented" );
-//	}
+
 	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
 	}
 }

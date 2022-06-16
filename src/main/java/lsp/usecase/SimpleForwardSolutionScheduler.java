@@ -75,9 +75,6 @@ import lsp.shipment.LSPShipment;
 	public void setEmbeddingContainer( LSP lsp ) {
 		this.lsp = lsp;
 	}
-//	@Override public LSP getEmbeddingContainer(){
-//		return this.lsp;
-//	}
 
 
 	private void insertShipmentsAtBeginning() {

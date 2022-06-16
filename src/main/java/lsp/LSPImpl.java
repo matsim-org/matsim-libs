@@ -74,12 +74,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return id;
 	}
 
-//	@Override
-//	public Collection<LSPShipment> getShipments() {
-//		return shipments;
-//	}
 
-	
 	@Override
 	public void scheduleSolutions() {
 		solutionScheduler.scheduleSolutions();
@@ -167,9 +162,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			double score = scorer.scoreCurrentPlan(this);
 			this.selectedPlan.setScore(score);
 		} else {
-			final String msg = "trying to score the current LSP plan, but scorer is not set.";
-//			throw new RuntimeException( msg + "  Aborting ..." );
-			log.fatal( msg );
+			log.fatal("trying to score the current LSP plan, but scorer is not set.");
 		}
 	}
 

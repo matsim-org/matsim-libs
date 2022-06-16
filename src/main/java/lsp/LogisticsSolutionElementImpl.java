@@ -74,13 +74,6 @@ import java.util.Collections;
 		return outgoingShipments;
 	}
 
-//	@Override
-//	//KMT, KN: Never Used? -- Wäre wenn eher eh was für eine Utils-klasse. (ggf. mit anderem Namen). Frage: gedoppelt mit Scheduler?
-//	public void schedulingOfResourceCompleted() {
-//		for( ShipmentWithTime tuple : outgoingShipments.getSortedShipments()){
-//			nextElement.getIncomingShipments().addShipment(tuple.getTime(), tuple.getShipment());
-//		}
-//	}
 
 	@Override
 	public void setEmbeddingContainer( LogisticsSolution solution ) {
