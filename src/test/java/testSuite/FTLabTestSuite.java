@@ -50,7 +50,7 @@ import lspMobsimTests.RepeatedMultipleShipmentsCompleteLSPMobsimTest;
 import lspMobsimTests.SecondReloadLSPMobsimTest;
 import lspPlanTests.CollectionLSPPlanTest;
 import lspPlanTests.CompleteLSPPlanTest;
-import lspReplanningTests.CollectionLSPReplanningTest;
+import example.lsp.lspReplanning.CollectionLSPReplanningTest;
 import lsp.usecase.CollectionLSPSchedulingTest;
 import lsp.usecase.CompleteLSPSchedulingTest;
 import lsp.usecase.FirstReloadLSPSchedulingTest;
