@@ -33,7 +33,7 @@ import org.matsim.contrib.freight.carrier.Tour;
 public final class LSPTourStartEvent extends Event{
 
 	public static final String EVENT_TYPE = "LspFreightTourStarted";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE;
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	public static final String ATTRIBUTE_DRIVER = "driver";

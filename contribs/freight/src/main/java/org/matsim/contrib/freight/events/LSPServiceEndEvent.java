@@ -38,7 +38,7 @@ public final class LSPServiceEndEvent extends Event {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 	public static final String ATTRIBUTE_SERVICE = "service";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE;
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	
 	private final CarrierService service;
