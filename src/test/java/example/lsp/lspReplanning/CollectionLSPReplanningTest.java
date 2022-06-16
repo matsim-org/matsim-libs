@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lspReplanningTests;
+package example.lsp.lspReplanning;
 
 import lsp.*;
 import lsp.controler.LSPModule;

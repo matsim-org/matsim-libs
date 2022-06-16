@@ -22,9 +22,10 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import lsp.LSPDataObject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
@@ -47,15 +48,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * starts as soon as the considered LSPShipment arrives at the {@link TransshipmentHub}
  * and ends after a fixed and a size dependent amount of time.
  */
-/*package-private*/ class TransshipmentHub implements LSPResource {
-	private final Attributes attributes = new Attributes();
+/*package-private*/ class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPResource {
 
 	private final Id<LSPResource> id;
 	private final Id<Link> locationLinkId;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
-	private final List<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker> trackers;
 
 	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder){
 		this.id = builder.getId();
@@ -65,9 +63,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		TranshipmentHubTourEndEventHandler eventHandler = new TranshipmentHubTourEndEventHandler(this);
 		transshipmentHubScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
-		this.eventHandlers = new ArrayList<>();
-		this.trackers = new ArrayList<>();
-		eventHandlers.add(eventHandler);
+		this.addSimulationTracker( eventHandler );
 	}
 	
 	@Override
@@ -75,11 +71,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return locationLinkId;
 	}
 
-//	@Override
-//	public Class<? extends TranshipmentHub> getClassOfResource() {
-//		return this.getClass();
-//	}
-//
 	@Override
 	public Id<Link> getEndLinkId() {
 		return locationLinkId;
@@ -108,29 +99,4 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return transshipmentHubScheduler.getCapacityNeedLinear();
 	}
 
-	@Override public Collection <EventHandler> getEventHandlers(){
-		return eventHandlers;
-	}
-
-	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
-		this.trackers.add(tracker);
-		this.eventHandlers.addAll(tracker.getEventHandlers());
-//		this.infos.addAll(tracker.getAttributes() );
-		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-			this.attributes.putAttribute( entry.getKey(), entry.getValue());
-		}
-	}
-
-	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
-		return trackers;
-	}
-	@Override public Attributes getAttributes(){
-		return attributes;
-	}
-
-//	@Override
-//	public void setEventsManager(EventsManager eventsManager) {
-//	}
 }

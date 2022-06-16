@@ -175,8 +175,9 @@ import lsp.LSPResource;
 			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
         	
 			for(ShipmentPlanElement element : shipment.getShipmentPlan().getPlanElements().values()) {
-        		System.out.println("Solution Id: " + element.getSolutionElement().getEmbeddingContainer().getId()
-        		+ " SolutionElement Id: " + element.getSolutionElement().getId()
+        		System.out.println(
+//					"Solution Id: " + element.getSolutionElement().getEmbeddingContainer().getId() +
+        		" SolutionElement Id: " + element.getSolutionElement().getId()
         		+ " Resource Id: " + element.getResourceId()
         		+ " Type: " + element.getElementType()
         		+ " Start Time: " + element.getStartTime()

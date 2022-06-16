@@ -20,6 +20,7 @@
 
 package lsp.usecase;
 
+import lsp.controler.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
@@ -32,14 +33,21 @@ import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.events.handler.EventHandler;
 
-/*package-private*/ class CollectionTourEndEventHandler implements LSPTourEndEventHandler {
+import java.util.ArrayList;
+import java.util.Collection;
+
+/*package-private*/ class CollectionTourEndEventHandler implements AfterMobsimListener, LSPTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private final LSPShipment lspShipment;
+	private LSPShipment lspShipment;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
-	
+	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+
 	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
@@ -124,7 +132,13 @@ import lsp.LSPResource;
 		return resource.getId();
 	}
 
-		
+
+	@Override public void setEmbeddingContainer( LSPShipment pointer ){
+		this.lspShipment = pointer;
+	}
+
+	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+	}
 }
 
 	

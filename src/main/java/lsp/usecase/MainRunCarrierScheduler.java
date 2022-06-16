@@ -289,7 +289,7 @@ import org.matsim.vehicles.VehicleType;
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				MainRunTourStartEventHandler handler = new MainRunTourStartEventHandler(tuple.getShipment(), carrierService, element, resource);
-				tuple.getShipment().getEventHandlers().add(handler);
+				tuple.getShipment().addSimulationTracker( handler );
 				break;
 			}
 		}
@@ -299,7 +299,7 @@ import org.matsim.vehicles.VehicleType;
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				MainRunTourEndEventHandler handler = new MainRunTourEndEventHandler(tuple.getShipment(), carrierService, element,resource);
-				tuple.getShipment().getEventHandlers().add(handler);
+				tuple.getShipment().addSimulationTracker( handler );
 				break;
 			}
 		}

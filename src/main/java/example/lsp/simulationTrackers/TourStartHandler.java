@@ -20,11 +20,13 @@
 
 package example.lsp.simulationTrackers;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.events.LSPTourStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 /*package-private*/ class TourStartHandler implements LSPTourStartEventHandler {
+	private static final Logger log = Logger.getLogger( TourStartHandler.class );
 
 	private double vehicleFixedCosts;
 		
@@ -35,6 +37,7 @@ import org.matsim.vehicles.Vehicle;
 
 	@Override
 	public void handleEvent(LSPTourStartEvent event) {
+		log.warn( "handling tour start event=" + event );
 		vehicleFixedCosts = vehicleFixedCosts + ((Vehicle) event.getVehicle()).getType().getCostInformation().getFix();
 	}
 

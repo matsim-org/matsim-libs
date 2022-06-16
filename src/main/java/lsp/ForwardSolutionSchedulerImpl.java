@@ -97,15 +97,11 @@ import lsp.shipment.LSPShipment;
 		for(LSPResource resource : sortedResourceList ) {
 			resource.schedule(bufferTime);
 		}
-
 	}
 
 	@Override
 	public void setEmbeddingContainer( LSP lsp ) {
 		this.lsp = lsp;
-	}
-	@Override public LSP getEmbeddingContainer(){
-		return this.lsp;
 	}
 
 	private void setResourceNeighbours() {
@@ -177,7 +173,6 @@ import lsp.shipment.LSPShipment;
 			if(element.getPreviousElement() == null){
 				return element;
 			}
-			
 		}
 		return null;
 	}

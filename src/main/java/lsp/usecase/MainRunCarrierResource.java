@@ -22,8 +22,9 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
 
+import lsp.LSPDataObject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,19 +37,15 @@ import lsp.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/*package-private*/ class MainRunCarrierResource implements LSPCarrierResource {
-	private final Attributes attributes = new Attributes();
+/*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
 	private final Id<LSPResource>id;
 	private final Carrier carrier;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
-	private final ArrayList<LogisticsSolutionElement> clientElements;
+	private final Collection<LogisticsSolutionElement> clientElements;
 	private final MainRunCarrierScheduler mainRunScheduler;
 	private final Network network;
-	private final Collection<EventHandler> eventHandlers;
-	private final Collection<LSPSimulationTracker> trackers;
-
 
 	MainRunCarrierResource( UsecaseUtils.MainRunCarrierAdapterBuilder builder ){
 			this.id = builder.getId();
@@ -58,8 +55,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			this.clientElements = builder.getClientElements();
 			this.mainRunScheduler = builder.getMainRunScheduler();
 			this.network = builder.getNetwork();
-			this.eventHandlers = new ArrayList<>();
-			this.trackers = new ArrayList<>();
 		}
 	
 	
@@ -72,11 +67,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	public Id<Link> getStartLinkId() {
 		return fromLinkId;
 	}
-
-//	@Override
-//	public Class<?> getClassOfResource() {
-//		return carrier.getClass();
-//	}
 
 	@Override
 	public Id<Link> getEndLinkId() {
@@ -100,31 +90,5 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	public Network getNetwork(){
 		return network;
 	}
-
-	@Override public Collection <EventHandler> getEventHandlers(){
-		return eventHandlers;
-	}
-
-	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
-		this.trackers.add(tracker);
-		this.eventHandlers.addAll(tracker.getEventHandlers());
-//		this.infos.addAll(tracker.getAttributes() );
-		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ) {
-			this.attributes.putAttribute( entry.getKey(), entry.getValue());
-		}
-	}
-
-	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
-		return trackers;
-	}
-	@Override public Attributes getAttributes(){
-		return attributes;
-	}
-
-//	@Override
-//	public void setEventsManager(EventsManager eventsManager) {
-//	}
 
 }

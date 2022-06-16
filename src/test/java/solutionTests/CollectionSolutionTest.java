@@ -99,8 +99,8 @@ public class CollectionSolutionTest {
 
 	@Test
 	public void testCollectionSolution() {
-		assertNotNull(collectionSolution.getEventHandlers());
-		assertTrue(collectionSolution.getEventHandlers().isEmpty());
+		assertNotNull(collectionSolution.getSimulationTrackers() );
+		assertTrue(collectionSolution.getSimulationTrackers().isEmpty() );
 		assertNotNull(collectionSolution.getAttributes() );
 		assertTrue(collectionSolution.getAttributes().isEmpty() );
 		assertNull(collectionSolution.getLSP() );
@@ -115,7 +115,7 @@ public class CollectionSolutionTest {
 			if(elements.indexOf(element) == (elements.size() -1)) {
 				assertNull(element.getNextElement());
 			}
-			assertSame(element.getEmbeddingContainer(), collectionSolution );
+//			assertSame(element.getEmbeddingContainer(), collectionSolution );
 		}	
 	}
 	

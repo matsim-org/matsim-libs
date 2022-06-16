@@ -22,8 +22,10 @@ package lsp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import lsp.controler.LSPSimulationTracker;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -33,7 +35,7 @@ import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/* package-private */class LSPImpl implements LSP {
+/* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger( LSPImpl.class );
 
 	private final Id<LSP> id;
@@ -44,7 +46,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Collection<LSPResource> resources;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
-	private final Attributes attributes = new Attributes();
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){
@@ -73,12 +74,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return id;
 	}
 
-//	@Override
-//	public Collection<LSPShipment> getShipments() {
-//		return shipments;
-//	}
 
-	
 	@Override
 	public void scheduleSolutions() {
 		solutionScheduler.scheduleSolutions();
@@ -166,9 +162,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			double score = scorer.scoreCurrentPlan(this);
 			this.selectedPlan.setScore(score);
 		} else {
-			final String msg = "trying to score the current LSP plan, but scorer is not set.";
-//			throw new RuntimeException( msg + "  Aborting ..." );
-			log.fatal( msg );
+			log.fatal("trying to score the current LSP plan, but scorer is not set.");
 		}
 	}
 
@@ -189,6 +183,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void setScorer(LSPScorer scorer) {
 		this.scorer =  scorer;
+
 	}
 
 
@@ -202,11 +197,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public Collection<LSPShipment> getShipments() {
 		return this.shipments ;
-	}
-
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
 	}
 
 }

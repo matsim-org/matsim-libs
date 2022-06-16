@@ -21,17 +21,28 @@
 package example.lsp.simulationTrackers;
 
 import lsp.LSPUtils;
+import lsp.LogisticsSolution;
 import lsp.controler.LSPSimulationTracker;
+import org.matsim.contrib.freight.events.*;
+import org.matsim.contrib.freight.events.eventhandler.*;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-/*package-private*/ class LinearCostTracker implements LSPSimulationTracker{
+/*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
+								       LSPLinkEnterEventHandler,
+								       LSPVehicleLeavesTrafficEventHandler,
+								       LSPTourStartEventHandler,
+								       LSPServiceStartEventHandler,
+								       LSPServiceEndEventHandler,
+								       LSPLinkLeaveEventHandler
+{
 
-	private final Attributes attributes = new Attributes();
 	private final Collection<EventHandler> eventHandlers;
 //	private final Collection<LSPInfo> infos;
 	private double distanceCosts;
@@ -45,7 +56,8 @@ import java.util.Collection;
 	private double linearUnitCosts;
 	
 	private final double shareOfFixedCosts;
-	
+	private LogisticsSolution logisticsSolution;
+
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
 //		CostInfo costInfo = new CostInfo();
@@ -55,8 +67,7 @@ import java.util.Collection;
 	}
 	
 	
-	@Override
-	public Collection<EventHandler> getEventHandlers() {
+	public final Collection<EventHandler> getEventHandlers() {
 		return eventHandlers;
 	}
 
@@ -96,15 +107,15 @@ import java.util.Collection;
 //		}
 //		info.setFixedCost( fixedUnitCosts );
 //		info.setVariableCost( linearUnitCosts );
-		LSPUtils.setFixedCost( this, fixedUnitCosts );
-		LSPUtils.setVariableCost( this, linearUnitCosts );
+		LSPUtils.setFixedCost( this.logisticsSolution, fixedUnitCosts );
+		LSPUtils.setVariableCost( this.logisticsSolution, linearUnitCosts );
 		
 		
 	}
 
 
 	@Override
-	public void reset() {
+	public void reset( int iteration) {
 		distanceCosts = 0;
 		timeCosts = 0;
 		loadingCosts = 0;
@@ -117,7 +128,55 @@ import java.util.Collection;
 	}
 
 
-	@Override public Attributes getAttributes(){
-		return attributes;
+//	@Override public Attributes getAttributes(){
+//		return attributes;
+//	}
+	@Override public void setEmbeddingContainer( LogisticsSolution pointer ){
+		this.logisticsSolution = pointer;
 	}
+	@Override public void handleEvent( LSPFreightLinkEnterEvent event ){
+		for( EventHandler eventHandler : this.eventHandlers ){
+			if ( eventHandler instanceof LSPLinkEnterEventHandler ) {
+				((LSPLinkEnterEventHandler) eventHandler).handleEvent( event );
+			}
+		}
+	}
+	@Override public void handleEvent( LSPFreightVehicleLeavesTrafficEvent event ){
+		for( EventHandler eventHandler : this.eventHandlers ){
+			if ( eventHandler instanceof LSPVehicleLeavesTrafficEventHandler ) {
+				((LSPVehicleLeavesTrafficEventHandler) eventHandler).handleEvent( event );
+			}
+		}
+	}
+	@Override public void handleEvent( LSPTourStartEvent event ){
+		for( EventHandler eventHandler : this.eventHandlers ){
+			if ( eventHandler instanceof LSPTourStartEventHandler ) {
+				((LSPTourStartEventHandler) eventHandler).handleEvent( event );
+			}
+		}
+	}
+	@Override public void handleEvent( LSPServiceEndEvent event ){
+		for( EventHandler eventHandler : this.eventHandlers ){
+			if ( eventHandler instanceof LSPServiceEndEventHandler ) {
+				((LSPServiceEndEventHandler) eventHandler).handleEvent( event );
+			}
+		}
+	}
+	@Override public void handleEvent( LSPServiceStartEvent event ){
+		for( EventHandler eventHandler : this.eventHandlers ){
+			if ( eventHandler instanceof LSPServiceStartEventHandler ) {
+				((LSPServiceStartEventHandler) eventHandler).handleEvent( event );
+			}
+		}
+	}
+	@Override public void handleEvent( LSPFreightLinkLeaveEvent event ){
+		for( EventHandler eventHandler : this.eventHandlers ){
+			if ( eventHandler instanceof LSPLinkLeaveEventHandler ) {
+				((LSPLinkLeaveEventHandler) eventHandler).handleEvent( event );
+			}
+		}
+	}
+//	@Override public LogisticsSolution getEmbeddingContainer(){
+//		throw new RuntimeException( "not implemented" );
+//	}
 }

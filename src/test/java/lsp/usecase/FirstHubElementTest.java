@@ -60,7 +60,7 @@ public class FirstHubElementTest {
 		assertTrue(reloadingElement.getIncomingShipments().getSortedShipments().isEmpty());
 		assertNotNull(reloadingElement.getAttributes() );
 		assertTrue(reloadingElement.getAttributes().isEmpty() );
-		assertNull(reloadingElement.getEmbeddingContainer() );
+//		assertNull(reloadingElement.getEmbeddingContainer() );
 		assertNull(reloadingElement.getNextElement());
 		assertNotNull(reloadingElement.getOutgoingShipments());
 		assertNotNull(reloadingElement.getOutgoingShipments().getShipments());

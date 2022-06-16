@@ -107,8 +107,8 @@ public class CollectionAdapterTest {
 		}
 		assertSame(carrierResource.getEndLinkId(), collectionLinkId);
 		assertSame(carrierResource.getStartLinkId(), collectionLinkId);
-		assertNotNull(carrierResource.getEventHandlers());
-		assertTrue(carrierResource.getEventHandlers().isEmpty());
+		assertNotNull(carrierResource.getSimulationTrackers() );
+		assertTrue(carrierResource.getSimulationTrackers().isEmpty() );
 		assertNotNull(carrierResource.getAttributes() );
 		assertTrue(carrierResource.getAttributes().isEmpty() );
 		assertSame(carrierResource.getStartLinkId(), collectionLinkId);

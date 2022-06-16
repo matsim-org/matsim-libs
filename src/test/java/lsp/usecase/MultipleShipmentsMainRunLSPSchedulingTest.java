@@ -323,8 +323,8 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 		}
 
-		assertEquals(1, firstTranshipmentHubAdapter.getEventHandlers().size());
-		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubAdapter.getEventHandlers());
+		assertEquals(1, firstTranshipmentHubAdapter.getSimulationTrackers().size() );
+		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubAdapter.getSimulationTrackers());
 		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
 		TranshipmentHubTourEndEventHandler reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 
@@ -348,8 +348,8 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		}
 	
 		for(LSPShipment shipment : lsp.getShipments()) {
-			assertEquals(4, shipment.getEventHandlers().size());
-			eventHandlers = new ArrayList<>(shipment.getEventHandlers());
+			assertEquals(4, shipment.getSimulationTrackers().size() );
+			eventHandlers = new ArrayList<>(shipment.getSimulationTrackers());
 			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			planElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
 			ArrayList<LogisticsSolutionElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements());

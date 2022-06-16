@@ -126,13 +126,16 @@ public class CollectionTrackerTest {
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
 
-		shareOfFixedCosts = 0.2;
-		LinearCostTracker tracker = new LinearCostTracker(shareOfFixedCosts);
-		tracker.getEventHandlers().add(new TourStartHandler() );
-		tracker.getEventHandlers().add(new CollectionServiceHandler() );
-		tracker.getEventHandlers().add(new DistanceAndTimeHandler(network) );
+		{
+			shareOfFixedCosts = 0.2;
+			LinearCostTracker tracker = new LinearCostTracker( shareOfFixedCosts );
+			tracker.getEventHandlers().add( new TourStartHandler() );
+			tracker.getEventHandlers().add( new CollectionServiceHandler() );
+			tracker.getEventHandlers().add( new DistanceAndTimeHandler( network ) );
+			// I think that it would be better to use delegation inside LinearCostTracker, i.e. to not expose getEventHandlers(). kai, jun'22
 
-		collectionSolution.addSimulationTracker(tracker);
+			collectionSolution.addSimulationTracker( tracker );
+		}
 
 		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();

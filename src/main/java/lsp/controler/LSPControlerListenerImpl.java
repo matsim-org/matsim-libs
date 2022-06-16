@@ -26,14 +26,17 @@ import lsp.replanning.LSPReplanningModule;
 import lsp.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 
 import javax.inject.Inject;
@@ -44,7 +47,7 @@ import java.util.List;
 
 class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 							  ReplanningListener, IterationStartsListener{
-
+	private static final Logger log = Logger.getLogger( LSPControlerListenerImpl.class );
 
 	private CarrierAgentTracker carrierResourceTracker;
 	private final Carriers carriers;
@@ -53,9 +56,10 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 	private final LSPScoringModule scoringModule;
 	private final Collection<LSPEventCreator> creators;
 
-	private List<EventHandler> registeredHandlers;
+	private List<EventHandler> registeredHandlers = new ArrayList<>();
 
 	@Inject private EventsManager eventsManager;
+	@Inject private MatsimServices matsimServices;
 
 	@Inject LSPControlerListenerImpl( Scenario scenario, LSPReplanningModule replanningModule, LSPScoringModule scoringModule,
 					  Collection<LSPEventCreator> creators ) {
@@ -74,30 +78,45 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 		carrierResourceTracker = new CarrierAgentTracker(carriers, creators, eventsManager );
 		eventsManager.addHandler(carrierResourceTracker);
-		registeredHandlers = new ArrayList<>();
 
 		for(LSP lsp : lsps.getLSPs().values()) {
+
+			// simulation trackers of lsp:
+			registerEventHandlers( lsp );
+
+			// simulation trackers of shipments:
 			for(LSPShipment shipment : lsp.getShipments()) {
-				for(EventHandler handler : shipment.getEventHandlers()) {
-					eventsManager.addHandler(handler);
+				registerEventHandlers( shipment );
+			}
+
+			LSPPlan selectedPlan = lsp.getSelectedPlan();
+
+			// simulation trackers of solutions:
+			for(LogisticsSolution solution : selectedPlan.getSolutions()) {
+				registerEventHandlers( solution );
+
+				// simulation trackers of solution elements:
+				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+					registerEventHandlers( element );
+
+					// simulation trackers of resources:
+					registerEventHandlers( element.getResource() );
+
 				}
 			}
-			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for(LogisticsSolution solution : selectedPlan.getSolutions()) {
-				for(EventHandler handler : solution.getEventHandlers()) {
-					eventsManager.addHandler(handler);
-				}
-				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for(EventHandler handler : element.getEventHandlers()) {
-						eventsManager.addHandler(handler);
-					}
-					for(EventHandler handler : element.getResource().getEventHandlers() ) {
-						if(!registeredHandlers.contains(handler)) {
-							eventsManager.addHandler(handler);
-							registeredHandlers.add(handler);
-						}
-					}
-				}
+		}
+	}
+	private void registerEventHandlers( HasSimulationTrackers<?> lsp ){
+		// get all simulation trackers ...
+		for( LSPSimulationTracker<?> simulationTracker : lsp.getSimulationTrackers() ){
+			// ... register themselves ...
+			if ( !registeredHandlers.contains( simulationTracker ) ){
+				log.warn("adding eventsHandler: " + simulationTracker );
+				eventsManager.addHandler( simulationTracker );
+				registeredHandlers.add( simulationTracker );
+				matsimServices.addControlerListener( simulationTracker );
+			} else {
+				log.warn("not adding eventsHandler since already added: " + simulationTracker );
 			}
 		}
 	}
@@ -117,42 +136,7 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
-
 		eventsManager.removeHandler(carrierResourceTracker);
-
-		Collection<LSPSimulationTracker> alreadyUpdatedTrackers = new ArrayList<>();
-		for(LSP lsp : lsps.getLSPs().values()) {
-			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for( LSPSimulationTracker tracker : element.getResource().getSimulationTrackers()) {
-						if(!alreadyUpdatedTrackers.contains(tracker)) {
-							tracker.notifyAfterMobsim(event);
-							alreadyUpdatedTrackers.add(tracker);
-						}
-					}
-					for( LSPSimulationTracker tracker : element.getSimulationTrackers()) {
-						tracker.notifyAfterMobsim(event);
-					}
-				}
-				for( LSPSimulationTracker tracker : solution.getSimulationTrackers()) {
-					tracker.notifyAfterMobsim(event);
-				}
-			}
-		}
-
-//		for(LSP lsp : lsps.getLSPs().values()) {
-//			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-//				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-//					for(LSPInfo info : element.getAttributes()) {
-//						info.update();
-//					}
-//				}
-//				for(LSPInfo info : solution.getAttributes()) {
-//					info.update();
-//				}
-//			}
-//		}
 	}
 
 
@@ -184,42 +168,5 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
-
-
-		if(event.getIteration() > 0) {
-			for(EventHandler handler : registeredHandlers) {
-				eventsManager.removeHandler(handler);
-			}
-
-			for(LSP lsp : lsps.getLSPs().values()) {
-				for(LSPShipment shipment : lsp.getShipments()) {
-					shipment.getEventHandlers().clear();
-				}
-
-				for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-					for(EventHandler handler : solution.getEventHandlers()) {
-						handler.reset(event.getIteration());
-					}
-					for( LSPSimulationTracker tracker : solution.getSimulationTrackers()) {
-						tracker.reset();
-					}
-					for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-						for(EventHandler handler : element.getEventHandlers()) {
-							handler.reset(event.getIteration());
-						}
-						for( LSPSimulationTracker tracker : element.getSimulationTrackers()) {
-							tracker.reset();
-						}
-						for(EventHandler handler : element.getResource().getEventHandlers()) {
-							handler.reset(event.getIteration());
-						}
-						for( LSPSimulationTracker tracker : element.getResource().getSimulationTrackers()) {
-							tracker.reset();
-						}
-					}
-				}
-			}
-		}
 	}
 }

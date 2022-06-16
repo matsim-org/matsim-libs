@@ -98,14 +98,14 @@ import java.util.*;
 					     .setSolutionScheduler( UsecaseUtils.createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( lspResource ) ) )
 					     .build();
 
-		TipSimulationTracker tracker = new TipSimulationTracker();
+//		TipScorer.TipSimulationTracker tracker = new TipScorer.TipSimulationTracker();
 
 		//add SimulationTracker to the Resource
-		lspResource.addSimulationTracker(tracker);
+//		lspResource.addSimulationTracker(tracker);
 
 		//Create the Scorer and add it to the lsp
-		final TipScorer scorer = new TipScorer( lsp );
-		lspResource.addSimulationTracker( scorer );
+		final TipScorer scorer = new TipScorer();
+		lsp.addSimulationTracker( scorer );
 		lsp.setScorer( scorer );
 
 		// yyyyyy there is almost surely something wrong with the design if you cannot set the

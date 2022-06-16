@@ -62,7 +62,7 @@ public class SecondHubElementTest {
 		assertTrue(hubElement.getIncomingShipments().getSortedShipments().isEmpty());
 		assertNotNull(hubElement.getAttributes() );
 		assertTrue(hubElement.getAttributes().isEmpty() );
-		assertNull(hubElement.getEmbeddingContainer() );
+//		assertNull(hubElement.getEmbeddingContainer() );
 		assertNull(hubElement.getNextElement());
 		assertNotNull(hubElement.getOutgoingShipments());
 		assertNotNull(hubElement.getOutgoingShipments().getShipments());

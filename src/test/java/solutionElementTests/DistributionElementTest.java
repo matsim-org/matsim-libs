@@ -100,7 +100,7 @@ public class DistributionElementTest {
 		assertTrue(distributionElement.getIncomingShipments().getSortedShipments().isEmpty());
 		assertNotNull(distributionElement.getAttributes() );
 		assertTrue(distributionElement.getAttributes().isEmpty() );
-		assertNull(distributionElement.getEmbeddingContainer() );
+//		assertNull(distributionElement.getEmbeddingContainer() );
 		assertNull(distributionElement.getNextElement());
 		assertNotNull(distributionElement.getOutgoingShipments());
 		assertNotNull(distributionElement.getOutgoingShipments().getShipments());

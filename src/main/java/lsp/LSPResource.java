@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  *
  *
  */
-public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers, HasEventHandlers, Attributable{
+public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers<LSPResource>, Attributable{
 
 	Id<Link> getStartLinkId();
 
@@ -45,7 +45,5 @@ public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTra
 	Collection <LogisticsSolutionElement> getClientElements();
 
 	void schedule(int bufferTime);
-
-//	void setEventsManager(EventsManager eventsManager);
 
 }

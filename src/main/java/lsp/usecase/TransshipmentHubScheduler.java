@@ -108,11 +108,6 @@ import lsp.shipment.ShipmentPlanElement;
 	}
 
 
-//	public TranshipmentHub getTranshipmentHub() {
-//		return TranshipmentHub;
-//	}
-
-
 	public void setTranshipmentHub(TransshipmentHub transshipmentHub) {
 		this.transshipmentHub = transshipmentHub;
 	}

@@ -102,7 +102,7 @@ public class MainRunElementTest {
 		assertTrue(mainRunElement.getIncomingShipments().getSortedShipments().isEmpty());
 		assertNotNull(mainRunElement.getAttributes() );
 		assertTrue(mainRunElement.getAttributes().isEmpty() );
-		assertNull(mainRunElement.getEmbeddingContainer() );
+//		assertNull(mainRunElement.getEmbeddingContainer() );
 		assertNull(mainRunElement.getNextElement());
 		assertNotNull(mainRunElement.getOutgoingShipments());
 		assertNotNull(mainRunElement.getOutgoingShipments().getShipments());

@@ -36,7 +36,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
  * 3. Interact with the agents that embody the demand side of the freight transport market, if they are specified in the setting.
  * 4. Coordinate carriers that are in charge of the physical transport.
  */
-public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
+public interface LSP extends HasPlansAndId<LSPPlan,LSP>, HasSimulationTrackers<LSP> {
 
 	/**
 	 * @return

@@ -36,10 +36,7 @@ public class LSPReplanningModuleImpl implements LSPReplanningModule{
 		this.scenario = scenario;
 	}
 	
-//	LSPReplanningModuleImpl(LSPs lsps) {
-//		this.lsps = lsps;
-//	}
-		
+
 	@Override
 	public void notifyReplanning(ReplanningEvent arg0) {
 		replanLSPs(arg0);

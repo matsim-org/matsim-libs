@@ -20,8 +20,12 @@
 
 package lsp.usecase;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
+import lsp.controler.LSPSimulationTracker;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,9 +38,16 @@ import org.matsim.contrib.freight.events.LSPTourEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.events.handler.EventHandler;
 
-/*package-private*/  class TranshipmentHubTourEndEventHandler implements LSPTourEndEventHandler {
+/*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
 
+	@Override public void setEmbeddingContainer( LSPResource pointer ){
+	}
+	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+	}
 	static class TransshipmentHubEventHandlerPair {
 		public final LSPShipment shipment;
 		public final LogisticsSolutionElement element;
@@ -46,8 +57,7 @@ import lsp.LSPResource;
 			this.element = element;
 		}	
 	}
-	
-	
+
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
@@ -177,7 +187,7 @@ import lsp.LSPResource;
 	}
 	
 	
-	public HashMap<CarrierService, TransshipmentHubEventHandlerPair> getServicesWaitedFor() {
+	public Map<CarrierService, TransshipmentHubEventHandlerPair> getServicesWaitedFor() {
 		return servicesWaitedFor;
 	}
 

@@ -225,8 +225,8 @@ public class CompleteSolutionTest {
 
 	@Test
 	public void testCompleteSolution() {
-		assertNotNull(solution.getEventHandlers());
-		assertTrue(solution.getEventHandlers().isEmpty());
+		assertNotNull(solution.getSimulationTrackers() );
+		assertTrue(solution.getSimulationTrackers().isEmpty() );
 		assertNotNull(solution.getAttributes() );
 		assertTrue(solution.getAttributes().isEmpty() );
 		assertNull(solution.getLSP() );
@@ -241,7 +241,7 @@ public class CompleteSolutionTest {
 				if(elements.indexOf(element) == (elements.size() -1)) {
 					assertNull(element.getNextElement());
 				}
-				assertSame(element.getEmbeddingContainer(), solution );
+//				assertSame(element.getEmbeddingContainer(), solution );
 			}
 		assertNull(collectionElement.getPreviousElement());
 		assertSame(collectionElement.getNextElement(), firstHubElement);

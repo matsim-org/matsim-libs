@@ -27,12 +27,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
 
 
-/* package-private */ class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
+/* package-private */ class LogisticsSolutionElementImpl extends LSPDataObject<LogisticsSolutionElement> implements LogisticsSolutionElement {
 
-	private final Attributes attributes = new Attributes();
 	private final Id<LogisticsSolutionElement>id;
 	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
@@ -41,9 +40,6 @@ import java.util.Map;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private final Collection<LSPSimulationTracker> trackers;
-	private final Collection<EventHandler> handlers;
-//	private EventsManager eventsManager;
 
 	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
 		this.id = builder.id;
@@ -51,15 +47,11 @@ import java.util.Map;
 		this.incomingShipments = builder.incomingShipments;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
-		this.handlers = new ArrayList<>();
-		this.trackers = new ArrayList<>();
 	}
 	
-	@Override
-	public Id<LogisticsSolutionElement> getId() {
+	@Override public Id<LogisticsSolutionElement> getId() {
 		return id;
 	}
-
 
 	@Override
 	public void connectWithNextElement(LogisticsSolutionElement element) {
@@ -82,22 +74,10 @@ import java.util.Map;
 		return outgoingShipments;
 	}
 
-//	@Override
-//	//KMT, KN: Never Used? -- Wäre wenn eher eh was für eine Utils-klasse. (ggf. mit anderem Namen). Frage: gedoppelt mit Scheduler?
-//	public void schedulingOfResourceCompleted() {
-//		for( ShipmentWithTime tuple : outgoingShipments.getSortedShipments()){
-//			nextElement.getIncomingShipments().addShipment(tuple.getTime(), tuple.getShipment());
-//		}
-//	}
 
 	@Override
 	public void setEmbeddingContainer( LogisticsSolution solution ) {
 		this.solution = solution;
-	}
-
-	@Override
-	public LogisticsSolution getEmbeddingContainer() {
-		return solution;
 	}
 
 	@Override
@@ -109,36 +89,5 @@ import java.util.Map;
 	public LogisticsSolutionElement getNextElement() {
 		return nextElement;
 	}
-
-	@Override
-	public void addSimulationTracker( LSPSimulationTracker tracker ) {
-		trackers.add(tracker);
-
-		// can't say if this hierarchical design is useful or confusing. kai, may'22
-		// yy should maybe check for overwriting?  However, did also not check in original design. kai, may'22
-		for( Map.Entry<String, Object> entry : tracker.getAttributes().getAsMap().entrySet() ){
-			attributes.putAttribute( entry.getKey(), entry.getValue() );
-		}
-
-		handlers.addAll(tracker.getEventHandlers());
-	}
-
-	public Collection<EventHandler> getEventHandlers(){
-		return handlers;
-	}
-
-	@Override
-	public Collection<LSPSimulationTracker> getSimulationTrackers() {
-		return trackers;
-	}
-	@Override public Attributes getAttributes(){
-		return attributes;
-	}
-
-//	@Override
-//	public void setEventsManager(EventsManager eventsManager) {
-//		this.eventsManager = eventsManager;
-//	}
-	
 
 }
