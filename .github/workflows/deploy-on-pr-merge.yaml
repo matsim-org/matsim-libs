@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Cache local Maven repository
         uses: actions/cache@v2
