@@ -79,7 +79,7 @@ jobs:
               - '!contribs/**'
 
       - name: Cache local Maven repository
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
         with:
           path: ~/.m2/repository
