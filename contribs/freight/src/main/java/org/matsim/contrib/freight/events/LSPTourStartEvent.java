@@ -24,32 +24,37 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.api.internal.HasVehicleId;
+import org.matsim.vehicles.Vehicle;
 
-public final class LSPTourStartEvent extends Event{
+import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
-	public static final String EVENT_TYPE = "LspFreightTourStarted";
-	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE;
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_CARRIER = "carrier";
-	public static final String ATTRIBUTE_DRIVER = "driver";
-	public static final String ATTRIBUTE_TOUR = "tour";	
-	
+public final class LSPTourStartEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId {
+
+	public static final String EVENT_TYPE = "LspFreightTourStarts";
+
+	private final Id<Link> linkId;
 	private final Id<Carrier> carrierId;
-	private final Id<Person> driverId;
+	private final Id<Person> personId;
 	private final Tour tour;
-	private final CarrierVehicle vehicle;
-	
-	public LSPTourStartEvent(Id<Carrier>  carrierId, Id<Person> driverId, Tour tour, double time, CarrierVehicle vehicle) {
-		super(time);
+	private final Id<Vehicle> vehicleId;
+
+	//TODO: Public constructor or usage via creator? kmt' jun'22
+	public LSPTourStartEvent(ActivityEndEvent event, Id<Carrier>  carrierId, Id<Vehicle> vehicleId, Tour tour) {
+		super(event.getTime());
+		this.linkId = event.getLinkId();
 		this.carrierId = carrierId;
-		this.driverId = driverId;
-		this.tour = tour;
-		this.vehicle = vehicle;
+		this.personId = event.getPersonId();
+		this.tour = tour; 		//TODO: Wo we need the "Tour"-Object here? kmt, jun'22
+		this.vehicleId = vehicleId;
 	}
 
 	@Override
@@ -61,25 +66,30 @@ public final class LSPTourStartEvent extends Event{
 		return carrierId;
 	}
 
-	public Id<Person> getDriverId() {
-		return driverId;
-	}
-
 	public Tour getTour() {
 		return tour;
 	}
 
-	public CarrierVehicle getVehicle() {
-		return vehicle;
+	@Override
+	public Id<Link> getLinkId() {
+		return this.linkId;
 	}
-	
+
+	@Override
+	public Id<Person> getPersonId() {
+		return this.personId;
+	}
+
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicle.getId().toString() );
-		attr.put(ATTRIBUTE_LINK, this.tour.getStartLinkId().toString());
+		// person, link, vehicle done by superclass
 		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
-		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());
 		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
 		return attr;
 	}

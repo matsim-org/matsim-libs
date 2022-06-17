@@ -47,7 +47,7 @@ public final class Vehicle2CarrierEventHandler implements LSPTourStartEventHandl
 
 	@Override
 	public void handleEvent(LSPTourStartEvent event) {
-		carrierVehicles.put(event.getVehicle().getId(), event.getCarrierId());
+		carrierVehicles.put(event.getVehicleId(), event.getCarrierId());
 	}
 
 	@Override

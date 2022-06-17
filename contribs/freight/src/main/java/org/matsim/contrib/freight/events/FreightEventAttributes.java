@@ -24,7 +24,10 @@ package org.matsim.contrib.freight.events;
 public class FreightEventAttributes {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
-	public static final String ATTRIBUTE_DRIVER = "driver";
+	public static final String ATTRIBUTE_DRIVER = "person";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 	public static final String ATTRIBUTE_SERVICE = "service";
+	public static final String ATTRIBUTE_SHIPMENT = "shipment";
+	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_TOUR = "tour";
 }

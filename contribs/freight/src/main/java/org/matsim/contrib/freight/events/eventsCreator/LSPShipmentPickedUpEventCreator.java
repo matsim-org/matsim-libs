@@ -36,7 +36,7 @@ import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-			Id<Person> driverId, int activityCounter) {
+			Id<Person> driverId) {
 		if(event instanceof ActivityEndEvent) {
 			if(event.getEventType().equals(FreightConstants.PICKUP)) {
 				Pickup pickup = (Pickup) activity;
