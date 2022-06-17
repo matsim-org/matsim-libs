@@ -64,7 +64,7 @@ public final class RunDiscreteModeChoiceExample{
 			dmcConfig.setTourConstraints( CollectionUtils.stringArrayToSet( new String[]{ConstraintModule.VEHICLE_CONTINUITY, ConstraintModule.SUBTOUR_MODE} ) );
 			// (yyyy I don't know what this does.  kai, jun'21)
 
-			dmcConfig.setTourEstimator( EstimatorModule.UNIFORM );
+			dmcConfig.setTourEstimator( EstimatorModule.MATSIM_DAY_SCORING );
 			// (yyyy I don't know what this does.  kai, jun'21)
 
 			dmcConfig.setTourFinder( TourFinderModule.PLAN_BASED );
