@@ -44,16 +44,17 @@ public final class LSPTourStartEvent extends Event implements HasPersonId, HasLi
 	private final Id<Link> linkId;
 	private final Id<Carrier> carrierId;
 	private final Id<Person> personId;
-	private final Tour tour;
+//	private final Tour tour;
 	private final Id<Vehicle> vehicleId;
 
 	//TODO: Public constructor or usage via creator? kmt' jun'22
-	public LSPTourStartEvent(ActivityEndEvent event, Id<Carrier>  carrierId, Id<Vehicle> vehicleId, Tour tour) {
+//	public LSPTourStartEvent(ActivityEndEvent event, Id<Carrier>  carrierId, Id<Vehicle> vehicleId, Tour tour) {
+	public LSPTourStartEvent(ActivityEndEvent event, Id<Carrier>  carrierId, Id<Vehicle> vehicleId) {
 		super(event.getTime());
 		this.linkId = event.getLinkId();
 		this.carrierId = carrierId;
 		this.personId = event.getPersonId();
-		this.tour = tour; 		//TODO: Wo we need the "Tour"-Object here? kmt, jun'22
+//		this.tour = tour; 		//TODO: Wo we need the "Tour"-Object here? kmt, jun'22
 		this.vehicleId = vehicleId;
 	}
 
@@ -66,9 +67,9 @@ public final class LSPTourStartEvent extends Event implements HasPersonId, HasLi
 		return carrierId;
 	}
 
-	public Tour getTour() {
-		return tour;
-	}
+//	public Tour getTour() {
+//		return tour;
+//	}
 
 	@Override
 	public Id<Link> getLinkId() {
@@ -90,7 +91,7 @@ public final class LSPTourStartEvent extends Event implements HasPersonId, HasLi
 		Map<String, String> attr = super.getAttributes();
 		// person, link, vehicle done by superclass
 		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
-		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
+//		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
 		return attr;
 	}
 }

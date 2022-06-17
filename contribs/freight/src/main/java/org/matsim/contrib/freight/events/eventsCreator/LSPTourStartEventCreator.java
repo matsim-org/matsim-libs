@@ -38,7 +38,7 @@ import org.matsim.contrib.freight.events.LSPTourStartEvent;
 		if((event instanceof ActivityEndEvent)) {
 			ActivityEndEvent endEvent = (ActivityEndEvent) event;
 			if(endEvent.getActType().equals(FreightConstants.START)) {
-				return new LSPTourStartEvent(endEvent, carrier.getId(), scheduledTour.getVehicle().getId(), scheduledTour.getTour());
+				return new LSPTourStartEvent(endEvent, carrier.getId(), scheduledTour.getVehicle().getId());
 			}	
 		}
 		return null;	
