@@ -8,6 +8,8 @@ import org.matsim.modechoice.TestScenario;
 
 import java.util.Collection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TopNChoicesGeneratorTest extends ScenarioTest {
 
 
@@ -20,9 +22,9 @@ public class TopNChoicesGeneratorTest extends ScenarioTest {
 
 		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
 
-		System.out.println(candidates);
+		assertThat(candidates)
+				.hasSize(10);
 
-		// TODO: car is in every mode
 
 	}
 }

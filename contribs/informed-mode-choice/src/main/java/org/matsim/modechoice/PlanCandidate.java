@@ -49,7 +49,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 
 	@Override
 	public int compareTo(PlanCandidate o) {
-		return Double.compare(utility, o.utility);
+		return Double.compare(o.utility, utility);
 	}
 
 	@Override
@@ -70,8 +70,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	public String toString() {
 		return "PlanCandidate{" +
 				"modes=" + Arrays.toString(modes) +
-				", utility=" + utility +
-				", max=" + max +
+				", utility=" + utility + (utility != max ? "(max=" + max + " )" : "") +
 				'}';
 	}
 }

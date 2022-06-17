@@ -104,6 +104,7 @@ final class ModeChoiceSearch {
 		}
 
 		mapping.clear();
+		inv.clear();
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
+import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -164,7 +166,7 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
 
-		Map<PlanCandidate, PlanCandidate> candidates = new HashMap<>(combinations.size() * config.getK());
+		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectAVLTreeMap<>();
 
 		for (List<PlanModel.Combination> options : combinations) {
 
@@ -233,6 +235,7 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 			}
 
 		}
+
 
 		return candidates.keySet();
 	}
