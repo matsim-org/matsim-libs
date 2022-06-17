@@ -1,19 +1,22 @@
 package org.matsim.modechoice;
 
 import com.google.inject.Inject;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Router responsible for routing all possible modes between trips.
@@ -45,44 +48,57 @@ public final class EstimateRouter {
 
 			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
-			for (TripStructureUtils.Trip oldTrip : trips) {
+			List<Leg>[] legs = new List[trips.size()];
 
-				// TODO: routing mode for new routes
+			int i = 0;
+			for (TripStructureUtils.Trip oldTrip : trips) {
 
 				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
 
-				// Ignored
-				if (!modes.contains(routingMode))
+				// Ignored mode
+				if (!modes.contains(routingMode)) {
+					legs[i++] = null;
 					continue;
+				}
+
+				Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
+				Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
+
+				// don't route if same location
+				if ((from.getLinkId() != null && from.getLinkId() == to.getLinkId()) ||
+						(from.getCoord() != null && from.getCoord().equals(to.getCoord()))) {
+					legs[i++] = null;
+					continue;
+				}
 
 				timeTracker.addActivity(oldTrip.getOriginActivity());
 
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
-						routingMode,
-						FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities),
-						FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities),
+						mode, from, to,
 						timeTracker.getTime().seconds(),
 						plan.getPerson(),
 						oldTrip.getTripAttributes()
 				);
 
-				// TODO: store legs
+				// store and increment
+				List<Leg> ll = newTrip.stream()
+						.filter(el -> el instanceof Leg)
+						.map(el -> (Leg) el)
+						.collect(Collectors.toList());
+
+				// The PT router can return walk only trips that don't actually use pt
+				// this one special case is handled here, it is unclear if similar behaviour might be present in other modes
+				if (mode.equals(TransportMode.pt) && ll.stream().noneMatch(l -> l.getMode().equals(TransportMode.pt))) {
+					legs[i++] = null;
+					continue;
+				}
+
+				legs[i++] = ll;
+
 			}
+
+			model.setLegs(mode, legs);
 		}
-
-		// TODO: input: context, collected mode options, plan
-		// only mode options that allow to use the mode at all
-
-
-		// TODO: output
-		// for each mode: (options is not relevant)
-		// array of the travel times
-
-		// everything may go into the plan model ?
-		// -> alternatives
-
-		// also collect the trips here for re-use
-
 
 		return model;
 	}

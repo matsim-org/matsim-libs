@@ -1,6 +1,7 @@
 package org.matsim.modechoice.estimators;
 
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.modechoice.EstimatorContext;
 import org.matsim.modechoice.ModeAvailability;
 
@@ -13,8 +14,14 @@ public class DefaultLegScoreEstimator implements LegEstimator<ModeAvailability> 
 	@Override
 	public double estimate(EstimatorContext context, String mode, Leg leg, ModeAvailability option) {
 
-		// TODO
+		ModeUtilityParameters params = context.scoring.modeParams.get(mode);
 
-		return 0;
+		double dist = leg.getRoute().getDistance();
+		double tt = leg.getTravelTime().orElse(0);
+
+		return params.constant +
+				params.marginalUtilityOfDistance_m * dist +
+				params.marginalUtilityOfTraveling_s * tt +
+				context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * dist;
 	}
 }

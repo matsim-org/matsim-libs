@@ -4,7 +4,7 @@ import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.modechoice.EstimatorContext;
 import org.matsim.modechoice.ModeAvailability;
 
-public interface FixedCostEstimator<T extends Enum<?>> {
+public interface FixedCostsEstimator<T extends Enum<?>> {
 
 	/**
 	 * The usage utility is added to the total score estimate, if this mode was used at least one tine.
@@ -17,7 +17,7 @@ public interface FixedCostEstimator<T extends Enum<?>> {
 	double fixedUtility(EstimatorContext context, String mode, T option);
 
 
-	static final class DailyConstant implements FixedCostEstimator<ModeAvailability> {
+	final class DailyConstant implements FixedCostsEstimator<ModeAvailability> {
 
 		@Override
 		public double usageUtility(EstimatorContext context, String mode, ModeAvailability option) {

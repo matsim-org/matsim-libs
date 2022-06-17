@@ -6,9 +6,11 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.modechoice.constraints.TripConstraint;
-import org.matsim.modechoice.estimators.FixedCostEstimator;
+import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.PlanBasedLegEstimator;
+import org.matsim.modechoice.estimators.PlanEstimator;
+import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.search.TopNChoicesGenerator;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -22,11 +24,6 @@ import java.util.Set;
  */
 public final class InformedModeChoiceModule extends AbstractModule {
 
-	/**
-	 * Special entry that can match any of the available modes.
-	 */
-	public static final String ANY_MODE = "any_mode";
-
 	private final Builder builder;
 
 	private InformedModeChoiceModule(Builder builder) {
@@ -38,7 +35,9 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		bindAllModes(builder.fixedCosts, new TypeLiteral<>() {
 		});
-		bindAllModes(builder.estimators, new TypeLiteral<>() {
+		bindAllModes(builder.legEstimators, new TypeLiteral<>() {
+		});
+		bindAllModes(builder.tripEstimators, new TypeLiteral<>() {
 		});
 		bindAllModes(builder.planEstimators, new TypeLiteral<>() {
 		});
@@ -47,6 +46,9 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 		});
+
+		bind(EstimateRouter.class).asEagerSingleton();
+		bind(TopNChoicesGenerator.class).asEagerSingleton();
 
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
@@ -59,10 +61,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	 */
 	private <T> void bindAllModes(Map<String, Class<? extends T>> map, TypeLiteral<T> value) {
 
+		// Ensure to bind to internal strings
 		MapBinder<String, T> mapBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 		}, value);
 		for (Map.Entry<String, Class<? extends T>> e : map.entrySet()) {
-			mapBinder.addBinding(e.getKey()).to(e.getValue()).in(Singleton.class);
+			mapBinder.addBinding(e.getKey().intern()).to(e.getValue()).in(Singleton.class);
 		}
 	}
 
@@ -75,9 +78,12 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	 */
 	public static final class Builder {
 
-		private final Map<String, Class<? extends FixedCostEstimator<?>>> fixedCosts = new HashMap<>();
-		private final Map<String, Class<? extends LegEstimator<?>>> estimators = new HashMap<>();
-		private final Map<String, Class<? extends PlanBasedLegEstimator<?>>> planEstimators = new HashMap<>();
+		private final Map<String, Class<? extends FixedCostsEstimator<?>>> fixedCosts = new HashMap<>();
+		private final Map<String, Class<? extends LegEstimator<?>>> legEstimators = new HashMap<>();
+		private final Map<String, Class<? extends TripEstimator<?>>> tripEstimators = new HashMap<>();
+
+		private final Map<String, Class<? extends PlanEstimator<?>>> planEstimators = new HashMap<>();
+
 		private final Map<String, Class<? extends ModeOptions<?>>> options = new HashMap<>();
 
 		private final Set<Class<? extends TripConstraint<?>>> constraints = new LinkedHashSet<>();
@@ -85,7 +91,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a fixed cost to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withFixedCosts(Class<? extends FixedCostEstimator<T>> estimator, String... modes) {
+		public <T extends Enum<?>> Builder withFixedCosts(Class<? extends FixedCostsEstimator<T>> estimator, String... modes) {
 
 			for (String mode : modes) {
 				fixedCosts.put(mode, estimator);
@@ -97,16 +103,36 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a {@link LegEstimator} to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
+		public <T extends Enum<?>> Builder withLegEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
 		                                                 String... modes) {
 
 			for (String mode : modes) {
 
-				if (planEstimators.containsKey(mode))
+				if (tripEstimators.containsKey(mode))
 					throw new IllegalArgumentException(String.format("Mode %s already has a plan estimator. Only one of either can be used", mode));
 
 
-				estimators.put(mode, estimator);
+				legEstimators.put(mode, estimator);
+				options.put(mode, option);
+			}
+
+			return this;
+		}
+
+
+		/**
+		 * Adds a {@link TripEstimator} to one or more modes.
+		 */
+		public <T extends Enum<?>> Builder withTripEstimator(Class<? extends TripEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
+		                                                    String... modes) {
+
+			for (String mode : modes) {
+
+				if (tripEstimators.containsKey(mode))
+					throw new IllegalArgumentException(String.format("Mode %s already has a plan estimator. Only one of either can be used", mode));
+
+
+				tripEstimators.put(mode, estimator);
 				options.put(mode, option);
 			}
 
@@ -114,16 +140,17 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		}
 
 		/**
-		 * Adds a plan based estimator to one or more nodes. Only one of {@link LegEstimator} or {@link PlanBasedLegEstimator} cam be present.
+		 * Adds a plan based estimator to one or more nodes. Only one of {@link LegEstimator} or {@link TripEstimator} cam be present.
 		 */
-		public <T extends Enum<?>> Builder withPlanEstimator(Class<? extends PlanBasedLegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
+		public <T extends Enum<?>> Builder withPlanEstimator(Class<? extends PlanEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
 		                                                     String... modes) {
 
 			for (String mode : modes) {
-				if (estimators.containsKey(mode))
+				if (legEstimators.containsKey(mode))
 					throw new IllegalArgumentException(String.format("Mode %s already has an leg estimator. Only one of either leg or plan-based can be used", mode));
 
 
+				tripEstimators.put(mode, estimator);
 				planEstimators.put(mode, estimator);
 				options.put(mode, option);
 			}
