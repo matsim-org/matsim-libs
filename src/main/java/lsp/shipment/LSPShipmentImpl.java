@@ -37,7 +37,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment {
 
-	private final Id<LSPShipment> id;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
 	private final TimeWindow startTimeWindow;
@@ -51,7 +50,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
-		this.id = builder.id;
+		super( builder.id );
 		this.fromLinkId = builder.fromLinkId;
 		this.toLinkId = builder.toLinkId;
 		this.startTimeWindow = builder.startTimeWindow;
@@ -63,12 +62,6 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		this.log = new ShipmentPlanImpl(this);
 		this.requirements = new ArrayList<>();
 		this.requirements.addAll( builder.requirements );
-	}
-
-
-	@Override
-	public Id<LSPShipment> getId() {
-		return id;
 	}
 
 	@Override

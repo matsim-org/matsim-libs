@@ -39,15 +39,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
-	private final Attributes attributes = new Attributes();
-	private final Id<LSPResource>id;
 	private final Carrier carrier;
-	private final ArrayList<LogisticsSolutionElement> clientElements;
+	private final Collection<LogisticsSolutionElement> clientElements;
 	private final DistributionCarrierScheduler distributionHandler;
 	private final Network network;
 
 	DistributionCarrierResource( UsecaseUtils.DistributionCarrierAdapterBuilder builder ){
-		this.id = builder.id;
+		super( builder.id );
 		Id<Link> locationLinkId = builder.locationLinkId;
 		this.distributionHandler = builder.distributionHandler;
 		this.clientElements = builder.clientElements;
@@ -83,11 +81,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	
 	}
 
-	@Override
-	public Id<LSPResource> getId() {
-		return id;
-	}
-	
 	@Override
 	public Collection<LogisticsSolutionElement> getClientElements() {
 		return clientElements;

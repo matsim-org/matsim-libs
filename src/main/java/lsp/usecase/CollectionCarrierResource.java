@@ -40,14 +40,13 @@ import java.util.List;
 
 /*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
-	private final Id<LSPResource>id;
 	private final Carrier carrier;
 	private final List<LogisticsSolutionElement> clientElements;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
 
 	CollectionCarrierResource( UsecaseUtils.CollectionCarrierAdapterBuilder builder ){
-		this.id = builder.id;
+		super( builder.id );
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
@@ -85,11 +84,6 @@ import java.util.List;
 	@Override
 	public Collection<LogisticsSolutionElement> getClientElements() {
 		return clientElements;
-	}
-
-	@Override
-	public Id<LSPResource> getId() {
-		return id;
 	}
 
 	@Override
