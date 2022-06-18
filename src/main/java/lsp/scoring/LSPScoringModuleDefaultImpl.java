@@ -36,14 +36,10 @@ public class LSPScoringModuleDefaultImpl implements LSPScoringModule{
 		
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		scoreLSPs(event);
-	}
-
-	@Override
-	public void scoreLSPs(ScoringEvent arg0) {
 		LSPs lsps = LSPUtils.getLSPs( scenario );
 		for(LSP lsp : lsps.getLSPs().values()) {
 			lsp.scoreSelectedPlan();
 		}
 	}
+
 }

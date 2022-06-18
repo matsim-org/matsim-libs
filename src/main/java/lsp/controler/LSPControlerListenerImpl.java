@@ -131,7 +131,8 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		scoringModule.scoreLSPs(event);
+		scoringModule.notifyScoring(event);
+		// yyyyyy might make more sense to register the scoring module directly as scoring controler listener
 	}
 
 	@Override
