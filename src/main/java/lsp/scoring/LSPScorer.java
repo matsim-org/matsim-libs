@@ -20,11 +20,12 @@
 
 package lsp.scoring;
 
-import lsp.HasBackpointer;
 import lsp.LSP;
-import lsp.LSPResource;
+import lsp.controler.LSPSimulationTracker;
 
-public interface LSPScorer extends HasBackpointer<LSP> {
-	// yyyy why lsp as argument if there is already a backpointer?  kai, may'22
-	double scoreCurrentPlan(LSP lsp);
+/**
+ * LSPScorer uses the capabilities of {@link LSPSimulationTracker} to come up with a score for the current plan.
+ */
+public interface LSPScorer extends LSPSimulationTracker<LSP> {
+	double computeScoreForCurrentPlan();
 }

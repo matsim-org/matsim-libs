@@ -74,14 +74,6 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>, HasSimulationTrackers<L
 	
 	void replan( ReplanningEvent arg0 );
 
-	
-	/**
-	 * @param scorer
-	 *
-	 * yyyy does it make sense to expose this (implies that scorer can be changed during iterations)?
-	 */
-	void setScorer( LSPScorer scorer );
-
 	/**
 	 * @param replanner
 	 *

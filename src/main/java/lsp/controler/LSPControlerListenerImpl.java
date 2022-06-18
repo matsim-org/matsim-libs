@@ -56,7 +56,7 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 	private final LSPScoringModule scoringModule;
 	private final Collection<LSPEventCreator> creators;
 
-	private List<EventHandler> registeredHandlers = new ArrayList<>();
+	private final List<EventHandler> registeredHandlers = new ArrayList<>();
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
