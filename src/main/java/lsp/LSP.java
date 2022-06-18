@@ -21,11 +21,10 @@
 package lsp;
 
 import java.util.Collection;
-import org.matsim.api.core.v01.Id;
+
 import org.matsim.api.core.v01.population.HasPlansAndId;
 
 import lsp.replanning.LSPReplanner;
-import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.controler.events.ReplanningEvent;
 

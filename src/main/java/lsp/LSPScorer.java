@@ -18,7 +18,7 @@
  *  * ***********************************************************************
  */
 
-package lsp.scoring;
+package lsp;
 
 import lsp.LSP;
 import lsp.controler.LSPSimulationTracker;

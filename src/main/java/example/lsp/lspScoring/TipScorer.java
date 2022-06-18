@@ -22,7 +22,7 @@ package example.lsp.lspScoring;
 
 import lsp.LSP;
 import lsp.controler.LSPSimulationTracker;
-import lsp.scoring.LSPScorer;
+import lsp.LSPScorer;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;

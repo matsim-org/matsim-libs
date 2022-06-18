@@ -22,10 +22,6 @@ package example.lsp.lspScoring;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.ShipmentUtils;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
@@ -151,8 +147,6 @@ public class CollectionLSPScoringTest {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 		config.controler().setFirstIteration(0);

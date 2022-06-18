@@ -22,11 +22,7 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScorer;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
+import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -141,8 +137,6 @@ import java.util.*;
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		} );
 

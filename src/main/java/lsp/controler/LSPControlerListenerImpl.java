@@ -22,9 +22,6 @@ package lsp.controler;
 
 
 import lsp.*;
-import lsp.replanning.LSPReplanningModule;
-import lsp.LSPCarrierResource;
-import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +33,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 
 import javax.inject.Inject;
@@ -52,8 +48,6 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 	private CarrierAgentTracker carrierResourceTracker;
 	private final Carriers carriers;
 	private final Scenario scenario;
-	private final LSPReplanningModule replanningModule;
-	private final LSPScoringModule scoringModule;
 	private final Collection<LSPEventCreator> creators;
 
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
@@ -61,11 +55,9 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
 
-	@Inject LSPControlerListenerImpl( Scenario scenario, LSPReplanningModule replanningModule, LSPScoringModule scoringModule,
+	@Inject LSPControlerListenerImpl( Scenario scenario,
 					  Collection<LSPEventCreator> creators ) {
 		this.scenario = scenario;
-		this.replanningModule = replanningModule;
-		this.scoringModule = scoringModule;
 		this.creators = creators;
 		this.carriers = getCarriers();
 	}
@@ -123,16 +115,23 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 
 	//Hier muss noch die Moeglichkeit reinkommen, dass nicht alle LSPs nach jeder Iteration neu planen, sondern nur ein Teil von denen
-	//Das kann durch ein entsprechendes replanningModule erreicht werden. Hier muss man dann nix aendern
+	//Das kann durch ein entsprechendes replanningModule erreicht werden. Hier muss man dann nix aendern. kmt
+	// das geht jetzt nicht mehr.  kai, jun'22
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		replanningModule.replanLSPs(event);
+		LSPs lsps = LSPUtils.getLSPs( scenario );
+		for(LSP lsp : lsps.getLSPs().values()) {
+			lsp.replan( event );
+		}
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		scoringModule.notifyScoring(event);
-		// yyyyyy might make more sense to register the scoring module directly as scoring controler listener
+		LSPs lsps = LSPUtils.getLSPs( scenario );
+		for(LSP lsp : lsps.getLSPs().values()) {
+			lsp.scoreSelectedPlan();
+		}
+		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
 	}
 
 	@Override

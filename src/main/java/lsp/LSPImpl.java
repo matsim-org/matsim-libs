@@ -24,12 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import lsp.controler.LSPSimulationTracker;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.ReplanningEvent;
 
 import lsp.replanning.LSPReplanner;
-import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
