@@ -1,3 +1,7 @@
+![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=push)
+![code-coverage](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml/badge.svg)
+[![codecov - matsim only](https://codecov.io/gh/matsim-org/matsim-libs/branch/master/graph/badge.svg?token=3p7uJdHdnd)](https://codecov.io/gh/matsim-org/matsim-libs)
+
 ## Overview
 
 MATSim provides a toolbox to run and implement large-scale agent-based
