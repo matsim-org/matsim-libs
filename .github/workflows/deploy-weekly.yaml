@@ -28,11 +28,11 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Set MATSim weekly version
-        run: mvn versions:set --batch-mode -DnewVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/SNAPSHOT//')$(date +"%Yw%U") -DgenerateBackupPoms=false
+        run: mvn versions:set --batch-mode -DnewVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/SNAPSHOT//')$(date +"%Yw%V") -DgenerateBackupPoms=false
 
       # Build and publish are separated so we start deploying only after all jars are built successfully
-      - name: Build jars
-        run: mvn package --batch-mode
+      - name: Build and verify jars
+        run: mvn verify --batch-mode
 
 #      - name: Publish jars to matsim maven repo
 #        # fail at end to deploy as many jars as possible
