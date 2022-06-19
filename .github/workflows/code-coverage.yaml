@@ -1,11 +1,8 @@
 name: weekly-code-coverage
 
 on:
-  push: # TEMP for testing purposes; ultimately it will be weekly (on: schedule)
-    branches:
-      - master
-#  schedule:
-#    - crone: '30 3 * * 0' # Sun 3:30 UTC
+  schedule:
+    - cron: '30 3 * * 0' # Sun 3:30 UTC
 
 jobs:
   code-coverage:
