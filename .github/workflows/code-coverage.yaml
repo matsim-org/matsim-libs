@@ -9,9 +9,7 @@ on:
 
 jobs:
   code-coverage:
-    name: deploy snapshot/PR-labelled version
-    # for PR-labelled deployment -- only if closed by merging
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    name: create and publish coverage report
 
     runs-on: ubuntu-latest
 
