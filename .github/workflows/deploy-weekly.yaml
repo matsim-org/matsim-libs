@@ -1,11 +1,8 @@
 name: deploy-weekly
 
 on:
-  push: # TEMP for testing purposes; ultimately it will be weekly (on: schedule)
-    branches:
-      - master
-#  schedule:
-#    - cron: '30 0 * * 1' # Mon 0:30 UTC
+  schedule:
+    - cron: '30 0 * * 1' # Mon 0:30 UTC
 
 jobs:
   deploy-weekly-build:
@@ -34,12 +31,12 @@ jobs:
       - name: Build and verify jars
         run: mvn verify --batch-mode
 
-#      - name: Publish jars to matsim maven repo
-#        # fail at end to deploy as many jars as possible
-#        run: mvn deploy --batch-mode --fail-at-end -DskipTests -Dmaven.resources.skip=true -Dmaven.install.skip=true
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
+      - name: Publish jars to matsim maven repo
+        # fail at end to deploy as many jars as possible
+        run: mvn deploy --batch-mode --fail-at-end -DskipTests -Dmaven.resources.skip=true -Dmaven.install.skip=true
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
 
     env:
       MAVEN_OPTS: -Xmx2g
