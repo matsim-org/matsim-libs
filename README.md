@@ -1,5 +1,7 @@
-![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=push)
-![code-coverage](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml/badge.svg)
+[![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=push)](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml)
+[![deploy-weekly](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml/badge.svg)](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml)
+[![full-integration](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml/badge.svg)](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml)
+[![weekly-code-coverage](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml/badge.svg)](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml)
 [![codecov - matsim only](https://codecov.io/gh/matsim-org/matsim-libs/branch/master/graph/badge.svg?token=3p7uJdHdnd)](https://codecov.io/gh/matsim-org/matsim-libs)
 
 ## Overview
