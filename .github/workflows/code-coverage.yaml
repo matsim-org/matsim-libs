@@ -1,0 +1,39 @@
+name: weekly-code-coverage
+
+on:
+  push: # TEMP for testing purposes; ultimately it will be weekly (on: schedule)
+    branches:
+      - master
+#  schedule:
+#    - crone: '30 3 * * 0' # Sun 3:30 UTC
+
+jobs:
+  code-coverage:
+    name: deploy snapshot/PR-labelled version
+    # for PR-labelled deployment -- only if closed by merging
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+          cache: 'maven'
+
+      # Run unit and integration tests with jacoco profile
+      - name: Create coverage report
+        run: mvn verify -P jacoco --batch-mode --also-make --projects matsim -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+
+      - name: Push coverage to CodeCov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./matsim/target/site/jacoco/jacoco.xml
+
+    env:
+      MAVEN_OPTS: -Xmx2g
