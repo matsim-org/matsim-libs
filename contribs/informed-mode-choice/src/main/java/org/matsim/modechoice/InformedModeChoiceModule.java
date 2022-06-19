@@ -10,7 +10,7 @@ import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.PlanEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
-import org.matsim.modechoice.search.TopNChoicesGenerator;
+import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -48,7 +48,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		});
 
 		bind(EstimateRouter.class).asEagerSingleton();
-		bind(TopNChoicesGenerator.class).asEagerSingleton();
+		bind(TopKChoicesGenerator.class).asEagerSingleton();
 
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);

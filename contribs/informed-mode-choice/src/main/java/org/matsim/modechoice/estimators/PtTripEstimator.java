@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * <p>
  * Based on the estimator in the discrete_mode_choice module.
  */
-public final class PtTripEstimator implements TripEstimator<ModeAvailability> {
+public class PtTripEstimator implements TripEstimator<ModeAvailability> {
 
 	private static final Logger log = LogManager.getLogger(PtTripEstimator.class);
 
@@ -69,14 +69,8 @@ public final class PtTripEstimator implements TripEstimator<ModeAvailability> {
 				totalWaitingTime += estimateWaitingTime(leg.getDepartureTime().seconds(), route);
 				numberOfVehicularLegs++;
 
-				double dist = leg.getRoute().getDistance();
-				double tt = leg.getTravelTime().orElse(0);
-
 				// Default leg scoring
-				estimate += params.constant +
-						params.marginalUtilityOfDistance_m * dist +
-						params.marginalUtilityOfTraveling_s * tt +
-						context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * dist;
+				estimate += scoreLeg(leg, context, params);
 			}
 
 		}
@@ -91,7 +85,17 @@ public final class PtTripEstimator implements TripEstimator<ModeAvailability> {
 		return MinMaxEstimate.ofMin(estimate);
 	}
 
-	public double estimateWaitingTime(double agentDepartureTime, TransitPassengerRoute route) {
+	protected double scoreLeg(Leg leg, EstimatorContext context, ModeUtilityParameters params) {
+		double dist = leg.getRoute().getDistance();
+		double tt = leg.getTravelTime().orElse(0);
+
+		return params.constant +
+				params.marginalUtilityOfDistance_m * dist +
+				params.marginalUtilityOfTraveling_s * tt +
+				context.scoring.marginalUtilityOfMoney * params.monetaryDistanceCostRate * dist;
+	}
+
+	protected double estimateWaitingTime(double agentDepartureTime, TransitPassengerRoute route) {
 		TransitLine transitLine = transitSchedule.getTransitLines().get(route.getLineId());
 		TransitRoute transitRoute = transitLine.getRoutes().get(route.getRouteId());
 

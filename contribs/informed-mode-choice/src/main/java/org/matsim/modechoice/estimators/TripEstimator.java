@@ -28,7 +28,7 @@ public interface TripEstimator<T extends Enum<?>> {
 
 
 	/**
-	 * Indicate whether an estimate will be uncertain and requires a maximum.
+	 * Indicate whether an estimate will be so uncertain that it requires an additional maximum estimation.
 	 */
 	default boolean providesMaxEstimate(EstimatorContext context, String mode, T option) {
 		return false;

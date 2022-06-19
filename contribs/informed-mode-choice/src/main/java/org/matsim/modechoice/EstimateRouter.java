@@ -54,6 +54,7 @@ public final class EstimateRouter {
 			for (TripStructureUtils.Trip oldTrip : trips) {
 
 				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
+				timeTracker.addActivity(oldTrip.getOriginActivity());
 
 				// Ignored mode
 				if (!modes.contains(routingMode)) {
@@ -70,8 +71,6 @@ public final class EstimateRouter {
 					legs[i++] = null;
 					continue;
 				}
-
-				timeTracker.addActivity(oldTrip.getOriginActivity());
 
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 						mode, from, to,

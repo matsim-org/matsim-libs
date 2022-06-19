@@ -6,7 +6,6 @@ import org.matsim.core.router.TripStructureUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A coarse model of the daily plan containing the trips and legs for using each mode.
@@ -48,13 +47,49 @@ public final class PlanModel {
 	}
 
 	/**
-	 * Return the legs of using a mode for ith trip.
+	 * Return the legs of using a mode for ith trip. This can explicitly be null if a mode can not be used for this trip.
 	 */
 	@Nullable
 	public List<Leg> getLegs(String mode, int i) {
-		return legs.get(mode)[i];
+		List<Leg>[] legs = this.legs.get(mode);
+
+		// Can happen if a leg was not routed at all
+		if (legs == null)
+			return null;
+
+		return legs[i];
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+
+		b.append("PlanModel{").append("trips=").append(trips()).append(", legs={ ");
+
+		// Outputs the number of legs per trip
+		for (Map.Entry<String, List<Leg>[]> e : legs.entrySet()) {
+			b.append(e.getKey()).append("=[");
+
+			int length = e.getValue().length;
+			for (int i = 0; i < length; i++) {
+
+				List<Leg> v = e.getValue()[i];
+				if (v == null)
+					b.append("null");
+				else
+					b.append(v.size());
+
+				if (i != length - 1)
+					b.append(",");
+			}
+
+			b.append("] ");
+		}
+
+		b.append("}}");
+
+		return b.toString();
+	}
 
 	/**
 	 * Combination o mode and availability option.

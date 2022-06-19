@@ -1,4 +1,4 @@
-package org.matsim.modechoice;
+package playground.vsp;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -8,15 +8,17 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.modechoice.InformedModeChoiceModule;
+import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.estimators.DailyConstantFixedCosts;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.PtTripEstimator;
+import playground.vsp.pt.fare.PtTripFareEstimator;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A test scenario based on kelheim example.
@@ -55,23 +57,13 @@ public class TestScenario extends MATSimApplication {
 	}
 
 	@Override
-	protected Config prepareConfig(Config config) {
-
-		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-
-		imc.setModes(Set.of("car", "ride", "bike", "walk", "pt"));
-
-		return config;
-	}
-
-	@Override
 	protected void prepareControler(Controler controler) {
 
 		InformedModeChoiceModule.Builder builder = InformedModeChoiceModule.newBuilder()
 				.withFixedCosts(DailyConstantFixedCosts.class, "car")
-				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "ride", "bike", "walk")
-				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderIfCarAvailable.class, "car")
-				.withTripEstimator(PtTripEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
+				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "bike", "walk")
+				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderYesAndNo.class, "car")
+				.withTripEstimator(PtTripFareEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
 
 		controler.addOverridingModule(builder.build());
 

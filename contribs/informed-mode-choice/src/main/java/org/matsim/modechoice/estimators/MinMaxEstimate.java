@@ -30,10 +30,18 @@ public final class MinMaxEstimate {
 	}
 
 	/**
-	 * Create a new minimum estimate.
+	 * Create a new minimum estimate. This is the default when only one estimate can be provided.
+	 * An estimate should never overestimate the costs, i.e. never underestimate the utility.
 	 */
 	public static MinMaxEstimate ofMin(double min) {
 		return new MinMaxEstimate(min, Double.NaN);
 	}
 
+	@Override
+	public String toString() {
+		return "Estimate{" +
+				"min=" + min +
+				", max=" + max +
+				'}';
+	}
 }

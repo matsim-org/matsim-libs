@@ -70,9 +70,7 @@ public interface ModeOptions<T extends Enum<?>> {
 		@Override
 		public List<ModeAvailability> get(Person person) {
 
-			// TODO: also considers licence
-
-			if (!"never".equals(PersonUtils.getCarAvail(person)))
+			if (PersonUtils.canUseCar(person))
 				return ConsiderYesAndNo.BOTH;
 
 			return AlwaysAvailable.NO;

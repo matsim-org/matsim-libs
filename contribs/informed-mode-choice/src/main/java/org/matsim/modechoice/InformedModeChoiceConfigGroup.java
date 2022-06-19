@@ -2,14 +2,8 @@ package org.matsim.modechoice;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
-import it.unimi.dsi.fastutil.objects.Object2ByteArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2ByteMap;
-import it.unimi.dsi.fastutil.objects.Object2ByteMaps;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.ChangeModeConfigGroup;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +17,8 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private static final String NAME = "informedModeChoice";
 
 	public final static String CONFIG_PARAM_MODES = "modes";
-	public final static String CONFIG_PARAM_KTH = "kthBest";
+	public final static String CONFIG_PARAM_TOP_K = "topK";
+	public final static String CONFIG_PARAM_CUTOFF = "cutoff";
 
 	/**
 	 * The setter ensures, that this class always contains internal string representations.
@@ -34,6 +29,15 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 * Use kth best trips.
 	 */
 	private int k = 5;
+
+	/**
+	 * Discard solution worse than certain percent.
+	 */
+	private double cutoff = 0;
+
+	// TODO: some plans have large deviations in score points
+	// this threshold may depend on difference between estimated and executed scores
+	// probably better to remove this option, and determine such factor during iterations
 
 	public InformedModeChoiceConfigGroup() {
 		super(NAME);
@@ -55,14 +59,25 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 				.collect(Collectors.toSet());
 	}
 
-	@StringSetter(CONFIG_PARAM_KTH)
-	public void setK(int k) {
+	@StringSetter(CONFIG_PARAM_TOP_K)
+	public void setTopK(int k) {
 		this.k = k;
 	}
 
-	@StringGetter(CONFIG_PARAM_KTH)
-	public int getK() {
+	@StringGetter(CONFIG_PARAM_TOP_K)
+	public int getTopK() {
 		return k;
+	}
+
+
+	@StringSetter(CONFIG_PARAM_CUTOFF)
+	public void setCutoff(double cutoff) {
+		this.cutoff = cutoff;
+	}
+
+	@StringGetter(CONFIG_PARAM_CUTOFF)
+	public double getCutoff() {
+		return cutoff;
 	}
 
 	public Set<String> getModes() {
@@ -73,7 +88,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
-		comments.put(CONFIG_PARAM_KTH, "Defines how many kth best trips should be generated.");
+		comments.put(CONFIG_PARAM_TOP_K, "Defines how many top k best trips of each category should be generated.");
 
 		return comments;
 	}

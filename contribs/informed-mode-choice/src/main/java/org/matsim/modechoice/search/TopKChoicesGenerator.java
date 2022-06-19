@@ -2,8 +2,9 @@ package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
-import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -20,19 +21,24 @@ import java.util.function.Predicate;
 /**
  * Generate top n choices for each possible mode option.
  */
-public final class TopNChoicesGenerator implements CandidateGenerator {
+public final class TopKChoicesGenerator implements CandidateGenerator {
 
-	@Inject
-	private InformedModeChoiceConfigGroup config;
+
+	/**
+	 * Maximum number of iterations. Memory usage will increase with more and more.
+	 */
+	private static final int MAX_ITER = 10_000_000;
+
+	private static final Logger log = LogManager.getLogger(TopKChoicesGenerator.class);
+
+	private final InformedModeChoiceConfigGroup config;
+	private final Map<String, ModeOptions<?>> options;
 
 	@Inject
 	private Map<String, LegEstimator<?>> legEstimators;
 
 	@Inject
 	private Map<String, TripEstimator<?>> tripEstimator;
-
-	@Inject
-	private Map<String, ModeOptions<?>> options;
 
 	@Inject
 	private Map<String, FixedCostsEstimator<?>> fixedCosts;
@@ -46,9 +52,18 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 	@Inject
 	private Set<TripConstraint<?>> constraints;
 
-	public TopNChoicesGenerator() {
-	}
+	@Inject
+	public TopKChoicesGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
 
+		this.config = config;
+		this.options = options;
+
+		for (String mode : config.getModes()) {
+
+			if (!options.containsKey(mode))
+				throw new IllegalArgumentException(String.format("No estimators configured for mode %s", mode));
+		}
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -63,6 +78,7 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 		for (String mode : config.getModes()) {
 
 			ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode);
+
 			List<Enum<?>> modeOptions = t.get(plan.getPerson());
 			if (modeOptions.stream().anyMatch(t::allowUsage))
 				usableModes.add(mode);
@@ -85,13 +101,12 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 
 		Map<PlanModel.Combination, double[]> estimates = calculateEstimates(context, planModel, options);
 
-
 		List<ConstraintHolder<?>> constraints = new ArrayList<>();
 
 		for (TripConstraint<?> c : this.constraints) {
 			constraints.add(new ConstraintHolder<>(
 					(TripConstraint<Object>) c,
-					c.getContext(context, plan)
+					c.getContext(context, planModel, plan)
 			));
 		}
 
@@ -187,14 +202,21 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 			String[] result = new String[planModel.trips()];
 
 			// store which modes have been used for one solution
-			HashSet<String> usedModes = new HashSet<>();
+			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
 
 			int k = 0;
+			int n = 0;
 			DoubleIterator it = search.iter(result);
+			double best = Double.NEGATIVE_INFINITY;
 
 			outer:
-			while (it.hasNext() && k < config.getK()) {
+			while (it.hasNext() && k < config.getTopK()) {
 				double estimate = it.nextDouble();
+
+				if (n++ > MAX_ITER) {
+					log.warn("Maximum number of iterations reached for {}", context.person.getId());
+					break;
+				}
 
 				for (ConstraintHolder<?> c : constraints) {
 					if (!c.test(result))
@@ -221,11 +243,19 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 
 				usedModes.clear();
 
-				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
+				// the cutoff won't work until estimates are below 0
+				// normally an agent should not have a negative costs for travelling
+				if (estimate < 0 && estimate > best)
+					best = estimate;
 
+				// estimate and best are negative at this point
+				if (estimate < 0 && config.getCutoff() > 0 && estimate < best * (1 + config.getCutoff()))
+					break;
+
+				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 				PlanCandidate existing;
 
-				// update min max utility for exiting candidates
+				// update min max utility for existing candidates
 				if ((existing = candidates.get(c)) != null) {
 					existing.updateUtility(estimate);
 				} else
@@ -253,7 +283,7 @@ public final class TopNChoicesGenerator implements CandidateGenerator {
 
 		@Override
 		public boolean test(String[] modes) {
-			return constraint.filter(context, modes);
+			return constraint.isValid(context, modes);
 		}
 	}
 
