@@ -35,9 +35,10 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	/**
 	 * Updates the minimum and maximum estimates accordingly.
 	 */
-	public void updateUtility(double utility) {
+	public PlanCandidate updateUtility(double utility) {
 		this.utility = Math.min(this.utility, utility);
 		this.max = Math.max(this.max, utility);
+		return this;
 	}
 
 	/**
@@ -77,6 +78,8 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 			// modes could be not specified
 			if (mode == null)
 				continue;
+
+			// TODO: check if staging activities are correct
 
 			for (Leg leg : trip.getLegsOnly()) {
 

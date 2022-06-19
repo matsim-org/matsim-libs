@@ -83,8 +83,13 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		Controler controler = MATSimApplication.prepare(scenario, config);
 
+		// THis is currently needed because vehicle id mapping needs to be initialized
+		controler.run();
+
 		Injector injector = controler.getInjector();
 		injector.injectMembers(this);
+
+		log.info("Estimating choice set...");
 
 		ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), config.global().getNumberOfThreads(), this);
 
@@ -115,7 +120,6 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 				plan = person.createCopyOfSelectedPlanAndMakeSelected();
 
 			c.applyTo(plan);
-
 			plan = null;
 		}
 	}

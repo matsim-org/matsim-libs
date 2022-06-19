@@ -17,6 +17,7 @@ import org.matsim.modechoice.estimators.TripEstimator;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Generate top n choices for each possible mode option.
@@ -181,7 +182,7 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
 
-		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectAVLTreeMap<>();
+		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectOpenHashMap<>();
 
 		for (List<PlanModel.Combination> options : combinations) {
 
@@ -266,8 +267,7 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 
 		}
 
-
-		return candidates.keySet();
+		return candidates.keySet().stream().sorted().collect(Collectors.toUnmodifiableList());
 	}
 
 	private static final class ConstraintHolder<T> implements Predicate<String[]> {
