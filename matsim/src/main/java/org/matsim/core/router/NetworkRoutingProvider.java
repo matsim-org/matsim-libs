@@ -131,10 +131,14 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 		if ( !plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			/* 
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
-			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass an
-			 * accessEgressToNetworkRouter RoutingModule.
+			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard
+			 * accessEgressToNetworkRouter RoutingModule for walk..
 			 */
+
 			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
+
+			// more precisely: If the transport mode is walk, then code is used that does not need the accessEgressToNetwork router.  kai, jun'22
+
 			if (mode.equals(TransportMode.walk)) {
 				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation, multimodalLinkChooser);
 			} else {
