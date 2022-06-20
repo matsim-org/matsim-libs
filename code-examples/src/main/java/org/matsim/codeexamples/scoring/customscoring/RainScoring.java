@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.scoring.example16customscoring;
+package org.matsim.codeexamples.scoring.customscoring;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.scoring.SumScoringFunction;

@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.scoring.example16customscoring;
+package org.matsim.codeexamples.scoring.customscoring;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -26,12 +25,11 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 
-public class RunCustomScoringExample {
+class RunCustomScoringExample {
 	static final String DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE = "DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE";
 
 
@@ -66,8 +64,13 @@ public class RunCustomScoringExample {
 	}
 
 	public static void main(String[] args) {
-		String configFile = "scenarios/equil/example5-config.xml" ;
-		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		final Scenario scenario;
+		if ( args==null || args.length==0 || args[0]==null ){
+			String configFile = "scenarios/equil/example5-config.xml";
+			scenario = ScenarioUtils.loadScenario( ConfigUtils.loadConfig( configFile ) );
+		} else {
+			scenario = ScenarioUtils.loadScenario( ConfigUtils.loadConfig( args ) );
+		}
 
 		// Every second person gets a special property which influences their score.
 		// ObjectAttributes can be written to and read from files, so in reality,

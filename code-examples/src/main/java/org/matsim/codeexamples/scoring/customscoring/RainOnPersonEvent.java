@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.scoring.example16customscoring;
+package org.matsim.codeexamples.scoring.customscoring;
 
 import java.util.Map;
 
@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
-public class RainOnPersonEvent extends Event implements HasPersonId {
+class RainOnPersonEvent extends Event implements HasPersonId {
 
 	private Id<Person> personId;
 
