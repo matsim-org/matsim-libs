@@ -45,7 +45,7 @@ public final class VehicleType implements Attributable{
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
-	private Id<VehicleType> id;
+	private final Id<VehicleType> id;
 	private final Attributes attributes = new Attributes();
 
 	VehicleType( Id<VehicleType> typeId ) {

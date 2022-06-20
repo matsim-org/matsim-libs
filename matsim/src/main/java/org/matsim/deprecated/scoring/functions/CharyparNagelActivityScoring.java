@@ -112,7 +112,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.activityParams.get(act.getType() );
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
 					"(module name=\"planCalcScore\" in the config file).");
@@ -251,7 +251,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	protected OptionalTime[] getOpeningInterval(final Activity act) {
 
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		ActivityUtilityParameters actParams = this.params.activityParams.get(act.getType() );
 		if (actParams == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
 					"(module name=\"planCalcScore\" in the config file).");
