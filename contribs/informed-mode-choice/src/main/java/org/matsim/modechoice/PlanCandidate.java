@@ -48,6 +48,10 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		return utility;
 	}
 
+	public double getMaxUtility() {
+		return max;
+	}
+
 	/**
 	 * Get mode for trip i.
 	 */

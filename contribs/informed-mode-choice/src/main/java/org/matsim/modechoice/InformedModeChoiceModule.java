@@ -10,6 +10,7 @@ import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.PlanEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.replanning.BestChoiceStrategyProvider;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.util.HashMap;
@@ -23,6 +24,10 @@ import java.util.Set;
  * @see Builder
  */
 public final class InformedModeChoiceModule extends AbstractModule {
+
+	public static String BEST_CHOICE_STRATEGY = "BestChoice";
+
+	public static String BEST_K_SELECTION_STRATEGY = "BestKSelection";
 
 	private final Builder builder;
 
@@ -53,8 +58,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
 		}
-	}
 
+		addPlanStrategyBinding(BEST_CHOICE_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
+		addPlanStrategyBinding(BEST_K_SELECTION_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
+
+	}
 
 	/**
 	 * Binds all entries in map to their modes.
