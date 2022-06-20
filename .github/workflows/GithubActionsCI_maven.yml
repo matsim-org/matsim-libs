@@ -7,6 +7,7 @@ on:
   push:
     branches-ignore:
       - 'master' # no need to run after merging to master
+      - 'main' # no need to run after merging to main; main is the "new" master
     pull_request:
 
 jobs:
