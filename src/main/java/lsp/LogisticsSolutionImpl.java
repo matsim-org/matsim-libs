@@ -30,24 +30,17 @@ import java.util.Collection;
 /* package-private */ class LogisticsSolutionImpl extends LSPDataObject<LogisticsSolution> implements LogisticsSolution {
 	private static final Logger log = Logger.getLogger( LogisticsSolutionImpl.class );
 
-	private final Id<LogisticsSolution> id;
 	private LSP lsp;
 	private final Collection<LogisticsSolutionElement> solutionElements;
 	private final Collection<LSPShipment> shipments;
 
 	LogisticsSolutionImpl( LSPUtils.LogisticsSolutionBuilder builder ){
-		this.id = builder.id;
+		super( builder.id );
 		this.solutionElements = builder.elements;
 		for(LogisticsSolutionElement element : this.solutionElements) {
 			element.setEmbeddingContainer(this );
 		}
 		this.shipments = new ArrayList<>();
-	}
-	
-	
-	@Override
-	public Id<LogisticsSolution> getId() {
-		return id;
 	}
 
 	@Override

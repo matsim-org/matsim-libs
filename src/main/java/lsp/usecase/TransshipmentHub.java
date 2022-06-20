@@ -50,13 +50,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 /*package-private*/ class TransshipmentHub extends LSPDataObject<LSPResource> implements LSPResource {
 
-	private final Id<LSPResource> id;
 	private final Id<Link> locationLinkId;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
 
 	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder){
-		this.id = builder.getId();
+		super( builder.getId() );
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
 		transshipmentHubScheduler.setTranshipmentHub(this);
@@ -79,11 +78,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public Collection<LogisticsSolutionElement> getClientElements() {
 		return clientElements;
-	}
-
-	@Override
-	public Id<LSPResource> getId() {
-		return id;
 	}
 
 	@Override

@@ -32,7 +32,6 @@ import java.util.Collections;
 
 /* package-private */ class LogisticsSolutionElementImpl extends LSPDataObject<LogisticsSolutionElement> implements LogisticsSolutionElement {
 
-	private final Id<LogisticsSolutionElement>id;
 	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
 	private LogisticsSolutionElement nextElement;
@@ -42,17 +41,13 @@ import java.util.Collections;
 	private LogisticsSolution solution;
 
 	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
-		this.id = builder.id;
+		super( builder.id );
 		this.resource = builder.resource;
 		this.incomingShipments = builder.incomingShipments;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
 	}
 	
-	@Override public Id<LogisticsSolutionElement> getId() {
-		return id;
-	}
-
 	@Override
 	public void connectWithNextElement(LogisticsSolutionElement element) {
 		this.nextElement = element;

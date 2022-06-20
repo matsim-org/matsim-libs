@@ -38,7 +38,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger( LSPImpl.class );
 
-	private final Id<LSP> id;
 	private final Collection<LSPShipment> shipments;
 	private final ArrayList<LSPPlan> plans;
 	private final SolutionScheduler solutionScheduler;
@@ -49,9 +48,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){
+		super( builder.id );
 		this.shipments = new ArrayList<>();
 		this.plans= new ArrayList<>();
-		this.id = builder.id;
 		this.solutionScheduler = builder.solutionScheduler;
 		this.solutionScheduler.setEmbeddingContainer(this );
 		this.selectedPlan=builder.initialPlan;
@@ -68,13 +67,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}	
 	}
 	
-	
-	@Override
-	public Id<LSP> getId() {
-		return id;
-	}
-
-
 	@Override
 	public void scheduleSolutions() {
 		solutionScheduler.scheduleSolutions();

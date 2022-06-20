@@ -39,7 +39,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 
-	private final Id<LSPResource>id;
 	private final Carrier carrier;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
@@ -48,7 +47,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final Network network;
 
 	MainRunCarrierResource( UsecaseUtils.MainRunCarrierAdapterBuilder builder ){
-			this.id = builder.getId();
+			super( builder.getId() );
 			this.carrier = builder.getCarrier();
 			this.fromLinkId = builder.getFromLinkId();
 			this.toLinkId = builder.getToLinkId();
@@ -57,12 +56,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			this.network = builder.getNetwork();
 		}
 	
-	
-	@Override
-	public Id<LSPResource> getId() {
-		return id;
-	}
-
 	@Override
 	public Id<Link> getStartLinkId() {
 		return fromLinkId;
