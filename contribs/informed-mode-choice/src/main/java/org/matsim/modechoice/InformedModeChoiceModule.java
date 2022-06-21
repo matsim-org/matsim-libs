@@ -62,6 +62,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		addPlanStrategyBinding(BEST_CHOICE_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
 		addPlanStrategyBinding(BEST_K_SELECTION_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
 
+		// TODO: SubTour best choice + best k selection
+		
+		// TODO: allow generators to only work on subset of plans
+
+
 	}
 
 	/**
