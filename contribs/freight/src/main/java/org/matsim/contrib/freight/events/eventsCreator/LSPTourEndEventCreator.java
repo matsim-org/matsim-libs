@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.events.LSPTourEndEvent;
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-			Id<Person> driverId) {
+							 Id<Person> driverId, int activityCounter) {
 		if(event instanceof ActivityStartEvent) {
 			ActivityStartEvent startEvent = (ActivityStartEvent) event;
 			if(startEvent.getActType().equals(FreightConstants.END)) {

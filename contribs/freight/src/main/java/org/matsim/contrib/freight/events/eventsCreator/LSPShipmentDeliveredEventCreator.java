@@ -36,7 +36,7 @@ import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-			Id<Person> driverId) {
+							 Id<Person> driverId, int activityCounter) {
 		if(event instanceof ActivityEndEvent) {
 			if(event.getEventType().equals(FreightConstants.DELIVERY)) {
 				Delivery delivery = (Delivery) activity;

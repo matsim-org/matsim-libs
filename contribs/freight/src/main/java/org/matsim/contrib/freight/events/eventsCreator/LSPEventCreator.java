@@ -30,6 +30,9 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 
 public interface LSPEventCreator {
 
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId);
-	
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter);
+	// activityCounter is currently needed to get the correct "service" or "pickup" / "delivery" activity out auf the scheduled plan.
+	// It is well integrated in the {@link CarrierEventTracker}.
+	// Maybe it can be replaced by the correct freight-activity here --> move the getTourElement ... up
+	// kmt, Jun22
 }
