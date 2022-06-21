@@ -83,9 +83,4 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	public ArrayRoutingNetworkLink createRoutingNetworkLink(final Link link, final RoutingNetworkNode fromNode, final RoutingNetworkNode toNode) {
 		return new ArrayRoutingNetworkLink(link, fromNode, toNode, this.linkArrayIndexCounter++);
 	}
-
-	@Override
-	public void setLinkFactory(final LinkFactory factory) {
-		throw new RuntimeException("not implemented");
-	}
 }

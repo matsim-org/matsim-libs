@@ -21,14 +21,17 @@ package org.matsim.contrib.etaxi.util;
 
 import static org.matsim.contrib.util.stats.DurationStats.stateDurationByTimeBinAndState;
 
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.etaxi.util.ETaxiStats.ETaxiState;
-import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector.ChargingSequence;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
 import org.matsim.contrib.util.stats.DurationStats;
 import org.matsim.contrib.util.stats.DurationStats.State;
@@ -43,13 +46,19 @@ public class ETaxiStatsCalculator {
 	private final SortedMap<Integer, ETaxiStats> hourlyEStats = new TreeMap<>();
 	private final ETaxiStats dailyEStats = new ETaxiStats(TaxiStatsCalculator.DAILY_STATS_ID);
 
-	public ETaxiStatsCalculator(Iterable<? extends DvrpVehicle> vehicles) {
-		for (DvrpVehicle vehicle : vehicles) {
-			stateDurationByTimeBinAndState(getStateSampleStream(vehicle, 3600), 3600).forEach(
+	public ETaxiStatsCalculator(List<ChargingSequence> chargingSequences, FleetSpecification fleetSpecification) {
+		for (ChargingSequence sequence : chargingSequences) {
+			//only calculate stats for EVs belonging to a given mode/fleet
+			var vehicleId = Id.create(sequence.getChargingStart().getVehicleId(), DvrpVehicle.class);
+			if (!fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {
+				continue;
+			}
+
+			stateDurationByTimeBinAndState(getStateSampleStream(sequence, 3600), 3600).forEach(
 					(hour, stateDurations) -> updateStateDurations(getHourlyStats(hour), stateDurations));
 
 			Map<ETaxiState, Double> dailyStateDuration = DurationStats.stateDurationByTimeBinAndState(
-					getStateSampleStream(vehicle, Integer.MAX_VALUE), Integer.MAX_VALUE)
+							getStateSampleStream(sequence, Integer.MAX_VALUE), Integer.MAX_VALUE)
 					.entrySet()
 					.iterator()
 					.next()
@@ -66,14 +75,17 @@ public class ETaxiStatsCalculator {
 		return dailyEStats;
 	}
 
-	private Stream<TimeBinSample<State<ETaxiState>>> getStateSampleStream(DvrpVehicle vehicle, int binSize) {
-		return StreamEx.of(vehicle.getSchedule().tasks()).select(ChargingTask.class).flatMap(t -> {
-			int arrivalTime = (int)t.getBeginTime();
-			int chargingStartTime = (int)t.getChargingStartedTime();
-			int chargingEndTime = (int)t.getEndTime();
-			return Stream.of(new State<>(ETaxiState.QUEUED, arrivalTime, chargingStartTime),
-					new State<>(ETaxiState.PLUGGED, chargingStartTime, chargingEndTime));
-		}).flatMap(eTaxiStateState -> TimeBinSamples.stateSamples(eTaxiStateState, binSize));
+	private Stream<TimeBinSample<State<ETaxiState>>> getStateSampleStream(ChargingSequence seq, int binSize) {
+		var pluggedState = new State<>(ETaxiState.PLUGGED, seq.getChargingStart().getTime(),
+				seq.getChargingEnd().getTime());
+		var states = StreamEx.of(pluggedState);
+
+		//optionally (only if queueing occurred)
+		seq.getQueuedAtCharger()
+				.map(e -> new State<>(ETaxiState.QUEUED, e.getTime(), pluggedState.beginTime))
+				.ifPresent(states::prepend);
+
+		return states.flatMap(eTaxiStateState -> TimeBinSamples.stateSamples(eTaxiStateState, binSize));
 	}
 
 	private ETaxiStats getHourlyStats(int hour) {

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,12 +46,19 @@ import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author mrieser / senozon
  */
 public class PersonPrepareForSimTest {
 
+	//As the used network was switched from carOnly to multimodal, this test is pointless. Will keep it for now, though -sm march22
+	@Ignore
 	@Test
 	public void testRun_MultimodalNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -83,6 +91,8 @@ public class PersonPrepareForSimTest {
 		Assert.assertEquals(link1id, activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 
+	//As the used network was switched from carOnly to multimodal, this test is pointless. Will keep it for now, though -sm march22
+	@Ignore
 	@Test
 	public void testRun_MultimodalScenario() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -171,7 +181,7 @@ public class PersonPrepareForSimTest {
 	 * them <b>after</b> {@link PrepareForSimImpl} was run (and adapted outdated plans). However, for the time being we do not
 	 * explicitly check for outdated modes and hope that an exception will be thrown during routing of that single leg trip, 
 	 * because no router should be registered for those modes (and wasn't registered before introducing routingMode, besides 
-	 * {@link TransportMode.transit_walk} which was also used for access/egress to pt and transfer between pt and therefore is
+	 * "transit_walk" which was also used for access/egress to pt and transfer between pt and therefore is
 	 * checked explicitly).
 	 */
 	@Test
@@ -420,6 +430,54 @@ public class PersonPrepareForSimTest {
 				Assert.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 		}
+	}
+
+	@Test
+	public void testReplaceExperimentalTransitRoute() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		createAndAddNetwork(sc);
+		Id<Link> startLink = Id.createLinkId("1");
+		Id<Link> endLink = Id.createLinkId("2");
+		TransitStopFacility stopFacility1 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
+				Id.create("stop1", TransitStopFacility.class),
+				sc.getNetwork().getLinks().get(startLink).getToNode().getCoord(),
+				false);
+		stopFacility1.setLinkId(startLink);
+		sc.getTransitSchedule().addStopFacility(stopFacility1);
+		TransitStopFacility stopFacility2 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
+				Id.create("stop2", TransitStopFacility.class),
+				sc.getNetwork().getLinks().get(endLink).getToNode().getCoord(),
+				false);
+		stopFacility2.setLinkId(endLink);
+		sc.getTransitSchedule().addStopFacility(stopFacility2);
+		Population pop = sc.getPopulation();
+		PopulationFactory pf = pop.getFactory();
+		Person person = pf.createPerson(Id.create("2", Person.class));
+		Plan plan = pf.createPlan();
+		Activity activity1 = pf.createActivityFromLinkId("h", startLink);
+		plan.addActivity(activity1);
+		Leg leg = pf.createLeg(TransportMode.pt);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
+		Id<TransitLine> line = Id.create("line", TransitLine.class);
+		Id<TransitRoute> route = Id.create("route", TransitRoute.class);
+		ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
+				stopFacility1, stopFacility2, line, route);
+		leg.setRoute(experimentalTransitRoute);
+		plan.addLeg(leg);
+		Activity activity2 = pf.createActivityFromLinkId("w", endLink);
+		plan.addActivity(activity2);
+		person.addPlan(plan);
+		pop.addPerson(person);
+
+		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
+
+		Assert.assertEquals(DefaultTransitPassengerRoute.ROUTE_TYPE, leg.getRoute().getRouteType());
+		Assert.assertEquals(startLink, leg.getRoute().getStartLinkId());
+		Assert.assertEquals(endLink, leg.getRoute().getEndLinkId());
+		Assert.assertEquals(stopFacility1.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getAccessStopId());
+		Assert.assertEquals(stopFacility2.getId(), ((DefaultTransitPassengerRoute) leg.getRoute()).getEgressStopId());
+		Assert.assertEquals(line, ((DefaultTransitPassengerRoute) leg.getRoute()).getLineId());
+		Assert.assertEquals(route, ((DefaultTransitPassengerRoute) leg.getRoute()).getRouteId());
 	}
 
 	private static class DummyRouter implements PlanAlgorithm {

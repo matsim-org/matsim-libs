@@ -20,14 +20,26 @@
 
 package org.matsim.analysis;
 
+import java.awt.*;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYBarPainter;
+import org.jfree.data.xy.DefaultTableXYDataset;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -44,9 +56,11 @@ import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.charts.StackedBarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
 
 /**
  * Calculates at the end of each iteration mode statistics, based on the main mode identifier of a trip chain.
@@ -80,7 +94,7 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 
 	@Inject
 	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
+							   PlanCalcScoreConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
@@ -107,9 +121,9 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			List<Trip> trips = TripStructureUtils.getTrips(plan) ;
 			for ( Trip trip : trips ) {
 				String mode = this.mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
-				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning" 
+				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning"
 				// mode identification.  Maybe revise.  kai, nov'16
-				
+
 				Double cnt = this.modeCnt.get( mode );
 				if ( cnt==null ) {
 					cnt = 0. ;
@@ -153,7 +167,7 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			for ( String mode : modes ) {
 				modeOut.write("\t" + mode);
 			}
-			modeOut.write("\n"); ;
+			modeOut.write("\n");
 			for (int iter = firstIteration; iter <= event.getIteration(); iter++) {
 				modeOut.write( String.valueOf(iter) ) ;
 				for ( String mode : modes ) {
@@ -185,6 +199,25 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			}
 			chart.addMatsimLogo();
 			chart.saveAsPng(this.modeFileName + ".png", 800, 600);
+
+			/////// EDIT: STACKED_BAR ///////////////////////////////////////////////////////
+			if (event.getIteration() > this.minIteration) {
+				// create chart when data of more than one iteration is available.
+				StackedBarChart chart2 = new StackedBarChart("Mode Statistics", "iteration", "share");
+				for (Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet()) {
+					String mode = entry.getKey();
+					Map<Integer, Double> history = entry.getValue();
+					double[] historyArray = new double[history.size()];
+					int i = 0;
+					for ( Entry<Integer,Double> entryHistory : history.entrySet() ) {
+						historyArray[i] = entryHistory.getValue();
+						i++;
+					}
+					chart2.addSeries(mode, historyArray);
+				}
+				chart2.addMatsimLogo();
+				chart2.saveAsPng(this.modeFileName + "_stackedbar.png", 800, 600);
+			}
 		}
 		modeCnt.clear();
 	}
@@ -193,4 +226,20 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 		return Collections.unmodifiableMap( this.modeHistories ) ;
 	}
 
+	////////////copied methods - to not depend on dvrp ///////////////////////////////////////////////////////
+	private void makeStayTaskSeriesGrey(XYPlot plot) {
+		XYDataset dataset = plot.getDataset(0);
+		for (int i = 0; i < dataset.getSeriesCount(); i++) {
+			plot.getRenderer().setSeriesPaint(i, Color.LIGHT_GRAY);
+			return;
+		}
+	}
+	private static void saveAsPNG(JFreeChart chart, String filename, int width, int height) {
+		try {
+			ChartUtils.writeChartAsPNG(new FileOutputStream(filename + ".png"), chart, width, height);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

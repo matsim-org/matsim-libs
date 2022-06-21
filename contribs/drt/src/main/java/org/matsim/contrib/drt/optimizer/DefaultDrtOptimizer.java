@@ -59,13 +59,14 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final DepotFinder depotFinder;
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
+	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 
 	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
-		   RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
-		   ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
-		   UnplannedRequestInserter requestInserter) {
+			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
+			ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
+			UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -75,6 +76,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
+		this.insertionRetryQueue = insertionRetryQueue;
+
 		rebalancingInterval = drtCfg.getRebalancingParams().map(RebalancingParams::getInterval).orElse(null);
 		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
 				drtCfg.getAdvanceRequestPlanningHorizon());
@@ -84,7 +87,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
 
-		if (!unplannedRequests.getSchedulableRequests().isEmpty()) {
+		if (!unplannedRequests.getSchedulableRequests().isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(
+				e.getSimulationTime())) {
 			for (DvrpVehicle v : fleet.getVehicles().values()) {
 				scheduleTimingUpdater.updateTimings(v);
 			}

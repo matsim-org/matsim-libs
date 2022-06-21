@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.genericUtils.gexf.*;
 import org.matsim.contrib.minibus.genericUtils.gexf.viz.PositionContent;
-import org.matsim.contrib.minibus.operator.Operator;
+import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -37,9 +37,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

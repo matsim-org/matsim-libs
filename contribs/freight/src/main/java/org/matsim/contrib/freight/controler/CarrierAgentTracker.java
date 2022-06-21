@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.controler;
 
 import java.util.ArrayList;
@@ -51,12 +72,11 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
 		this.events = events;
-		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
 	}
 	public CarrierAgentTracker( Carriers carriers, Collection<LSPEventCreator> creators, EventsManager events ) {
-		// yyyy needs to be public with current setup. kai, sep'20
+		// yyyy needs to be public because of LSP. kai, sep'20
 
 		this.carriers = carriers;
 		this.lspEventCreators = creators;
@@ -68,11 +88,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			log.warn( "" );
-			log.warn( "about to create scoring function for carrierId=" + carrier.getId() );
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
-			log.warn( "have now created scoring function for carrierId=" + carrier.getId() );
-			log.warn( "" );
 			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction );
 			carrierAgents.add(carrierAgent);
 		}
@@ -90,6 +106,8 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * @see Plan, CarrierPlan
 	 */
 	public Collection<Plan> createPlans() {
+		// yyyy needs to be public because of LSP. kai, sep'20
+
 		List<Plan> vehicleRoutes = new ArrayList<>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			List<Plan> plansForCarrier = carrierAgent.createFreightDriverPlans();
@@ -102,7 +120,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * Request all carrier agents to score their plans.
 	 * 
 	 */
-	public void scoreSelectedPlans() {
+	void scoreSelectedPlans() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = findCarrierAgent(carrier.getId());
 			agent.scoreSelectedPlan();
@@ -214,8 +232,9 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		carrierAgent.handleEvent(event, driverId );
 	}
 	private CarrierAgent getCarrierAgent(Id<Person> driverId) {
-		if(driverAgentMap.containsKey(driverId)){
-			return driverAgentMap.get(driverId);
+		CarrierAgent carrier = driverAgentMap.get(driverId);
+		if(carrier != null){
+			return carrier;
 		}
 		for(CarrierAgent ca : carrierAgents){
 			if(ca.getDriverIds().contains(driverId)){

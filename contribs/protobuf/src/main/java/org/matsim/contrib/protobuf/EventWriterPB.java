@@ -20,7 +20,7 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
     /**
      * How many events are written per batch.
      */
-    private static int BATCH_SIZE = 1000;
+    private static final  int BATCH_SIZE = 1000;
 
     private final OutputStream out;
 

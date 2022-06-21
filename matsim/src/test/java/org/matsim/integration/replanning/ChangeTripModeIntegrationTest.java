@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -55,10 +54,10 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ExperiencedPlanElementsModule;
-import org.matsim.core.scoring.ExperiencedPlansModule;
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -104,8 +103,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 				install(new ScenarioByInstanceModule(scenario));
 				install(new NewControlerModule());
 				install(new ControlerDefaultCoreListenersModule());
-				install(new ExperiencedPlanElementsModule());
-				install(new ExperiencedPlansModule());
+				install(new StandaloneExperiencedPlansModule());
 				install(new DefaultMobsimModule());
 				install(new EventsManagerModule());
 				install(new StrategyManagerModule());
@@ -113,6 +111,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 				install(new TripRouterModule());
 				install(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());
+				install(new TimeInterpretationModule());
 				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
 				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
 			}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -11,6 +12,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
+import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
+import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
@@ -62,9 +66,12 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	private RouterProvider routerProvider;
 	@Inject
 	private VehicleChoiceAgent vehicleChoiceAgent;
+	@Inject
+	private Scenario scenario;
 
 	@Override
-	public List<PlanElement> reserveAndrouteCarsharingTrip(final Plan plan, String carsharingType, Leg legToBeRouted, Double time) {
+	public List<PlanElement> reserveAndrouteCarsharingTrip(final Plan plan, String carsharingType, Leg legToBeRouted,
+			Double time) {
 		Person person = plan.getPerson();
 		Link startLink = network.getLinks().get(legToBeRouted.getRoute().getStartLinkId());
 		Link destinationLink = network.getLinks().get(legToBeRouted.getRoute().getEndLinkId());
@@ -118,7 +125,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			}
 		} else {
 
-			// === agent does not hold the vehicle, therefore must find a one
+			// === agent does not hold the vehicle, therefore must find one
 			// from the supply side===
 			// === here he chooses the company, type of vehicle and in the end
 			// vehicle ===
@@ -130,9 +137,9 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			// get(((CarsharingRoute)legToBeRouted.getRoute()).getCompany());
 			List<CSVehicle> offeredVehicles = new ArrayList<>();
 			for (CompanyAgent companyAgent : this.carsharingSupplyContainer.getCompanyAgents().values()) {
-
+				double vehicleSearchDistance = getVehicleSearchDistance(carsharingType);
 				CSVehicle offeredVehicle = companyAgent.vehicleRequest(person.getId(), startLink, destinationLink,
-						carsharingType, typeOfVehicle);
+						carsharingType, typeOfVehicle, vehicleSearchDistance);
 
 				if (offeredVehicle != null)
 					offeredVehicles.add(offeredVehicle);
@@ -199,13 +206,30 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		}
 	}
 
+	private double getVehicleSearchDistance(String carsharingType) {
+		switch (carsharingType) {
+		case "oneway":
+			return Double.parseDouble(scenario.getConfig().getModules().get(OneWayCarsharingConfigGroup.GROUP_NAME)
+					.getParams().get("searchDistanceOneWayCarsharing"));
+		case "freefloating":
+			return Double.parseDouble(scenario.getConfig().getModules().get(FreeFloatingConfigGroup.GROUP_NAME)
+					.getParams().get("searchDistanceFreefloating"));
+		case "twoway":
+			return Double.parseDouble(scenario.getConfig().getModules().get(TwoWayCarsharingConfigGroup.GROUP_NAME)
+					.getParams().get("searchDistanceTwoWayCarsharing"));
+		default:
+			throw new RuntimeException("you requested a carsharing type that is not implemented");
+		}
+
+	}
+
 	private double getDurationOfNextActivity(Plan plan, Leg legToBeRouted, double time) {
 
 		int index = plan.getPlanElements().indexOf(legToBeRouted);
 
 		Activity a = (Activity) plan.getPlanElements().get(index + 1);
 
-		//return a.getEndTime() - time > 0.0 ? a.getEndTime() - time : 0.0;
+		// return a.getEndTime() - time > 0.0 ? a.getEndTime() - time : 0.0;
 		return a.getEndTime().isUndefined() ? 0 : a.getEndTime().seconds() - time;
 	}
 

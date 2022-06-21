@@ -50,7 +50,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	private final double probaForChangeSingleTripMode;
 
-	public enum Behavior {fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes}
+	public enum Behavior {fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes, betweenAllAndFewerConstraints}
 
 	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes;
 

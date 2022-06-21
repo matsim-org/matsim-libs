@@ -27,10 +27,13 @@ import java.util.stream.DoubleStream;
 import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -76,6 +79,16 @@ public interface Waypoint {
 		public int getOutgoingOccupancy() {
 			return occupancy;
 		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("task", task)
+					.add("link", link)
+					.add("time", time)
+					.add("occupancy", occupancy)
+					.toString();
+		}
 	}
 
 	class End implements Waypoint {
@@ -116,6 +129,11 @@ public interface Waypoint {
 		@Override
 		public int getOutgoingOccupancy() {
 			throw new UnsupportedOperationException("End is the terminal waypoint");
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("link", link).add("arrivalTime", arrivalTime).toString();
 		}
 	}
 
@@ -169,13 +187,13 @@ public interface Waypoint {
 
 		private double calcLatestArrivalTime() {
 			return getMaxTimeConstraint(
-					task.getDropoffRequests().values().stream().mapToDouble(DrtRequest::getLatestArrivalTime),
+					task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
 					task.getBeginTime());
 		}
 
 		private double calcLatestDepartureTime() {
 			return getMaxTimeConstraint(
-					task.getPickupRequests().values().stream().mapToDouble(DrtRequest::getLatestStartTime),
+					task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
 					task.getEndTime());
 		}
 
@@ -218,6 +236,11 @@ public interface Waypoint {
 		public int getOutgoingOccupancy() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("request", request).toString();
+		}
 	}
 
 	class Dropoff implements Waypoint {
@@ -245,6 +268,11 @@ public interface Waypoint {
 		@Override
 		public int getOutgoingOccupancy() {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("request", request).toString();
 		}
 	}
 }

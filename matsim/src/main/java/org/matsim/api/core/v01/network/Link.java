@@ -119,8 +119,13 @@ public interface Link extends BasicLocation, Attributable, Identifiable<Link> {
 	 */
 	public Set<String> getAllowedModes();
 
-	double getFlowCapacityPerSec();
+	double getCapacityPeriod();
 
-	double getFlowCapacityPerSec(double time);
+	default double getFlowCapacityPerSec() {
+		return getCapacity() / getCapacityPeriod();
+	}
 
+	default double getFlowCapacityPerSec(double time) {
+		return getCapacity(time) / getCapacityPeriod();
+	}
 }

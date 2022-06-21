@@ -1,6 +1,7 @@
 package playground.vsp.congestion;
 
-import org.junit.Assert;
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
@@ -18,10 +19,10 @@ public class DelayInfo {
 			this.freeSpeedLeaveTime = agentInfo.getFreeSpeedLeaveTime() ;
 		}
 		public DelayInfo build() {
-			Assert.assertNotNull( personId );
-			Assert.assertNotNull( linkEnterTime );
-			Assert.assertNotNull( freeSpeedLeaveTime );
-			Assert.assertNotNull( linkLeaveTime );
+			Objects.requireNonNull( personId );
+			Objects.requireNonNull( linkEnterTime );
+			Objects.requireNonNull( freeSpeedLeaveTime );
+			Objects.requireNonNull( linkLeaveTime );
 			return new DelayInfo( personId, linkEnterTime, freeSpeedLeaveTime, linkLeaveTime ) ;
 		}
 		public Builder setPersonId( Id<Person> personId ) {

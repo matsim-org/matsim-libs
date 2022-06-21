@@ -25,4 +25,6 @@ public interface NoiseImmission {
      * @return the correction term in dB(A)
      */
     double calculateCorrection(double projectedDistance, NoiseReceiverPoint nrp, Link candidateLink);
+
+    void setCurrentRp(NoiseReceiverPoint nrp);
 }

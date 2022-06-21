@@ -19,14 +19,15 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import java.net.URL;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,6 +35,7 @@ import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -97,6 +99,11 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 
+	private static final String INITIAL_TRAVEL_TIMES_FILE = "initialTravelTimesFile";
+	private static final String INITIAL_TRAVEL_TIMES_FILE_EXP =
+			"File containing the initial link travel time estimates."
+					+ " Ignored if null";
+
 	// used for building route; empty ==> no filtering (routing network equals scenario.network)
 	@NotNull
 	private ImmutableSet<String> networkModes = ImmutableSet.of(TransportMode.car);
@@ -110,6 +117,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 
 	@PositiveOrZero
 	private double travelTimeEstimationBeta = 0; // [s], 0 ==> only offline TT estimation
+
+	@Nullable
+	private String initialTravelTimesFile = null;
 
 	@Nullable
 	private DvrpTravelTimeMatrixParams travelTimeMatrixParams;
@@ -243,5 +253,27 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 			addParameterSet(new DvrpTravelTimeMatrixParams());
 		}
 		return travelTimeMatrixParams;
+	}
+
+	/**
+	 * @return {@value #INITIAL_TRAVEL_TIMES_FILE_EXP}
+	 */
+	@StringGetter(INITIAL_TRAVEL_TIMES_FILE)
+	@Nullable
+	public String getInitialTravelTimesFile() {
+		return initialTravelTimesFile;
+	}
+
+	/**
+	 * @param initialTravelTimesFile {@value #INITIAL_TRAVEL_TIMES_FILE_EXP}
+	 */
+	@StringSetter(INITIAL_TRAVEL_TIMES_FILE)
+	public void setInitialTravelTimesFile(@Nullable String initialTravelTimesFile) {
+		this.initialTravelTimesFile = initialTravelTimesFile;
+	}
+
+	@Nullable
+	public URL getInitialTravelTimesUrl(URL context) {
+		return initialTravelTimesFile == null ? null : ConfigGroup.getInputFileURL(context, initialTravelTimesFile);
 	}
 }

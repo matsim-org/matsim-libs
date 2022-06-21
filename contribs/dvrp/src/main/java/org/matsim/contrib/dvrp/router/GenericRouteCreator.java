@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -32,6 +33,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.inject.name.Named;
 
@@ -43,7 +45,7 @@ public class GenericRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	private final LeastCostPathCalculator router;
 
 	public GenericRouteCreator(LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Network modalNetwork,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory) {
 		this.travelTime = travelTime;
 		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
@@ -52,7 +54,7 @@ public class GenericRouteCreator implements DefaultMainLegRouter.RouteCreator {
 
 	@Override
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink,
-			RouteFactories routeFactories) {
+			Person person, Attributes tripAttributes, RouteFactories routeFactories) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
 				router, travelTime);
 		double travelTime = unsharedPath.getTravelTime();//includes first & last link

@@ -122,6 +122,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -206,6 +207,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -307,6 +309,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -399,6 +402,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -492,6 +496,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -561,6 +566,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -630,6 +636,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
@@ -754,9 +761,11 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicle(ptVeh1);
 
 		TransitSchedule schedule = f.scenario.getTransitSchedule();
@@ -871,6 +880,7 @@ public class HermesTransitTest {
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
 		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehType1.getCapacity().setSeats(1);
 		ptVehicles.addVehicleType(ptVehType1);
 
 		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);

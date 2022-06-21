@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic {
+public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic implements ChargingWithAssignmentLogic {
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
 
 	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
@@ -41,12 +41,14 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		super(charger, chargingStrategy, eventsManager);
 	}
 
+	@Override
 	public void assignVehicle(ElectricVehicle ev) {
 		if (assignedVehicles.put(ev.getId(), ev) != null) {
 			throw new IllegalArgumentException("Vehicle is already assigned: " + ev.getId());
 		}
 	}
 
+	@Override
 	public void unassignVehicle(ElectricVehicle ev) {
 		if (assignedVehicles.remove(ev.getId()) == null) {
 			throw new IllegalArgumentException("Vehicle was not assigned: " + ev.getId());
@@ -56,6 +58,7 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 	private final Collection<ElectricVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
 			assignedVehicles.values());
 
+	@Override
 	public Collection<ElectricVehicle> getAssignedVehicles() {
 		return unmodifiableAssignedVehicles;
 	}

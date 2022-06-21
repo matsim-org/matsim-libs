@@ -35,9 +35,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class RecursiveLocationMutator extends AbstractLocationMutator{
 
@@ -47,8 +49,9 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 	private double recursionTravelSpeed = 30.0;
 	private int maxRecursions = 10;
 	private TripRouter router;
+	private final TimeInterpretation timeInterpretation;
 
-	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,
+	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, TimeInterpretation timeInterpretation,
 			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(scenario, quad_trees, facilities_of_type, random);
@@ -56,14 +59,16 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		this.maxRecursions = this.getDccg().getMaxRecursions();
 		this.recursionTravelSpeed = this.getDccg().getTravelSpeed_car();
 		this.router = router;
+		this.timeInterpretation = timeInterpretation;
 	}
 
-	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, Random random) {
+	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, TimeInterpretation timeInterpretation, Random random) {
 		super(scenario, random);
 		this.recursionTravelSpeedChange = this.getDccg().getRecursionTravelSpeedChange();
 		this.maxRecursions = this.getDccg().getMaxRecursions();
 		this.recursionTravelSpeed = this.getDccg().getTravelSpeed_car();
 		this.router = router;
+		this.timeInterpretation = timeInterpretation;
 	}
 
 	@Override
@@ -185,7 +190,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 			  FacilitiesUtils.toFacility( fromAct, null ),
 			  FacilitiesUtils.toFacility( toAct, null ),
 				fromAct.getEndTime().seconds(),
-				person );
+				person, new Attributes() );
 
 		if ( trip.size() != 1 ) {
 			throw new IllegalStateException( "This method can only be used with "+
@@ -198,7 +203,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		leg.setTravelTime(tripLeg.getTravelTime().seconds() );
 		leg.setDepartureTime(tripLeg.getDepartureTime().seconds() );
 
-		PopulationUtils.decideOnTravelTimeForLeg( tripLeg );
+		timeInterpretation.decideOnLegTravelTime( tripLeg );
 		return leg.getTravelTime().seconds();
 	}
 

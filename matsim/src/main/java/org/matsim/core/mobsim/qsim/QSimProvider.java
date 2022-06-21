@@ -24,6 +24,7 @@ package org.matsim.core.mobsim.qsim;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -83,12 +84,18 @@ public class QSimProvider implements Provider<QSim> {
 		modules.forEach(m -> m.setIterationNumber(iterationNumber));
 		overridingModules.forEach(m -> m.setIterationNumber(iterationNumber));
 
-		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
-
+		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, Collections.emptyList());
+		
+		for (AbstractQSimModule override : overridingModules) {
+			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
+		}
+		
+		final AbstractQSimModule finalQsimModule = qsimModule;
+		
 		AbstractModule module = new AbstractModule() {
 			@Override
 			protected void configure() {
-				install(qsimModule);
+				install(finalQsimModule);
 				bind(QSim.class).asEagerSingleton();
 				bind(Netsim.class).to(QSim.class);
 			}

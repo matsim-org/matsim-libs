@@ -34,7 +34,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="mobsim" value="queueSimulation" />
-		<param name="snapshotFormat" value="googleearth,transims" /> <!-- googleearth, transims, plansfile -->
+		<param name="snapshotFormat" value="transims" /> <!-- googleearth, transims, plansfile -->
 	</module>
 
 	<module name="plans">

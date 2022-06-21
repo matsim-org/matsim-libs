@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -48,6 +48,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.facilities.FacilitiesUtils;
 
 import com.google.common.base.Preconditions;
@@ -201,32 +202,33 @@ public final class PassengerEngineWithPrebooking
 
 	// ================ PICKUP / DROPOFF
 
+	@Override
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			PassengerRequest request, double now) {
+			Id<Request> requestId, double now) {
 		Id<Link> linkId = driver.getCurrentLinkId();
-		RequestEntry requestEntry = activeRequests.get(request.getId());
+		RequestEntry requestEntry = activeRequests.get(requestId);
 		MobsimPassengerAgent passenger = requestEntry.passenger;
 
 		if (passenger.getCurrentLinkId() != linkId
 				|| passenger.getState() != MobsimAgent.State.LEG
 				|| !passenger.getMode().equals(mode)) {
-			awaitingPickups.put(request.getId(), pickupActivity);
+			awaitingPickups.put(requestId, pickupActivity);
 			return false;// wait for the passenger
 		}
 
-		if (!internalPassengerHandling.tryPickUpPassenger(driver, passenger, request.getId(), now)) {
+		if (!internalPassengerHandling.tryPickUpPassenger(driver, passenger, requestId, now)) {
 			// the passenger has already been picked up and is on another taxi trip
 			// seems there have been at least 2 requests made by this passenger for this location
-			awaitingPickups.put(request.getId(), pickupActivity);
+			awaitingPickups.put(requestId, pickupActivity);
 			return false;// wait for the passenger (optimistically, he/she should appear soon)
 		}
 
 		return true;
 	}
 
-	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		internalPassengerHandling.dropOffPassenger(driver, activeRequests.remove(request.getId()).passenger,
-				request.getId(), now);
+	@Override
+	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
+		internalPassengerHandling.dropOffPassenger(driver, activeRequests.remove(requestId).passenger, requestId, now);
 	}
 
 	// ================ REJECTED/SCHEDULED EVENTS
@@ -288,7 +290,7 @@ public final class PassengerEngineWithPrebooking
 	}
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
-		return new ModalProviders.AbstractProvider<>(mode) {
+		return new ModalProviders.AbstractProvider<>(mode, DvrpModes::mode) {
 			@Inject
 			private EventsManager eventsManager;
 

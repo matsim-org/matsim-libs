@@ -70,6 +70,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -84,6 +85,9 @@ public class AgentNotificationTest {
 
 		@Inject
 		MessageQueue messageQueue;
+		
+		@Inject
+		TimeInterpretation timeInterpretation;
 
 		@Override
 		public MobsimAgent createMobsimAgentFromPerson(Person p) {
@@ -95,7 +99,7 @@ public class AgentNotificationTest {
 			PersonDriverAgentImpl delegate;
 
 			MyAgent(Plan selectedPlan) {
-				delegate = new PersonDriverAgentImpl(selectedPlan, simulation);
+				delegate = new PersonDriverAgentImpl(selectedPlan, simulation, timeInterpretation);
 			}
 
 			@Override

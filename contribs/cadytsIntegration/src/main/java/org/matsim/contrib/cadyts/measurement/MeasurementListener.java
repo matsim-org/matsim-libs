@@ -22,11 +22,11 @@ package org.matsim.contrib.cadyts.measurement;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.analysis.kai.DataMap;
 import org.matsim.contrib.analysis.kai.Databins;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
@@ -161,7 +160,7 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 
 	@Override
 	public double getSimValue(Measurement mea, int startTime_s, int endTime_s, TYPE type) {
-		Assert.assertNotNull( mea ); 
+		Objects.requireNonNull( mea );
 		return this.databins.getValue( mea, this.databins.getIndex( startTime_s ) ) ;
 	}
 

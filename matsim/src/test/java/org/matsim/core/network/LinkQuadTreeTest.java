@@ -145,6 +145,31 @@ public class LinkQuadTreeTest {
 	}
 
 	@Test
+	public void testPut_zeroLengthLink_negativeCoords() {
+		/* Same as test above, but with negative coords
+		 */
+
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		LinkQuadTree qt = new LinkQuadTree(0, 0, -1000, -1000);
+		Link l13 = createLink(s, 0, -1000, -400, -400);
+		Link l23 = createLink(s, -1000, -1000, -400, -400);
+		Link l53 = createLink(s, 0, 0, -400, -400);
+		Link l63 = createLink(s, -1000, 0, -400, -400);
+		Link l43 = createLink(s, -400, -400, -400, -400);
+		Link l34 = createLink(s, -400, -400, -400, -400);
+		qt.put(l13);
+		qt.put(l23);
+		qt.put(l53);
+		qt.put(l63);
+		qt.put(l43);
+		qt.put(l34);
+
+		// mostly check that there is no exception like StackOverflowError
+		Assert.assertEquals(l13, qt.getNearest(-100, -800));
+	}
+
+	@Test
 	public void testRemove() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 

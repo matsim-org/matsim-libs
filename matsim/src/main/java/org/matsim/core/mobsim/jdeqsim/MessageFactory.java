@@ -21,6 +21,8 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
+import org.matsim.core.utils.timing.TimeInterpretation;
+
 /**
  * The message factory is used for creating and disposing messages - mainly for
  * performance gain to have lesser garbage collection.
@@ -73,9 +75,9 @@ public class MessageFactory {
 		}
 	}
 
-	public static EndLegMessage getEndLegMessage(Scheduler scheduler, Vehicle vehicle) {
+	public static EndLegMessage getEndLegMessage(Scheduler scheduler, Vehicle vehicle, TimeInterpretation timeInterpretation) {
 		if (endLegMessageQueue.size() == 0) {
-			return new EndLegMessage(scheduler, vehicle);
+			return new EndLegMessage(scheduler, vehicle, timeInterpretation);
 		} else {
 			EndLegMessage message = endLegMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);

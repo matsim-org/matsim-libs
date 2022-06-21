@@ -47,7 +47,7 @@ import java.util.Map;
 
 public class NetworkSink implements SinkSource {
 
-	private static Logger log = Logger.getLogger(NetworkSink.class);
+	private static final  Logger log = Logger.getLogger(NetworkSink.class);
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private final CoordinateTransformation transform;

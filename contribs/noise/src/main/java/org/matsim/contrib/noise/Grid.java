@@ -111,7 +111,7 @@ final class Grid {
 		}
 		
 		setActivityCoord2NearestReceiverPointId();
-		
+
 		// delete unnecessary information
 		this.consideredActivityCoordsForReceiverPointGrid.clear();
 		this.consideredActivityCoordsForSpatialFunctionality.clear();

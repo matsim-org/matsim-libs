@@ -49,7 +49,7 @@ public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity i
 
 	@Override
 	protected void beforeFirstStep(double now) {
-		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request, now);
+		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity i
 			throw new IllegalArgumentException("I am waiting for a different passenger!");
 		}
 
-		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request, now);
+		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now);
 		if (!passengerAboard) {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}

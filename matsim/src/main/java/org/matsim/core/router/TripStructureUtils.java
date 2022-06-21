@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Helps to work on plans with complex trips.
@@ -203,6 +204,15 @@ public final class TripStructureUtils {
 	 */
 	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements) {
 		return getSubtours(planElements, TripStructureUtils::isStageActivityType );
+	}
+
+	/**
+	 * Returns the top-level tour as {@link Subtour} object even if it is unclosed. This subtour will always
+	 * contain all trips of a plan. Child tours will not be set.
+	 * @see Subtour
+	 */
+	public static Subtour getUnclosedRootSubtour(final Plan plan) {
+		return new Subtour(TripStructureUtils.getTrips(plan), false);
 	}
 
 	// for contrib socnetsim only
@@ -376,12 +386,20 @@ public final class TripStructureUtils {
 		public List<Leg> getLegsOnly() {
 			return legs;
 		}
+		
+		/**
+		 * Attributes of preceding activity are passed as trip attributes until more explicit encoding is found.
+		 */
+		public Attributes getTripAttributes() {
+			return originActivity.getAttributes();
+		}
 
 		@Override
 		public String toString() {
 			return "{Trip: origin="+originActivity+"; "+
 					       "trip="+trip+"; "+
-					       "destination="+destinationActivity+"}";
+					       "destination="+destinationActivity + "; " +
+					       getTripAttributes().toString() + "}";
 		}
 
 		@Override

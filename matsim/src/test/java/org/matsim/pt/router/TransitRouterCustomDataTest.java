@@ -34,7 +34,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -71,7 +73,7 @@ public class TransitRouterCustomDataTest {
 		TransitRouterImpl router = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
 
 		double x = -100;
-		List<Leg> legs = router.calcRoute(new FakeFacility( new Coord(x, (double) 0)), new FakeFacility( new Coord((double) 3100, (double) 0)), 5.9*3600, null);
+		List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility( new Coord(x, (double) 0)), new FakeFacility( new Coord((double) 3100, (double) 0)), 5.9*3600, null));
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
 		
 		/* the following is not really nice as a test, but I had to somehow

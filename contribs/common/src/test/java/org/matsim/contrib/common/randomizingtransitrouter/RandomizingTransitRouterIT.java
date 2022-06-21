@@ -42,6 +42,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -51,7 +52,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class RandomizingTransitRouterIT {
-	private static Logger log = Logger.getLogger( RandomizingTransitRouterIT.class ) ;
+	private static final Logger log = Logger.getLogger( RandomizingTransitRouterIT.class ) ;
 	
 	private static final class MyObserver implements PersonEntersVehicleEventHandler {
 //		private enum ObservedVehicle{ pt_1009_1 /*direct, fast, with wait*/, pt_2009_1 /*direct, slow*/, pt_3009_1 /*with interchange*/} ;
@@ -89,12 +90,15 @@ public class RandomizingTransitRouterIT {
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("population.xml");
 
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.transit().setTransitScheduleFile("transitschedule.xml");
 		config.transit().setVehiclesFile("transitVehicles.xml");
 		config.transit().setUseTransit(true);
 		
 		config.controler().setOutputDirectory( outputDir );
 		config.controler().setLastIteration(20);
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
 		
 		config.global().setNumberOfThreads(1);
 		

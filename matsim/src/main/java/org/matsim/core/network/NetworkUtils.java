@@ -20,15 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,12 +32,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -54,21 +50,39 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = Logger.getLogger(NetworkUtils.class);
+
+	/**
+	 * This will create a time invariant network.
+	 *
+	 * @return Empty time invariant MATSim network
+	 */
+	public static Network createNetwork() {
+		return createNetwork(ConfigUtils.createConfig());
+	}
+
+	/**
+	 * Override for {@link NetworkUtils#createNetwork(NetworkConfigGroup)}
+	 */
 	public static Network createNetwork(Config config) {
 		return createNetwork(config.network());
 	}
 
-
+	/**
+	 * Creates a network based on the properties found in network config group. Either returns a default network or
+	 * a time variable network
+	 *
+	 * @param networkConfigGroup the 'isTimeVariantNetwork' property is read
+	 * @return Empty MATSim network
+	 */
 	public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
-		Network network = new NetworkImpl();
+		LinkFactory linkFactory = new LinkFactoryImpl();
 
 		if (networkConfigGroup.isTimeVariantNetwork()) {
-			network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+			linkFactory = new VariableIntervalTimeVariantLinkFactory();
 		}
 
-		return network;
+		return new NetworkImpl(linkFactory);
 	}
-
 
 	/**
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
@@ -101,7 +115,7 @@ public final class NetworkUtils {
 	 * @return array containing the nodes, sorted ascending by id.
 	 */
 	public static Node[] getSortedNodes(final Network network) {
-		Node[] nodes = network.getNodes().values().toArray(new Node[network.getNodes().size()]);
+		Node[] nodes = network.getNodes().values().toArray(Node[]::new);
 		Arrays.sort(nodes, Comparator.comparing(Identifiable::getId));
 		return nodes;
 	}
@@ -136,7 +150,7 @@ public final class NetworkUtils {
 	 * @return array containing the links, sorted ascending by id.
 	 */
 	public static Link[] getSortedLinks(final Network network) {
-		Link[] links = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
+		Link[] links = network.getLinks().values().toArray(Link[]::new);
 		Arrays.sort(links, Comparator.comparing(Identifiable::getId));
 		return links;
 	}
@@ -416,19 +430,19 @@ public final class NetworkUtils {
         if (nearestRightLink == null) {
             return nearestOverallLink;
         }
-        return nearestRightLink;
-    }
+		return nearestRightLink;
+	}
 
-    /**
-     * Finds the (approx.) nearest link to a given point on the map.
-     * It searches first for the nearest node, and then for the nearest link
-     * originating or ending at that node.
-     *
-     * @param coord
-     *          the coordinate for which the closest link should be found
-     * @return the link found closest to coord
-     * 
-     * @see {@link NetworkUtils#getNearestLinkExactly(Network, Coord)}
+	/**
+	 * Finds the (approx.) nearest link to a given point on the map.
+	 * It searches first for the nearest node, and then for the nearest link
+	 * originating or ending at that node.
+	 *
+	 * @param coord
+	 *          the coordinate for which the closest link should be found
+	 * @return the link found closest to coord
+	 *
+	 * @see NetworkUtils#getNearestLinkExactly(Network, Coord)
      */
     public static Link getNearestLink(Network network, final Coord coord) {
         Link nearestLink = null;
@@ -440,7 +454,7 @@ public final class NetworkUtils {
         }
 
         if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
-            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
+            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?][node = " + nearestNode.getId() + "]" ) ;
         }
 
         // now find nearest link from the nearest node
@@ -614,13 +628,22 @@ public final class NetworkUtils {
 	}
 
 
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link ) {
 		return link.getLength() / link.getFreespeed() ;
 	}
+	/**
+	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
+	 * complicated which eventually got refactored into the current version?  kai, feb'20
+	 */
 	public static double getFreespeedTravelTime( Link link, double time ) {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
 
+	public static final String ALLOWED_SPEED = "allowed_speed";
 	public static final String TYPE="type" ;
 	public static void setType( Link link , String type ) {
 //		if ( link instanceof LinkImpl ) {
@@ -647,7 +670,8 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
 //		}
-		return (String) link.getAttributes().getAttribute(ORIGID);
+		Object o = link.getAttributes().getAttribute(ORIGID);
+		return o == null ? null : o.toString();
 	}
 
 	public static void setOrigId( Link link, String id ) {
@@ -666,12 +690,6 @@ public final class NetworkUtils {
 			double capacity, double lanes) {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
 	}
-
-
-	public static Network createNetwork() {
-		return new NetworkImpl();
-	}
-
 
 	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
 			final double capacity, final double numLanes) {
@@ -765,14 +783,6 @@ public final class NetworkUtils {
 		}
 	}
 
-	@Deprecated // use network.getFactory() instead
-	public static LinkFactoryImpl createLinkFactory() {
-		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
-		// the different factory types need to be visible, or at least configurable, during initialization: User needs to be able to select which factory to
-		// insert into NetworkFactory.  kai, may'17
-		return new LinkFactoryImpl();
-	}
-
 	public static final String ORIGID = "origid";
 	
 	public static void runNetworkCleaner( Network network ) {
@@ -794,10 +804,6 @@ public final class NetworkUtils {
 		return null;
 	}
 
-	public static void readNetwork(Network network, String string) {
-		new MatsimNetworkReader(network).readFile(string);
-	}
-
 	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
 		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
@@ -812,25 +818,51 @@ public final class NetworkUtils {
 		link.getAttributes().putAttribute(attribute,accessTime);
 	}
 
-	public static OptionalTime getLinkEgressTime(Link link, String routingMode){
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+	public static OptionalTime getLinkEgressTime(Link link, String routingMode) {
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
-		if (o!=null){
+		if (o != null) {
 			return OptionalTime.defined((double) o);
-		}
-		else return OptionalTime.undefined();
+		} else return OptionalTime.undefined();
 	}
 
-	public static void setLinkEgressTime(Link link, String routingMode, double egressTime){
-		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
-		link.getAttributes().putAttribute(attribute,egressTime);
+	public static void setLinkEgressTime(Link link, String routingMode, double egressTime) {
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX + routingMode;
+		link.getAttributes().putAttribute(attribute, egressTime);
 	}
 
+	public static Network readNetwork(String filename) {
+		return readNetwork(filename, ConfigUtils.createConfig());
+	}
 
-	public static Network readNetwork(String string) {
-		Network network = createNetwork();
-		new MatsimNetworkReader(network).readFile(string);
+	public static Network readNetwork(String filename, Config config) {
+		return readNetwork(filename, config.network());
+	}
+
+	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup) {
+		Network network = createNetwork(networkConfigGroup);
+		new MatsimNetworkReader(network).readFile(filename);
 		return network;
+	}
+
+	/**
+	 * reads network form file and applies a coordinate transformation.
+	 * @param filename network file name
+	 * @param transformation coordinate transformation as from @{{@link org.matsim.core.utils.geometry.transformations.TransformationFactory#getCoordinateTransformation(String, String)}}
+	 * @return network from file transformed onto target CRS
+	 */
+	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup, CoordinateTransformation transformation) {
+		var network = readNetwork(filename, networkConfigGroup);
+		network.getNodes().values().parallelStream()
+				.forEach(node -> {
+					var transformedCoord = transformation.transform(node.getCoord());
+					node.setCoord(transformedCoord);
+				});
+		return network;
+	}
+
+	public static void readNetwork(Network network, String string) {
+		new MatsimNetworkReader(network).readFile(string);
 	}
 
 	public static boolean compare(Network expected, Network actual) {
@@ -862,14 +894,24 @@ public final class NetworkUtils {
 	}
 
 	public static NetworkCollector getCollector() {
-		return new NetworkCollector();
+		NetworkConfigGroup networkConfigGroup = new NetworkConfigGroup();
+		networkConfigGroup.setTimeVariantNetwork(false);
+		return getCollector(networkConfigGroup);
+	}
+
+	public static NetworkCollector getCollector(Config config) {
+		return getCollector(config.network());
+	}
+
+	public static NetworkCollector getCollector(NetworkConfigGroup networkConfigGroup) {
+		return new NetworkCollector(networkConfigGroup);
 	}
 
 	private static boolean testLinksAreEqual(Link expected, Link actual) {
 
 		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
 				&& expected.getCapacity() == actual.getCapacity()
-				&& expected.getFlowCapacityPerSec() == actual.getFlowCapacityPerSec()
+				&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
 				&& expected.getFreespeed() == actual.getFreespeed()
 				&& expected.getLength() == actual.getLength()
 				&& expected.getNumberOfLanes() == actual.getNumberOfLanes();
@@ -887,6 +929,28 @@ public final class NetworkUtils {
 	 */
 	public static Coord findNearestPointOnLink(Coord coord, Link link) {
 		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+	}
 
+	public static final String ORIG_GEOM = "origgeom";
+	public static List<Node> getOriginalGeometry(Link link) {
+
+		// use a list since order is important
+		List<Node> result = new ArrayList<>();
+		result.add(link.getFromNode());
+		var attr = (String)link.getAttributes().getAttribute(ORIG_GEOM);
+
+		if (!StringUtils.isBlank(attr)) {
+			var data = attr.split(" ");
+			for (String date : data) {
+				var values = date.split(",");
+				if (values.length != 3) throw new RuntimeException("expected three values per node but found: " + date);
+				var coord = new Coord(Double.parseDouble(values[1]), Double.parseDouble(values[2]));
+				var node = new NodeImpl(Id.createNodeId(values[0]), coord);
+				result.add(node);
+			}
+		}
+
+		result.add(link.getToNode());
+		return result;
 	}
 }

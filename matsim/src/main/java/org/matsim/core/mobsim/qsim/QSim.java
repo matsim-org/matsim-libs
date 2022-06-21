@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,6 +40,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -47,6 +49,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -91,11 +94,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEndRescheduler {
+public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
-	/** time since last "info" */
+	/**
+	 * time since last "info"
+	 */
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;
@@ -225,12 +230,13 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	@Override
 	public void run() {
+		boolean tryBlockWithException = false;
 		try {
 			// Teleportation must be last (default) departure handler, so add it only before running:
 			this.departureHandlers.add(this.teleportationEngine);
 
 			// ActivityEngine must be last (=default) activity handler, so add it only before running:
-			this.activityHandlers.add( this.activityEngine ) ;
+			this.activityHandlers.add(this.activityEngine);
 
 			prepareSim();
 			this.listenerManager.fireQueueSimulationInitializedEvent();
@@ -251,15 +257,26 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			while (doContinue) {
 				doContinue = doSimStep();
 			}
+		} catch (RuntimeException tryBlockException) {
+			tryBlockWithException = true;
+			throw tryBlockException;
 		} finally {
 			// We really want to perform that. For instance, with QNetsimEngine, threads are cleaned up in this method.
 			// Without this finally, in case of a crash, threads are not closed, which lead to process hanging forever
 			// at least on the eth euler cluster (but not on our local machines at ivt!?) td oct 15
 			try {
 				cleanupSim();
-			} catch(Exception e) {
-				log.warn( "exception in finally block - " +
-						  "this may be a follow-up exception of an exception thrown in the try block.", e);
+			} catch (RuntimeException cleanupException) {
+				if (tryBlockWithException) {
+					// we want to log this exception thrown during the cleanup, but not to throw it
+					// since there is another (earlier) exception thrown in the try block
+					log.warn("exception in finally block - "
+									+ "this may be a follow-up exception of an exception thrown in the try block.",
+							cleanupException);
+				} else {
+					// no exception thrown in the try block, let's re-throw the exception from the cleanup step
+					throw cleanupException;
+				}
 			}
 		}
 	}
@@ -478,7 +495,15 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		double now = this.getSimTimer().getTimeOfDay();
 		Id<Link> linkId = agent.getCurrentLinkId();
 		Gbl.assertIf( linkId!=null );
-		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode()));
+		
+		String routingMode = null;
+		
+		if (agent instanceof PlanAgent) {
+			Leg currentLeg = (Leg) ((PlanAgent) agent).getCurrentPlanElement();
+			routingMode = TripStructureUtils.getRoutingMode(currentLeg);
+		}
+		
+		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode(), routingMode));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if (departureHandler.handleDeparture(now, agent, linkId)) {

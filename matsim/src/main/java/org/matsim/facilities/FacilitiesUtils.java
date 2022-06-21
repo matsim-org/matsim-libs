@@ -27,18 +27,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.LinkWrapperFacilityWithSpecificCoord;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
+import org.matsim.core.router.MultimodalLinkChooser;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
@@ -96,6 +93,11 @@ public class FacilitiesUtils {
 		return decideOnLink( facility, network ).getId() ;
 	}
 
+	/**
+	 * @deprecated
+	 * Please use {@link MultimodalLinkChooser} instead
+	 */
+	@Deprecated
 	public static Link decideOnLink( final Facility facility, final Network network ) {
 		Link accessActLink = null ;
 		
@@ -123,6 +125,8 @@ public class FacilitiesUtils {
 			
 			accessActLink = NetworkUtils.getNearestLink(network, facility.getCoord()) ;
 			if ( accessActLink == null ) {
+				log.warn("Facility without link for which no nearest link on the respective network could be found. " +
+						"About to abort. Writing out the first 10 links to understand which subnetwork was used to help debugging.");
 				int ii = 0 ;
 				for ( Link link : network.getLinks().values() ) {
 					if ( ii==10 ) {

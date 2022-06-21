@@ -104,7 +104,7 @@ public class SkillsIT {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "grid-network.xml");
 
-		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
 		{
 			Carrier carrier = CarrierUtils.createCarrier( Id.create("TestCarrier", Carrier.class));
 			{
@@ -126,7 +126,7 @@ public class SkillsIT {
 				typeOne.getCapacity().setOther( 2.0 );
 				FreightUtils.addSkill(typeOne, "skill 1");
 				capabilitiesBuilder.addType(typeOne);
-				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation)
+				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation, typeOne )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
 						.setType(typeOne)
@@ -141,7 +141,7 @@ public class SkillsIT {
 				typeTwo.getCapacity().setOther( 2.0 );
 				FreightUtils.addSkill(typeTwo, "skill 2");
 				capabilitiesBuilder.addType(typeTwo);
-				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation)
+				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation, typeTwo )
 						.setEarliestStart(0.0)
 						.setLatestEnd(Time.parseTime("24:00:00"))
 						.setType(typeTwo)

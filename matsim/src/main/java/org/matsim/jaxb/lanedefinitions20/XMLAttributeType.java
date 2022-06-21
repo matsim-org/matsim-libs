@@ -21,7 +21,7 @@
  */
 package org.matsim.jaxb.lanedefinitions20;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 /**
  * This type can be used for all attributes of classes in MATSim that implement the Attributable interface.

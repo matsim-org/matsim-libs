@@ -62,4 +62,7 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 * </ul>
 	 */
 	Schedule getSchedule();
+
+
+	DvrpVehicleSpecification getSpecification();
 }

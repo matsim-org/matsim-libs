@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C)  by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +83,7 @@ public final class RunChessboard {
             prepareScenario() ;
         }
 
-        Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+        Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
         CarrierVehicleTypes types = FreightUtils.getCarrierVehicleTypes(scenario);
 
         Controler controler = new Controler(scenario);
@@ -112,7 +133,7 @@ public final class RunChessboard {
                         if (event.getIteration() % statInterval != 0) return;
                         //write plans
                         String dir = controlerIO.getIterationPath(event.getIteration());
-                        new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+                        new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 
                         //write stats
                         freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

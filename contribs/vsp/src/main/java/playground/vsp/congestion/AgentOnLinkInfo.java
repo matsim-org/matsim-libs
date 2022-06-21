@@ -1,6 +1,7 @@
 package playground.vsp.congestion;
 
-import org.junit.Assert;
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -24,10 +25,10 @@ public final class AgentOnLinkInfo {
 			this.freeSpeedLeaveTime = d ; return this ;
 		}
 		public final AgentOnLinkInfo build() {
-			Assert.assertNotNull( personId );
-			Assert.assertNotNull( linkId );
-			Assert.assertNotNull( enterTime );
-			Assert.assertNotNull( freeSpeedLeaveTime );
+			Objects.requireNonNull( personId );
+			Objects.requireNonNull( linkId );
+			Objects.requireNonNull( enterTime );
+			Objects.requireNonNull( freeSpeedLeaveTime );
 			return new AgentOnLinkInfo( personId, linkId, enterTime, freeSpeedLeaveTime ) ;
 		}
 

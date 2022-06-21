@@ -170,7 +170,7 @@ public class AStarEuclidean extends Dijkstra {
 			if ( totalCost==0. ) {
 				log.warn( "finding totalCost=" + totalCost + "; this will often (or always?) lead to a null " +
 								  "pointer exception later.  In my own case, it was related to a network " +
-								  "having freespeed infinity at places.  kai, jan'18") ;
+								  "having freespeed infinity at places.  linkId=" + l.getId()+ ". kai, jan'18") ;
 			}
 			
 			if (data.getPrevLink().getId().compareTo(l.getId()) > 0) {

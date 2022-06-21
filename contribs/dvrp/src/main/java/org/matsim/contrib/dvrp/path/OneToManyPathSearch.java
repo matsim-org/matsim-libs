@@ -29,19 +29,18 @@ import java.util.function.Supplier;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-import ch.sbb.matsim.routing.graph.Graph;
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
-
 public class OneToManyPathSearch {
-	public static OneToManyPathSearch createSearch(Graph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
+	public static OneToManyPathSearch createSearch(SpeedyGraph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
 			TravelDisutility travelDisutility, boolean lazyPathCreation) {
-		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility),
+		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility), travelTime,
 				lazyPathCreation);
 	}
 
@@ -75,6 +74,7 @@ public class OneToManyPathSearch {
 			return travelTime;
 		}
 
+		//package visibility only (path.nodes is null)
 		Path getPath() {
 			if (path == null) {
 				path = pathSupplier.get();
@@ -85,11 +85,14 @@ public class OneToManyPathSearch {
 
 	private final IdMap<Node, Node> nodeMap;
 	private final LeastCostPathTree dijkstraTree;
+	private final TravelTime travelTime;
 	private final boolean lazyPathCreation;
 
-	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, boolean lazyPathCreation) {
+	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
+			boolean lazyPathCreation) {
 		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
+		this.travelTime = travelTime;
 		this.lazyPathCreation = lazyPathCreation;
 	}
 
@@ -99,8 +102,8 @@ public class OneToManyPathSearch {
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward,
 			double maxTravelTime) {
-		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
-				startTime);
+		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime,
+				forward, fromLink, startTime);
 		pathConstructor.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataArray(toLinks, pathConstructor);
 	}
@@ -112,8 +115,8 @@ public class OneToManyPathSearch {
 
 	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			boolean forward, double maxTravelTime) {
-		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
-				startTime);
+		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, travelTime, forward,
+				fromLink, startTime);
 		pathCalculator.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataMap(toLinks, pathCalculator);
 	}

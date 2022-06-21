@@ -34,11 +34,11 @@ final class Hermes implements Mobsim {
 	private Agent[] agents;
 	private ScenarioImporter si;
 	private final Scenario scenario;
-	private final ParallelEventsManager eventsManager;
+	private final EventsManager eventsManager;
 
 	public Hermes(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
-		this.eventsManager = (ParallelEventsManager) eventsManager;
+		this.eventsManager = eventsManager;
 	}
 
 	private void importScenario() throws Exception {

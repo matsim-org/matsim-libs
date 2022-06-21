@@ -20,6 +20,7 @@
 package org.matsim.contrib.etaxi.run;
 
 import static java.util.stream.Collectors.toList;
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
 import java.net.URL;
 import java.util.List;
@@ -36,8 +37,8 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
-import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
-import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
+import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
+import org.matsim.contrib.evrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
@@ -68,7 +69,8 @@ public class RunETaxiScenario {
 	public static Controler createControler(Config config, boolean otfvis) {
 		MultiModeTaxiConfigGroup multiModeTaxiConfig = MultiModeTaxiConfigGroup.get(config);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeETaxiModule());

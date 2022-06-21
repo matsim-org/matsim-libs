@@ -27,7 +27,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author michalm
  */
-abstract class AbstractTask implements Task {
+public abstract class AbstractTask implements Task {
 	// ==== BEGIN: fields managed by ScheduleImpl
 	int taskIdx;
 	TaskStatus status;

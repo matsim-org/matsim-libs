@@ -26,8 +26,7 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.CHProfile;
 import com.graphhopper.config.Profile;
-import com.graphhopper.reader.osm.GraphHopperOSM;
-import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.routing.util.CarFlagEncoder;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import org.apache.logging.log4j.LogManager;
@@ -36,7 +35,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -96,7 +94,7 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
 
     public LinkTurnDirectionAttributesFromGraphHopper(String osmFilePath) {
         this.osm = Path.of(osmFilePath);
-    };
+    }
 
     private LinkTurnDirectionAttributesFromGraphHopper(String osmFilePath, String matsimNetworkFilePath, String networkCrs) {
         this.osm = Path.of(osmFilePath);
@@ -159,11 +157,11 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
 
 
     private static GraphHopper createGraphHopperInstance(String ghLoc) {
-        GraphHopper hopper = new GraphHopperOSM().forServer();
-        hopper.setDataReaderFile(ghLoc);
+        GraphHopper hopper = new GraphHopper();
+        hopper.setGraphHopperLocation(ghLoc);
         // specify where to store graphhopper files
         hopper.setGraphHopperLocation("target/routing-graph-cache");
-        hopper.setEncodingManager(EncodingManager.create("car"));
+        hopper.getEncodingManagerBuilder().add(new CarFlagEncoder());
 
         // see docs/core/profiles.md to learn more about profiles
         hopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));
@@ -171,7 +169,8 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
         // this enables speed mode for the profile we called car
         hopper.getCHPreparationHandler().setCHProfiles(new CHProfile("car"));
         // explicitly allow that the calling code can disable this speed mode
-        hopper.getRouterConfig().setCHDisablingAllowed(true);
+        // NOTE: disabling_allowed config options were removed for GH 3.0, michalm, may'22
+        // hopper.getRouterConfig().setCHDisablingAllowed(true);
 
         // now this can take minutes if it imports or a few seconds for loading of course this is dependent on the area you import
         hopper.importOrLoad();

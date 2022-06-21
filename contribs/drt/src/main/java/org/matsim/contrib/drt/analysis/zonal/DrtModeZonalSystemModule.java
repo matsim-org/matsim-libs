@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.MatsimServices;
@@ -90,15 +90,14 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 		})).asEagerSingleton();
 
 		//zonal analysis
-		bindModal(ZonalIdleVehicleXYVisualiser.class).
-				toProvider(modalProvider(
-						getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
-								getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+		bindModal(ZonalIdleVehicleXYVisualiser.class).toProvider(modalProvider(
+				getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
+						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 		addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
 		bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
-				getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
+				getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtEventSequenceCollector.class),
 						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 	}

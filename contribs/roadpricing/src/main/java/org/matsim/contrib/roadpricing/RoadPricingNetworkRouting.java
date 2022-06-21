@@ -9,6 +9,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.MultimodalLinkChooser;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.SingleModeNetworksCache;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -16,6 +17,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
@@ -66,6 +68,12 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 	@Inject
 	@Named(TransportMode.walk)
 	RoutingModule walkRouter;
+	
+	@Inject
+	TimeInterpretation timeInterpretation;
+
+	@Inject
+	MultimodalLinkChooser multimodalLinkChooser;
 
 	private
 	Network filteredNetwork;
@@ -76,7 +84,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 			Set<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
-			filteredNetwork = NetworkUtils.createNetwork();
+			filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
 			filter.filter(filteredNetwork, modes);
 		}
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL);
@@ -88,7 +96,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						travelTime);
 		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
-					routeAlgo, scenario, filteredNetwork, walkRouter );
+					routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser );
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo);

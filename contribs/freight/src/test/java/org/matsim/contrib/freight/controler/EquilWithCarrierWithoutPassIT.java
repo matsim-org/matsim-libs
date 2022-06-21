@@ -28,9 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
@@ -45,6 +43,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.vehicles.Vehicle;
 
@@ -87,8 +87,13 @@ public class EquilWithCarrierWithoutPassIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
-		new CarrierPlanXmlReader(carriers).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
+		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
+		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+
+		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		addDummyVehicleType( carriers, "default") ;
 
 		controler = new Controler(scenario);

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactory;
 
+@Deprecated
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 
 	@Override

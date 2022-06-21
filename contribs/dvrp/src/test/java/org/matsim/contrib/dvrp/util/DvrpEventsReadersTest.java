@@ -94,7 +94,8 @@ public class DvrpEventsReadersTest {
 				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), EventsFileFormat.xml);
 		eventsManager.finishProcessing();
 
-		assertThat(handler.handledEvents).usingFieldByFieldElementComparator().containsExactlyElementsOf(dvrpEvents);
+		assertThat(handler.handledEvents).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyElementsOf(dvrpEvents);
 	}
 
 	private static class TestEventHandler

@@ -34,10 +34,11 @@ public class PersonDepartureEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final PersonDepartureEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new PersonDepartureEvent(25669.05, Id.create("921", Person.class), Id.create("390", Link.class), TransportMode.bike));
+				new PersonDepartureEvent(25669.05, Id.create("921", Person.class), Id.create("390", Link.class), TransportMode.bike, "bikeRoutingMode"));
 		assertEquals(25669.05, event.getTime(), EPSILON);
 		assertEquals("921", event.getPersonId().toString());
 		assertEquals("390", event.getLinkId().toString());
 		assertEquals("bike", event.getLegMode());
+		assertEquals("bikeRoutingMode", event.getRoutingMode());
 	}
 }

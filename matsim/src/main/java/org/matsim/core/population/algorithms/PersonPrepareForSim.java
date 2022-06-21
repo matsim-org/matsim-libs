@@ -29,15 +29,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -56,7 +55,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
-	private final Network carOnlyNetwork;
+	private final Network network;
 	private final ActivityFacilities activityFacilities;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
@@ -67,14 +66,11 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	 * create multiple copies of a car-only-network. Instead, we can create that network once in
 	 * the Controller and re-use it for each new instance. cdobler, sep'15
 	 */
-	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
+	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network network) {
 		super();
 		this.router = router;
-		this.carOnlyNetwork = carOnlyNetwork ;
-		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
-			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
-		}
-		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
+		this.network = network ;
+		this.xy2links = new XY2Links(network, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;
 	}
@@ -82,16 +78,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
-		this.carOnlyNetwork = scenario.getNetwork();
-		Network net = this.carOnlyNetwork;
-		if (NetworkUtils.isMultimodal( carOnlyNetwork )) {
-			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( carOnlyNetwork );
-			net = NetworkUtils.createNetwork();
-			HashSet<String> modes = new HashSet<String>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		}
+		this.network = scenario.getNetwork();
+		Network net = this.network;
 		
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
@@ -206,6 +194,17 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 //							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
 							// using the full network for the distance calculation.  kai, jul'18
+						} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+							// replace deprecated ExperimentalTransitRoute with DefaultTransitPassengerRoute
+							ExperimentalTransitRoute oldRoute = (ExperimentalTransitRoute) leg.getRoute();
+							DefaultTransitPassengerRoute newRoute = new DefaultTransitPassengerRoute(
+									oldRoute.getStartLinkId(),
+									oldRoute.getEndLinkId(),
+									oldRoute.getAccessStopId(),
+									oldRoute.getEgressStopId(),
+									oldRoute.getLineId(),
+									oldRoute.getRouteId());
+							leg.setRoute(newRoute);
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

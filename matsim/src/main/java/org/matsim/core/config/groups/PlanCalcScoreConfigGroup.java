@@ -1101,8 +1101,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public static final String MODE = "mode";
 		
-		static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
-		static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
+		private static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
+		private static final String DAILY_MONETARY_CONSTANT_CMT = "[unit_of_money/day] Fixed cost of mode, per day.";
+
+		private static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
 		
 		private String mode = null;
 		private double traveling = -6.0;
@@ -1143,8 +1145,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			map.put(CONSTANT, CONSTANT_CMT );
 			map.put(DAILY_UTILITY_CONSTANT, "[utils] daily utility constant. "
 					+ "default=0 to be backwards compatible");
-			map.put(DAILY_MONETARY_CONSTANT, "[money] daily monetary constant. "
-					+ "default=0 to be backwards compatible");
+			map.put(DAILY_MONETARY_CONSTANT, DAILY_MONETARY_CONSTANT_CMT ) ;
 			return map;
 		}
 
@@ -1216,11 +1217,17 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.monetaryDistanceRate = monetaryDistanceRate;
 			return this ;
 		}
+		/**
+		 * @return {@value #DAILY_MONETARY_CONSTANT_CMT}
+		 */
 		@StringGetter(DAILY_MONETARY_CONSTANT)
 		public double getDailyMonetaryConstant() {
 			return dailyMonetaryConstant;
 		}
 
+		/**
+		 * @param dailyMonetaryConstant -- {@value #DAILY_MONETARY_CONSTANT_CMT}
+		 */
 		@StringSetter(DAILY_MONETARY_CONSTANT)
 		public ModeParams setDailyMonetaryConstant(double dailyMonetaryConstant) {
 			this.dailyMonetaryConstant = dailyMonetaryConstant;
@@ -1631,6 +1638,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
 		public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+			// should be disabled like in the following.  kai, may'22
+//			if ( usingOldScoringBelowZeroUtilityDuration ) {
+//				throw new RuntimeException( "using old scoringBelowZeroUtility duration is no longer possible.  Use matsim version 14.0 " +
+//									    "or older if you truly need this for backwards compatibility." )
+//			}
 			testForLocked();
 			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 		}

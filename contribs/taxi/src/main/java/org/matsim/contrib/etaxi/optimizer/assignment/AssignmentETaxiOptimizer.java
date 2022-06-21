@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
@@ -47,7 +48,7 @@ import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.PartialSort;
+import org.matsim.contrib.common.collections.PartialSort;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -190,7 +191,8 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 		// filter least charged vehicles
 		// assumption: all b.capacities are equal
 		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
-				vehiclesBelowMinSocLevel, v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc());
+				vehiclesBelowMinSocLevel,
+				Comparator.comparingDouble(v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc()));
 
 		return new VehicleData(timer.getTimeOfDay(), eScheduler.getScheduleInquiry(), leastChargedVehicles.stream());
 	}

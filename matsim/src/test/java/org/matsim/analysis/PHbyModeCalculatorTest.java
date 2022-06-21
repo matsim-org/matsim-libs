@@ -33,11 +33,11 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PHbyModeCalculatorTest {
 
-	private static int car_travel;
-	private static int pt_travel;
-	private static int walk_travel;
-	private static int pt_wait;
-	private static int stageActivity_wait;
+	private int car_travel;
+	private int pt_travel;
+	private int walk_travel;
+	private int pt_wait;
+	private int stageActivity_wait;
 	
 
 	Id<Person> person1 = Id.create("person1", Person.class);
@@ -200,7 +200,7 @@ public class PHbyModeCalculatorTest {
 	}
 
 	/************ Determining the columns of the output file ************/
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

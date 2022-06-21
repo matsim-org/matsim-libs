@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
@@ -43,7 +43,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@BeforeClass
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		String outfileName = this.getOutputDirectory() + "../testOutputVehicles.xml";
@@ -160,6 +160,29 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
 	}
+
+	@Test
+	public void test_VehicleAttributesReadCorrectly(){
+		assertNotNull(vehicleTypes);
+		/* First vehicle has an attribute. */
+		Vehicle v1 = vehicles.get(Id.createVehicleId("23"));
+		assertNotNull(v1.getAttributes());
+		assertNotNull(v1.getAttributes().getAttribute("testAttributeString"));
+		assertEquals("firstVehicle", v1.getAttributes().getAttribute("testAttributeString").toString());
+
+		/* Second vehicle has no attributes. */
+		Vehicle v2 = vehicles.get(Id.createVehicleId("42"));
+		assertNotNull(v2.getAttributes());
+		assertTrue(v2.getAttributes().isEmpty());
+		assertNull(v2.getAttributes().getAttribute("testAttribute"));
+
+		/* Third vehicle again has one attribute. */
+		Vehicle v3 = vehicles.get(Id.createVehicleId(" 42  23"));
+		assertNotNull(v3.getAttributes());
+		assertNotNull(v3.getAttributes().getAttribute("testAttributeDouble"));
+		assertEquals(1.234, v3.getAttributes().getAttribute("testAttributeDouble"));
+	}
+
 
 	@Test
 	public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {

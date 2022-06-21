@@ -4,8 +4,8 @@
 
 package ch.sbb.matsim.analysis.skims;
 
-import ch.sbb.matsim.routing.graph.Graph;
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.LeastCostPathTree;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +43,7 @@ public final class NetworkSkimMatrices {
 
     public static <T> NetworkIndicators<T> calculateSkimMatrices(Network xy2lNetwork, Network routingNetwork, Map<T, Coord[]> coordsPerZone, double departureTime, TravelTime travelTime,
             TravelDisutility travelDisutility, int numberOfThreads) {
-        Graph routingGraph = new Graph(routingNetwork);
+        SpeedyGraph routingGraph = new SpeedyGraph(routingNetwork);
         Map<T, Node[]> nodesPerZone = new HashMap<>();
         for (Map.Entry<T, Coord[]> e : coordsPerZone.entrySet()) {
             T zoneId = e.getKey();
@@ -95,7 +95,7 @@ public final class NetworkSkimMatrices {
         private final static Person PERSON = PopulationUtils.getFactory().createPerson(Id.create("thePerson", Person.class));
         private final ConcurrentLinkedQueue<T> originZones;
         private final Set<T> destinationZones;
-        private final Graph graph;
+        private final SpeedyGraph graph;
         private final Map<T, Node[]> nodesPerZone;
         private final NetworkIndicators<T> networkIndicators;
         private final TravelTime travelTime;
@@ -103,8 +103,8 @@ public final class NetworkSkimMatrices {
         private final double departureTime;
         private final Counter counter;
 
-        RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, Graph graph, Map<T, Node[]> nodesPerZone, NetworkIndicators<T> networkIndicators, double departureTime,
-                TravelTime travelTime, TravelDisutility travelDisutility, Counter counter) {
+        RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, SpeedyGraph graph, Map<T, Node[]> nodesPerZone, NetworkIndicators<T> networkIndicators, double departureTime,
+                  TravelTime travelTime, TravelDisutility travelDisutility, Counter counter) {
             this.originZones = originZones;
             this.destinationZones = destinationZones;
             this.graph = graph;

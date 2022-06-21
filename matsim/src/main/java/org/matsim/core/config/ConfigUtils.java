@@ -311,7 +311,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
-        }
+		}
 		return moduleClass.cast(module);
 	}
 

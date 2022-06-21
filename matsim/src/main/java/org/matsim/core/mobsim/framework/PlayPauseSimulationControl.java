@@ -29,9 +29,9 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 /**
- * Extracted the play/pause functionality from otfvis to make it available for other purposes (specifically, RMITs 
+ * Extracted the play/pause functionality from otfvis to make it available for other purposes (specifically, RMITs
  * CombineSim approach).
- * 
+ *
  * @author nagel
  */
 public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
@@ -56,7 +56,8 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 		qSim.addQueueSimulationListeners(playPauseMobsimListener);
 	}
 
-	private class PlayPauseMobsimListener implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener {
+	private class PlayPauseMobsimListener
+			implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener {
 		@Override
 		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
 			try {
@@ -65,15 +66,17 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 				throw new RuntimeException(e);
 			}
 		}
+
 		@Override
 		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
 			access.release();
-			localTime = (int) event.getSimulationTime();
+			localTime = (int)event.getSimulationTime();
 			// yy I am not so sure about the "int".  kai, nov'17
 			stepDone.arriveAndAwaitAdvance();
 			// This is arrival by one party.  If "pause" has been pressed before, we have a second party, and thus do not
 			// advance.
 		}
+
 		@Override
 		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 			localTime = Double.MAX_VALUE;
@@ -84,6 +87,8 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 	@Override
 	public final void doStep(int time) {
 		if (status == Status.PLAY) {
+			// this may happen when clicking single/multi-step forward buttons while playing in the async mode,
+			// so that combination should be disabled in GUI, michalm
 			throw new IllegalStateException();
 		}
 		while (localTime < time) {
@@ -117,7 +122,7 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 	}
 
 	public final boolean isFinished() {
-		return ( localTime == Double.MAX_VALUE ) ;
+		return (localTime == Double.MAX_VALUE);
 	}
 
 	public final double getLocalTime() {
