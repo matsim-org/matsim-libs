@@ -43,9 +43,7 @@ mvn install --also-make --projects matsim
 
 ## Binaries
 
-Releases and release candidates, including information how to use them by Maven, Gradle, or similar, also for contribs, can be found at https://bintray.com/matsim/matsim/.
-
-Snapshots, with the usual use-at-your-own-risk disclaimer, are at http://oss.jfrog.org/artifactory/simple/oss-snapshot-local/org/matsim/.
+Releases (also PR-based and weekly releases) and snapshots can be found at https://repo.matsim.org/.
 
 An example how to get started with your own project, including a complete pom.xml, is at https://github.com/matsim-org/matsim-example-project .
 
