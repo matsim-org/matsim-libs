@@ -21,11 +21,10 @@
 package lsp;
 
 import java.util.Collection;
-import org.matsim.api.core.v01.Id;
+
 import org.matsim.api.core.v01.population.HasPlansAndId;
 
 import lsp.replanning.LSPReplanner;
-import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.controler.events.ReplanningEvent;
 
@@ -73,14 +72,6 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>, HasSimulationTrackers<L
 	void assignShipmentToLSP( LSPShipment shipment );
 	
 	void replan( ReplanningEvent arg0 );
-
-	
-	/**
-	 * @param scorer
-	 *
-	 * yyyy does it make sense to expose this (implies that scorer can be changed during iterations)?
-	 */
-	void setScorer( LSPScorer scorer );
 
 	/**
 	 * @param replanner

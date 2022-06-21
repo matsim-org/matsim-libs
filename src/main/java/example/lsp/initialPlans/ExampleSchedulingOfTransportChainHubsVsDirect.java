@@ -22,11 +22,7 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScorer;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
+import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -39,6 +35,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.events.LSPTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -117,21 +117,6 @@ import java.util.*;
 
 		log.info("create LSP");
 		LSP lsp = createInitialLSP( scenario.getNetwork(), solutionType );
-		lsp.setScorer( new LSPScorer(){
-			private LSP lsp;
-			@Override public double scoreCurrentPlan( LSP lsp ){
-				lsp.getSelectedPlan().setScore( 0. );
-				return 0.;
-				// yyyy unclear if this is supposed to set the score.  Or just return it.  kai, may'22
-				// yyyyyy we need to look into matsim design and check how it is done there.  kai, may'22
-			}
-			@Override public void setEmbeddingContainer( LSP pointer ){
-				this.lsp = pointer;
-			}
-//			@Override public LSP getEmbeddingContainer(){
-//				return this.lsp;
-//			}
-		} );
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
@@ -152,8 +137,6 @@ import java.util.*;
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		} );
 
@@ -169,6 +152,23 @@ import java.util.*;
 	}
 
 	private static LSP createInitialLSP(Network network, SolutionType solutionType) {
+
+		LSPUtils.LSPBuilder lspBuilder = null;
+		switch( solutionType ) {
+			case onePlan_withHub:
+				lspBuilder = LSPUtils.LSPBuilder.getInstance( Id.create( "LSPwithReloading", LSP.class ) );
+				break;
+			case onePlan_direct:
+				lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
+				break;
+			case twoPlans_directAndHub:
+				lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class));
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + solutionType );
+		}
+
+		lspBuilder.setSolutionScorer( new MyLSPScorer() );
 
 		final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)"); //TODO: Hochziehen aber non-static.
 		final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");
@@ -341,8 +341,7 @@ import java.util.*;
 
 				LSPPlan lspPlan_Reloading = createLSPPlan_reloading(depotElement, mainRunElement, hubElement, distributionElement);
 
-				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPwithReloading", LSP.class))
-						.setInitialPlan(lspPlan_Reloading)
+				return lspBuilder.setInitialPlan(lspPlan_Reloading)
 						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_Reloading)))
 						.build();
 
@@ -353,7 +352,7 @@ import java.util.*;
 
 				LSPPlan lspPlan_direct = createLSPPlan_direct(depotElement, directDistributionElement);
 
-				return LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
+				return lspBuilder
 						.setInitialPlan(lspPlan_direct)
 						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 						.build();
@@ -375,7 +374,7 @@ import java.util.*;
 				List<LSPResource> resourcesList = createResourcesListFromLSPPlan(lspPlan_direct);
 				resourcesList.addAll(createResourcesListFromLSPPlan(lspPlan_Reloading));
 
-				final LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("LSPdirect", LSP.class))
+				final LSP lsp = lspBuilder
 						.setInitialPlan(lspPlan_direct)
 						.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList))
 						.build();
@@ -415,8 +414,7 @@ import java.util.*;
 		log.info("");
 		log.info("set up logistic Solution - direct distribution from the depot is created");
 
-		LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
-						Id.create("SolutionDirectId", LogisticsSolution.class))
+		LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance( Id.create("SolutionDirectId", LogisticsSolution.class))
 				.addSolutionElement(depotElement)
 				.addSolutionElement(directDistributionElement)
 				.build();
@@ -523,5 +521,26 @@ import java.util.*;
 			e.printStackTrace();
 		}
 	}
+
+	private static class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {
+		private double score = 0.;
+		@Override public double computeScoreForCurrentPlan(){
+			return score;
+		}
+		@Override public void setEmbeddingContainer( LSP pointer ){
+		}
+		@Override public void handleEvent( LSPTourEndEvent event ){
+			score ++;
+			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+		}
+		@Override public void reset( int iteration ){
+			score = 0.;
+		}
+		@Override public void handleEvent( LSPServiceEndEvent event ){
+			score ++;
+			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+		}
+	}
+
 
 }

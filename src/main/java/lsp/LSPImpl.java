@@ -22,18 +22,13 @@ package lsp;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import lsp.controler.LSPSimulationTracker;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
 
 import lsp.replanning.LSPReplanner;
-import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger( LSPImpl.class );
@@ -60,7 +55,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.scorer = builder.scorer;
 		if(this.scorer != null) {
 			this.scorer.setEmbeddingContainer(this );
-		}	
+			this.addSimulationTracker( this.scorer );
+		}
 		this.replanner = builder.replanner;
 		if(this.replanner != null) {
 			this.replanner.setEmbeddingContainer(this );
@@ -151,8 +147,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	public void scoreSelectedPlan() {
 		if(this.scorer != null) {
-			double score = scorer.scoreCurrentPlan(this);
-			this.selectedPlan.setScore(score);
+			this.selectedPlan.setScore( scorer.computeScoreForCurrentPlan() );
 		} else {
 			log.fatal("trying to score the current LSP plan, but scorer is not set.");
 		}
@@ -170,14 +165,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			this.replanner.replan( arg0 );
 		}
 	}
-
-
-	@Override
-	public void setScorer(LSPScorer scorer) {
-		this.scorer =  scorer;
-
-	}
-
 
 	@Override
 	public void setReplanner(LSPReplanner replanner) {

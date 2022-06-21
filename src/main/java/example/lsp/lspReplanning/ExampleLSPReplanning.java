@@ -23,11 +23,7 @@ package example.lsp.lspReplanning;
 import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.replanning.LSPReplanner;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.replanning.LSPReplanningUtils;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -197,12 +193,6 @@ import java.util.Random;
 		//Start the Mobsim two iterations are necessary for replanning
 		Controler controler = new Controler(config);
 		controler.addOverridingModule( new LSPModule() );
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
-			}
-		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(4);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

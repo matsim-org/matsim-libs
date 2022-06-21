@@ -22,10 +22,6 @@ package example.lsp.lspScoring;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.ShipmentUtils;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
@@ -71,15 +67,15 @@ public class CollectionLSPScoringTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
-		VehicleType collectionType = CarrierVehicleType.Builder.newInstance( Id.create("CollectionCarrierVehicleType", VehicleType.class ) )
+		VehicleType collectionVehicleType = CarrierVehicleType.Builder.newInstance( Id.create("CollectionCarrierVehicleType", VehicleType.class ) )
 								       .setCapacity(10 ).setCostPerDistanceUnit(0.0004 ).setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50 / 3.6 ).build();
 
 		Link collectionLink = network.getLinks().get( Id.createLinkId("(4 2) (4 3)" ) ); // (make sure that the link exists)
 
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionType);
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionVehicleType);
 
 		Carrier carrier = CarrierUtils.createCarrier( Id.create("CollectionCarrier", Carrier.class ) );
-		carrier.setCarrierCapabilities( CarrierCapabilities.Builder.newInstance().addType(collectionType ).addVehicle(carrierVehicle ).setFleetSize(FleetSize.INFINITE ).build() );
+		carrier.setCarrierCapabilities( CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType ).addVehicle(carrierVehicle ).setFleetSize(FleetSize.INFINITE ).build() );
 
 		LSPResource collectionAdapter = CollectionCarrierAdapterBuilder.newInstance( Id.create("CollectionCarrierAdapter", LSPResource.class ), network)
 									       .setCollectionScheduler( createDefaultCollectionCarrierScheduler() ).setCarrier(carrier ).setLocationLinkId(collectionLink.getId() ).build();
@@ -92,7 +88,9 @@ public class CollectionLSPScoringTest {
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 						   .setInitialPlan( LSPUtils.createLSPPlan().setAssigner( createDeterministicShipmentAssigner() ).addSolution(collectionSolution ) )
-						   .setSolutionScheduler( createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( collectionAdapter ) ) ).build();
+						   .setSolutionScheduler( createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( collectionAdapter ) ) )
+						   .setSolutionScorer( new TipScorer() )
+						   .build();
 
 //		TipEventHandler handler = new TipEventHandler();
 //		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
@@ -101,9 +99,9 @@ public class CollectionLSPScoringTest {
 //		TipInfo info = new TipInfo();
 //		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
 //		collectionAdapter.addSimulationTracker(tipTracker);
-		TipScorer tipScorer = new TipScorer();
-		collectionLSP.addSimulationTracker( tipScorer );
-		collectionLSP.setScorer(tipScorer);
+//		TipScorer tipScorer = new TipScorer();
+//		collectionLSP.addSimulationTracker( tipScorer );
+//		collectionLSP.setScorer(tipScorer);
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
@@ -149,8 +147,6 @@ public class CollectionLSPScoringTest {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 		config.controler().setFirstIteration(0);

@@ -26,10 +26,6 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.*;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
@@ -184,12 +180,6 @@ import lsp.LSPResource;
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule( new LSPModule() );
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
-			}
-		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
