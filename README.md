@@ -1,8 +1,9 @@
-[![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=push)](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml)
-[![deploy-weekly](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml/badge.svg)](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml)
-[![full-integration](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml/badge.svg)](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml)
-[![weekly-code-coverage](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml/badge.svg)](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml)
-[![codecov - matsim only](https://codecov.io/gh/matsim-org/matsim-libs/branch/master/graph/badge.svg?token=3p7uJdHdnd)](https://codecov.io/gh/matsim-org/matsim-libs)
+[![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=push "snapshot release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml)
+[![deploy-on-pr-merge](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml/badge.svg?event=pull_request_target&branch= "PR-merge release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-on-pr-merge.yaml)
+[![deploy-weekly](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml/badge.svg "weekly release")](https://github.com/matsim-org/matsim-libs/actions/workflows/deploy-weekly.yaml)
+[![full-integration](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml/badge.svg "daily release-like build")](https://github.com/matsim-org/matsim-libs/actions/workflows/full-integration.yaml)
+[![weekly-code-coverage](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml/badge.svg "matsim module only")](https://github.com/matsim-org/matsim-libs/actions/workflows/code-coverage.yaml)
+[![codecov - matsim only](https://codecov.io/gh/matsim-org/matsim-libs/branch/master/graph/badge.svg?token=3p7uJdHdnd "matsim module only")](https://codecov.io/gh/matsim-org/matsim-libs)
 
 ## Overview
 
@@ -42,9 +43,7 @@ mvn install --also-make --projects matsim
 
 ## Binaries
 
-Releases and release candidates, including information how to use them by Maven, Gradle, or similar, also for contribs, can be found at https://bintray.com/matsim/matsim/.
-
-Snapshots, with the usual use-at-your-own-risk disclaimer, are at http://oss.jfrog.org/artifactory/simple/oss-snapshot-local/org/matsim/.
+Releases (also PR-based and weekly releases) and snapshots can be found at https://repo.matsim.org/.
 
 An example how to get started with your own project, including a complete pom.xml, is at https://github.com/matsim-org/matsim-example-project .
 
