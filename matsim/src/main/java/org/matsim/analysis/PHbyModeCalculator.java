@@ -157,11 +157,11 @@ public class PHbyModeCalculator {
 
             for (String mode : allModes){
                 double[] valueTravelTime =  phtPerIteration.values().stream()
-                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).travelTime/1000.0)
+                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).travelTime/3600.0)
                         .toArray();
                 chart.addSeries(mode + TRAVEL_TIME_SUFFIX, valueTravelTime);
                 double[] valueWaitTime =  phtPerIteration.values().stream()
-                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).waitTime/1000.0)
+                        .mapToDouble(k->k.getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0)).waitTime/3600.0)
                         .toArray();
                 chart.addSeries(mode + WAIT_TIME_SUFFIX, valueWaitTime);
             }
