@@ -31,11 +31,13 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -103,17 +105,20 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				nonCarWarn++;
 			}
 		}
-		final double arrivalTime = event.getTime();
 
-		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( event.getLinkId(), arrivalTime);
+		// extract event details
+		final double arrivalTime = event.getTime();
+		final Id<Link> linkId = event.getLinkId();
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( linkId, arrivalTime);
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		this.vehicleLeavesTraffic.put(vehicleId, linkId2Time);
 
 		double enterTime = this.linkenter.get(vehicleId).getSecond();
 		double travelTime = arrivalTime - enterTime;
 
+		// match vehicleId to scenario and test for non-scenario vehicles
+		// if vehicle type is defined calculate warm emissions - todo: duplicated code?
 		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-
 		//Todo @rjg: extract method for douplicadet code?
 		if (vehicle == null) {
 			ColdEmissionHandler.handleNullVehicle(vehicleId, emissionsConfigGroup);
@@ -136,12 +141,20 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 
 		} else {
+
+			// warm emissions calculation - todo: duplicated code?
 			VehicleType vehicleType = vehicle.getType();
+			Link link = scenario.getNetwork().getLinks().get(linkId);
 			Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
 			warmEmissionAnalysisModule.throwWarmEmissionEvent(arrivalTime, linkId, vehicleId, warmEmissions);
+
+			// todo: vehicle leaves traffic always happens after vehicle leaves link, so do we still need this again? ~rjg
+			if (this.vehicleEntersTraffic.containsKey(vehicleId)) {this.vehicleEntersTraffic.remove(vehicleId);} // so that no second emission event is computed for travel from parking to link leave
+			if (this.vehicleLeavesTraffic.containsKey(vehicleId)) {this.vehicleLeavesTraffic.remove(vehicleId);} // todo: do we need this, too? ~rjg
 		}
 
 	//Todo: @rjg: decide wheter to remove entries from one or more "lists"....
+		// rjg: done 1/2
 
 	// yyyyyy This event should also trigger an emissions calculation, from link entry up to here.  Probably not done since this particular
 	// event did not exist when the emissions contrib was programmed.  Would be easy to do: calculate the emission and remove
@@ -171,6 +184,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
+		// extract event details
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Link> linkId = event.getLinkId();
 		double leaveTime = event.getTime();
@@ -217,13 +231,15 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				travelTime = leaveTime - enterTime; // todo ASK kmt: the LINK was not used to enter of leave traffic i.e. still commuting? ... both the same? ~rjg
 			} else {
 				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
-//				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); //Not needed any more
-				travelTime = arrivalTime - enterTime; //Vehicle leaves traffic on the Link
+//				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); // Not needed anymore ~kmt/rjg 06/22
+				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link
 
 				this.vehicleLeavesTraffic.remove(vehicleId);
 				this.vehicleEntersTraffic.remove(vehicleId);
 			}
 
+			// match vehicleId to scenario and test for non-scenario vehicles
+			// if vehicle type is defined calculate warm emissions - todo: duplicated code?
 			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 
 			if (vehicle == null) {
@@ -247,6 +263,8 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				}
 
 			} else {
+
+				// warm emissions calculation - todo: duplicated code?
 				VehicleType vehicleType = vehicle.getType();
 				Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
 				warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
