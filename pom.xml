@@ -16,8 +16,6 @@
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 	<repositories>
@@ -51,106 +49,175 @@
 			<version>${matsim.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
-		<defaultGoal>compiler:compile</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.10.1</version>
 				<configuration>
-					<source>11</source>
-					<target>11</target>
-					<showWarnings>false</showWarnings>
-					<showDeprecation>false</showDeprecation>
-					<encoding>UTF-8</encoding>
-					<!-- configure initial and maximal memory for compiling -->
-					<fork>true</fork>
-					<meminitial>128m</meminitial>
-					<maxmem>512m</maxmem>
-					<compilerArguments>
-						<Xmaxwarns>4000</Xmaxwarns>
-						<Xmaxerrs>100</Xmaxerrs>
-					</compilerArguments>
+					<release>17</release>
 				</configuration>
 			</plugin>
-
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-enforcer-plugin</artifactId>-->
+<!--				<version>3.0.0</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>enforce</id>-->
+<!--						<goals>-->
+<!--							<goal>enforce</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--				<configuration>-->
+<!--					<rules>-->
+<!--						<requireUpperBoundDeps/>-->
+<!--						<banDuplicatePomDependencyVersions/>-->
+<!--						<requireReleaseDeps>-->
+<!--							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>-->
+<!--							<excludes>-->
+<!--								<exclude>org.matsim:*</exclude>-->
+<!--								<exclude>org.matsim.contrib:*</exclude>-->
+<!--							</excludes>-->
+<!--						</requireReleaseDeps>-->
+<!--						<requireMavenVersion>-->
+<!--							<version>3.6.3</version>-->
+<!--						</requireMavenVersion>-->
+<!--					</rules>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.4</version>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>org.matsim.api.core.v01.AutoResetIdCaches</value>
+						</property>
+					</properties>
 				</configuration>
 			</plugin>
-
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>libs/</classpathPrefix>
-						</manifest>
-					</archive>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>org.matsim.api.core.v01.AutoResetIdCaches</value>
+						</property>
+					</properties>
 				</configuration>
 			</plugin>
-
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.0.0-M7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.2.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.2.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>3.0.0-M1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.4.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>buildnumber-maven-plugin</artifactId>
+					<version>3.0.0</version>
+					<executions>
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>create</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<doCheck>false</doCheck>
+						<doUpdate>false</doUpdate>
+						<revisionOnScmFailure>unknown</revisionOnScmFailure>
+						<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
-	
+
 		<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<defaultGoal>assembly:assembly</defaultGoal>
-				<pluginManagement>
+			<profile>
+				<id>release</id>
+				<build>
 					<plugins>
 						<plugin>
-							<artifactId>maven-assembly-plugin</artifactId>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<executions>
+								<execution>
+									<id>attach-javadocs</id>
+									<goals>
+										<goal>jar</goal>
+									</goals>
+								</execution>
+							</executions>
 							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</plugin>
-						<plugin>
-							<artifactId>maven-jar-plugin</artifactId>
-							<configuration>
-								<archive>
-									<manifest>
-										<addClasspath>true</addClasspath>
-										<classpathPrefix>libs/</classpathPrefix>
-									</manifest>
-								</archive>
+								<linksource>true</linksource>
+								<doclint>none</doclint>
+								<quiet>true</quiet>
 							</configuration>
 						</plugin>
 					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
+				</build>
+			</profile>
+			<profile>
+				<id>hudson</id>
+				<build>
+					<pluginManagement>
+						<plugins>
+							<plugin>
+								<groupId>org.apache.maven.plugins</groupId>
+								<artifactId>maven-javadoc-plugin</artifactId>
+								<configuration>
+									<doclint>none</doclint>
+									<quiet>true</quiet>
+								</configuration>
+							</plugin>
+						</plugins>
+					</pluginManagement>
+				</build>
+			</profile>
 	</profiles>
 	
 </project>
