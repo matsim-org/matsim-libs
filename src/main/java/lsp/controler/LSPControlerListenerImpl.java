@@ -119,17 +119,15 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 	// das geht jetzt nicht mehr.  kai, jun'22
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
-		for(LSP lsp : lsps.getLSPs().values()) {
+		for(LSP lsp : LSPUtils.getLSPs( scenario ).getLSPs().values()) {
 			lsp.replan( event );
 		}
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
-		for(LSP lsp : lsps.getLSPs().values()) {
-			lsp.scoreSelectedPlan();
+		for(LSP lsp : LSPUtils.getLSPs( scenario ).getLSPs().values()) {
+			lsp.scoreSelectedPlan( event );
 		}
 		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
 	}

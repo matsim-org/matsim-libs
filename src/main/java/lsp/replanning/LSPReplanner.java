@@ -30,6 +30,6 @@ import lsp.LSPPlan;
 public interface LSPReplanner extends HasBackpointer<LSP> {
 
 	void replan(ReplanningEvent event);
-	GenericStrategyManager<LSPPlan,LSP> getStrategyManager();
-	void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager);
+//	GenericStrategyManager<LSPPlan,LSP> getStrategyManager();
+//	void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager);
 }

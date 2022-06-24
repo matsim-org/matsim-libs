@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import lsp.replanning.LSPReplanner;
 import lsp.shipment.LSPShipment;
 import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.events.ScoringEvent;
 
 /**
  *  In the class library, the interface LSP has the following tasks:
@@ -60,8 +61,9 @@ public interface LSP extends HasPlansAndId<LSPPlan,LSP>, HasSimulationTrackers<L
 
 	/**
 	 * ok (behavioral method)
+	 * @param scoringEvent
 	 */
-	void scoreSelectedPlan();
+	void scoreSelectedPlan( ScoringEvent scoringEvent );
 	
 
 	/**

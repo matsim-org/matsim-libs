@@ -161,10 +161,9 @@ public class CollectionLSPReplanningTest {
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 		collectionLSP.scheduleSolutions();
-		GenericStrategyManagerFactoryImpl factory = new GenericStrategyManagerFactoryImpl();
+		TomorrowShipmentAssignerStrategyManagerFactoryImpl factory = new TomorrowShipmentAssignerStrategyManagerFactoryImpl();
 		GenericStrategyManager<LSPPlan, LSP> manager = factory.createStrategyManager(collectionLSP);
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(collectionLSP);
-		replanner.setStrategyManager(manager);
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( manager );
 		collectionLSP.setReplanner(replanner);
 
 		ArrayList<LSP> lspList = new ArrayList<>();

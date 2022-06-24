@@ -21,6 +21,8 @@
 package lsp.replanning;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -32,14 +34,14 @@ import lsp.LSPPlan;
 class LSPReplannerImpl implements LSPReplanner{
 
 	private LSP lsp;
-	private GenericStrategyManager<LSPPlan, LSP> strategyManager;
+	private final GenericStrategyManager<LSPPlan, LSP> strategyManager;
 	
-	LSPReplannerImpl(LSP lsp) {
-		this.lsp = lsp;
+	LSPReplannerImpl( GenericStrategyManager<LSPPlan, LSP> strategyManager ) {
+		this.strategyManager = strategyManager;
 	}
 	
-	public LSPReplannerImpl() {
-	}
+//	public LSPReplannerImpl() {
+//	}
 	
 	@Override
 	public void setEmbeddingContainer( LSP lsp ) {
@@ -49,20 +51,18 @@ class LSPReplannerImpl implements LSPReplanner{
 	@Override
 	public void replan(ReplanningEvent event) {
 		if(strategyManager != null) {
-			ArrayList<LSP> lspList = new ArrayList<>();
-			lspList.add(lsp);
-			strategyManager.run(lspList, null, event.getIteration(), event.getReplanningContext());
+			strategyManager.run( Collections.singletonList( lsp ), null, event.getIteration(), event.getReplanningContext() );
 		}
 	}
 
-	@Override
-	public GenericStrategyManager<LSPPlan, LSP> getStrategyManager() {
-		return strategyManager;
-	}
+//	@Override
+//	public GenericStrategyManager<LSPPlan, LSP> getStrategyManager() {
+//		return strategyManager;
+//	}
 
-	@Override
-	public void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager) {
-		this.strategyManager = manager;
-	}
+//	@Override
+//	public void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager) {
+//		this.strategyManager = manager;
+//	}
 
 }
