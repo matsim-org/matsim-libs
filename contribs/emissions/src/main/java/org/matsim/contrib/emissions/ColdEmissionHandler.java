@@ -85,19 +85,14 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
 
     @Override
     public void handleEvent(LinkLeaveEvent event) {
+
+        // extract event details
 		Id<Vehicle> vehicleId = event.getVehicleId();
         Id<Link> linkId = event.getLinkId();
         Link link = this.scenario.getNetwork().getLinks().get(linkId);
         double linkLength = link.getLength();
 
-        if (linkLength == 0.) {
-            if (zeroLinkLengthWarnCnt == 0 ){
-                logger.warn("Length of the link "+ linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
-                logger.warn(Gbl.ONLYONCE);
-                zeroLinkLengthWarnCnt++;
-            }
-            return;
-        }
+        warnIfZeroLinkLength(linkId, linkLength);
 
         Double previousDistance = this.vehicleId2accumulatedDistance.get(vehicleId);
         if (previousDistance != null) {
@@ -108,7 +103,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
             Vehicle vehicle = VehicleUtils.findVehicle( event.getVehicleId(), scenario );
 
             if ( vehicle==null ){
-                handleNullVehicle( vehicleId, emissionsConfigGroup );
+                handleNullVehicleECG( vehicleId, emissionsConfigGroup );
             } else{
 
                 if( (distance / 1000) > 1.0 ){
@@ -128,18 +123,19 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
             }
         }
     }
-    static void handleNullVehicle( Id<Vehicle> vehicleId, EmissionsConfigGroup emissionsConfigGroup ){
+
+    static void handleNullVehicleECG(Id<Vehicle> vehicleId, EmissionsConfigGroup emissionsConfigGroup ){
         if( emissionsConfigGroup.getNonScenarioVehicles().equals( EmissionsConfigGroup.NonScenarioVehicles.abort ) ){
             throw new RuntimeException(
-                            "No vehicle defined for id " + vehicleId + ". " +
-                                            "Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-                                            + " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-                                            + " Aborting..." );
+                    "No vehicle defined for id " + vehicleId + ". " +
+                            "Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+                            + " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+                            + " Aborting..." );
         } else if( emissionsConfigGroup.getNonScenarioVehicles().equals(
-                        EmissionsConfigGroup.NonScenarioVehicles.ignore ) ){
+                EmissionsConfigGroup.NonScenarioVehicles.ignore ) ){
             if( noVehWarnCnt < 10 ){
                 logger.warn(
-                                "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored." );
+                        "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored." );
                 noVehWarnCnt++;
                 if( noVehWarnCnt == 10 ) logger.warn( Gbl.FUTURE_SUPPRESSED );
             }
@@ -190,13 +186,23 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
 
         Vehicle vehicle = VehicleUtils.findVehicle( vehicleId, scenario ) ;
         if ( vehicle==null ) {
-            handleNullVehicle( vehicleId, emissionsConfigGroup );
+            handleNullVehicleECG( vehicleId, emissionsConfigGroup );
         } else{
             Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(
                     vehicle.getType(), vehicleId, linkId, startEngineTime, parkingDuration, 1);
 
             coldEmissionAnalysisModule.throwColdEmissionEvent(vehicleId, linkId, startEngineTime, coldEmissions);
             // yyyy again, I do not know what the "distance" does.  kai, jan'20
+        }
+    }
+
+    private void warnIfZeroLinkLength(Id<Link> linkId, double linkLength) {
+        if (linkLength == 0.) {
+            if (zeroLinkLengthWarnCnt == 0) {
+                logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+                logger.warn(Gbl.ONLYONCE);
+                zeroLinkLengthWarnCnt++;
+            }
         }
     }
 

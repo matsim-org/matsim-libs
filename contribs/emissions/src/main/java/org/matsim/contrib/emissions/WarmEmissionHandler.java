@@ -31,13 +31,11 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -109,58 +107,36 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		// extract event details
 		final double arrivalTime = event.getTime();
 		final Id<Link> linkId = event.getLinkId();
+		Link link = this.scenario.getNetwork().getLinks().get(linkId);
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( linkId, arrivalTime);
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		this.vehicleLeavesTraffic.put(vehicleId, linkId2Time);
 
 		double enterTime = this.linkenter.get(vehicleId).getSecond();
+		double leaveTime = event.getTime();
 		double travelTime = arrivalTime - enterTime;
 
 		// match vehicleId to scenario and test for non-scenario vehicles
-		// if vehicle type is defined calculate warm emissions - todo: duplicated code?
+		// if vehicle type is defined calculate warm emissions
 		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-		//Todo @rjg: extract method for douplicadet code?
-		if (vehicle == null) {
-			ColdEmissionHandler.handleNullVehicle(vehicleId, emissionsConfigGroup);
+		// execute emissions calculation method
+		doEmissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 
-			if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
-				throw new RuntimeException(
-						"No vehicle defined for id " + vehicleId + ". " +
-								"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-								+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-								+ " Aborting...");
-			} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
-				if (noVehWarnCnt < 10) {
-					logger.warn(
-							"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
-					noVehWarnCnt++;
-					if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
-				}
-			} else {
-				throw new RuntimeException("Not yet implemented. Aborting...");
-			}
-
-		} else {
-
-			// warm emissions calculation - todo: duplicated code?
-			VehicleType vehicleType = vehicle.getType();
-			Link link = scenario.getNetwork().getLinks().get(linkId);
-			Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
-			warmEmissionAnalysisModule.throwWarmEmissionEvent(arrivalTime, linkId, vehicleId, warmEmissions);
-
-			// todo: vehicle leaves traffic always happens after vehicle leaves link, so do we still need this again? ~rjg
-			if (this.vehicleEntersTraffic.containsKey(vehicleId)) {this.vehicleEntersTraffic.remove(vehicleId);} // so that no second emission event is computed for travel from parking to link leave
-			if (this.vehicleLeavesTraffic.containsKey(vehicleId)) {this.vehicleLeavesTraffic.remove(vehicleId);} // todo: do we need this, too? ~rjg
+		if (vehicle != null) {
+			// vehicle leaving traffic always happens before vehicle leaves link, so we only need this here and not at linkLeaveEvent
+			// this is so that no second emission event is computed for travel from parking to link leave
+			this.vehicleEntersTraffic.remove(vehicleId);
+			this.vehicleLeavesTraffic.remove(vehicleId);
 		}
 
-	//Todo: @rjg: decide wheter to remove entries from one or more "lists"....
-		// rjg: done 1/2
+	//Todo: @rjg: decide whether to remove entries from one or more "lists" - DONE ~rjg
 
 	// yyyyyy This event should also trigger an emissions calculation, from link entry up to here.  Probably not done since this particular
 	// event did not exist when the emissions contrib was programmed.  Would be easy to do: calculate the emission and remove
 	// the vehicle from the linkenter data structure so that no second emission event is computed for travel from parking to
 	// link leave.  (This could also be done, but the excellent should not be in the way of the good.)  kai, may'16
 }
+
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
@@ -187,18 +163,11 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		// extract event details
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Link> linkId = event.getLinkId();
-		double leaveTime = event.getTime();
 		Link link = this.scenario.getNetwork().getLinks().get(linkId);
 		double linkLength = link.getLength();
+		double leaveTime = event.getTime();
 
-		if (linkLength == 0.) {
-			if (zeroLinkLengthWarnCnt == 0) {
-				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
-				logger.warn(Gbl.ONLYONCE);
-				zeroLinkLengthWarnCnt++;
-			}
-			return;
-		}
+		warnIfZeroLinkLength(linkId, linkLength);
 
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 		linkLeaveCnt++;
@@ -222,55 +191,75 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 			linkLeaveSomeActWarnCnt++;
 		} else {
+			// the vehicle traversed the entire link, DO calculate emissions
 			double enterTime = this.linkenter.get(vehicleId).getSecond();
 			double travelTime;
 			if (!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)) {
-				travelTime = leaveTime - enterTime; // todo ASK kmt: the VEHICLE did not enter or leave traffic from this link i.e. still commuting? ~rjg
+				travelTime = leaveTime - enterTime;
 			} else if (!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
 					|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
-				travelTime = leaveTime - enterTime; // todo ASK kmt: the LINK was not used to enter of leave traffic i.e. still commuting? ... both the same? ~rjg
+				travelTime = leaveTime - enterTime;
 			} else {
 				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
-//				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); // Not needed anymore ~kmt/rjg 06/22
-				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link
+//				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); // Not needed anymore ~kmt/rjg 06.22
+				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link, before LinkLeaveEvent
 
-				this.vehicleLeavesTraffic.remove(vehicleId);
-				this.vehicleEntersTraffic.remove(vehicleId);
+//				this.vehicleLeavesTraffic.remove(vehicleId);
+//				this.vehicleEntersTraffic.remove(vehicleId); // Not needed anymore (see VehicleLeavesTrafficEvent) ~rjg 06.22
+				// todo: ASK kmt why we need the second, too? ~rjg
 			}
 
 			// match vehicleId to scenario and test for non-scenario vehicles
-			// if vehicle type is defined calculate warm emissions - todo: duplicated code?
+			// if vehicle type is defined calculate warm emissions
 			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-
-			if (vehicle == null) {
-				ColdEmissionHandler.handleNullVehicle(vehicleId, emissionsConfigGroup);
-
-				if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
-					throw new RuntimeException(
-							"No vehicle defined for id " + vehicleId + ". " +
-									"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-									+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-									+ " Aborting...");
-				} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
-					if (noVehWarnCnt < 10) {
-						logger.warn(
-								"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
-						noVehWarnCnt++;
-						if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
-					}
-				} else {
-					throw new RuntimeException("Not yet implemented. Aborting...");
-				}
-
-			} else {
-
-				// warm emissions calculation - todo: duplicated code?
-				VehicleType vehicleType = vehicle.getType();
-				Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
-				warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
-			}
+			// execute emissions calculation method
+			doEmissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 		}
 
+	}
+
+	private void doEmissionsCalculation(Id<Vehicle> vehicleId, Vehicle vehicle, Id<Link> linkId, Link link, double leaveTime, double travelTime) {
+
+		if (vehicle == null) {
+			handleNullVehicle(vehicleId);
+		} else {
+			// warm emissions calculation
+			VehicleType vehicleType = vehicle.getType();
+			Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
+			warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
+		}
+	}
+
+	private void warnIfZeroLinkLength(Id<Link> linkId, double linkLength) {
+		if (linkLength == 0.) {
+			if (zeroLinkLengthWarnCnt == 0) {
+				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+				logger.warn(Gbl.ONLYONCE);
+				zeroLinkLengthWarnCnt++;
+			}
+		}
+	}
+
+	private void handleNullVehicle(Id<Vehicle> vehicleId) {
+
+		ColdEmissionHandler.handleNullVehicleECG(vehicleId, emissionsConfigGroup);
+
+		if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
+			throw new RuntimeException(
+					"No vehicle defined for id " + vehicleId + ". " +
+							"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+							+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+							+ " Aborting...");
+		} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
+			if (noVehWarnCnt < 10) {
+				logger.warn(
+						"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
+				noVehWarnCnt++;
+				if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		} else {
+			throw new RuntimeException("Not yet implemented. Aborting...");
+		}
 	}
 
 	/*package-private*/ int getLinkLeaveCnt() {
