@@ -166,11 +166,7 @@ public class CollectionLSPReplanningTest {
 		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( manager );
 		collectionLSP.setReplanner(replanner);
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(collectionLSP);
-		LSPs lsps = new LSPs(lspList);
-
-		LSPUtils.addLSPs( scenario, lsps );
+		LSPUtils.addLSPs( scenario, new LSPs( Collections.singletonList( collectionLSP )) );
 
 		Controler controler = new Controler(scenario);
 
