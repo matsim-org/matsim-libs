@@ -15,16 +15,20 @@ import org.matsim.modechoice.search.TopKChoicesGenerator;
 import javax.inject.Inject;
 
 /**
- * Provider for {@link IMCStrategy}.
+ * Provider for {@link IMCSelectFromGenerator}.
  */
 public class BestKSelectionStrategyProvider implements Provider<PlanStrategy> {
 
 	@Inject
 	private javax.inject.Provider<TripRouter> tripRouterProvider;
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private ActivityFacilities facilities;
-	@Inject private TimeInterpretation timeInterpretation;
-	@Inject private TopKChoicesGenerator generator;
+	@Inject
+	private GlobalConfigGroup globalConfigGroup;
+	@Inject
+	private ActivityFacilities facilities;
+	@Inject
+	private TimeInterpretation timeInterpretation;
+	@Inject
+	private TopKChoicesGenerator generator;
 
 	@Override
 	public PlanStrategy get() {
@@ -32,7 +36,7 @@ public class BestKSelectionStrategyProvider implements Provider<PlanStrategy> {
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
 		// TODO: scale is hardcoded
-		builder.addStrategyModule(new IMCStrategyModule(globalConfigGroup, generator, new MultinomialLogitSelector(0.1, MatsimRandom.getLocalInstance())));
+		builder.addStrategyModule(new IMCSimpleStrategyModule(globalConfigGroup, generator, new MultinomialLogitSelector(0.1, MatsimRandom.getLocalInstance())));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
 

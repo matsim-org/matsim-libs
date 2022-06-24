@@ -2,7 +2,10 @@ package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
@@ -22,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * Generate top n choices for each possible mode option.
  */
-public final class TopKChoicesGenerator implements CandidateGenerator {
+public class TopKChoicesGenerator implements CandidateGenerator {
 
 
 	/**
@@ -54,7 +57,7 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 	private Set<TripConstraint<?>> constraints;
 
 	@Inject
-	public TopKChoicesGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
+	TopKChoicesGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
 
 		this.config = config;
 		this.options = options;
@@ -66,15 +69,38 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 		}
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
 	public Collection<PlanCandidate> generate(Plan plan) {
+		return generate(plan, config.getTopK(), 0);
+	}
+
+	/**
+	 * Generate k top choices.
+	 *
+	 * @param plan      plan
+	 * @param topK      use at most top k choices (for each combination)
+	 * @param threshold discard solutions that are worse than best solution
+	 */
+	public Collection<PlanCandidate> generate(Plan plan, int topK, double threshold) {
 
 		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
 
-		Set<String> usableModes = new HashSet<>();
-
 		Map<String, List<PlanModel.Combination>> options = new IdentityHashMap<>();
+
+		PlanModel planModel = buildAndRouteOptions(plan, context, options);
+
+		Map<PlanModel.Combination, double[]> estimates = calculateEstimates(context, planModel, options);
+
+		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel, plan);
+
+		return generateCandidate(context, planModel, topK, threshold, estimates, constraints, PlanModel.combinations(options));
+	}
+
+	/**
+	 * Creates the plan model and fills the map with options.
+	 */
+	private PlanModel buildAndRouteOptions(Plan plan, EstimatorContext context, Map<String, List<PlanModel.Combination>> options) {
+
+		Set<String> usableModes = new HashSet<>();
 
 		for (String mode : config.getModes()) {
 
@@ -98,12 +124,12 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 			options.put(mode, c);
 		}
 
-		PlanModel planModel = router.routeModes(plan, usableModes);
+		return router.routeModes(plan, usableModes);
+	}
 
-		Map<PlanModel.Combination, double[]> estimates = calculateEstimates(context, planModel, options);
+	private List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel, Plan plan) {
 
 		List<ConstraintHolder<?>> constraints = new ArrayList<>();
-
 		for (TripConstraint<?> c : this.constraints) {
 			constraints.add(new ConstraintHolder<>(
 					(TripConstraint<Object>) c,
@@ -111,8 +137,7 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 			));
 		}
 
-		return generateCandidate(context, planModel, estimates, constraints, PlanModel.combinations(options));
-
+		return constraints;
 	}
 
 	/**
@@ -177,8 +202,9 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, Map<PlanModel.Combination, double[]> estimates,
-	                                                    List<ConstraintHolder<?>> constraints, List<List<PlanModel.Combination>> combinations) {
+	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, int topK, double threshold,
+	                                                            Map<PlanModel.Combination, double[]> estimates, List<ConstraintHolder<?>> constraints,
+	                                                            List<List<PlanModel.Combination>> combinations) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
 
@@ -211,7 +237,7 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 			double best = Double.NEGATIVE_INFINITY;
 
 			outer:
-			while (it.hasNext() && k < config.getTopK()) {
+			while (it.hasNext() && k < topK) {
 				double estimate = it.nextDouble();
 
 				if (n++ > MAX_ITER) {
@@ -246,11 +272,11 @@ public final class TopKChoicesGenerator implements CandidateGenerator {
 
 				// the cutoff won't work until estimates are below 0
 				// normally an agent should not have a negative costs for travelling
-				if (estimate < 0 && estimate > best)
+				if (estimate > best)
 					best = estimate;
 
 				// estimate and best are negative at this point
-				if (estimate < 0 && config.getCutoff() > 0 && estimate < best * (1 + config.getCutoff()))
+				if (threshold > 0 && best - estimate > threshold)
 					break;
 
 				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);

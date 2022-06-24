@@ -10,12 +10,12 @@ import java.util.Collection;
 /**
  * Choose route using a generator and selector.
  */
-public class IMCStrategy implements PlanAlgorithm {
+public class IMCSelectFromGenerator implements PlanAlgorithm {
 
 	private final CandidateGenerator generator;
 	private final Selector<PlanCandidate> selector;
 
-	public IMCStrategy(CandidateGenerator generator, Selector<PlanCandidate> selector) {
+	public IMCSelectFromGenerator(CandidateGenerator generator, Selector<PlanCandidate> selector) {
 		this.generator = generator;
 		this.selector = selector;
 	}

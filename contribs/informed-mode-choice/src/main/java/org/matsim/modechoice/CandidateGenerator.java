@@ -11,6 +11,9 @@ import java.util.Iterator;
 @FunctionalInterface
 public interface CandidateGenerator {
 
+	/**
+	 * Generate plan candidates, ordered by their natural comparator.
+	 */
 	Collection<PlanCandidate> generate(Plan plan);
 
 

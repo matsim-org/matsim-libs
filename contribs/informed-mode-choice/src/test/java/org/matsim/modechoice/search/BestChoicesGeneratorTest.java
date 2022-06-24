@@ -10,20 +10,18 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TopKChoicesGeneratorTest extends ScenarioTest {
-
+public class BestChoicesGeneratorTest extends ScenarioTest {
 
 	@Test
 	public void choices() {
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+		BestChoicesGenerator generator = injector.getInstance(BestChoicesGenerator.class);
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
 		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
-
 		assertThat(candidates)
-				.hasSize(10)
+				.hasSize(1)
 				.first()
 				.isEqualTo(new PlanCandidate(new String[]{"bike", "walk", "pt", "walk"}, Double.NaN));
 
@@ -31,9 +29,9 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
 		candidates = generator.generate(person.getSelectedPlan());
 		assertThat(candidates)
-				.hasSize(10)
+				.hasSize(1)
 				.first()
 				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car", "car", "car", null}, Double.NaN));
-
 	}
+
 }

@@ -7,14 +7,14 @@ import org.matsim.modechoice.CandidateGenerator;
 import org.matsim.modechoice.PlanCandidate;
 
 /**
- * Module for {@link IMCStrategy}.
+ * Module for {@link IMCSelectFromGenerator}.
  */
-public class IMCStrategyModule extends AbstractMultithreadedModule {
+public class IMCSimpleStrategyModule extends AbstractMultithreadedModule {
 
 	private final CandidateGenerator generator;
 	private final Selector<PlanCandidate> selector;
 
-	public IMCStrategyModule(GlobalConfigGroup globalConfigGroup, CandidateGenerator generator, Selector<PlanCandidate> selector) {
+	public IMCSimpleStrategyModule(GlobalConfigGroup globalConfigGroup, CandidateGenerator generator, Selector<PlanCandidate> selector) {
 		super(globalConfigGroup);
 		this.generator = generator;
 		this.selector = selector;
@@ -22,7 +22,7 @@ public class IMCStrategyModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new IMCStrategy(generator, selector);
+		return new IMCSelectFromGenerator(generator, selector);
 	}
 
 }

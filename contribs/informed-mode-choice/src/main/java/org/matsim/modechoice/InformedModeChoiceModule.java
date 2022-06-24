@@ -11,6 +11,9 @@ import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.PlanEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.modechoice.replanning.BestChoiceStrategyProvider;
+import org.matsim.modechoice.replanning.BestKSelectionStrategyProvider;
+import org.matsim.modechoice.replanning.InformedModeChoiceStrategyProvider;
+import org.matsim.modechoice.search.BestChoicesGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.util.HashMap;
@@ -28,6 +31,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	public static String BEST_CHOICE_STRATEGY = "BestChoice";
 
 	public static String BEST_K_SELECTION_STRATEGY = "BestKSelection";
+
+	public static String INFORMED_MODE_CHOICE = "InformedModeChoice";
 
 	private final Builder builder;
 
@@ -54,18 +59,18 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		bind(EstimateRouter.class).asEagerSingleton();
 		bind(TopKChoicesGenerator.class).asEagerSingleton();
+		bind(BestChoicesGenerator.class).asEagerSingleton();
 
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
 		}
 
 		addPlanStrategyBinding(BEST_CHOICE_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
-		addPlanStrategyBinding(BEST_K_SELECTION_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
+		addPlanStrategyBinding(BEST_K_SELECTION_STRATEGY).toProvider(BestKSelectionStrategyProvider.class);
+		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// TODO: SubTour best choice + best k selection
-		
 		// TODO: allow generators to only work on subset of plans
-
 
 	}
 
