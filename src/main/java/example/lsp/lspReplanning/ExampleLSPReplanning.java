@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -114,13 +115,21 @@ import java.util.Random;
 		LSP lsp  = collectionLSPBuilder.build();
 				
 				//Create StrategyManager, insert it in Replanner and add it to the lsp;
-				TomorrowShipmentAssignerStrategyManagerFactoryImpl factory = new TomorrowShipmentAssignerStrategyManagerFactoryImpl();
+//				TomorrowShipmentAssignerStrategyManagerFactoryImpl factory = new TomorrowShipmentAssignerStrategyManagerFactoryImpl();
 				// yyyy this feels quite odd.  The matsim GenericStrategyManager is heavyweight infrastructure, which exists
 				// once in the system.  Does it really make sense to now have one per agent?  Maybe just program directly
 				// what you want and need.  ??
-				
-				GenericStrategyManager<LSPPlan, LSP> manager = factory.createStrategyManager(lsp);
-				LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( manager );
+
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<>();
+
+		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+		maybeTodayAssigner.setLSP( lsp );
+
+		strategyManager.addStrategy(
+				new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy(), null, 1 );
+
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( strategyManager );
+
 //				replanner.setStrategyManager(manager);
 				lsp.setReplanner(replanner);
 //		collectionLSPBuilder.setReplanner( replanner ) ;
