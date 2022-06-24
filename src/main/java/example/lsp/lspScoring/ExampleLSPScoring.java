@@ -22,11 +22,7 @@ package example.lsp.lspScoring;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.LSPResource;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
@@ -96,20 +92,8 @@ import java.util.*;
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class ) )
 					     .setInitialPlan(lspPlan )
 					     .setSolutionScheduler( UsecaseUtils.createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( lspResource ) ) )
+					     .setSolutionScorer( new TipScorer() )
 					     .build();
-
-//		TipScorer.TipSimulationTracker tracker = new TipScorer.TipSimulationTracker();
-
-		//add SimulationTracker to the Resource
-//		lspResource.addSimulationTracker(tracker);
-
-		//Create the Scorer and add it to the lsp
-		final TipScorer scorer = new TipScorer();
-		lsp.addSimulationTracker( scorer );
-		lsp.setScorer( scorer );
-
-		// yyyyyy there is almost surely something wrong with the design if you cannot set the
-		// scorer in the builder. kai, sep'18
 
 		return lsp;
 	}
@@ -172,8 +156,6 @@ import java.util.*;
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 		return controler;

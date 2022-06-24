@@ -22,70 +22,41 @@ package example.lsp.lspScoring;
 
 import lsp.LSP;
 import lsp.controler.LSPSimulationTracker;
-import lsp.scoring.LSPScorer;
+import lsp.LSPScorer;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
-/*package-private*/ class TipScorer implements AfterMobsimListener, LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
+/*package-private*/ class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
 {
 	private static final Logger log = Logger.getLogger( TipScorer.class );
 
 	private final Random tipRandom;
 	private double tipSum;
-	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
-	private LSP lsp;
 
 	/*package-private*/ TipScorer() {
 		tipRandom = new Random(1);
 		tipSum = 0;
 	}
 	
-	@Override
-	public double scoreCurrentPlan(LSP lsp) {
+	@Override public double computeScoreForCurrentPlan() {
 		return tipSum;
 	}
 
 	@Override public void setEmbeddingContainer( LSP pointer ){
-		this.lsp = pointer;
+		// backpointer not needed here, therefor not memorizing it.  kai, jun'22
 	}
-//	@Override public LSP getEmbeddingContainer(){
-//		throw new RuntimeException( "not implemented" );
-//	}
 
-//	@Override public Collection<EventHandler> getEventHandlers() {
-//		return this.eventHandlers;
-//	}
-
-	@Override
-	public void handleEvent( LSPServiceEndEvent event ) {
+	@Override public void handleEvent( LSPServiceEndEvent event ) {
 		double tip = tipRandom.nextDouble() * 5;
 		log.warn("tipSum=" + tipSum + "; tip=" + tip);
 		tipSum += tip;
 	}
 
-	@Override public void notifyAfterMobsim( AfterMobsimEvent event ) {
-//		log.warn("just called reset on tipSum=" + tipSum );
-//		tipSum = 0.;
-	}
-
-
 	@Override public void reset( int iteration ){
-		log.warn("just called reset on tipSum=" + tipSum );
 		tipSum = 0.;
-//		throw new RuntimeException( "just called reset" );
 	}
-
-//	@Override public Attributes getAttributes(){
-//		return null;
-//	}
-
 
 }

@@ -18,32 +18,14 @@
  *  * ***********************************************************************
  */
 
-package lsp.scoring;
+package lsp;
 
-import com.google.inject.Inject;
 import lsp.LSP;
-import lsp.LSPUtils;
-import lsp.LSPs;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.events.ScoringEvent;
+import lsp.controler.LSPSimulationTracker;
 
-public class LSPScoringModuleDefaultImpl implements LSPScoringModule{
-
-	private final Scenario scenario;
-	@Inject LSPScoringModuleDefaultImpl( Scenario scenario ) {
-		this.scenario = scenario;
-	}
-		
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-		scoreLSPs(event);
-	}
-
-	@Override
-	public void scoreLSPs(ScoringEvent arg0) {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
-		for(LSP lsp : lsps.getLSPs().values()) {
-			lsp.scoreSelectedPlan();
-		}
-	}
+/**
+ * LSPScorer uses the capabilities of {@link LSPSimulationTracker} to come up with a score for the current plan.
+ */
+public interface LSPScorer extends LSPSimulationTracker<LSP> {
+	double computeScoreForCurrentPlan();
 }

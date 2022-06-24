@@ -24,13 +24,10 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import lsp.*;
-import lsp.replanning.LSPReplanningModule;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScoringModule;
-import lsp.scoring.LSPScoringModuleDefaultImpl;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.junit.Before;
@@ -126,23 +123,13 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<>();
+		List<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(collectionAdapter);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
+		collectionLSPBuilder.setSolutionScorer( new TipScorer() );
 		collectionLSP = collectionLSPBuilder.build();
-
-//		TipEventHandler handler = new TipEventHandler();
-//		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
-//		LSPAttributes function = LSPInfoFunctionUtils.createDefaultInfoFunction();
-//		function.getAttributes().add(value );
-//		TipInfo info = new TipInfo();
-//		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
-//		collectionAdapter.addSimulationTracker(tipTracker);
-		TipScorer tipScorer = new TipScorer();
-		collectionLSP.addSimulationTracker( tipScorer );
-		collectionLSP.setScorer(tipScorer);
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
@@ -187,8 +174,6 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				install( new LSPModule() );
-				this.bind( LSPReplanningModule.class ).to( LSPReplanningModuleImpl.class );
-				this.bind( LSPScoringModule.class ).to( LSPScoringModuleDefaultImpl.class );
 			}
 		});
 		config.controler().setFirstIteration(0);
