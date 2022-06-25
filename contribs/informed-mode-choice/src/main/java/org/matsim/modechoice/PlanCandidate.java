@@ -17,27 +17,27 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	private final String[] modes;
 
 	/**
-	 * Estimated minimum utility. An estimate should never underestimate the utility.
+	 * Estimated maximum utility. An estimate should never underestimate the utility.
 	 */
 	private double utility;
 
 	/**
-	 * Max estimate. This is the maximum expected utility that could be achieved.
+	 * Minimum estimate. This is the minimal expected utility that can be achieved. (But might be more)
 	 */
-	private double max;
+	private double min;
 
 	public PlanCandidate(String[] modes, double utility) {
 		this.modes = modes;
 		this.utility = utility;
-		this.max = utility;
+		this.min = utility;
 	}
 
 	/**
 	 * Updates the minimum and maximum estimates accordingly.
 	 */
 	public PlanCandidate updateUtility(double utility) {
-		this.utility = Math.min(this.utility, utility);
-		this.max = Math.max(this.max, utility);
+		this.utility = Math.max(this.utility, utility);
+		this.min = Math.min(this.min, utility);
 		return this;
 	}
 
@@ -48,8 +48,8 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		return utility;
 	}
 
-	public double getMaxUtility() {
-		return max;
+	public double getMinUtility() {
+		return min;
 	}
 
 	/**
@@ -71,8 +71,8 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		plan.setType(id);
 		plan.setScore(null);
 
-		plan.getAttributes().putAttribute(MIN_ESTIMATE, utility);
-		plan.getAttributes().putAttribute(MAX_ESTIMATE, max);
+		plan.getAttributes().putAttribute(MAX_ESTIMATE, utility);
+		plan.getAttributes().putAttribute(MIN_ESTIMATE, min);
 
 		int k = 0;
 		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
@@ -135,7 +135,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	public String toString() {
 		return "PlanCandidate{" +
 				"modes=" + Arrays.toString(modes) +
-				", utility=" + utility + (utility != max ? " (max=" + max + ")" : "") +
+				", utility=" + utility + (utility != min ? " (min=" + min + ")" : "") +
 				'}';
 	}
 }

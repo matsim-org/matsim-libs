@@ -116,8 +116,8 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 				c.add(new PlanModel.Combination(mode, modeOption));
 				TripEstimator<Enum<?>> te = (TripEstimator<Enum<?>>) tripEstimator.get(mode);
 
-				// Check if max estimate is needed
-				if (te != null && te.providesMaxEstimate(context, mode, modeOption))
+				// Check if min estimate is needed
+				if (te != null && te.providesMinEstimate(context, mode, modeOption))
 					c.add(new PlanModel.Combination(mode, modeOption, true));
 			}
 
@@ -173,7 +173,7 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 					double estimate = 0;
 					if (tripEst != null) {
 						MinMaxEstimate minMax = tripEst.estimate(context, c.getMode(), planModel, legs, c.getOption());
-						estimate += c.isMax() ? minMax.getMax() : minMax.getMin();
+						estimate += c.isMin() ? minMax.getMin() : minMax.getMax();
 					}
 
 					for (Leg leg : legs) {

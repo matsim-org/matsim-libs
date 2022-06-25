@@ -14,7 +14,7 @@ import java.util.List;
 public interface TripEstimator<T extends Enum<?>> {
 
 	/**
-	 * Calculate a *minimum* estimate of utility íf this mode would be used. This method will be called with all legs of a trip.
+	 * Calculate an estimate of utility íf this mode would be used. This method will be called with all legs of a trip.
 	 * legs not belonging to this mode must not be estimated and are only present as context.
 	 *
 	 * @param context person traveling
@@ -28,9 +28,9 @@ public interface TripEstimator<T extends Enum<?>> {
 
 
 	/**
-	 * Indicate whether an estimate will be so uncertain that it requires an additional maximum estimation.
+	 * Indicate whether an estimate will be uncertain, so that it requires an additional minimum estimation.
 	 */
-	default boolean providesMaxEstimate(EstimatorContext context, String mode, T option) {
+	default boolean providesMinEstimate(EstimatorContext context, String mode, T option) {
 		return false;
 	}
 

@@ -11,7 +11,7 @@ import org.matsim.modechoice.EstimatorContext;
 public interface LegEstimator<T extends Enum<?>> {
 
 	/**
-	 * Calculate a *minimum* estimate of utility íf this mode would be used.
+	 * Calculate an estimate of utility íf this mode would be used.
 	 *
 	 * @param context person traveling
 	 * @param mode    desire mode

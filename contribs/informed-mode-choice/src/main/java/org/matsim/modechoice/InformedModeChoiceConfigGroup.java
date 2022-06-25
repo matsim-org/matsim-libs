@@ -22,7 +22,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * The setter ensures, that this class always contains internal string representations.
 	 */
-	private Set<String> modes = Set.of(TransportMode.car, TransportMode.walk, TransportMode.pt, TransportMode.bike);
+	private List<String> modes = List.of(TransportMode.car, TransportMode.walk, TransportMode.pt, TransportMode.bike);
 
 	/**
 	 * Use kth best trips.
@@ -46,7 +46,8 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public void setModes(Iterable<String> modes) {
 		this.modes = StreamSupport.stream(modes.spliterator(), false)
 				.map(String::intern)
-				.collect(Collectors.toSet());
+				.distinct()
+				.collect(Collectors.toList());
 	}
 
 	@StringSetter(CONFIG_PARAM_TOP_K)
@@ -59,7 +60,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return k;
 	}
 
-	public Set<String> getModes() {
+	public List<String> getModes() {
 		return modes;
 	}
 

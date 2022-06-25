@@ -31,12 +31,12 @@ public class BestChoicesGenerator extends TopKChoicesGenerator {
 			return Set.of();
 
 		// sort by minimum guaranteed utility
-		candidates.sort(Comparator.comparingDouble(PlanCandidate::getUtility).reversed());
+		candidates.sort(Comparator.comparingDouble(PlanCandidate::getMinUtility).reversed());
 
 		double min = candidates.get(0).getUtility();
 
 		// Candidates with worse best case utility than the guaranteed best can be removed
-		candidates.removeIf(c -> c.getMaxUtility() < min);
+		candidates.removeIf(c -> c.getUtility() < min);
 
 		return candidates;
 	}

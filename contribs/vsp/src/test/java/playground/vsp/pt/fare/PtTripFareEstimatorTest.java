@@ -120,4 +120,16 @@ public class PtTripFareEstimatorTest {
 						.isCloseTo(-379.4, Offset.offset(0.1));
 
 	}
+
+	@Test
+	public void all() {
+
+		for (Id<Person> agent : TestScenario.Agents) {
+			List<MinMaxEstimate> est = estimateAgent(agent);
+
+			assertThat(est)
+					.allMatch(e -> e.getMin() <= e.getMax(), "Min smaller max");
+
+		}
+	}
 }

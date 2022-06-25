@@ -82,8 +82,8 @@ public class PtTripFareEstimator extends PtTripEstimator {
 			estimate += context.scoring.utilityOfLineSwitch * (numberOfVehicularLegs - 1);
 		}
 
-		double max = estimate;
-		if (providesMaxEstimate(context, mode, option)) {
+		double max;
+		if (providesMinEstimate(context, mode, option)) {
 			double maxFareUtility = -context.scoring.marginalUtilityOfMoney * calcMinimumFare(plan);
 
 			// It can happen that this bound is not even better
@@ -93,8 +93,10 @@ public class PtTripFareEstimator extends PtTripEstimator {
 			maxFareUtility = Math.max(fareUtility, maxFareUtility);
 
 			max = estimate + maxFareUtility;
-		}
+		} else
+			max = estimate + fareUtility;
 
+		// Distance fareUtility is the highest possible price, therefore the minimum utility
 		return MinMaxEstimate.of(estimate + fareUtility, max);
 	}
 
@@ -164,7 +166,7 @@ public class PtTripFareEstimator extends PtTripEstimator {
 	}
 
 	@Override
-	public boolean providesMaxEstimate(EstimatorContext context, String mode, ModeAvailability option) {
+	public boolean providesMinEstimate(EstimatorContext context, String mode, ModeAvailability option) {
 		return config.getApplyUpperBound();
 	}
 }

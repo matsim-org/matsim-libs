@@ -100,20 +100,20 @@ public final class PlanModel {
 		private final Enum<?> option;
 
 		/**
-		 * Whether this should be for a maximum estimate. Otherwise, minimum is assumed.
+		 * Whether this should be for a minimum estimate. Otherwise, maximum is assumed.
 		 */
-		private final boolean max;
+		private final boolean min;
 
 		public Combination(String mode, Enum<?> option) {
 			this.mode = mode;
 			this.option = option;
-			this.max = false;
+			this.min = false;
 		}
 
-		public Combination(String mode, Enum<?> option, boolean max) {
+		public Combination(String mode, Enum<?> option, boolean min) {
 			this.mode = mode;
 			this.option = option;
-			this.max = max;
+			this.min = min;
 		}
 
 		public String getMode() {
@@ -124,13 +124,13 @@ public final class PlanModel {
 			return option;
 		}
 
-		public boolean isMax() {
-			return max;
+		public boolean isMin() {
+			return min;
 		}
 
 		@Override
 		public String toString() {
-			return mode + "=" + option + (max ? " (max) " : "");
+			return mode + "=" + option + (min ? " (min) " : "");
 		}
 
 		@Override
@@ -138,12 +138,12 @@ public final class PlanModel {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
 			Combination that = (Combination) o;
-			return max == that.max && mode.equals(that.mode) && option == that.option;
+			return min == that.min && mode.equals(that.mode) && option == that.option;
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(mode, option, max);
+			return Objects.hash(mode, option, min);
 		}
 	}
 

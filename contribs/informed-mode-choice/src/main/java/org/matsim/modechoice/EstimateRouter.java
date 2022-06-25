@@ -14,6 +14,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public final class EstimateRouter {
 	/**
 	 * Route all modes that are relevant with all possible options.
 	 */
-	public PlanModel routeModes(Plan plan, Set<String> modes) {
+	public PlanModel routeModes(Plan plan, Collection<String> modes) {
 
 		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
 

@@ -82,7 +82,7 @@ public class PtTripEstimator implements TripEstimator<ModeAvailability> {
 		}
 
 
-		return MinMaxEstimate.ofMin(estimate);
+		return MinMaxEstimate.ofMax(estimate);
 	}
 
 	protected double scoreLeg(Leg leg, EstimatorContext context, ModeUtilityParameters params) {

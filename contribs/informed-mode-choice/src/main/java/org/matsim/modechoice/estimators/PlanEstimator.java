@@ -21,4 +21,5 @@ public interface PlanEstimator<T extends Enum<?>> extends TripEstimator<T> {
 
 	// TODO: distances and departure times for all trips of the day
 	// might be useful for some estimates (pt)
+	// or for certain types of tolls
 }
