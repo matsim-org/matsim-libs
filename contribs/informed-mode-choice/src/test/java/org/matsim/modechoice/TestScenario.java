@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -107,6 +108,13 @@ public class TestScenario extends MATSimApplication {
 				newModes.add("freight");
 
 				link.setAllowedModes(newModes);
+			}
+		}
+
+		// reset all scores
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				plan.setScore(null);
 			}
 		}
 	}

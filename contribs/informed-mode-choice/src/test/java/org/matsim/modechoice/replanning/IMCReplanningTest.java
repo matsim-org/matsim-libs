@@ -8,8 +8,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.modechoice.InformedModeChoiceModule;
 import org.matsim.modechoice.TestScenario;
 
-import static org.junit.Assert.*;
-
 public class IMCReplanningTest {
 
 	@Test
@@ -27,7 +25,6 @@ public class IMCReplanningTest {
 		Controler controler = MATSimApplication.prepare(TestScenario.class, config);
 
 		controler.run();
-
 
 	}
 }

@@ -1,10 +1,12 @@
 package org.matsim.modechoice;
 
+import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Candidate for trip modes. One candidate is compared to others by the minimum utility estimate.
@@ -57,6 +59,22 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public String getMode(int i) {
 		return modes[i];
+	}
+
+
+	/**
+	 * Return features vector with number of occurrences per mode.
+	 */
+	public static double[] occurrences(List<String> modes, String type) {
+
+		double[] ft = new double[modes.size()];
+
+		for (int i = 0; i < modes.size(); i++) {
+			int count = StringUtils.countMatches(type, modes.get(i));
+			ft[i] = count;
+		}
+
+		return ft;
 	}
 
 	/**
