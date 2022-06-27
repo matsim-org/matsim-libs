@@ -33,7 +33,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		assertThat(candidates)
 				.hasSize(10)
 				.first()
-				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car", "car", "car", null}, Double.NaN));
+				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car", "car", "car", "car"}, Double.NaN));
 
 	}
 }

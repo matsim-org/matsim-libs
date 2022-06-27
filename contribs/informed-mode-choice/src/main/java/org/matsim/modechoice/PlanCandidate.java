@@ -84,7 +84,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public void applyTo(Plan plan) {
 
-		String id = getPlanType(modes);
+		String id = getPlanType();
 
 		plan.setType(id);
 		plan.setScore(null);
@@ -117,7 +117,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	/**
 	 * Return identifier for chosen modes.
 	 */
-	public static String getPlanType(String[] modes) {
+	public String getPlanType() {
 
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < modes.length; i++) {

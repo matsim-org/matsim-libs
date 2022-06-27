@@ -14,6 +14,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
@@ -22,7 +23,8 @@ import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The main strategy for informed mode choice.
@@ -32,6 +34,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private static final Logger log = LogManager.getLogger(InformedModeChoicePlanStrategy.class);
 
 	private final RandomUnscoredPlanSelector<Plan, Person> unscored = new RandomUnscoredPlanSelector<>();
+	private final RandomPlanSelector<Plan, Person> random = new RandomPlanSelector<>();
 
 	private final InformedModeChoiceConfigGroup config;
 	private final TopKChoicesGenerator generator;
@@ -149,23 +152,30 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
 
 		// TODO: should replace old plans with same type
-		// TODO: should remove and not regenrate unpromising plan types
+		// TODO: should remove and not regenerate unpromising plan types
 
-		applyCandidates(person, person.getSelectedPlan(), candidates);
-
+		applyCandidates(person, candidates);
+		person.setSelectedPlan(random.selectPlan(person));
 	}
 
-	private void applyCandidates(HasPlansAndId<Plan, Person> person, Plan plan, Collection<PlanCandidate> candidates) {
+	private void applyCandidates(HasPlansAndId<Plan, Person> person, Collection<PlanCandidate> candidates) {
 
 		for (PlanCandidate c : candidates) {
 
-			if (plan == null)
-				plan = person.createCopyOfSelectedPlanAndMakeSelected();
+			List<? extends Plan> same = person.getPlans().stream()
+					.filter(p -> c.getPlanType().equals(p.getType()))
+					.collect(Collectors.toList());
 
-			c.applyTo(plan);
-			plan = null;
+			// if this type exists, overwrite existing plans
+			if (!same.isEmpty()) {
+				same.forEach(c::applyTo);
+
+			} else {
+
+				Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
+				c.applyTo(plan);
+			}
 		}
-
 	}
 
 	@Override

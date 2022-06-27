@@ -67,11 +67,13 @@ public final class EstimateRouter {
 				Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
 
 				// don't route if same location
+				/*
 				if ((from.getLinkId() != null && from.getLinkId() == to.getLinkId()) ||
 						(from.getCoord() != null && from.getCoord().equals(to.getCoord()))) {
 					legs[i++] = null;
 					continue;
 				}
+				 */
 
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 						mode, from, to,
