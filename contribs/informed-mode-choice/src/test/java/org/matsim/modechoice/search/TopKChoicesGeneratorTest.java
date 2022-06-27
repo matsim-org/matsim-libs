@@ -1,6 +1,7 @@
 package org.matsim.modechoice.search;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.ScenarioTest;
@@ -34,6 +35,20 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 				.hasSize(10)
 				.first()
 				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car", "car", "car", "car"}, Double.NaN));
+
+	}
+
+	@Test
+	public void person() {
+
+		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+
+		Person person = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("10390"));
+
+		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
+
+		assertThat(candidates)
+				.contains(new PlanCandidate(new String[]{"car"}, -5.96));
 
 	}
 }

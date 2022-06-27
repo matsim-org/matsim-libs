@@ -17,6 +17,9 @@ public interface FixedCostsEstimator<T extends Enum<?>> {
 	double fixedUtility(EstimatorContext context, String mode, T option);
 
 
+	/**
+	 * Default implementation that uses the daily constant as fixed costs.
+	 */
 	final class DailyConstant implements FixedCostsEstimator<ModeAvailability> {
 
 		@Override

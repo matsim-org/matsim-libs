@@ -13,8 +13,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.modechoice.estimators.DailyConstantFixedCosts;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
+import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.PtTripEstimator;
 
 import javax.annotation.Nullable;
@@ -125,7 +125,7 @@ public class TestScenario extends MATSimApplication {
 	protected void prepareControler(Controler controler) {
 
 		InformedModeChoiceModule.Builder builder = InformedModeChoiceModule.newBuilder()
-				.withFixedCosts(DailyConstantFixedCosts.class, "car")
+				.withFixedCosts(FixedCostsEstimator.DailyConstant.class, "car")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "ride", "bike", "walk")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderIfCarAvailable.class, "car")
 				.withTripEstimator(PtTripEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
