@@ -40,6 +40,9 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--scenario", description = "Full qualified classname of the MATSim application scenario class. The IMC modules must be specified there.", required = true)
 	private Class<? extends MATSimApplication> scenario;
 
+	@CommandLine.Option(names = "--args", description = "Arguments passed to the scenario")
+	private String scenarioArgs;
+
 	@CommandLine.Option(names = "--population", description = "Path to input population")
 	private Path populationPath;
 
@@ -81,7 +84,12 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		imc.setTopK(topK);
 		imc.setModes(modes);
 
-		Controler controler = MATSimApplication.prepare(scenario, config);
+		Controler controler;
+
+		if (scenarioArgs == null)
+			controler = MATSimApplication.prepare(scenario, config);
+		else
+			controler = MATSimApplication.prepare(scenario, config, scenarioArgs);
 
 		// THis is currently needed because vehicle id mapping needs to be initialized
 		controler.run();
