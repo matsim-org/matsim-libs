@@ -2,8 +2,10 @@ package org.matsim.application.prepare.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PersonUtils;
@@ -13,10 +15,7 @@ import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SplittableRandom;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "fix-subtour-modes", description = "Fix modes for subtours that contain chain and non-chain based modes, by choosing one of the found modes randomly.", showDefaultValues = true)
@@ -35,6 +34,9 @@ public class FixSubtourModes implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
 	private Set<String> chainBasedModes;
+
+	@CommandLine.Option(names = "--all-plans", description = "Whether to fix all plans, or only selected", defaultValue = "false")
+	private boolean allPlans;
 
 	private final SplittableRandom rnd = new SplittableRandom();
 
@@ -57,11 +59,29 @@ public class FixSubtourModes implements MATSimAppCommand {
 			String subpop = PopulationUtils.getSubpopulation(person);
 			if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) continue;
 
-			for (TripStructureUtils.Subtour st : TripStructureUtils.getSubtours(person.getSelectedPlan())) {
+			List<? extends Plan> plans = allPlans ? person.getPlans() : List.of(person.getSelectedPlan());
 
-				if (fixSubtour(person, st))
+			for (Plan plan : plans) {
+
+				try {
+					Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(plan);
+					for (TripStructureUtils.Subtour st : subtours) {
+
+						if (fixSubtour(person, st))
+							fixed++;
+
+					}
+				} catch (Exception e) {
+					log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e.getMessage());
+
+					for (Leg leg : TripStructureUtils.getLegs(plan)) {
+						leg.setRoute(null);
+						leg.setMode(TransportMode.walk);
+						TripStructureUtils.setRoutingMode(leg, TransportMode.walk);
+					}
+
 					fixed++;
-
+				}
 			}
 
 			processed++;
@@ -76,6 +96,7 @@ public class FixSubtourModes implements MATSimAppCommand {
 
 	/**
 	 * Fix a subtour if it violates the constraints.
+	 *
 	 * @return whether subtour was adjusted
 	 */
 	public boolean fixSubtour(Person person, TripStructureUtils.Subtour st) {
