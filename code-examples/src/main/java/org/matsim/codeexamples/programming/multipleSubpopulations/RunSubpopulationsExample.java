@@ -91,6 +91,7 @@ public class RunSubpopulationsExample {
 //		config.plans().setSubpopulationAttributeName(SUBPOP_ATTRIB_NAME); /* This is the default anyway. */
 		config.network().setInputFile(EQUIL_NETWORK);
 		config.controler().setOutputDirectory(OUTPUT);
+		config.controler().setLastIteration( 1 );
 		
 		/* Strategies set up in the 'strategy' module of the config file are only applicable to the 'default' population, i.e. those agents without a subpopulation
 		 * attribute. For all agents with a subpopulation attribute, you need to set up the suite of strategies for the subpopulation(s).
@@ -101,6 +102,7 @@ public class RunSubpopulationsExample {
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
 			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.TimeAllocationMutator ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.2 ) );
+
 			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.8 ) );
 		}
 		{
