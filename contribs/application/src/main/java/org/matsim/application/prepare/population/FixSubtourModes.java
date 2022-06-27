@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PersonUtils;
@@ -34,6 +35,9 @@ public class FixSubtourModes implements MATSimAppCommand {
 	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
 	private Set<String> chainBasedModes;
 
+	@CommandLine.Option(names = "--all-plans", description = "Whether to fix all plans, or only selected", defaultValue = "false")
+	private boolean allPlans;
+
 	private final SplittableRandom rnd = new SplittableRandom();
 
 	public static void main(String[] args) {
@@ -55,26 +59,29 @@ public class FixSubtourModes implements MATSimAppCommand {
 			String subpop = PopulationUtils.getSubpopulation(person);
 			if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) continue;
 
-			try {
-				Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(person.getSelectedPlan());
-				for (TripStructureUtils.Subtour st : subtours) {
+			List<? extends Plan> plans = allPlans ? person.getPlans() : List.of(person.getSelectedPlan());
 
-					if (fixSubtour(person, st))
-						fixed++;
+			for (Plan plan : plans) {
 
+				try {
+					Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(plan);
+					for (TripStructureUtils.Subtour st : subtours) {
+
+						if (fixSubtour(person, st))
+							fixed++;
+
+					}
+				} catch (Exception e) {
+					log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e.getMessage());
+
+					for (Leg leg : TripStructureUtils.getLegs(plan)) {
+						leg.setRoute(null);
+						leg.setMode(TransportMode.walk);
+						TripStructureUtils.setRoutingMode(leg, TransportMode.walk);
+					}
+
+					fixed++;
 				}
-			} catch (Exception e) {
-				log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e.getMessage());
-
-				for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
-					leg.setRoute(null);
-					leg.setMode(TransportMode.walk);
-					TripStructureUtils.setRoutingMode(leg, TransportMode.walk);
-				}
-
-				fixed++;
-
-				continue;
 			}
 
 			processed++;
