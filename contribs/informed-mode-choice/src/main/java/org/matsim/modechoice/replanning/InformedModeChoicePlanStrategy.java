@@ -67,10 +67,9 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	@Override
 	public void init(ReplanningContext replanningContext) {
 
-
 		String f = controlerIO.getIterationFilename(replanningContext.getIteration(), "scoreEstimates.tsv.gz");
 
-		boolean explainScores = ConfigUtils.addOrGetModule(globalConfig, PlanCalcScoreConfigGroup.class).isExplainScores();
+		boolean explainScores = globalConfig.planCalcScore().isExplainScores();
 
 		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(f), CSVFormat.MONGODB_TSV)) {
 
@@ -198,12 +197,18 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		executor.shutdown();
 
 		try {
-			boolean b = executor.awaitTermination(10, TimeUnit.SECONDS);
+			boolean b = executor.awaitTermination(1, TimeUnit.HOURS);
+
+			if (!b) {
+				log.error("Not all replanning tasks could finish");
+				throw new RuntimeException("Not all replanning tasks could finish");
+			}
+
 		} catch (InterruptedException e) {
-			log.error("Not all tasks could finish", e);
+			log.error("Not all replanning tasks could finish", e);
+			throw new RuntimeException(e);
 		}
 	}
-
 
 	private final class ReplanningTask implements Runnable {
 
