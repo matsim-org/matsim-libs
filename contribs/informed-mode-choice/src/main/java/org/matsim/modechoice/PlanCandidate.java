@@ -89,8 +89,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		plan.setType(id);
 		plan.setScore(null);
 
-		plan.getAttributes().putAttribute(MAX_ESTIMATE, utility);
-		plan.getAttributes().putAttribute(MIN_ESTIMATE, min);
+		applyAttributes(plan);
 
 		int k = 0;
 		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
@@ -112,6 +111,16 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 
 			k++;
 		}
+	}
+
+	/**
+	 * Set estimates as plan attributes.
+	 */
+	public void applyAttributes(Plan plan) {
+
+		plan.getAttributes().putAttribute(MAX_ESTIMATE, utility);
+		plan.getAttributes().putAttribute(MIN_ESTIMATE, min);
+
 	}
 
 	/**

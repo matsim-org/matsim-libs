@@ -10,12 +10,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.PlanCandidate;
@@ -23,7 +27,11 @@ import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -37,17 +45,21 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private final RandomPlanSelector<Plan, Person> random = new RandomPlanSelector<>();
 
 	private final InformedModeChoiceConfigGroup config;
+	private final Config globalConfig;
 	private final TopKChoicesGenerator generator;
 
 	private final SimpleRegression[] reg;
 	private final Scenario scenario;
 	private final OutputDirectoryHierarchy controlerIO;
 
-	public InformedModeChoicePlanStrategy(InformedModeChoiceConfigGroup config, TopKChoicesGenerator generator,
+	private ExecutorService executor;
+
+	public InformedModeChoicePlanStrategy(Config config, TopKChoicesGenerator generator,
 	                                      Scenario scenario, OutputDirectoryHierarchy controlerIO) {
-		this.config = config;
+		this.globalConfig = config;
+		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		this.generator = generator;
-		this.reg = new SimpleRegression[config.getModes().size()];
+		this.reg = new SimpleRegression[this.config.getModes().size()];
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
 	}
@@ -58,6 +70,8 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 		String f = controlerIO.getIterationFilename(replanningContext.getIteration(), "scoreEstimates.csv.gz");
 
+		boolean explainScores = ConfigUtils.addOrGetModule(globalConfig, PlanCalcScoreConfigGroup.class).isExplainScores();
+
 		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(f), CSVFormat.DEFAULT)) {
 
 			csv.print("person");
@@ -65,6 +79,9 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			csv.print("plan");
 			csv.print("type");
 			csv.print("score");
+			if (explainScores)
+				csv.print(ScoringFunction.SCORE_EXPLANATION);
+
 			csv.print(PlanCandidate.MAX_ESTIMATE);
 			csv.print(PlanCandidate.MIN_ESTIMATE);
 
@@ -83,6 +100,9 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 					csv.print(i++);
 					csv.print(plan.getType());
 					csv.print(plan.getScore());
+					if (explainScores)
+						csv.print(plan.getAttributes().getAttribute(ScoringFunction.SCORE_EXPLANATION));
+
 					csv.print(plan.getAttributes().getAttribute(PlanCandidate.MAX_ESTIMATE));
 					csv.print(plan.getAttributes().getAttribute(PlanCandidate.MIN_ESTIMATE));
 
@@ -97,12 +117,12 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		} catch (IOException e) {
 			log.error("Could not write Estimate csv", e);
 		}
+
+		this.executor = Executors.newWorkStealingPool(globalConfig.global().getNumberOfThreads());
 	}
 
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
-
-		// TODO: needs own multithreading
 
 		Plan unscored = this.unscored.selectPlan(person);
 
@@ -148,27 +168,21 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
  */
 
 		//Plan best = person.getPlans().stream().max(Comparator.comparingDouble(Plan::getScore)).orElseThrow();
-
-		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
-
-		// TODO: should replace old plans with same type
-		// TODO: should remove and not regenerate unpromising plan types
-
-		applyCandidates(person, candidates);
-		person.setSelectedPlan(random.selectPlan(person));
+		executor.submit(new ReplanningTask(person));
 	}
 
-	private void applyCandidates(HasPlansAndId<Plan, Person> person, Collection<PlanCandidate> candidates) {
+	private void applyCandidates(HasPlansAndId<Plan, Person> person, Collection<PlanCandidate> candidates, Plan best) {
 
 		for (PlanCandidate c : candidates) {
 
+			// the best plan is not modified
 			List<? extends Plan> same = person.getPlans().stream()
 					.filter(p -> c.getPlanType().equals(p.getType()))
 					.collect(Collectors.toList());
 
-			// if this type exists, overwrite existing plans
+			// if this type exists, overwrite estimates
 			if (!same.isEmpty()) {
-				same.forEach(c::applyTo);
+				same.forEach(c::applyAttributes);
 
 			} else {
 
@@ -181,5 +195,41 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	@Override
 	public void finish() {
 
+		executor.shutdown();
+
+		try {
+			boolean b = executor.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			log.error("Not all tasks could finish", e);
+		}
 	}
+
+
+	private final class ReplanningTask implements Runnable {
+
+		private final HasPlansAndId<Plan, Person> person;
+
+		private ReplanningTask(HasPlansAndId<Plan, Person> person) {
+			this.person = person;
+		}
+
+		@Override
+		public void run() {
+
+			Plan best = person.getPlans().stream()
+					.max(Comparator.comparingDouble(Plan::getScore)).orElse(null);
+
+			person.setSelectedPlan(best);
+
+			Collection<PlanCandidate> candidates = generator.generate(best);
+
+			// TODO: should replace old plans with same type
+			// TODO: should remove and not regenerate unpromising plan types
+
+
+			applyCandidates(person, candidates, best);
+			person.setSelectedPlan(random.selectPlan(person));
+		}
+	}
+
 }

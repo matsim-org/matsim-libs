@@ -56,4 +56,8 @@ public final class CharyparNagelMoneyScoring implements SumScoringFunction.Money
 		return this.score;
 	}
 
+	@Override
+	public void explainScore(StringBuilder out) {
+		out.append("money=").append(score);
+	}
 }
