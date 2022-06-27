@@ -68,11 +68,11 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	public void init(ReplanningContext replanningContext) {
 
 
-		String f = controlerIO.getIterationFilename(replanningContext.getIteration(), "scoreEstimates.csv.gz");
+		String f = controlerIO.getIterationFilename(replanningContext.getIteration(), "scoreEstimates.tsv.gz");
 
 		boolean explainScores = ConfigUtils.addOrGetModule(globalConfig, PlanCalcScoreConfigGroup.class).isExplainScores();
 
-		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(f), CSVFormat.DEFAULT)) {
+		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(f), CSVFormat.MONGODB_TSV)) {
 
 			csv.print("person");
 			csv.print("subpopulation");
