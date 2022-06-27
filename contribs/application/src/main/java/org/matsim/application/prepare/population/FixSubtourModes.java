@@ -2,6 +2,7 @@ package org.matsim.application.prepare.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -13,10 +14,7 @@ import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SplittableRandom;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "fix-subtour-modes", description = "Fix modes for subtours that contain chain and non-chain based modes, by choosing one of the found modes randomly.", showDefaultValues = true)
@@ -57,11 +55,26 @@ public class FixSubtourModes implements MATSimAppCommand {
 			String subpop = PopulationUtils.getSubpopulation(person);
 			if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) continue;
 
-			for (TripStructureUtils.Subtour st : TripStructureUtils.getSubtours(person.getSelectedPlan())) {
+			try {
+				Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(person.getSelectedPlan());
+				for (TripStructureUtils.Subtour st : subtours) {
 
-				if (fixSubtour(person, st))
-					fixed++;
+					if (fixSubtour(person, st))
+						fixed++;
 
+				}
+			} catch (Exception e) {
+				log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e.getMessage());
+
+				for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
+					leg.setRoute(null);
+					leg.setMode(TransportMode.walk);
+					TripStructureUtils.setRoutingMode(leg, TransportMode.walk);
+				}
+
+				fixed++;
+
+				continue;
 			}
 
 			processed++;
@@ -76,6 +89,7 @@ public class FixSubtourModes implements MATSimAppCommand {
 
 	/**
 	 * Fix a subtour if it violates the constraints.
+	 *
 	 * @return whether subtour was adjusted
 	 */
 	public boolean fixSubtour(Person person, TripStructureUtils.Subtour st) {
