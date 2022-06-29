@@ -17,12 +17,9 @@ import java.util.Collection;
 
 /**
  * A less restrictive version of mass conservation on subtours.
- * This class ensures that on each subtour only one chainbased mode can be used.
- * Which usually means that a vehicle needs to be brought back where it was token.
- *
- *
+ * This class ensures that on each subtour only one chain-based mode can be used.
  */
-public class RelaxedSubtourConstraint implements TripConstraint<int[]> {
+public final class RelaxedSubtourConstraint implements TripConstraint<int[]> {
 
 	private final ReferenceSet<String> chainBasedModes;
 
@@ -75,7 +72,7 @@ public class RelaxedSubtourConstraint implements TripConstraint<int[]> {
 
 			// if one of the modes is chain based
 			// the same needs to be used on the whole subtrip
-			if ((chainBasedModes.contains(mode) || chainBasedModes.contains(other)) && other != mode)
+			if (other != mode && (chainBasedModes.contains(mode) || chainBasedModes.contains(other)))
 				return false;
 
 		}
