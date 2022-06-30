@@ -58,7 +58,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	private int topK;
 
 	@CommandLine.Option(names = "--threshold", description = "Cut-off plans below certain score scaled by distance.", defaultValue = "0")
-	private int threshold;
+	private double threshold;
 
 	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", defaultValue = "car,walk,bike,pt,ride", split = ",")
 	private Set<String> modes;
@@ -71,8 +71,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 	private Writer distWriter;
 
-	@Inject
-	private TopKChoicesGenerator generator;
+	private ThreadLocal<TopKChoicesGenerator> generatorCache;
 
 	public static void main(String[] args) {
 		new GenerateChoiceSet().execute(args);
@@ -104,6 +103,8 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			controler = MATSimApplication.prepare(scenario, config, scenarioArgs);
 
 		Injector injector = controler.getInjector();
+
+		generatorCache = ThreadLocal.withInitial(() -> injector.getInstance(TopKChoicesGenerator.class));
 
 		// copy the original plan, so no modifications are made
 		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
@@ -166,6 +167,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			threshold = model.distance() * this.threshold;
 		}
 
+		TopKChoicesGenerator generator = generatorCache.get();
 		Collection<PlanCandidate> candidates = generator.generate(plan, topK, threshold);
 
 		// remove all other plans

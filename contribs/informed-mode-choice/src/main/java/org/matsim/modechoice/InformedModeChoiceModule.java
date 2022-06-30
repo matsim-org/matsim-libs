@@ -54,9 +54,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 		});
 
-		bind(EstimateRouter.class).asEagerSingleton();
-		bind(TopKChoicesGenerator.class).asEagerSingleton();
-		bind(BestChoicesGenerator.class).asEagerSingleton();
+
+		// Not singleton, they should be able to be created per thread if necessary.
+		bind(EstimateRouter.class);
+		bind(TopKChoicesGenerator.class);
+		bind(BestChoicesGenerator.class);
 
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
@@ -117,7 +119,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		 * Adds a {@link LegEstimator} to one or more modes.
 		 */
 		public <T extends Enum<?>> Builder withLegEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
-		                                                 String... modes) {
+		                                                    String... modes) {
 
 			for (String mode : modes) {
 
@@ -137,7 +139,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		 * Adds a {@link TripEstimator} to one or more modes.
 		 */
 		public <T extends Enum<?>> Builder withTripEstimator(Class<? extends TripEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
-		                                                    String... modes) {
+		                                                     String... modes) {
 
 			for (String mode : modes) {
 
