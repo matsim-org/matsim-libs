@@ -1,6 +1,9 @@
 package playground.vsp.pt.fare;
 
 import com.google.inject.Inject;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleDoublePair;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,6 +39,68 @@ public class PtTripFareEstimator extends PtTripEstimator {
 
 	@Override
 	public MinMaxEstimate estimate(EstimatorContext context, String mode, PlanModel plan, List<Leg> trip, ModeAvailability option) {
+
+		DoubleDoublePair p = estimateTrip(context, trip);
+
+		double estimate = p.leftDouble();
+		double fareUtility = p.rightDouble();
+
+		double max;
+		if (providesMinEstimate(context, mode, option)) {
+			double maxFareUtility = -context.scoring.marginalUtilityOfMoney * calcMinimumFare(plan);
+
+			// It can happen that this bound is not even better
+			// this is the case if there is one trip only
+			// or for instance if there is one short and one very long trip
+			// the upper bound might have no effect in these cases
+			maxFareUtility = Math.max(fareUtility, maxFareUtility);
+
+			max = estimate + maxFareUtility;
+		} else
+			max = estimate + fareUtility;
+
+		// Distance fareUtility is the highest possible price, therefore the minimum utility
+		return MinMaxEstimate.of(estimate + fareUtility, max);
+	}
+
+	@Override
+	@SuppressWarnings("StringEquality")
+	public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+
+		double utility = 0;
+		DoubleList fares = new DoubleArrayList();
+
+		assert plan.trips() == modes.length : String.format("Plan and mode length differ: %d vs. %d", plan.trips(), mode.length());
+
+		for (int i = 0; i < modes.length; i++) {
+
+			if (modes[i] == TransportMode.pt) {
+
+				List<Leg> legs = plan.getLegs(mode, i);
+
+				assert legs != null : "Legs must be not null at this point";
+
+				DoubleDoublePair p = estimateTrip(context, legs);
+
+				utility += p.firstDouble();
+				fares.add(p.rightDouble());
+			}
+		}
+
+		// fares are negative, so the minimum is used
+		double maxFare = fares.doubleStream().min().orElseThrow();
+		double sumFares = fares.doubleStream().sum();
+
+		//
+		return utility + Math.max(maxFare * config.getUpperBoundFactor(), sumFares);
+	}
+
+	/**
+	 * Estimate utility and fare for one trip.
+	 *
+	 * @return pair of utility and maximum distance based fare
+	 */
+	private DoubleDoublePair estimateTrip(EstimatorContext context, List<Leg> trip) {
 
 		ModeUtilityParameters params = context.scoring.modeParams.get(TransportMode.pt);
 
@@ -82,22 +147,7 @@ public class PtTripFareEstimator extends PtTripEstimator {
 			estimate += context.scoring.utilityOfLineSwitch * (numberOfVehicularLegs - 1);
 		}
 
-		double max;
-		if (providesMinEstimate(context, mode, option)) {
-			double maxFareUtility = -context.scoring.marginalUtilityOfMoney * calcMinimumFare(plan);
-
-			// It can happen that this bound is not even better
-			// this is the case if there is one trip only
-			// or for instance if there is one short and one very long trip
-			// the upper bound might have no effect in these cases
-			maxFareUtility = Math.max(fareUtility, maxFareUtility);
-
-			max = estimate + maxFareUtility;
-		} else
-			max = estimate + fareUtility;
-
-		// Distance fareUtility is the highest possible price, therefore the minimum utility
-		return MinMaxEstimate.of(estimate + fareUtility, max);
+		return DoubleDoublePair.of(estimate, fareUtility);
 	}
 
 	/**
@@ -161,7 +211,7 @@ public class PtTripFareEstimator extends PtTripEstimator {
 		// the upper bound is the maximum single trip times a factor
 		// therefore the minimum upper bound is the fare for the second-longest trip
 		// the max costs are then assumed to be evenly distributed over all pt trips
-		return 1d/n * config.getUpperBoundFactor() * DistanceBasedPtFareHandler.computeFare(secondMinDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
+		return 1d / n * config.getUpperBoundFactor() * DistanceBasedPtFareHandler.computeFare(secondMinDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
 				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
 	}
 

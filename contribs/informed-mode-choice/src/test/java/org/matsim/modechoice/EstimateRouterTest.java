@@ -2,6 +2,7 @@ package org.matsim.modechoice;
 
 import com.google.inject.Injector;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -10,7 +11,7 @@ import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Map;
 
@@ -21,13 +22,15 @@ public class EstimateRouterTest {
 
 	private EstimateRouter router;
 	private InformedModeChoiceConfigGroup group;
-
 	private Controler controler;
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Before
 	public void setUp() throws Exception {
 
-		Config config = TestScenario.loadConfig();
+		Config config = TestScenario.loadConfig(utils);
 
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
@@ -44,7 +47,10 @@ public class EstimateRouterTest {
 
 		Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 
-		PlanModel planModel = router.routeModes(persons.get(TestScenario.Agents.get(1)).getSelectedPlan(), group.getModes());
+		Plan plan = persons.get(TestScenario.Agents.get(1)).getSelectedPlan();
+		PlanModel planModel = new PlanModel(plan);
+
+		router.routeModes(plan, planModel, group.getModes());
 
 		assertThat(planModel)
 				.isNotNull();

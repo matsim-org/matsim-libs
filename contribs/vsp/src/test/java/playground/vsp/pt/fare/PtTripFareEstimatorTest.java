@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -20,6 +21,7 @@ import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.TestScenario;
 
 import java.util.ArrayList;
@@ -31,27 +33,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PtTripFareEstimatorTest {
 
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	protected InformedModeChoiceConfigGroup group;
 	protected Controler controler;
-
 	protected Injector injector;
-
 	@Inject
 	private EstimateRouter router;
-
 	@Inject
 	private ScoringParametersForPerson params;
-
 	@Inject
 	private Map<String, TripEstimator<?>> tripEstimator;
-
-
 	private PtTripFareEstimator estimator;
 
 	@Before
 	public void setUp() throws Exception {
 
-		Config config = TestScenario.loadConfig();
+		Config config = TestScenario.loadConfig(utils);
 
 		Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = config.planCalcScore().getScoringParameters("person").getModes();
 
@@ -89,7 +88,9 @@ public class PtTripFareEstimatorTest {
 
 		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
 
-		PlanModel model = router.routeModes(plan, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		PlanModel model = new PlanModel(plan);
+
+		router.routeModes(plan, model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
 
 		List<MinMaxEstimate> ests = new ArrayList<>();
 
@@ -117,7 +118,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(est)
 				.allMatch(e -> e.getMin() < e.getMax(), "Min smaller max")
 				.first().extracting(MinMaxEstimate::getMin, InstanceOfAssertFactories.DOUBLE)
-						.isCloseTo(-379.4, Offset.offset(0.1));
+				.isCloseTo(-379.4, Offset.offset(0.1));
 
 	}
 
@@ -131,5 +132,47 @@ public class PtTripFareEstimatorTest {
 					.allMatch(e -> e.getMin() <= e.getMax(), "Min smaller max");
 
 		}
+	}
+
+	@Test
+	public void planEstimate() {
+
+		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(2));
+		Plan plan = person.getSelectedPlan();
+
+		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
+
+		PlanModel model = new PlanModel(plan);
+
+		router.routeModes(plan, model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+
+		List<MinMaxEstimate> singleTrips = estimateAgent(TestScenario.Agents.get(2));
+
+		double maxSum = singleTrips.stream().mapToDouble(MinMaxEstimate::getMax).sum();
+		double minSum = singleTrips.stream().mapToDouble(MinMaxEstimate::getMin).sum();
+
+		System.out.println(singleTrips);
+
+		// 2nd one does hat have a pt connection
+		double estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "pt", "pt", "pt"}, model, ModeAvailability.YES);
+
+		assertThat(estimate)
+				.isLessThanOrEqualTo(maxSum)
+				.isGreaterThanOrEqualTo(minSum)
+				.isCloseTo(-2738.72, Offset.offset(0.1));
+
+
+		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
+
+		assertThat(estimate)
+				.isLessThanOrEqualTo(maxSum)
+				.isGreaterThanOrEqualTo(minSum)
+				.isCloseTo(-1222.91, Offset.offset(0.1));
+
+		// Essentially single trip
+		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
+		assertThat(estimate)
+				.isCloseTo(singleTrips.get(0).getMin(), Offset.offset(0.1));
+
 	}
 }

@@ -39,20 +39,18 @@ public final class EstimateRouter {
 	/**
 	 * Route all modes that are relevant with all possible options.
 	 */
-	public PlanModel routeModes(Plan plan, Collection<String> modes) {
+	public void routeModes(Plan plan, PlanModel model, Collection<String> modes) {
 
-		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
-
-		PlanModel model = new PlanModel(trips);
 
 		for (String mode : modes) {
 
 			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
-			List<Leg>[] legs = new List[trips.size()];
+			List<Leg>[] legs = new List[model.trips()];
 
 			int i = 0;
-			for (TripStructureUtils.Trip oldTrip : trips) {
+
+			for (TripStructureUtils.Trip oldTrip : model) {
 
 				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
 				timeTracker.addActivity(oldTrip.getOriginActivity());
@@ -75,9 +73,10 @@ public final class EstimateRouter {
 				}
 				 */
 
+				// Use the end-time of an activity or the time tracker if not available
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 						mode, from, to,
-						timeTracker.getTime().seconds(),
+						oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
 						plan.getPerson(),
 						oldTrip.getTripAttributes()
 				);
@@ -101,8 +100,6 @@ public final class EstimateRouter {
 
 			model.setLegs(mode, legs);
 		}
-
-		return model;
 	}
 
 }

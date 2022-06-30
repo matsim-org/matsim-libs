@@ -50,11 +50,6 @@ public class MultinomialLogitSelector implements Selector<PlanCandidate> {
 		for (PlanCandidate candidate : pcs) {
 			double utility = candidate.getUtility();
 
-			// if there is a min and max, choose either randomly
-			if (utility != candidate.getMinUtility()) {
-				utility = rnd.nextBoolean() ? utility : candidate.getMinUtility();
-			}
-
 			// Warn if there is a utility that is exceeding the feasible range
 			if (utility > MAX_UTILITY) {
 				log.warn(String.format(

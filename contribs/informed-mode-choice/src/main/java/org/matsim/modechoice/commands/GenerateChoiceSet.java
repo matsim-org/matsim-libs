@@ -18,13 +18,18 @@ import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 import picocli.CommandLine;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(
 		name = "generate-choice-set",
@@ -52,14 +57,19 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--top-k", description = "Use top k estimates", defaultValue = "5")
 	private int topK;
 
+	@CommandLine.Option(names = "--threshold", description = "Cut-off plans below certain score scaled by distance.", defaultValue = "0")
+	private int threshold;
+
 	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", defaultValue = "car,walk,bike,pt,ride", split = ",")
 	private Set<String> modes;
 
 	@CommandLine.Option(names = "--output", description = "Path for output population", required = true)
 	private Path output;
 
+	@CommandLine.Option(names = "--output-dist", description = "Write estimation distribution to output. Filename is derived from output", defaultValue = "false")
+	private boolean outputDist;
 
-	// TODO: option for time dependent network
+	private Writer distWriter;
 
 	@Inject
 	private TopKChoicesGenerator generator;
@@ -81,27 +91,60 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
+		log.info("Using k={}, threshold={}", topK, threshold);
+
 		imc.setTopK(topK);
 		imc.setModes(modes);
 
 		Controler controler;
 
-		if (scenarioArgs == null)
+		if (scenarioArgs == null || scenarioArgs.isBlank())
 			controler = MATSimApplication.prepare(scenario, config);
 		else
 			controler = MATSimApplication.prepare(scenario, config, scenarioArgs);
 
+		Injector injector = controler.getInjector();
+
+		// copy the original plan, so no modifications are made
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
+			String subpop = PopulationUtils.getSubpopulation(person);
+			if (subpopulation != null && !subpop.equals(subpopulation))
+				continue;
+
+			Plan selected = person.getSelectedPlan();
+			selected.setScore(null);
+
+			Plan copy = person.createCopyOfSelectedPlanAndMakeSelected();
+			copy.setType("source");
+
+			person.setSelectedPlan(selected);
+		}
+
+
 		// THis is currently needed because vehicle id mapping needs to be initialized
 		controler.run();
 
-		Injector injector = controler.getInjector();
 		injector.injectMembers(this);
 
 		log.info("Estimating choice set...");
 
+		if (outputDist) {
+
+			String name = output.getFileName().toString().replace(".gz", "").replace(".xml", ".tsv");
+			Path out = output.getParent().resolve(name);
+
+			log.info("Writing output distribution to {}", out);
+
+			distWriter = Files.newBufferedWriter(out);
+			distWriter.write("person\testimates\n");
+		}
+
 		ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), config.global().getNumberOfThreads(), this);
 
 		PopulationUtils.writePopulation(controler.getScenario().getPopulation(), output.toString());
+
+		if (distWriter != null)
+			distWriter.close();
 
 		return 0;
 	}
@@ -113,11 +156,19 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		if (subpopulation != null && !subpop.equals(subpopulation))
 			return;
 
-		Plan plan = person.getSelectedPlan();
+		Plan plan = person.getPlans().stream().filter(p -> "source".equals(p.getType())).findFirst().orElseThrow();
 
-		Collection<PlanCandidate> candidates = generator.generate(plan);
+		double threshold = this.threshold;
 
-		// remove all unselected plans
+		// the absolute threshold is scaled to distance
+		if (this.threshold > 0) {
+			PlanModel model = new PlanModel(plan);
+			threshold = model.distance() * this.threshold;
+		}
+
+		Collection<PlanCandidate> candidates = generator.generate(plan, topK, threshold);
+
+		// remove all other plans
 		Set<Plan> plans = new HashSet<>(person.getPlans());
 		plans.remove(plan);
 		plans.forEach(person::removePlan);
@@ -130,5 +181,22 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			c.applyTo(plan);
 			plan = null;
 		}
+
+		if (distWriter != null) {
+
+			// the writer is synchronized
+			try {
+				distWriter.write(person.getId() + "\t" +
+						candidates.stream()
+								.map(PlanCandidate::getUtility).map(String::valueOf)
+								.collect(Collectors.joining(";")) +
+						"\n");
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
+		}
+
 	}
 }

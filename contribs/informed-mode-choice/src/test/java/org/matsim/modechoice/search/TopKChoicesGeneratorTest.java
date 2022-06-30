@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopKChoicesGeneratorTest extends ScenarioTest {
 
-
 	@Test
 	public void choices() {
 
@@ -28,15 +27,15 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
 
 		assertThat(candidates)
-				.hasSize(10)
+				.hasSize(5)
 				.first()
-				.isEqualTo(new PlanCandidate(new String[]{"bike", "walk", "pt", "walk"}, Double.NaN));
+				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car"}, Double.NaN));
 
 
 		person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
 		candidates = generator.generate(person.getSelectedPlan());
 		assertThat(candidates)
-				.hasSize(10)
+				.hasSize(5)
 				.first()
 				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car", "car", "car", "car"}, Double.NaN));
 

@@ -1,16 +1,21 @@
 package org.matsim.modechoice;
 
-import com.google.common.collect.Lists;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A coarse model of the daily plan containing the trips and legs for using each mode.
  */
-public final class PlanModel {
+public final class PlanModel implements Iterable<TripStructureUtils.Trip> {
 
 	private final TripStructureUtils.Trip[] trips;
 
@@ -18,6 +23,11 @@ public final class PlanModel {
 	 * Routed legs.
 	 */
 	private final Map<String, List<Leg>[]> legs;
+
+	public PlanModel(Plan plan) {
+		this.trips = TripStructureUtils.getTrips(plan).toArray(new TripStructureUtils.Trip[0]);
+		this.legs = new IdentityHashMap<>();
+	}
 
 	public PlanModel(List<TripStructureUtils.Trip> trips) {
 		this.trips = trips.toArray(new TripStructureUtils.Trip[0]);
@@ -33,6 +43,22 @@ public final class PlanModel {
 	 */
 	public int modes() {
 		return legs.size();
+	}
+
+	/**
+	 * Estimated bee line distance.
+	 */
+	public double distance() {
+
+		double dist = 0;
+		for (TripStructureUtils.Trip trip : trips) {
+			if (trip.getOriginActivity().getCoord() == null || trip.getDestinationActivity().getCoord() == null)
+				throw new IllegalStateException("No coordinates given");
+
+			dist += CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
+		}
+
+		return dist;
 	}
 
 	/**
@@ -91,69 +117,25 @@ public final class PlanModel {
 		return b.toString();
 	}
 
-	/**
-	 * Combination o mode and availability option.
-	 */
-	public static final class Combination {
-
-		private final String mode;
-		private final Enum<?> option;
-
-		/**
-		 * Whether this should be for a minimum estimate. Otherwise, maximum is assumed.
-		 */
-		private final boolean min;
-
-		public Combination(String mode, Enum<?> option) {
-			this.mode = mode;
-			this.option = option;
-			this.min = false;
-		}
-
-		public Combination(String mode, Enum<?> option, boolean min) {
-			this.mode = mode;
-			this.option = option;
-			this.min = min;
-		}
-
-		public String getMode() {
-			return mode;
-		}
-
-		public Enum<?> getOption() {
-			return option;
-		}
-
-		public boolean isMin() {
-			return min;
-		}
-
-		@Override
-		public String toString() {
-			return mode + "=" + option + (min ? " (min) " : "");
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			Combination that = (Combination) o;
-			return min == that.min && mode.equals(that.mode) && option == that.option;
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(mode, option, min);
-		}
+	@Override
+	@Nonnull
+	public Iterator<TripStructureUtils.Trip> iterator() {
+		return new TripIterator();
 	}
 
-	/**
-	 * Return all possible choice combinations.
-	 */
-	public static List<List<Combination>> combinations(Map<String, List<Combination>> combinations) {
+	private final class TripIterator implements Iterator<TripStructureUtils.Trip> {
 
-		List<List<Combination>> collect = new ArrayList<>(combinations.values());
-		return Lists.cartesianProduct(collect);
+		int cursor;       // index of next element to return
+
+		@Override
+		public boolean hasNext() {
+			return cursor != trips.length;
+		}
+
+		@Override
+		public TripStructureUtils.Trip next() {
+			return getTrip(cursor++);
+		}
 	}
 
 }

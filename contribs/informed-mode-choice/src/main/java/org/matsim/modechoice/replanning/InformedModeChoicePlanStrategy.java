@@ -81,8 +81,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			if (explainScores)
 				csv.print(ScoringFunction.SCORE_EXPLANATION);
 
-			csv.print(PlanCandidate.MAX_ESTIMATE);
-			csv.print(PlanCandidate.MIN_ESTIMATE);
+			csv.print(PlanCandidate.ESTIMATE_ATTR);
 
 			for (String mode : config.getModes()) {
 				csv.print(mode);
@@ -102,8 +101,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 					if (explainScores)
 						csv.print(plan.getAttributes().getAttribute(ScoringFunction.SCORE_EXPLANATION));
 
-					csv.print(plan.getAttributes().getAttribute(PlanCandidate.MAX_ESTIMATE));
-					csv.print(plan.getAttributes().getAttribute(PlanCandidate.MIN_ESTIMATE));
+					csv.print(plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR));
 
 					for (String mode : config.getModes()) {
 						csv.print(StringUtils.countMatches(plan.getType(), mode));
@@ -114,7 +112,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			}
 
 		} catch (IOException e) {
-			log.error("Could not write Estimate csv", e);
+			log.error("Could not write Estimate tsv", e);
 		}
 
 		this.executor = Executors.newWorkStealingPool(globalConfig.global().getNumberOfThreads());
@@ -220,6 +218,12 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 		@Override
 		public void run() {
+
+			// First fill missing plan types
+			for (Plan plan : person.getPlans())
+				if (plan.getType() == null)
+					plan.setType(PlanCandidate.guessPlanType(plan, config.getModes()));
+
 
 			Plan best = person.getPlans().stream()
 					.max(Comparator.comparingDouble(Plan::getScore)).orElse(null);

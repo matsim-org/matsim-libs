@@ -16,6 +16,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.PtTripEstimator;
+import org.matsim.testcases.MatsimTestUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -45,7 +46,11 @@ public class TestScenario extends MATSimApplication {
 		super(config);
 	}
 
-	public static Config loadConfig() {
+	/**
+	 * Load scenario config.
+	 * @param utils needed to set correct output directory {@code @Rule public MatsimTestUtils utils = new MatsimTestUtils();}
+	 */
+	public static Config loadConfig(MatsimTestUtils utils) {
 
 		File f;
 		try {
@@ -56,6 +61,7 @@ public class TestScenario extends MATSimApplication {
 
 		Config config = ConfigUtils.loadConfig(f.toString());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		return config;
 	}

@@ -2,10 +2,7 @@ package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import it.unimi.dsi.fastutil.objects.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
@@ -25,11 +22,12 @@ import java.util.stream.Collectors;
 /**
  * Generate top n choices for each possible mode option.
  */
+@SuppressWarnings("unchecked")
 public class TopKChoicesGenerator implements CandidateGenerator {
 
 
 	/**
-	 * Maximum number of iterations. Memory usage will increase with more and more.
+	 * Maximum number of iterations. Memory usage will increase the more iterations are done.
 	 */
 	private static final int MAX_ITER = 10_000_000;
 
@@ -84,23 +82,14 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 
 		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
 
-		Map<String, List<PlanModel.Combination>> options = new IdentityHashMap<>();
+		PlanModel planModel = new PlanModel(plan);
 
-		PlanModel planModel = buildAndRouteOptions(plan, context, options);
-
-		Map<PlanModel.Combination, double[]> estimates = calculateEstimates(context, planModel, options);
-
-		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel, plan);
-
-		return generateCandidate(context, planModel, topK, threshold, estimates, constraints, PlanModel.combinations(options));
-	}
-
-	/**
-	 * Creates the plan model and fills the map with options.
-	 */
-	private PlanModel buildAndRouteOptions(Plan plan, EstimatorContext context, Map<String, List<PlanModel.Combination>> options) {
+		Map<String, List<Combination>> options = new IdentityHashMap<>();
 
 		Set<String> usableModes = new HashSet<>();
+
+		// modes that need to be re-estimated with the full plan
+		Set<String> consolidateModes = new HashSet<>();
 
 		for (String mode : config.getModes()) {
 
@@ -110,22 +99,37 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 			if (modeOptions.stream().anyMatch(t::allowUsage))
 				usableModes.add(mode);
 
-			List<PlanModel.Combination> c = new ArrayList<>();
+			List<Combination> c = new ArrayList<>();
 
 			for (Enum<?> modeOption : modeOptions) {
-				c.add(new PlanModel.Combination(mode, modeOption));
 				TripEstimator<Enum<?>> te = (TripEstimator<Enum<?>>) tripEstimator.get(mode);
 
 				// Check if min estimate is needed
-				if (te != null && te.providesMinEstimate(context, mode, modeOption))
-					c.add(new PlanModel.Combination(mode, modeOption, true));
+				if (te != null && te.providesMinEstimate(context, mode, modeOption)) {
+
+					c.add(new Combination(mode, modeOption, planModel.trips(), true, false));
+					c.add(new Combination(mode, modeOption, planModel.trips(), true, true));
+
+					consolidateModes.add(mode);
+				} else {
+
+					c.add(new Combination(mode, modeOption, planModel.trips(), false, false));
+
+				}
 			}
 
 			options.put(mode, c);
 		}
 
-		return router.routeModes(plan, usableModes);
+		router.routeModes(plan, planModel, usableModes);
+
+		calculateEstimates(context, planModel, options);
+
+		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel, plan);
+
+		return generateCandidate(context, planModel, topK, threshold, consolidateModes, constraints, Combination.combinations(options));
 	}
+
 
 	private List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel, Plan plan) {
 
@@ -143,16 +147,14 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 	/**
 	 * Calculate the estimates for all options.
 	 */
-	@SuppressWarnings("unchecked")
-	private Map<PlanModel.Combination, double[]> calculateEstimates(EstimatorContext context, PlanModel planModel, Map<String, List<PlanModel.Combination>> options) {
+	private void calculateEstimates(EstimatorContext context, PlanModel planModel, Map<String, List<Combination>> options) {
 
-		Map<PlanModel.Combination, double[]> estimates = new IdentityHashMap<>();
+		for (Map.Entry<String, List<Combination>> e : options.entrySet()) {
 
-		for (Map.Entry<String, List<PlanModel.Combination>> e : options.entrySet()) {
+			for (Combination c : e.getValue()) {
 
-			for (PlanModel.Combination c : e.getValue()) {
-
-				double[] values = new double[planModel.trips()];
+				double[] values = c.getEstimates();
+				double[] tValues = c.getTripEstimates();
 
 				// Collect all estimates
 				for (int i = 0; i < planModel.trips(); i++) {
@@ -173,7 +175,13 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 					double estimate = 0;
 					if (tripEst != null) {
 						MinMaxEstimate minMax = tripEst.estimate(context, c.getMode(), planModel, legs, c.getOption());
-						estimate += c.isMin() ? minMax.getMin() : minMax.getMax();
+						double tripEstimate = c.isMin() ? minMax.getMin() : minMax.getMax();
+
+						// Only store if required
+						if (tValues != null)
+							tValues[i] = tripEstimate;
+
+						estimate += tripEstimate;
 					}
 
 					for (Leg leg : legs) {
@@ -193,28 +201,25 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 
 					values[i] = estimate;
 				}
-
-				estimates.put(c, values);
 			}
 		}
 
-		return estimates;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("StringEquality")
 	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, int topK, double threshold,
-	                                                            Map<PlanModel.Combination, double[]> estimates, List<ConstraintHolder<?>> constraints,
-	                                                            List<List<PlanModel.Combination>> combinations) {
+	                                                    Set<String> consolidateModes, List<ConstraintHolder<?>> constraints,
+	                                                    List<List<Combination>> combinations) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
 
 		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectOpenHashMap<>();
 
-		for (List<PlanModel.Combination> options : combinations) {
+		for (List<Combination> options : combinations) {
 
 			search.clear();
 
-			for (PlanModel.Combination mode : options) {
+			for (Combination mode : options) {
 
 				ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode.getMode());
 
@@ -222,7 +227,7 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 				if (!t.allowUsage(mode.getOption()))
 					continue;
 
-				search.addEstimates(mode.getMode(), estimates.get(mode));
+				search.addEstimates(mode.getMode(), mode.getEstimates());
 			}
 
 			// results will be updated here
@@ -253,7 +258,7 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 				Collections.addAll(usedModes, result);
 
 				// Add the fixed costs estimate if a mode has been used
-				for (PlanModel.Combination mode : options) {
+				for (Combination mode : options) {
 
 					FixedCostsEstimator<Enum<?>> f = (FixedCostsEstimator<Enum<?>>) fixedCosts.get(mode.getMode());
 
@@ -268,32 +273,66 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 					estimate += f.fixedUtility(context, mode.getMode(), mode.getOption());
 				}
 
+				for (String consolidateMode : consolidateModes) {
+					// search all options for the mode to consolidate
+					for (Combination mode : options) {
+						if (mode.getMode() == consolidateMode && usedModes.contains(consolidateMode)) {
+
+							TripEstimator<Enum<?>> f = (TripEstimator<Enum<?>>) tripEstimator.get(mode.getMode());
+
+							// subtract all the trip estimates that have been made before
+							for (int i = 0; i < result.length; i++) {
+								if (result[i] == mode.getMode())
+									estimate -= mode.getTripEstimates()[i];
+							}
+
+							// Add the estimate for the whole plan
+							estimate += f.estimate(context, mode.getMode(), result, planModel, mode.getOption());
+
+						}
+					}
+				}
+
 				usedModes.clear();
 
-				// the cutoff won't work until estimates are below 0
-				// normally an agent should not have a negative costs for travelling
 				if (estimate > best)
 					best = estimate;
 
-				// estimate and best are negative at this point
 				if (threshold > 0 && best - estimate > threshold)
 					break;
 
-				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
-				PlanCandidate existing;
+				// relative threshold, only works if estimate is negative
+				else if (threshold < 0 && best < 0 && estimate < (1 - threshold) * best)
+					break;
 
-				// update min max utility for existing candidates
-				if ((existing = candidates.get(c)) != null) {
-					existing.updateUtility(estimate);
-				} else
-					candidates.put(c, c);
+				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
+
+				if (candidates.containsKey(c))
+					if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5)
+						throw new IllegalStateException("Candidates estimates differ: " + candidates.get(c) + " | " + c);
+
+				candidates.put(c, c);
 
 				k++;
 			}
-
 		}
 
-		return candidates.keySet().stream().sorted().collect(Collectors.toUnmodifiableList());
+		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
+
+		// threshold need to be rechecked again on the global best
+		if (threshold != 0) {
+
+			double best = result.get(0).getUtility();
+
+			if (threshold < 0)
+				// relative threshold
+				result.removeIf(c -> c.getUtility() < (1 - threshold) * best);
+			else
+				// absolute threshold
+				result.removeIf(c -> c.getUtility() < best - threshold);
+		}
+
+		return result;
 	}
 
 	private static final class ConstraintHolder<T> implements Predicate<String[]> {

@@ -10,9 +10,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.modechoice.InformedModeChoiceModule;
 import org.matsim.modechoice.ModeOptions;
-import org.matsim.modechoice.estimators.DailyConstantFixedCosts;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
-import org.matsim.modechoice.estimators.PtTripEstimator;
+import org.matsim.modechoice.estimators.FixedCostsEstimator;
+import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.pt.fare.PtTripFareEstimator;
 
 import javax.annotation.Nullable;
@@ -41,7 +41,7 @@ public class TestScenario extends MATSimApplication {
 		super(config);
 	}
 
-	public static Config loadConfig() {
+	public static Config loadConfig(MatsimTestUtils utils) {
 
 		File f;
 		try {
@@ -52,7 +52,7 @@ public class TestScenario extends MATSimApplication {
 
 		Config config = ConfigUtils.loadConfig(f.toString());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		return config;
 	}
 
@@ -60,7 +60,7 @@ public class TestScenario extends MATSimApplication {
 	protected void prepareControler(Controler controler) {
 
 		InformedModeChoiceModule.Builder builder = InformedModeChoiceModule.newBuilder()
-				.withFixedCosts(DailyConstantFixedCosts.class, "car")
+				.withFixedCosts(FixedCostsEstimator.DailyConstant.class, "car")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "bike", "walk")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderYesAndNo.class, "car")
 				.withTripEstimator(PtTripFareEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");

@@ -8,7 +8,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.PlanEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.modechoice.replanning.BestChoiceStrategyProvider;
 import org.matsim.modechoice.replanning.BestKSelectionStrategyProvider;
@@ -48,8 +47,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bindAllModes(builder.legEstimators, new TypeLiteral<>() {
 		});
 		bindAllModes(builder.tripEstimators, new TypeLiteral<>() {
-		});
-		bindAllModes(builder.planEstimators, new TypeLiteral<>() {
 		});
 		bindAllModes(builder.options, new TypeLiteral<>() {
 		});
@@ -100,8 +97,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		private final Map<String, Class<? extends LegEstimator<?>>> legEstimators = new HashMap<>();
 		private final Map<String, Class<? extends TripEstimator<?>>> tripEstimators = new HashMap<>();
 
-		private final Map<String, Class<? extends PlanEstimator<?>>> planEstimators = new HashMap<>();
-
 		private final Map<String, Class<? extends ModeOptions<?>>> options = new HashMap<>();
 
 		private final Set<Class<? extends TripConstraint<?>>> constraints = new LinkedHashSet<>();
@@ -151,25 +146,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 
 				tripEstimators.put(mode, estimator);
-				options.put(mode, option);
-			}
-
-			return this;
-		}
-
-		/**
-		 * Adds a plan based estimator to one or more nodes. Only one of {@link LegEstimator} or {@link TripEstimator} cam be present.
-		 */
-		public <T extends Enum<?>> Builder withPlanEstimator(Class<? extends PlanEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
-		                                                     String... modes) {
-
-			for (String mode : modes) {
-				if (legEstimators.containsKey(mode))
-					throw new IllegalArgumentException(String.format("Mode %s already has an leg estimator. Only one of either leg or plan-based can be used", mode));
-
-
-				tripEstimators.put(mode, estimator);
-				planEstimators.put(mode, estimator);
 				options.put(mode, option);
 			}
 

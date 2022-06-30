@@ -13,34 +13,18 @@ import java.util.List;
  */
 public final class PlanCandidate implements Comparable<PlanCandidate> {
 
-	public static final String MIN_ESTIMATE = "min_estimate";
-	public static final String MAX_ESTIMATE = "max_estimate";
+	public static final String ESTIMATE_ATTR = "estimate";
 
 	private final String[] modes;
 
 	/**
 	 * Estimated maximum utility. An estimate should never underestimate the utility.
 	 */
-	private double utility;
-
-	/**
-	 * Minimum estimate. This is the minimal expected utility that can be achieved. (But might be more)
-	 */
-	private double min;
+	private final double utility;
 
 	public PlanCandidate(String[] modes, double utility) {
 		this.modes = modes;
 		this.utility = utility;
-		this.min = utility;
-	}
-
-	/**
-	 * Updates the minimum and maximum estimates accordingly.
-	 */
-	public PlanCandidate updateUtility(double utility) {
-		this.utility = Math.max(this.utility, utility);
-		this.min = Math.min(this.min, utility);
-		return this;
 	}
 
 	/**
@@ -48,10 +32,6 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public double getUtility() {
 		return utility;
-	}
-
-	public double getMinUtility() {
-		return min;
 	}
 
 	/**
@@ -118,8 +98,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public void applyAttributes(Plan plan) {
 
-		plan.getAttributes().putAttribute(MAX_ESTIMATE, utility);
-		plan.getAttributes().putAttribute(MIN_ESTIMATE, min);
+		plan.getAttributes().putAttribute(ESTIMATE_ATTR, utility);
 
 	}
 
@@ -133,6 +112,28 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 
 			b.append(modes[i]);
 			if (i != modes.length - 1)
+				b.append("-");
+		}
+
+		return b.toString();
+	}
+
+	/**
+	 * Infer plan type from routing modes.
+	 */
+	public static String guessPlanType(Plan plan, List<String> modes) {
+
+		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
+
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < trips.size(); i++) {
+
+			String routingMode = TripStructureUtils.getRoutingMode(trips.get(i).getLegsOnly().get(0));
+			if (!modes.contains(routingMode))
+				routingMode = null;
+
+			b.append(routingMode);
+			if (i != trips.size() - 1)
 				b.append("-");
 		}
 
@@ -162,7 +163,6 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	public String toString() {
 		return "PlanCandidate{" +
 				"modes=" + Arrays.toString(modes) +
-				", utility=" + utility + (utility != min ? " (min=" + min + ")" : "") +
-				'}';
+				", utility=" + utility + '}';
 	}
 }

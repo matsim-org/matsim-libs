@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class BestChoicesGenerator extends TopKChoicesGenerator {
 
-	// This class is completely based on the top k choices generator with k=1
+	// This class is completely based on the top k choices generator with a small k
 	// However, only computing the very best option is an easier problem to solve
 	// and a dedicated implementation might be more efficient
 
@@ -25,20 +25,14 @@ public class BestChoicesGenerator extends TopKChoicesGenerator {
 	@Override
 	public Collection<PlanCandidate> generate(Plan plan) {
 
-		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, 1, 0));
+		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, 3, 0));
 
 		if (candidates.isEmpty())
 			return Set.of();
 
-		// sort by minimum guaranteed utility
-		candidates.sort(Comparator.comparingDouble(PlanCandidate::getMinUtility).reversed());
+		candidates.sort(Comparator.comparingDouble(PlanCandidate::getUtility).reversed());
 
-		double min = candidates.get(0).getUtility();
-
-		// Candidates with worse best case utility than the guaranteed best can be removed
-		candidates.removeIf(c -> c.getUtility() < min);
-
-		return candidates;
+		return List.of(candidates.get(0));
 	}
 
 }
