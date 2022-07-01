@@ -46,6 +46,7 @@ public class Freight{
 				// kai/kai, jan'21
 				// See javadoc of CarrierStrategyManager for some explanation of design decisions.  kai, jul'22
 				bind( CarrierStrategyManager.class ).toProvider( () -> null );
+				// (the null binding means that a zeroth iteration will run. kai, jul'22)
 			}
 		} ) ;
 		
