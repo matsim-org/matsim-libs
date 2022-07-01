@@ -19,7 +19,7 @@ public class InformedModeChoiceStrategyProvider implements Provider<PlanStrategy
 	@Inject
 	private Scenario scenario;
 	@Inject
-	private TopKChoicesGenerator generator;
+	private Provider<TopKChoicesGenerator> generator;
 
 	@Inject
 	private OutputDirectoryHierarchy controlerIO;

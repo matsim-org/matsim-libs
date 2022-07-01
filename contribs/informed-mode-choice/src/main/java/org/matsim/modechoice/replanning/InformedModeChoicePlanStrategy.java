@@ -1,5 +1,6 @@
 package org.matsim.modechoice.replanning;
 
+import com.google.inject.Provider;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -29,9 +29,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -46,22 +45,33 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 	private final InformedModeChoiceConfigGroup config;
 	private final Config globalConfig;
-	private final TopKChoicesGenerator generator;
-
+	private final TopKChoicesGenerator[] generator;
 	private final SimpleRegression[] reg;
 	private final Scenario scenario;
 	private final OutputDirectoryHierarchy controlerIO;
 
+	private final AtomicInteger counter = new AtomicInteger(0);
+
+	/**
+	 * Maps thread to array index of generators. Each threads will use its on generator exclusively.
+	 */
+	private ThreadLocal<Integer> assignment = ThreadLocal.withInitial(counter::getAndIncrement);
+
 	private ExecutorService executor;
 
-	public InformedModeChoicePlanStrategy(Config config, TopKChoicesGenerator generator,
+	public InformedModeChoicePlanStrategy(Config config, Provider<TopKChoicesGenerator> generator,
 	                                      Scenario scenario, OutputDirectoryHierarchy controlerIO) {
 		this.globalConfig = config;
 		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-		this.generator = generator;
 		this.reg = new SimpleRegression[this.config.getModes().size()];
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
+
+		this.generator = new TopKChoicesGenerator[config.global().getNumberOfThreads()];
+
+		for (int i = 0; i < this.generator.length; i++) {
+			this.generator[i] = generator.get();
+		}
 	}
 
 	@Override
@@ -115,6 +125,9 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			log.error("Could not write Estimate tsv", e);
 		}
 
+		// Thread local stores which thread uses which generator
+		this.counter.set(0);
+		this.assignment = ThreadLocal.withInitial(counter::getAndIncrement);
 		this.executor = Executors.newWorkStealingPool(globalConfig.global().getNumberOfThreads());
 	}
 
@@ -219,6 +232,17 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		@Override
 		public void run() {
 
+			try {
+				plan();
+			} catch (Throwable t) {
+				log.error("Thread threw an exception", t);
+				throw t;
+			}
+
+		}
+
+		private void plan() {
+
 			// First fill missing plan types
 			for (Plan plan : person.getPlans())
 				if (plan.getType() == null)
@@ -230,15 +254,14 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 			person.setSelectedPlan(best);
 
-			Collection<PlanCandidate> candidates = generator.generate(best);
+			Collection<PlanCandidate> candidates = generator[assignment.get()].generate(best);
 
 			// TODO: should replace old plans with same type
 			// TODO: should remove and not regenerate unpromising plan types
 
-
 			applyCandidates(person, candidates, best);
 			person.setSelectedPlan(random.selectPlan(person));
+
 		}
 	}
-
 }
