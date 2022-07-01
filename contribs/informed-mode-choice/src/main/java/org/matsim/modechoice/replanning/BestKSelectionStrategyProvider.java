@@ -36,9 +36,8 @@ public class BestKSelectionStrategyProvider implements Provider<PlanStrategy> {
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
 		// TODO: scale is hardcoded
-		builder.addStrategyModule(new IMCSimpleStrategyModule(globalConfigGroup, generator, new MultinomialLogitSelector(0.1, MatsimRandom.getLocalInstance())));
+		builder.addStrategyModule(new IMCSimpleStrategyModule(globalConfigGroup, generator, new MultinomialLogitSelector(1, MatsimRandom.getLocalInstance())));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
-
 
 		return builder.build();
 	}

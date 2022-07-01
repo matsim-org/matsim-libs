@@ -1,6 +1,5 @@
 package org.matsim.modechoice.replanning;
 
-import com.google.inject.Provider;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
@@ -19,12 +18,17 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -46,6 +50,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private final InformedModeChoiceConfigGroup config;
 	private final Config globalConfig;
 	private final TopKChoicesGenerator[] generator;
+	private final PlanRouter[] router;
 	private final SimpleRegression[] reg;
 	private final Scenario scenario;
 	private final OutputDirectoryHierarchy controlerIO;
@@ -59,8 +64,9 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 	private ExecutorService executor;
 
-	public InformedModeChoicePlanStrategy(Config config, Provider<TopKChoicesGenerator> generator,
-	                                      Scenario scenario, OutputDirectoryHierarchy controlerIO) {
+	public InformedModeChoicePlanStrategy(Config config, Scenario scenario, OutputDirectoryHierarchy controlerIO,
+	                                      Provider<TopKChoicesGenerator> generator, Provider<TripRouter> tripRouterProvider, ActivityFacilities facilities,
+	                                      TimeInterpretation timeInterpretation) {
 		this.globalConfig = config;
 		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		this.reg = new SimpleRegression[this.config.getModes().size()];
@@ -68,9 +74,11 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		this.controlerIO = controlerIO;
 
 		this.generator = new TopKChoicesGenerator[config.global().getNumberOfThreads()];
+		this.router = new PlanRouter[config.global().getNumberOfThreads()];
 
 		for (int i = 0; i < this.generator.length; i++) {
 			this.generator[i] = generator.get();
+			this.router[i] =  new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation);
 		}
 	}
 
@@ -198,6 +206,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 				Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
 				c.applyTo(plan);
+
+				// If this plan is new, it needs to be routed
+				router[assignment.get()].run(plan);
+
 			}
 		}
 	}

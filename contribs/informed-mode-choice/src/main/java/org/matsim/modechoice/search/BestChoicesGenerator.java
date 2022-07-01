@@ -25,14 +25,12 @@ public class BestChoicesGenerator extends TopKChoicesGenerator {
 	@Override
 	public Collection<PlanCandidate> generate(Plan plan) {
 
-		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, 3, 0));
+		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, 10, 0));
 
 		if (candidates.isEmpty())
 			return Set.of();
 
-		candidates.sort(Comparator.comparingDouble(PlanCandidate::getUtility).reversed());
-
-		return List.of(candidates.get(0));
+		return List.of(candidates.stream().max(Comparator.comparingDouble(PlanCandidate::getUtility)).orElseThrow());
 	}
 
 }

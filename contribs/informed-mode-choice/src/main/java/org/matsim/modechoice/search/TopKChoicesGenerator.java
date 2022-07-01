@@ -149,6 +149,9 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 	 */
 	private void calculateEstimates(EstimatorContext context, PlanModel planModel, Map<String, List<Combination>> options) {
 
+		// estimates only consider the leg score by using a certain mode
+		// early or late arrival can also have an effect on the activity scores which is not considered here
+
 		for (Map.Entry<String, List<Combination>> e : options.entrySet()) {
 
 			for (Combination c : e.getValue()) {
@@ -301,7 +304,7 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 				if (threshold > 0 && best - estimate > threshold)
 					break;
 
-				// relative threshold, only works if estimate is negative
+					// relative threshold, only works if estimate is negative
 				else if (threshold < 0 && best < 0 && estimate < (1 - threshold) * best)
 					break;
 
