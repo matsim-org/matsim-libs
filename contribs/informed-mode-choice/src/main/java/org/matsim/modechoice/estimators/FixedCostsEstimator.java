@@ -14,7 +14,9 @@ public interface FixedCostsEstimator<T extends Enum<?>> {
 	/**
 	 * The fixed utility is always added to the score estimate, regardless of usage.
 	 */
-	double fixedUtility(EstimatorContext context, String mode, T option);
+	default double fixedUtility(EstimatorContext context, String mode, T option) {
+		return 0;
+	}
 
 
 	/**
