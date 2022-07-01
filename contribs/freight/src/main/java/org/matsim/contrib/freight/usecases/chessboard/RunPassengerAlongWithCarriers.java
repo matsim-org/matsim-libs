@@ -42,7 +42,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -187,12 +187,12 @@ final class RunPassengerAlongWithCarriers {
         }
 
         @Override
-        public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+        public GenericStrategyManagerImpl<CarrierPlan, Carrier> createStrategyManager() {
             TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
             final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
                     travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-            final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<>();
+            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
             strategyManager.setMaxPlansPerAgent(5);
 
             strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);

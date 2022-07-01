@@ -61,7 +61,7 @@ public class StrategyManager implements MatsimManager {
 
 	private static final Logger log = Logger.getLogger(StrategyManager.class);
 
-	private final GenericStrategyManager<Plan, Person> delegate;
+	private final GenericStrategyManagerImpl<Plan, Person> delegate;
 
 	@Inject
 	StrategyManager( StrategyConfigGroup strategyConfigGroup,
@@ -101,11 +101,11 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	public StrategyManager() {
-		this.delegate = new GenericStrategyManager<>();
+		this.delegate = new GenericStrategyManagerImpl<>();
 	}
 
 	StrategyManager(StrategyChooser<Plan, Person> strategyChooser) {
-		this.delegate = new GenericStrategyManager<>(strategyChooser);
+		this.delegate = new GenericStrategyManagerImpl<>(strategyChooser);
 	}
 
 //	/**

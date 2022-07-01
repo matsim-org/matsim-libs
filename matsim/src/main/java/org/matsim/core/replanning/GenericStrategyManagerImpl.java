@@ -29,7 +29,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.choosers.WeightedStrategyChooser;
@@ -49,11 +48,11 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  * @author rieser (for the original StrategyManager)
  *
  */
-public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements MatsimManager {
+public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlansAndId<? extends BasicPlan, AG>> implements GenericStrategyManager<PL, AG>{
 	// the "I extends ... <, I>" is correct, although it feels odd.  kai, nov'15
 	
 	private static final Logger log =
-			Logger.getLogger(GenericStrategyManager.class);
+			Logger.getLogger( GenericStrategyManagerImpl.class );
 
 
 	static class StrategyWeights<T extends BasicPlan, I> implements StrategyChooser.Weights<T, I> {
@@ -96,11 +95,11 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 
 //	private String subpopulationAttributeName = null;
 	
-	public GenericStrategyManager() {
+	public GenericStrategyManagerImpl() {
 		this(new WeightedStrategyChooser<>());
 	}
 
-	public GenericStrategyManager(StrategyChooser<PL, AG> strategyChooser) {
+	public GenericStrategyManagerImpl( StrategyChooser<PL, AG> strategyChooser ) {
 		this.strategyChooser = strategyChooser;
 	}
 
@@ -118,10 +117,10 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 * the probability this strategy will be used for an agent.
 	 *
 	 */
-	public final void addStrategy(
+	@Override public final void addStrategy(
 			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation,
-			final double weight)
+			final double weight )
 	{
 		final StrategyWeights<PL, AG> weights = getStrategyWeights( subpopulation );
 		if ( weights.strategies.contains( strategy ) ) {
@@ -198,7 +197,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 *
 	 * @param iteration the current iteration we're handling
 	 */
-	public final void run(
+	@Override public final void run(
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
 			final int iteration,
 			final ReplanningContext replanningContext ) {
@@ -310,7 +309,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 * currently modified plan they're trying out.
 	 *
 	 */
-	public final void setMaxPlansPerAgent(final int maxPlansPerAgent) {
+	@Override public final void setMaxPlansPerAgent( final int maxPlansPerAgent ) {
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
 
@@ -319,11 +318,11 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 * change will take place before the strategies are applied.
 	 *
 	 */
-	public final void addChangeRequest(
+	@Override public final void addChangeRequest(
 			final int iteration,
 			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation,
-			final double newWeight) {
+			final double newWeight ) {
 		final StrategyWeights<PL, AG> weights = getStrategyWeights( subpopulation );
 		Integer iter = iteration;
 		Map<GenericPlanStrategy<PL, AG>, Double> iterationRequests = weights.changeRequests.get(iter);
@@ -363,7 +362,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final PlanSelector<PL, AG> planSelector) {
+	@Override public final void setPlanSelectorForRemoval( final PlanSelector<PL, AG> planSelector ) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector = planSelector;
 	}
@@ -372,11 +371,11 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 		return this.maxPlansPerAgent ;
 	}
 
-	public final List<GenericPlanStrategy<PL, AG>> getStrategies(String subpopulation) {
+	@Override public final List<GenericPlanStrategy<PL, AG>> getStrategies( String subpopulation ) {
 		return getStrategyWeights( subpopulation ).unmodifiableStrategies;
 	}
 
-	public final List<Double> getWeights(String subpopulation) {
+	@Override public final List<Double> getWeights( String subpopulation ) {
 		return getStrategyWeights( subpopulation ).unmodifiableWeights;
 	}
 

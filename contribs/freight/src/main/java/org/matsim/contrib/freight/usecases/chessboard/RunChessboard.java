@@ -21,7 +21,6 @@
 
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +39,6 @@ import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFact
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -48,8 +46,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManager;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -240,12 +237,12 @@ public final class RunChessboard {
         }
 
         @Override
-        public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+        public GenericStrategyManagerImpl<CarrierPlan, Carrier> createStrategyManager() {
             TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
             final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
                             travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-            final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<>();
+            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
             strategyManager.setMaxPlansPerAgent(5);
             {
                 GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger<>( 1. ));

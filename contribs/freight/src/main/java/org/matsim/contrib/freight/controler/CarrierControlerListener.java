@@ -42,7 +42,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 
 import javax.inject.Inject;
 
@@ -100,7 +100,7 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 		if (carrierPlanStrategyManagerFactory == null) {
 			return;
 		}
-		GenericStrategyManager<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
+		GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
 		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 

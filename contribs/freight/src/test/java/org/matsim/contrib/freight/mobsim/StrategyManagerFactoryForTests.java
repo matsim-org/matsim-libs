@@ -10,13 +10,12 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.controler.ReRouteVehicles;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
@@ -58,7 +57,7 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
     }
 
     @Override
-    public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+    public GenericStrategyManagerImpl<CarrierPlan, Carrier> createStrategyManager() {
 
         final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(network, new MyTravelCosts(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 
@@ -67,7 +66,7 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
         planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, network, travelTimes.get(TransportMode.car)));
 
 
-        GenericStrategyManager<CarrierPlan, Carrier> stratManager = new GenericStrategyManager<CarrierPlan, Carrier>();
+        GenericStrategyManagerImpl<CarrierPlan, Carrier> stratManager = new GenericStrategyManagerImpl<CarrierPlan, Carrier>();
         stratManager.addStrategy(planStrat_reRoutePlan, null, 1.0);
 
         return stratManager;
