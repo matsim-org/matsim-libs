@@ -150,21 +150,20 @@ public final class RunChessboard {
 
 
 
-        final String NEW_STRATEGY = "newStrategy";
-        {
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-            stratSets.setStrategyName( NEW_STRATEGY );
-            stratSets.setWeight( 0.1 );
-            config.strategy().addStrategySettings( stratSets );
-        }
-        controler.addOverridingModule( new AbstractModule(){
-            @Override public void install(){
-                binder().bind( PlanStrategy.class ).annotatedWith( Names.named( NEW_STRATEGY ) ).toInstance( null );
-            }
-        } );
+//        final String NEW_STRATEGY = "newStrategy";
+//        {
+//            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+//            stratSets.setStrategyName( NEW_STRATEGY );
+//            stratSets.setWeight( 0.1 );
+//            config.strategy().addStrategySettings( stratSets );
+//        }
+//        controler.addOverridingModule( new AbstractModule(){
+//            @Override public void install(){
+//                binder().bind( PlanStrategy.class ).annotatedWith( Names.named( NEW_STRATEGY ) ).toInstance( null );
+//            }
+//        } );
 
-
-
+// (I think that the above was just an attempt, which did not lead to anywhere.  kai, jul'22)
 
 
         controler.run();

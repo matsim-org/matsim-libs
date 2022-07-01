@@ -238,7 +238,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				}
 
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType);
-				vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
 				String startTime = atts.getValue(VEHICLE_EARLIEST_START);
 				if (startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
 				String endTime = atts.getValue(VEHICLE_LATEST_END);
@@ -342,6 +341,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			case ATTRIBUTE:
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
+			case "route":
+				// do nothing
+				break ;
 			default:
 				logger.warn("Unexpected value while reading in. This field will be ignored: " + name);
 		}

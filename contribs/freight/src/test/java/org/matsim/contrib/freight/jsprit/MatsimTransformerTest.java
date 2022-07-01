@@ -358,7 +358,7 @@ public class MatsimTransformerTest {
 	private CarrierVehicle getMatsimVehicle(String VehicleId, String locationId, VehicleType matsimType) {
 		return CarrierVehicle.Builder
 				.newInstance(Id.create(VehicleId, org.matsim.vehicles.Vehicle.class), Id.create(locationId, Link.class), matsimType )
-				.setEarliestStart(10.0).setLatestEnd(20.0).setType(matsimType).build();
+				.setEarliestStart(10.0).setLatestEnd(20.0).build();
 	}
 
 	private VehicleType getMatsimVehicleType() {

@@ -87,14 +87,24 @@ final class RunPassengerAlongWithCarriers {
 		final Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
+//		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
-		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
-		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
+//		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
+//		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
+//
+//		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
 
-		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
+//		controler.addOverridingModule(carrierController);
 
-		controler.addOverridingModule(carrierController);
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.install(new CarrierModule() );
+				this.bind( CarrierPlanStrategyManagerFactory.class ).toInstance( new MyCarrierPlanStrategyManagerFactory( types ) );
+				this.bind( CarrierScoringFunctionFactory.class ).toInstance( createScoringFunctionFactory( scenario.getNetwork() ) );
+			}
+		} );
+
+
 		prepareFreightOutputDataAndStats(scenario, controler.getEvents(), controler, carriers);
 
 		controler.run();

@@ -45,8 +45,8 @@ import java.util.List;
 
 public final class CarrierModule extends AbstractModule {
 
-	private CarrierPlanStrategyManagerFactory strategyManagerFactory;
-	private CarrierScoringFunctionFactory scoringFunctionFactory;
+//	private CarrierPlanStrategyManagerFactory strategyManagerFactory;
+//	private CarrierScoringFunctionFactory scoringFunctionFactory;
 
 	public CarrierModule() {
 	}
@@ -65,12 +65,12 @@ public final class CarrierModule extends AbstractModule {
 	/**
 	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
 	 */
-	@Deprecated
-	public CarrierModule(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-//		this.carriers = carriers;
-		this.strategyManagerFactory = strategyManagerFactory;
-		this.scoringFunctionFactory = scoringFunctionFactory;
-	}
+//	@Deprecated
+//	public CarrierModule(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
+////		this.carriers = carriers;
+//		this.strategyManagerFactory = strategyManagerFactory;
+//		this.scoringFunctionFactory = scoringFunctionFactory;
+//	}
 
 	@Override public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
@@ -78,12 +78,12 @@ public final class CarrierModule extends AbstractModule {
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
 
-		if (strategyManagerFactory != null) {
-			bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
-		}
-		if (scoringFunctionFactory != null) {
-			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
-		}
+//		if (strategyManagerFactory != null) {
+//			bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
+//		}
+//		if (scoringFunctionFactory != null) {
+//			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+//		}
 
 //		bind(CarrierControlerListener.class).in( Singleton.class );
 		bind(CarrierControlerListener.class).asEagerSingleton();

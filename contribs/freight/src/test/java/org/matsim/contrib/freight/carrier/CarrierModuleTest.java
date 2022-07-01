@@ -107,12 +107,13 @@ public class CarrierModuleTest {
         controler.run();
     }
 
-    @Test
-    public void test_ConstructorWithThreeParameters(){
-	    // note setUp method!
-        controler.addOverridingModule(new CarrierModule(new StrategyManagerFactoryForTests(),
-		    new DistanceScoringFunctionFactoryForTests()));
-        controler.run();
-    }
+//    @Test
+//    public void test_ConstructorWithThreeParameters(){
+//	    // note setUp method!
+//        controler.addOverridingModule(new CarrierModule(new StrategyManagerFactoryForTests(),
+//		    new DistanceScoringFunctionFactoryForTests()));
+//        controler.run();
+//    }
+    // this syntax is no longer allowed.  kai, jul'22
 
 }
