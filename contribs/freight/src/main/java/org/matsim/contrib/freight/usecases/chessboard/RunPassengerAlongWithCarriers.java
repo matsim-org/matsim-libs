@@ -21,6 +21,7 @@
 
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -99,7 +100,7 @@ final class RunPassengerAlongWithCarriers {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				this.install(new CarrierModule() );
-				this.bind( CarrierPlanStrategyManagerFactory.class ).toInstance( new MyCarrierPlanStrategyManagerFactory( types ) );
+				this.bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory(types) );
 				this.bind( CarrierScoringFunctionFactory.class ).toInstance( createScoringFunctionFactory( scenario.getNetwork() ) );
 			}
 		} );
@@ -169,7 +170,7 @@ final class RunPassengerAlongWithCarriers {
 		};
 	}
 	
-	private static class MyCarrierPlanStrategyManagerFactory implements CarrierPlanStrategyManagerFactory {
+	private static class MyCarrierPlanStrategyManagerFactory implements Provider<CarrierStrategyManager>{
 
         @Inject
         private Network network;
@@ -187,12 +188,13 @@ final class RunPassengerAlongWithCarriers {
         }
 
         @Override
-        public GenericStrategyManagerImpl<CarrierPlan, Carrier> createStrategyManager() {
+        public CarrierStrategyManager get() {
             TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
             final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
                     travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
+//            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
+		final CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
             strategyManager.setMaxPlansPerAgent(5);
 
             strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);
@@ -205,7 +207,7 @@ final class RunPassengerAlongWithCarriers {
             
 //            strategyManager.addStrategy(new SelectBestPlanAndOptimizeItsVehicleRouteFactory(network, types, modeTravelTimes.get(TransportMode.car)).createStrategy(), null, 0.05);
             
-            return strategyManager;
+            return (CarrierStrategyManager) strategyManager;
         }
     }
 

@@ -22,7 +22,7 @@
 package org.matsim.contrib.freight;
 
 import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.controler.AbstractModule;
@@ -35,14 +35,6 @@ public class Freight{
 	// * repair execution path where config instead of scenario is given to controler
 
 	public static void configure( AllowsConfiguration ao ) {
-//		Gbl.assertIf( ao instanceof Controler);  // we need the scenario; otherwise find other way
-//		Controler controler = (Controler) ao;
-//		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );;
-//		if ( true ){
-//			freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
-//		} else{
-//			freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
-//		}
 		ao.addOverridingModule( new CarrierModule( ) ) ;
 
 		ao.addOverridingModule( new AbstractModule(){
@@ -52,7 +44,8 @@ public class Freight{
 
 				// yyyy in the long run, needs to be done differently (establish strategy manager as fixed infrastructure; have user code register strategies there).
 				// kai/kai, jan'21
-				bind( CarrierPlanStrategyManagerFactory.class ).toInstance( () -> null );
+				// See javadoc of CarrierStrategyManager for some explanation of design decisions.  kai, jul'22
+				bind( CarrierStrategyManager.class ).toProvider( () -> null );
 			}
 		} ) ;
 		

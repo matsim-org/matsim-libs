@@ -62,7 +62,7 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 
 	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
-	private final CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
+	private final CarrierStrategyManager strategyManager;
 
 	private CarrierAgentTracker carrierAgentTracker;
 
@@ -72,9 +72,9 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject CarrierControlerListener(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
+	@Inject CarrierControlerListener( CarrierStrategyManager strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory ) {
 //		log.warn( "calling ctor; scoringFunctionFactory=" + scoringFunctionFactory.getClass() );
-		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
+		this.strategyManager = strategyManagerFactory;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
 
@@ -97,10 +97,10 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
-		if (carrierPlanStrategyManagerFactory == null) {
-			return;
-		}
-		GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
+//		if (carrierPlanStrategyManagerFactory == null) {
+//			return;
+//		}
+//		GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
 		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 

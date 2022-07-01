@@ -21,16 +21,14 @@
 
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.controler.ReRouteVehicles;
-import org.matsim.contrib.freight.controler.TimeAllocationMutator;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.*;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.usecases.analysis.CarrierScoreStats;
 import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
@@ -103,7 +101,7 @@ public final class RunChessboard {
             @Override
             public void install() {
                 install(new CarrierModule());
-                bind(CarrierPlanStrategyManagerFactory.class).toInstance( new MyCarrierPlanStrategyManagerFactory(types) );
+                bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory( types ));
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
             }
         });
@@ -219,7 +217,7 @@ public final class RunChessboard {
 
     }
 
-    private static class MyCarrierPlanStrategyManagerFactory implements CarrierPlanStrategyManagerFactory {
+    private static class MyCarrierPlanStrategyManagerFactory implements Provider<CarrierStrategyManager>{
 
         @Inject
         private Network network;
@@ -237,12 +235,13 @@ public final class RunChessboard {
         }
 
         @Override
-        public GenericStrategyManagerImpl<CarrierPlan, Carrier> createStrategyManager() {
+        public CarrierStrategyManager get() {
             TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
             final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
                             travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
+//            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
+            final CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
             strategyManager.setMaxPlansPerAgent(5);
             {
                 GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger<>( 1. ));

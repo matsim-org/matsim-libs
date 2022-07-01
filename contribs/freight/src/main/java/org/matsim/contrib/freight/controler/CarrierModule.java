@@ -45,45 +45,12 @@ import java.util.List;
 
 public final class CarrierModule extends AbstractModule {
 
-//	private CarrierPlanStrategyManagerFactory strategyManagerFactory;
-//	private CarrierScoringFunctionFactory scoringFunctionFactory;
-
-	public CarrierModule() {
-	}
-
-//	/**
-//	 * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must be bound separately
-//	 * when this constructor is used.
-//	 *
-//	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
-//	 */
-//	@Deprecated
-//	public CarrierModule(Carriers carriers) {
-//		this.carriers = carriers;
-//	}
-
-	/**
-	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
-	 */
-//	@Deprecated
-//	public CarrierModule(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-////		this.carriers = carriers;
-//		this.strategyManagerFactory = strategyManagerFactory;
-//		this.scoringFunctionFactory = scoringFunctionFactory;
-//	}
 
 	@Override public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
-
-//		if (strategyManagerFactory != null) {
-//			bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
-//		}
-//		if (scoringFunctionFactory != null) {
-//			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
-//		}
 
 //		bind(CarrierControlerListener.class).in( Singleton.class );
 		bind(CarrierControlerListener.class).asEagerSingleton();
@@ -130,6 +97,7 @@ public final class CarrierModule extends AbstractModule {
 	// The freight QSim needs it (see below [[where?]]).
 	// yyyy this feels rather scary.  kai, oct'19
 	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
+	// Is this maybe already resolved now?  kai, jul'22
 	@Provides
 	CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
 		return carrierControlerListener.getCarrierAgentTracker();
@@ -146,14 +114,6 @@ public final class CarrierModule extends AbstractModule {
 	private static class CarrierProvider implements Provider<Carriers> {
 		@Inject Scenario scenario;
 		@Override public Carriers get() {
-//			if ( carriers!=null ){
-//				if ( scenario.getScenarioElement( FreightUtils.CARRIERS ) != null ) {
-//					throw new RuntimeException("carriers are provided as scenario element AND per the CarrierModule constructor.  I could check if " +
-//										     "they are the same, but in general the second way to do this is deprecated so please put " +
-//										     "null into your constructor (and expect more cleanup here).") ;
-//				}
-//				scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
-//			}
 			return FreightUtils.getCarriers(scenario);
 		}
 	}
