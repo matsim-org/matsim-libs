@@ -121,7 +121,8 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	public final void addStrategy(
 			final GenericPlanStrategy<PL, AG> strategy,
 			final String subpopulation,
-			final double weight) {
+			final double weight)
+	{
 		final StrategyWeights<PL, AG> weights = getStrategyWeights( subpopulation );
 		if ( weights.strategies.contains( strategy ) ) {
 			log.error( "Strategy "+strategy+" is already defined for subpopulation "+subpopulation  );
@@ -199,11 +200,10 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 */
 	public final void run(
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
-					Population population,
-					final int iteration,
-					final ReplanningContext replanningContext ) {
+			final int iteration,
+			final ReplanningContext replanningContext ) {
 		handleChangeRequests(iteration);
-		run(persons, population, replanningContext);
+		run(persons, replanningContext );
 	}
 
 	/**
@@ -213,8 +213,8 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 */
 	final void run(
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
-					Population population,
-					final ReplanningContext replanningContext) {
+			final ReplanningContext replanningContext )
+	{
 		// initialize all strategies
 		for (GenericPlanStrategy<PL, AG> strategy : distinctStrategies()) {
 			strategy.init(replanningContext);

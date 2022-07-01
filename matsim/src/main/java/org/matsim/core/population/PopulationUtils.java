@@ -73,7 +73,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
@@ -1114,26 +1113,34 @@ public final class PopulationUtils {
 
 	// ---
 
-	public static Object getPersonAttribute(HasPlansAndId person, String key) {
-		if ( person instanceof Attributable ){
-			return ((Attributable) person).getAttributes().getAttribute( key );
-		}
-		return null;
+	/**
+	 * @deprecated -- please inline.  kai, jun'22
+	 */
+	public static Object getPersonAttribute(HasPlansAndId<?,?> person, String key) {
+		return person.getAttributes().getAttribute( key );
 	}
+	/**
+	 * @deprecated -- please inline.  kai, jun'22
+	 */
 	public static void putPersonAttribute( HasPlansAndId<?,?> person, String key, Object value ) {
 		person.getAttributes().putAttribute( key, value ) ;
 	}
+	/**
+	 * @deprecated -- please inline.  kai, jun'22
+	 */
 	public static Object removePersonAttribute( Person person, String key ) {
 		return person.getAttributes().removeAttribute( key );
 	}
-	@Deprecated  // this command is a bit dangerous, since it might clear someone else's attributes.  Maybe best don't use.  kai, may'19
+	/**
+	 * @deprecated -- this command is dangerous since it might clear some else's attributes.  Better just remove specificially the attributes that you "own".  kai, may'19
+	 */
 	public static void removePersonAttributes( Person person, Population population ) {
 		//population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
 		person.getAttributes().clear();
 	}
 
         public static String getSubpopulation( HasPlansAndId<?,?> person ){
-		return (String) getPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME );
+		return (String) person.getAttributes().getAttribute( SUBPOPULATION_ATTRIBUTE_NAME );
         }
         public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
 		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
@@ -1155,7 +1162,7 @@ public final class PopulationUtils {
 		if ( person==null ) {
 			if ( tryStdCnt>0){
 				tryStdCnt--;
-				log.info( "personId=" + personId + " not in allPersons; trying standard vehicles container ..." );
+				log.info( "personId=" + personId + " not in allPersons; trying standard population container ..." );
 				if ( tryStdCnt==0 ) {
 					log.info( Gbl.FUTURE_SUPPRESSED );
 				}

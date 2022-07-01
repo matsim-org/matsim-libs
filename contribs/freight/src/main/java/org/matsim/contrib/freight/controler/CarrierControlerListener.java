@@ -101,7 +101,7 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 			return;
 		}
 		GenericStrategyManager<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
-		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , null, event.getIteration(), event.getReplanningContext() );
+		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 
 }
