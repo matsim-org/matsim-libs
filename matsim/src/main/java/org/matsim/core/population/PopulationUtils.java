@@ -1117,6 +1117,12 @@ public final class PopulationUtils {
 	 * @deprecated -- please inline.  kai, jun'22
 	 */
 	public static Object getPersonAttribute(HasPlansAndId<?,?> person, String key) {
+		if ( person==null ) {
+			return null;
+		}
+		// (This was originally "if person instanceof Attributable then ...".  Since HasPlansAndId now implements Attributable, this is in
+		// principle always fulfilled.  However, if person==null, then person instanceof Attributable also fails.  kai, jul'22)
+
 		return person.getAttributes().getAttribute( key );
 	}
 	/**
@@ -1140,6 +1146,11 @@ public final class PopulationUtils {
 	}
 
         public static String getSubpopulation( HasPlansAndId<?,?> person ){
+		if ( person==null ) {
+			return null;
+		}
+		// (This originally delegated to getPersonAttribute.  See comment there.  kai, jul'22)
+
 		return (String) person.getAttributes().getAttribute( SUBPOPULATION_ATTRIBUTE_NAME );
         }
         public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
