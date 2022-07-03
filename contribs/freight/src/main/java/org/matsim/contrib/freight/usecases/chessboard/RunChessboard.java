@@ -44,7 +44,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -72,10 +71,6 @@ public final class RunChessboard {
     }
 
     public void run() {
-        run(null,null) ;
-    }
-
-    public void run( Collection<AbstractModule> controlerModules, Collection<AbstractQSimModule> qsimModules ) {
         if ( scenario==null ) {
             prepareScenario() ;
         }
@@ -85,30 +80,14 @@ public final class RunChessboard {
 
         Controler controler = new Controler(scenario);
 
-        if ( controlerModules!=null ){
-            for( AbstractModule abstractModule : controlerModules ){
-                controler.addOverridingModule( abstractModule ) ;
-            }
-        }
-        if ( qsimModules!=null ) {
-            for( AbstractQSimModule qsimModule : qsimModules ){
-                controler.addOverridingQSimModule( qsimModule ) ;
-            }
-        }
-
+        controler.addOverridingModule(new CarrierModule() );
 
         controler.addOverridingModule(new AbstractModule() {
+
             @Override
             public void install() {
-                install(new CarrierModule());
                 bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory( types ));
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
-            }
-        });
-        controler.addOverridingModule(new AbstractModule() {
-
-            @Override
-            public void install() {
                 final CarrierScoreStats scores = new CarrierScoreStats(carriers, config.controler().getOutputDirectory() +"/carrier_scores", true);
                 final int statInterval = 1;
                 final LegHistogram freightOnly = new LegHistogram(900);
@@ -142,7 +121,6 @@ public final class RunChessboard {
                 });
             }
         });
-
 
 
 //        final String NEW_STRATEGY = "newStrategy";

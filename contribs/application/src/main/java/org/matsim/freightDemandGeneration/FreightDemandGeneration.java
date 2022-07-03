@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
@@ -45,6 +44,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -447,7 +447,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private static Controler prepareControler(Scenario scenario) {
 		Controler controler = new Controler(scenario);
 
-		Freight.configure(controler);
+		((AllowsConfiguration) controler).addOverridingModule( new CarrierModule( ) ) ;
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

@@ -41,9 +41,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -57,7 +55,6 @@ import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
 
 final class RunPassengerAlongWithCarriers {
@@ -72,10 +69,6 @@ final class RunPassengerAlongWithCarriers {
 	}
 
 	public void run() {
-		run(null,null) ;
-	}
-
-	public void run( Collection<AbstractModule> controlerModules, Collection<AbstractQSimModule> qsimModules ) {
 		if ( scenario==null ) {
 			prepareScenario() ;
 		}
@@ -88,18 +81,10 @@ final class RunPassengerAlongWithCarriers {
 		final Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
-//		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
-
-//		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
-//		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
-//
-//		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
-
-//		controler.addOverridingModule(carrierController);
+		controler.addOverridingModule( new CarrierModule() );
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				this.install(new CarrierModule() );
 				this.bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory(types) );
 				this.bind( CarrierScoringFunctionFactory.class ).toInstance( createScoringFunctionFactory( scenario.getNetwork() ) );
 			}

@@ -27,11 +27,12 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,6 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.scoring.ScoringFunction;
 
 import java.util.List;
 
@@ -52,8 +54,11 @@ public final class CarrierModule extends AbstractModule {
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
 
-//		bind(CarrierControlerListener.class).in( Singleton.class );
-		bind(CarrierControlerListener.class).asEagerSingleton();
+//		bind(CarrierControlerListener.class).asEagerSingleton();
+		bind(CarrierControlerListener.class).in( Singleton.class );
+		// (this is a binding separate from the binding as controler listener)
+		// (the weaker in(Singleton.class) passes all tests. ??  kai, jul'22)
+
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
 		// this switches on certain qsim components:
@@ -88,6 +93,13 @@ public final class CarrierModule extends AbstractModule {
 			}
 		} );
 
+		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryDummyImpl.class ) ;
+
+		// yyyy in the long run, needs to be done differently (establish strategy manager as fixed infrastructure; have user code register strategies there).
+		// kai/kai, jan'21
+		// See javadoc of CarrierStrategyManager for some explanation of design decisions.  kai, jul'22
+		bind( CarrierStrategyManager.class ).toProvider( () -> null );
+		// (the null binding means that a zeroth iteration will run. kai, jul'22)
 
 		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), FreightUtils.getCarriers( event.getServices().getScenario() ) ));
 
@@ -98,9 +110,32 @@ public final class CarrierModule extends AbstractModule {
 	// yyyy this feels rather scary.  kai, oct'19
 	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
 	// Is this maybe already resolved now?  kai, jul'22
-	@Provides
-	CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
+	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
 		return carrierControlerListener.getCarrierAgentTracker();
+	}
+
+	private static class CarrierScoringFunctionFactoryDummyImpl implements CarrierScoringFunctionFactory {
+		@Override public ScoringFunction createScoringFunction( Carrier carrier ){
+			return new ScoringFunction(){
+				@Override public void handleActivity( Activity activity ){
+				}
+				@Override public void handleLeg( Leg leg ){
+				}
+				@Override public void agentStuck( double time ){
+				}
+				@Override public void addMoney( double amount ){
+				}
+				@Override public void addScore( double amount ){
+				}
+				@Override public void finish(){
+				}
+				@Override public double getScore(){
+					return Double.NEGATIVE_INFINITY;
+				}
+				@Override public void handleEvent( Event event ){
+				}
+			};
+		}
 	}
 
 	private static void writeAdditionalRunOutput( OutputDirectoryHierarchy controllerIO, Config config, Carriers carriers ) {
