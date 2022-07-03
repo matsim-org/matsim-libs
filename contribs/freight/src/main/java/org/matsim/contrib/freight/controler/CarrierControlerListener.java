@@ -44,6 +44,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -72,9 +73,9 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject CarrierControlerListener( CarrierStrategyManager strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory ) {
-//		log.warn( "calling ctor; scoringFunctionFactory=" + scoringFunctionFactory.getClass() );
-		this.strategyManager = strategyManagerFactory;
+	@Inject CarrierControlerListener( @Nullable CarrierStrategyManager strategyManager, CarrierScoringFunctionFactory scoringFunctionFactory ) {
+		// The current default is bind( CarrierStrategyManager.class ).toProvider( () -> null );
+		this.strategyManager = strategyManager;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
 
@@ -97,10 +98,6 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
-//		if (carrierPlanStrategyManagerFactory == null) {
-//			return;
-//		}
-//		GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
 		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 

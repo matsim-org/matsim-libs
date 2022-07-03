@@ -447,13 +447,16 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private static Controler prepareControler(Scenario scenario) {
 		Controler controler = new Controler(scenario);
 
-		((AllowsConfiguration) controler).addOverridingModule( new CarrierModule( ) ) ;
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new CarrierModule());
-			}
-		});
+//		((AllowsConfiguration) controler).addOverridingModule( new CarrierModule( ) ) ;
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				install(new CarrierModule());
+//			}
+//		});
+
+		controler.addOverridingModule( new CarrierModule() );
+
 		return controler;
 	}
 
