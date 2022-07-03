@@ -30,9 +30,7 @@ import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -41,6 +39,9 @@ import java.util.stream.Collectors;
  * The main strategy for informed mode choice.
  */
 public class InformedModeChoicePlanStrategy implements PlanStrategy {
+
+	public static final String SCORE_HIST = "scoreHistory";
+	public static final String ESTIMATE_HIST = "estimateHistory";
 
 	private static final Logger log = LogManager.getLogger(InformedModeChoicePlanStrategy.class);
 
@@ -78,14 +79,31 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 		for (int i = 0; i < this.generator.length; i++) {
 			this.generator[i] = generator.get();
-			this.router[i] =  new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation);
+			this.router[i] = new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation);
 		}
 	}
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
 
-		String f = controlerIO.getIterationFilename(replanningContext.getIteration(), "scoreEstimates.tsv.gz");
+		writeEstimates(replanningContext.getIteration());
+
+		// Only for debugging
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			plan.getAttributes().putAttribute(SCORE_HIST, Objects.toString(plan.getAttributes().getAttribute(SCORE_HIST), "") + plan.getScore() + ";");
+			plan.getAttributes().putAttribute(ESTIMATE_HIST,
+					Objects.toString(plan.getAttributes().getAttribute(ESTIMATE_HIST), "") + Objects.toString(plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR), "") + ";");
+		}
+
+		// Thread local stores which thread uses which generator
+		this.counter.set(0);
+		this.assignment = ThreadLocal.withInitial(counter::getAndIncrement);
+		this.executor = Executors.newWorkStealingPool(globalConfig.global().getNumberOfThreads());
+	}
+
+	private void writeEstimates(int iteration) {
+		String f = controlerIO.getIterationFilename(iteration, "scoreEstimates.tsv.gz");
 
 		boolean explainScores = globalConfig.planCalcScore().isExplainScores();
 
@@ -132,11 +150,6 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		} catch (IOException e) {
 			log.error("Could not write Estimate tsv", e);
 		}
-
-		// Thread local stores which thread uses which generator
-		this.counter.set(0);
-		this.assignment = ThreadLocal.withInitial(counter::getAndIncrement);
-		this.executor = Executors.newWorkStealingPool(globalConfig.global().getNumberOfThreads());
 	}
 
 	@Override
@@ -206,6 +219,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 				Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
 				c.applyTo(plan);
+
+				plan.getAttributes().removeAttribute(SCORE_HIST);
+				plan.getAttributes().removeAttribute(ESTIMATE_HIST);
+				plan.getAttributes().removeAttribute(ScoringFunction.SCORE_EXPLANATION);
 
 				// If this plan is new, it needs to be routed
 				router[assignment.get()].run(plan);
