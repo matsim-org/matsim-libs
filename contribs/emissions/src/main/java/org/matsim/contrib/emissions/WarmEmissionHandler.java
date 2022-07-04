@@ -105,28 +105,30 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		}
 
 		// extract event details
-		final double arrivalTime = event.getTime();
+		final double leaveTime = event.getTime(); // leave traffic to perform activity... NOT link leave time!
 		final Id<Link> linkId = event.getLinkId();
 		Link link = this.scenario.getNetwork().getLinks().get(linkId);
-		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( linkId, arrivalTime);
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(linkId, leaveTime);
 		final Id<Vehicle> vehicleId = event.getVehicleId();
 		this.vehicleLeavesTraffic.put(vehicleId, linkId2Time);
 
 		double enterTime = this.linkenter.get(vehicleId).getSecond();
-		double leaveTime = event.getTime();
-		double travelTime = arrivalTime - enterTime;
+		double travelTime = leaveTime - enterTime;
 
 		// match vehicleId to scenario and test for non-scenario vehicles
 		// if vehicle type is defined calculate warm emissions
 		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 		// execute emissions calculation method
-		doEmissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
+		emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 
 		if (vehicle != null) {
-			// vehicle leaving traffic always happens before vehicle leaves link, so we only need this here and not at linkLeaveEvent
-			// this is so that no second emission event is computed for travel from parking to link leave
+			// todo ? vehicle leaving traffic always happens before vehicle leaves link, so we only need this here and not at linkLeaveEvent
+			// this is "so that no second emission event is computed for travel from parking to link leave" (kn)
 			this.vehicleEntersTraffic.remove(vehicleId);
 			this.vehicleLeavesTraffic.remove(vehicleId);
+			this.linkenter.remove(vehicleId);
+			// because after this vehicleLeavesTrafficEvent there can/will be another trafficEnter, linkEnter
+			// (and then later trafficLeave as well)...
 		}
 
 	//Todo: @rjg: decide whether to remove entries from one or more "lists" - DONE ~rjg
@@ -174,14 +176,14 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		if (!this.linkenter.containsKey(vehicleId)) {
 			int maxLinkLeaveFirstActWarnCnt = 3;
-			if (linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt) {
+			if (linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt) { // vehicle has NOT entered this link
 				logger.info("Vehicle " + vehicleId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
 				logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
 				logger.info("Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveFirstActWarnCnt == maxLinkLeaveFirstActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveFirstActWarnCnt++;
-		} else if (!this.linkenter.get(vehicleId).getFirst().equals(linkId)) {
+		} else if (!this.linkenter.get(vehicleId).getFirst().equals(linkId)) { // vehicle HAS entered a link but not THIS one
 			int maxLinkLeaveSomeActWarnCnt = 3;
 			if (linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt) {
 				logger.warn("Vehicle " + vehicleId + " is ending an activity other than the first and leaving link " + linkId + " without having entered.");
@@ -191,35 +193,42 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 			linkLeaveSomeActWarnCnt++;
 		} else {
-			// the vehicle traversed the entire link, DO calculate emissions
+			// the vehicle traversed the entire link, DO calculate emissions IF this was not after an activity...
 			double enterTime = this.linkenter.get(vehicleId).getSecond();
 			double travelTime;
 			if (!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)) {
+				// vehicle has NOT entered or left traffic
 				travelTime = leaveTime - enterTime;
 			} else if (!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
 					|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
 				travelTime = leaveTime - enterTime;
 			} else {
-				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
+				// the vehicle has "left" the link after an activity, thus no emissions calculation for this travel time
+
+//				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond(); // todo but we removed the vehicle from this list in vehicleLeavesTrafficEvent - in this case, just before this linkLeaveEvent...
 //				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); // Not needed anymore ~kmt/rjg 06.22
-				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link, before LinkLeaveEvent
+//				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link, before LinkLeaveEvent
+
+				travelTime = 0; // so that no emissions are calculated...
 
 //				this.vehicleLeavesTraffic.remove(vehicleId);
-//				this.vehicleEntersTraffic.remove(vehicleId); // Not needed anymore (see VehicleLeavesTrafficEvent) ~rjg 06.22
-				// todo: ASK kmt why we need the second, too? ~rjg
+//				this.vehicleEntersTraffic.remove(vehicleId);
 			}
 
 			// match vehicleId to scenario and test for non-scenario vehicles
 			// if vehicle type is defined calculate warm emissions
 			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 			// execute emissions calculation method
-			doEmissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
-		}
+			emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 
+			if (vehicle != null) {
+				this.linkenter.remove(vehicleId);
+				// because after this linkLeaveEvent there can/will be another linkEnterEvent
+			}
+		}
 	}
 
-	private void doEmissionsCalculation(Id<Vehicle> vehicleId, Vehicle vehicle, Id<Link> linkId, Link link, double leaveTime, double travelTime) {
-
+	private void emissionsCalculation(Id<Vehicle> vehicleId, Vehicle vehicle, Id<Link> linkId, Link link, double leaveTime, double travelTime) {
 		if (vehicle == null) {
 			handleNullVehicle(vehicleId);
 		} else {
