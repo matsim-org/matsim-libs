@@ -56,7 +56,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	private final ReplanningAnnealerConfigGroup saConfig;
 	private final int innovationStop;
 	private final String sep;
-	private EnumMap<AnnealParameterOption, Double> currentValues;
+	private final EnumMap<AnnealParameterOption, Double> currentValues;
 	private int currentIter;
 	private List<String> header;
 	@Inject
@@ -208,7 +208,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 		}
 	}
 
-	private List<Double> annealReplanning(double globalInnovationValue, StrategyManager stratMan, String subpopulation) {
+	private List<Double> annealReplanning( double globalInnovationValue, StrategyManager stratMan, String subpopulation ) {
 		List<Double> annealValues = new ArrayList<>();
 		double totalInnovationWeights = getStrategyWeights(stratMan, subpopulation, StratType.allInnovation);
 		double totalSelectorWeights = getStrategyWeights(stratMan, subpopulation, StratType.allSelectors);
