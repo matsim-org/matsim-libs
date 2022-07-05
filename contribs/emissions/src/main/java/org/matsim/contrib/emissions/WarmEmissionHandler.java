@@ -118,17 +118,17 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		// match vehicleId to scenario and test for non-scenario vehicles
 		// if vehicle type is defined calculate warm emissions
 		Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-		// execute emissions calculation method
-		emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 
 		if (vehicle != null) {
-			// todo ? vehicle leaving traffic always happens before vehicle leaves link, so we only need this here and not at linkLeaveEvent
+			// execute emissions calculation method
+			emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
+
 			// this is "so that no second emission event is computed for travel from parking to link leave" (kn)
+			// because after this vehicleLeavesTrafficEvent there can/will be another enterTraffic, linkEnter
+			// (and then later leaveTraffic as well)...
 			this.vehicleEntersTraffic.remove(vehicleId);
 			this.vehicleLeavesTraffic.remove(vehicleId);
 			this.linkenter.remove(vehicleId);
-			// because after this vehicleLeavesTrafficEvent there can/will be another trafficEnter, linkEnter
-			// (and then later trafficLeave as well)...
 		}
 
 	//Todo: @rjg: decide whether to remove entries from one or more "lists" - DONE ~rjg
@@ -174,9 +174,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 		linkLeaveCnt++;
 
-		if (!this.linkenter.containsKey(vehicleId)) {
+		if (!this.linkenter.containsKey(vehicleId)) { // vehicle has NOT entered this link
 			int maxLinkLeaveFirstActWarnCnt = 3;
-			if (linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt) { // vehicle has NOT entered this link
+			if (linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt) {
 				logger.info("Vehicle " + vehicleId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
 				logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
 				logger.info("Thus, no emissions are calculated for this link leave event.");
@@ -203,25 +203,28 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 					|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
 				travelTime = leaveTime - enterTime;
 			} else {
-				// the vehicle has "left" the link after an activity, thus no emissions calculation for this travel time
+				// the vehicle has "left" the link after an activity, thus NO emissions calculation for this travel time
+				// which takes place from parking lot to linkLeave
 
-//				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond(); // todo but we removed the vehicle from this list in vehicleLeavesTrafficEvent - in this case, just before this linkLeaveEvent...
+//				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond(); // not available: removed vehicleId from this map on vehicleLeavesTrafficEvent
 //				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); // Not needed anymore ~kmt/rjg 06.22
 //				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link, before LinkLeaveEvent
 
 				travelTime = 0; // so that no emissions are calculated...
 
-//				this.vehicleLeavesTraffic.remove(vehicleId);
+//				this.vehicleLeavesTraffic.remove(vehicleId); // not needed anymore ~rjg
 //				this.vehicleEntersTraffic.remove(vehicleId);
 			}
 
 			// match vehicleId to scenario and test for non-scenario vehicles
 			// if vehicle type is defined calculate warm emissions
 			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
-			// execute emissions calculation method
-			emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 
-			if (vehicle != null) {
+			if (vehicle != null && travelTime != 0) {
+				// execute emissions calculation method
+				emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
+
+				// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
 				this.linkenter.remove(vehicleId);
 				// because after this linkLeaveEvent there can/will be another linkEnterEvent
 			}
