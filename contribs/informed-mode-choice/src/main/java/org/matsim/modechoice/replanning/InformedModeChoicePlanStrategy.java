@@ -86,7 +86,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	@Override
 	public void init(ReplanningContext replanningContext) {
 
-		writeEstimates(replanningContext.getIteration());
+		final int writePlansInterval = globalConfig.controler().getWritePlansInterval();
+
+		if (writePlansInterval > 0 && (replanningContext.getIteration() % writePlansInterval == 0))
+			writeEstimates(replanningContext.getIteration());
 
 		// Only for debugging
 		for (Person person : scenario.getPopulation().getPersons().values()) {
