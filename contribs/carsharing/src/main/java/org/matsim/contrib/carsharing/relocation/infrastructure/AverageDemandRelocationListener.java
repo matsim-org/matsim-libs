@@ -1,16 +1,7 @@
 package org.matsim.contrib.carsharing.relocation.infrastructure;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
@@ -28,7 +19,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.matrices.Entry;
@@ -36,8 +26,8 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.text.DecimalFormat;
+import java.util.*;
 
 public class AverageDemandRelocationListener implements IterationStartsListener, DispatchRelocationsEventHandler {
 
@@ -48,8 +38,6 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 
 	@Inject
 	private CarSharingDemandTracker demandTracker;
-	@Inject
-	StrategyManager strategyManager;
 	// temp
 	@Inject
 	private OutputDirectoryHierarchy outputDirectoryHierarchy;

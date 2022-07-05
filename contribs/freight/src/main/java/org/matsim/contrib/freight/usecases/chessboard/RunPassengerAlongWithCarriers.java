@@ -21,6 +21,7 @@
 
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -40,9 +41,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -56,7 +55,6 @@ import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
 
 final class RunPassengerAlongWithCarriers {
@@ -71,10 +69,6 @@ final class RunPassengerAlongWithCarriers {
 	}
 
 	public void run() {
-		run(null,null) ;
-	}
-
-	public void run( Collection<AbstractModule> controlerModules, Collection<AbstractQSimModule> qsimModules ) {
 		if ( scenario==null ) {
 			prepareScenario() ;
 		}
@@ -87,14 +81,16 @@ final class RunPassengerAlongWithCarriers {
 		final Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers, types ).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
+		controler.addOverridingModule( new CarrierModule() );
 
-		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
-		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory(types) );
+				this.bind( CarrierScoringFunctionFactory.class ).toInstance( createScoringFunctionFactory( scenario.getNetwork() ) );
+			}
+		} );
 
-		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
 
-		controler.addOverridingModule(carrierController);
 		prepareFreightOutputDataAndStats(scenario, controler.getEvents(), controler, carriers);
 
 		controler.run();
@@ -159,7 +155,7 @@ final class RunPassengerAlongWithCarriers {
 		};
 	}
 	
-	private static class MyCarrierPlanStrategyManagerFactory implements CarrierPlanStrategyManagerFactory {
+	private static class MyCarrierPlanStrategyManagerFactory implements Provider<CarrierStrategyManager>{
 
         @Inject
         private Network network;
@@ -177,12 +173,13 @@ final class RunPassengerAlongWithCarriers {
         }
 
         @Override
-        public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+        public CarrierStrategyManager get() {
             TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
             final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
                     travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-            final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<>();
+//            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
+		final CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
             strategyManager.setMaxPlansPerAgent(5);
 
             strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);
@@ -195,7 +192,7 @@ final class RunPassengerAlongWithCarriers {
             
 //            strategyManager.addStrategy(new SelectBestPlanAndOptimizeItsVehicleRouteFactory(network, types, modeTravelTimes.get(TransportMode.car)).createStrategy(), null, 0.05);
             
-            return strategyManager;
+            return (CarrierStrategyManager) strategyManager;
         }
     }
 
