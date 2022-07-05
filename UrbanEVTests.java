@@ -787,16 +787,6 @@ public class UrbanEVTests {
 				Assert.assertEquals("there should be 8 people plugging out this test", 9, plugOutCntPerPerson.size(), 0);
 //				Assert.assertEquals( plugInCntPerPerson.size(), plugOutCntPerPerson.size()); //not necessary
 
-//				Assert.assertTrue(plugInCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
-
-				//	The number of plug in and outs is not equal anymore since we added homecharging
-
-//				for (Id<Person> personId : plugInCntPerPerson.keySet()) {
-//					Assert.assertTrue("in this test, each agent should only plugin once. agent=" + personId,
-//							plugInCntPerPerson.get(personId).size() >= 1);
-//					Assert.assertTrue( "each agent should plug in just as often as it plugs out. agent = " + personId,
-//							plugInCntPerPerson.get(personId).size() == plugOutCntPerPerson.get(personId).size());
-//				}
 			}
 
 			this.plugInCntPerPerson.clear();
