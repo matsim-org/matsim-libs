@@ -62,7 +62,7 @@ public class FinalSoc2VehicleTypeTest {
 		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
 		CreateUrbanEVTestScenario.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 
-		handler = new SOCHandler(scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.car, VehicleType.class)));
+		handler = new SOCHandler(scenario.getVehicles().getVehicleTypes().get(Id.create("person", VehicleType.class))); //car vehicle type currently is set to the same name as the person id
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
 		controler.addControlerListener(handler);
@@ -116,15 +116,16 @@ public class FinalSoc2VehicleTypeTest {
 	}
 
 	@Test
+	public void testInitialEnergyInIter0(){
+		Assert.assertTrue(handler.iterationInitialSOC.get(0).equals(CreateUrbanEVTestScenario.CAR_INITIAL_ENERGY));
+	}
+
+	@Test
 	public void testSOCIsDumpedIntoVehicleType(){
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
-		VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.car, VehicleType.class));
+		VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create("person", VehicleType.class));
 		Assert.assertNotEquals(EVUtils.getInitialEnergy(carType.getEngineInformation()), CreateUrbanEVTestScenario.CAR_INITIAL_ENERGY);
-		Assert.assertEquals(7.6778193969518895, EVUtils.getInitialEnergy(carType.getEngineInformation()), MatsimTestUtils.EPSILON);
-
-		//agent has not driven the bike so SOC should have not changed
-		VehicleType bikeType = scenario.getVehicles().getVehicleTypes().get(Id.create(TransportMode.bike, VehicleType.class));
-		Assert.assertEquals(EVUtils.getInitialEnergy(bikeType.getEngineInformation()), CreateUrbanEVTestScenario.BIKE_INITIAL_ENERGY, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(4.04297917065838, EVUtils.getInitialEnergy(carType.getEngineInformation()), MatsimTestUtils.EPSILON);
 	}
 
 	@Test

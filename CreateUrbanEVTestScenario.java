@@ -64,16 +64,6 @@ class CreateUrbanEVTestScenario {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//manually insert car vehicle type with attributes (hbefa technology, initial energy etc....)
-
-
-
-//		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
-//		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
-//		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), BIKE_INITIAL_ENERGY);
-//		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
-
-
-
 		createAndRegisterPersonalCarAndBikeVehicles(scenario);
 		return scenario;
 	}
@@ -83,21 +73,18 @@ class CreateUrbanEVTestScenario {
 
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 
-			Set<String> chargerTypes = new HashSet<>();
-			chargerTypes.add("DC");
-
-
-			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(), VehicleType.class));
+			VehicleType carVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString(), VehicleType.class)); //TODO should at least have a suffix "_car"
 			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
 			EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), CAR_INITIAL_ENERGY);
-			EVUtils.setChargerTypes(carVehicleType.getEngineInformation(),chargerTypes);
+			EVUtils.setChargerTypes(carVehicleType.getEngineInformation(),Arrays.asList("a", "b", "default"));
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car), carVehicleType);
 			scenario.getVehicles().addVehicle(carVehicle);
 
-			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString() +"_bike", VehicleType.class));
+			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(Id.create(person.getId().toString() + "_bike", VehicleType.class));
 			Vehicle bikeVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.bike), bikeVehicleType);
+
 			scenario.getVehicles().addVehicleType(bikeVehicleType);
 			scenario.getVehicles().addVehicle(bikeVehicle);
 
