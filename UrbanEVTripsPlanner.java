@@ -341,7 +341,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			} else throw new IllegalArgumentException();
 		}
 
-		return lastLegWithVehicle;
+		if(lastLegWithVehicle == null){
+			throw new RuntimeException("found no leg with vehicle " + originalVehicleId + ". Should not happen. Is the corresponding mode a network mode?");
+		} else {
+			return lastLegWithVehicle;
+		}
 	}
 
 	/**
