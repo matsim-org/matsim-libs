@@ -23,10 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -454,12 +451,14 @@ public class TripStructureUtilsTest {
 		}
 	}
 
+	@Ignore("Subtours now also uses the coordinates if available. This test does not throw an NPE anymore. -- jul'22")
 	@Test( expected=NullPointerException.class )
 	public void testNPEWhenLocationNullInSubtourAnalysis() {
 		// this may sound surprising, but for a long time the algorithm
 		// was perfectly fine with that if assertions were disabled...
 
 		final Plan plan = populationFactory.createPlan();
+
 		// link ids are null
 		plan.addActivity(
 				populationFactory.createActivityFromCoord(
