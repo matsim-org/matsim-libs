@@ -60,14 +60,12 @@ public class ActivityWhileChargingFinder {
 		Preconditions.checkState(plan.getPlanElements().contains(leg));
 		List<PlanElement> planElementsBeforeLeg = plan.getPlanElements().subList(0, plan.getPlanElements().indexOf(leg));
 
+		//collect precedent activitiesWhileCharging
 		List<PlanElement> precedentPluginInteractions = planElementsBeforeLeg.stream().filter(planElement -> planElement.toString().contains((UrbanVehicleChargingHandler.PLUGIN_IDENTIFIER))).collect(Collectors.toList());
 		List<Activity> precedentActsWhileCharging = new ArrayList<>();
-
 		for (PlanElement precedentPluginInteraction : precedentPluginInteractions) {
-
-		int index = plan.getPlanElements().indexOf(precedentPluginInteraction);
-		precedentActsWhileCharging.add(EditPlans.findRealActAfter(mobsimAgent, index));
-
+			int index = plan.getPlanElements().indexOf(precedentPluginInteraction);
+			precedentActsWhileCharging.add(EditPlans.findRealActAfter(mobsimAgent, index));
 		}
 
 		List<Activity> activities = TripStructureUtils.getActivities(planElementsBeforeLeg, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
@@ -75,7 +73,7 @@ public class ActivityWhileChargingFinder {
 				.filter(activity -> activityTypes.contains(activity.getType()))
 				.map(activity -> planElementsBeforeLeg.indexOf(activity))
 				.filter(idx -> idx > 0)
-				.map(idx -> new Tuple<>(getEvLegBeforeActivity(planElementsBeforeLeg, (Activity) planElementsBeforeLeg.get(idx), evRoutingMode), (Activity) planElementsBeforeLeg.get(idx)))
+				.map(idx -> new Tuple<>(getPrecedentLegOfRoutingModeBeforeActivity(planElementsBeforeLeg, (Activity) planElementsBeforeLeg.get(idx), evRoutingMode), (Activity) planElementsBeforeLeg.get(idx)))
 //				.filter(tuple -> TripStructureUtils.getRoutingMode(tuple.getFirst()).equals(evRoutingMode))
 				.collect(Collectors.toList());
 
@@ -115,25 +113,25 @@ public class ActivityWhileChargingFinder {
 		}
 		for (int ii = actIndex + 1; ii < planElements.size(); ii++){
 			PlanElement element = planElements.get(ii);
-			if(element instanceof Leg)
-				if(((Leg) element).getMode().equals(routingMode)){
-					return (Leg) element;
+			if(element instanceof Leg && TripStructureUtils.getRoutingMode((Leg) element).equals(routingMode)){
+				return (Leg) element;
 			}
 		}
 		return null;
 	}
 
-	Leg getEvLegBeforeActivity (List<PlanElement> planElements, Activity activity, String routingMode){
+	@Nullable
+	Leg getPrecedentLegOfRoutingModeBeforeActivity(List<PlanElement> planElements, Activity activity, String routingMode){
 		int actIndex = planElements.indexOf(activity);
 		if(actIndex < 0){
 			log.warn("could not find activity within given list of plan elements");
 			return null;
 		}
-		if(actIndex == planElements.size() - 1) {
-			log.warn("the given activity is the last activity in the given list of plan elements");
+		if(actIndex == 0) {
+			log.warn("the given activity is the first activity in the given list of plan elements");
 			return null;
 		}
-		for (int ii = actIndex ; ii > 0 ; ii--){
+		for (int ii = actIndex -1 ; ii >= 0 ; ii--){
 			PlanElement element = planElements.get(ii);
 			if(element instanceof Leg)
 				if(((Leg) element).getMode().equals(routingMode)){
