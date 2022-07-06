@@ -125,7 +125,7 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 
 				}
 			} catch (Exception e) {
-				log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e.getMessage());
+				log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e);
 
 				for (Leg leg : TripStructureUtils.getLegs(plan)) {
 					leg.setRoute(null);
@@ -134,6 +134,8 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 				}
 
 				fixed++;
+
+				throw e;
 			}
 		}
 

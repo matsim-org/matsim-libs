@@ -354,11 +354,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private boolean atSameLocation(Activity firstLegUsingMode,
 	                               Activity lastLegUsingMode) {
-		return firstLegUsingMode.getFacilityId() != null ?
-				firstLegUsingMode.getFacilityId().equals(
-						lastLegUsingMode.getFacilityId()) :
-				firstLegUsingMode.getLinkId().equals(
-						lastLegUsingMode.getLinkId());
+		if (firstLegUsingMode.getFacilityId() != null)
+			return firstLegUsingMode.getFacilityId().equals(lastLegUsingMode.getFacilityId());
+		else if (firstLegUsingMode.getCoord() != null && lastLegUsingMode.getCoord() != null)
+			return firstLegUsingMode.getCoord().equals(lastLegUsingMode.getCoord());
+		else
+			return firstLegUsingMode.getLinkId().equals(lastLegUsingMode.getLinkId());
 	}
 
 	private Activity findLastDestinationOfMode(

@@ -19,14 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -230,21 +226,26 @@ public final class TripStructureUtils {
 			final Predicate<String> isStageActivity ) {
 		final List<Subtour> subtours = new ArrayList<>();
 
-		Id<?> destinationId = null;
-		final List<Id<?>> originIds = new ArrayList<>();
+		Object destinationId = null;
+
+		// can be either id or coordinate
+		final List<Object> originIds = new ArrayList<>();
 		final List<Trip> trips = getTrips( planElements, isStageActivity );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
+
 		for (Trip trip : trips) {
-			final Id<?> originId;
+			final Object originId;
 			//use facilities if available
-			if (trip.getOriginActivity().getFacilityId()!=null ) {
+			if (trip.getOriginActivity().getFacilityId() != null) {
 				originId = trip.getOriginActivity().getFacilityId();
+			} else if (trip.getOriginActivity().getCoord() != null) {
+				originId = trip.getOriginActivity().getCoord();
 			} else {
 				originId = trip.getOriginActivity().getLinkId();
 			}
 
 			if ( originId == null ) {
-				throw new NullPointerException( "Both facility id and link id for origin activity "+trip.getOriginActivity()+
+				throw new NullPointerException( "Facility id, link id and coordinates for origin activity "+trip.getOriginActivity()+
 										" are null!" );
 			}
 
@@ -252,14 +253,16 @@ public final class TripStructureUtils {
 				throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
 			}
 
-			if (trip.getDestinationActivity().getFacilityId()!=null ) {
+			if (trip.getDestinationActivity().getFacilityId() != null) {
 				destinationId = trip.getDestinationActivity().getFacilityId();
+			} else if (trip.getDestinationActivity().getCoord() != null) {
+				destinationId = trip.getDestinationActivity().getCoord();
 			} else {
 				destinationId = trip.getDestinationActivity().getLinkId();
 			}
 
 			if ( destinationId == null ) {
-				throw new NullPointerException( "Both facility id and link id for destination activity "+trip.getDestinationActivity()+
+				throw new NullPointerException( "Facility id, and link id and coordinates for destination activity "+trip.getDestinationActivity()+
 										" are null!" );
 			}
 
