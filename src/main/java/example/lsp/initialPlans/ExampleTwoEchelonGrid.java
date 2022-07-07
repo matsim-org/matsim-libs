@@ -67,8 +67,17 @@ import java.util.Random;
  */
 final class ExampleTwoEchelonGrid {
 
+
 	private static final Logger log = Logger.getLogger(ExampleTwoEchelonGrid.class);
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
+
+	private static final VehicleType VEH_TYPE_LARGE_10 = CarrierVehicleType.Builder.newInstance(Id.create("large10", VehicleType.class))
+			.setCapacity(10)
+			.setMaxVelocity(10)
+			.setFixCost(130)
+			.setCostPerDistanceUnit(0.001)
+			.setCostPerTimeUnit(0.01)
+			.build();
 
 	public static void main(String[] args) {
 		log.info("Prepare Config");
@@ -145,8 +154,8 @@ final class ExampleTwoEchelonGrid {
 		LSPPlan lspPlan = LSPUtils.createLSPPlan();
 		Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
 				directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-				VehicleType largeType = createVehicleType(Id.create("large10", VehicleType.class), 10, 10, 130, 0.001, 0.01);
-				CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, largeType));
+
+		CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
 		LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
 				.setCarrier(directCarrier)
 				.build();
@@ -172,26 +181,7 @@ final class ExampleTwoEchelonGrid {
 
 		return lsp;
 	}
-
-
-	private static VehicleType createVehicleType(Id<VehicleType> vehicleTypeId, int maximumVelocity, double capacity, double fixedCost, double costsPerMeter, double costsPerSecond) {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(vehicleTypeId);
-		vehicleType.setMaximumVelocity(maximumVelocity);
-		vehicleType.getCapacity().setOther(capacity);
-		vehicleType.getCostInformation().setFixedCost(fixedCost);
-		vehicleType.getCostInformation().setCostsPerMeter(costsPerMeter);
-		vehicleType.getCostInformation().setCostsPerSecond(costsPerSecond);
-		return vehicleType;
-
-		//TODO: @KN: How to use this syntax?
-//		return VehicleUtils.createVehicleType(vehicleTypeId)
-//			.setMaximumVelocity(maximumVelocity)
-//			.getCapacity().setOther(capacity)
-//			.getCostInformation().setFixedCost(fixedCost); //<< --- here it fails, because it try to find the getCostInformation in the VehicleCapacity :(
-//			.getCostInformation().setCostsPerMeter(costsPerMeter);
-//			.getCostInformation().setCostsPerSecond(costsPerSecond);
-	}
-
+	
 	private static Collection<LSPShipment> createInitialLSPShipments() {
 		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
 
