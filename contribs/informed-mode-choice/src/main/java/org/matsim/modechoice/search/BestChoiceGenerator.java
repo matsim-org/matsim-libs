@@ -9,23 +9,23 @@ import org.matsim.modechoice.PlanCandidate;
 import java.util.*;
 
 /**
- * Generates the best known choices. It should be noted that there could be multiple when min max estimates are in use.
+ * Generates the best known choices.
  */
-public class BestChoicesGenerator extends TopKChoicesGenerator {
+public class BestChoiceGenerator extends TopKChoicesGenerator {
 
 	// This class is completely based on the top k choices generator with a small k
 	// However, only computing the very best option is an easier problem to solve
 	// and a dedicated implementation might be more efficient
 
 	@Inject
-	BestChoicesGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
+	BestChoiceGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
 		super(config, options);
 	}
 
 	@Override
 	public Collection<PlanCandidate> generate(Plan plan) {
 
-		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, 10, 0));
+		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, null, 10, 0));
 
 		if (candidates.isEmpty())
 			return Set.of();

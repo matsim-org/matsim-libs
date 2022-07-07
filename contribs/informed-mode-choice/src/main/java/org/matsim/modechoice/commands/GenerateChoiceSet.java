@@ -168,7 +168,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		}
 
 		TopKChoicesGenerator generator = generatorCache.get();
-		Collection<PlanCandidate> candidates = generator.generate(plan, topK, threshold);
+		Collection<PlanCandidate> candidates = generator.generate(plan, null, topK, threshold);
 
 		// remove all other plans
 		Set<Plan> plans = new HashSet<>(person.getPlans());

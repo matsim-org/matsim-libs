@@ -6,15 +6,17 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.modechoice.CandidateGenerator;
 import org.matsim.modechoice.PlanCandidate;
 
-/**
- * Module for {@link IMCSelectFromGenerator}.
- */
-public class IMCSimpleStrategyModule extends AbstractMultithreadedModule {
+import javax.inject.Provider;
 
-	private final CandidateGenerator generator;
+/**
+ * Module for {@link SelectFromGeneratorStrategy}.
+ */
+public class SimplePlanSelectionStrategyModule extends AbstractMultithreadedModule {
+
+	private final Provider<? extends CandidateGenerator> generator;
 	private final Selector<PlanCandidate> selector;
 
-	public IMCSimpleStrategyModule(GlobalConfigGroup globalConfigGroup, CandidateGenerator generator, Selector<PlanCandidate> selector) {
+	public SimplePlanSelectionStrategyModule(GlobalConfigGroup globalConfigGroup, Provider<? extends CandidateGenerator> generator, Selector<PlanCandidate> selector) {
 		super(globalConfigGroup);
 		this.generator = generator;
 		this.selector = selector;
@@ -22,7 +24,7 @@ public class IMCSimpleStrategyModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new IMCSelectFromGenerator(generator, selector);
+		return new SelectFromGeneratorStrategy(generator.get(), selector);
 	}
 
 }

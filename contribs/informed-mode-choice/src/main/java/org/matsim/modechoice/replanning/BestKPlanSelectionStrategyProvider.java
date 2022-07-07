@@ -1,6 +1,5 @@
 package org.matsim.modechoice.replanning;
 
-import com.google.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
@@ -10,33 +9,40 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
- * Provider for {@link IMCSelectFromGenerator}.
+ * Provider for {@link SelectFromGeneratorStrategy}.
  */
-public class BestKSelectionStrategyProvider implements Provider<PlanStrategy> {
+public class BestKPlanSelectionStrategyProvider implements Provider<PlanStrategy> {
 
 	@Inject
-	private javax.inject.Provider<TripRouter> tripRouterProvider;
+	private Provider<TripRouter> tripRouterProvider;
 	@Inject
 	private GlobalConfigGroup globalConfigGroup;
+
+	@Inject
+	private InformedModeChoiceConfigGroup configGroup;
+
 	@Inject
 	private ActivityFacilities facilities;
 	@Inject
 	private TimeInterpretation timeInterpretation;
 	@Inject
-	private TopKChoicesGenerator generator;
+	private Provider<TopKChoicesGenerator> generator;
 
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		// TODO: scale is hardcoded
-		builder.addStrategyModule(new IMCSimpleStrategyModule(globalConfigGroup, generator, new MultinomialLogitSelector(1, MatsimRandom.getLocalInstance())));
+		builder.addStrategyModule(new SimplePlanSelectionStrategyModule(globalConfigGroup, generator,
+				new MultinomialLogitSelector(configGroup.getInvBeta(), MatsimRandom.getLocalInstance())));
+
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
 		return builder.build();

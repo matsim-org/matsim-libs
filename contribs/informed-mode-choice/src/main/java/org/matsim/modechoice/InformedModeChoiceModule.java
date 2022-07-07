@@ -9,10 +9,10 @@ import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
-import org.matsim.modechoice.replanning.BestChoiceStrategyProvider;
-import org.matsim.modechoice.replanning.BestKSelectionStrategyProvider;
+import org.matsim.modechoice.replanning.BestKPlanSelectionStrategyProvider;
 import org.matsim.modechoice.replanning.InformedModeChoiceStrategyProvider;
-import org.matsim.modechoice.search.BestChoicesGenerator;
+import org.matsim.modechoice.replanning.SingleLegSelectionStrategyProvider;
+import org.matsim.modechoice.search.BestChoiceGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.util.HashMap;
@@ -27,9 +27,9 @@ import java.util.Set;
  */
 public final class InformedModeChoiceModule extends AbstractModule {
 
-	public static String BEST_CHOICE_STRATEGY = "BestChoice";
+	public static String BEST_K_PLAN_SELECTION_STRATEGY = "BestKPlanSelection";
 
-	public static String BEST_K_SELECTION_STRATEGY = "BestKSelection";
+	public static String SINGLE_LEG_SELECTION_STRATEGY = "SingleLegSelection";
 
 	public static String INFORMED_MODE_CHOICE = "InformedModeChoice";
 
@@ -58,14 +58,14 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		// Not singleton, they should be able to be created per thread if necessary.
 		bind(EstimateRouter.class);
 		bind(TopKChoicesGenerator.class);
-		bind(BestChoicesGenerator.class);
+		bind(BestChoiceGenerator.class);
 
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
 		}
 
-		addPlanStrategyBinding(BEST_CHOICE_STRATEGY).toProvider(BestChoiceStrategyProvider.class);
-		addPlanStrategyBinding(BEST_K_SELECTION_STRATEGY).toProvider(BestKSelectionStrategyProvider.class);
+		addPlanStrategyBinding(BEST_K_PLAN_SELECTION_STRATEGY).toProvider(BestKPlanSelectionStrategyProvider.class);
+		addPlanStrategyBinding(SINGLE_LEG_SELECTION_STRATEGY).toProvider(SingleLegSelectionStrategyProvider.class);
 		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// TODO: SubTour best choice + best k selection

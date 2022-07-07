@@ -2,6 +2,7 @@ package org.matsim.modechoice;
 
 import org.matsim.api.core.v01.population.Plan;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -14,7 +15,14 @@ public interface CandidateGenerator {
 	/**
 	 * Generate plan candidates, ordered by their natural comparator.
 	 */
-	Collection<PlanCandidate> generate(Plan plan);
+	default Collection<PlanCandidate> generate(Plan plan) {
+		return generate(plan, null);
+	}
 
 
+	/**
+	 * Generate plan candidates, ordered by their natural comparator.
+	 * @param mask if not null, only include these trips with a true entry at their respective index.
+	 */
+	Collection<PlanCandidate> generate(Plan plan, @Nullable boolean[] mask);
 }

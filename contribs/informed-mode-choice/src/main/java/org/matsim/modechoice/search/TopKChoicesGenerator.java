@@ -67,8 +67,8 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 		}
 	}
 
-	public Collection<PlanCandidate> generate(Plan plan) {
-		return generate(plan, config.getTopK(), 0);
+	public Collection<PlanCandidate> generate(Plan plan, boolean[] mask) {
+		return generate(plan, mask, config.getTopK(), 0);
 	}
 
 	/**
@@ -78,11 +78,14 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 	 * @param topK      use at most top k choices (for each combination)
 	 * @param threshold discard solutions that are worse than best solution
 	 */
-	public Collection<PlanCandidate> generate(Plan plan, int topK, double threshold) {
+	public Collection<PlanCandidate> generate(Plan plan, boolean[] mask, int topK, double threshold) {
 
 		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
 
 		PlanModel planModel = new PlanModel(plan);
+
+		if (mask != null)
+			throw new UnsupportedOperationException("Mask not supported yet");
 
 		Map<String, List<Combination>> options = new IdentityHashMap<>();
 

@@ -10,12 +10,12 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BestChoicesGeneratorTest extends ScenarioTest {
+public class BestChoiceGeneratorTest extends ScenarioTest {
 
 	@Test
 	public void choices() {
 
-		BestChoicesGenerator generator = injector.getInstance(BestChoicesGenerator.class);
+		BestChoiceGenerator generator = injector.getInstance(BestChoiceGenerator.class);
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 

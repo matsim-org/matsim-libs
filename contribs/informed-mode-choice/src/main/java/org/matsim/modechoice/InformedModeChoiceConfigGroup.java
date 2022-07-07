@@ -5,7 +5,8 @@ import com.google.common.base.Splitter;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -19,6 +20,8 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_TOP_K = "topK";
 
+	public final static String CONFIG_PARAM_INV_BETA = "invBeta";
+
 	/**
 	 * The setter ensures, that this class always contains internal string representations.
 	 */
@@ -28,6 +31,11 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 * Use kth best trips.
 	 */
 	private int k = 5;
+
+	/**
+	 * Scale parameter for MNL.
+	 */
+	private double invBeta = 1;
 
 	public InformedModeChoiceConfigGroup() {
 		super(NAME);
@@ -60,6 +68,16 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return k;
 	}
 
+	@StringGetter(CONFIG_PARAM_INV_BETA)
+	public double getInvBeta() {
+		return invBeta;
+	}
+
+	@StringSetter(CONFIG_PARAM_INV_BETA)
+	public void setInvBeta(double invBeta) {
+		this.invBeta = invBeta;
+	}
+
 	public List<String> getModes() {
 		return modes;
 	}
@@ -69,6 +87,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> comments = super.getComments();
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
 		comments.put(CONFIG_PARAM_TOP_K, "Defines how many top k best trips of each category should be generated.");
+		comments.put(CONFIG_PARAM_INV_BETA, "1/beta parameter to trade-off of exploration for alternatives. Para,eter of 0 is equal to best choice.");
 
 		return comments;
 	}
