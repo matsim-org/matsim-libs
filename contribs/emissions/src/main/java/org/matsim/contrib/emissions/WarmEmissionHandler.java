@@ -196,37 +196,48 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			// the vehicle traversed the entire link, DO calculate emissions IF this was not after an activity...
 			double enterTime = this.linkenter.get(vehicleId).getSecond();
 			double travelTime;
-			if (!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)) {
-				// vehicle has NOT entered or left traffic
-				travelTime = leaveTime - enterTime;
-			} else if (!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
-					|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
-				travelTime = leaveTime - enterTime;
-			} else {
-				// the vehicle has "left" the link after an activity, thus NO emissions calculation for this travel time
-				// which takes place from parking lot to linkLeave
+			{ // after-activity check code block
+				if (!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)) {
+					// vehicle has NOT entered or left traffic
+					travelTime = leaveTime - enterTime;
+				} else if (!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
+						|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
+					travelTime = leaveTime - enterTime;
+				} else {
+					// the vehicle has "left" the link after an activity, thus NO emissions calculation for this travel time
+					// which takes place from parking lot to linkLeave
 
 //				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond(); // not available: removed vehicleId from this map on vehicleLeavesTrafficEvent
 //				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond(); // Not needed anymore ~kmt/rjg 06.22
 //				travelTime = arrivalTime - enterTime; // when vehicle leaves traffic ON the link, before LinkLeaveEvent
 
-				travelTime = 0; // so that no emissions are calculated...
+					travelTime = 0; // so that no emissions are calculated...
 
 //				this.vehicleLeavesTraffic.remove(vehicleId); // not needed anymore ~rjg
 //				this.vehicleEntersTraffic.remove(vehicleId);
+				}
 			}
+			// todo the whole after-activity check code block above could be simplified to:
+//			if (this.vehicleEntersTraffic.containsKey(vehicleId) ||
+//					this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())) {
+//				{
+//					// calculate emissions block
+//				}
+//			}
 
-			// match vehicleId to scenario and test for non-scenario vehicles
-			// if vehicle type is defined calculate warm emissions
-			Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
+			{ // calculate emissions block
+				// match vehicleId to scenario and test for non-scenario vehicles
+				// if vehicle type is defined calculate warm emissions
+				Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 
-			if (vehicle != null && travelTime != 0) {
-				// execute emissions calculation method
-				emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
+				if (vehicle != null && travelTime != 0) {
+					// execute emissions calculation method
+					emissionsCalculation(vehicleId, vehicle, linkId, link, leaveTime, travelTime);
 
-				// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
-				this.linkenter.remove(vehicleId);
-				// because after this linkLeaveEvent there can/will be another linkEnterEvent
+					// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
+					this.linkenter.remove(vehicleId);
+					// because after this linkLeaveEvent there can/will be another linkEnterEvent
+				}
 			}
 		}
 	}
