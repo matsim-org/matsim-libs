@@ -26,6 +26,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -58,12 +59,14 @@ public class QSimProvider implements Provider<QSim> {
 	private IterationCounter iterationCounter;
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
+	private Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private QSimComponentsConfig components;
 
 	@Inject
 	QSimProvider(Injector injector, Config config, IterationCounter iterationCounter,
 			Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
-			@Named("overrides") List<AbstractQSimModule> overridingModules) {
+			@Named("overrides") List<AbstractQSimModule> overridingModules,
+		     @Named("overridesFromAbstractModule") Set<AbstractQSimModule> overridingModulesFromAbstractModule ) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
@@ -71,6 +74,7 @@ public class QSimProvider implements Provider<QSim> {
 		this.iterationCounter = iterationCounter;
 		this.components = components;
 		this.overridingModules = overridingModules;
+		this.overridingModulesFromAbstractModule = overridingModulesFromAbstractModule;
 	}
 
 	@Override
@@ -85,11 +89,15 @@ public class QSimProvider implements Provider<QSim> {
 		overridingModules.forEach(m -> m.setIterationNumber(iterationNumber));
 
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, Collections.emptyList());
-		
+
+		for (AbstractQSimModule override : overridingModulesFromAbstractModule) {
+			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
+		}
+
 		for (AbstractQSimModule override : overridingModules) {
 			qsimModule = AbstractQSimModule.overrideQSimModules(Collections.singleton(qsimModule), Collections.singletonList(override));
 		}
-		
+
 		final AbstractQSimModule finalQsimModule = qsimModule;
 		
 		AbstractModule module = new AbstractModule() {
