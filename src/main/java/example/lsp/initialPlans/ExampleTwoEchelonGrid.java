@@ -130,25 +130,27 @@ final class ExampleTwoEchelonGrid {
 	
 
 //		//TODO: Brauchen wir das hier wirklich?
-//		LogisticsSolutionElement depotElement;
-//		{
-//			log.info( "Create depot" );
-//
-//			//The scheduler for the first reloading point is created --> this will be the depot in this use case
-//			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
-//					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
-//					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
-//					.build();
-//
-//			//The scheduler is added to the Resource and the Resource is created
-//			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Depot", LSPResource.class ), Id.createLinkId("i(5,0)") )
-//					.setTransshipmentHubScheduler( depotScheduler )
-//					.build();
-//
-//			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
-//					.setResource( depotResource )
-//					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
-//		}
+		//Scheint so, weil nur 1 Element nicht geht, aktuell. --> die direkte Beliferung ist es irgendwie nötig
+		LogisticsSolutionElement depotElement;
+		{
+			log.info( "Create depot" );
+
+			//The scheduler for the first reloading point is created --> this will be the depot in this use case
+			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
+					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
+					.build();
+
+			//The scheduler is added to the Resource and the Resource is created
+			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Depot", LSPResource.class ), DEPOT_LINK_ID )
+					.setTransshipmentHubScheduler( depotScheduler )
+					.build();
+
+			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
+					.setResource( depotResource )
+					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
+		}
+
 
 
 		Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
@@ -159,12 +161,17 @@ final class ExampleTwoEchelonGrid {
 				.setCarrier(directCarrier)
 				.build();
 
-		LogisticsSolutionElement solutionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierSE", LogisticsSolutionElement.class))
+		LogisticsSolutionElement directCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierSE", LogisticsSolutionElement.class))
 				.setResource(directCarrierRessource)
 				.build();
 
+		//Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO: Vielleicht bekommt man das noch eleganter hin.
+		// z.B. in der Reihenfolge in der die solutionsElemnents der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
+		depotElement.connectWithNextElement(directCarrierElement);
+
 		LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
-				.addSolutionElement(solutionElement)
+				.addSolutionElement(depotElement)
+				.addSolutionElement(directCarrierElement)
 				.build();
 
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
