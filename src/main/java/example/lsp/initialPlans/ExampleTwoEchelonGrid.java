@@ -190,6 +190,8 @@ final class ExampleTwoEchelonGrid {
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan)))
 				.setSolutionScorer(new MyLSPScorer());
 
+		//Todo: noch den zweiten Plan mit dem Hub bauen und hinzufügen.
+
 		LSP lsp = lspBuilder.build();
 
 		log.info("create initial LSPShipments");

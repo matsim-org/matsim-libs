@@ -8,6 +8,13 @@ import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 
 /**
+ * Todo: Put in some plausible values ... ->
+ * - fixed, time and distance costs for Tours.
+ * - time for services (duration)
+ *
+ * TODO: Wie komme ich beim TourEndEvent an die passenden Daten ran um das vernüftig zu scoren?
+ * Was ist mit handling in Hubs? ist das in "Service" mit drinnen??
+ *
  * @author Kai Martins-Turner (kturner)
  */
 class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {
