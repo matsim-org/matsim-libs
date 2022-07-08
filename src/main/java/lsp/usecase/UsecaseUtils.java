@@ -27,9 +27,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class UsecaseUtils {
 
@@ -51,6 +52,24 @@ public class UsecaseUtils {
 
 	public static SingleSolutionShipmentAssigner createSinglesolutionShipmentAssigner() {
 		return new SingleSolutionShipmentAssigner();
+	}
+
+	/**
+	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
+	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
+	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freigth contrib.
+	 *
+	 * KMT/Jul22
+	 *
+	 * @param carrier
+	 * @return Collection of VehicleTypes
+	 */
+	static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
+		Set<VehicleType> vehicleTypeCollection = new HashSet<>();
+		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			vehicleTypeCollection.add(carrierVehicle.getType());
+		}
+		return vehicleTypeCollection;
 	}
 
 	public static class CollectionCarrierAdapterBuilder {
@@ -290,4 +309,7 @@ public class UsecaseUtils {
 		}
 
 	}
+
+
+
 }
