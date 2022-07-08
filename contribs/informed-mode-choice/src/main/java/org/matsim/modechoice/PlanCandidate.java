@@ -64,9 +64,6 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public void applyTo(Plan plan) {
 
-		String id = getPlanType();
-
-		plan.setType(id);
 		plan.setScore(null);
 
 		applyAttributes(plan);

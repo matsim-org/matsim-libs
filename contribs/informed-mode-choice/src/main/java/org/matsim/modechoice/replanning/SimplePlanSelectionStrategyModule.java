@@ -14,9 +14,9 @@ import javax.inject.Provider;
 public class SimplePlanSelectionStrategyModule extends AbstractMultithreadedModule {
 
 	private final Provider<? extends CandidateGenerator> generator;
-	private final Selector<PlanCandidate> selector;
+	private final Provider<Selector<PlanCandidate>> selector;
 
-	public SimplePlanSelectionStrategyModule(GlobalConfigGroup globalConfigGroup, Provider<? extends CandidateGenerator> generator, Selector<PlanCandidate> selector) {
+	public SimplePlanSelectionStrategyModule(GlobalConfigGroup globalConfigGroup, Provider<? extends CandidateGenerator> generator, Provider<Selector<PlanCandidate>> selector) {
 		super(globalConfigGroup);
 		this.generator = generator;
 		this.selector = selector;
@@ -24,7 +24,7 @@ public class SimplePlanSelectionStrategyModule extends AbstractMultithreadedModu
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new SelectFromGeneratorStrategy(generator.get(), selector);
+		return new SelectFromGeneratorStrategy(generator.get(), selector.get());
 	}
 
 }

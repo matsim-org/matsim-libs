@@ -222,6 +222,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 				Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
 				c.applyTo(plan);
+				plan.setType(c.getPlanType());
 
 				plan.getAttributes().removeAttribute(SCORE_HIST);
 				plan.getAttributes().removeAttribute(ESTIMATE_HIST);
@@ -290,6 +291,8 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 			// TODO: should replace old plans with same type
 			// TODO: should remove and not regenerate unpromising plan types
+
+			// TODO: random must be thread local
 
 			applyCandidates(person, candidates, best);
 			person.setSelectedPlan(random.selectPlan(person));

@@ -10,6 +10,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
+import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import javax.inject.Inject;
@@ -18,16 +19,14 @@ import javax.inject.Provider;
 /**
  * Provider for {@link SelectFromGeneratorStrategy}.
  */
-public class BestKPlanSelectionStrategyProvider implements Provider<PlanStrategy> {
+public class SelectBestKPlanModesStrategyProvider implements Provider<PlanStrategy> {
 
 	@Inject
 	private Provider<TripRouter> tripRouterProvider;
 	@Inject
 	private GlobalConfigGroup globalConfigGroup;
-
 	@Inject
 	private InformedModeChoiceConfigGroup configGroup;
-
 	@Inject
 	private ActivityFacilities facilities;
 	@Inject
@@ -40,11 +39,14 @@ public class BestKPlanSelectionStrategyProvider implements Provider<PlanStrategy
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SimplePlanSelectionStrategyModule(globalConfigGroup, generator,
-				new MultinomialLogitSelector(configGroup.getInvBeta(), MatsimRandom.getLocalInstance())));
-
+		builder.addStrategyModule(new SimplePlanSelectionStrategyModule(globalConfigGroup, generator, this::createSelector));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
 		return builder.build();
 	}
+
+	private Selector<PlanCandidate> createSelector() {
+		return new MultinomialLogitSelector(configGroup.getInvBeta(), MatsimRandom.getLocalInstance());
+	}
+
 }

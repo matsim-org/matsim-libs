@@ -9,10 +9,11 @@ import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
-import org.matsim.modechoice.replanning.BestKPlanSelectionStrategyProvider;
+import org.matsim.modechoice.replanning.SelectBestKPlanModesStrategyProvider;
 import org.matsim.modechoice.replanning.InformedModeChoiceStrategyProvider;
-import org.matsim.modechoice.replanning.SingleLegSelectionStrategyProvider;
+import org.matsim.modechoice.replanning.SelectSingleTripModeStrategyProvider;
 import org.matsim.modechoice.search.BestChoiceGenerator;
+import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import java.util.HashMap;
@@ -27,9 +28,12 @@ import java.util.Set;
  */
 public final class InformedModeChoiceModule extends AbstractModule {
 
-	public static String BEST_K_PLAN_SELECTION_STRATEGY = "BestKPlanSelection";
+	public static String SELECT_BEST_K_PLAN_MODES_STRATEGY = "SelectBestKPlanModes";
 
-	public static String SINGLE_LEG_SELECTION_STRATEGY = "SingleLegSelection";
+	public static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
+
+	// TODO
+	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
 
 	public static String INFORMED_MODE_CHOICE = "InformedModeChoice";
 
@@ -54,22 +58,24 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 		});
 
-
 		// Not singleton, they should be able to be created per thread if necessary.
 		bind(EstimateRouter.class);
 		bind(TopKChoicesGenerator.class);
 		bind(BestChoiceGenerator.class);
+		bind(SingleTripChoicesGenerator.class);
 
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
 		}
 
-		addPlanStrategyBinding(BEST_K_PLAN_SELECTION_STRATEGY).toProvider(BestKPlanSelectionStrategyProvider.class);
-		addPlanStrategyBinding(SINGLE_LEG_SELECTION_STRATEGY).toProvider(SingleLegSelectionStrategyProvider.class);
+		addPlanStrategyBinding(SELECT_BEST_K_PLAN_MODES_STRATEGY).toProvider(SelectBestKPlanModesStrategyProvider.class);
+		addPlanStrategyBinding(SELECT_SINGLE_TRIP_MODE_STRATEGY).toProvider(SelectSingleTripModeStrategyProvider.class);
 		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// TODO: SubTour best choice + best k selection
 		// TODO: allow generators to only work on subset of plans
+
+		// TODO: annealing for inv better
 
 	}
 

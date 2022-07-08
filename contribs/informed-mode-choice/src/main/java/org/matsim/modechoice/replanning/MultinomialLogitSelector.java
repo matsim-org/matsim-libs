@@ -17,7 +17,7 @@ import java.util.*;
  *
  * <code>P(i) = exp( Ui ) / Sum( U1 + U2 + ... + Un )</code>
  * <p>
- * With a scale parameter of zero this class is equivalent tobest choice.
+ * With a scale parameter of zero this class is equivalent to the best choice.
  *
  * @author sebhoerl
  * @author rakow

@@ -1,0 +1,70 @@
+package org.matsim.modechoice.replanning;
+
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
+import org.matsim.modechoice.search.SingleTripChoicesGenerator;
+
+import javax.inject.Provider;
+import java.util.Collection;
+import java.util.Random;
+
+/**
+ * Selects the mode for a single leg, based on estimation.
+ *
+ * @see org.matsim.core.population.algorithms.ChooseRandomSingleLegMode
+ */
+public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
+
+	private final Provider<SingleTripChoicesGenerator> generator;
+	private final Provider<Selector<PlanCandidate>> selector;
+
+	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup, Provider<SingleTripChoicesGenerator> generator,
+	                                   Provider<Selector<PlanCandidate>> selector) {
+		super(globalConfigGroup);
+		this.generator = generator;
+		this.selector = selector;
+	}
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new Algorithm(generator.get(), selector.get());
+	}
+
+	private final class Algorithm implements PlanAlgorithm {
+
+		private final SingleTripChoicesGenerator generator;
+		private final Selector<PlanCandidate> selector;
+		private final Random rnd;
+
+		public Algorithm(SingleTripChoicesGenerator generator, Selector<PlanCandidate> selector) {
+			this.generator = generator;
+			this.selector = selector;
+			this.rnd = MatsimRandom.getLocalInstance();
+		}
+
+		@Override
+		public void run(Plan plan) {
+
+			PlanModel model = new PlanModel(plan);
+			boolean[] mask = new boolean[model.trips()];
+
+			// Set one trip to be modifiable
+			mask[rnd.nextInt(mask.length)] = true;
+
+			// TODO: only select trips that are allowed to change
+
+			Collection<PlanCandidate> candidates = generator.generate(plan, mask);
+			PlanCandidate selected = selector.select(candidates);
+
+			if (selected != null) {
+				selected.applyTo(plan);
+			}
+		}
+	}
+
+}

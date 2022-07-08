@@ -181,6 +181,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 				plan = person.createCopyOfSelectedPlanAndMakeSelected();
 
 			c.applyTo(plan);
+			plan.setType(c.getPlanType());
 			plan = null;
 		}
 

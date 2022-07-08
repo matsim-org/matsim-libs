@@ -2,17 +2,16 @@ package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
-import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
 
 import java.util.*;
@@ -23,8 +22,7 @@ import java.util.stream.Collectors;
  * Generate top n choices for each possible mode option.
  */
 @SuppressWarnings("unchecked")
-public class TopKChoicesGenerator implements CandidateGenerator {
-
+public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 	/**
 	 * Maximum number of iterations. Memory usage will increase the more iterations are done.
@@ -33,38 +31,10 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 
 	private static final Logger log = LogManager.getLogger(TopKChoicesGenerator.class);
 
-	private final InformedModeChoiceConfigGroup config;
-	private final Map<String, ModeOptions<?>> options;
-
-	@Inject
-	private Map<String, LegEstimator<?>> legEstimators;
-
-	@Inject
-	private Map<String, TripEstimator<?>> tripEstimator;
-
-	@Inject
-	private Map<String, FixedCostsEstimator<?>> fixedCosts;
-
-	@Inject
-	private ScoringParametersForPerson params;
-
-	@Inject
-	private EstimateRouter router;
-
-	@Inject
-	private Set<TripConstraint<?>> constraints;
 
 	@Inject
 	TopKChoicesGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
-
-		this.config = config;
-		this.options = options;
-
-		for (String mode : config.getModes()) {
-
-			if (!options.containsKey(mode))
-				throw new IllegalArgumentException(String.format("No estimators configured for mode %s", mode));
-		}
+		super(config, options);
 	}
 
 	public Collection<PlanCandidate> generate(Plan plan, boolean[] mask) {
@@ -145,71 +115,6 @@ public class TopKChoicesGenerator implements CandidateGenerator {
 		}
 
 		return constraints;
-	}
-
-	/**
-	 * Calculate the estimates for all options.
-	 */
-	private void calculateEstimates(EstimatorContext context, PlanModel planModel, Map<String, List<Combination>> options) {
-
-		// estimates only consider the leg score by using a certain mode
-		// early or late arrival can also have an effect on the activity scores which is not considered here
-
-		for (Map.Entry<String, List<Combination>> e : options.entrySet()) {
-
-			for (Combination c : e.getValue()) {
-
-				double[] values = c.getEstimates();
-				double[] tValues = c.getTripEstimates();
-
-				// Collect all estimates
-				for (int i = 0; i < planModel.trips(); i++) {
-
-					List<Leg> legs = planModel.getLegs(c.getMode(), i);
-
-					// This mode could not be applied
-					if (legs == null) {
-						values[i] = Double.NEGATIVE_INFINITY;
-						continue;
-					}
-
-					TripEstimator<Enum<?>> tripEst = (TripEstimator<Enum<?>>) tripEstimator.get(c.getMode());
-
-					// some options may produce equivalent options, but are re-estimated
-					// however, the more expensive computation is routing and only done once
-
-					double estimate = 0;
-					if (tripEst != null) {
-						MinMaxEstimate minMax = tripEst.estimate(context, c.getMode(), planModel, legs, c.getOption());
-						double tripEstimate = c.isMin() ? minMax.getMin() : minMax.getMax();
-
-						// Only store if required
-						if (tValues != null)
-							tValues[i] = tripEstimate;
-
-						estimate += tripEstimate;
-					}
-
-					for (Leg leg : legs) {
-						String legMode = leg.getMode();
-
-						// Already scored with the trip estimator
-						if (tripEst != null && legMode.equals(c.getMode()))
-							continue;
-
-						LegEstimator<Enum<?>> legEst = (LegEstimator<Enum<?>>) legEstimators.get(legMode);
-
-						if (legEst == null)
-							throw new IllegalStateException("No leg estimator defined for mode: " + legMode);
-
-						estimate += legEst.estimate(context, legMode, leg, c.getOption());
-					}
-
-					values[i] = estimate;
-				}
-			}
-		}
-
 	}
 
 	@SuppressWarnings("StringEquality")

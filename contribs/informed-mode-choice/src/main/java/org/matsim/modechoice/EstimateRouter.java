@@ -81,6 +81,8 @@ public final class EstimateRouter {
 						oldTrip.getTripAttributes()
 				);
 
+				timeTracker.addElements(newTrip);
+
 				// store and increment
 				List<Leg> ll = newTrip.stream()
 						.filter(el -> el instanceof Leg)
@@ -102,4 +104,44 @@ public final class EstimateRouter {
 		}
 	}
 
+	/**
+	 * Route a single trip with certain index.
+	 */
+	public void routeSingleTrip(Plan plan, PlanModel model, Collection<String> modes, int idx) {
+
+
+		TripStructureUtils.Trip oldTrip = model.getTrip(idx);
+
+		Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
+		Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
+
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+
+		// Use time information of existing trips
+		for (int i = 0; i < idx; i++) {
+			timeTracker.addElements(model.getTrip(i).getTripElements());
+		}
+
+		for (String mode : modes) {
+
+			timeTracker.addActivity(oldTrip.getOriginActivity());
+
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
+					mode, from, to,
+					oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
+					plan.getPerson(),
+					oldTrip.getTripAttributes()
+			);
+
+			List<Leg> ll = newTrip.stream()
+					.filter(el -> el instanceof Leg)
+					.map(el -> (Leg) el)
+					.collect(Collectors.toList());
+
+			List<Leg>[] legs = new List[model.trips()];
+			legs[idx] = ll;
+
+			model.setLegs(mode, legs);
+		}
+	}
 }
