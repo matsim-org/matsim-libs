@@ -95,6 +95,9 @@ final class ExampleTwoEchelonGrid {
 		log.info("Run MATSim");
 		controler.run();
 
+		log.info("Some results ....");
+		printSomeResults(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values());
+
 		log.info("Done.");
 	}
 
@@ -129,7 +132,7 @@ final class ExampleTwoEchelonGrid {
 
 	private static LSP createLSP(Network network) {
 		log.info("create LSP");
-	
+
 
 //		//TODO: Brauchen wir das hier wirklich?
 		//Scheint so, weil nur 1 Element nicht geht, aktuell. --> die direkte Beliferung ist es irgendwie nötig
@@ -225,6 +228,7 @@ final class ExampleTwoEchelonGrid {
 	}
 
 	//TODO: This is maybe something that can go into a utils class ... KMT jul22
+
 	private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
 		log.info("Collecting all LSPResources from the LSPPlan");
 		List<LSPResource> resourcesList = new ArrayList<>() ;			//TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
@@ -236,4 +240,15 @@ final class ExampleTwoEchelonGrid {
 		return resourcesList;
 	}
 
+	private static void printSomeResults(Collection<LSP> lsps) {
+		for (LSP lsp : lsps) {
+			log.info("The LSP `` " + lsp.getId()  + " ´´ has the following number of plans: " + lsp.getPlans().size());
+			log.info("The scores are");
+			for (LSPPlan plan : lsp.getPlans()) {
+				log.info(plan.getScore());
+			}
+			log.info("The selected plan has the score: " + lsp.getSelectedPlan().getScore());
+			log.info("###");
+		}
+	}
 }
