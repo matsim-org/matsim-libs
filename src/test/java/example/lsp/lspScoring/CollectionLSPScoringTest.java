@@ -87,7 +87,7 @@ public class CollectionLSPScoringTest {
 											.addSolutionElement(collectionElement ).build();
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
-						   .setInitialPlan( LSPUtils.createLSPPlan().setAssigner( createDeterministicShipmentAssigner() ).addSolution(collectionSolution ) )
+						   .setInitialPlan( LSPUtils.createLSPPlan().setAssigner( createSinglesolutionShipmentAssigner() ).addSolution(collectionSolution ) )
 						   .setSolutionScheduler( createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( collectionAdapter ) ) )
 						   .setSolutionScorer( new TipScorer() )
 						   .build();

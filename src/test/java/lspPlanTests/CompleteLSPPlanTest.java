@@ -211,7 +211,7 @@ public class CompleteLSPPlanTest {
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		completeSolution = completeSolutionBuilder.build();
 		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);

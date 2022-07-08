@@ -234,7 +234,7 @@ import lsp.LSPResource;
 		
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
-		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		

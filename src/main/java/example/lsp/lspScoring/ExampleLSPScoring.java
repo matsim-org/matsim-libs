@@ -86,7 +86,7 @@ import java.util.*;
 											.addSolutionElement(logisticsSolutionElement ).build();
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
-		LSPPlan lspPlan = LSPUtils.createLSPPlan().setAssigner( UsecaseUtils.createDeterministicShipmentAssigner() ).addSolution(logisticsSolution );
+		LSPPlan lspPlan = LSPUtils.createLSPPlan().setAssigner( UsecaseUtils.createSinglesolutionShipmentAssigner() ).addSolution(logisticsSolution );
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class ) )

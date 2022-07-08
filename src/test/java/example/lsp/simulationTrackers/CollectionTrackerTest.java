@@ -133,7 +133,7 @@ public class CollectionTrackerTest {
 			collectionSolution.addSimulationTracker( tracker );
 		}
 
-		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
