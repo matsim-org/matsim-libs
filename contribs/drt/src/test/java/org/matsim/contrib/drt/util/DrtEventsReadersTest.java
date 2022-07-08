@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
@@ -69,9 +68,7 @@ public class DrtEventsReadersTest {
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
 			taskEnded(30, DefaultDrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//
-			taskEnded(70, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, 3, link2),//
-			taskStarted(90, EDrtChargingTask.TYPE, 4, link2)//
-	);
+			taskEnded(70, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE, 3, link2));
 
 	@Test
 	public void testReader() {

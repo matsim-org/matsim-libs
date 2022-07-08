@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 public class TaxiToRequestAssignmentCostProvider {
 	// This paper used ARRIVAL_TIME: M. Maciejewski, J. Bischoff, K. Nagel: An assignment-based approach to efficient
@@ -50,7 +50,7 @@ public class TaxiToRequestAssignmentCostProvider {
 		this.params = params;
 	}
 
-	public AssignmentCost<TaxiRequest> getCost(AssignmentRequestData rData, VehicleData vData) {
+	public AssignmentCost<DrtRequest> getCost(AssignmentRequestData rData, VehicleData vData) {
 		final Mode currentMode = getCurrentMode(rData, vData);
 		return (departure, reqEntry, pathData) -> {
 			double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
@@ -84,7 +84,7 @@ public class TaxiToRequestAssignmentCostProvider {
 		}
 	}
 
-	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<TaxiRequest> reqEntry,
+	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<DrtRequest> reqEntry,
 			PathData pathData) {
 		double travelTime = pathData == null ? params.getNullPathCost() : pathData.getTravelTime();
 		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);

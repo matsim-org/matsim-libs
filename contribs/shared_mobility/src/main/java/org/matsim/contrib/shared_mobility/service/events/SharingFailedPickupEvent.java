@@ -14,7 +14,7 @@ public class SharingFailedPickupEvent extends AbstractSharingEvent {
 
 	public SharingFailedPickupEvent(double time, Id<SharingService> serviceId, Id<Person> personId, Id<Link> linkId,
 			Optional<Id<SharingStation>> stationId) {
-		super(time, serviceId, personId, linkId, Optional.empty(), stationId);
+		super(time, serviceId, personId, linkId, Optional.empty(), stationId, Optional.empty());
 	}
 
 	@Override

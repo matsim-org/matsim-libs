@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.optimizer.insertion.selective;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.IncrementalStopDurationEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -50,7 +51,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		addModalComponent(SelectiveInsertionSearch.class, modalProvider(getter -> {
 			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(drtCfg,
 					getter.getModal(InsertionCostCalculator.class), getter.getModal(TravelTimeMatrix.class),
-					getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
+					getter.getModal(TravelTime.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(), getter.getModal(IncrementalStopDurationEstimator.class));
 			// Use 0 as the cost for the selected insertion:
 			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
 			//   no other insertion to compare with.
@@ -59,7 +60,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
 			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
 			return new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculator.class),
-					zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class));
+					zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class), getter.getModal(IncrementalStopDurationEstimator.class));
 		}));
 		bindModal(DrtInsertionSearch.class).to(modalKey(SelectiveInsertionSearch.class));
 

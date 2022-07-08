@@ -1,18 +1,10 @@
 package org.matsim.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.options.SampleOptions;
 import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
-import org.matsim.application.prepare.freight.toBeDeleted.GenerateGermanWideFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
 import org.matsim.application.prepare.population.MergePopulations;
 import org.matsim.application.prepare.population.TrajectoryToPlans;
@@ -20,10 +12,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 import picocli.CommandLine;
+
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class MATSimApplicationTest {
 
@@ -69,8 +69,8 @@ public class MATSimApplicationTest {
 		assertThat(params.getOrCreateModeParams("car").getConstant())
 				.isEqualTo(-1);
 
-        assertThat(params.getOrCreateModeParams("bike").getConstant())
-                .isEqualTo(-2);
+		assertThat(params.getOrCreateModeParams("bike").getConstant())
+				.isEqualTo(-2);
 
 	}
 
@@ -158,9 +158,26 @@ public class MATSimApplicationTest {
 
 	}
 
+	@Test
+	public void run() {
+
+		Config config = ConfigUtils.createConfig();
+		Path out = Path.of(utils.getOutputDirectory()).resolve("out");
+
+		config.controler().setOutputDirectory(out.toString());
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(1);
+
+		int ret = MATSimApplication.execute(TestScenario.class, config);
+
+		// Content defined in the post process section
+		assertThat(out.resolve("test.txt"))
+				.hasContent("Inhalt");
+
+	}
+
 	@MATSimApplication.Prepare({
-			TrajectoryToPlans.class, GenerateShortDistanceTrips.class,
-			GenerateGermanWideFreightTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
+			TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
 	})
 	private static final class TestScenario extends MATSimApplication {
 
@@ -179,8 +196,13 @@ public class MATSimApplicationTest {
 		protected Config prepareConfig(Config config) {
 
 			config.controler().setRunId(sample.adjustName("run-25pct"));
-
 			return config;
+		}
+
+
+		@Override
+		protected List<MATSimAppCommand> preparePostProcessing(Path outputFolder, String runId) {
+			return List.of(new TestCommand(outputFolder.resolve("test.txt"), "Inhalt"));
 		}
 	}
 

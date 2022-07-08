@@ -135,21 +135,21 @@ public class InnovationSwitchOffTest {
 						System.out.flush();
 						log.warn(" Iteration: " + event.getIteration());
 						final StrategyManager sm = strategyManagerProvider.get(); // move into controler package if access to sm is a problem. kai, jun'13
-						for (int ii = 0; ii < sm.getStrategiesOfDefaultSubpopulation().size(); ii++) {
-							log.warn("strategy " + sm.getStrategiesOfDefaultSubpopulation().get(ii) + " has weight " + sm.getWeightsOfDefaultSubpopulation().get(ii));
-							if (event.getIteration() == 11 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(ReRoute.class.getSimpleName())) {
-								Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
+						for ( int ii = 0 ; ii < sm.getStrategies( null ).size(); ii++) {
+							log.warn("strategy " + sm.getStrategies( null ).get(ii ) + " has weight " + sm.getWeights( null ).get(ii ) );
+							if (event.getIteration() == 11 && sm.getStrategies( null ).get(ii ).toString().contains(ReRoute.class.getSimpleName() )) {
+								Assert.assertEquals(0.1, sm.getWeights( null ).get(ii ), 0.000001 );
 							}
-							if (event.getIteration() == 12 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(ReRoute.class.getSimpleName())) {
-								Assert.assertEquals(0., sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
+							if (event.getIteration() == 12 && sm.getStrategies( null ).get(ii ).toString().contains(ReRoute.class.getSimpleName() )) {
+								Assert.assertEquals(0., sm.getWeights( null ).get(ii ), 0.000001 );
 							}
-							if (event.getIteration() == 13 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(
+							if (event.getIteration() == 13 && sm.getStrategies( null ).get(ii ).toString().contains(
 								  TimeAllocationMutatorModule.class.getSimpleName() )) {
-								Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
+								Assert.assertEquals(0.1, sm.getWeights( null ).get(ii ), 0.000001 );
 							}
-							if (event.getIteration() == 14 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(
+							if (event.getIteration() == 14 && sm.getStrategies( null ).get(ii ).toString().contains(
 								  TimeAllocationMutatorModule.class.getSimpleName() )) {
-								Assert.assertEquals(0.0, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
+								Assert.assertEquals(0.0, sm.getWeights( null ).get(ii ), 0.000001 );
 							}
 						}
 						System.err.flush();

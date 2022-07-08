@@ -36,6 +36,8 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -194,10 +196,10 @@ public class InsertionDetourTimeCalculatorTest {
 				.put(stop0.getLink(), stop1.getLink(), dropoffDetourReplacedDriveEstimate)
 				.build();
 
-		var detourTimeCalculator = new InsertionDetourTimeCalculator(STOP_DURATION,
+		var detourTimeCalculator = new InsertionDetourTimeCalculator(new DefaultIncrementalStopDurationEstimator(STOP_DURATION),
 				(from, to, departureTime) -> replacedDriveTimeEstimates.get(from, to));
 		var actualDetourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion,
-				insertion.detourData);
+				insertion.detourData, drtRequest);
 
 		double departureTime = start.getDepartureTime() + detour.detourToPickup.getTravelTime() + STOP_DURATION;
 		double pickupTimeLoss = detour.detourToPickup.getTravelTime()
@@ -213,8 +215,8 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private void assertDetourTimeInfo(InsertionWithDetourData insertion, DetourTimeInfo expected) {
-		var detourTimeCalculator = new InsertionDetourTimeCalculator(STOP_DURATION, null);
-		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion, insertion.detourData);
+		var detourTimeCalculator = new InsertionDetourTimeCalculator(new DefaultIncrementalStopDurationEstimator(STOP_DURATION), null);
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion, insertion.detourData, drtRequest);
 		assertThat(detourTimeInfo).usingRecursiveComparison().isEqualTo(expected);
 	}
 

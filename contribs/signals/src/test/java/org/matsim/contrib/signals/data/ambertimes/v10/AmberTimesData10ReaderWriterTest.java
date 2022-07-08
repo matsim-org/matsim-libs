@@ -29,7 +29,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 

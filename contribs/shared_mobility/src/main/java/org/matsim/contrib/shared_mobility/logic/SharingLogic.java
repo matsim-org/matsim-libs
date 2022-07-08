@@ -21,6 +21,7 @@ import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingUtils;
 import org.matsim.contrib.shared_mobility.service.SharingVehicle;
 import org.matsim.contrib.shared_mobility.service.VehicleInteractionPoint;
+import org.matsim.contrib.shared_mobility.service.events.SharingReservingEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingDropoffEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedDropoffEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedPickupEvent;
@@ -56,8 +57,8 @@ public class SharingLogic {
 	private final SharingService service;
 
 	public SharingLogic(SharingService service, RoutingModule accessEgressRoutingModule,
-			RoutingModule mainModeRoutingModule, Scenario scenario, EventsManager eventsManager,
-			TimeInterpretation timeInterpretation) {
+						RoutingModule mainModeRoutingModule, Scenario scenario, EventsManager eventsManager,
+						TimeInterpretation timeInterpretation) {
 		this.service = service;
 		this.eventsManager = eventsManager;
 
@@ -70,6 +71,7 @@ public class SharingLogic {
 	}
 
 	public boolean tryBookVehicle(double now, MobsimAgent agent) {
+		double currentTime=now;
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		int bookingActivityIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
@@ -126,11 +128,13 @@ public class SharingLogic {
 
 			// Insert new plan elements
 			plan.getPlanElements().addAll(bookingActivityIndex + 1, updatedElements);
-
-			Leg leg = ((Leg) mainElements.get(0));
-
 			setVehicle(plan,mainElements, closestVehicleInteraction.get().getVehicle());
+
 			service.reserveVehicle(agent,closestVehicleInteraction.get().getVehicle());
+			eventsManager.processEvent(new SharingReservingEvent(currentTime, service.getId(),
+					agent.getId(), bookingActivity.getLinkId(), closestVehicleInteraction.get().getVehicle().getId(),
+					closestVehicleInteraction.get().getStationId(), dropoffActivity.getLinkId()));
+
 			return true;
 		} else {
 			return false;
@@ -216,9 +220,6 @@ public class SharingLogic {
 				List<? extends PlanElement> mainElements = routeMainStage(vehicleLinkId, dropoffActivity.getLinkId(),
 						now, agent);
 				updatedElements.addAll(mainElements);
-
-				Leg leg = ((Leg) mainElements.get(0));
-
 				setVehicle(plan, mainElements, selectedVehicleInteraction.get().getVehicle());
 
 				// Insert new plan elements
@@ -367,7 +368,7 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeAccessEgressStage(Id<Link> originId, Id<Link> destinationId,
-			double departureTime, MobsimAgent agent) {
+															   double departureTime, MobsimAgent agent) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 
@@ -376,7 +377,7 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeMainStage(Id<Link> originId, Id<Link> destinationId, double departureTime,
-			MobsimAgent agent) {
+													   MobsimAgent agent) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 

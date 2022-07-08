@@ -23,13 +23,13 @@ import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
 
 import java.util.List;
 
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,7 +42,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final RequestQueue<TaxiRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestPlanningHorizon();
+	private final RequestQueue<DrtRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestPlanningHorizon();
 
 	private final UnplannedRequestInserter requestInserter;
 
@@ -97,13 +97,13 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	protected void unscheduleAwaitingRequests() {
-		List<TaxiRequest> removedRequests = scheduler.removeAwaitingRequestsFromAllSchedules();
+		List<DrtRequest> removedRequests = scheduler.removeAwaitingRequestsFromAllSchedules();
 		removedRequests.forEach(unplannedRequests::addRequest);
 	}
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.addRequest((TaxiRequest)request);
+		unplannedRequests.addRequest((DrtRequest)request);
 	}
 
 	@Override

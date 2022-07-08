@@ -76,7 +76,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		createCarrierAgents(carrierScoringFunctionFactory);
 	}
 	public CarrierAgentTracker( Carriers carriers, Collection<LSPEventCreator> creators, EventsManager events ) {
-		// yyyy needs to be public with current setup. kai, sep'20
+		// yyyy needs to be public because of LSP. kai, sep'20
 
 		this.carriers = carriers;
 		this.lspEventCreators = creators;
@@ -106,6 +106,8 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * @see Plan, CarrierPlan
 	 */
 	public Collection<Plan> createPlans() {
+		// yyyy needs to be public because of LSP. kai, sep'20
+
 		List<Plan> vehicleRoutes = new ArrayList<>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			List<Plan> plansForCarrier = carrierAgent.createFreightDriverPlans();
@@ -118,7 +120,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * Request all carrier agents to score their plans.
 	 * 
 	 */
-	public void scoreSelectedPlans() {
+	void scoreSelectedPlans() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = findCarrierAgent(carrier.getId());
 			agent.scoreSelectedPlan();

@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.schedule;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
@@ -30,10 +30,10 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 
 public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
-	final double stopDuration;
+	private final StopDurationEstimator stopDurationEstimator;
 
-	public DrtStayTaskEndTimeCalculator(DrtConfigGroup drtConfigGroup) {
-		this.stopDuration = drtConfigGroup.getStopDuration();
+	public DrtStayTaskEndTimeCalculator(StopDurationEstimator stopDurationEstimator) {
+		this.stopDurationEstimator = stopDurationEstimator;
 	}
 
 	@Override
@@ -58,9 +58,12 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 				double maxEarliestPickupTime = ((DrtStopTask)task).getPickupRequests()
 						.values()
 						.stream()
-						.mapToDouble(DrtRequest::getEarliestStartTime)
+						.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
 						.max()
 						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
+				double stopDuration = stopDurationEstimator.calcDuration(vehicle,
+						((DrtStopTask) task).getDropoffRequests().values(),
+						((DrtStopTask) task).getPickupRequests().values());
 				return Math.max(newBeginTime + stopDuration, maxEarliestPickupTime);
 			}
 

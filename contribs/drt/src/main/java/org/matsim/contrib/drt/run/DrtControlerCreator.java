@@ -53,7 +53,7 @@ public final class DrtControlerCreator {
 	}
 
 	/**
-	 * Creates a controller in one step. Assumes a single DRT service.
+	 * Creates a controller in one step.
 	 *
 	 * @param config
 	 * @param otfvis

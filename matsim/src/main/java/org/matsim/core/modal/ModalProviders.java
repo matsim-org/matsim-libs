@@ -108,6 +108,10 @@ public class ModalProviders {
 			return injector.getInstance(modalAnnotationCreator.key(typeLiteral, mode));
 		}
 
+		protected <I> Provider<I> getModalProvider(Class<I> type) {
+			return injector.getProvider(modalAnnotationCreator.key(type, mode));
+		}
+
 		protected String getMode() {
 			return mode;
 		}

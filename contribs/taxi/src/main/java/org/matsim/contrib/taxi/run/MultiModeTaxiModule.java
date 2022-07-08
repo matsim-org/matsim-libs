@@ -20,7 +20,12 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.matsim.contrib.drt.fare.DrtFareParams;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtModeModule;
+import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.taxi.analysis.TaxiModeAnalysisModule;
+import org.matsim.contrib.taxi.optimizer.TaxiModeOptimizerQSimModule;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
@@ -36,9 +41,66 @@ public class MultiModeTaxiModule extends AbstractModule {
 	@Override
 	public void install() {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
-			install(new TaxiModeModule(taxiCfg));
-			installQSimModule(new TaxiModeQSimModule(taxiCfg));
+			var drtCfg = convertTaxiToDrtCfg(taxiCfg);
+			install(new DrtModeModule(drtCfg));
+			installQSimModule(new DrtModeQSimModule(drtCfg, new TaxiModeOptimizerQSimModule(taxiCfg)));
 			install(new TaxiModeAnalysisModule(taxiCfg));
 		}
+	}
+
+	public static DrtConfigGroup convertTaxiToDrtCfg(TaxiConfigGroup taxiCfg) {
+
+		// Taxi specific settings, not applicable directly to DRT
+		// - destinationKnown
+		// - vehicleDiversion
+		// - onlineVehicleTracker
+		// - breakSimulationIfNotAllRequestsServed
+		// - taxiOptimizerParams
+
+		var drtCfg = new DrtConfigGroup();
+
+		drtCfg.setMode(taxiCfg.getMode());
+		drtCfg.setUseModeFilteredSubnetwork(taxiCfg.isUseModeFilteredSubnetwork());
+		drtCfg.setStopDuration(Double.NaN);//used only inside the DRT optimiser
+
+		// Taxi optimisers do not reject, so time constraints are only used for routing plans (DrtRouteCreator).
+		// Using some (relatively high) values as we do not know what values should be there. They can be adjusted
+		// manually after the TaxiAsDrtConfigGroup config is created.
+		drtCfg.setMaxWaitTime(3600);
+		drtCfg.setMaxTravelTimeAlpha(2);
+		drtCfg.setMaxTravelTimeBeta(3600);
+		drtCfg.setMaxAbsoluteDetour(Double.MAX_VALUE);
+
+		drtCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		drtCfg.setChangeStartLinkToLastLinkInSchedule(taxiCfg.isChangeStartLinkToLastLinkInSchedule());
+		drtCfg.setIdleVehiclesReturnToDepots(false);
+		drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+		drtCfg.setMaxWalkDistance(Double.MAX_VALUE);
+		drtCfg.setVehiclesFile(taxiCfg.getTaxisFile());
+		drtCfg.setTransitStopFile(null);
+		drtCfg.setDrtServiceAreaShapeFile(null);
+		drtCfg.setPlotDetailedCustomerStats(taxiCfg.getDetailedStats() || taxiCfg.getTimeProfiles());
+		drtCfg.setNumberOfThreads(taxiCfg.getNumberOfThreads());
+		drtCfg.setAdvanceRequestPlanningHorizon(0);
+		drtCfg.setStoreUnsharedPath(false);
+
+		taxiCfg.getTaxiFareParams().ifPresent(taxiFareParams -> {
+			var drtFareParams = new DrtFareParams();
+			drtFareParams.setBaseFare(taxiFareParams.getBasefare());
+			drtFareParams.setDistanceFare_m(taxiFareParams.getDistanceFare_m());
+			drtFareParams.setTimeFare_h(taxiFareParams.getTimeFare_h());
+			drtFareParams.setDailySubscriptionFee(taxiFareParams.getDailySubscriptionFee());
+			drtFareParams.setMinFarePerTrip(taxiFareParams.getMinFarePerTrip());
+			drtCfg.addParameterSet(drtFareParams);
+		});
+
+		// DRT specific settings, not existing in taxi
+		// - drtCfg.drtInsertionSearchParams
+		// - drtCfg.zonalSystemParams
+		// - drtCfg.rebalancingParams
+		// - drtCfg.drtSpeedUpParams
+		// - drtCfg.drtRequestInsertionRetryParams
+
+		return drtCfg;
 	}
 }

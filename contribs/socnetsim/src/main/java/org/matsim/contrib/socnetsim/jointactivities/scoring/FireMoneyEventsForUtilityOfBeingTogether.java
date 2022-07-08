@@ -50,7 +50,6 @@ import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -148,7 +147,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 //			  (Double) PopulationUtils.getPersonAttribute(
 //				    person, "typicalDuration_"+type, scenario.getPopulation()
 //										   );
-		final Double typicalDuration = (Double) PopulationUtils.getPersonAttribute( person, "typicalDuration_"+type );
+		final Double typicalDuration = (Double) person.getAttributes().getAttribute( "typicalDuration_" + type );
 
 		if ( typicalDuration != null ) return typicalDuration;
 

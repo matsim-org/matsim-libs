@@ -107,7 +107,7 @@ public class EquilWithCarrierWithPassIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});

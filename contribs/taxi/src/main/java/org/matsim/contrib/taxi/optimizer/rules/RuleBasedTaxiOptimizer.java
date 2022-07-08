@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.optimizer.rules;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.STAY;
 
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -31,7 +32,6 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
@@ -64,7 +64,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		super.requestSubmitted(request);
-		unplannedRequestRegistry.addRequest((TaxiRequest)request);
+		unplannedRequestRegistry.addRequest((DrtRequest)request);
 	}
 
 	@Override

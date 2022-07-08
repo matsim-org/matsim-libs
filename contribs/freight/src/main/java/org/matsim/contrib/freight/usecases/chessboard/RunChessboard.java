@@ -21,16 +21,14 @@
 
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.controler.ReRouteVehicles;
-import org.matsim.contrib.freight.controler.TimeAllocationMutator;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.*;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.usecases.analysis.CarrierScoreStats;
 import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
@@ -46,7 +44,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -60,7 +57,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -75,10 +71,6 @@ public final class RunChessboard {
     }
 
     public void run() {
-        run(null,null) ;
-    }
-
-    public void run( Collection<AbstractModule> controlerModules, Collection<AbstractQSimModule> qsimModules ) {
         if ( scenario==null ) {
             prepareScenario() ;
         }
@@ -88,30 +80,14 @@ public final class RunChessboard {
 
         Controler controler = new Controler(scenario);
 
-        if ( controlerModules!=null ){
-            for( AbstractModule abstractModule : controlerModules ){
-                controler.addOverridingModule( abstractModule ) ;
-            }
-        }
-        if ( qsimModules!=null ) {
-            for( AbstractQSimModule qsimModule : qsimModules ){
-                controler.addOverridingQSimModule( qsimModule ) ;
-            }
-        }
-
+        controler.addOverridingModule(new CarrierModule() );
 
         controler.addOverridingModule(new AbstractModule() {
+
             @Override
             public void install() {
-                install(new CarrierModule());
-                bind(CarrierPlanStrategyManagerFactory.class).toInstance( new MyCarrierPlanStrategyManagerFactory(types) );
+                bind( CarrierStrategyManager.class ).toProvider( new MyCarrierPlanStrategyManagerFactory( types ));
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
-            }
-        });
-        controler.addOverridingModule(new AbstractModule() {
-
-            @Override
-            public void install() {
                 final CarrierScoreStats scores = new CarrierScoreStats(carriers, config.controler().getOutputDirectory() +"/carrier_scores", true);
                 final int statInterval = 1;
                 final LegHistogram freightOnly = new LegHistogram(900);
@@ -145,6 +121,24 @@ public final class RunChessboard {
                 });
             }
         });
+
+
+//        final String NEW_STRATEGY = "newStrategy";
+//        {
+//            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+//            stratSets.setStrategyName( NEW_STRATEGY );
+//            stratSets.setWeight( 0.1 );
+//            config.strategy().addStrategySettings( stratSets );
+//        }
+//        controler.addOverridingModule( new AbstractModule(){
+//            @Override public void install(){
+//                binder().bind( PlanStrategy.class ).annotatedWith( Names.named( NEW_STRATEGY ) ).toInstance( null );
+//            }
+//        } );
+
+// (I think that the above was just an attempt, which did not lead to anywhere.  kai, jul'22)
+
+
         controler.run();
 
     }
@@ -171,15 +165,15 @@ public final class RunChessboard {
         return config;
     }
 
-    private static void createOutputDir(String outdir){
-        File dir = new File(outdir);
-        // if the directory does not exist, create it
-        if (!dir.exists()){
-            System.out.println("creating directory "+outdir);
-            boolean result = dir.mkdirs();
-            if(result) System.out.println(outdir+" created");
-        }
-    }
+//    private static void createOutputDir(String outdir){
+//        File dir = new File(outdir);
+//        // if the directory does not exist, create it
+//        if (!dir.exists()){
+//            System.out.println("creating directory "+outdir);
+//            boolean result = dir.mkdirs();
+//            if(result) System.out.println(outdir+" created");
+//        }
+//    }
 
 
     private static class MyCarrierScoringFunctionFactory implements CarrierScoringFunctionFactory {
@@ -201,7 +195,7 @@ public final class RunChessboard {
 
     }
 
-    private static class MyCarrierPlanStrategyManagerFactory implements CarrierPlanStrategyManagerFactory {
+    private static class MyCarrierPlanStrategyManagerFactory implements Provider<CarrierStrategyManager>{
 
         @Inject
         private Network network;
@@ -219,15 +213,16 @@ public final class RunChessboard {
         }
 
         @Override
-        public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+        public CarrierStrategyManager get() {
             TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
             final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
-                    travelDisutility, modeTravelTimes.get(TransportMode.car));
+                            travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-            final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<>();
+//            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
+            final CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
             strategyManager.setMaxPlansPerAgent(5);
             {
-                GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanChanger<CarrierPlan, Carrier>(1.));
+                GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger<>( 1. ));
                 //						strategy.addStrategyModule(new ReRouter(router, services.getNetwork(), services.getLinkTravelTimes(), .1));
                 strategyManager.addStrategy(strategy, null, 1.0);
 
@@ -238,7 +233,7 @@ public final class RunChessboard {
             //						strategyManager.addStrategy( strategy, null, 0.1) ;
             //					}
             {
-                GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<CarrierPlan, Carrier>());
+                GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new KeepSelected<>());
                 strategy.addStrategyModule(new TimeAllocationMutator());
                 strategy.addStrategyModule(new ReRouteVehicles(router, network, modeTravelTimes.get(TransportMode.car), 1.));
                 strategyManager.addStrategy(strategy, null, 0.5);

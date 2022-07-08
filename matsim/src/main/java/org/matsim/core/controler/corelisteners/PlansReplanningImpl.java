@@ -43,8 +43,8 @@ import javax.inject.Provider;
 final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
 
 	private final Provider<ReplanningContext> replanningContextProvider;
-	private Population population;
-	private StrategyManager strategyManager;
+	private final Population population;
+	private final StrategyManager strategyManager;
 	
 	@Inject
 	PlansReplanningImpl(StrategyManager strategyManager, Population pop, Provider<ReplanningContext> replanningContextProvider) {
