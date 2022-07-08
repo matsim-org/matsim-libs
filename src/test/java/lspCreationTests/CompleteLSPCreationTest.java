@@ -212,7 +212,7 @@ public class CompleteLSPCreationTest {
 		completeSolutionBuilder.addSolutionElement(secondHubElement);
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completeSolution  = completeSolutionBuilder.build();

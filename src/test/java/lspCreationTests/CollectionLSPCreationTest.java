@@ -97,7 +97,7 @@ public class CollectionLSPCreationTest {
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
 		
-		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);

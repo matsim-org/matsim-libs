@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -99,7 +98,7 @@ import java.util.Random;
 				
 				//The initial plan of the lsp is generated and the assigner and the solution from above are added
 				LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-				ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+				ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 				collectionPlan.setAssigner(assigner);
 				collectionPlan.addSolution(collectionSolution);
 				
