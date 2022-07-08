@@ -127,8 +127,7 @@ final class ExampleTwoEchelonGrid {
 
 	private static LSP createLSP(Network network) {
 		log.info("create LSP");
-		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class));
-		lspBuilder.setSolutionScorer( new MyLSPScorer() );
+	
 
 //		//TODO: Brauchen wir das hier wirklich?
 //		LogisticsSolutionElement depotElement;
@@ -151,7 +150,7 @@ final class ExampleTwoEchelonGrid {
 //					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 //		}
 
-		LSPPlan lspPlan = LSPUtils.createLSPPlan();
+
 		Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
 				directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
@@ -159,14 +158,23 @@ final class ExampleTwoEchelonGrid {
 		LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
 				.setCarrier(directCarrier)
 				.build();
+
 		LogisticsSolutionElement solutionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierSE", LogisticsSolutionElement.class))
 				.setResource(directCarrierRessource)
 				.build();
+
 		LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
 				.addSolutionElement(solutionElement)
 				.build();
-		lspPlan.addSolution(solution_direct);
-		lspBuilder.setInitialPlan(lspPlan);
+
+		LSPPlan lspPlan = LSPUtils.createLSPPlan()
+				.addSolution(solution_direct)
+				.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+
+		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
+				.setInitialPlan(lspPlan)
+				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())
+				.setSolutionScorer(new MyLSPScorer());
 
 		LSP lsp = lspBuilder.build();
 
@@ -181,7 +189,7 @@ final class ExampleTwoEchelonGrid {
 
 		return lsp;
 	}
-	
+
 	private static Collection<LSPShipment> createInitialLSPShipments() {
 		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
 
