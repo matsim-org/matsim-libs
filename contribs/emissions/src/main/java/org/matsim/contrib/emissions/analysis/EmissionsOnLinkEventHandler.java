@@ -40,7 +40,7 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
 
     private final TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBins;
 
-    EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
+    public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
 
         this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
     }
@@ -50,7 +50,7 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
      *
      * @return Collected emissions by time bin and by link id
      */
-    TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> getTimeBins() {
+    public TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> getTimeBins() {
         return timeBins;
     }
 

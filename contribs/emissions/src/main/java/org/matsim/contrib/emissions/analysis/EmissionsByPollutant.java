@@ -38,23 +38,23 @@ public class EmissionsByPollutant {
 
     private final Map<Pollutant, Double> emissionByPollutant;
 
-    EmissionsByPollutant(Map<Pollutant, Double> emissions) {
+    public EmissionsByPollutant(Map<Pollutant, Double> emissions) {
         this.emissionByPollutant = emissions;
     }
 
-    void addEmissions( Map<Pollutant, Double> emissions ) {
+    public void addEmissions( Map<Pollutant, Double> emissions ) {
         emissions.forEach(this::addEmission);
     }
 
-    double addEmission(Pollutant pollutant, double value) {
+    public double addEmission(Pollutant pollutant, double value) {
         return emissionByPollutant.merge(pollutant, value, Double::sum);
     }
 
-    Map<Pollutant, Double> getEmissions() {
+    public Map<Pollutant, Double> getEmissions() {
         return emissionByPollutant;
     }
 
-    double getEmission(Pollutant pollutant) {
+    public double getEmission(Pollutant pollutant) {
         return emissionByPollutant.get(pollutant);
     }
 
