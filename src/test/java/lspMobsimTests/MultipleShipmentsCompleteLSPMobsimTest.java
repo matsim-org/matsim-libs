@@ -224,7 +224,7 @@ public class MultipleShipmentsCompleteLSPMobsimTest {
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		LogisticsSolution completeSolution = completeSolutionBuilder.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);

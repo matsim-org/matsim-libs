@@ -423,7 +423,7 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
+				.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner())
 				.addSolution(completeSolutionDirect);
 	}
 
@@ -449,7 +449,7 @@ import java.util.*;
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 
 		return LSPUtils.createLSPPlan()
-				.setAssigner(UsecaseUtils.createDeterministicShipmentAssigner())
+				.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner())
 				.addSolution(completeSolutionWithReloading);
 	}
 

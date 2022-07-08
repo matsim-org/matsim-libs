@@ -49,7 +49,7 @@ public class UsecaseUtils {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 
-	public static SingleSolutionShipmentAssigner createDeterministicShipmentAssigner() {
+	public static SingleSolutionShipmentAssigner createSinglesolutionShipmentAssigner() {
 		return new SingleSolutionShipmentAssigner();
 	}
 

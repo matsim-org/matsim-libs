@@ -128,7 +128,7 @@ public class CollectionLSPMobsimTest {
 		}
 		final LSPPlan collectionPlan;
 		{
-			ShipmentAssigner assigner = createDeterministicShipmentAssigner();
+			ShipmentAssigner assigner = createSinglesolutionShipmentAssigner();
 			collectionPlan = LSPUtils.createLSPPlan();
 			collectionPlan.setAssigner( assigner );
 			collectionPlan.addSolution( collectionSolution );
