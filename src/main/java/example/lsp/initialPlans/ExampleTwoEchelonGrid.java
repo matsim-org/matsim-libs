@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -43,10 +44,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This is an academic example for the 2-echelon problem.
@@ -103,16 +101,20 @@ final class ExampleTwoEchelonGrid {
 	private static Config prepareConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9" ), "grid9x9.xml")));
-
 		config.controler().setOutputDirectory("output/2echelon/");
 		config.controler().setLastIteration(2);
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
+		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+
+
 		return config;
 	}
 
 	private static Scenario prepareScenario(Config config) {
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//Change speed on all links to 30 km/h (8.33333 m/s) for easier computation --> Freeflow TT per link is 2min
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -159,6 +161,7 @@ final class ExampleTwoEchelonGrid {
 		CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
 		LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
 				.setCarrier(directCarrier)
+				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 				.build();
 
 		LogisticsSolutionElement directCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierSE", LogisticsSolutionElement.class))
@@ -166,7 +169,7 @@ final class ExampleTwoEchelonGrid {
 				.build();
 
 		//Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO: Vielleicht bekommt man das noch eleganter hin.
-		// z.B. in der Reihenfolge in der die solutionsElemnents der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
+		// z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
 		depotElement.connectWithNextElement(directCarrierElement);
 
 		LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
@@ -180,7 +183,8 @@ final class ExampleTwoEchelonGrid {
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
 				.setInitialPlan(lspPlan)
-				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())
+//				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
+				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan)))
 				.setSolutionScorer(new MyLSPScorer());
 
 		LSP lsp = lspBuilder.build();
@@ -218,6 +222,18 @@ final class ExampleTwoEchelonGrid {
 			shipmentList.add(builder.build());
 //		}
 		return shipmentList;
+	}
+
+	//TODO: This is maybe something that can go into a utils class ... KMT jul22
+	private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
+		log.info("Collecting all LSPResources from the LSPPlan");
+		List<LSPResource> resourcesList = new ArrayList<>() ;			//TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
+		for (LogisticsSolution solution : lspPlanWithReloading.getSolutions()) {
+			for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+				resourcesList.add(solutionElement.getResource());
+			}
+		}
+		return resourcesList;
 	}
 
 }
