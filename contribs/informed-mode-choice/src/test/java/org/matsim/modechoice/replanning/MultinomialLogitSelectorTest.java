@@ -131,6 +131,22 @@ public class MultinomialLogitSelectorTest {
 		assertThat(sample[1]).isCloseTo(0.5, Offset.offset(0.01));
 	}
 
+	@Test
+	public void single() {
+
+
+		selector = new MultinomialLogitSelector(1, new Random(0));
+
+		List<PlanCandidate> candidates = List.of(
+				new PlanCandidate(new String[]{"car"}, 1.)
+		);
+
+		double[] sample = sample(N, candidates);
+
+		assertThat(sample[0]).isEqualTo(1);
+
+	}
+
 	/**
 	 * Sample n times and return relative frequency of how often a candidate was selected.
 	 */

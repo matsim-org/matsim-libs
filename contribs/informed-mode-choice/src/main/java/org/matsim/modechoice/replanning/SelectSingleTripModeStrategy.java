@@ -52,6 +52,11 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		public void run(Plan plan) {
 
 			PlanModel model = new PlanModel(plan);
+
+			// empty plan
+			if (model.trips() == 0)
+				return;
+
 			boolean[] mask = new boolean[model.trips()];
 
 			// Set one trip to be modifiable
