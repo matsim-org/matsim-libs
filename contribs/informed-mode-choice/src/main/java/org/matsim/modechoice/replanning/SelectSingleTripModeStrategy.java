@@ -11,6 +11,7 @@ import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
 import javax.inject.Provider;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -35,7 +36,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		return new Algorithm(generator.get(), selector.get());
 	}
 
-	private final class Algorithm implements PlanAlgorithm {
+	private static final class Algorithm implements PlanAlgorithm {
 
 		private final SingleTripChoicesGenerator generator;
 		private final Selector<PlanCandidate> selector;
@@ -54,11 +55,17 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			boolean[] mask = new boolean[model.trips()];
 
 			// Set one trip to be modifiable
-			mask[rnd.nextInt(mask.length)] = true;
+			int idx = rnd.nextInt(mask.length);
+
+			mask[idx] = true;
 
 			// TODO: only select trips that are allowed to change
 
 			Collection<PlanCandidate> candidates = generator.generate(plan, mask);
+
+			// Remove options that are the same as the current mode
+			candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
+
 			PlanCandidate selected = selector.select(candidates);
 
 			if (selected != null) {

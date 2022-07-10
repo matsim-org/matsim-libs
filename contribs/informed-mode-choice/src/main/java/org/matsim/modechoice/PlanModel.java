@@ -68,6 +68,13 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip> {
 		return trips[i];
 	}
 
+	/**
+	 * Get the mode of the ith trip.
+	 */
+	public String getTripMode(int i) {
+		return TripStructureUtils.getRoutingMode(trips[i].getLegsOnly().get(0));
+	}
+
 	void setLegs(String mode, List<Leg>[] legs) {
 		this.legs.put(mode.intern(), legs);
 	}
