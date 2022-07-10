@@ -12,6 +12,7 @@ import org.matsim.modechoice.ScenarioTest;
 import org.matsim.modechoice.TestScenario;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -84,6 +85,38 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		}
 	}
 
+	@Test
+	public void predefined() {
+
+		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+
+		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
+
+		TopKChoicesGenerator.Context ctx = generator.generate(person.getSelectedPlan(), null, 6, 0);
+
+		PlanCandidate first = ctx.getResult().iterator().next();
+
+		assertThat(first.getPlanType()).isEqualTo("car-car-car-car");
+		assertThat(first.getUtility()).isEqualTo(-6.186329864145045);
+
+
+		List<PlanCandidate> candidates = generator.generatePredefined(ctx, List.of(
+				new String[]{"car", "car", "car", "car"},
+				new String[]{"walk", "walk", "walk", "walk"},
+				new String[]{"walk", "bike", null, "car"}
+		));
+
+		PlanCandidate car = candidates.get(0);
+
+		assertThat(car.getPlanType()).isEqualTo("car-car-car-car");
+		assertThat(car.getUtility()).isEqualTo(first.getUtility());
+
+		PlanCandidate walk = candidates.get(1);
+
+		assertThat(walk.getPlanType()).isEqualTo("walk-walk-walk-walk");
+		assertThat(walk.getUtility()).isLessThan(first.getUtility());
+
+	}
 
 	/**
 	 * Normalize modes for all legs.

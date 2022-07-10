@@ -9,7 +9,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.modechoice.InformedModeChoiceConfigGroup;
+import org.matsim.modechoice.ModeChoiceWeightScheduler;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
@@ -25,14 +25,15 @@ public class SelectBestKPlanModesStrategyProvider implements Provider<PlanStrate
 	private Provider<TripRouter> tripRouterProvider;
 	@Inject
 	private GlobalConfigGroup globalConfigGroup;
-	@Inject
-	private InformedModeChoiceConfigGroup configGroup;
+
 	@Inject
 	private ActivityFacilities facilities;
 	@Inject
 	private TimeInterpretation timeInterpretation;
 	@Inject
 	private Provider<TopKChoicesGenerator> generator;
+	@Inject
+	private ModeChoiceWeightScheduler weights;
 
 	@Override
 	public PlanStrategy get() {
@@ -46,7 +47,7 @@ public class SelectBestKPlanModesStrategyProvider implements Provider<PlanStrate
 	}
 
 	private Selector<PlanCandidate> createSelector() {
-		return new MultinomialLogitSelector(configGroup.getInvBeta(), MatsimRandom.getLocalInstance());
+		return new MultinomialLogitSelector(weights.getInvBeta(), MatsimRandom.getLocalInstance());
 	}
 
 }

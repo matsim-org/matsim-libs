@@ -72,11 +72,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		addPlanStrategyBinding(SELECT_SINGLE_TRIP_MODE_STRATEGY).toProvider(SelectSingleTripModeStrategyProvider.class);
 		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
+		// Ensure that only one instance exists
+		bind(ModeChoiceWeightScheduler.class).in(Singleton.class);
+		addControlerListenerBinding().to(ModeChoiceWeightScheduler.class).in(Singleton.class);
+
 		// TODO: SubTour best choice + best k selection
-		// TODO: allow generators to only work on subset of plans
-
-		// TODO: annealing for inv better
-
 	}
 
 	/**

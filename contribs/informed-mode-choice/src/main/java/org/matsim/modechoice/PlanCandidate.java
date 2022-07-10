@@ -14,6 +14,7 @@ import java.util.List;
 public final class PlanCandidate implements Comparable<PlanCandidate> {
 
 	public static final String ESTIMATE_ATTR = "estimate";
+	public static final String TYPE_ATTR = "modeType";
 
 	private final String[] modes;
 
@@ -77,8 +78,6 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 			if (mode == null)
 				continue;
 
-			// TODO: check if staging activities are correct
-
 			for (Leg leg : trip.getLegsOnly()) {
 
 				leg.setRoute(null);
@@ -95,6 +94,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 	 */
 	public void applyAttributes(Plan plan) {
 
+		plan.getAttributes().putAttribute(TYPE_ATTR, getPlanType());
 		plan.getAttributes().putAttribute(ESTIMATE_ATTR, utility);
 
 	}
@@ -135,6 +135,22 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		}
 
 		return b.toString();
+	}
+
+	/**
+	 * Creates array of selected modes from plan type.
+	 */
+	public static String[] createModeArray(String planType) {
+		String[] modes = planType.split("-");
+		for (int i = 0; i < modes.length; i++) {
+
+			if (modes[i].equals("null"))
+				modes[i] = null;
+			else
+				modes[i] = modes[i].intern();
+		}
+
+		return modes;
 	}
 
 	@Override

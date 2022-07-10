@@ -1,11 +1,14 @@
 package org.matsim.modechoice.replanning;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -13,10 +16,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -40,19 +43,14 @@ import java.util.stream.Collectors;
  */
 public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
-	public static final String SCORE_HIST = "scoreHistory";
-	public static final String ESTIMATE_HIST = "estimateHistory";
-
 	private static final Logger log = LogManager.getLogger(InformedModeChoicePlanStrategy.class);
 
 	private final RandomUnscoredPlanSelector<Plan, Person> unscored = new RandomUnscoredPlanSelector<>();
-	private final RandomPlanSelector<Plan, Person> random = new RandomPlanSelector<>();
 
 	private final InformedModeChoiceConfigGroup config;
 	private final Config globalConfig;
-	private final TopKChoicesGenerator[] generator;
-	private final PlanRouter[] router;
-	private final SimpleRegression[] reg;
+
+	private final ThreadContext[] threadContexts;
 	private final Scenario scenario;
 	private final OutputDirectoryHierarchy controlerIO;
 
@@ -65,38 +63,45 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 	private ExecutorService executor;
 
+	private final IdMap<Person, PlanHistory> history;
+
 	public InformedModeChoicePlanStrategy(Config config, Scenario scenario, OutputDirectoryHierarchy controlerIO,
 	                                      Provider<TopKChoicesGenerator> generator, Provider<TripRouter> tripRouterProvider, ActivityFacilities facilities,
 	                                      TimeInterpretation timeInterpretation) {
 		this.globalConfig = config;
 		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-		this.reg = new SimpleRegression[this.config.getModes().size()];
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
 
-		this.generator = new TopKChoicesGenerator[config.global().getNumberOfThreads()];
-		this.router = new PlanRouter[config.global().getNumberOfThreads()];
+		this.threadContexts = new ThreadContext[config.global().getNumberOfThreads()];
 
-		for (int i = 0; i < this.generator.length; i++) {
-			this.generator[i] = generator.get();
-			this.router[i] = new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation);
+		for (int i = 0; i < this.threadContexts.length; i++) {
+			this.threadContexts[i] = new ThreadContext(generator.get(), new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation), MatsimRandom.getLocalInstance());
 		}
+
+		history = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
 	}
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
 
 		final int writePlansInterval = globalConfig.controler().getWritePlansInterval();
+		final int lastIteration = globalConfig.controler().getLastIteration();
 
-		if (writePlansInterval > 0 && (replanningContext.getIteration() % writePlansInterval == 0))
+
+		if (replanningContext.getIteration() == lastIteration ||
+				(writePlansInterval > 0 && (replanningContext.getIteration() % writePlansInterval == 0))
+		) {
 			writeEstimates(replanningContext.getIteration());
+			writeHistory(replanningContext.getIteration());
+		}
 
 		// Only for debugging
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			plan.getAttributes().putAttribute(SCORE_HIST, Objects.toString(plan.getAttributes().getAttribute(SCORE_HIST), "") + plan.getScore() + ";");
-			plan.getAttributes().putAttribute(ESTIMATE_HIST,
-					Objects.toString(plan.getAttributes().getAttribute(ESTIMATE_HIST), "") + Objects.toString(plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR), "") + ";");
+
+			PlanHistory hist = history.computeIfAbsent(person.getId(), PlanHistory::new);
+			hist.add(plan);
 		}
 
 		// Thread local stores which thread uses which generator
@@ -155,6 +160,32 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		}
 	}
 
+	private void writeHistory(int iteration) {
+
+		String f = controlerIO.getIterationFilename(iteration, "estimateHistory.tsv.gz");
+
+		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(f), CSVFormat.MONGODB_TSV)) {
+
+			csv.printRecord("person", "type", "scoreHistory", "estimateHistory");
+
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+
+				PlanHistory hist = history.get(person.getId());
+
+				for (String type : hist.types()) {
+					csv.printRecord(person.getId(), type,
+							hist.getScores(type).doubleStream().mapToObj(String::valueOf).collect(Collectors.joining(";")),
+							hist.getEstimates(type).doubleStream().mapToObj(String::valueOf).collect(Collectors.joining(";"))
+					);
+				}
+			}
+
+		} catch (IOException e) {
+			log.error("Could not estimate history tsv", e);
+		}
+
+	}
+
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
 
@@ -205,11 +236,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		executor.submit(new ReplanningTask(person));
 	}
 
-	private void applyCandidates(HasPlansAndId<Plan, Person> person, Collection<PlanCandidate> candidates, Plan best) {
+	private void applyCandidates(HasPlansAndId<Plan, Person> person, Collection<PlanCandidate> candidates) {
 
 		for (PlanCandidate c : candidates) {
 
-			// the best plan is not modified
 			List<? extends Plan> same = person.getPlans().stream()
 					.filter(p -> c.getPlanType().equals(p.getType()))
 					.collect(Collectors.toList());
@@ -224,13 +254,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 				c.applyTo(plan);
 				plan.setType(c.getPlanType());
 
-				plan.getAttributes().removeAttribute(SCORE_HIST);
-				plan.getAttributes().removeAttribute(ESTIMATE_HIST);
 				plan.getAttributes().removeAttribute(ScoringFunction.SCORE_EXPLANATION);
 
 				// If this plan is new, it needs to be routed
-				router[assignment.get()].run(plan);
-
+				threadContexts[assignment.get()].planRouter.run(plan);
 			}
 		}
 	}
@@ -276,27 +303,91 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 		private void plan() {
 
+			Set<String> missing = new HashSet<>();
 			// First fill missing plan types
 			for (Plan plan : person.getPlans())
-				if (plan.getType() == null)
-					plan.setType(PlanCandidate.guessPlanType(plan, config.getModes()));
+				if (plan.getAttributes().getAttribute(PlanCandidate.TYPE_ATTR) == null) {
+					String guess = PlanCandidate.guessPlanType(plan, config.getModes());
 
+					missing.add(guess);
+					plan.setType(guess);
+				}
 
 			Plan best = person.getPlans().stream()
 					.max(Comparator.comparingDouble(Plan::getScore)).orElse(null);
 
 			person.setSelectedPlan(best);
 
-			Collection<PlanCandidate> candidates = generator[assignment.get()].generate(best);
+			ThreadContext tc = threadContexts[assignment.get()];
+
+			TopKChoicesGenerator.Context ctx = tc.generator.generate(best, null, config.getTopK(), 0);
+
+			for (PlanCandidate c : ctx.getResult()) {
+				missing.remove(c.getPlanType());
+			}
 
 			// TODO: should replace old plans with same type
 			// TODO: should remove and not regenerate unpromising plan types
 
-			// TODO: random must be thread local
+			applyCandidates(person, ctx.getResult());
 
-			applyCandidates(person, candidates, best);
-			person.setSelectedPlan(random.selectPlan(person));
+			// Estimate missing scores for already exising plans
+			if (!missing.isEmpty()) {
 
+				List<PlanCandidate> predefined = tc.generator.generatePredefined(ctx, missing.stream().map(PlanCandidate::createModeArray).collect(Collectors.toList()));
+				applyCandidates(person, predefined);
+			}
+
+
+			person.setSelectedPlan(person.getPlans().get(tc.rnd.nextInt(person.getPlans().size())));
+		}
+	}
+
+	/**
+	 * Context for each separate thread.
+	 */
+	private static final class ThreadContext {
+
+		private final TopKChoicesGenerator generator;
+		private final PlanRouter planRouter;
+		private final Random rnd;
+
+		public ThreadContext(TopKChoicesGenerator generator, PlanRouter planRouter, Random rnd) {
+			this.generator = generator;
+			this.planRouter = planRouter;
+			this.rnd = rnd;
+		}
+	}
+
+	private static final class PlanHistory {
+
+		private final Map<String, DoubleList> scores = new HashMap<>();
+		private final Map<String, DoubleList> estimates = new HashMap<>();
+
+		public PlanHistory(Id<Person> id) {
+		}
+
+		public void add(Plan plan) {
+
+			Object estimate = plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR);
+
+			if (plan.getType() == null || estimate == null || plan.getScore() == null)
+				return;
+
+			scores.computeIfAbsent(plan.getType(), k -> new DoubleArrayList()).add((double) plan.getScore());
+			estimates.computeIfAbsent(plan.getType(), k -> new DoubleArrayList()).add((double) estimate);
+		}
+
+		public Set<String> types() {
+			return scores.keySet();
+		}
+
+		public DoubleList getScores(String type) {
+			return scores.get(type);
+		}
+
+		public DoubleList getEstimates(String type) {
+			return estimates.get(type);
 		}
 	}
 }

@@ -4,8 +4,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.InformedModeChoiceModule;
 import org.matsim.modechoice.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
@@ -16,7 +18,7 @@ public class IMCReplanningTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void replanning() {
+	public void informedModeChoice() {
 
 		Config config = TestScenario.loadConfig(utils);
 
@@ -26,6 +28,27 @@ public class IMCReplanningTest {
 				.setSubpopulation("person")
 				.setWeight(0.5)
 		);
+
+		Controler controler = MATSimApplication.prepare(TestScenario.class, config);
+
+		controler.run();
+
+	}
+
+	@Test
+	public void selectSingleTrip() {
+
+		Config config = TestScenario.loadConfig(utils);
+
+		config.controler().setLastIteration(10);
+		config.strategy().addStrategySettings(new StrategyConfigGroup.StrategySettings()
+				.setStrategyName(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY)
+				.setSubpopulation("person")
+				.setWeight(0.5)
+		);
+
+		ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class)
+				.setAnneal(InformedModeChoiceConfigGroup.Schedule.linear);
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, config);
 

@@ -25,7 +25,7 @@ public class BestChoiceGenerator extends TopKChoicesGenerator {
 	@Override
 	public Collection<PlanCandidate> generate(Plan plan) {
 
-		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, null, 10, 0));
+		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, null, 10, 0).getResult());
 
 		if (candidates.isEmpty())
 			return Set.of();

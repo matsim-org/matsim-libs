@@ -19,8 +19,10 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_TOP_K = "topK";
-
 	public final static String CONFIG_PARAM_INV_BETA = "invBeta";
+
+	public final static String CONFIG_PARAM_ANNEAL = "anneal";
+
 
 	/**
 	 * The setter ensures, that this class always contains internal string representations.
@@ -36,6 +38,11 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 * Scale parameter for MNL.
 	 */
 	private double invBeta = 1;
+
+	/**
+	 * Annealing schedule.
+	 */
+	private Schedule anneal = Schedule.off;
 
 	public InformedModeChoiceConfigGroup() {
 		super(NAME);
@@ -78,6 +85,16 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		this.invBeta = invBeta;
 	}
 
+	@StringGetter(CONFIG_PARAM_ANNEAL)
+	public Schedule getAnneal() {
+		return anneal;
+	}
+
+	@StringSetter(CONFIG_PARAM_ANNEAL)
+	public void setAnneal(Schedule anneal) {
+		this.anneal = anneal;
+	}
+
 	public List<String> getModes() {
 		return modes;
 	}
@@ -87,8 +104,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> comments = super.getComments();
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
 		comments.put(CONFIG_PARAM_TOP_K, "Defines how many top k best trips of each category should be generated.");
-		comments.put(CONFIG_PARAM_INV_BETA, "1/beta parameter to trade-off of exploration for alternatives. Para,eter of 0 is equal to best choice.");
+		comments.put(CONFIG_PARAM_INV_BETA, "1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice.");
+		comments.put(CONFIG_PARAM_ANNEAL, "Annealing for the invBeta parameter.");
 
 		return comments;
+	}
+
+	public enum Schedule {
+		off,
+		linear
 	}
 }

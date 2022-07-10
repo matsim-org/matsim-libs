@@ -40,7 +40,7 @@ public class AnalyzeChoices implements MATSimAppCommand {
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.MONGODB_TSV)) {
 
-			printer.printRecord("person", "k", "selected", "score", "type", "score_hist", "estimation_hist");
+			printer.printRecord("person", "k", "selected", "score", "type");
 
 			for (Person person : population.getPersons().values()) {
 
@@ -77,9 +77,7 @@ public class AnalyzeChoices implements MATSimAppCommand {
 
 					Plan plan = plans.get(k);
 					printer.printRecord(person.getId(), k, person.getSelectedPlan() == plan ? 1 : 0, plan.getScore(),
-							plan.getType(),
-							plan.getAttributes().getAttribute(InformedModeChoicePlanStrategy.SCORE_HIST),
-							plan.getAttributes().getAttribute(InformedModeChoicePlanStrategy.ESTIMATE_HIST)
+							plan.getType()
 					);
 				}
 			}
