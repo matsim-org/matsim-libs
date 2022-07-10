@@ -45,6 +45,7 @@ public class MultinomialLogitSelector implements Selector<PlanCandidate> {
 		if (candidates.isEmpty())
 			return null;
 
+		// if two option are exactly the same this will be incorrect
 		if (scale <= 0) {
 			return candidates.stream().sorted().findFirst().orElse(null);
 		}
@@ -55,6 +56,10 @@ public class MultinomialLogitSelector implements Selector<PlanCandidate> {
 
 		double min = candidates.stream().mapToDouble(PlanCandidate::getUtility).min().orElseThrow();
 		double scale = candidates.stream().mapToDouble(PlanCandidate::getUtility).max().orElseThrow() - min;
+
+		// For very small differences the small is ignored
+		if (scale < 1e-6)
+			scale = 1;
 
 		for (PlanCandidate candidate : pcs) {
 			double utility = (candidate.getUtility() - min) / scale;

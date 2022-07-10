@@ -64,7 +64,7 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 
 		ArrayList<PlanCandidate> candidates = new ArrayList<>();
 
-		// construct the
+		// construct candidates
 		for (List<Combination> value : options.values()) {
 
 			Combination est = value.get(0);
@@ -72,7 +72,12 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 			String[] modes = new String[planModel.trips()];
 			modes[idx] = est.getMode();
 
-			candidates.add(new PlanCandidate(modes, est.getEstimates()[idx]));
+			double estimate = est.getEstimates()[idx];
+
+			if (estimate == Double.NEGATIVE_INFINITY)
+				continue;
+
+			candidates.add(new PlanCandidate(modes, estimate));
 		}
 
 		Collections.sort(candidates);

@@ -30,4 +30,20 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 				.last().matches(c -> c.getMode(0).equals(TransportMode.ride));
 
 	}
+
+
+	@Test
+	public void unavailable() {
+
+		SingleTripChoicesGenerator generator = injector.getInstance(SingleTripChoicesGenerator.class);
+
+		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
+
+		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan(), new boolean[]{false, false, true, false, false, false, false});
+
+
+		assertThat(candidates)
+				.noneMatch(c -> c.getMode(2).equals(TransportMode.pt));
+
+	}
 }

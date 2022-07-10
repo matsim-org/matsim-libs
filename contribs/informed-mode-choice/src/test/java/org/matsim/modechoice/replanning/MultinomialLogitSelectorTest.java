@@ -1,5 +1,6 @@
 package org.matsim.modechoice.replanning;
 
+import org.assertj.core.data.Offset;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.modechoice.PlanCandidate;
@@ -112,6 +113,22 @@ public class MultinomialLogitSelectorTest {
 
 		assertThat(sample).containsExactly(0, 1, 0);
 
+	}
+
+	@Test
+	public void sameScore() {
+
+		selector = new MultinomialLogitSelector(0.001, new Random(0));
+
+		List<PlanCandidate> candidates = List.of(
+				new PlanCandidate(new String[]{"car"}, 1.),
+				new PlanCandidate(new String[]{"walk"}, 1.)
+		);
+
+		double[] sample = sample(N, candidates);
+
+		assertThat(sample[0]).isCloseTo(0.5, Offset.offset(0.01));
+		assertThat(sample[1]).isCloseTo(0.5, Offset.offset(0.01));
 	}
 
 	/**

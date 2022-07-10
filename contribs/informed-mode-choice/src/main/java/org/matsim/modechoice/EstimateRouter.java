@@ -7,16 +7,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,10 +40,17 @@ public final class EstimateRouter {
 	 */
 	public void routeModes(Plan plan, PlanModel model, Collection<String> modes) {
 
+		double[] startTimes = new double[model.trips()];
+
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+
+		for (int i = 0; i < model.trips() - 1; i++) {
+			TripStructureUtils.Trip oldTrip = model.getTrip(i);
+
+			startTimes[i + 1] = advanceTimetracker(timeTracker, oldTrip, plan);
+		}
 
 		for (String mode : modes) {
-
-			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
 			List<Leg>[] legs = new List[model.trips()];
 
@@ -53,6 +59,8 @@ public final class EstimateRouter {
 			for (TripStructureUtils.Trip oldTrip : model) {
 
 				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
+
+				timeTracker.setTime(startTimes[i]);
 				timeTracker.addActivity(oldTrip.getOriginActivity());
 
 				// Ignored mode
@@ -109,21 +117,24 @@ public final class EstimateRouter {
 	 */
 	public void routeSingleTrip(Plan plan, PlanModel model, Collection<String> modes, int idx) {
 
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+
+		for (int i = 0; i < idx; i++) {
+			TripStructureUtils.Trip oldTrip = model.getTrip(i);
+			advanceTimetracker(timeTracker, oldTrip, plan);
+		}
 
 		TripStructureUtils.Trip oldTrip = model.getTrip(idx);
 
 		Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
 		Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
 
-		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
-
-		// Use time information of existing trips
-		for (int i = 0; i < idx; i++) {
-			timeTracker.addElements(model.getTrip(i).getTripElements());
-		}
+		// store time before this trip starts
+		OptionalTime t = timeTracker.getTime();
 
 		for (String mode : modes) {
 
+			timeTracker.setTime(t.seconds());
 			timeTracker.addActivity(oldTrip.getOriginActivity());
 
 			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
@@ -138,10 +149,49 @@ public final class EstimateRouter {
 					.map(el -> (Leg) el)
 					.collect(Collectors.toList());
 
+			// not a real pt trip, see reasoning above
+			if (mode.equals(TransportMode.pt) && ll.stream().noneMatch(l -> l.getMode().equals(TransportMode.pt))) {
+				model.setLegs(mode, new List[model.trips()]);
+				continue;
+			}
+
 			List<Leg>[] legs = new List[model.trips()];
 			legs[idx] = ll;
 
 			model.setLegs(mode, legs);
 		}
 	}
+
+	/**
+	 * Use time information of existing routes or compute routes if necessary.
+	 */
+	private double advanceTimetracker(TimeTracker timeTracker, TripStructureUtils.Trip oldTrip, Plan plan) {
+		timeTracker.addActivity(oldTrip.getOriginActivity());
+
+		List<Leg> oldLegs = oldTrip.getLegsOnly();
+		boolean undefined = oldLegs.stream().anyMatch(l -> timeInterpretation.decideOnLegTravelTime(l).isUndefined());
+
+		// If no time is known the previous trips need to be routed
+		if (undefined) {
+			String routingMode = TripStructureUtils.getRoutingMode(oldLegs.get(0));
+			List<? extends PlanElement> legs = routeTrip(oldTrip, plan, routingMode != null ? routingMode : oldLegs.get(0).getMode(), timeTracker);
+			timeTracker.addElements(legs);
+
+		} else
+			timeTracker.addElements(oldLegs);
+
+		return timeTracker.getTime().seconds();
+	}
+
+	private List<? extends PlanElement> routeTrip(TripStructureUtils.Trip trip, Plan plan, String routingMode, TimeTracker timeTracker) {
+		return tripRouter.calcRoute( //
+				routingMode, //
+				FacilitiesUtils.toFacility(trip.getOriginActivity(), facilities), //
+				FacilitiesUtils.toFacility(trip.getDestinationActivity(), facilities), //
+				timeTracker.getTime().seconds(), //
+				plan.getPerson(), //
+				trip.getTripAttributes() //
+		);
+	}
+
 }
