@@ -96,8 +96,10 @@ final class ExampleTwoEchelonGrid {
 		controler.run();
 
 		log.info("Some results ....");
-		printSomeResults(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values());
-
+		printScores(LSPUtils.getLSPs(controler.getScenario()).getLSPs().values());
+		for (LSP lsp : LSPUtils.getLSPs(controler.getScenario()).getLSPs().values()) {
+			UsecaseUtils.printResults(controler.getControlerIO().getOutputPath(), lsp);
+		}
 		log.info("Done.");
 	}
 
@@ -136,26 +138,25 @@ final class ExampleTwoEchelonGrid {
 
 //		//TODO: Brauchen wir das hier wirklich?
 		//Scheint so, weil nur 1 Element nicht geht, aktuell. --> die direkte Beliferung ist es irgendwie nötig
-		LogisticsSolutionElement depotElement;
-		{
-			log.info( "Create depot" );
-
-			//The scheduler for the first reloading point is created --> this will be the depot in this use case
-			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
-					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
-					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
-					.build();
-
-			//The scheduler is added to the Resource and the Resource is created
-			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Depot", LSPResource.class ), DEPOT_LINK_ID )
-					.setTransshipmentHubScheduler( depotScheduler )
-					.build();
-
-			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
-					.setResource( depotResource )
-					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
-		}
-
+//		LogisticsSolutionElement depotElement;
+//		{
+//			log.info( "Create depot" );
+//
+//			//The scheduler for the first reloading point is created --> this will be the depot in this use case
+//			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+//					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
+//					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
+//					.build();
+//
+//			//The scheduler is added to the Resource and the Resource is created
+//			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Depot", LSPResource.class ), DEPOT_LINK_ID )
+//					.setTransshipmentHubScheduler( depotScheduler )
+//					.build();
+//
+//			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
+//					.setResource( depotResource )
+//					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
+//		}
 
 
 		Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
@@ -173,10 +174,10 @@ final class ExampleTwoEchelonGrid {
 
 		//Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO: Vielleicht bekommt man das noch eleganter hin.
 		// z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
-		depotElement.connectWithNextElement(directCarrierElement);
+//		depotElement.connectWithNextElement(directCarrierElement);
 
 		LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
-				.addSolutionElement(depotElement)
+//				.addSolutionElement(depotElement)
 				.addSolutionElement(directCarrierElement)
 				.build();
 
@@ -214,7 +215,8 @@ final class ExampleTwoEchelonGrid {
 //		for(int i = 1; i < 6; i++) {
 			Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
-			int capacityDemand = rand.nextInt(10);
+//		int capacityDemand = rand.nextInt(10);
+			int capacityDemand = rand.nextInt(5);
 			builder.setCapacityDemand(capacityDemand);
 
 			builder.setFromLinkId(DEPOT_LINK_ID);
@@ -242,7 +244,8 @@ final class ExampleTwoEchelonGrid {
 		return resourcesList;
 	}
 
-	private static void printSomeResults(Collection<LSP> lsps) {
+
+	private static void printScores(Collection<LSP> lsps) {
 		for (LSP lsp : lsps) {
 			log.info("The LSP `` " + lsp.getId()  + " ´´ has the following number of plans: " + lsp.getPlans().size());
 			log.info("The scores are");
