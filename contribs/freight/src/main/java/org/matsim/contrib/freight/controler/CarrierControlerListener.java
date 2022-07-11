@@ -81,6 +81,8 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
+		// (means that it is recreated before every mobsim run)
+
 		eventsManager.addHandler(carrierAgentTracker);
 		// (add and remove per mobsim run)
 	}

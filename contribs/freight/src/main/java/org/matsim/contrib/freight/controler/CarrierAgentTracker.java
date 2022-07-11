@@ -50,11 +50,11 @@ import org.matsim.core.scoring.ScoringFunction;
  * @author mzilske, sschroeder
  *
  */
-public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+public final class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 						     LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 						     PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler 
 {
-	// yyyy not sure if this _has_ to be public, but current LSP design makes this necessary.  kai, sep'20
+	// yyyy not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
 
 	private static final Logger log = Logger.getLogger( CarrierAgentTracker.class ) ;
 

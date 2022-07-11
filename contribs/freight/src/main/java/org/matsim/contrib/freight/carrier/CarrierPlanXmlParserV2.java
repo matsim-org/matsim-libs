@@ -284,8 +284,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						if (actEndTime == null)
 							throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 						currentStartTime = parseTimeToDouble(actEndTime);
-						previousActLoc = currentVehicle.getLocation();
-						currentTourBuilder.scheduleStart(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+						previousActLoc = currentVehicle.getLinkId();
+						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 
 						break;
 					case "pickup": {
@@ -317,8 +317,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						break;
 					}
 					case "end":
-						finishLeg(currentVehicle.getLocation());
-						currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+						finishLeg(currentVehicle.getLinkId() );
+						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 				}
 				break;

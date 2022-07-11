@@ -289,7 +289,7 @@ public class FreightUtils {
 			throw new RuntimeException("Carrier " + carrier.getId() + " has NO ScheduledTours. --> CanNOT create a new carrier from solution");
 		}
 		for (ScheduledTour tour : tours) {
-			Id<Link> depotForTour = tour.getVehicle().getLocation();
+			Id<Link> depotForTour = tour.getVehicle().getLinkId();
 			for (TourElement te : tour.getTour().getTourElements()) {
 				if (te instanceof ServiceActivity) {
 					ServiceActivity act = (ServiceActivity) te;

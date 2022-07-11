@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
@@ -58,13 +57,13 @@ public class CarrierUtilsTest {
 		Assert.assertEquals(1, carrier.getCarrierCapabilities().getCarrierVehicles().size());
 		CarrierVehicle cv = (CarrierVehicle) carrier.getCarrierCapabilities().getCarrierVehicles().values().toArray()[0];
 		Assert.assertEquals(VehicleUtils.getDefaultVehicleType(), cv.getType());
-		Assert.assertEquals(Id.createLinkId("link0"), cv.getLocation());
+		Assert.assertEquals(Id.createLinkId("link0"), cv.getLinkId() );
 
 		//get Vehicle
 		CarrierVehicle carrierVehicle1 = CarrierUtils.getCarrierVehicle(carrier, testVehicleId );
 		Assert.assertEquals(testVehicleId, carrierVehicle1.getId());
 		Assert.assertEquals(VehicleUtils.getDefaultVehicleType(), carrierVehicle1.getType());
-		Assert.assertEquals(Id.createLinkId("link0"), carrierVehicle1.getLocation());
+		Assert.assertEquals(Id.createLinkId("link0"), carrierVehicle1.getLinkId() );
 	}
 
 	@Test

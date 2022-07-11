@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -266,33 +265,43 @@ class CarrierAgent
 		clear();
 		System.out.flush();
 		System.err.flush() ;
-		List<Plan> routes = new ArrayList<>();
 		if (carrier.getSelectedPlan() == null) {
-			return routes;
+			return Collections.emptyList();
 		}
+		List<Plan> routes = new ArrayList<>();
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+			// (go through scheduled tours of selected plan:)
+
 			Id<Person> driverId = createDriverId(scheduledTour.getVehicle());
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour);
 			Plan plan = PopulationUtils.createPlan();
-			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLocation());
+			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
 				if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
 					Route route = tourLeg.getRoute();
+
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
+					// yy At least in EquilWithoutCarrierWithPassIT, it runs through even without the above line ... but it looks
+					// like the simulation is not generating kilometers.  Presumably, there is no equivalent to "prepareForSim"
+					// for carriers.  Did not check any further.  kai, jul'22
+
 					//this returns TransportMode.car if the attribute is null
 					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
+
 					//TODO we might need to set the route to null if the the mode is a drt mode
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
+
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());
-					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime()
-							.seconds());
+					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime().seconds());
+					// yy why is it setting travel time twice?  kai, jul'22
+
 					plan.addLeg(leg);
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
@@ -302,7 +311,7 @@ class CarrierAgent
 					plan.addActivity(tourElementActivity);
 				}
 			}
-			Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLocation());
+			Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLinkId() );
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
