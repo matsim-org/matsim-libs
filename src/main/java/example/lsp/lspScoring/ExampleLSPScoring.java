@@ -23,9 +23,11 @@ package example.lsp.lspScoring;
 import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.LSPResource;
+import lsp.controler.LSPSimulationTracker;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +35,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -61,11 +65,10 @@ import java.util.*;
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance( Id.createVehicleId("CollectionVehicle" ), collectionLinkId, carrierVehicleType );
-
 		CarrierCapabilities capabilities = CarrierCapabilities.Builder.newInstance()
 //									      .addType(carrierVehicleType )
-									      .addVehicle(carrierVehicle ).setFleetSize(FleetSize.INFINITE ).build();
+									      .addVehicle( CarrierVehicle.newInstance( Id.createVehicleId("CollectionVehicle" ), collectionLinkId, carrierVehicleType ) )
+									      .setFleetSize(FleetSize.INFINITE ).build();
 
 		Carrier carrier = CarrierUtils.createCarrier( Id.create("CollectionCarrier", Carrier.class ) );
 		carrier.setCarrierCapabilities(capabilities);
@@ -153,11 +156,7 @@ import java.util.*;
 	static Controler prepareControler( Scenario scenario ){
 		//Start the Mobsim one iteration is sufficient for scoring
 		Controler controler = new Controler( scenario );
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() );
-			}
-		});
+		controler.addOverridingModule( new LSPModule() );
 		return controler;
 	}
 	static Scenario prepareScenario( Config config ){
@@ -195,4 +194,35 @@ import java.util.*;
 	}
 
 
+	/*package-private*/ static class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
+	{
+		private static final Logger log = Logger.getLogger( TipScorer.class );
+
+		private final Random tipRandom;
+		private double tipSum;
+
+		/*package-private*/ TipScorer() {
+			tipRandom = new Random(1);
+			tipSum = 0;
+		}
+
+		@Override public double computeScoreForCurrentPlan() {
+			return tipSum;
+		}
+
+		@Override public void setEmbeddingContainer( LSP pointer ){
+			// backpointer not needed here, therefor not memorizing it.  kai, jun'22
+		}
+
+		@Override public void handleEvent( LSPServiceEndEvent event ) {
+			double tip = tipRandom.nextDouble() * 5;
+			log.warn("tipSum=" + tipSum + "; tip=" + tip);
+			tipSum += tip;
+		}
+
+		@Override public void reset( int iteration ){
+			tipSum = 0.;
+		}
+
+	}
 }

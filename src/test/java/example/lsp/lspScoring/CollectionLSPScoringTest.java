@@ -89,7 +89,7 @@ public class CollectionLSPScoringTest {
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 						   .setInitialPlan( LSPUtils.createLSPPlan().setAssigner( createSinglesolutionShipmentAssigner() ).addSolution(collectionSolution ) )
 						   .setSolutionScheduler( createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( collectionAdapter ) ) )
-						   .setSolutionScorer( new TipScorer() )
+						   .setSolutionScorer( new ExampleLSPScoring.TipScorer() )
 						   .build();
 
 //		TipEventHandler handler = new TipEventHandler();
