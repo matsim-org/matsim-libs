@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * Most of the other test implicitly test the EmissionModule as well. Still, I guess it makes sense to have this here
  */
-public class TestEmissionModule {
+public class EmissionModuleTest {
 
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
