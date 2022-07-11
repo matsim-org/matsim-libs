@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * Most of the other test implicitly test the EmissionModule as well. Still, I guess it makes sense to have this here
  */
-public class EmissionModuleTest {
+public class TestEmissionModule {
 
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -38,7 +38,7 @@ public class EmissionModuleTest {
 
         var config = ConfigUtils.createConfig(emissionConfig);
 
-        // create a scenario with a random network where every link has an hebefa road type except one link.
+        // create a scenario with a random network where every link has a hbefa road type except one link.
         var scenario = ScenarioUtils.createMutableScenario(config);
         var network = TestUtils.createRandomNetwork(1000, 10000, 10000);
         new VspHbefaRoadTypeMapping().addHbefaMappings(network);
