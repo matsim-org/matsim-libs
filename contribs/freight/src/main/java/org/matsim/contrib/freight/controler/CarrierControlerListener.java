@@ -98,6 +98,9 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
+		if ( strategyManager==null ) {
+			throw new RuntimeException( "You need to set CarrierStrategyManager to something meaningful to run iterations." );
+		}
 		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 
