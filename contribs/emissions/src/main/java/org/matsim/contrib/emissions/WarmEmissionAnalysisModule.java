@@ -280,7 +280,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			if (ecg.handlesHighAverageSpeeds()) {
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
-			} else {
+			} else { // todo: why is this a problem... causes "missing events" when removed ~rjg
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 		}
