@@ -117,12 +117,13 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if (vehicle != null) {
 			// execute emissions calculation method
 			emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime);
-
 			// this is "so that no second emission event is computed for travel from parking to link leave" (kn)
 			// because after this vehicleLeavesTrafficEvent there can/will be another enterTraffic, linkEnter
 			// (and then later leaveTraffic as well)...
 			this.vehicleEntersTrafficMap.remove(vehicleId);
 			this.linkEnterMap.remove(vehicleId);
+		} else {
+			handleNullVehicle(vehicleId);
 		}
 
 }
@@ -190,13 +191,14 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 					// if vehicle type is defined calculate warm emissions
 					Vehicle vehicle = VehicleUtils.findVehicle(vehicleId, scenario);
 
-					if (vehicle != null && travelTime != 0) {
+					if (vehicle != null) {
 						// execute emissions calculation method
 						emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime);
-
 						// remove vehicle from data structure (no activity on this link, thus not removing from vehicleEnters/LeavesTraffic)
 						this.linkEnterMap.remove(vehicleId);
 						// because after this linkLeaveEvent there can/will be another linkEnterEvent
+					} else {
+						handleNullVehicle(vehicleId);
 					}
 				}
 			}
@@ -206,14 +208,10 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	}
 
 	private void emissionsCalculation(Id<Vehicle> vehicleId, Vehicle vehicle, Link link, double leaveTime, double travelTime) {
-		if (vehicle == null) {
-			handleNullVehicle(vehicleId);
-		} else {
-			// warm emissions calculation
-			VehicleType vehicleType = vehicle.getType();
-			Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
-			warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, link.getId(), vehicleId, warmEmissions);
-		}
+		// warm emissions calculation
+		VehicleType vehicleType = vehicle.getType();
+		Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
+		warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, link.getId(), vehicleId, warmEmissions);
 	}
 
 	private void warnIfZeroLinkLength(Id<Link> linkId, double linkLength) {
