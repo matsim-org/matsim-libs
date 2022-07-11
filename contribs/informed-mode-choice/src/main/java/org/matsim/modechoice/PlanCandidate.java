@@ -72,7 +72,8 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		int k = 0;
 		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
 
-			String mode = modes[k];
+			// increment k after only usage here
+			String mode = modes[k++];
 
 			// modes could be not specified
 			if (mode == null)
@@ -84,8 +85,6 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 				leg.setMode(mode);
 				TripStructureUtils.setRoutingMode(leg, mode);
 			}
-
-			k++;
 		}
 	}
 

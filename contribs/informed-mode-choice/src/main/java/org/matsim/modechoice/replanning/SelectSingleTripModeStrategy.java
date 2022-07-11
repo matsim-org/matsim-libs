@@ -1,5 +1,7 @@
 package org.matsim.modechoice.replanning;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -20,6 +22,8 @@ import java.util.Random;
  * @see org.matsim.core.population.algorithms.ChooseRandomSingleLegMode
  */
 public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
+
+	private static final Logger log = LogManager.getLogger(SelectSingleTripModeStrategy.class);
 
 	private final Provider<SingleTripChoicesGenerator> generator;
 	private final Provider<Selector<PlanCandidate>> selector;
@@ -72,6 +76,8 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
 
 			PlanCandidate selected = selector.select(candidates);
+
+			log.debug("Candidates for person {} at trip {}: {} | selected {}", plan.getPerson(), idx, candidates, selected);
 
 			if (selected != null) {
 				selected.applyTo(plan);
