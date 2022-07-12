@@ -69,7 +69,7 @@ class CarrierAgent
 	 * @author mzilske, sschroeder
 	 *
 	 */
-	class CarrierDriverAgent {
+	final class CarrierDriverAgent {
 
 		private Leg currentLeg;
 
@@ -90,6 +90,8 @@ class CarrierAgent
 		}
 
 		private void handleAnEvent( Event event ) {
+			// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
+
 			if ( event instanceof PersonArrivalEvent ) {
 				handleEvent( (PersonArrivalEvent) event );
 			} else if ( event instanceof PersonDepartureEvent ){
@@ -196,6 +198,16 @@ class CarrierAgent
 				currentActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
 			}
 			notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
+		}
+
+		/**
+		 * {@link CarrierAgentTracker} is an event handler, and it passes events related to individual carriers (but only those) to them.
+		 * Here, they are send back to the tracker. The main (only) reason why this is necessary is some fields such as "activity" or
+		 * "scheduledTour" are not filled in from the event itself, and one needs the agent to figure it out.
+		 */
+		private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
+			if ( scoringFunction==null ) {
+				lspTracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);}
 		}
 
 		private TourActivity getTourActivity() {
@@ -349,16 +361,6 @@ class CarrierAgent
 		return id;
 	}
 
-	/**
-	 * {@link CarrierAgentTracker} is an event handler, and it passes events related to individual carriers (but only those) to them.  Here, they
-	 * are send back to the tracker.  yyyy remove this indirection.  The main (only) reason why this is necessary is that "activity" is not filled
-	 * in from the event itself, and one needs the agent to figure it out.
-	 */
-	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
-		if ( scoringFunction==null ) {
-			lspTracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);}
-	}
-
 	void scoreSelectedPlan() {
 		if (carrier.getSelectedPlan() == null) {
 			return;
@@ -367,6 +369,7 @@ class CarrierAgent
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
 	void handleEvent( Event event, Id<Person> driverId ) {
+		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier
 		getDriver( driverId ).handleAnEvent( event );
 	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){

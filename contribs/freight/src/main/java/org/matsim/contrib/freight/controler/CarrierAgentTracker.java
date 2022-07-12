@@ -142,8 +142,8 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 	}
 
 	void notifyEventHappened( Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
-		for( org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator LSPEventCreator : lspEventCreators ) {
-			Event customEvent = LSPEventCreator.createEvent(event, carrier, activity, scheduledTour, driverId, activityCounter);
+		for( org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator lspEventCreator : lspEventCreators ) {
+			Event customEvent = lspEventCreator.createEvent(event, carrier, activity, scheduledTour, driverId, activityCounter);
 			if(customEvent != null) {
 				events.processEvent(customEvent);
 			}
