@@ -26,12 +26,13 @@ import lsp.LSP;
 import lsp.LSPPlan;
 import lsp.ShipmentAssigner;
 import lsp.replanning.LSPPlanStrategyManagerFactory;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 
 /*package-private*/ class GenericStrategyManagerFactoryImpl implements LSPPlanStrategyManagerFactory {
 
 	@Override
 	public GenericStrategyManager<LSPPlan, LSP> createStrategyManager(LSP lsp) {
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<>();
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
 		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
 		maybeTodayAssigner.setLSP(lsp);
 
