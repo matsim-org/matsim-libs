@@ -116,13 +116,12 @@ final class ExampleTwoEchelonGrid {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9" ), "grid9x9.xml")));
 		config.controler().setOutputDirectory("output/2echelon/");
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(10);
 
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
 		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
-
 
 		return config;
 	}
@@ -222,7 +221,7 @@ final class ExampleTwoEchelonGrid {
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 				.setSolutionScorer(new MyLSPScorer());
-		
+
 
 		LSP lsp = lspBuilder.build();
 		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
