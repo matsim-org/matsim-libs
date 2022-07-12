@@ -280,8 +280,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			if (ecg.handlesHighAverageSpeeds()) {
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
-			} else { // todo: why is this a problem... causes "missing events" when removed ~rjg
-				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
+			} else { // todo: persisting error is: "missing events" when this here is changed ~rjg
+				// we find that emission events for vehicleLeavesTrafficEvent make it appear
+				// as if the vehicle drove faster than the allowed freespeed (freeVelocity_ms).
+				// Is this because it has not traversed the ENTIRE link upon vehicleLeavesTrafficEvents? ~rjg
+//				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
+				averageSpeed_kmh = freeVelocity_ms * 3.6;
 			}
 		}
 
