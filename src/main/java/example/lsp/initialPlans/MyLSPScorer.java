@@ -42,7 +42,7 @@ class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEve
 
 	@Override
 	public void handleEvent(LSPServiceEndEvent event) {
-		score++;
+		score = score + 0.1;
 		// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 	}
 }
