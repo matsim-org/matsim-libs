@@ -1,3 +1,4 @@
+LSP: LSPwithReloading
 Shipment: 1
 DepotElement		Depot		HANDLE		0.0		15.0MainRunElement		MainRunAdapter		LOAD		19.0		1699.0MainRunElement		MainRunAdapter		TRANSPORT		1699.0		3299.0MainRunElement		MainRunAdapter		UNLOAD		3299.0		4979.0SecondHubElement		TranshipmentHub2		HANDLE		4979.0		4994.0DistributionElement		DistributionCarrierAdapter		LOAD		4994.0		5414.0DistributionElement		DistributionCarrierAdapter		TRANSPORT		5414.0		6733.999999999997DistributionElement		DistributionCarrierAdapter		UNLOAD		6733.999999999997		7033.999999999997
 Shipment: 2

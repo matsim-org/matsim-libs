@@ -1,3 +1,4 @@
+LSP: LSPdirect
 Shipment: 1
 DepotElement		Depot		HANDLE		0.0		15.0DirectDistributionElement		DirectDistributionCarrierAdapter		LOAD		15.0		435.0DirectDistributionElement		DirectDistributionCarrierAdapter		TRANSPORT		435.0		3088.333333333334DirectDistributionElement		DirectDistributionCarrierAdapter		UNLOAD		3088.333333333334		3388.333333333334
 Shipment: 2
