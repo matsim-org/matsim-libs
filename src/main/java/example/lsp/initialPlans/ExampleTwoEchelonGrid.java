@@ -68,6 +68,7 @@ final class ExampleTwoEchelonGrid {
 
 	private static final Logger log = Logger.getLogger(ExampleTwoEchelonGrid.class);
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
+	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
 
 	private static final VehicleType VEH_TYPE_LARGE_10 = CarrierVehicleType.Builder.newInstance(Id.create("large10", VehicleType.class))
 			.setCapacity(10)
@@ -75,6 +76,14 @@ final class ExampleTwoEchelonGrid {
 			.setFixCost(130)
 			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.01)
+			.build();
+
+	private static final VehicleType VEH_TYPE_SMALL_02 = CarrierVehicleType.Builder.newInstance(Id.create("small02", VehicleType.class))
+			.setCapacity(2)
+			.setMaxVelocity(10)
+			.setFixCost(25)
+			.setCostPerDistanceUnit(0.0005)
+			.setCostPerTimeUnit(0.005)
 			.build();
 
 	public static void main(String[] args) {
@@ -135,65 +144,88 @@ final class ExampleTwoEchelonGrid {
 	private static LSP createLSP(Network network) {
 		log.info("create LSP");
 
+		LSPPlan lspPlan_direct;
+		{
+			log.info( "Create lspPlan for direct delivery" );
 
-//		//TODO: Brauchen wir das hier wirklich?
-		//Scheint so, weil nur 1 Element nicht geht, aktuell. --> die direkte Beliferung ist es irgendwie nötig
-//		LogisticsSolutionElement depotElement;
-//		{
-//			log.info( "Create depot" );
-//
-//			//The scheduler for the first reloading point is created --> this will be the depot in this use case
-//			LSPResourceScheduler depotScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
-//					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
-//					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
-//					.build();
-//
-//			//The scheduler is added to the Resource and the Resource is created
-//			LSPResource depotResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Depot", LSPResource.class ), DEPOT_LINK_ID )
-//					.setTransshipmentHubScheduler( depotScheduler )
-//					.build();
-//
-//			depotElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "DepotElement", LogisticsSolutionElement.class ))
-//					.setResource( depotResource )
-//					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
-//		}
+			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
+			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
+			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
+					.setCarrier(directCarrier)
+					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.build();
+
+			LogisticsSolutionElement directCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticsSolutionElement.class))
+					.setResource(directCarrierRessource)
+					.build();
 
 
-		Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
-				directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+			LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
+					.addSolutionElement(directCarrierElement)
+					.build();
 
-		CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
-		LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
-				.setCarrier(directCarrier)
-				.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
-				.build();
+			lspPlan_direct = LSPUtils.createLSPPlan()
+					.addSolution(solution_direct)
+					.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+		}
 
-		LogisticsSolutionElement directCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("directCarrierSE", LogisticsSolutionElement.class))
-				.setResource(directCarrierRessource)
-				.build();
+		LSPPlan lspPlan_withHub;
+		{
+			log.info( "Create lspPlan with Hub" );
 
-		//Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO: Vielleicht bekommt man das noch eleganter hin.
-		// z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
-//		depotElement.connectWithNextElement(directCarrierElement);
+			//The scheduler for the first reloading point is created --> this will be the depot in this use case
+			LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
+					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
+					.setCapacityNeedLinear(1) //additional time needed per shipmentSize (for Scheduler)
+					.build();
 
-		LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("directSolution", LogisticsSolution.class))
-//				.addSolutionElement(depotElement)
-				.addSolutionElement(directCarrierElement)
-				.build();
+			//The scheduler is added to the Resource and the Resource is created
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Hub", LSPResource.class ), HUB_LINK_ID )
+					.setTransshipmentHubScheduler( hubScheduler )
+					.build();
 
-		LSPPlan lspPlan = LSPUtils.createLSPPlan()
-				.addSolution(solution_direct)
-				.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+			LogisticsSolutionElement hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "HubLSE", LogisticsSolutionElement.class ))
+					.setResource( hubResource )
+					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
+
+			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+			distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+			CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_02));
+			LSPResource distributionCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("distributionCarrierRes", LSPResource.class), network)
+					.setCarrier(distributionCarrier)
+					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.build();
+
+			LogisticsSolutionElement distributionCarrierElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("distributionCarrierLSE", LogisticsSolutionElement.class))
+					.setResource(distributionCarrierRessource)
+					.build();
+
+			//Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO: Vielleicht bekommt man das noch eleganter hin.
+			// z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
+			hubElement.connectWithNextElement(distributionCarrierElement);
+
+			LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("hubSolution", LogisticsSolution.class))
+					.addSolutionElement(hubElement)
+					.addSolutionElement(distributionCarrierElement)
+					.build();
+
+			lspPlan_withHub = LSPUtils.createLSPPlan()
+					.addSolution(solution_direct)
+					.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+		}
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan)
+				.setInitialPlan(lspPlan_direct)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan)))
+				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
 				.setSolutionScorer(new MyLSPScorer());
-
-		//Todo: noch den zweiten Plan mit dem Hub bauen und hinzufügen.
+		
 
 		LSP lsp = lspBuilder.build();
+		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
@@ -213,20 +245,20 @@ final class ExampleTwoEchelonGrid {
 		Random rand = MatsimRandom.getRandom();
 		int i = 1;
 //		for(int i = 1; i < 6; i++) {
-			Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+		Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
+		ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 //		int capacityDemand = rand.nextInt(10);
-			int capacityDemand = rand.nextInt(5);
-			builder.setCapacityDemand(capacityDemand);
+		int capacityDemand = rand.nextInt(5);
+		builder.setCapacityDemand(capacityDemand);
 
-			builder.setFromLinkId(DEPOT_LINK_ID);
-			builder.setToLinkId(Id.createLinkId("i(5,5)R"));
+		builder.setFromLinkId(DEPOT_LINK_ID);
+		builder.setToLinkId(Id.createLinkId("i(5,5)R"));
 
-			builder.setEndTimeWindow(TimeWindow.newInstance(0,(24*3600)));
-			builder.setStartTimeWindow(TimeWindow.newInstance(0,(24*3600)));
-			builder.setDeliveryServiceTime(capacityDemand * 60 );
+		builder.setEndTimeWindow(TimeWindow.newInstance(0,(24*3600)));
+		builder.setStartTimeWindow(TimeWindow.newInstance(0,(24*3600)));
+		builder.setDeliveryServiceTime(capacityDemand * 60 );
 
-			shipmentList.add(builder.build());
+		shipmentList.add(builder.build());
 //		}
 		return shipmentList;
 	}
