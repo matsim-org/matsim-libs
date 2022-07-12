@@ -88,9 +88,9 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
-			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction );
+			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier ) );
 			carrierAgents.add(carrierAgent);
+			// (since the tracker is recreated for every iteration, the agent and the scoring function are also recreated every iteration)
 		}
 	}
 	private void createCarrierAgents() {

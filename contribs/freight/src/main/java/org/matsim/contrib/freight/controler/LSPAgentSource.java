@@ -45,11 +45,13 @@ import java.util.Collection;
 
 
 /**
- * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
- * this template use File | Settings | File Templates.
- * 
+ * @deprecated -- try using {@link FreightAgentSource} instead.
  */
-public class LSPAgentSource implements AgentSource {
+public final class LSPAgentSource implements AgentSource {
+	// yyyy I think that this is here and not in the LSP package since FreightControlerUtils is package-private.  Here is better, since at least
+	// the constructor can be package-private because of injection.  It does, however, look identical to FreightAgentSource, and it is thus not
+	// clear if it is needed at all.  (From thinking about it, we insert carrier drivers into the mobsim, and they should be the same for LSPs and
+	// for Carriers.)  kai, jul'22
 
 	public static final String COMPONENT_NAME = LSPAgentSource.class.getSimpleName();
 	private static final Logger log = Logger.getLogger( LSPAgentSource.class );
@@ -64,34 +66,40 @@ public class LSPAgentSource implements AgentSource {
 		this.vehicleRoutes = carrierAgentTracker.createPlans();
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
+
+		throw new RuntimeException( "try using FreightAgentSource instead" );
+
 	}
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for ( Plan vRoute : vehicleRoutes) {
 
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPerson());
-			Gbl.assertNotNull( agent );
+		throw new RuntimeException( "try using FreightAgentSource instead" );
 
-			Vehicle vehicle;
-			if( FreightControlerUtils.getVehicle( vRoute ) == null){
-				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-				log.warn("vehicle for agent "+vRoute.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
-			}
-			else if( FreightControlerUtils.getVehicle( vRoute ).getType() == null){
-				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-				log.warn("vehicleType for agent "+vRoute.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
-			}
-			else vehicle = FreightControlerUtils.getVehicle( vRoute );
-			Gbl.assertNotNull(vehicle);
-
-			QVehicleImpl qVeh = new QVehicleImpl( vehicle );
-			Gbl.assertNotNull( qVeh );
-
-			qsim.addParkedVehicle( qVeh, agent.getCurrentLinkId() );
-			qsim.insertAgentIntoMobsim(agent);
-			log.warn( "just added vehicle with id=" + qVeh.getId() + " and agent with id=" + agent.getId() );
-		}
+//		for ( Plan vRoute : vehicleRoutes) {
+//
+//			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPerson());
+//			Gbl.assertNotNull( agent );
+//
+//			Vehicle vehicle;
+//			if( FreightControlerUtils.getVehicle( vRoute ) == null){
+//				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
+//				log.warn("vehicle for agent "+vRoute.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
+//			}
+//			else if( FreightControlerUtils.getVehicle( vRoute ).getType() == null){
+//				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
+//				log.warn("vehicleType for agent "+vRoute.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
+//			}
+//			else vehicle = FreightControlerUtils.getVehicle( vRoute );
+//			Gbl.assertNotNull(vehicle);
+//
+//			QVehicleImpl qVeh = new QVehicleImpl( vehicle );
+//			Gbl.assertNotNull( qVeh );
+//
+//			qsim.addParkedVehicle( qVeh, agent.getCurrentLinkId() );
+//			qsim.insertAgentIntoMobsim(agent);
+//			log.warn( "just added vehicle with id=" + qVeh.getId() + " and agent with id=" + agent.getId() );
+//		}
 	}
 
 }

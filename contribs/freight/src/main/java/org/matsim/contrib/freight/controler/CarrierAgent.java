@@ -240,7 +240,7 @@ class CarrierAgent
 		Gbl.assertNotNull(carrierScoringFunction);
 	}
 
-	public CarrierAgent( CarrierAgentTracker lspCarrierTracker, Carrier carrier ){
+	CarrierAgent( CarrierAgentTracker lspCarrierTracker, Carrier carrier ){
 		lspTracker = lspCarrierTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
@@ -349,6 +349,11 @@ class CarrierAgent
 		return id;
 	}
 
+	/**
+	 * {@link CarrierAgentTracker} is an event handler, and it passes events related to individual carriers (but only those) to them.  Here, they
+	 * are send back to the tracker.  yyyy remove this indirection.  The main (only) reason why this is necessary is that "activity" is not filled
+	 * in from the event itself, and one needs the agent to figure it out.
+	 */
 	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
 		if ( scoringFunction==null ) {
 			lspTracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);}

@@ -48,24 +48,26 @@ import org.matsim.vehicles.VehicleUtils;
  * this template use File | Settings | File Templates.
  * 
  */
- class FreightAgentSource implements AgentSource {
+ public final class FreightAgentSource implements AgentSource {
+	 // made public so that it can be used from LSP.  Still has a package-private constructor, thus ok.  kai, jul'22
+
 	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
 	private static final  Logger log = Logger.getLogger(FreightAgentSource.class);
 	private final CarrierAgentTracker tracker;
 
-	private Collection<MobsimAgent> mobSimAgents;
+	private final Collection<MobsimAgent> mobSimAgents;
 
-	private AgentFactory agentFactory;
+	private final AgentFactory agentFactory;
 
-	private QSim qsim;
+	private final QSim qsim;
 
 	@Inject
 	FreightAgentSource(CarrierAgentTracker tracker, AgentFactory agentFactory, QSim qsim) {
 		this.tracker = tracker;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
-		mobSimAgents = new ArrayList<MobsimAgent>();
+		mobSimAgents = new ArrayList<>();
 	}
 
 	@Override

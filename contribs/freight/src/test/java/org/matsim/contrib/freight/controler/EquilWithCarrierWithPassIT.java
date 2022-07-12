@@ -43,7 +43,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 public class EquilWithCarrierWithPassIT {
-	// "pass" stands for  "passengers" but means "persons".  Please rename if you feel like it, but you will also have to rename the test input
+	// "pass" stands for  "passengers" but means "persons".  Please rename if you feel like it, but you would also have to rename the test input
 	// directory.  kai, jul'22
 
 	private Controler controler;
