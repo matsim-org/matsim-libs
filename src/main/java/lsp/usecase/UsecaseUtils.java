@@ -80,7 +80,7 @@ public class UsecaseUtils {
 	}
 
 	public static void printResults(String outputDir, LSP lsp) {
-		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/" + lsp.getId().toString()+ "_schedules.txt" ) ){
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/" + lsp.getId().toString()+ "_schedules.tsv" ) ){
 			final String str0 = "LSP: " + lsp.getId();
 			System.out.println( str0 );
 			writer.write( str0 + "\n");
@@ -93,7 +93,7 @@ public class UsecaseUtils {
 				for( ShipmentPlanElement element : elementList ){
 					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
 					System.out.println( str2 );
-					writer.write(str2);
+					writer.write(str2 + "\n");
 				}
 				System.out.println();
 				writer.write("\n");
