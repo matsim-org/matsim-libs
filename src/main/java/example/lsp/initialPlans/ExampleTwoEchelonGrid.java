@@ -174,6 +174,20 @@ final class ExampleTwoEchelonGrid {
 		{
 			log.info( "Create lspPlan with Hub" );
 
+			Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+
+			//TODO: Funktioniert mit DistributionCarrier ... aber nicht mit main Carrier. --> Ansehen! --> Main benötigt eventuell vorher ein Depot?
+			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
+			LSPResource mainCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
+					.setCarrier(mainCarrier)
+					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
+					.build();
+
+			LogisticsSolutionElement mainCarrierLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticsSolutionElement.class))
+					.setResource(mainCarrierRessource)
+					.build();
+
 			//The scheduler for the first reloading point is created --> this will be the depot in this use case
 			LSPResourceScheduler hubScheduler = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance()
 					.setCapacityNeedFixed(10) //Time needed, fixed (for Scheduler)
@@ -185,7 +199,7 @@ final class ExampleTwoEchelonGrid {
 					.setTransshipmentHubScheduler( hubScheduler )
 					.build();
 
-			LogisticsSolutionElement hubElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "HubLSE", LogisticsSolutionElement.class ))
+			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "HubLSE", LogisticsSolutionElement.class ))
 					.setResource( hubResource )
 					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 
@@ -204,10 +218,12 @@ final class ExampleTwoEchelonGrid {
 
 			//Kettenbildung per hand, damit dann klar ist, wie das Scheduling ablaufen soll. TODO: Vielleicht bekommt man das noch eleganter hin.
 			// z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet werden: ".addSolutionElement(..)"
-			hubElement.connectWithNextElement(distributionCarrierElement);
+			mainCarrierLSE.connectWithNextElement(hubLSE);
+			hubLSE.connectWithNextElement(distributionCarrierElement);
 
 			LogisticsSolution solution_direct = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("hubSolution", LogisticsSolution.class))
-					.addSolutionElement(hubElement)
+					.addSolutionElement(mainCarrierLSE)
+					.addSolutionElement(hubLSE)
 					.addSolutionElement(distributionCarrierElement)
 					.build();
 
@@ -217,14 +233,17 @@ final class ExampleTwoEchelonGrid {
 		}
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan_direct)
+//				.setInitialPlan(lspPlan_direct)
+				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_direct)))
+				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_withHub))) //TODO: Hier müssen irgendwie die Ressourcen beider Pläne rein, oder?
 				.setSolutionScorer(new MyLSPScorer());
 
 
 		LSP lsp = lspBuilder.build();
-		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
+//		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
+		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
+
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
