@@ -201,10 +201,10 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	}
 
 	public static class PreplannedSchedules {
-		private final Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle;
+		public final Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle;
 		//TODO use (immutable)list instead of queue (queue assumes we modify this collection, but we should not - it's input data)
-		private final Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops;
-		private final Set<PreplannedRequest> unassignedRequests;
+		public final Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops;
+		public final Set<PreplannedRequest> unassignedRequests;
 
 		public PreplannedSchedules(Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle,
 				Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops,
@@ -217,14 +217,14 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 
 	// also input to the external optimiser
 	public static final class PreplannedRequest {
-		private final Id<Person> passengerId;
-		private final double earliestStartTime;
-		private final double latestStartTime;
-		private final double latestArrivalTime;
-		private final Id<Link> fromLinkId;
-		private final Id<Link> toLinkId;
+		public final Id<Person> passengerId;
+		public final double earliestStartTime;
+		public final double latestStartTime;
+		public final double latestArrivalTime;
+		public final Id<Link> fromLinkId;
+		public final Id<Link> toLinkId;
 
-		static PreplannedRequest createFromRequest(DrtRequest request) {
+		public static PreplannedRequest createFromRequest(DrtRequest request) {
 			return new PreplannedRequest(request.getPassengerId(), request.getEarliestStartTime(),
 					request.getLatestStartTime(), request.getLatestArrivalTime(), request.getFromLink().getId(),
 					request.getToLink().getId());
@@ -276,15 +276,15 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 
 	// sequence of preplanned tasks is the output from the external optimiser and the input to the drt simulation
 	public static final class PreplannedStop {
-		private final PreplannedRequest preplannedRequest;
-		private final boolean pickup;//pickup or dropoff
+		public final PreplannedRequest preplannedRequest;
+		public final boolean pickup;//pickup or dropoff
 
 		public PreplannedStop(PreplannedRequest preplannedRequest, boolean pickup) {
 			this.preplannedRequest = preplannedRequest;
 			this.pickup = pickup;
 		}
 
-		private Id<Link> getLinkId() {
+		public Id<Link> getLinkId() {
 			return pickup ? preplannedRequest.fromLinkId : preplannedRequest.toLinkId;
 		}
 	}
