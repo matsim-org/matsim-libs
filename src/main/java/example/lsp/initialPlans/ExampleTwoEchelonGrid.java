@@ -22,6 +22,8 @@ package example.lsp.initialPlans;
 
 import lsp.*;
 import lsp.controler.LSPModule;
+import lsp.replanning.LSPReplanner;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -38,11 +40,14 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 
@@ -165,9 +170,10 @@ final class ExampleTwoEchelonGrid {
 					.addSolutionElement(directCarrierElement)
 					.build();
 
+			final ShipmentAssigner singlesolutionShipmentAssigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 			lspPlan_direct = LSPUtils.createLSPPlan()
 					.addSolution(solution_direct)
-					.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+					.setAssigner(singlesolutionShipmentAssigner);
 		}
 
 		LSPPlan lspPlan_withHub;
@@ -227,22 +233,38 @@ final class ExampleTwoEchelonGrid {
 					.addSolutionElement(distributionCarrierElement)
 					.build();
 
+
 			lspPlan_withHub = LSPUtils.createLSPPlan()
 					.addSolution(solution_direct)
 					.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+
 		}
 
+		//Todo: Auch das ist wirr: Muss hier alle sommeln, damit man die dann im LSPBuilder dem SolutionSceduler mitgeben kann. Im Nachgang packt man dann aber erst den zweiten Plan dazu ... urgs KMT'Jul22
+		List<LSPPlan> lspPlans = new ArrayList<>();
+		lspPlans.add(lspPlan_withHub);
+		lspPlans.add(lspPlan_direct);
+
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-//				.setInitialPlan(lspPlan_direct)
-				.setInitialPlan(lspPlan_withHub)
+				.setInitialPlan(lspPlan_direct)
+//				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlan(lspPlan_withHub))) //TODO: Hier müssen irgendwie die Ressourcen beider Pläne rein, oder?
+				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //TODO: Hier müssen irgendwie die Ressourcen beider Pläne rein, oder?
 				.setSolutionScorer(new MyLSPScorer());
 
 
 		LSP lsp = lspBuilder.build();
-//		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
-		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
+		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
+//		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
+
+		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
+		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
+		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManager<>();
+		strategyManager.addStrategy(strategy,null, 1);
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(lsp);
+		replanner.setStrategyManager(strategyManager);
+		replanner.setEmbeddingContainer(lsp);
+		lsp.setReplanner(replanner);
 
 
 		log.info("create initial LSPShipments");
@@ -283,12 +305,14 @@ final class ExampleTwoEchelonGrid {
 
 	//TODO: This is maybe something that can go into a utils class ... KMT jul22
 
-	private static List<LSPResource> createResourcesListFromLSPPlan(LSPPlan lspPlanWithReloading) {
-		log.info("Collecting all LSPResources from the LSPPlan");
-		List<LSPResource> resourcesList = new ArrayList<>() ;			//TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
-		for (LogisticsSolution solution : lspPlanWithReloading.getSolutions()) {
-			for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
-				resourcesList.add(solutionElement.getResource());
+	private static List<LSPResource> createResourcesListFromLSPPlans(List<LSPPlan> lspPlans) {
+		log.info("Collecting all LSPResources from the LSPPlans");
+		List<LSPResource> resourcesList = new ArrayList<>();            //TODO: Mache daraus ein Set, damit jede Resource nur einmal drin ist? kmt Feb22
+		for (LSPPlan lspPlan : lspPlans) {
+			for (LogisticsSolution solution : lspPlan.getSolutions()) {
+				for (LogisticsSolutionElement solutionElement : solution.getSolutionElements()) {
+					resourcesList.add(solutionElement.getResource());
+				}
 			}
 		}
 		return resourcesList;
