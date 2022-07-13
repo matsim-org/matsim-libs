@@ -37,12 +37,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.controler.CarrierAgent.CarrierDriverAgent;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * This keeps track of all carrierAgents during simulation.

@@ -24,8 +24,9 @@ package org.matsim.contrib.freight.controler;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.vehicles.Vehicle;
 
-class FreightControlerUtils{
+final class FreightControlerUtils{
 	static final String CARRIER_VEHICLE = "carrierVehicle";
+	private FreightControlerUtils(){ } // do not instantiate
 	public static Vehicle getVehicle( Plan plan ) {
 		return (Vehicle) plan.getAttributes().getAttribute( CARRIER_VEHICLE );
 	}

@@ -85,6 +85,8 @@ import org.matsim.vehicles.VehicleUtils;
 			}
 			else vehicle = FreightControlerUtils.getVehicle( vRoute );
 //			qsim.createAndParkVehicleOnLink(vehicle, agent.getCurrentLinkId());
+
+			log.warn("inserting vehicleId=" + vehicle.getId() + " into mobsim.");
 			
 			QVehicle qVehicle = new QVehicleImpl( vehicle ) ;
 			qsim.addParkedVehicle( qVehicle, agent.getCurrentLinkId() );
