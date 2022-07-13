@@ -30,9 +30,9 @@ public final class RelaxedSubtourConstraint implements TripConstraint<int[]> {
 	}
 
 	@Override
-	public int[] getContext(EstimatorContext context, PlanModel model, Plan plan) {
+	public int[] getContext(EstimatorContext context, PlanModel model) {
 
-		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(plan);
+		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan());
 
 		// ids will contain unique identifier to which subtour a trip belongs.
 		int[] ids = new int[model.trips()];

@@ -97,7 +97,7 @@ public class CountChoices implements MATSimAppCommand, PersonAlgorithm {
 		if (subpopulation != null && !subpop.equals(subpopulation))
 			return;
 
-		PlanModel trips = new PlanModel(person.getSelectedPlan());
+		PlanModel trips = PlanModel.newInstance(person.getSelectedPlan());
 
 		List<String> usableModes = new ArrayList<>(modes);
 		if (!PersonUtils.canUseCar(person))
@@ -108,8 +108,8 @@ public class CountChoices implements MATSimAppCommand, PersonAlgorithm {
 
 		EstimatorContext context = new EstimatorContext(person, null);
 
-		int[] stContext = st.getContext(context, trips, person.getSelectedPlan());
-		RelaxedMassConservationConstraint.Context mcContext = mc.getContext(context, trips, person.getSelectedPlan());
+		int[] stContext = st.getContext(context, trips);
+		RelaxedMassConservationConstraint.Context mcContext = mc.getContext(context, trips);
 
 		int st_choices = 0;
 		int mc_choices = 0;

@@ -64,6 +64,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(BestChoiceGenerator.class);
 		bind(SingleTripChoicesGenerator.class);
 
+		bind(PlanModelService.class).in(Singleton.class);
+
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
 		}

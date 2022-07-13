@@ -30,110 +30,76 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 
 	@Inject
-	TopKChoicesGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
-		super(config, options);
+	TopKChoicesGenerator(InformedModeChoiceConfigGroup config) {
+		super(config);
 	}
 
-	public Collection<PlanCandidate> generate(Plan plan, boolean[] mask) {
-		return generate(plan, mask, config.getTopK(), 0).result;
+	public Collection<PlanCandidate> generate(PlanModel planModel, boolean[] mask) {
+		return generate(planModel, mask, config.getTopK(), 0);
 	}
 
 	/**
 	 * Generate k top choices.
 	 *
-	 * @param plan      plan
+	 * @param planModel plan
 	 * @param topK      use at most top k choices (for each combination)
 	 * @param threshold discard solutions that are worse than best solution
 	 */
-	public Context generate(Plan plan, boolean[] mask, int topK, double threshold) {
+	public Collection<PlanCandidate> generate(PlanModel planModel, boolean[] mask, int topK, double threshold) {
 
-		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
-
-		PlanModel planModel = new PlanModel(plan);
+		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
 		if (mask != null)
 			throw new UnsupportedOperationException("Mask not supported yet");
 
-		Map<String, List<Combination>> options = new IdentityHashMap<>();
-
-		Set<String> usableModes = new HashSet<>();
+		prepareModel(planModel, context);
 
 		// modes that need to be re-estimated with the full plan
-		Set<String> consolidateModes = new HashSet<>();
+		Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
 
-		for (String mode : config.getModes()) {
+		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
 
-			ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode);
-
-			List<Enum<?>> modeOptions = t.get(plan.getPerson());
-			if (modeOptions.stream().anyMatch(t::allowUsage))
-				usableModes.add(mode);
-
-			List<Combination> c = new ArrayList<>();
-
-			for (Enum<?> modeOption : modeOptions) {
-				TripEstimator<Enum<?>> te = (TripEstimator<Enum<?>>) tripEstimator.get(mode);
-
-				// Check if min estimate is needed
-				if (te != null && te.providesMinEstimate(context, mode, modeOption)) {
-
-					c.add(new Combination(mode, modeOption, planModel.trips(), true, false));
-					c.add(new Combination(mode, modeOption, planModel.trips(), true, true));
-
-					consolidateModes.add(mode);
-				} else {
-
-					c.add(new Combination(mode, modeOption, planModel.trips(), false, false));
-
-				}
-			}
-
-			options.put(mode, c);
-		}
-
-		router.routeModes(plan, planModel, usableModes);
-
-		calculateEstimates(context, planModel, options);
-
-		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel, plan);
-
-		return new Context(context, planModel, consolidateModes, options,
-				generateCandidate(context, planModel, topK, threshold, consolidateModes, constraints, Combination.combinations(options)));
+		return generateCandidate(context, planModel, topK, threshold, consolidateModes, constraints);
 	}
 
-
-	private List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel, Plan plan) {
+	private List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel) {
 
 		List<ConstraintHolder<?>> constraints = new ArrayList<>();
 		for (TripConstraint<?> c : this.constraints) {
 			constraints.add(new ConstraintHolder<>(
 					(TripConstraint<Object>) c,
-					c.getContext(context, planModel, plan)
+					c.getContext(context, planModel)
 			));
 		}
 
 		return constraints;
 	}
 
+	protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
+		if (!planModel.hasEstimates()) {
+
+			service.initEstimates(context, planModel);
+			router.routeModes(planModel, planModel.filterModes(ModeEstimate::isUsable));
+			service.calculateEstimates(context, planModel);
+		}
+	}
+
 
 	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, int topK, double threshold,
-	                                                    Set<String> consolidateModes, List<ConstraintHolder<?>> constraints,
-	                                                    List<List<Combination>> combinations) {
+	                                                    Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
 
 		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectOpenHashMap<>();
 
-		for (List<Combination> options : combinations) {
+		for (List<ModeEstimate> options : planModel.combinations()) {
 
 			search.clear();
 
-			for (Combination mode : options) {
-
-				ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode.getMode());
+			for (ModeEstimate mode : options) {
 
 				// check if a mode can be use at all
-				if (!t.allowUsage(mode.getOption()))
+				if (!mode.isUsable())
 					continue;
 
 				search.addEstimates(mode.getMode(), mode.getEstimates());
@@ -216,12 +182,12 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	@SuppressWarnings("StringEquality")
 	private double computePlanEstimate(EstimatorContext context, PlanModel planModel, String[] result,
 	                                   ReferenceSet<String> usedModes,
-	                                   Set<String> consolidateModes, Collection<Combination> options) {
+	                                   Set<String> consolidateModes, Collection<ModeEstimate> options) {
 
 		double estimate = 0;
 
 		// Add the fixed costs estimate if a mode has been used
-		for (Combination mode : options) {
+		for (ModeEstimate mode : options) {
 
 			FixedCostsEstimator<Enum<?>> f = (FixedCostsEstimator<Enum<?>>) fixedCosts.get(mode.getMode());
 
@@ -238,7 +204,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		for (String consolidateMode : consolidateModes) {
 			// search all options for the mode to consolidate
-			for (Combination mode : options) {
+			for (ModeEstimate mode : options) {
 				if (mode.getMode() == consolidateMode && usedModes.contains(consolidateMode)) {
 
 					TripEstimator<Enum<?>> f = (TripEstimator<Enum<?>>) tripEstimator.get(mode.getMode());
@@ -262,23 +228,23 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	/**
 	 * Compute candidates from predefined given modes.
 	 *
-	 * @param ctx   context that have been returned by {@link #generate(Plan, boolean[], int, double)}.
 	 * @param modes list of mode combinations to estimate
 	 * @return one candidate for each requested mode combination
 	 */
-	public List<PlanCandidate> generatePredefined(Context ctx, List<String[]> modes) {
+	public List<PlanCandidate> generatePredefined(PlanModel planModel, List<String[]> modes) {
 
 		List<PlanCandidate> candidates = new ArrayList<>();
 
-		Map<String, Combination> singleOptions = new HashMap<>();
+		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
+		prepareModel(planModel, context);
+
+		Map<String, ModeEstimate> singleOptions = new HashMap<>();
 
 		// reduce to single options that are usable
-		for (Map.Entry<String, List<Combination>> e : ctx.options.entrySet()) {
-			for (Combination o : e.getValue()) {
-				ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(o.getMode());
-
+		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
+			for (ModeEstimate o : e.getValue()) {
 				// check if a mode can be use at all
-				if (!t.allowUsage(o.getOption()))
+				if (!o.isUsable() || o.isMin())
 					continue;
 
 				singleOptions.put(e.getKey(), o);
@@ -286,11 +252,12 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			}
 		}
 
+
 		// Same Logic as the top k estimator
 		for (String[] result : modes) {
 
-			if (result.length != ctx.planModel.trips())
-				throw new IllegalArgumentException(String.format("Mode arrays must be same length as trips: %d != %d", result.length, ctx.planModel.trips()));
+			if (result.length != planModel.trips())
+				throw new IllegalArgumentException(String.format("Mode arrays must be same length as trips: %d != %d", result.length, planModel.trips()));
 
 			double estimate = 0;
 
@@ -304,7 +271,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 				String mode = result[i];
 
-				Combination opt = singleOptions.get(mode);
+				ModeEstimate opt = singleOptions.get(mode);
 				if (opt == null)
 					continue;
 
@@ -314,54 +281,19 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>(result);
 
-			estimate += computePlanEstimate(ctx.context, ctx.planModel, result, usedModes, ctx.consolidateModes, singleOptions.values());
+			Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
 
-			PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, ctx.planModel.trips()), estimate);
+			estimate += computePlanEstimate(context, planModel, result, usedModes, consolidateModes, singleOptions.values());
+
+			PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 
 			candidates.add(c);
 		}
 
-
 		return candidates;
 	}
 
-	/**
-	 * Context to be re-used for multiple estimations
-	 */
-	public static final class Context {
-
-		private final EstimatorContext context;
-		private final PlanModel planModel;
-		private final Set<String> consolidateModes;
-		private final Map<String, List<Combination>> options;
-		private final Collection<PlanCandidate> result;
-
-		public Context(EstimatorContext context, PlanModel planModel, Set<String> consolidateModes,
-		               Map<String, List<Combination>> options, Collection<PlanCandidate> result) {
-
-			this.context = context;
-			this.planModel = planModel;
-			this.consolidateModes = consolidateModes;
-			this.options = options;
-			this.result = result;
-		}
-
-
-		public Collection<PlanCandidate> getResult() {
-			return result;
-		}
-	}
-
-	private static final class ConstraintHolder<T> implements Predicate<String[]> {
-
-		public final TripConstraint<T> constraint;
-		public final T context;
-
-		private ConstraintHolder(TripConstraint<T> constraint, T context) {
-			this.constraint = constraint;
-			this.context = context;
-		}
-
+	private record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
 
 		@Override
 		public boolean test(String[] modes) {

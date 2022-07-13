@@ -61,7 +61,7 @@ public class RelaxedSubtourConstraintTest {
 
 		plan.addActivity(f.createActivityFromLinkId("home", Id.createLinkId(0)));
 
-		int[] context = constraint.getContext(new EstimatorContext(person, null), new PlanModel(TripStructureUtils.getTrips(plan)), plan);
+		int[] context = constraint.getContext(new EstimatorContext(person, null), PlanModel.newInstance(plan));
 
 		System.out.println(Arrays.toString(context));
 
@@ -90,7 +90,7 @@ public class RelaxedSubtourConstraintTest {
 
 		plan.addActivity(f.createActivityFromLinkId("leisure", Id.createLinkId(2)));
 
-		int[] context = constraint.getContext(new EstimatorContext(person, null), new PlanModel(TripStructureUtils.getTrips(plan)), plan);
+		int[] context = constraint.getContext(new EstimatorContext(person, null), PlanModel.newInstance(plan));
 
 		System.out.println(Arrays.toString(context));
 
@@ -119,7 +119,7 @@ public class RelaxedSubtourConstraintTest {
 
 		plan.addActivity(f.createActivityFromLinkId("leisure", Id.createLinkId(2)));
 
-		int[] context = constraint.getContext(new EstimatorContext(person, null), new PlanModel(TripStructureUtils.getTrips(plan)), plan);
+		int[] context = constraint.getContext(new EstimatorContext(person, null), PlanModel.newInstance(plan));
 
 		System.out.println(Arrays.toString(context));
 

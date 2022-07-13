@@ -38,7 +38,7 @@ public final class EstimateRouter {
 	/**
 	 * Route all modes that are relevant with all possible options.
 	 */
-	public void routeModes(Plan plan, PlanModel model, Collection<String> modes) {
+	public void routeModes(PlanModel model, Collection<String> modes) {
 
 		double[] startTimes = new double[model.trips()];
 
@@ -47,7 +47,7 @@ public final class EstimateRouter {
 		for (int i = 0; i < model.trips() - 1; i++) {
 			TripStructureUtils.Trip oldTrip = model.getTrip(i);
 
-			startTimes[i + 1] = advanceTimetracker(timeTracker, oldTrip, plan);
+			startTimes[i + 1] = advanceTimetracker(timeTracker, oldTrip, model);
 		}
 
 		for (String mode : modes) {
@@ -85,7 +85,7 @@ public final class EstimateRouter {
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 						mode, from, to,
 						oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
-						plan.getPerson(),
+						model.getPerson(),
 						oldTrip.getTripAttributes()
 				);
 
@@ -115,13 +115,13 @@ public final class EstimateRouter {
 	/**
 	 * Route a single trip with certain index.
 	 */
-	public void routeSingleTrip(Plan plan, PlanModel model, Collection<String> modes, int idx) {
+	public void routeSingleTrip(PlanModel model, Collection<String> modes, int idx) {
 
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
 		for (int i = 0; i < idx; i++) {
 			TripStructureUtils.Trip oldTrip = model.getTrip(i);
-			advanceTimetracker(timeTracker, oldTrip, plan);
+			advanceTimetracker(timeTracker, oldTrip, model);
 		}
 
 		TripStructureUtils.Trip oldTrip = model.getTrip(idx);
@@ -140,7 +140,7 @@ public final class EstimateRouter {
 			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 					mode, from, to,
 					oldTrip.getOriginActivity().getEndTime().orElse(timeTracker.getTime().seconds()),
-					plan.getPerson(),
+					model.getPerson(),
 					oldTrip.getTripAttributes()
 			);
 
@@ -165,7 +165,7 @@ public final class EstimateRouter {
 	/**
 	 * Use time information of existing routes or compute routes if necessary.
 	 */
-	private double advanceTimetracker(TimeTracker timeTracker, TripStructureUtils.Trip oldTrip, Plan plan) {
+	private double advanceTimetracker(TimeTracker timeTracker, TripStructureUtils.Trip oldTrip, PlanModel plan) {
 		timeTracker.addActivity(oldTrip.getOriginActivity());
 
 		List<Leg> oldLegs = oldTrip.getLegsOnly();
@@ -183,7 +183,7 @@ public final class EstimateRouter {
 		return timeTracker.getTime().seconds();
 	}
 
-	private List<? extends PlanElement> routeTrip(TripStructureUtils.Trip trip, Plan plan, String routingMode, TimeTracker timeTracker) {
+	private List<? extends PlanElement> routeTrip(TripStructureUtils.Trip trip, PlanModel plan, String routingMode, TimeTracker timeTracker) {
 		return tripRouter.calcRoute( //
 				routingMode, //
 				FacilitiesUtils.toFacility(trip.getOriginActivity(), facilities), //

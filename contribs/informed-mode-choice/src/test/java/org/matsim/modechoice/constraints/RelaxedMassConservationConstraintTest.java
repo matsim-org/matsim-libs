@@ -58,7 +58,7 @@ public class RelaxedMassConservationConstraintTest {
 
 		plan.addActivity(f.createActivityFromLinkId("home", Id.createLinkId(0)));
 
-		RelaxedMassConservationConstraint.Context context = constraint.getContext(new EstimatorContext(person, null), new PlanModel(TripStructureUtils.getTrips(plan)), plan);
+		RelaxedMassConservationConstraint.Context context = constraint.getContext(new EstimatorContext(person, null), PlanModel.newInstance(plan));
 
 		System.out.println(context);
 
@@ -90,7 +90,7 @@ public class RelaxedMassConservationConstraintTest {
 
 		plan.addActivity(f.createActivityFromLinkId("leisure", Id.createLinkId(2)));
 
-		RelaxedMassConservationConstraint.Context context = constraint.getContext(new EstimatorContext(person, null), new PlanModel(TripStructureUtils.getTrips(plan)), plan);
+		RelaxedMassConservationConstraint.Context context = constraint.getContext(new EstimatorContext(person, null), PlanModel.newInstance(plan));
 
 		System.out.println(context);
 
@@ -119,7 +119,7 @@ public class RelaxedMassConservationConstraintTest {
 
 		plan.addActivity(f.createActivityFromLinkId("leisure", Id.createLinkId(2)));
 
-		RelaxedMassConservationConstraint.Context context = constraint.getContext(new EstimatorContext(person, null), new PlanModel(TripStructureUtils.getTrips(plan)), plan);
+		RelaxedMassConservationConstraint.Context context = constraint.getContext(new EstimatorContext(person, null), PlanModel.newInstance(plan));
 
 		System.out.println(context);
 

@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
@@ -64,14 +64,14 @@ public class TopKMinMaxTest {
 	@Before
 	public void setUp() throws Exception {
 
-		Map<String, ModeOptions<?>> options = Map.of(TransportMode.car, new ModeOptions.AlwaysAvailable(), TransportMode.walk, new ModeOptions.AlwaysAvailable());
+		TestModule testModule = new TestModule();
 
-		InformedModeChoiceConfigGroup config = new InformedModeChoiceConfigGroup();
+		InformedModeChoiceConfigGroup config = ConfigUtils.addOrGetModule(testModule.config, InformedModeChoiceConfigGroup.class);
 		config.setModes(List.of(TransportMode.car, TransportMode.walk));
 
-		generator = new TopKChoicesGenerator(config, options);
+		generator = new TopKChoicesGenerator(config);
 
-		injector = Guice.createInjector(new TestModule());
+		injector = Guice.createInjector(testModule);
 
 		injector.injectMembers(generator);
 	}
@@ -81,7 +81,9 @@ public class TopKMinMaxTest {
 
 		Person person = create();
 
-		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
+		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+
+		Collection<PlanCandidate> candidates = generator.generate(model);
 
 		Iterator<PlanCandidate> it = candidates.iterator();
 
@@ -143,6 +145,12 @@ public class TopKMinMaxTest {
 
 	private class TestModule extends AbstractModule {
 
+		private final Config config;
+
+		public TestModule() {
+			config = TestScenario.loadConfig(utils);
+		}
+
 		@Override
 		protected void configure() {
 
@@ -172,6 +180,10 @@ public class TopKMinMaxTest {
 					FacilitiesUtils.createActivityFacilities(),
 					TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes)));
 
+			MapBinder<String, ModeOptions<?>> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
+			optionBinder.addBinding(TransportMode.car).toInstance(new ModeOptions.AlwaysAvailable());
+			optionBinder.addBinding(TransportMode.walk).toInstance(new ModeOptions.AlwaysAvailable());
+
 
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
@@ -195,12 +207,10 @@ public class TopKMinMaxTest {
 
 			tripBinder.addBinding(TransportMode.car).toInstance(new CarTripEstimator());
 
-			Config config = TestScenario.loadConfig(utils);
-
 			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters("person"), Map.of(), config.scenario());
 
 			bind(ScoringParametersForPerson.class).toInstance(person -> scoring.build());
-
+			bind(InformedModeChoiceConfigGroup.class).toInstance(ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class));
 
 		}
 	}

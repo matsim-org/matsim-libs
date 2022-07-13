@@ -1,37 +1,63 @@
 package org.matsim.modechoice;
 
+import com.google.common.collect.Lists;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * A coarse model of the daily plan containing the trips and legs for using each mode.
  */
-public final class PlanModel implements Iterable<TripStructureUtils.Trip> {
+public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPerson {
 
 	private final TripStructureUtils.Trip[] trips;
+	private final Person person;
 
 	/**
-	 * Routed legs.
+	 * Routed trips for each mode and all legs.
 	 */
 	private final Map<String, List<Leg>[]> legs;
 
-	public PlanModel(Plan plan) {
-		this.trips = TripStructureUtils.getTrips(plan).toArray(new TripStructureUtils.Trip[0]);
-		this.legs = new IdentityHashMap<>();
+	/**
+	 * Estimates for all modes and all available {@link ModeOptions}.
+	 */
+	private final Map<String, List<ModeEstimate>> estimates;
+
+	/**
+	 * Original plan.
+	 */
+	private final Plan plan;
+
+	/**
+	 * Create a new plan model instance from an existing plan.
+	 */
+	public static PlanModel newInstance(Plan plan) {
+		return new PlanModel(plan);
 	}
 
-	public PlanModel(List<TripStructureUtils.Trip> trips) {
-		this.trips = trips.toArray(new TripStructureUtils.Trip[0]);
-		this.legs = new IdentityHashMap<>();
+	private PlanModel(Plan plan) {
+		this.person = plan.getPerson();
+		this.trips = TripStructureUtils.getTrips(plan).toArray(new TripStructureUtils.Trip[0]);
+		this.plan = plan;
+		this.legs = new HashMap<>();
+		this.estimates = new HashMap<>();
+	}
+
+	@Override
+	public Person getPerson() {
+		return person;
+	}
+
+	public Plan getPlan() {
+		return plan;
 	}
 
 	public int trips() {
@@ -76,7 +102,58 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip> {
 	}
 
 	void setLegs(String mode, List<Leg>[] legs) {
-		this.legs.put(mode.intern(), legs);
+		mode = mode.intern();
+
+		List<Leg>[] existing = this.legs.putIfAbsent(mode, legs);
+
+		if (existing != null) {
+
+			if (legs.length != existing.length)
+				throw new IllegalArgumentException(String.format("Existing legs have different length than the newly provided: %d vs. %d", existing.length, legs.length));
+
+			// Copy existing non-null legs
+			for (int i = 0; i < legs.length; i++) {
+				List<Leg> l = legs[i];
+				if (l != null)
+					existing[i] = l;
+			}
+		}
+	}
+
+	void putEstimate(String mode, List<ModeEstimate> options) {
+		this.estimates.put(mode, options);
+	}
+
+	/**
+	 * Stored estimates.
+	 */
+	public Map<String, List<ModeEstimate>> getEstimates() {
+		return estimates;
+	}
+
+	public Set<String> filterModes(Predicate<? super ModeEstimate> predicate) {
+		Set<String> modes = new HashSet<>();
+		for (Map.Entry<String, List<ModeEstimate>> e : estimates.entrySet()) {
+			if (e.getValue().stream().anyMatch(predicate))
+				modes.add(e.getKey());
+		}
+
+		return modes;
+	}
+
+	/**
+	 * Check io estimates are present. Otherwise call {@link PlanModelService}
+	 */
+	public boolean hasEstimates() {
+		return !this.estimates.isEmpty();
+	}
+
+	/**
+	 * Return all possible choice combinations.
+	 */
+	public List<List<ModeEstimate>> combinations() {
+		List<List<ModeEstimate>> collect = new ArrayList<>(estimates.values());
+		return Lists.cartesianProduct(collect);
 	}
 
 	/**

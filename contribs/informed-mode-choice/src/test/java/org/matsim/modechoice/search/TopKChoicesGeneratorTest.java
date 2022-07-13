@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.ScenarioTest;
 import org.matsim.modechoice.TestScenario;
 
@@ -25,7 +26,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
-		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
+		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
 
 		assertThat(candidates)
 				.hasSize(5)
@@ -34,7 +35,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 
 		person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
-		candidates = generator.generate(person.getSelectedPlan());
+		candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
 		assertThat(candidates)
 				.hasSize(5)
 				.first()
@@ -49,7 +50,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("10390"));
 
-		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan());
+		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
 
 		assertThat(candidates)
 				.contains(new PlanCandidate(new String[]{"car"}, -5.96));
@@ -72,13 +73,13 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 			Plan car = p.createCopyOfSelectedPlanAndMakeSelected();
 			setLegs(car, "car");
-			Collection<PlanCandidate> carCandidates = generator.generate(car);
+			Collection<PlanCandidate> carCandidates = generator.generate(PlanModel.newInstance(car));
 
 			p.setSelectedPlan(orig);
 
 			Plan walk = p.createCopyOfSelectedPlanAndMakeSelected();
 			setLegs(walk, "walk");
-			Collection<PlanCandidate> walkCandidates = generator.generate(walk);
+			Collection<PlanCandidate> walkCandidates = generator.generate(PlanModel.newInstance(walk));
 
 			assertThat(carCandidates)
 					.isEqualTo(walkCandidates);
@@ -92,15 +93,17 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
-		TopKChoicesGenerator.Context ctx = generator.generate(person.getSelectedPlan(), null, 6, 0);
+		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-		PlanCandidate first = ctx.getResult().iterator().next();
+		Collection<PlanCandidate> result = generator.generate(model, null, 6, 0);
+
+		PlanCandidate first = result.iterator().next();
 
 		assertThat(first.getPlanType()).isEqualTo("car-car-car-car");
 		assertThat(first.getUtility()).isEqualTo(-6.186329864145045);
 
 
-		List<PlanCandidate> candidates = generator.generatePredefined(ctx, List.of(
+		List<PlanCandidate> candidates = generator.generatePredefined(model, List.of(
 				new String[]{"car", "car", "car", "car"},
 				new String[]{"walk", "walk", "walk", "walk"},
 				new String[]{"walk", "bike", null, "car"}

@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.modechoice.CandidateGenerator;
 import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 
 import java.util.Collection;
 
@@ -23,7 +24,7 @@ public class SelectFromGeneratorStrategy implements PlanAlgorithm {
 	@Override
 	public void run(Plan plan) {
 
-		Collection<PlanCandidate> candidates = generator.generate(plan);
+		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(plan));
 		PlanCandidate candidate = selector.select(candidates);
 
 		if (candidate != null) {

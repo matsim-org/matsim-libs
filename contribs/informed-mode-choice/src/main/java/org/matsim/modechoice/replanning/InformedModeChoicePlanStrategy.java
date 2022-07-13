@@ -29,6 +29,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import javax.inject.Provider;
@@ -320,21 +321,23 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 			ThreadContext tc = threadContexts[assignment.get()];
 
-			TopKChoicesGenerator.Context ctx = tc.generator.generate(best, null, config.getTopK(), 0);
+			PlanModel model = PlanModel.newInstance(best);
 
-			for (PlanCandidate c : ctx.getResult()) {
+			Collection<PlanCandidate> results = tc.generator.generate(model, null, config.getTopK(), 0);
+
+			for (PlanCandidate c : results) {
 				missing.remove(c.getPlanType());
 			}
 
 			// TODO: should replace old plans with same type
 			// TODO: should remove and not regenerate unpromising plan types
 
-			applyCandidates(person, ctx.getResult());
+			applyCandidates(person, results);
 
 			// Estimate missing scores for already exising plans
 			if (!missing.isEmpty()) {
 
-				List<PlanCandidate> predefined = tc.generator.generatePredefined(ctx, missing.stream().map(PlanCandidate::createModeArray).collect(Collectors.toList()));
+				List<PlanCandidate> predefined = tc.generator.generatePredefined(model, missing.stream().map(PlanCandidate::createModeArray).collect(Collectors.toList()));
 				applyCandidates(person, predefined);
 			}
 

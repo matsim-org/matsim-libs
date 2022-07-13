@@ -15,8 +15,8 @@ public interface CandidateGenerator {
 	/**
 	 * Generate plan candidates, ordered by their natural comparator.
 	 */
-	default Collection<PlanCandidate> generate(Plan plan) {
-		return generate(plan, null);
+	default Collection<PlanCandidate> generate(PlanModel planModel) {
+		return generate(planModel, null);
 	}
 
 
@@ -24,5 +24,5 @@ public interface CandidateGenerator {
 	 * Generate plan candidates, ordered by their natural comparator.
 	 * @param mask if not null, only include these trips with a true entry at their respective index.
 	 */
-	Collection<PlanCandidate> generate(Plan plan, @Nullable boolean[] mask);
+	Collection<PlanCandidate> generate(PlanModel planModel, @Nullable boolean[] mask);
 }

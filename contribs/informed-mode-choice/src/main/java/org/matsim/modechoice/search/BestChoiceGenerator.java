@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 
 import java.util.*;
 
@@ -18,14 +19,14 @@ public class BestChoiceGenerator extends TopKChoicesGenerator {
 	// and a dedicated implementation might be more efficient
 
 	@Inject
-	BestChoiceGenerator(InformedModeChoiceConfigGroup config, Map<String, ModeOptions<?>> options) {
-		super(config, options);
+	BestChoiceGenerator(InformedModeChoiceConfigGroup config) {
+		super(config);
 	}
 
 	@Override
-	public Collection<PlanCandidate> generate(Plan plan) {
+	public Collection<PlanCandidate> generate(PlanModel plan) {
 
-		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, null, 10, 0).getResult());
+		List<PlanCandidate> candidates = new ArrayList<>(generate(plan, null, 10, 0));
 
 		if (candidates.isEmpty())
 			return Set.of();

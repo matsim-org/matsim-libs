@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.ScenarioTest;
 import org.matsim.modechoice.TestScenario;
 
@@ -21,7 +22,9 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
-		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan(), new boolean[]{true, false, false, false});
+		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+
+		Collection<PlanCandidate> candidates = generator.generate(model, new boolean[]{true, false, false, false});
 
 		assertThat(candidates)
 				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
@@ -39,7 +42,9 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
 
-		Collection<PlanCandidate> candidates = generator.generate(person.getSelectedPlan(), new boolean[]{false, false, true, false, false, false, false});
+		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+
+		Collection<PlanCandidate> candidates = generator.generate(model, new boolean[]{false, false, true, false, false, false, false});
 
 
 		assertThat(candidates)

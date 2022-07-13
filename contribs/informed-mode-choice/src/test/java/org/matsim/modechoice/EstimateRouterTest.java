@@ -48,9 +48,9 @@ public class EstimateRouterTest {
 		Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 
 		Plan plan = persons.get(TestScenario.Agents.get(1)).getSelectedPlan();
-		PlanModel planModel = new PlanModel(plan);
+		PlanModel planModel = PlanModel.newInstance(plan);
 
-		router.routeModes(plan, planModel, group.getModes());
+		router.routeModes(planModel, group.getModes());
 
 		assertThat(planModel)
 				.isNotNull();

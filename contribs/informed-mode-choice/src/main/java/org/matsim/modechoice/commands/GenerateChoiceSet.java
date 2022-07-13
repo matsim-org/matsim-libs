@@ -161,14 +161,15 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		double threshold = this.threshold;
 
+		PlanModel model = PlanModel.newInstance(plan);
+
 		// the absolute threshold is scaled to distance
 		if (this.threshold > 0) {
-			PlanModel model = new PlanModel(plan);
 			threshold = model.distance() * this.threshold;
 		}
 
 		TopKChoicesGenerator generator = generatorCache.get();
-		Collection<PlanCandidate> candidates = generator.generate(plan, null, topK, threshold).getResult();
+		Collection<PlanCandidate> candidates = generator.generate(model, null, topK, threshold);
 
 		// remove all other plans
 		Set<Plan> plans = new HashSet<>(person.getPlans());
