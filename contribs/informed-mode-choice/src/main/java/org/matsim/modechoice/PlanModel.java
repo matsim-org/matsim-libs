@@ -19,7 +19,13 @@ import java.util.function.Predicate;
 public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPerson {
 
 	private final TripStructureUtils.Trip[] trips;
+
 	private final Person person;
+
+	/**
+	 * Used modes of the input plan.
+	 */
+	private final String[] currentModes;
 
 	/**
 	 * Routed trips for each mode and all legs.
@@ -49,6 +55,12 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		this.plan = plan;
 		this.legs = new HashMap<>();
 		this.estimates = new HashMap<>();
+		this.currentModes = new String[trips.length];
+
+		for (int i = 0; i < trips.length; i++) {
+			String routingMode = TripStructureUtils.getRoutingMode(trips[i].getLegsOnly().get(0)).intern();
+			currentModes[i] = routingMode;
+		}
 	}
 
 	@Override
@@ -69,6 +81,28 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 */
 	public int modes() {
 		return legs.size();
+	}
+
+	/**
+	 * The current used modes of the original plan.
+	 */
+	public String[] getCurrentModes() {
+		return Arrays.copyOf(currentModes, currentModes.length);
+	}
+
+	/**
+	 * Update the current modes from an updated plan.
+	 */
+	public void setCurrentModes(Plan plan) {
+		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
+
+		if (trips.size() != this.trips.length)
+			throw new IllegalArgumentException("The given plan has a different number of trips");
+
+		for (int i = 0; i < this.trips.length; i++) {
+			String routingMode = TripStructureUtils.getRoutingMode(trips.get(i).getLegsOnly().get(0)).intern();
+			currentModes[i] = routingMode;
+		}
 	}
 
 	/**

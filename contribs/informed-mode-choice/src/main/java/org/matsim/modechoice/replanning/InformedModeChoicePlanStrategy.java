@@ -323,7 +323,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 			PlanModel model = PlanModel.newInstance(best);
 
-			Collection<PlanCandidate> results = tc.generator.generate(model, null, config.getTopK(), 0);
+			Collection<PlanCandidate> results = tc.generator.generate(model, null, null, config.getTopK(), 0);
 
 			for (PlanCandidate c : results) {
 				missing.remove(c.getPlanType());

@@ -5,14 +5,11 @@ import it.unimi.dsi.fastutil.doubles.DoubleIterator;
 import it.unimi.dsi.fastutil.objects.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.modechoice.*;
-import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -34,8 +31,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		super(config);
 	}
 
-	public Collection<PlanCandidate> generate(PlanModel planModel, boolean[] mask) {
-		return generate(planModel, mask, config.getTopK(), 0);
+	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
+		return generate(planModel, consideredModes, mask, config.getTopK(), 0);
 	}
 
 	/**
@@ -45,7 +42,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	 * @param topK      use at most top k choices (for each combination)
 	 * @param threshold discard solutions that are worse than best solution
 	 */
-	public Collection<PlanCandidate> generate(PlanModel planModel, boolean[] mask, int topK, double threshold) {
+	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask, int topK, double threshold) {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
@@ -59,20 +56,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
 
-		return generateCandidate(context, planModel, topK, threshold, consolidateModes, constraints);
-	}
-
-	private List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel) {
-
-		List<ConstraintHolder<?>> constraints = new ArrayList<>();
-		for (TripConstraint<?> c : this.constraints) {
-			constraints.add(new ConstraintHolder<>(
-					(TripConstraint<Object>) c,
-					c.getContext(context, planModel)
-			));
-		}
-
-		return constraints;
+		return generateCandidate(context, planModel, topK, threshold, consideredModes, consolidateModes, constraints);
 	}
 
 	protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
@@ -86,7 +70,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 
 	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, int topK, double threshold,
-	                                                    Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
+	                                                    Set<String> consideredModes, Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
 
@@ -99,7 +83,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			for (ModeEstimate mode : options) {
 
 				// check if a mode can be use at all
-				if (!mode.isUsable())
+				if (!mode.isUsable() && (consideredModes == null || consideredModes.contains(mode.getMode())))
 					continue;
 
 				search.addEstimates(mode.getMode(), mode.getEstimates());
@@ -291,14 +275,6 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		}
 
 		return candidates;
-	}
-
-	private record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
-
-		@Override
-		public boolean test(String[] modes) {
-			return constraint.isValid(context, modes);
-		}
 	}
 
 }

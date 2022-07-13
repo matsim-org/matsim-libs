@@ -1,13 +1,15 @@
 package org.matsim.modechoice.search;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.modechoice.*;
+import org.matsim.modechoice.EstimatorContext;
+import org.matsim.modechoice.InformedModeChoiceConfigGroup;
+import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.constraints.RelaxedMassConservationConstraint;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -24,7 +26,7 @@ public class SubtourChoiceGenerator extends AbstractCandidateGenerator {
 	}
 
 	@Override
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable boolean[] mask) {
+	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, @Nullable boolean[] mask) {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 

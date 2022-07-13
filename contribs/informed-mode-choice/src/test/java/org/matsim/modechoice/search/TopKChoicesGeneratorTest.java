@@ -95,7 +95,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-		Collection<PlanCandidate> result = generator.generate(model, null, 6, 0);
+		Collection<PlanCandidate> result = generator.generate(model, null, null, 6, 0);
 
 		PlanCandidate first = result.iterator().next();
 

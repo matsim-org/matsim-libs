@@ -9,6 +9,7 @@ import org.matsim.modechoice.ScenarioTest;
 import org.matsim.modechoice.TestScenario;
 
 import java.util.Collection;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,7 +25,7 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-		Collection<PlanCandidate> candidates = generator.generate(model, new boolean[]{true, false, false, false});
+		Collection<PlanCandidate> candidates = generator.generate(model, null, new boolean[]{true, false, false, false});
 
 		assertThat(candidates)
 				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
@@ -44,11 +45,27 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-		Collection<PlanCandidate> candidates = generator.generate(model, new boolean[]{false, false, true, false, false, false, false});
-
+		Collection<PlanCandidate> candidates = generator.generate(model, null, new boolean[]{false, false, true, false, false, false, false});
 
 		assertThat(candidates)
 				.noneMatch(c -> c.getMode(2).equals(TransportMode.pt));
+
+	}
+
+	@Test
+	public void subset() {
+
+		SingleTripChoicesGenerator generator = injector.getInstance(SingleTripChoicesGenerator.class);
+
+		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
+
+		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+
+		Collection<PlanCandidate> candidates = generator.generate(model, Set.of(TransportMode.car, TransportMode.walk), new boolean[]{true, false, false, false});
+
+		assertThat(candidates)
+				.hasSize(2)
+				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
 
 	}
 }

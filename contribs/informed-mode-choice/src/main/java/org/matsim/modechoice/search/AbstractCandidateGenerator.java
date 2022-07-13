@@ -1,18 +1,17 @@
 package org.matsim.modechoice.search;
 
 import com.google.inject.Inject;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
-import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Holds fields required for injection.
@@ -41,6 +40,27 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 
 	protected AbstractCandidateGenerator(InformedModeChoiceConfigGroup config) {
 		this.config = config;
+	}
+
+	protected final List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel) {
+
+		List<TopKChoicesGenerator.ConstraintHolder<?>> constraints = new ArrayList<>();
+		for (TripConstraint<?> c : this.constraints) {
+			constraints.add(new TopKChoicesGenerator.ConstraintHolder<>(
+					(TripConstraint<Object>) c,
+					c.getContext(context, planModel)
+			));
+		}
+
+		return constraints;
+	}
+
+	protected record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
+
+		@Override
+		public boolean test(String[] modes) {
+			return constraint.isValid(context, modes);
+		}
 	}
 
 }

@@ -19,7 +19,7 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 	@Override
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable boolean[] mask) {
+	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask) {
 
 		if (mask == null)
 			throw new IllegalArgumentException("Mask must be provided");
@@ -39,7 +39,9 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 			service.initEstimates(context, planModel);
 		}
 
-		router.routeSingleTrip(planModel, planModel.filterModes(ModeEstimate::isUsable), idx);
+		Predicate<ModeEstimate> considerMode = m -> consideredModes == null || consideredModes.contains(m.getMode());
+
+		router.routeSingleTrip(planModel, planModel.filterModes(considerMode.and(ModeEstimate::isUsable)), idx);
 
 		service.calculateEstimates(context, planModel);
 
@@ -51,6 +53,7 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 			Optional<ModeEstimate> opt = value.stream()
 					.filter(ModeEstimate::isUsable)
 					.filter(Predicate.not(ModeEstimate::isMin))
+					.filter(considerMode)
 					.findFirst();
 
 			if (opt.isEmpty())

@@ -70,7 +70,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 			// TODO: only select trips that are allowed to change
 
-			Collection<PlanCandidate> candidates = generator.generate(model, mask);
+			Collection<PlanCandidate> candidates = generator.generate(model, null, mask);
 
 			// Remove options that are the same as the current mode
 			candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
