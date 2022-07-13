@@ -217,7 +217,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 
 	// also input to the external optimiser
 	public static final class PreplannedRequest {
-		private final Id<Person> passengerId;
+		private final Id<Person> passengerId; // TODO maybe change it to request ID? If we use passenger ID, each person can only have one trip
 		private final double earliestStartTime;
 		private final double latestStartTime;
 		private final double latestArrivalTime;
