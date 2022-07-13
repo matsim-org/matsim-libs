@@ -42,6 +42,7 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 		this.config = config;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected final List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel) {
 
 		List<TopKChoicesGenerator.ConstraintHolder<?>> constraints = new ArrayList<>();

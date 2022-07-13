@@ -113,6 +113,13 @@ public class TopKMinMaxTest {
 
 	}
 
+	@Test
+	public void subset() {
+
+		// TODO: test minmax on subset
+
+	}
+
 	private static Person create() {
 
 		PopulationFactory f = PopulationUtils.getFactory();

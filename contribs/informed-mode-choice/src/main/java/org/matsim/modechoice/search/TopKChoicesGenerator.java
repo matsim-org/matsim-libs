@@ -46,8 +46,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
-		if (mask != null)
-			throw new UnsupportedOperationException("Mask not supported yet");
+		if (mask.length != planModel.trips())
+			throw new IllegalArgumentException("Mask must be same length as trips.");
 
 		prepareModel(planModel, context);
 
@@ -56,7 +56,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
 
-		return generateCandidate(context, planModel, topK, threshold, consideredModes, consolidateModes, constraints);
+		return generateCandidate(context, planModel, mask, topK, threshold, consideredModes, consolidateModes, constraints);
 	}
 
 	protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
@@ -69,7 +69,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 
-	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, int topK, double threshold,
+	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double threshold,
 	                                                    Set<String> consideredModes, Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
@@ -83,14 +83,20 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			for (ModeEstimate mode : options) {
 
 				// check if a mode can be use at all
-				if (!mode.isUsable() && (consideredModes == null || consideredModes.contains(mode.getMode())))
+				if (!mode.isUsable() || (consideredModes != null && !consideredModes.contains(mode.getMode())))
 					continue;
 
-				search.addEstimates(mode.getMode(), mode.getEstimates());
+				search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
 			}
 
 			// results will be updated here
-			String[] result = new String[planModel.trips()];
+			String[] result = planModel.getCurrentModes();
+
+			// There could be unknown modes which need to be removed first
+			for (int i = 0; i < result.length; i++) {
+				if (!config.getModes().contains(result[i]))
+					result[i] = null;
+			}
 
 			// store which modes have been used for one solution
 			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
@@ -113,6 +119,9 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 					if (!c.test(result))
 						continue outer;
 				}
+
+				// TODO: add masked estimates?
+
 
 				Collections.addAll(usedModes, result);
 

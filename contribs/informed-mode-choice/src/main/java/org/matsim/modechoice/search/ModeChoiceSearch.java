@@ -87,13 +87,18 @@ final class ModeChoiceSearch {
 	 * Copy estimates into the internal map.
 	 */
 	public void addEstimates(String mode, double[] values) {
+		addEstimates(mode, values, null);
+	}
+
+	public void addEstimates(String mode, double[] values, boolean[] mask) {
 
 		byte idx = mapping.computeIfAbsent(mode, k -> (byte) mapping.size());
 		inv.putIfAbsent(idx, mode);
 
 		// estimates needs to be accessed by each trip index first and then by mode
 		for (int i = 0; i < values.length; i++) {
-			estimates[i][idx] = values[i];
+			if (mask == null || mask[i])
+				estimates[i][idx] = values[i];
 		}
 	}
 
@@ -137,7 +142,10 @@ final class ModeChoiceSearch {
 	 */
 	private void convert(byte[] path, String[] modes) {
 		for (int i = 0; i < path.length; i++) {
-			modes[i] = inv.getOrDefault(path[i], null);
+			String m = inv.get(path[i]);
+			// Pre-defined entries are not touched
+			if (m != null)
+				modes[i] = m;
 		}
 	}
 
@@ -235,15 +243,7 @@ final class ModeChoiceSearch {
 		}
 	}
 
-	private static final class Entry implements Comparable<Entry> {
-
-		private final byte[] modes;
-		private final double deviation;
-
-		private Entry(byte[] modes, double deviation) {
-			this.modes = modes;
-			this.deviation = deviation;
-		}
+	private record Entry(byte[] modes, double deviation) implements Comparable<Entry> {
 
 		@Override
 		public int compareTo(Entry o) {

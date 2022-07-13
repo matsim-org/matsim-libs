@@ -47,6 +47,8 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		Collection<PlanCandidate> candidates = generator.generate(model, null, new boolean[]{false, false, true, false, false, false, false});
 
+		System.out.println(candidates);
+
 		assertThat(candidates)
 				.noneMatch(c -> c.getMode(2).equals(TransportMode.pt));
 

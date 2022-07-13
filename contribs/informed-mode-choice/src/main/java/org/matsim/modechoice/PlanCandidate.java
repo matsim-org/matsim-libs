@@ -42,6 +42,12 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 		return modes[i];
 	}
 
+	/**
+	 * Return a copy of this candidate's modes.
+	 */
+	public String[] getModes() {
+		return Arrays.copyOf(modes, modes.length);
+	}
 
 	/**
 	 * Return features vector with number of occurrences per mode.
