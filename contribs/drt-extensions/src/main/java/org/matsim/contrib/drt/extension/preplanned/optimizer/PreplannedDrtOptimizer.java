@@ -25,7 +25,6 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -55,8 +54,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -65,7 +62,7 @@ import com.google.common.base.Preconditions;
 public class PreplannedDrtOptimizer implements DrtOptimizer {
 	private final PreplannedSchedules preplannedSchedules;
 
-	private final Map<PreplannedRequest, DrtRequest> openRequests = new HashMap<>();
+	private final Map<PreplannedRequestKey, DrtRequest> openRequests = new HashMap<>();
 
 	private final String mode;
 	private final Network network;
@@ -111,13 +108,13 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		var drtRequest = (DrtRequest)request;
-		var preplannedRequest = PreplannedRequest.createFromRequest(drtRequest);
-		openRequests.put(preplannedRequest, drtRequest);
+		var preplannedRequest = createFromRequest(drtRequest);
+		openRequests.put(preplannedRequest.key, drtRequest);
 
-		var vehicleId = preplannedSchedules.preplannedRequestToVehicle.get(preplannedRequest);
+		var vehicleId = preplannedSchedules.preplannedRequestToVehicle.get(preplannedRequest.key);
 
 		if (vehicleId == null) {
-			Preconditions.checkState(preplannedSchedules.unassignedRequests.contains(preplannedRequest),
+			Preconditions.checkState(preplannedSchedules.unassignedRequests.containsKey(preplannedRequest.key),
 					"Pre-planned request (%s) not assigned to any vehicle and not marked as unassigned.",
 					preplannedRequest);
 			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), mode, request.getId(),
@@ -181,11 +178,11 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 
 			var stopTask = taskFactory.createStopTask(vehicle, currentTime, currentTime + stopDuration, currentLink);
 			if (nextStop.pickup) {
-				var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest),
+				var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
 						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
 				stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
 			} else {
-				var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest),
+				var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
 						"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
 				stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
 			}
@@ -200,88 +197,31 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 	}
 
-	public static class PreplannedSchedules {
-		private final Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle;
-		//TODO use (immutable)list instead of queue (queue assumes we modify this collection, but we should not - it's input data)
-		private final Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops;
-		private final Set<PreplannedRequest> unassignedRequests;
+	//TODO use (immutable)list instead of queue of preplanned stops (queue assumes we modify this collection, but we should not - it's input data)
+	public record PreplannedSchedules(Map<PreplannedRequestKey, Id<DvrpVehicle>> preplannedRequestToVehicle,
+									  Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops,
+									  Map<PreplannedRequestKey, PreplannedRequest> unassignedRequests) {
+	}
 
-		public PreplannedSchedules(Map<PreplannedRequest, Id<DvrpVehicle>> preplannedRequestToVehicle,
-				Map<Id<DvrpVehicle>, Queue<PreplannedStop>> vehicleToPreplannedStops,
-				Set<PreplannedRequest> unassignedRequests) {
-			this.preplannedRequestToVehicle = preplannedRequestToVehicle;
-			this.vehicleToPreplannedStops = vehicleToPreplannedStops;
-			this.unassignedRequests = unassignedRequests;
-		}
+	public record PreplannedRequestKey(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId) {
 	}
 
 	// also input to the external optimiser
-	public static final class PreplannedRequest {
-		private final Id<Person> passengerId;
-		private final double earliestStartTime;
-		private final double latestStartTime;
-		private final double latestArrivalTime;
-		private final Id<Link> fromLinkId;
-		private final Id<Link> toLinkId;
+	public record PreplannedRequest(PreplannedRequestKey key, double earliestStartTime, double latestStartTime,
+									double latestArrivalTime) {
+	}
 
-		static PreplannedRequest createFromRequest(DrtRequest request) {
-			return new PreplannedRequest(request.getPassengerId(), request.getEarliestStartTime(),
-					request.getLatestStartTime(), request.getLatestArrivalTime(), request.getFromLink().getId(),
-					request.getToLink().getId());
-		}
-
-		public PreplannedRequest(Id<Person> passengerId, double earliestStartTime, double latestStartTime,
-				double latestArrivalTime, Id<Link> fromLinkId, Id<Link> toLinkId) {
-			this.passengerId = passengerId;
-			this.earliestStartTime = earliestStartTime;
-			this.latestStartTime = latestStartTime;
-			this.latestArrivalTime = latestArrivalTime;
-			this.fromLinkId = fromLinkId;
-			this.toLinkId = toLinkId;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (!(o instanceof PreplannedRequest))
-				return false;
-			PreplannedRequest that = (PreplannedRequest)o;
-			return Objects.equal(passengerId, that.passengerId)
-					&& Objects.equal(fromLinkId, that.fromLinkId)
-					&& Objects.equal(toLinkId, that.toLinkId);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashCode(passengerId, fromLinkId, toLinkId);
-		}
-
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(this)
-					.add("passengerId", passengerId)
-					.add("earliestStartTime", earliestStartTime)
-					.add("latestStartTime", latestStartTime)
-					.add("latestArrivalTime", latestArrivalTime)
-					.add("fromLinkId", fromLinkId)
-					.add("toLinkId", toLinkId)
-					.toString();
-		}
+	static PreplannedRequest createFromRequest(DrtRequest request) {
+		return new PreplannedRequest(new PreplannedRequestKey(request.getPassengerId(), request.getFromLink().getId(),
+				request.getToLink().getId()), request.getEarliestStartTime(), request.getLatestStartTime(),
+				request.getLatestArrivalTime());
 	}
 
 	// sequence of preplanned tasks is the output from the external optimiser and the input to the drt simulation
-	public static final class PreplannedStop {
-		private final PreplannedRequest preplannedRequest;
-		private final boolean pickup;//pickup or dropoff
-
-		public PreplannedStop(PreplannedRequest preplannedRequest, boolean pickup) {
-			this.preplannedRequest = preplannedRequest;
-			this.pickup = pickup;
-		}
-
+	public record PreplannedStop(PreplannedRequest preplannedRequest, boolean pickup //pickup or dropoff
+	) {
 		private Id<Link> getLinkId() {
-			return pickup ? preplannedRequest.fromLinkId : preplannedRequest.toLinkId;
+			return pickup ? preplannedRequest.key.fromLinkId : preplannedRequest.key.toLinkId;
 		}
 	}
 }
