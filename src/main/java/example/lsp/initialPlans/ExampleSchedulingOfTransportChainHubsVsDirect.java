@@ -24,7 +24,6 @@ import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
 import org.apache.log4j.Logger;
@@ -46,11 +45,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.*;
 
 /**	The LSP have to possibilities to send the goods from the first depot to the recipients:
@@ -145,7 +141,7 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		printResults(config.controler().getOutputDirectory() , lsp);
+		UsecaseUtils.printResults(config.controler().getOutputDirectory() , lsp);
 
 		log.info("Done.");
 
@@ -499,27 +495,6 @@ import java.util.*;
 			shipmentList.add(shipment);
 		}
 		return shipmentList;
-	}
-
-	private static void printResults(String outputDir, LSP lsp) {
-		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/schedules.txt" ) ){
-			for( LSPShipment shipment : lsp.getShipments() ){
-				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
-				elementList.sort( ShipmentUtils.createShipmentPlanElementComparator() );
-				final String str1 = "Shipment: " + shipment.getId();
-				System.out.println( str1 );
-				writer.write( str1 + "\n");
-				for( ShipmentPlanElement element : elementList ){
-					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println( str2 );
-					writer.write(str2);
-				}
-				System.out.println();
-				writer.write("\n");
-			}
-		} catch( IOException e ){
-			e.printStackTrace();
-		}
 	}
 
 	private static class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {

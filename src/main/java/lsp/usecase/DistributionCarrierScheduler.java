@@ -103,7 +103,10 @@ import org.matsim.vehicles.VehicleType;
 		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 		
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
-			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
+			//TODO KMT: Verstehe es nur mäßig, was er hier mit den Fahrzeugtypen macht. Er nimmt einfach das erste/nächste(?) und schaut ob es da rein passt... Aber weas ist, wenn es mehrer gibt???
+			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
+//					(carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next()).getType();
+					//.getVehicleTypes().iterator().next();  //Nutzen wir eingetlich nicht mehr in freight contrib -> vehTypes aus den Vehicles holen.
 			if((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getSize();
@@ -149,7 +152,7 @@ import org.matsim.vehicles.VehicleType;
 	
 	private void routeCarrier(Carrier carrier){
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, adapter.getNetwork());
-	    NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), carrier.getCarrierCapabilities().getVehicleTypes());
+	    NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
 	    NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 	    vrpBuilder.setRoutingCost(netbasedTransportcosts);
 	    VehicleRoutingProblem vrp = vrpBuilder.build();
@@ -164,8 +167,8 @@ import org.matsim.vehicles.VehicleType;
         NetworkRouter.routePlan(plan, netbasedTransportcosts);
         carrier.setSelectedPlan(plan);
 	}
-	
-	
+
+
 	@Override protected void updateShipments() {
 		for( ShipmentWithTime tuple: shipments) {
 			updateSchedule(tuple);
@@ -280,13 +283,13 @@ import org.matsim.vehicles.VehicleType;
 	private Carrier createAuxiliaryCarrier( ArrayList<ShipmentWithTime> shipmentsInCurrentTour, double startTime ){
 		Carrier auxiliaryCarrier = CarrierUtils.createCarrier( carrier.getId() );
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
-		final VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
+		final VehicleType vehicleType = carrierVehicle.getType();
 
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLocation(), vehicleType);
 	    vBuilder.setEarliestStart(startTime);
 	    vBuilder.setLatestEnd(24*60*60);
 	    CarrierVehicle cv = vBuilder.build();
-	    auxiliaryCarrier.getCarrierCapabilities().getVehicleTypes().add(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
+//	    auxiliaryCarrier.getCarrierCapabilities().getVehicleTypes().add(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
 	    auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 	    auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
 	    

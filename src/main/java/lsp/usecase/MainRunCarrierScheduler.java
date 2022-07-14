@@ -102,7 +102,7 @@ import org.matsim.vehicles.VehicleType;
 		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
-			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
+			VehicleType vehicleType = UsecaseUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getSize();
@@ -130,7 +130,7 @@ import org.matsim.vehicles.VehicleType;
 	
 	private CarrierPlan createPlan(Carrier carrier, List<ShipmentWithTime> tuples ){
 		
-		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), adapter.getCarrier().getCarrierCapabilities().getVehicleTypes());
+		NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), UsecaseUtils.getVehicleTypeCollection(adapter.getCarrier()));
 		NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 		Collection<ScheduledTour> tours = new ArrayList<>();
 		
