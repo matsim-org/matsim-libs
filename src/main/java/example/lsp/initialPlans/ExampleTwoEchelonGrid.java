@@ -43,6 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -246,19 +247,20 @@ final class ExampleTwoEchelonGrid {
 		lspPlans.add(lspPlan_direct);
 
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(lspPlan_direct)
-//				.setInitialPlan(lspPlan_withHub)
+//				.setInitialPlan(lspPlan_direct)
+				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
-				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //TODO: Hier müssen irgendwie die Ressourcen beider Pläne rein, oder?
+				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
 				.setSolutionScorer(new MyLSPScorer());
 
 
 		LSP lsp = lspBuilder.build();
-		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
-//		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
+//		lsp.addPlan(lspPlan_withHub); //add the second Plan to the lsp
+		lsp.addPlan(lspPlan_direct); //add the second Plan to the lsp
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
-		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
+//		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
+		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
 		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManager<>();
 		strategyManager.addStrategy(strategy,null, 1);
 		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(lsp);
