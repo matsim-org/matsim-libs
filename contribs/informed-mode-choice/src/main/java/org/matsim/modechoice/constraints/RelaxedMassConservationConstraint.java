@@ -25,17 +25,19 @@ import java.util.stream.Collectors;
 public final class RelaxedMassConservationConstraint implements TripConstraint<RelaxedMassConservationConstraint.Context> {
 
 	private final ReferenceSet<String> chainBasedModes;
+	private final double coordDistance;
 
 	@Inject
 	public RelaxedMassConservationConstraint(SubtourModeChoiceConfigGroup config) {
 		chainBasedModes = new ReferenceArraySet<>();
 		chainBasedModes.addAll(Arrays.stream(config.getChainBasedModes()).map(String::intern).collect(Collectors.toSet()));
+		coordDistance = config.getCoordDistance();
 	}
 
 	@Override
 	public Context getContext(EstimatorContext context, PlanModel model) {
 
-		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan());
+		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan(), coordDistance);
 
 		Object2IntMap<Object> facilities = new Object2IntArrayMap<>();
 

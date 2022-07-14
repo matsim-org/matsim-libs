@@ -22,17 +22,18 @@ import java.util.Collection;
 public final class RelaxedSubtourConstraint implements TripConstraint<int[]> {
 
 	private final ReferenceSet<String> chainBasedModes;
-
+	private final double coordDistance;
 	@Inject
 	public RelaxedSubtourConstraint(SubtourModeChoiceConfigGroup config) {
 		chainBasedModes = new ReferenceArraySet<>();
 		chainBasedModes.addAll(Arrays.asList(config.getChainBasedModes()));
+		coordDistance = config.getCoordDistance();
 	}
 
 	@Override
 	public int[] getContext(EstimatorContext context, PlanModel model) {
 
-		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan());
+		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan(), coordDistance);
 
 		// ids will contain unique identifier to which subtour a trip belongs.
 		int[] ids = new int[model.trips()];
