@@ -76,7 +76,11 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectOpenHashMap<>();
 
-		for (List<ModeEstimate> options : planModel.combinations()) {
+		int skipped = 0;
+		List<List<ModeEstimate>> combinations = planModel.combinations();
+
+		comb:
+		for (List<ModeEstimate> options : combinations) {
 
 			search.clear();
 
@@ -96,6 +100,37 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			for (int i = 0; i < result.length; i++) {
 				if (!config.getModes().contains(result[i]))
 					result[i] = null;
+
+				if (mask != null && !mask[i] && result[i] != null) {
+
+					// If the predefined mode contain any non-usable mode, this combination is skipped
+					// There should be at least one combination where the mode is usable, if not the input violates the configuration
+					for (ModeEstimate option : options) {
+						if (option.getMode().equals(result[i]) && !option.isUsable()) {
+							skipped++;
+							continue comb;
+						}
+
+					}
+				}
+			}
+
+			// Estimation of already existing modes that were predetermined
+			// the search will not add them, so they need to be calculated here
+			double preDeterminedEstimate = 0;
+			if (mask != null) {
+
+				for (int i = 0; i < mask.length; i++) {
+
+					// only select the unmasked modes
+					if (mask[i] || result[i] == null)
+						continue;
+
+					for (ModeEstimate option : options) {
+						if (option.getMode().equals(result[i]))
+							preDeterminedEstimate += option.getEstimates()[i];
+					}
+				}
 			}
 
 			// store which modes have been used for one solution
@@ -108,7 +143,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 			outer:
 			while (it.hasNext() && k < topK) {
-				double estimate = it.nextDouble();
+				double estimate = preDeterminedEstimate + it.nextDouble();
 
 				if (n++ > MAX_ITER) {
 					log.warn("Maximum number of iterations reached for {}", context.person.getId());
@@ -119,8 +154,6 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 					if (!c.test(result))
 						continue outer;
 				}
-
-				// TODO: add masked estimates?
 
 
 				Collections.addAll(usedModes, result);
@@ -150,6 +183,9 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				k++;
 			}
 		}
+
+		if (skipped == combinations.size())
+			throw new IllegalStateException("Received an input with predetermined modes, which are not usable for this agent: " + planModel.getPerson());
 
 		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
 

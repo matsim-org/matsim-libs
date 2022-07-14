@@ -116,7 +116,23 @@ public class TopKMinMaxTest {
 	@Test
 	public void subset() {
 
-		// TODO: test minmax on subset
+		Person person = create();
+
+		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+
+		Collection<PlanCandidate> candidates = generator.generate(model, null, new boolean[]{true, false});
+
+		assertThat(candidates.size()).isEqualTo(2);
+
+		assertThat(candidates).first()
+				.isEqualTo(new PlanCandidate(new String[]{"walk", "walk"}, Double.NaN))
+				.extracting(PlanCandidate::getUtility).asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+				.isCloseTo(-1, Offset.offset(0d));
+
+		assertThat(candidates).last()
+				.isEqualTo(new PlanCandidate(new String[]{"car", "walk"}, Double.NaN))
+				.extracting(PlanCandidate::getUtility).asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+				.isCloseTo(-3, Offset.offset(0d));
 
 	}
 
