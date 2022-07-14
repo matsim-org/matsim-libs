@@ -208,7 +208,7 @@ public final class RunChessboard {
 
         private final CarrierVehicleTypes types;
 
-        public MyCarrierPlanStrategyManagerFactory(CarrierVehicleTypes types) {
+        MyCarrierPlanStrategyManagerFactory(CarrierVehicleTypes types) {
             this.types = types;
         }
 

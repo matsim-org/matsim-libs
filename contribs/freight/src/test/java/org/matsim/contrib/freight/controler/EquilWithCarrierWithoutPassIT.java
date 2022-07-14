@@ -21,79 +21,41 @@
 package org.matsim.contrib.freight.controler;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-
-import static org.matsim.contrib.freight.controler.EquilWithCarrierWithPassIT.addDummyVehicleType;
 
 public class EquilWithCarrierWithoutPassIT {
+	// "pass" stands for  "passengers" but means "persons".  Please rename if you feel like it, but you will also have to rename the test input
+	// directory.  kai, jul'22
+
+	private Controler controler;
 	
-	Controler controler;
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	private FreightConfigGroup freightConfigGroup;
+	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Before
-	public void setUp() throws Exception{
-		String NETWORK_FILENAME = testUtils.getClassInputDirectory() + "network.xml";
-		Config config = new Config();
-		config.addCoreModules();
-		
-		ActivityParams workParams = new ActivityParams("w");
-		workParams.setTypicalDuration(60 * 60 * 8);
-		config.planCalcScore().addActivityParams(workParams);
-		ActivityParams homeParams = new ActivityParams("h");
-		homeParams.setTypicalDuration(16 * 60 * 60);
-		config.planCalcScore().addActivityParams(homeParams);
-		config.global().setCoordinateSystem("EPSG:32632");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(2);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.controler().setWritePlansInterval(1);
-		config.controler().setCreateGraphs(false);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile(NETWORK_FILENAME);
-
-		freightConfigGroup = new FreightConfigGroup();
-		config.addModule(freightConfigGroup);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
-		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
-
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
-		new CarrierPlanXmlReader(carriers, carrierVehicleTypes ).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-		addDummyVehicleType( carriers, "default") ;
-
+	public void setUp() {
+		Config config = EquilWithCarrierWithPassIT.commonConfig( testUtils );
+		Scenario scenario = EquilWithCarrierWithPassIT.commonScenario( config, testUtils );
 		controler = new Controler(scenario);
-
 	}
 
 	@Test
 	public void testMobsimWithCarrierRunsWithoutException() {
-
+		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -105,8 +67,40 @@ public class EquilWithCarrierWithoutPassIT {
 		controler.run();
 	}
 
+	@Test(expected = IllegalStateException.class )
+	public void testWithoutCarrierRoutes() {
+		Config config = EquilWithCarrierWithPassIT.commonConfig( testUtils );
+		Scenario scenario = EquilWithCarrierWithPassIT.commonScenario( config, testUtils );
+
+		// set the routes to null:
+		for( Carrier carrier : FreightUtils.getCarriers( scenario ).getCarriers().values() ){
+			for( ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours() ){
+				for( Tour.TourElement tourElement : tour.getTour().getTourElements() ){
+					if ( tourElement instanceof Tour.Leg ) {
+						((Tour.Leg) tourElement).setRoute( null );
+					}
+				}
+			}
+		}
+
+		controler = new Controler(scenario);
+		controler.addOverridingModule(new CarrierModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
+
+		// this fails in CarrierAgent#createDriverPlans(...).  Could be made pass there, but then does not seem to drive on network.  Would
+		// need carrier equivalent to PersonPrepareForSim.  Could then adapt this test accordingly. kai, jul'22
+		controler.run();
+	}
+
 	@Test
 	public void testScoringInMeters(){
+		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -118,14 +112,16 @@ public class EquilWithCarrierWithoutPassIT {
 		controler.run();
 
 		Carrier carrier1 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
-		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore().doubleValue(), 0.0);
+		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
 
 		Carrier carrier2 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore().doubleValue(), 0.0);
+		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 	}
 
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
+		setUp();
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );
 		if ( false ){
 			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
 		} else{
@@ -151,6 +147,8 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWTimeWindowEnforcement(){
+		setUp();
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );
 		if ( true ){
 			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
 		} else{
@@ -177,6 +175,8 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
+		setUp();
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );
 		if ( true ){
 			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
 		} else{

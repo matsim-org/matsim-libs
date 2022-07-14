@@ -30,11 +30,7 @@ public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyM
 
     static class MyTravelCosts implements TravelDisutility {
 
-        private TravelTime travelTime;
-
-        private double cost_per_m = 1.0 / 1000.0;
-
-        private double cost_per_s = 50.0 / (60.0 * 60.0);
+        private final TravelTime travelTime;
 
         public MyTravelCosts(TravelTime travelTime) {
             super();
@@ -42,8 +38,7 @@ public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyM
         }
 
         @Override
-        public double getLinkTravelDisutility(final Link link,
-                                              final double time, final Person person, final Vehicle vehicle) {
+        public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
             return disutility(link.getLength(),  travelTime.getLinkTravelTime(link, time, null, null));
         }
 
@@ -53,6 +48,8 @@ public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyM
         }
 
         private double disutility(double distance, double time) {
+            double cost_per_m = 1.0 / 1000.0;
+            double cost_per_s = 50.0 / (60.0 * 60.0);
             return distance * cost_per_m + time * cost_per_s;
         }
     }
@@ -62,8 +59,7 @@ public class StrategyManagerFactoryForTests implements Provider<CarrierStrategyM
 
         final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(network, new MyTravelCosts(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 
-        GenericPlanStrategyImpl<CarrierPlan, Carrier> planStrat_reRoutePlan =
-                new GenericPlanStrategyImpl<CarrierPlan, Carrier>(new BestPlanSelector<CarrierPlan, Carrier>());
+        GenericPlanStrategyImpl<CarrierPlan, Carrier> planStrat_reRoutePlan = new GenericPlanStrategyImpl<>( new BestPlanSelector<>() );
         planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, network, travelTimes.get(TransportMode.car)));
 
         CarrierStrategyManager stratManager = new CarrierStrategyManagerImpl();

@@ -307,7 +307,11 @@ public class Tour {
 		private Leg(Leg leg) {
 			this.expTransportTime = leg.getExpectedTransportTime();
 			this.departureTime = leg.getExpectedDepartureTime();
-			this.route = leg.getRoute().clone();
+			if ( leg.getRoute() == null ) {
+				this.route = null ;
+			} else{
+				this.route = leg.getRoute().clone();
+			}
 		}
 
 		public Route getRoute() {
