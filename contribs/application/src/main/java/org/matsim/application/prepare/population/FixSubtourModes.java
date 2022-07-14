@@ -45,6 +45,9 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--mass-conservation", description = "Whether to check for the mass conservation of the whole plan", defaultValue = "true", negatable = true)
 	private boolean massConservation;
 
+	@CommandLine.Option(names = "--coord-dist", description = "Use coordinate distance for subtours if greater 0", defaultValue = "0")
+	private double coordDist;
+
 	private final SplittableRandom rnd = new SplittableRandom();
 	private ChooseRandomLegModeForSubtour strategy = null;
 
@@ -110,7 +113,7 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 		for (Plan plan : plans) {
 
 			try {
-				Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(plan);
+				Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(plan, coordDist);
 				for (TripStructureUtils.Subtour st : subtours) {
 
 					if (fixSubtour(person, st))
@@ -125,7 +128,7 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 
 				}
 			} catch (Exception e) {
-				log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e.getMessage());
+				log.warn("Exception occurred when handling person {}: {}. Whole plan will be set to walk.", person.getId(), e);
 
 				for (Leg leg : TripStructureUtils.getLegs(plan)) {
 					leg.setRoute(null);
@@ -134,6 +137,8 @@ public class FixSubtourModes implements MATSimAppCommand, PersonAlgorithm {
 				}
 
 				fixed++;
+
+				throw e;
 			}
 		}
 

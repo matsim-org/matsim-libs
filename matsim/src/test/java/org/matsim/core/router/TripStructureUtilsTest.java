@@ -20,13 +20,11 @@
 package org.matsim.core.router;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -454,12 +452,14 @@ public class TripStructureUtilsTest {
 		}
 	}
 
+
 	@Test( expected=NullPointerException.class )
 	public void testNPEWhenLocationNullInSubtourAnalysis() {
 		// this may sound surprising, but for a long time the algorithm
 		// was perfectly fine with that if assertions were disabled...
 
 		final Plan plan = populationFactory.createPlan();
+
 		// link ids are null
 		plan.addActivity(
 				populationFactory.createActivityFromCoord(
@@ -472,6 +472,37 @@ public class TripStructureUtilsTest {
 						new Coord((double) 0, (double) 0)) );
 
 		TripStructureUtils.getSubtours( plan );
+	}
+
+	@Test
+	public void testSubtourCoords() {
+
+		final Plan plan = populationFactory.createPlan();
+
+		// link ids are null
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord(0,  0)) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 50, 50)) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 10, 10)) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(populationFactory.createActivityFromCoord("type", new Coord( 0, 0)) );
+
+		Collection<TripStructureUtils.Subtour> st = TripStructureUtils.getSubtours(plan, 14);
+
+		st.forEach(System.out::println);
+
+		System.out.println("---");
+
+		assert st.size() == 1;
+
+		// distance between 10,10 and 0,0 is sqrt(200), above this threshold there will be one more subtour
+		st = TripStructureUtils.getSubtours(plan, 15);
+
+		st.forEach(System.out::println);
+
+		assert st.size() == 2;
+
 	}
 
 	@Test
