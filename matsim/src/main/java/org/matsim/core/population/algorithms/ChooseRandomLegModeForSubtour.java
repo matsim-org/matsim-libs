@@ -247,7 +247,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			final List<Trip> trips,
 			final Collection<String> permissibleModesForThisPerson) {
 
-		final List<Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan));
+		final List<Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan, coordDist));
 		final ArrayList<Candidate> choiceSet = new ArrayList<>();
 
 		// there is no subtour containing all trips, so it will be added
