@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -155,7 +156,7 @@ class CarrierAgent
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			FreightControlerUtils.putVehicle( plan, vehicle );
+			FreightUtils.putVehicle( plan, vehicle );
 			routes.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
 		}
