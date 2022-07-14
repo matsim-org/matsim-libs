@@ -22,9 +22,9 @@ public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends Has
 	 * @param permute Permute which agents are selected at which iteration.
 	 *                This requires a sufficiently large number of agents (> 10.000) or the amount of agents forced to innovate each iteration may deviate from the mean.
 	 */
-	public ForceInnovationStrategyChooser(int iter, boolean permute) {
+	public ForceInnovationStrategyChooser(int iter, Permute permute) {
 		this.iter = iter;
-		this.permute = permute;
+		this.permute = permute == Permute.yes;
 	}
 
 	/**
@@ -75,6 +75,11 @@ public class ForceInnovationStrategyChooser<PL extends BasicPlan, AG extends Has
 		}
 		return null;
 
+	}
+
+	public enum Permute {
+		yes,
+		no;
 	}
 
 }
