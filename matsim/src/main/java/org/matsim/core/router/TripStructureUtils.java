@@ -23,12 +23,14 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -167,7 +169,11 @@ public final class TripStructureUtils {
 	}
 
 	public static Collection<Subtour> getSubtours( final Plan plan) {
-		return getSubtours( plan.getPlanElements() );
+		return getSubtours( plan.getPlanElements(), 0 );
+	}
+
+	public static Collection<Subtour> getSubtours( final Plan plan, double coordDistance) {
+		return getSubtours( plan.getPlanElements(), coordDistance );
 	}
 
 	/**
@@ -195,11 +201,13 @@ public final class TripStructureUtils {
 	 * (that is, if the origin of a trip is not the destination of the preceding
 	 * trip), an exception will be thrown.
 	 *
+	 * @param coordDistance if larger 0, also consider coordinates to be at same location if smaller than distance
+	 *
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
-	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements) {
-		return getSubtours(planElements, TripStructureUtils::isStageActivityType );
+	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements, double coordDistance) {
+		return getSubtours(planElements, TripStructureUtils::isStageActivityType, coordDistance );
 	}
 
 	/**
@@ -215,7 +223,7 @@ public final class TripStructureUtils {
 	// I think now that we should actually keep this.  kai, jan'20
 	@Deprecated
 	public static Collection<Subtour> getSubtours( final Plan plan, final Predicate<String> isStageActivity) {
-		return getSubtours( plan.getPlanElements(), isStageActivity );
+		return getSubtours( plan.getPlanElements(), isStageActivity, 0);
 	}
 
 	// for contrib socnetsim only
@@ -223,7 +231,7 @@ public final class TripStructureUtils {
 	@Deprecated
 	public static Collection<Subtour> getSubtours(
 			final List<? extends PlanElement> planElements,
-			final Predicate<String> isStageActivity ) {
+			final Predicate<String> isStageActivity, double coordDistance) {
 		final List<Subtour> subtours = new ArrayList<>();
 
 		Object destinationId = null;
@@ -238,7 +246,7 @@ public final class TripStructureUtils {
 			//use facilities if available
 			if (trip.getOriginActivity().getFacilityId() != null) {
 				originId = trip.getOriginActivity().getFacilityId();
-			} else if (trip.getOriginActivity().getCoord() != null) {
+			} else if (coordDistance > 0 && trip.getOriginActivity().getCoord() != null) {
 				originId = trip.getOriginActivity().getCoord();
 			} else {
 				originId = trip.getOriginActivity().getLinkId();
@@ -255,7 +263,7 @@ public final class TripStructureUtils {
 
 			if (trip.getDestinationActivity().getFacilityId() != null) {
 				destinationId = trip.getDestinationActivity().getFacilityId();
-			} else if (trip.getDestinationActivity().getCoord() != null) {
+			} else if (coordDistance > 0 && trip.getDestinationActivity().getCoord() != null) {
 				destinationId = trip.getDestinationActivity().getCoord();
 			} else {
 				destinationId = trip.getDestinationActivity().getLinkId();
@@ -268,9 +276,25 @@ public final class TripStructureUtils {
 
 			originIds.add( originId );
 
-			if (originIds.contains( destinationId )) {
+			int lastIdx = originIds.lastIndexOf(destinationId);
+
+			// fuzzy lookup for last idx based on coordinates
+			if (coordDistance > 0 && destinationId instanceof Coord destinationCoord) {
+				for (int i = originIds.size() - 1; i >= 0; i--) {
+
+					Object cmp = originIds.get(i);
+					if (cmp instanceof Coord cmpCoord) {
+						if (CoordUtils.calcEuclideanDistance(destinationCoord, cmpCoord) <= coordDistance) {
+							lastIdx = i;
+							break;
+						}
+					}
+				}
+			}
+
+			if (lastIdx > -1) {
 				// end of a subtour
-				final int subtourStartIndex = originIds.lastIndexOf( destinationId );
+				final int subtourStartIndex = lastIdx;
 				final int subtourEndIndex = originIds.size();
 
 				final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
