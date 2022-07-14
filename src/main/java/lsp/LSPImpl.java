@@ -78,6 +78,7 @@ import lsp.shipment.LSPShipment;
 				}
 			}
 		}
+		plan.setLSP(this);
 		return plans.add(plan);
 	}
 

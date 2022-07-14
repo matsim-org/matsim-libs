@@ -112,7 +112,7 @@ import lsp.LSPResourceScheduler;
 	
 	private void routeCarrier(){
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, adapter.getNetwork());
-	    NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), carrier.getCarrierCapabilities().getVehicleTypes());
+	    NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(adapter.getNetwork(), UsecaseUtils.getVehicleTypeCollection(carrier));
 	    NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
 	    vrpBuilder.setRoutingCost(netbasedTransportcosts);
 	    VehicleRoutingProblem vrp = vrpBuilder.build();
