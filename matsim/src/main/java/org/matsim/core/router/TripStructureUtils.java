@@ -200,6 +200,10 @@ public final class TripStructureUtils {
 	 * in case of successive activities not being located at the same location
 	 * (that is, if the origin of a trip is not the destination of the preceding
 	 * trip), an exception will be thrown.
+	 * <br>
+	 * Note: We (VSP) are not sure what this code does exactly. The correct definition
+	 * of what a subtour is in MATSim needs to be found!
+	 * Theresa, VSP mode choice seminar in jul'22
 	 *
 	 * @param coordDistance if larger 0, also consider coordinates to be at same location if smaller than distance
 	 *
