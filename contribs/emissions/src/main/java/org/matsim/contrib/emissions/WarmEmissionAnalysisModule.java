@@ -280,12 +280,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			if (ecg.handlesHighAverageSpeeds()) {
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
-			} else { // todo: persisting error is: "missing events" when this here is changed ~rjg
+			} else { // todo:
 				// we find that emission events for vehicleLeavesTrafficEvent make it appear
 				// as if the vehicle drove faster than the allowed freespeed (freeVelocity_ms).
 				// Is this because it has not traversed the ENTIRE link upon vehicleLeavesTrafficEvents? ~rjg
-//				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
-				averageSpeed_kmh = freeVelocity_ms * 3.6;
+//				averageSpeed_kmh = freeVelocity_ms * 3.6; // this breaks (more) tests: 'RuntimeException (below) must be thrown'
+				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 		}
 
@@ -331,7 +331,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				ef_gpkm = (fractionFreeFlow * efFreeFlow_gpkm) + (fractionStopGo * efStopGo_gpkm);
 
 			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-				ef_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
+				ef_gpkm = getEf(vehicleInformationTuple, efkey).getFactor(); // this produces errors if we hard-fix the avg speed error that currently causes tests to fail... ~rjg
 			} else {
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}
