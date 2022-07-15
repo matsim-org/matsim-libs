@@ -21,6 +21,7 @@
 package lsp.replanning;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -33,11 +34,14 @@ import lsp.LSPPlan;
 class LSPReplannerImpl implements LSPReplanner{
 
 	private LSP lsp;
-	private GenericStrategyManager<LSPPlan, LSP> strategyManager;
+	private final GenericStrategyManager<LSPPlan, LSP> strategyManager;
 	
-	LSPReplannerImpl(LSP lsp) {
-		this.lsp = lsp;
+	LSPReplannerImpl( GenericStrategyManager<LSPPlan, LSP> strategyManager ) {
+		this.strategyManager = strategyManager;
 	}
+	
+//	public LSPReplannerImpl() {
+//	}
 	
 	@Override
 	public void setEmbeddingContainer( LSP lsp ) {
@@ -47,22 +51,20 @@ class LSPReplannerImpl implements LSPReplanner{
 	@Override
 	public void replan(ReplanningEvent event) {
 		if(strategyManager != null) {
-			List<LSP> lspList = new ArrayList<>();
-			lspList.add(lsp);
-			strategyManager.run(lspList, event.getIteration(), event.getReplanningContext());
+			strategyManager.run( Collections.singletonList( lsp ), event.getIteration(), event.getReplanningContext() );
 		}
-		lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels wierd, but getting NullPointer because of missing lsp inside the assigner
+		lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
 		//TODO: Do we need to do it for each plan, if it gets selected???
 	}
 
-	@Override
-	public GenericStrategyManager<LSPPlan, LSP> getStrategyManager() {
-		return strategyManager;
-	}
+//	@Override
+//	public GenericStrategyManager<LSPPlan, LSP> getStrategyManager() {
+//		return strategyManager;
+//	}
 
-	@Override
-	public void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager) {
-		this.strategyManager = manager;
-	}
+//	@Override
+//	public void setStrategyManager(GenericStrategyManager<LSPPlan, LSP> manager) {
+//		this.strategyManager = manager;
+//	}
 
 }

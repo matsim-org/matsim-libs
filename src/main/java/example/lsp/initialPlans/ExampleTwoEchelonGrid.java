@@ -272,14 +272,12 @@ final class ExampleTwoEchelonGrid {
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
-		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
-		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManagerImpl();
-		strategyManager.addStrategy(strategy,null, 1);
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(lsp);
-		replanner.setStrategyManager(strategyManager);
+		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManagerImpl<>();
+		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()),null, 1);
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
 		replanner.setEmbeddingContainer(lsp);
-		lsp.setReplanner(replanner);
 
+		lsp.setReplanner(replanner);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
