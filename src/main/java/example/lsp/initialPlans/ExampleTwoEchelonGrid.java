@@ -43,6 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -261,7 +262,7 @@ final class ExampleTwoEchelonGrid {
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
 		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
-		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManager<>();
+		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManagerImpl<>();
 		strategyManager.addStrategy(strategy,null, 1);
 		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(lsp);
 		replanner.setStrategyManager(strategyManager);
