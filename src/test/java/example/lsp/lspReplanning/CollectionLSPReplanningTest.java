@@ -44,6 +44,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -169,7 +170,7 @@ public class CollectionLSPReplanningTest {
 		maybeTodayAssigner.setLSP( collectionLSP );
 		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
 
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<>();
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
 		strategyManager.addStrategy( strategy, null, 1 );
 
 		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( strategyManager );

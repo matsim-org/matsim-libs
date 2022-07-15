@@ -39,6 +39,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -120,7 +121,7 @@ import java.util.Random;
 				// once in the system.  Does it really make sense to now have one per agent?  Maybe just program directly
 				// what you want and need.  ??
 
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<>();
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
 
 		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
 		maybeTodayAssigner.setLSP( lsp );
