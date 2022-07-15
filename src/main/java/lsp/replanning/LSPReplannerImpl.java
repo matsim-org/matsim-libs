@@ -51,6 +51,8 @@ class LSPReplannerImpl implements LSPReplanner{
 			lspList.add(lsp);
 			strategyManager.run(lspList, event.getIteration(), event.getReplanningContext());
 		}
+		lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels wierd, but getting NullPointer because of missing lsp inside the assigner
+		//TODO: Do we need to do it for each plan, if it gets selected???
 	}
 
 	@Override
