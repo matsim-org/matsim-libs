@@ -45,7 +45,7 @@ import lsp.shipment.LSPShipment;
 
 /*package-private*/ class ExampleSimulationTrackers {
 
-	/*package-private*/ static LSP createLSPWithTracker(Network network) {
+	/*package-private*/ static LSP createLSPWithTracker( Scenario scenario ) {
 
 		//The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -73,7 +73,7 @@ import lsp.shipment.LSPShipment;
 
 		//The Adapter i.e. the Resource is created
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork() );
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
@@ -97,7 +97,7 @@ import lsp.shipment.LSPShipment;
 		example.lsp.simulationTrackers.LinearCostTracker tracker = new example.lsp.simulationTrackers.LinearCostTracker(0.2);
 		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.TourStartHandler() );
 		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.CollectionServiceHandler() );
-		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.DistanceAndTimeHandler(network) );
+		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.DistanceAndTimeHandler( scenario ) );
 		collectionSolution.addSimulationTracker(tracker);
 
 
@@ -166,7 +166,7 @@ import lsp.shipment.LSPShipment;
 		Network network = scenario.getNetwork();
 
 		//Create LSP and shipments
-		LSP lsp = createLSPWithTracker(network);
+		LSP lsp = createLSPWithTracker(scenario);
 		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
 
 		//assign the shipments to the LSP

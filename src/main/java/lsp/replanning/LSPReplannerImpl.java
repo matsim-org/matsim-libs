@@ -21,6 +21,7 @@
 package lsp.replanning;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -38,9 +39,6 @@ class LSPReplannerImpl implements LSPReplanner{
 		this.lsp = lsp;
 	}
 	
-	public LSPReplannerImpl() {
-	}
-	
 	@Override
 	public void setEmbeddingContainer( LSP lsp ) {
 		this.lsp = lsp;
@@ -49,9 +47,9 @@ class LSPReplannerImpl implements LSPReplanner{
 	@Override
 	public void replan(ReplanningEvent event) {
 		if(strategyManager != null) {
-			ArrayList<LSP> lspList = new ArrayList<>();
+			List<LSP> lspList = new ArrayList<>();
 			lspList.add(lsp);
-			strategyManager.run(lspList, null, event.getIteration(), event.getReplanningContext());
+			strategyManager.run(lspList, event.getIteration(), event.getReplanningContext());
 		}
 		lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels wierd, but getting NullPointer because of missing lsp inside the assigner
 		//TODO: Do we need to do it for each plan, if it gets selected???

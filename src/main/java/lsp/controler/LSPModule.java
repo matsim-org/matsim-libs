@@ -23,10 +23,10 @@ package lsp.controler;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.controler.LSPAgentSource;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.controler.CarrierAgentTracker;
+import org.matsim.contrib.freight.controler.FreightAgentSource;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -46,16 +46,13 @@ public class LSPModule extends AbstractModule {
 	public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
-//		bind(FreightConfigGroup.class).toInstance(carrierConfig);
-		// yyyyyy ????? doesn't this ignore the freightConfig that was just pulled out of config two lines earlier?  kai, may'22
-
 		bind( LSPControlerListenerImpl.class ).in( Singleton.class );
 		addControlerListenerBinding().to( LSPControlerListenerImpl.class );
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
 		List<String> abc = qsimComponents.getActiveComponents();
-		abc.add( LSPAgentSource.COMPONENT_NAME ) ;
+		abc.add( FreightAgentSource.COMPONENT_NAME );
 		switch ( freightConfig.getTimeWindowHandling() ) {
 			case ignore:
 				break;
@@ -71,8 +68,8 @@ public class LSPModule extends AbstractModule {
 		// this installs qsim components, which are switched on (or not) via the above syntax:
 		this.installQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
-				this.bind( LSPAgentSource.class ).in( Singleton.class );
-				this.addQSimComponentBinding( LSPAgentSource.COMPONENT_NAME ).to( LSPAgentSource.class );
+				this.bind( FreightAgentSource.class ).in( Singleton.class );
+				this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
 				switch( freightConfig.getTimeWindowHandling() ) {
 					case ignore:
 						break;

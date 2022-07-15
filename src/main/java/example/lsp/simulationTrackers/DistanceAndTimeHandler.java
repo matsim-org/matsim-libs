@@ -21,35 +21,44 @@
 package example.lsp.simulationTrackers;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
 
-import org.matsim.contrib.freight.events.LSPFreightLinkEnterEvent;
-import org.matsim.contrib.freight.events.LSPFreightLinkLeaveEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPLinkLeaveEventHandler;
-import org.matsim.contrib.freight.events.LSPFreightVehicleLeavesTrafficEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPVehicleLeavesTrafficEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPLinkEnterEventHandler;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 
-/*package-private*/ class DistanceAndTimeHandler implements LSPLinkEnterEventHandler, LSPVehicleLeavesTrafficEventHandler, LSPLinkLeaveEventHandler{
+/*package-private*/ class DistanceAndTimeHandler implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler{
+	private static final Logger log = Logger.getLogger( DistanceAndTimeHandler.class );
 
-	private final Collection<LSPFreightLinkEnterEvent> events;
+	private final Map<Id<Vehicle>,LinkEnterEvent> events;
+	private final Vehicles allVehicles;
 	private double distanceCosts;
 	private double timeCosts;
 	private final Network network;
 	
-	public DistanceAndTimeHandler(Network network) {
-		this.network = network;
-		this.events = new ArrayList<>();
+	DistanceAndTimeHandler( Scenario scenario  ) {
+		this.network = scenario.getNetwork();
+		this.events = new LinkedHashMap<>();
+		this.allVehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
 	}
 	
 	
 	@Override
-	public void handleEvent(LSPFreightLinkEnterEvent event) {
-		events.add(event);
+	public void handleEvent(LinkEnterEvent event) {
+		events.put(event.getVehicleId(),event);
 		
 	}
 
@@ -60,34 +69,26 @@ import org.matsim.vehicles.Vehicle;
 
 
 	@Override
-	public void handleEvent(LSPFreightVehicleLeavesTrafficEvent leaveEvent) {
-		for(LSPFreightLinkEnterEvent enterEvent : events) {
-			if((enterEvent.getLinkId() == leaveEvent.getLinkId()) && (enterEvent.getVehicleId() == leaveEvent.getVehicleId()) && 
-			   (enterEvent.getCarrierId() == leaveEvent.getCarrierId())   &&  (enterEvent.getDriverId() == leaveEvent.getDriverId())) {
-				double linkDuration = leaveEvent.getTime() - enterEvent.getTime();
-				timeCosts = timeCosts + (linkDuration * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerTimeUnit());
-				double linkLength = network.getLinks().get(enterEvent.getLinkId()).getLength();
-				distanceCosts = distanceCosts + (linkLength * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerDistanceUnit());
-				events.remove(enterEvent);
-				break;
-			}		
-		}
+	public void handleEvent( VehicleLeavesTrafficEvent leaveEvent ) {
+		processLeaveEvent( leaveEvent.getVehicleId(), leaveEvent.getTime() );
 	}
-
-
 	@Override
-	public void handleEvent(LSPFreightLinkLeaveEvent leaveEvent) {
-		for(LSPFreightLinkEnterEvent enterEvent : events) {
-			if((enterEvent.getLinkId() == leaveEvent.getLinkId()) && (enterEvent.getVehicleId() == leaveEvent.getVehicleId()) &&
-			   (enterEvent.getCarrierId() == leaveEvent.getCarrierId())   &&  (enterEvent.getDriverId() == leaveEvent.getDriverId())) {
-				double linkDuration = leaveEvent.getTime() - enterEvent.getTime();
-				timeCosts = timeCosts + (linkDuration * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerTimeUnit());
-				double linkLength = network.getLinks().get(enterEvent.getLinkId()).getLength();
-				distanceCosts = distanceCosts + (linkLength * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerDistanceUnit());
-				events.remove(enterEvent);
-				break;
-			}
+	public void handleEvent( LinkLeaveEvent leaveEvent ) {
+		processLeaveEvent( leaveEvent.getVehicleId(), leaveEvent.getTime() );
+	}
+	private void processLeaveEvent( Id<Vehicle> vehicleId, double time ){
+
+		LinkEnterEvent enterEvent = events.remove( vehicleId );
+		if ( enterEvent!=null ){
+			Vehicle carrierVehicle = this.allVehicles.getVehicles().get( vehicleId );
+			double linkDuration = time - enterEvent.getTime();
+			timeCosts += linkDuration * carrierVehicle.getType().getCostInformation().getCostsPerSecond();
+			double linkLength = network.getLinks().get( enterEvent.getLinkId() ).getLength();
+			distanceCosts += linkLength * carrierVehicle.getType().getCostInformation().getCostsPerMeter();
+
 		}
+		// (there might not be a corresponding enter event if vehicle just entered traffic.  Could add that as well, but then we would need to compensate for fact that this covers little distance. kai, jul'22)
+
 	}
 
 	public double getDistanceCosts() {

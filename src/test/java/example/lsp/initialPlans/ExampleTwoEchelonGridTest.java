@@ -18,45 +18,31 @@
  *  * ***********************************************************************
  */
 
-package example.lsp.lspScoring;
+package example.lsp.initialPlans;
 
-import lsp.LSP;
-import lsp.controler.LSPSimulationTracker;
-import lsp.LSPScorer;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.Random;
+import static org.junit.Assert.fail;
 
-/*package-private*/ class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, LSPServiceEndEventHandler
-{
-	private static final Logger log = Logger.getLogger( TipScorer.class );
+public class ExampleTwoEchelonGridTest {
+	private static final Logger log = Logger.getLogger( ExampleTwoEchelonGridTest.class );
+	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final Random tipRandom;
-	private double tipSum;
+	@Test
+	public void testForRuntimeExceptions(){
+		try{
+			ExampleTwoEchelonGrid.main( new String []{
+					"--config:controler.outputDirectory=" + utils.getOutputDirectory()
+					, "--config:controler.lastIteration=2"
+			} );
 
-	/*package-private*/ TipScorer() {
-		tipRandom = new Random(1);
-		tipSum = 0;
-	}
-	
-	@Override public double computeScoreForCurrentPlan() {
-		return tipSum;
-	}
-
-	@Override public void setEmbeddingContainer( LSP pointer ){
-		// backpointer not needed here, therefor not memorizing it.  kai, jun'22
-	}
-
-	@Override public void handleEvent( LSPServiceEndEvent event ) {
-		double tip = tipRandom.nextDouble() * 5;
-		log.warn("tipSum=" + tipSum + "; tip=" + tip);
-		tipSum += tip;
-	}
-
-	@Override public void reset( int iteration ){
-		tipSum = 0.;
+		} catch ( Exception ee ) {
+			log.fatal(ee) ;
+			fail() ;
+		}
 	}
 
 }

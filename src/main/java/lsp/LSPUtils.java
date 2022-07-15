@@ -64,6 +64,12 @@ public final class LSPUtils{
 			return this;
 		}
 
+		/**
+		 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
+		 * we cannot use injection ... since we cannot inject as many scorers as we have agents.  (At least this is what I think.) Which means
+		 * that the approach in matsim core and in carriers to have XxxScoringFunctionFactory is better for what we are doing here.  yyyyyy So
+		 * this needs to be changed.  kai, jul'22
+		 */
 		public LSPBuilder setSolutionScorer( LSPScorer scorer ){
 			this.scorer = scorer;
 			return this;

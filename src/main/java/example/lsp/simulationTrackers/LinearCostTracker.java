@@ -23,6 +23,12 @@ package example.lsp.simulationTrackers;
 import lsp.LSPUtils;
 import lsp.LogisticsSolution;
 import lsp.controler.LSPSimulationTracker;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.contrib.freight.events.*;
 import org.matsim.contrib.freight.events.eventhandler.*;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -35,12 +41,12 @@ import java.util.Collection;
 import java.util.List;
 
 /*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
-								       LSPLinkEnterEventHandler,
-								       LSPVehicleLeavesTrafficEventHandler,
+								       LinkEnterEventHandler,
+								       VehicleLeavesTrafficEventHandler,
 								       LSPTourStartEventHandler,
 								       LSPServiceStartEventHandler,
 								       LSPServiceEndEventHandler,
-								       LSPLinkLeaveEventHandler
+								       LinkLeaveEventHandler
 {
 
 	private final Collection<EventHandler> eventHandlers;
@@ -134,17 +140,17 @@ import java.util.List;
 	@Override public void setEmbeddingContainer( LogisticsSolution pointer ){
 		this.logisticsSolution = pointer;
 	}
-	@Override public void handleEvent( LSPFreightLinkEnterEvent event ){
+	@Override public void handleEvent( LinkEnterEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof LSPLinkEnterEventHandler ) {
-				((LSPLinkEnterEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof LinkEnterEventHandler ) {
+				((LinkEnterEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
-	@Override public void handleEvent( LSPFreightVehicleLeavesTrafficEvent event ){
+	@Override public void handleEvent( VehicleLeavesTrafficEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof LSPVehicleLeavesTrafficEventHandler ) {
-				((LSPVehicleLeavesTrafficEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof VehicleLeavesTrafficEventHandler ) {
+				((VehicleLeavesTrafficEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
@@ -169,10 +175,10 @@ import java.util.List;
 			}
 		}
 	}
-	@Override public void handleEvent( LSPFreightLinkLeaveEvent event ){
+	@Override public void handleEvent( LinkLeaveEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof LSPLinkLeaveEventHandler ) {
-				((LSPLinkLeaveEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof LinkLeaveEventHandler ) {
+				((LinkLeaveEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
