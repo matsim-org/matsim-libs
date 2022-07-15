@@ -79,6 +79,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 				}
 			}
 		}
+		plan.setLSP(this);
 		return plans.add(plan);
 	}
 

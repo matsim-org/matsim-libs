@@ -20,16 +20,24 @@
 
 package lsp.usecase;
 
+import lsp.LSP;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import lsp.LSPResourceScheduler;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.ShipmentPlanElement;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class UsecaseUtils {
 
@@ -49,8 +57,50 @@ public class UsecaseUtils {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 
-	public static SingleSolutionShipmentAssigner createDeterministicShipmentAssigner() {
+	public static SingleSolutionShipmentAssigner createSinglesolutionShipmentAssigner() {
 		return new SingleSolutionShipmentAssigner();
+	}
+
+	/**
+	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
+	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
+	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freigth contrib.
+	 *
+	 * KMT/Jul22
+	 *
+	 * @param carrier
+	 * @return Collection of VehicleTypes
+	 */
+	static Collection<VehicleType> getVehicleTypeCollection(Carrier carrier) {
+		Set<VehicleType> vehicleTypeCollection = new HashSet<>();
+		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			vehicleTypeCollection.add(carrierVehicle.getType());
+		}
+		return vehicleTypeCollection;
+	}
+
+	public static void printResults(String outputDir, LSP lsp) {
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/" + lsp.getId().toString()+ "_schedules.tsv" ) ){
+			final String str0 = "LSP: " + lsp.getId();
+			System.out.println( str0 );
+			writer.write( str0 + "\n");
+			for( LSPShipment shipment : lsp.getShipments() ){
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
+				elementList.sort( ShipmentUtils.createShipmentPlanElementComparator() );
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println( str1 );
+				writer.write( str1 + "\n");
+				for( ShipmentPlanElement element : elementList ){
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println( str2 );
+					writer.write(str2 + "\n");
+				}
+				System.out.println();
+				writer.write("\n");
+			}
+		} catch( IOException e ){
+			e.printStackTrace();
+		}
 	}
 
 	public static class CollectionCarrierAdapterBuilder {
@@ -290,4 +340,7 @@ public class UsecaseUtils {
 		}
 
 	}
+
+
+
 }

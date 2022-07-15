@@ -99,7 +99,7 @@ import java.util.Random;
 				
 				//The initial plan of the lsp is generated and the assigner and the solution from above are added
 				LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-				ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+				ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
 				collectionPlan.setAssigner(assigner);
 				collectionPlan.addSolution(collectionSolution);
 				
