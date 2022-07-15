@@ -81,6 +81,8 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 
 	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
+		// (means that it is recreated before every mobsim run)
+
 		eventsManager.addHandler(carrierAgentTracker);
 		// (add and remove per mobsim run)
 	}
@@ -98,6 +100,9 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
+		if ( strategyManager==null ) {
+			throw new RuntimeException( "You need to set CarrierStrategyManager to something meaningful to run iterations." );
+		}
 		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 

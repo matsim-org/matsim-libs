@@ -36,6 +36,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * Changes the transportation mode of one random non-empty subtour in a plan to a randomly chosen
@@ -106,12 +107,23 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private TripsToLegsAlgorithm tripsToLegs = null;
 	private ChooseRandomSingleLegMode changeSingleLegMode = null;
 
+	private double coordDist = 0;
+
 	public ChooseRandomLegModeForSubtour(
 			final MainModeIdentifier mainModeIdentifier,
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
 			final Random rng, SubtourModeChoice.Behavior behavior, double probaForChooseRandomSingleTripMode) {
+		this(mainModeIdentifier, permissibleModesCalculator, modes, chainBasedModes, rng, behavior, probaForChooseRandomSingleTripMode, 0);
+	}
+
+	public ChooseRandomLegModeForSubtour(
+			final MainModeIdentifier mainModeIdentifier,
+			final PermissibleModesCalculator permissibleModesCalculator,
+			final String[] modes,
+			final String[] chainBasedModes,
+			final Random rng, SubtourModeChoice.Behavior behavior, double probaForChooseRandomSingleTripMode, double coordDist) {
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
@@ -119,6 +131,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		this.behavior = behavior;
 		this.probaForChangeSingleTripMode = probaForChooseRandomSingleTripMode;
 		this.singleTripSubtourModes = this.chainBasedModes;
+		this.coordDist = coordDist;
 
 		this.rng = rng;
 		logger.info("Chain based modes: " + this.chainBasedModes.toString());
@@ -234,7 +247,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			final List<Trip> trips,
 			final Collection<String> permissibleModesForThisPerson) {
 
-		final List<Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan));
+		final List<Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan, coordDist));
 		final ArrayList<Candidate> choiceSet = new ArrayList<>();
 
 		// there is no subtour containing all trips, so it will be added
@@ -354,11 +367,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private boolean atSameLocation(Activity firstLegUsingMode,
 	                               Activity lastLegUsingMode) {
-		return firstLegUsingMode.getFacilityId() != null ?
-				firstLegUsingMode.getFacilityId().equals(
-						lastLegUsingMode.getFacilityId()) :
-				firstLegUsingMode.getLinkId().equals(
-						lastLegUsingMode.getLinkId());
+		if (firstLegUsingMode.getFacilityId() != null)
+			return firstLegUsingMode.getFacilityId().equals(lastLegUsingMode.getFacilityId());
+		else if ( coordDist > 0 && firstLegUsingMode.getCoord() != null && lastLegUsingMode.getCoord() != null)
+			return CoordUtils.calcEuclideanDistance(firstLegUsingMode.getCoord(), lastLegUsingMode.getCoord()) <= coordDist;
+		else
+			return firstLegUsingMode.getLinkId().equals(lastLegUsingMode.getLinkId());
 	}
 
 	private Activity findLastDestinationOfMode(

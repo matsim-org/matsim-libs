@@ -46,6 +46,9 @@ public class SubTourAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--st-proba", description = "Probability for single trip mode-choice", defaultValue = "0.5")
 	private double singleTrip;
 
+	@CommandLine.Option(names = "--coord-dist", description = "Use coordinate distance for subtours if greater 0", defaultValue = "0")
+	private double coordDist;
+
 	@CommandLine.Option(names = "--iter", description = "Iterate strategy to output choice sets", defaultValue = "1")
 	private int iter;
 
@@ -87,7 +90,7 @@ public class SubTourAnalysis implements MATSimAppCommand {
 		log.info("Detected modes: {}", modes);
 
 		ChooseRandomLegModeForSubtour strategy = new ChooseRandomLegModeForSubtour(new DefaultAnalysisMainModeIdentifier(), plan -> modes,
-				modes.toArray(new String[0]), chainBasedModes.toArray(new String[0]), new Random(1234), behavior, singleTrip);
+				modes.toArray(new String[0]), chainBasedModes.toArray(new String[0]), new Random(1234), behavior, singleTrip, coordDist);
 
 		int closed = 0;
 		int massConserving = 0;

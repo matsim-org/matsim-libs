@@ -60,7 +60,7 @@ import java.util.Map;
 final class RunPassengerAlongWithCarriers {
 
 	final static URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-	
+
 	private Config config ;
 	private Scenario scenario ;
 
@@ -99,9 +99,9 @@ final class RunPassengerAlongWithCarriers {
 
 	public final Config prepareConfig() {
 		config = ConfigUtils.loadConfig(IOUtils.extendUrl(url, "config.xml"));
-        config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-        config.global().setRandomSeed(4177);
-        config.controler().setOutputDirectory("./output/");
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		config.global().setRandomSeed(4177);
+		config.controler().setOutputDirectory("./output/");
 		return config;
 	}
 
@@ -154,46 +154,46 @@ final class RunPassengerAlongWithCarriers {
 			return sf;
 		};
 	}
-	
+
 	private static class MyCarrierPlanStrategyManagerFactory implements Provider<CarrierStrategyManager>{
 
-        @Inject
-        private Network network;
+		@Inject
+		private Network network;
 
-        @Inject
-        private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+		@Inject
+		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-        @Inject
-        private Map<String, TravelTime> modeTravelTimes;
+		@Inject
+		private Map<String, TravelTime> modeTravelTimes;
 
-        private final CarrierVehicleTypes types;
+		private final CarrierVehicleTypes types;
 
-        public MyCarrierPlanStrategyManagerFactory(CarrierVehicleTypes types) {
-            this.types = types;
-        }
+		public MyCarrierPlanStrategyManagerFactory(CarrierVehicleTypes types) {
+			this.types = types;
+		}
 
-        @Override
-        public CarrierStrategyManager get() {
-            TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
-            final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
-                    travelDisutility, modeTravelTimes.get(TransportMode.car));
+		@Override
+		public CarrierStrategyManager get() {
+			TravelDisutility travelDisutility = TravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car));
+			final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
+					travelDisutility, modeTravelTimes.get(TransportMode.car));
 
 //            final GenericStrategyManagerImpl<CarrierPlan, Carrier> strategyManager = new GenericStrategyManagerImpl<>();
-		final CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
-            strategyManager.setMaxPlansPerAgent(5);
+			final CarrierStrategyManager strategyManager = new CarrierStrategyManagerImpl();
+			strategyManager.setMaxPlansPerAgent(5);
 
-            strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);
-            {
-            	GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<CarrierPlan, Carrier>());
-                strategy.addStrategyModule(new TimeAllocationMutator());
-                strategy.addStrategyModule(new ReRouteVehicles(router, network, modeTravelTimes.get(TransportMode.car), 1.));
-                strategyManager.addStrategy(strategy, null, 0.5);
-            }
-            
+			strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);
+			{
+				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<CarrierPlan, Carrier>());
+				strategy.addStrategyModule(new TimeAllocationMutator());
+				strategy.addStrategyModule(new ReRouteVehicles(router, network, modeTravelTimes.get(TransportMode.car), 1.));
+				strategyManager.addStrategy(strategy, null, 0.5);
+			}
+
 //            strategyManager.addStrategy(new SelectBestPlanAndOptimizeItsVehicleRouteFactory(network, types, modeTravelTimes.get(TransportMode.car)).createStrategy(), null, 0.05);
-            
-            return (CarrierStrategyManager) strategyManager;
-        }
-    }
+
+			return (CarrierStrategyManager) strategyManager;
+		}
+	}
 
 }

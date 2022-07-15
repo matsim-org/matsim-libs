@@ -54,27 +54,25 @@ public final class CarrierModule extends AbstractModule {
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
 
-//		bind(CarrierControlerListener.class).asEagerSingleton();
 		bind(CarrierControlerListener.class).in( Singleton.class );
 		// (this is a binding separate from the binding as controler listener)
-		// (the weaker in(Singleton.class) passes all tests. ??  kai, jul'22)
 
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
-		List<String> abc = qsimComponents.getActiveComponents();
-		abc.add( FreightAgentSource.COMPONENT_NAME ) ;
+		List<String> components = qsimComponents.getActiveComponents();
+		components.add( FreightAgentSource.COMPONENT_NAME ) ;
 		switch ( freightConfig.getTimeWindowHandling() ) {
 			case ignore:
 				break;
 			case enforceBeginnings:
-				abc.add( WithinDayActivityReScheduling.COMPONENT_NAME );
+				components.add( WithinDayActivityReScheduling.COMPONENT_NAME );
 				break;
 			default:
 				throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
 		}
-		qsimComponents.setActiveComponents( abc );
+		qsimComponents.setActiveComponents( components );
 
 		// this installs qsim components, which are switched on (or not) via the above syntax:
 		this.installQSimModule( new AbstractQSimModule(){

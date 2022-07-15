@@ -35,14 +35,11 @@ import org.matsim.contrib.freight.events.LSPServiceStartEvent;
 /*package-private*/  final class LSPServiceStartEventCreator implements LSPEventCreator {
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-			Id<Person> driverId, int activityCounter) {
-		if(event instanceof ActivityStartEvent){
-			ActivityStartEvent startEvent = (ActivityStartEvent) event;
-			if(startEvent.getActType() == "service") {
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter) {
+		if( event instanceof ActivityStartEvent startEvent ){
+			if( startEvent.getActType().equals( "service" ) ) {
 				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if(element instanceof ServiceActivity) {
-					ServiceActivity serviceActivity = (ServiceActivity) element;
+				if( element instanceof ServiceActivity serviceActivity ) {
 					return new LSPServiceStartEvent(startEvent, carrier.getId(), driverId, serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
 				}
 			}	

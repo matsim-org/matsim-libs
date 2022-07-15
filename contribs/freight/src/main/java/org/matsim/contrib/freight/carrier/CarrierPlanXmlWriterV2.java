@@ -141,7 +141,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			if(vehicleTypeId == null) vehicleTypeId = v.getType() == null ? null : v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
-					+ "\" depotLinkId=\"" + v.getLocation()  
+					+ "\" depotLinkId=\"" + v.getLinkId()
 					+ "\" typeId=\"" + vehicleTypeId.toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
 					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
