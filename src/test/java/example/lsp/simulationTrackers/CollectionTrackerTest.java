@@ -23,6 +23,8 @@ package example.lsp.simulationTrackers;
 import lsp.*;
 import lsp.controler.LSPModule;
 import lsp.shipment.ShipmentUtils;
+import org.apache.log4j.Logger;
+import org.junit.Rule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
@@ -48,6 +50,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -61,16 +64,19 @@ import static org.junit.Assert.assertTrue;
 
 
 public class CollectionTrackerTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = Logger.getLogger( CollectionTrackerTest.class );
 
 	private Network network;
 	private Carrier carrier;
 	private LogisticsSolution collectionSolution;
 	private double shareOfFixedCosts;
+	private Config config;
 
 	@Before
 	public void initialize() {
 
-		Config config = new Config();
+		this.config = new Config();
 		config.addCoreModules();
 
 		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
@@ -127,7 +133,7 @@ public class CollectionTrackerTest {
 			LinearCostTracker tracker = new LinearCostTracker( shareOfFixedCosts );
 			tracker.getEventHandlers().add( new TourStartHandler() );
 			tracker.getEventHandlers().add( new CollectionServiceHandler() );
-			tracker.getEventHandlers().add( new DistanceAndTimeHandler( network ) );
+			tracker.getEventHandlers().add( new DistanceAndTimeHandler( scenario ) );
 			// I think that it would be better to use delegation inside LinearCostTracker, i.e. to not expose getEventHandlers(). kai, jun'22
 
 			collectionSolution.addSimulationTracker( tracker );
@@ -199,11 +205,13 @@ public class CollectionTrackerTest {
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		controler.run();
 	}
 
 	@Test
 	public void testCollectionTracker() {
+
 		assertEquals(1, collectionSolution.getSimulationTrackers().size());
 		LSPSimulationTracker tracker = collectionSolution.getSimulationTrackers().iterator().next();
 		assertTrue(tracker instanceof LinearCostTracker);
@@ -281,8 +289,11 @@ public class CollectionTrackerTest {
 						if(element instanceof ServiceActivity) {
 							ServiceActivity activity = (ServiceActivity) element;
 							scheduledDistanceCosts  += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
+							// (I think that we need this since the last link is not in the route.  Or is it?  kai, jul'22)
+							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}
 					}
+					log.warn( "scheduledDistanceCosts=" + scheduledDistanceCosts );
 				}
 				totalScheduledCosts += scheduledDistanceCosts;
 				assertEquals(scheduledDistanceCosts, trackedDistanceCosts, Math.max(scheduledDistanceCosts,trackedDistanceCosts)*0.01);

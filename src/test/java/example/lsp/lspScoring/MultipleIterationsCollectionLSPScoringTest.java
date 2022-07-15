@@ -128,7 +128,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
-		collectionLSPBuilder.setSolutionScorer( new TipScorer() );
+		collectionLSPBuilder.setSolutionScorer( new ExampleLSPScoring.TipScorer() );
 		collectionLSP = collectionLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
