@@ -41,9 +41,9 @@ import java.util.Collection;
 import java.util.List;
 
 
-class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 							  ReplanningListener, IterationStartsListener{
-	private static final Logger log = Logger.getLogger( LSPControlerListenerImpl.class );
+	private static final Logger log = Logger.getLogger( LSPControlerListener.class );
 
 	private CarrierAgentTracker carrierResourceTracker;
 	private final Carriers carriers;
@@ -55,8 +55,8 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
 
-	@Inject LSPControlerListenerImpl( Scenario scenario,
-					  Collection<LSPEventCreator> creators ) {
+	@Inject LSPControlerListener( Scenario scenario,
+				      Collection<LSPEventCreator> creators ) {
 		this.scenario = scenario;
 		this.creators = creators;
 		this.carriers = getCarriers();

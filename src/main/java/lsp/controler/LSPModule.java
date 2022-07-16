@@ -22,9 +22,15 @@ package lsp.controler;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import lsp.LSP;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
+import org.matsim.contrib.freight.controler.CarrierModule;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightAgentSource;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
@@ -32,6 +38,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,8 +54,8 @@ public class LSPModule extends AbstractModule {
 	public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
-		bind( LSPControlerListenerImpl.class ).in( Singleton.class );
-		addControlerListenerBinding().to( LSPControlerListenerImpl.class );
+		bind( LSPControlerListener.class ).in( Singleton.class );
+		addControlerListenerBinding().to( LSPControlerListener.class );
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
@@ -83,6 +91,8 @@ public class LSPModule extends AbstractModule {
 			}
 		} );
 
+		bind( LSPScoringFunctionFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
+
 	}
 
 	@Provides Collection<LSPEventCreator> provideEventCreators(){
@@ -90,8 +100,31 @@ public class LSPModule extends AbstractModule {
 		// (if you do not like them, you will have to override the binding.  kai, may'22)
 	}
 
-	@Provides CarrierAgentTracker provideCarrierResourceTracker( LSPControlerListenerImpl lspControlerListener ) {
+	@Provides CarrierAgentTracker provideCarrierResourceTracker( LSPControlerListener lspControlerListener ) {
 		return lspControlerListener.getCarrierResourceTracker();
 	}
 
+	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScoringFunctionFactory {
+		@Override public ScoringFunction createScoringFunction( LSP lsp ){
+			return new ScoringFunction(){
+				@Override public void handleActivity( Activity activity ){
+				}
+				@Override public void handleLeg( Leg leg ){
+				}
+				@Override public void agentStuck( double time ){
+				}
+				@Override public void addMoney( double amount ){
+				}
+				@Override public void addScore( double amount ){
+				}
+				@Override public void finish(){
+				}
+				@Override public double getScore(){
+					return Double.NEGATIVE_INFINITY;
+				}
+				@Override public void handleEvent( Event event ){
+				}
+			};
+		}
+	}
 }
