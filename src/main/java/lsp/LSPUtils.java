@@ -41,6 +41,7 @@ public final class LSPUtils{
 		return new WaitingShipmentsImpl();
 	}
 	private LSPUtils(){} // do not instantiate
+
 	public static final class LSPBuilder{
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
@@ -102,7 +103,7 @@ public final class LSPUtils{
 	public static final class LogisticsSolutionBuilder{
 		final Id<LogisticsSolution> id;
 		final Collection<LogisticsSolutionElement> elements;
-		final Collection<EventHandler> eventHandlers;
+//		final Collection<EventHandler> eventHandlers;
 		final Collection<LSPSimulationTracker<LogisticsSolution>> trackers;
 
 		public static LogisticsSolutionBuilder newInstance( Id<LogisticsSolution>id ){
@@ -111,7 +112,7 @@ public final class LSPUtils{
 
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
 			this.elements = new ArrayList<>();
-			this.eventHandlers = new ArrayList<>();
+//			this.eventHandlers = new ArrayList<>();
 			this.trackers = new ArrayList<LSPSimulationTracker<LogisticsSolution>>();
 			this.id = id;
 		}
@@ -121,10 +122,10 @@ public final class LSPUtils{
 			return this;
 		}
 
-		public LogisticsSolutionBuilder addEventHandler( EventHandler handler ) {
-			eventHandlers.add(handler);
-			return this;
-		}
+//		public LogisticsSolutionBuilder addEventHandler( EventHandler handler ) {
+//			eventHandlers.add(handler);
+//			return this;
+//		}
 
 		public LogisticsSolutionBuilder addTracker( LSPSimulationTracker<LogisticsSolution> tracker ) {
 			trackers.add(tracker);

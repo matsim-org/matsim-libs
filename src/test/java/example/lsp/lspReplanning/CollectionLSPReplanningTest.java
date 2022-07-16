@@ -42,7 +42,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -161,17 +163,23 @@ public class CollectionLSPReplanningTest {
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 		collectionLSP.scheduleSolutions();
-		GenericStrategyManagerFactoryImpl factory = new GenericStrategyManagerFactoryImpl();
-		GenericStrategyManager<LSPPlan, LSP> manager = factory.createStrategyManager(collectionLSP);
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(collectionLSP);
-		replanner.setStrategyManager(manager);
+
+
+
+		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+		maybeTodayAssigner.setLSP( collectionLSP );
+		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
+
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+		strategyManager.addStrategy( strategy, null, 1 );
+
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( strategyManager );
+
+
 		collectionLSP.setReplanner(replanner);
 
-		ArrayList<LSP> lspList = new ArrayList<>();
-		lspList.add(collectionLSP);
-		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.addLSPs( scenario, lsps );
+		LSPUtils.addLSPs( scenario, new LSPs( Collections.singletonList( collectionLSP )) );
 
 		Controler controler = new Controler(scenario);
 

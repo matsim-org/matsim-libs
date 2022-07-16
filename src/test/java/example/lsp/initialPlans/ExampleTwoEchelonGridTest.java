@@ -18,27 +18,31 @@
  *  * ***********************************************************************
  */
 
-package example.lsp.lspReplanning;
+package example.lsp.initialPlans;
 
-import org.matsim.core.replanning.GenericStrategyManager;
+import org.apache.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
-import lsp.LSP;
-import lsp.LSPPlan;
-import lsp.ShipmentAssigner;
-import lsp.replanning.LSPPlanStrategyManagerFactory;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
+import static org.junit.Assert.fail;
 
-/*package-private*/ class GenericStrategyManagerFactoryImpl implements LSPPlanStrategyManagerFactory {
+public class ExampleTwoEchelonGridTest {
+	private static final Logger log = Logger.getLogger( ExampleTwoEchelonGridTest.class );
+	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Override
-	public GenericStrategyManager<LSPPlan, LSP> createStrategyManager(LSP lsp) {
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-		maybeTodayAssigner.setLSP(lsp);
+	@Test
+	public void testForRuntimeExceptions(){
+		try{
+			ExampleTwoEchelonGrid.main( new String []{
+					"--config:controler.outputDirectory=" + utils.getOutputDirectory()
+					, "--config:controler.lastIteration=2"
+			} );
 
-		//Warum wird hier an der Stelle im GenericStrategyManager eine spezifische Strategy hinzugefügt? KMT Jun'20
-		strategyManager.addStrategy(new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);
-		return strategyManager;
+		} catch ( Exception ee ) {
+			log.fatal(ee) ;
+			fail() ;
+		}
 	}
 
 }

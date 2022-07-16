@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -45,7 +46,6 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -93,9 +93,11 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerTimeUnit(0.005)
 			.build();
 
+	private ExampleTwoEchelonGrid(){ } // so it cannot be instantiated
+
 	public static void main(String[] args) {
 		log.info("Prepare Config");
-		Config config = prepareConfig();
+		Config config = prepareConfig(args);
 
 		log.info("Prepare scenario");
 		Scenario scenario = prepareScenario(config);
@@ -119,12 +121,21 @@ final class ExampleTwoEchelonGrid {
 		log.info("Done.");
 	}
 
-	private static Config prepareConfig() {
+	private static Config prepareConfig(String[] args) {
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9" ), "grid9x9.xml")));
-		config.controler().setOutputDirectory("output/2echelon/");
-		config.controler().setLastIteration(10);
+		if (args.length != 0) {
+			for (String arg : args) {
+				log.warn(arg);
+			}
+			ConfigUtils.applyCommandline(config, args);
 
+			CommandLine cmd = ConfigUtils.getCommandLine(args);
+		} else {
+			config.controler().setOutputDirectory("output/2echelon/");
+			config.controler().setLastIteration(10);
+		}
+
+		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
@@ -261,14 +272,12 @@ final class ExampleTwoEchelonGrid {
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
-		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
 		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManagerImpl<>();
-		strategyManager.addStrategy(strategy,null, 1);
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(lsp);
-		replanner.setStrategyManager(strategyManager);
+		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()),null, 1);
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
 		replanner.setEmbeddingContainer(lsp);
-		lsp.setReplanner(replanner);
 
+		lsp.setReplanner(replanner);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");

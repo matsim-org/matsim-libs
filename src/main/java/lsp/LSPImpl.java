@@ -29,6 +29,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 
 import lsp.replanning.LSPReplanner;
 import lsp.shipment.LSPShipment;
+import org.matsim.core.controler.events.ScoringEvent;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger( LSPImpl.class );
@@ -146,7 +147,7 @@ import lsp.shipment.LSPShipment;
 		return resources;
 	}
 
-	public void scoreSelectedPlan() {
+	public void scoreSelectedPlan( ScoringEvent scoringEvent ) {
 		if(this.scorer != null) {
 			this.selectedPlan.setScore( scorer.computeScoreForCurrentPlan() );
 		} else {
@@ -169,6 +170,7 @@ import lsp.shipment.LSPShipment;
 
 	@Override
 	public void setReplanner(LSPReplanner replanner) {
+		replanner.setEmbeddingContainer( this );
 		this.replanner = replanner;
 	}
 
