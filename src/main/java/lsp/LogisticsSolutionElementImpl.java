@@ -32,22 +32,22 @@ import java.util.Collections;
 
 /* package-private */ class LogisticsSolutionElementImpl extends LSPDataObject<LogisticsSolutionElement> implements LogisticsSolutionElement {
 
-	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
-	private LogisticsSolutionElement previousElement;
-	private LogisticsSolutionElement nextElement;
 	private final LSPResource resource;
 	private final WaitingShipments incomingShipments;
 	private final WaitingShipments outgoingShipments;
+	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
+	private LogisticsSolutionElement previousElement;
+	private LogisticsSolutionElement nextElement;
 	private LogisticsSolution solution;
 
-	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
-		super( builder.id );
+	LogisticsSolutionElementImpl(LSPUtils.LogisticsSolutionElementBuilder builder) {
+		super(builder.id);
 		this.resource = builder.resource;
 		this.incomingShipments = builder.incomingShipments;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
 	}
-	
+
 	@Override
 	public void connectWithNextElement(LogisticsSolutionElement element) {
 		this.nextElement = element;
@@ -71,7 +71,7 @@ import java.util.Collections;
 
 
 	@Override
-	public void setEmbeddingContainer( LogisticsSolution solution ) {
+	public void setEmbeddingContainer(LogisticsSolution solution) {
 		this.solution = solution;
 	}
 

@@ -53,11 +53,11 @@ public class UsecaseUtils {
 		return new MainRunCarrierScheduler();
 	}
 
-	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler( List<LSPResource> resources ) {
+	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler(List<LSPResource> resources) {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 
-	public static SingleSolutionShipmentAssigner createSinglesolutionShipmentAssigner() {
+	public static SingleSolutionShipmentAssigner createSingleSolutionShipmentAssigner() {
 		return new SingleSolutionShipmentAssigner();
 	}
 
@@ -65,7 +65,7 @@ public class UsecaseUtils {
 	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
 	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
 	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freigth contrib.
-	 *
+	 * <p>
 	 * KMT/Jul22
 	 *
 	 * @param carrier
@@ -80,25 +80,25 @@ public class UsecaseUtils {
 	}
 
 	public static void printResults(String outputDir, LSP lsp) {
-		try ( BufferedWriter writer = IOUtils.getBufferedWriter(  outputDir + "/" + lsp.getId().toString()+ "_schedules.tsv" ) ){
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_schedules.tsv")) {
 			final String str0 = "LSP: " + lsp.getId();
-			System.out.println( str0 );
-			writer.write( str0 + "\n");
-			for( LSPShipment shipment : lsp.getShipments() ){
-				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
-				elementList.sort( ShipmentUtils.createShipmentPlanElementComparator() );
+			System.out.println(str0);
+			writer.write(str0 + "\n");
+			for (LSPShipment shipment : lsp.getShipments()) {
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
+				elementList.sort(ShipmentUtils.createShipmentPlanElementComparator());
 				final String str1 = "Shipment: " + shipment.getId();
-				System.out.println( str1 );
-				writer.write( str1 + "\n");
-				for( ShipmentPlanElement element : elementList ){
+				System.out.println(str1);
+				writer.write(str1 + "\n");
+				for (ShipmentPlanElement element : elementList) {
 					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
-					System.out.println( str2 );
+					System.out.println(str2);
 					writer.write(str2 + "\n");
 				}
 				System.out.println();
 				writer.write("\n");
 			}
-		} catch( IOException e ){
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -106,131 +106,131 @@ public class UsecaseUtils {
 	public static class CollectionCarrierAdapterBuilder {
 
 		final Id<LSPResource> id;
+		final ArrayList<LogisticsSolutionElement> clientElements;
+		final Network network;
 		Carrier carrier;
 		Id<Link> locationLinkId;
-		final ArrayList<LogisticsSolutionElement> clientElements;
 		CollectionCarrierScheduler collectionScheduler;
-		final Network network;
 
-			public static CollectionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
-				return new CollectionCarrierAdapterBuilder(id,network);
-			}
-
-			private CollectionCarrierAdapterBuilder(Id<LSPResource> id, Network network){
-				this.id = id;
-				this.clientElements = new ArrayList<>();
-				this.network = network;
-			}
-
-			public CollectionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId){
-				this.locationLinkId = locationLinkId;
-				return this;
-			}
-
-			public CollectionCarrierAdapterBuilder setCarrier(Carrier carrier){
-				this.carrier = carrier;
-				return this;
-			}
-
-
-			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
-				this.collectionScheduler = collectionCarrierScheduler;
-				return this;
-			}
-
-			public CollectionCarrierResource build(){
-				return new CollectionCarrierResource(this);
-			}
-
+		private CollectionCarrierAdapterBuilder(Id<LSPResource> id, Network network) {
+			this.id = id;
+			this.clientElements = new ArrayList<>();
+			this.network = network;
 		}
+
+		public static CollectionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network) {
+			return new CollectionCarrierAdapterBuilder(id, network);
+		}
+
+		public CollectionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId) {
+			this.locationLinkId = locationLinkId;
+			return this;
+		}
+
+		public CollectionCarrierAdapterBuilder setCarrier(Carrier carrier) {
+			this.carrier = carrier;
+			return this;
+		}
+
+
+		public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler) {
+			this.collectionScheduler = collectionCarrierScheduler;
+			return this;
+		}
+
+		public CollectionCarrierResource build() {
+			return new CollectionCarrierResource(this);
+		}
+
+	}
 
 
 	public static class DistributionCarrierAdapterBuilder {
 
-		final Id<LSPResource>id;
+		final Id<LSPResource> id;
+		final ArrayList<LogisticsSolutionElement> clientElements;
+		final Network network;
 		Carrier carrier;
 		Id<Link> locationLinkId;
-		final ArrayList<LogisticsSolutionElement> clientElements;
 		DistributionCarrierScheduler distributionHandler;
-		final Network network;
 
-			public static DistributionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
-				return new DistributionCarrierAdapterBuilder(id,network);
-			}
-
-			private DistributionCarrierAdapterBuilder(Id<LSPResource> id, Network network){
-				this.id = id;
-				this.clientElements = new ArrayList<>();
-				this.network = network;
-			}
-
-			public DistributionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId){
-				this.locationLinkId = locationLinkId;
-				return this;
-			}
-
-			public DistributionCarrierAdapterBuilder setCarrier(Carrier carrier){
-				this.carrier = carrier;
-				return this;
-			}
-
-
-			public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler){
-				this.distributionHandler = distributionCarrierScheduler;
-				return this;
-			}
-
-			public DistributionCarrierResource build(){
-				return new DistributionCarrierResource(this);
-			}
-
+		private DistributionCarrierAdapterBuilder(Id<LSPResource> id, Network network) {
+			this.id = id;
+			this.clientElements = new ArrayList<>();
+			this.network = network;
 		}
+
+		public static DistributionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network) {
+			return new DistributionCarrierAdapterBuilder(id, network);
+		}
+
+		public DistributionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId) {
+			this.locationLinkId = locationLinkId;
+			return this;
+		}
+
+		public DistributionCarrierAdapterBuilder setCarrier(Carrier carrier) {
+			this.carrier = carrier;
+			return this;
+		}
+
+
+		public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler) {
+			this.distributionHandler = distributionCarrierScheduler;
+			return this;
+		}
+
+		public DistributionCarrierResource build() {
+			return new DistributionCarrierResource(this);
+		}
+
+	}
 
 	public static class MainRunCarrierAdapterBuilder {
 
-		private final Id<LSPResource>id;
+		private final Id<LSPResource> id;
+		private final ArrayList<LogisticsSolutionElement> clientElements;
+		private final Network network;
 		private Carrier carrier;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
-		private final ArrayList<LogisticsSolutionElement> clientElements;
 		private MainRunCarrierScheduler mainRunScheduler;
-		private final Network network;
 
-			public static MainRunCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network){
-				return new MainRunCarrierAdapterBuilder(id,network);
-			}
+		private MainRunCarrierAdapterBuilder(Id<LSPResource> id, Network network) {
+			this.id = id;
+			this.clientElements = new ArrayList<>();
+			this.network = network;
+		}
 
-			private MainRunCarrierAdapterBuilder(Id<LSPResource> id, Network network){
-				this.id = id;
-				this.clientElements = new ArrayList<>();
-				this.network = network;
-			}
+		public static MainRunCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network) {
+			return new MainRunCarrierAdapterBuilder(id, network);
+		}
 
-			public MainRunCarrierAdapterBuilder setFromLinkId(Id<Link> fromLinkId){
-				this.fromLinkId = fromLinkId;
-				return this;
-			}
+		public MainRunCarrierAdapterBuilder setCarrier(Carrier carrier) {
+			this.carrier = carrier;
+			return this;
+		}
 
-			public MainRunCarrierAdapterBuilder setToLinkId(Id<Link> toLinkId){
-				this.toLinkId = toLinkId;
-				return this;
-			}
+		public MainRunCarrierAdapterBuilder setFromLinkId(Id<Link> fromLinkId) {
+			this.fromLinkId = fromLinkId;
+			return this;
+		}
 
-			public MainRunCarrierAdapterBuilder setCarrier(Carrier carrier){
-				this.carrier = carrier;
-				return this;
-			}
+		public MainRunCarrierAdapterBuilder setToLinkId(Id<Link> toLinkId) {
+			this.toLinkId = toLinkId;
+			return this;
+		}
+		public MainRunCarrierAdapterBuilder setMainRunCarrierScheduler(MainRunCarrierScheduler mainRunScheduler) {
+			this.mainRunScheduler = mainRunScheduler;
+			return this;
+		}
 
-			public MainRunCarrierAdapterBuilder setMainRunCarrierScheduler(MainRunCarrierScheduler mainRunScheduler){
-				this.mainRunScheduler = mainRunScheduler;
-				return this;
-			}
-
-			public MainRunCarrierResource build(){
-				return new MainRunCarrierResource(this);
-			}
+		public MainRunCarrierResource build() {
+			return new MainRunCarrierResource(this);
+		}
 
 		//--- Getter ---
+
 		Id<LSPResource> getId() {
 			return id;
 		}
@@ -258,35 +258,34 @@ public class UsecaseUtils {
 		Network getNetwork() {
 			return network;
 		}
-		}
+	}
 
 	public static class TranshipmentHubSchedulerBuilder {
 		private double capacityNeedLinear;
 		private double capacityNeedFixed;
 
-		private TranshipmentHubSchedulerBuilder(){
+		private TranshipmentHubSchedulerBuilder() {
 		}
 
-		public static TranshipmentHubSchedulerBuilder newInstance(){
+		public static TranshipmentHubSchedulerBuilder newInstance() {
 			return new TranshipmentHubSchedulerBuilder();
 		}
 
-
-		public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear){
+		public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear) {
 			this.capacityNeedLinear = capacityNeedLinear;
 			return this;
 		}
 
-		public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed){
+		public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed) {
 			this.capacityNeedFixed = capacityNeedFixed;
 			return this;
 		}
-
-		public TransshipmentHubScheduler build(){
+		public TransshipmentHubScheduler build() {
 			return new TransshipmentHubScheduler(this);
 		}
 
 		//--- Getters ---
+
 		double getCapacityNeedLinear() {
 			return capacityNeedLinear;
 		}
@@ -300,29 +299,29 @@ public class UsecaseUtils {
 
 		private final Id<LSPResource> id;
 		private final Id<Link> locationLinkId;
+		private final ArrayList<LogisticsSolutionElement> clientElements;
 		private TransshipmentHubScheduler transshipmentHubScheduler;
-		private final ArrayList <LogisticsSolutionElement> clientElements;
 
-		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId){
-			return new TransshipmentHubBuilder(id,locationLinkId);
-		}
-
-		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId){
+		private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId) {
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.locationLinkId = locationLinkId;
 		}
 
-		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler){
+		public static TransshipmentHubBuilder newInstance(Id<LSPResource> id, Id<Link> locationLinkId) {
+			return new TransshipmentHubBuilder(id, locationLinkId);
+		}
+
+		public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler) {
 			this.transshipmentHubScheduler = (TransshipmentHubScheduler) TranshipmentHubScheduler;
 			return this;
 		}
 
-		public TransshipmentHub build(){
+		public TransshipmentHub build() {
 			return new TransshipmentHub(this);
 		}
-
 		//--- Getters ---
+
 		Id<LSPResource> getId() {
 			return id;
 		}
@@ -340,7 +339,6 @@ public class UsecaseUtils {
 		}
 
 	}
-
 
 
 }

@@ -54,9 +54,10 @@ import static lsp.usecase.UsecaseUtils.*;
 import static org.junit.Assert.*;
 
 public class CollectionLSPMobsimTest {
-	private static final Logger log = Logger.getLogger( CollectionLSPMobsimTest.class );
+	private static final Logger log = Logger.getLogger(CollectionLSPMobsimTest.class);
 
-	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private LSP collectionLSP;
 	private Carrier carrier;
@@ -67,13 +68,13 @@ public class CollectionLSPMobsimTest {
 
 		// create config:
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile( "scenarios/2regions/2regions-network.xml" );
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setFirstIteration( 0 );
-		config.controler().setLastIteration( 0 );
+		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(0);
 
-		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
 
 		// load scenario:
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -90,7 +91,7 @@ public class CollectionLSPMobsimTest {
 
 		// define starting link (?):
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Link collectionLink = scenario.getNetwork().getLinks().get(collectionLinkId );
+		Link collectionLink = scenario.getNetwork().getLinks().get(collectionLinkId);
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLink.getId(), collectionType);
 
@@ -101,126 +102,128 @@ public class CollectionLSPMobsimTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		CollectionCarrierAdapterBuilder adapterBuilder = CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork() );
-		adapterBuilder.setCollectionScheduler( createDefaultCollectionCarrierScheduler() );
+		CollectionCarrierAdapterBuilder adapterBuilder = CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork());
+		adapterBuilder.setCollectionScheduler(createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionAdapter = adapterBuilder.build();
 
 		final LogisticsSolutionElement collectionElement;
 		{
-			Id<LogisticsSolutionElement> elementId = Id.create( "CollectionElement", LogisticsSolutionElement.class );
-			LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance( elementId );
-			collectionElementBuilder.setResource( collectionAdapter );
+			Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
+			LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+			collectionElementBuilder.setResource(collectionAdapter);
 			collectionElement = collectionElementBuilder.build();
 		}
 		final LogisticsSolution collectionSolution;
 		{
-			Id<LogisticsSolution> collectionSolutionId = Id.create( "CollectionSolution", LogisticsSolution.class );
-			LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance( collectionSolutionId );
-			collectionSolutionBuilder.addSolutionElement( collectionElement );
+			Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
+			LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
+			collectionSolutionBuilder.addSolutionElement(collectionElement);
 			collectionSolution = collectionSolutionBuilder.build();
 		}
 		final LSPPlan collectionPlan;
 		{
-			ShipmentAssigner assigner = createSinglesolutionShipmentAssigner();
+			ShipmentAssigner assigner = createSingleSolutionShipmentAssigner();
 			collectionPlan = LSPUtils.createLSPPlan();
-			collectionPlan.setAssigner( assigner );
-			collectionPlan.addSolution( collectionSolution );
+			collectionPlan.setAssigner(assigner);
+			collectionPlan.addSolution(collectionSolution);
 		}
 		{
 			final LSPUtils.LSPBuilder collectionLSPBuilder;
 			ArrayList<LSPResource> resourcesList = new ArrayList<>();
 			collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
-			collectionLSPBuilder.setInitialPlan( collectionPlan );
-			resourcesList.add( collectionAdapter );
-			SolutionScheduler simpleScheduler = createDefaultSimpleForwardSolutionScheduler( resourcesList );
-			simpleScheduler.setBufferTime( 300 );
-			collectionLSPBuilder.setSolutionScheduler( simpleScheduler );
+			collectionLSPBuilder.setInitialPlan(collectionPlan);
+			resourcesList.add(collectionAdapter);
+			SolutionScheduler simpleScheduler = createDefaultSimpleForwardSolutionScheduler(resourcesList);
+			simpleScheduler.setBufferTime(300);
+			collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 			collectionLSP = collectionLSPBuilder.build();
 		}
 		{
-			ArrayList<Link> linkList = new ArrayList<>( scenario.getNetwork().getLinks().values() );
-			for( int i = 1 ; i < 2 ; i++ ){
-				Id<LSPShipment> id = Id.create( i, LSPShipment.class );
-				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance( id );
+			ArrayList<Link> linkList = new ArrayList<>(scenario.getNetwork().getLinks().values());
+			for (int i = 1; i < 2; i++) {
+				Id<LSPShipment> id = Id.create(i, LSPShipment.class);
+				ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 				//Random random = new Random(1);
-				int capacityDemand = 1 + new Random().nextInt( 4 );
-				builder.setCapacityDemand( capacityDemand );
+				int capacityDemand = 1 + new Random().nextInt(4);
+				builder.setCapacityDemand(capacityDemand);
 
-				while( true ){
-					Collections.shuffle( linkList );
-					Link pendingFromLink = linkList.get( 0 );
-					if( pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-							    pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-							    pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-							    pendingFromLink.getToNode().getCoord().getY() <= 4000 ){
-						builder.setFromLinkId( pendingFromLink.getId() );
+				while (true) {
+					Collections.shuffle(linkList);
+					Link pendingFromLink = linkList.get(0);
+					if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+							pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+							pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+							pendingFromLink.getToNode().getCoord().getY() <= 4000) {
+						builder.setFromLinkId(pendingFromLink.getId());
 						break;
 					}
 				}
 
-				builder.setToLinkId( collectionLinkId );
-				TimeWindow endTimeWindow = TimeWindow.newInstance( 0, (24 * 3600) );
-				builder.setEndTimeWindow( endTimeWindow );
-				TimeWindow startTimeWindow = TimeWindow.newInstance( 0, (24 * 3600) );
-				builder.setStartTimeWindow( startTimeWindow );
-				builder.setDeliveryServiceTime( capacityDemand * 60 );
+				builder.setToLinkId(collectionLinkId);
+				TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
+				builder.setEndTimeWindow(endTimeWindow);
+				TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
+				builder.setStartTimeWindow(startTimeWindow);
+				builder.setDeliveryServiceTime(capacityDemand * 60);
 				LSPShipment shipment = builder.build();
-				collectionLSP.assignShipmentToLSP( shipment );
+				collectionLSP.assignShipmentToLSP(shipment);
 			}
 			collectionLSP.scheduleSolutions();
 		}
 		final LSPs lsps;
 		{
 			ArrayList<LSP> lspList = new ArrayList<>();
-			lspList.add( collectionLSP );
-			lsps = new LSPs( lspList );
+			lspList.add(collectionLSP);
+			lsps = new LSPs(lspList);
 		}
 		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler( new BasicEventHandler(){
-			@Override public void handleEvent( Event event ){
+		controler.getEvents().addHandler(new BasicEventHandler() {
+			@Override
+			public void handleEvent(Event event) {
 				log.warn(event);
-			}
-		} );
-
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() );
 			}
 		});
 
-		LSPUtils.addLSPs( scenario, lsps );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
+			}
+		});
+
+		LSPUtils.addLSPs(scenario, lsps);
 		controler.run();
 	}
 
 	@Test
 	public void testCollectionLSPMobsim() {
-		for(LSPShipment shipment : collectionLSP.getShipments()) {
+		for (LSPShipment shipment : collectionLSP.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 
 			log.warn("");
-			log.warn("shipment schedule plan elements:" );
-			for( ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values() ){
-				log.warn( planElement );
+			log.warn("shipment schedule plan elements:");
+			for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
+				log.warn(planElement);
 			}
 			log.warn("");
 			log.warn("shipment log plan elements:");
-			for( ShipmentPlanElement planElement : shipment.getLog().getPlanElements().values() ){
-				log.warn( planElement );
+			for (ShipmentPlanElement planElement : shipment.getLog().getPlanElements().values()) {
+				log.warn(planElement);
 			}
 			log.warn("");
 
 			assertEquals(shipment.getShipmentPlan().getPlanElements().size(), shipment.getLog().getPlanElements().size());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
+			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
+			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			//Das muss besser in den SchedulingTest rein
 			assertSame(collectionLSP.getResources().iterator().next(), collectionAdapter);
@@ -228,7 +231,7 @@ public class CollectionLSPMobsimTest {
 			assertSame(carrierResource.getCarrier(), carrier);
 			assertEquals(1, carrier.getServices().size());
 
-			for(ShipmentPlanElement scheduleElement : scheduleElements){
+			for (ShipmentPlanElement scheduleElement : scheduleElements) {
 				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertEquals(scheduleElement.getElementType(), logElement.getElementType());
 				assertSame(scheduleElement.getResourceId(), logElement.getResourceId());

@@ -33,14 +33,15 @@ import lsp.LSPResource;
 
 public class FirstReloadAdapterTest {
 
-	private static final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");;
+	private static final Id<Link> hubLinkId = Id.createLinkId("(4 2) (4 3)");
+	;
 	private TransshipmentHub transshipmentHub;
 
 	@Before
-	public void initialize(){
+	public void initialize() {
 
 
-		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
@@ -59,10 +60,10 @@ public class FirstReloadAdapterTest {
 		assertTrue(transshipmentHub.getClientElements().isEmpty());
 		assertSame(transshipmentHub.getEndLinkId(), hubLinkId);
 		assertSame(transshipmentHub.getStartLinkId(), hubLinkId);
-		assertNotNull(transshipmentHub.getSimulationTrackers() );
-		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty() );
-		assertEquals(1, transshipmentHub.getSimulationTrackers().size() );
-		assertNotNull(transshipmentHub.getAttributes() );
-		assertTrue(transshipmentHub.getAttributes().isEmpty() );
+		assertNotNull(transshipmentHub.getSimulationTrackers());
+		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty());
+		assertEquals(1, transshipmentHub.getSimulationTrackers().size());
+		assertNotNull(transshipmentHub.getAttributes());
+		assertTrue(transshipmentHub.getAttributes().isEmpty());
 	}
 }

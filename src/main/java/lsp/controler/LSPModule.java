@@ -38,22 +38,22 @@ import java.util.List;
 
 
 public class LSPModule extends AbstractModule {
-	private static final Logger log = org.apache.log4j.Logger.getLogger( LSPModule.class );
+	private static final Logger log = org.apache.log4j.Logger.getLogger(LSPModule.class);
 
 //	private final FreightConfigGroup carrierConfig = new FreightConfigGroup();
 
 	@Override
 	public void install() {
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(getConfig(), FreightConfigGroup.class);
 
-		bind( LSPControlerListenerImpl.class ).in( Singleton.class );
-		addControlerListenerBinding().to( LSPControlerListenerImpl.class );
+		bind(LSPControlerListenerImpl.class).in(Singleton.class);
+		addControlerListenerBinding().to(LSPControlerListenerImpl.class);
 
 		// this switches on certain qsim components:
-		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
+		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule(getConfig(), QSimComponentsConfigGroup.class);
 		List<String> abc = qsimComponents.getActiveComponents();
-		abc.add( FreightAgentSource.COMPONENT_NAME );
-		switch ( freightConfig.getTimeWindowHandling() ) {
+		abc.add(FreightAgentSource.COMPONENT_NAME);
+		switch (freightConfig.getTimeWindowHandling()) {
 			case ignore:
 				break;
 //			case enforceBeginnings:
@@ -61,16 +61,17 @@ public class LSPModule extends AbstractModule {
 //				log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
 //				break;
 			default:
-				throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+				throw new IllegalStateException("Unexpected value: " + freightConfig.getTimeWindowHandling());
 		}
-		qsimComponents.setActiveComponents( abc );
+		qsimComponents.setActiveComponents(abc);
 
 		// this installs qsim components, which are switched on (or not) via the above syntax:
-		this.installQSimModule( new AbstractQSimModule(){
-			@Override protected void configureQSim(){
-				this.bind( FreightAgentSource.class ).in( Singleton.class );
-				this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
-				switch( freightConfig.getTimeWindowHandling() ) {
+		this.installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(FreightAgentSource.class).in(Singleton.class);
+				this.addQSimComponentBinding(FreightAgentSource.COMPONENT_NAME).to(FreightAgentSource.class);
+				switch (freightConfig.getTimeWindowHandling()) {
 					case ignore:
 						break;
 //					case enforceBeginnings:
@@ -78,19 +79,19 @@ public class LSPModule extends AbstractModule {
 //						log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
 //						break;
 					default:
-						throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+						throw new IllegalStateException("Unexpected value: " + freightConfig.getTimeWindowHandling());
 				}
 			}
-		} );
+		});
 
 	}
 
-	@Provides Collection<LSPEventCreator> provideEventCreators(){
+	@Provides Collection<LSPEventCreator> provideEventCreators() {
 		return LSPEventCreatorUtils.getStandardEventCreators();
 		// (if you do not like them, you will have to override the binding.  kai, may'22)
 	}
 
-	@Provides CarrierAgentTracker provideCarrierResourceTracker( LSPControlerListenerImpl lspControlerListener ) {
+	@Provides CarrierAgentTracker provideCarrierResourceTracker(LSPControlerListenerImpl lspControlerListener) {
 		return lspControlerListener.getCarrierResourceTracker();
 	}
 

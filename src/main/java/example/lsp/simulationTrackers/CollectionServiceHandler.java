@@ -35,47 +35,28 @@ import org.matsim.vehicles.Vehicle;
 /*package-private*/ class CollectionServiceHandler implements LSPServiceStartEventHandler, LSPServiceEndEventHandler {
 
 
-	private static class ServiceTuple {
-		private final CarrierService service;
-		private final double startTime;
-		
-		public ServiceTuple(CarrierService service, double startTime) {
-			this.service = service;
-			this.startTime = startTime;
-		}
-
-		public CarrierService getService() {
-			return service;
-		}
-
-		public double getStartTime() {
-			return startTime;
-		}
-		
-	}
-
 	private final Collection<ServiceTuple> tuples;
 	private double totalLoadingCosts;
 	private int totalNumberOfShipments;
 	private int totalWeightOfShipments;
-	
-	public  CollectionServiceHandler() {
+
+	public CollectionServiceHandler() {
 		this.tuples = new ArrayList<>();
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
-			tuples.clear();
-			totalNumberOfShipments = 0;
-			totalWeightOfShipments = 0;
+		tuples.clear();
+		totalNumberOfShipments = 0;
+		totalWeightOfShipments = 0;
 	}
 
 	@Override
 	public void handleEvent(LSPServiceEndEvent event) {
 		System.out.println("Service Ends");
 		double loadingCosts = 0;
-		for(ServiceTuple tuple : tuples) {
-			if(tuple.getService() == event.getService()) {
+		for (ServiceTuple tuple : tuples) {
+			if (tuple.getService() == event.getService()) {
 				double serviceDuration = event.getTime() - tuple.getStartTime();
 				loadingCosts = serviceDuration * ((Vehicle) event.getVehicle()).getType().getCostInformation().getPerTimeUnit();
 				totalLoadingCosts = totalLoadingCosts + loadingCosts;
@@ -103,5 +84,24 @@ import org.matsim.vehicles.Vehicle;
 	public int getTotalWeightOfShipments() {
 		return totalWeightOfShipments;
 	}
-	
+
+	private static class ServiceTuple {
+		private final CarrierService service;
+		private final double startTime;
+
+		public ServiceTuple(CarrierService service, double startTime) {
+			this.service = service;
+			this.startTime = startTime;
+		}
+
+		public CarrierService getService() {
+			return service;
+		}
+
+		public double getStartTime() {
+			return startTime;
+		}
+
+	}
+
 }

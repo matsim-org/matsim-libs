@@ -43,7 +43,6 @@ import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 
 
-
 public class MainRunAdapterTest {
 
 	private org.matsim.vehicles.VehicleType mainRunType;
@@ -53,13 +52,13 @@ public class MainRunAdapterTest {
 	private CarrierCapabilities capabilities;
 	private Carrier carrier;
 	private LSPCarrierResource mainRunAdapter;
-	
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 
@@ -70,9 +69,9 @@ public class MainRunAdapterTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0008);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(120);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		mainRunType = vehicleTypeBuilder.build();
-				
+
 		toLinkId = Id.createLinkId("(14 2) (14 3)");
 		fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("MainRunVehicle");
@@ -89,42 +88,42 @@ public class MainRunAdapterTest {
 
 
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-        UsecaseUtils.MainRunCarrierAdapterBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
-        mainRunBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-        mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-        mainRunBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-        mainRunBuilder.setCarrier(carrier);
-        mainRunAdapter =  mainRunBuilder.build();
-	
+		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
+		mainRunBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunBuilder.setCarrier(carrier);
+		mainRunAdapter = mainRunBuilder.build();
+
 	}
-	
+
 	@Test
 	public void testMainRunAdapter() {
 		assertNotNull(mainRunAdapter.getClientElements());
 		assertTrue(mainRunAdapter.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass()));
-		if(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass())) {
+		if (LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass())) {
 //			assertTrue(Carrier.class.isAssignableFrom(mainRunAdapter.getClassOfResource()));
 			assertSame(mainRunAdapter.getCarrier(), carrier);
 		}
 		assertSame(mainRunAdapter.getEndLinkId(), toLinkId);
 		assertSame(mainRunAdapter.getStartLinkId(), fromLinkId);
-		assertNotNull(mainRunAdapter.getSimulationTrackers() );
-		assertTrue(mainRunAdapter.getSimulationTrackers().isEmpty() );
-		assertNotNull(mainRunAdapter.getAttributes() );
-		assertTrue(mainRunAdapter.getAttributes().isEmpty() );
-		if(mainRunAdapter.getCarrier() == carrier) {
+		assertNotNull(mainRunAdapter.getSimulationTrackers());
+		assertTrue(mainRunAdapter.getSimulationTrackers().isEmpty());
+		assertNotNull(mainRunAdapter.getAttributes());
+		assertTrue(mainRunAdapter.getAttributes().isEmpty());
+		if (mainRunAdapter.getCarrier() == carrier) {
 			assertSame(carrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
 			assertTrue(carrier.getPlans().isEmpty());
 			assertNull(carrier.getSelectedPlan());
 			assertTrue(carrier.getServices().isEmpty());
 			assertTrue(carrier.getShipments().isEmpty());
-			if(carrier.getCarrierCapabilities() == capabilities) {
+			if (carrier.getCarrierCapabilities() == capabilities) {
 				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
-				if(types.size() ==1) {
+				if (types.size() == 1) {
 					assertSame(types.get(0), mainRunType);
 					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
 					assertEquals(0.0008, mainRunType.getCostInformation().getPerDistanceUnit(), 0.0);
@@ -133,14 +132,14 @@ public class MainRunAdapterTest {
 					assertEquals((50 / 3.6), mainRunType.getMaximumVelocity(), 0.0);
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
-				if(vehicles.size() == 1) {
+				if (vehicles.size() == 1) {
 					assertSame(vehicles.get(0), carrierVehicle);
 					assertSame(carrierVehicle.getType(), mainRunType);
 					assertSame(carrierVehicle.getLocation(), fromLinkId);
 				}
 			}
 		}
-	
-	
+
+
 	}
 }

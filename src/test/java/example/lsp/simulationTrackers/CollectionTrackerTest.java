@@ -62,11 +62,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-
 public class CollectionTrackerTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	private static final Logger log = Logger.getLogger( CollectionTrackerTest.class );
-
+	private static final Logger log = Logger.getLogger(CollectionTrackerTest.class);
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 	private Network network;
 	private Carrier carrier;
 	private LogisticsSolution collectionSolution;
@@ -79,8 +78,8 @@ public class CollectionTrackerTest {
 		this.config = new Config();
 		config.addCoreModules();
 
-		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -94,7 +93,7 @@ public class CollectionTrackerTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
@@ -107,7 +106,7 @@ public class CollectionTrackerTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier( carrierId );
+		carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 
@@ -119,27 +118,27 @@ public class CollectionTrackerTest {
 		LSPResource collectionAdapter = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
+		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
 
 		{
 			shareOfFixedCosts = 0.2;
-			LinearCostTracker tracker = new LinearCostTracker( shareOfFixedCosts );
-			tracker.getEventHandlers().add( new TourStartHandler() );
-			tracker.getEventHandlers().add( new CollectionServiceHandler() );
-			tracker.getEventHandlers().add( new DistanceAndTimeHandler( scenario ) );
+			LinearCostTracker tracker = new LinearCostTracker(shareOfFixedCosts);
+			tracker.getEventHandlers().add(new TourStartHandler());
+			tracker.getEventHandlers().add(new CollectionServiceHandler());
+			tracker.getEventHandlers().add(new DistanceAndTimeHandler(scenario));
 			// I think that it would be better to use delegation inside LinearCostTracker, i.e. to not expose getEventHandlers(). kai, jun'22
 
-			collectionSolution.addSimulationTracker( tracker );
+			collectionSolution.addSimulationTracker(tracker);
 		}
 
-		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
@@ -153,20 +152,20 @@ public class CollectionTrackerTest {
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
 
-		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 
-		for(int i = 1; i < 2; i++) {
+		for (int i = 1; i < 2; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(4);
 			builder.setCapacityDemand(capacityDemand);
 
-			while(true) {
+			while (true) {
 				Collections.shuffle(linkList, random);
 				Link pendingFromLink = linkList.get(0);
-				if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
 						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
@@ -176,36 +175,36 @@ public class CollectionTrackerTest {
 			}
 
 			builder.setToLinkId(collectionLinkId);
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setDeliveryServiceTime(capacityDemand * 60 );
+			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LSPShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 		collectionLSP.scheduleSolutions();
 
 
-
 		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.addLSPs( scenario, lsps );
+		LSPUtils.addLSPs(scenario, lsps);
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
 			}
 		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		controler.run();
 	}
 
@@ -222,11 +221,11 @@ public class CollectionTrackerTest {
 		double totalTrackedWeight = 0;
 		int totalNumberOfScheduledShipments = 0;
 		int totalNumberOfTrackedShipments = 0;
-		for(EventHandler handler : linearTracker.getEventHandlers()) {
-			if(handler instanceof TourStartHandler ) {
+		for (EventHandler handler : linearTracker.getEventHandlers()) {
+			if (handler instanceof TourStartHandler) {
 				TourStartHandler startHandler = (TourStartHandler) handler;
 				double scheduledCosts = 0;
-				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					scheduledCosts += ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getFix();
 					totalScheduledCosts += scheduledCosts;
 				}
@@ -234,15 +233,15 @@ public class CollectionTrackerTest {
 				totalTrackedCosts += trackedCosts;
 				assertEquals(trackedCosts, scheduledCosts, 0.1);
 			}
-			if(handler instanceof CollectionServiceHandler ) {
+			if (handler instanceof CollectionServiceHandler) {
 				CollectionServiceHandler serviceHandler = (CollectionServiceHandler) handler;
 				totalTrackedWeight = serviceHandler.getTotalWeightOfShipments();
 				totalNumberOfTrackedShipments = serviceHandler.getTotalNumberOfShipments();
 				double scheduledCosts = 0;
-				for(ScheduledTour scheduledTour: carrier.getSelectedPlan().getScheduledTours()) {
+				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					Tour tour = scheduledTour.getTour();
-					for(TourElement element : tour.getTourElements()) {
-						if(element instanceof ServiceActivity){
+					for (TourElement element : tour.getTourElements()) {
+						if (element instanceof ServiceActivity) {
 							ServiceActivity activity = (ServiceActivity) element;
 							scheduledCosts += activity.getService().getServiceDuration() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerTimeUnit();
 							totalScheduledCosts += scheduledCosts;
@@ -255,61 +254,61 @@ public class CollectionTrackerTest {
 				totalTrackedCosts += trackedCosts;
 				assertEquals(trackedCosts, scheduledCosts, 0.1);
 			}
-			if(handler instanceof DistanceAndTimeHandler ) {
+			if (handler instanceof DistanceAndTimeHandler) {
 				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
 				double trackedTimeCosts = distanceHandler.getTimeCosts();
 				totalTrackedCosts += trackedTimeCosts;
 				double scheduledTimeCosts = 0;
-				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					Tour tour = scheduledTour.getTour();
-					for(TourElement element : tour.getTourElements() ) {
-						if(element instanceof Leg) {
+					for (TourElement element : tour.getTourElements()) {
+						if (element instanceof Leg) {
 							Leg leg = (Leg) element;
 							scheduledTimeCosts += leg.getExpectedTransportTime() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerTimeUnit();
 						}
 					}
 				}
 				totalScheduledCosts += scheduledTimeCosts;
-				assertEquals(scheduledTimeCosts, trackedTimeCosts, Math.max(scheduledTimeCosts,trackedTimeCosts)*0.01);
+				assertEquals(scheduledTimeCosts, trackedTimeCosts, Math.max(scheduledTimeCosts, trackedTimeCosts) * 0.01);
 
 				double scheduledDistanceCosts = 0;
 				double trackedDistanceCosts = distanceHandler.getDistanceCosts();
 				totalTrackedCosts += trackedDistanceCosts;
-				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
-					for(TourElement element : scheduledTour.getTour().getTourElements()) {
+					for (TourElement element : scheduledTour.getTour().getTourElements()) {
 						System.out.println(element);
-						if(element instanceof Leg) {
+						if (element instanceof Leg) {
 							Leg leg = (Leg) element;
 							NetworkRoute linkRoute = (NetworkRoute) leg.getRoute();
-							for(Id<Link> linkId: linkRoute.getLinkIds()) {
-								scheduledDistanceCosts  += network.getLinks().get(linkId).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
+							for (Id<Link> linkId : linkRoute.getLinkIds()) {
+								scheduledDistanceCosts += network.getLinks().get(linkId).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
 							}
 						}
-						if(element instanceof ServiceActivity) {
+						if (element instanceof ServiceActivity) {
 							ServiceActivity activity = (ServiceActivity) element;
-							scheduledDistanceCosts  += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
+							scheduledDistanceCosts += network.getLinks().get(activity.getLocation()).getLength() * ((Vehicle) scheduledTour.getVehicle()).getType().getCostInformation().getPerDistanceUnit();
 							// (I think that we need this since the last link is not in the route.  Or is it?  kai, jul'22)
 							// (yy I do not understand why we do not need to do this for the end activity of the tour.)
 						}
 					}
-					log.warn( "scheduledDistanceCosts=" + scheduledDistanceCosts );
+					log.warn("scheduledDistanceCosts=" + scheduledDistanceCosts);
 				}
 				totalScheduledCosts += scheduledDistanceCosts;
-				assertEquals(scheduledDistanceCosts, trackedDistanceCosts, Math.max(scheduledDistanceCosts,trackedDistanceCosts)*0.01);
+				assertEquals(scheduledDistanceCosts, trackedDistanceCosts, Math.max(scheduledDistanceCosts, trackedDistanceCosts) * 0.01);
 			}
 		}
 
-		double linearTrackedCostsPerShipment = (totalTrackedCosts * (1-shareOfFixedCosts))/totalTrackedWeight;
-		double linearScheduledCostsPerShipment = (totalScheduledCosts * (1-shareOfFixedCosts))/totalScheduledWeight;
-		double fixedTrackedCostsPerShipment = (totalTrackedCosts * shareOfFixedCosts)/totalNumberOfTrackedShipments;
-		double fixedScheduledCostsPerShipment = (totalScheduledCosts * shareOfFixedCosts)/totalNumberOfScheduledShipments;
+		double linearTrackedCostsPerShipment = (totalTrackedCosts * (1 - shareOfFixedCosts)) / totalTrackedWeight;
+		double linearScheduledCostsPerShipment = (totalScheduledCosts * (1 - shareOfFixedCosts)) / totalScheduledWeight;
+		double fixedTrackedCostsPerShipment = (totalTrackedCosts * shareOfFixedCosts) / totalNumberOfTrackedShipments;
+		double fixedScheduledCostsPerShipment = (totalScheduledCosts * shareOfFixedCosts) / totalNumberOfScheduledShipments;
 
 		assertEquals(totalTrackedWeight, totalTrackedWeight, 0);
 		assertEquals(totalNumberOfTrackedShipments, totalNumberOfScheduledShipments, 0);
-		assertEquals(totalTrackedCosts, totalScheduledCosts, Math.max(totalScheduledCosts, totalTrackedCosts)*0.01);
-		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment)*0.01);
-		assertEquals(fixedScheduledCostsPerShipment, fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, fixedScheduledCostsPerShipment)*0.01);
+		assertEquals(totalTrackedCosts, totalScheduledCosts, Math.max(totalScheduledCosts, totalTrackedCosts) * 0.01);
+		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment) * 0.01);
+		assertEquals(fixedScheduledCostsPerShipment, fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, fixedScheduledCostsPerShipment) * 0.01);
 
 //		LSPInfo info = collectionSolution.getAttributes().iterator().next();
 //		assertTrue(info instanceof CostInfo );
@@ -322,10 +321,10 @@ public class CollectionTrackerTest {
 
 		// I cannot say how the above was supposed to work, since costInfo.getVariableCost() was the same in both cases.  kai, may'22
 
-		assertEquals(2, collectionSolution.getAttributes().size() );
-		assertEquals( LSPUtils.getVariableCost( collectionSolution ) ,linearTrackedCostsPerShipment , Math.max(linearTrackedCostsPerShipment,LSPUtils.getVariableCost( collectionSolution ) ) * 0.01 );
-		assertEquals( LSPUtils.getVariableCost( collectionSolution )  , linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,LSPUtils.getVariableCost( collectionSolution ) ) * 0.01 );
-		assertEquals( LSPUtils.getFixedCost( collectionSolution ) ,fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,LSPUtils.getFixedCost( collectionSolution )) * 0.01 );
-		assertEquals( LSPUtils.getFixedCost( collectionSolution ),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,LSPUtils.getFixedCost( collectionSolution )) * 0.01 );
+		assertEquals(2, collectionSolution.getAttributes().size());
+		assertEquals(LSPUtils.getVariableCost(collectionSolution), linearTrackedCostsPerShipment, Math.max(linearTrackedCostsPerShipment, LSPUtils.getVariableCost(collectionSolution)) * 0.01);
+		assertEquals(LSPUtils.getVariableCost(collectionSolution), linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment, LSPUtils.getVariableCost(collectionSolution)) * 0.01);
+		assertEquals(LSPUtils.getFixedCost(collectionSolution), fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, LSPUtils.getFixedCost(collectionSolution)) * 0.01);
+		assertEquals(LSPUtils.getFixedCost(collectionSolution), fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment, LSPUtils.getFixedCost(collectionSolution)) * 0.01);
 	}
 }

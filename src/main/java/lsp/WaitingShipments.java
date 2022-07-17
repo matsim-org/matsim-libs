@@ -27,12 +27,12 @@ import lsp.shipment.LSPShipment;
 /**
  * Each LogisticsSolutionElement maintains two collections of WaitingShipments.
  * Instances of the latter class contain tuples of LSPShipments and time stamps.
- *
+ * <p>
  * The first of these collections stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
  * charge of the actual physical handling.
- *
+ * <p>
  * The second one stores shipments that have already been treated.
- *
+ * <p>
  * At the beginning of the scheduling process, all LSPShipments are added
  * to the collection of incoming shipments of the first LogisticsSolutionElement of the
  * LogisticsSolution to which they were assigned before. The tuples in the collection of
@@ -43,11 +43,11 @@ import lsp.shipment.LSPShipment;
 public interface WaitingShipments {
 
 	void addShipment(double time, LSPShipment shipment);
-	
+
 	Collection<ShipmentWithTime> getSortedShipments();
-	
+
 	Collection<ShipmentWithTime> getShipments();
-	
+
 	void clear();
-	
+
 }

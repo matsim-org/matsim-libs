@@ -16,7 +16,7 @@ public class LSPDataObject<T> implements HasSimulationTrackers<T>, Attributable,
 	private final Attributes attributes = new Attributes();
 	private final Id<T> id;
 
-	public LSPDataObject( Id<T> id ) {
+	public LSPDataObject(Id<T> id) {
 		this.id = id;
 	}
 

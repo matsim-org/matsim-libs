@@ -26,10 +26,10 @@ import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 /*package-private*/ class TourStartHandler implements LSPTourStartEventHandler {
-	private static final Logger log = Logger.getLogger( TourStartHandler.class );
+	private static final Logger log = Logger.getLogger(TourStartHandler.class);
 
 	private double vehicleFixedCosts;
-		
+
 	@Override
 	public void reset(int iteration) {
 		vehicleFixedCosts = 0;
@@ -37,7 +37,7 @@ import org.matsim.vehicles.Vehicle;
 
 	@Override
 	public void handleEvent(LSPTourStartEvent event) {
-		log.warn( "handling tour start event=" + event );
+		log.warn("handling tour start event=" + event);
 		vehicleFixedCosts = vehicleFixedCosts + ((Vehicle) event.getVehicle()).getType().getCostInformation().getFix();
 	}
 

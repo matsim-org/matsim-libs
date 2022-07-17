@@ -52,45 +52,45 @@ import static org.junit.Assert.assertTrue;
 
 public class CollectionLSPScoringTest {
 
-	private LSP collectionLSP;
 	private final int numberOfShipments = 25;
+	private LSP collectionLSP;
 
 	@Before
 	public void initialize() {
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile( "scenarios/2regions/2regions-network.xml" );
+		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 
-		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
 
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
-		VehicleType collectionVehicleType = CarrierVehicleType.Builder.newInstance( Id.create("CollectionCarrierVehicleType", VehicleType.class ) )
-								       .setCapacity(10 ).setCostPerDistanceUnit(0.0004 ).setCostPerTimeUnit(0.38 ).setFixCost(49 ).setMaxVelocity(50 / 3.6 ).build();
+		VehicleType collectionVehicleType = CarrierVehicleType.Builder.newInstance(Id.create("CollectionCarrierVehicleType", VehicleType.class))
+				.setCapacity(10).setCostPerDistanceUnit(0.0004).setCostPerTimeUnit(0.38).setFixCost(49).setMaxVelocity(50 / 3.6).build();
 
-		Link collectionLink = network.getLinks().get( Id.createLinkId("(4 2) (4 3)" ) ); // (make sure that the link exists)
+		Link collectionLink = network.getLinks().get(Id.createLinkId("(4 2) (4 3)")); // (make sure that the link exists)
 
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLink.getId(), collectionVehicleType);
 
-		Carrier carrier = CarrierUtils.createCarrier( Id.create("CollectionCarrier", Carrier.class ) );
-		carrier.setCarrierCapabilities( CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType ).addVehicle(carrierVehicle ).setFleetSize(FleetSize.INFINITE ).build() );
+		Carrier carrier = CarrierUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
+		carrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType).addVehicle(carrierVehicle).setFleetSize(FleetSize.INFINITE).build());
 
-		LSPResource collectionAdapter = CollectionCarrierAdapterBuilder.newInstance( Id.create("CollectionCarrierAdapter", LSPResource.class ), network)
-									       .setCollectionScheduler( createDefaultCollectionCarrierScheduler() ).setCarrier(carrier ).setLocationLinkId(collectionLink.getId() ).build();
+		LSPResource collectionAdapter = CollectionCarrierAdapterBuilder.newInstance(Id.create("CollectionCarrierAdapter", LSPResource.class), network)
+				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setCarrier(carrier).setLocationLinkId(collectionLink.getId()).build();
 
 		LogisticsSolutionElement collectionElement = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance( Id.create("CollectionElement", LogisticsSolutionElement.class ) ).setResource(collectionAdapter ).build();
+				.newInstance(Id.create("CollectionElement", LogisticsSolutionElement.class)).setResource(collectionAdapter).build();
 
-		LogisticsSolution collectionSolution = LSPUtils.LogisticsSolutionBuilder.newInstance( Id.create("CollectionSolution", LogisticsSolution.class ) )
-											.addSolutionElement(collectionElement ).build();
+		LogisticsSolution collectionSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("CollectionSolution", LogisticsSolution.class))
+				.addSolutionElement(collectionElement).build();
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
-						   .setInitialPlan( LSPUtils.createLSPPlan().setAssigner( createSinglesolutionShipmentAssigner() ).addSolution(collectionSolution ) )
-						   .setSolutionScheduler( createDefaultSimpleForwardSolutionScheduler( Collections.singletonList( collectionAdapter ) ) )
-						   .setSolutionScorer( new ExampleLSPScoring.TipScorer() )
-						   .build();
+				.setInitialPlan(LSPUtils.createLSPPlan().setAssigner(createSingleSolutionShipmentAssigner()).addSolution(collectionSolution))
+				.setSolutionScheduler(createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(collectionAdapter)))
+				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
+				.build();
 
 //		TipEventHandler handler = new TipEventHandler();
 //		LSPAttribute<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
@@ -107,7 +107,7 @@ public class CollectionLSPScoringTest {
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
@@ -124,12 +124,12 @@ public class CollectionLSPScoringTest {
 				}
 			}
 
-			builder.setToLinkId( collectionLink.getId() );
+			builder.setToLinkId(collectionLink.getId());
 			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setEndTimeWindow(endTimeWindow);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setDeliveryServiceTime(capacityDemand * 60 );
+			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LSPShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
@@ -140,7 +140,7 @@ public class CollectionLSPScoringTest {
 		lspList.add(collectionLSP);
 		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.addLSPs( scenario, lsps );
+		LSPUtils.addLSPs(scenario, lsps);
 
 		Controler controler = new Controler(scenario);
 

@@ -29,28 +29,28 @@ import java.util.List;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
-		
+
 	private final List<ShipmentWithTime> shipments;
-	
+
 	WaitingShipmentsImpl() {
 		this.shipments = new ArrayList<>();
 	}
-	
-	
+
+
 	@Override
 	public void addShipment(double time, LSPShipment shipment) {
 		ShipmentWithTime tuple = new ShipmentWithTime(time, shipment);
 		this.shipments.add(tuple);
-		shipments.sort( Comparator.comparingDouble( ShipmentWithTime::getTime ) );;
+		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
 	}
 
 	@Override
-	public Collection <ShipmentWithTime> getSortedShipments() {
-		shipments.sort( Comparator.comparingDouble( ShipmentWithTime::getTime ) );
+	public Collection<ShipmentWithTime> getSortedShipments() {
+		shipments.sort(Comparator.comparingDouble(ShipmentWithTime::getTime));
 		return shipments;
 	}
 
-	public void clear(){
+	public void clear() {
 		shipments.clear();
 	}
 
@@ -58,5 +58,5 @@ import java.util.List;
 	public Collection<ShipmentWithTime> getShipments() {
 		return shipments;
 	}
-		
+
 }

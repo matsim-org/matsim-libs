@@ -30,57 +30,50 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 
 /**
- *  In the class library, the interface LSP has the following tasks:
+ * In the class library, the interface LSP has the following tasks:
  * 1. Maintain one or several transport chains through which {@link LSPShipment}s are routed.
  * 2. Assign {@link LSPShipment}s to the suitable transport chain. --> {@link ShipmentAssigner}.
  * 3. Interact with the agents that embody the demand side of the freight transport market, if they are specified in the setting.
  * 4. Coordinate carriers that are in charge of the physical transport.
  */
-public interface LSP extends HasPlansAndId<LSPPlan,LSP>, HasSimulationTrackers<LSP> {
+public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<LSP> {
 
 	/**
-	 * @return
-	 *
-	 * yyyy does this have to be exposed?
+	 * @return yyyy does this have to be exposed?
 	 */
 	Collection<LSPShipment> getShipments();
-	
+
 	/**
 	 * ok (behavioral method)
 	 */
 	void scheduleSolutions();
-	
+
 
 	/**
-	 * @return
-	 *
-	 * yyyy does this have to be exposed?
+	 * @return yyyy does this have to be exposed?
 	 */
 	Collection<LSPResource> getResources();
 
 
 	/**
 	 * ok (behavioral method)
+	 *
 	 * @param scoringEvent
 	 */
-	void scoreSelectedPlan( ScoringEvent scoringEvent );
-	
+	void scoreSelectedPlan(ScoringEvent scoringEvent);
+
 
 	/**
-	 * @param shipment
-	 *
-	 * ok (LSP needs to be told that it is responsible for shipment)
+	 * @param shipment ok (LSP needs to be told that it is responsible for shipment)
 	 */
-	void assignShipmentToLSP( LSPShipment shipment );
-	
-	void replan( ReplanningEvent arg0 );
+	void assignShipmentToLSP(LSPShipment shipment);
+
+	void replan(ReplanningEvent arg0);
 
 	/**
-	 * @param replanner
-	 *
-	 * yyyy does it make sense to expose this (implies that replanner can be changed during iterations)?
+	 * @param replanner yyyy does it make sense to expose this (implies that replanner can be changed during iterations)?
 	 */
-	void setReplanner( LSPReplanner replanner );
-	
+	void setReplanner(LSPReplanner replanner);
+
 
 }    

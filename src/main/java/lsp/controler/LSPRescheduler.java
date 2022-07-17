@@ -38,14 +38,14 @@ import lsp.shipment.LSPShipment;
  * LogisticsSolutions can happen. Consequently, the transport operations that
  * result from this change in behavior of the corresponding LSP will also change
  * and thus the preparation of the simulation has to be redone.
- *
+ * <p>
  * The rescheduling process is triggered in the BeforeMobsimEvent of the following iteration which has
  * a LSPRescheduler as one of its listeners.
- *
+ * <p>
  * In this case, all LogisticsSolutions,
  * LogisticsSolutionElements and Resources are cleared of all shipments that
  * were assigned to them in the previous iteration in order to allow a new assignment.
- *
+ * <p>
  * Then, all LSPShipments of each LSP are assigned to the corresponding
  * LogisticsSolutions by the Assigner of the LSP in order to account for possible
  * changes in the LogisticsSolutions as well as in the assignment itself due to
@@ -57,26 +57,27 @@ import lsp.shipment.LSPShipment;
  * subsequent iterations of the simulation due to congestion.
  */
 final class LSPRescheduler {
-	private LSPRescheduler(){ }
+	private LSPRescheduler() {
+	}
 
-	static void notifyBeforeMobsim( LSPs lsps, BeforeMobsimEvent arg0) {
-		if(arg0.getIteration() !=  0) {
-			for(LSP lsp : lsps.getLSPs().values()){
-				for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+	static void notifyBeforeMobsim(LSPs lsps, BeforeMobsimEvent arg0) {
+		if (arg0.getIteration() != 0) {
+			for (LSP lsp : lsps.getLSPs().values()) {
+				for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 					solution.getShipments().clear();
-					for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+					for (LogisticsSolutionElement element : solution.getSolutionElements()) {
 						element.getIncomingShipments().clear();
 						element.getOutgoingShipments().clear();
 					}
 				}
-				
-				for(LSPShipment shipment : lsp.getShipments()) {
+
+				for (LSPShipment shipment : lsp.getShipments()) {
 					shipment.getShipmentPlan().clear();
 					shipment.getLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignToSolution(shipment);
 				}
 				lsp.scheduleSolutions();
-			}		
-		}		
+			}
+		}
 	}
 }

@@ -31,21 +31,21 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 final class LoggedShipmentTransport implements ShipmentLeg {
 
 	private final double startTime;
-	private double endTime;
 	private final LogisticsSolutionElement element;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> fromLinkId;
+	private double endTime;
 	private Id<Link> toLinkId;
 
-	LoggedShipmentTransport(ShipmentUtils.LoggedShipmentTransportBuilder builder){
+	LoggedShipmentTransport(ShipmentUtils.LoggedShipmentTransportBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
 		this.fromLinkId = builder.getFromLinkId();
 		this.toLinkId = builder.getToLinkId();
 	}
-	
-	
+
+
 	@Override
 	public LogisticsSolutionElement getSolutionElement() {
 		return element;
@@ -72,7 +72,7 @@ final class LoggedShipmentTransport implements ShipmentLeg {
 		return endTime;
 	}
 
-	public void setEndTime(double endTime){
+	public void setEndTime(double endTime) {
 		this.endTime = endTime;
 	}
 
@@ -80,22 +80,25 @@ final class LoggedShipmentTransport implements ShipmentLeg {
 	public Id<Link> getFromLinkId() {
 		return fromLinkId;
 	}
-	@Override public CarrierService getCarrierService(){
-		throw new RuntimeException( "not implemented" );
+
+	@Override
+	public CarrierService getCarrierService() {
+		throw new RuntimeException("not implemented");
 	}
 
 
 	public Id<Link> getToLinkId() {
 		return toLinkId;
 	}
-	@Override public Id<Carrier> getCarrierId(){
-		throw new RuntimeException( "not implemented" );
-	}
-
 
 	public void setToLinkId(Id<Link> toLinkId) {
 		this.toLinkId = toLinkId;
 	}
-	
-	
+
+	@Override
+	public Id<Carrier> getCarrierId() {
+		throw new RuntimeException("not implemented");
+	}
+
+
 }
