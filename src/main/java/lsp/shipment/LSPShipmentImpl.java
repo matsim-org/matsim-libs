@@ -49,8 +49,8 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 	private final List<Requirement> requirements;
 	private Id<LogisticsSolution> solutionId;
 
-	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
-		super( builder.id );
+	LSPShipmentImpl(ShipmentUtils.LSPShipmentBuilder builder) {
+		super(builder.id);
 		this.fromLinkId = builder.fromLinkId;
 		this.toLinkId = builder.toLinkId;
 		this.startTimeWindow = builder.startTimeWindow;
@@ -61,7 +61,7 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		this.schedule = new ShipmentPlanImpl(this);
 		this.log = new ShipmentPlanImpl(this);
 		this.requirements = new ArrayList<>();
-		this.requirements.addAll( builder.requirements );
+		this.requirements.addAll(builder.requirements);
 	}
 
 	@Override
@@ -109,11 +109,13 @@ class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment 
 		return requirements;
 	}
 
-	@Override public Id<LogisticsSolution> getSolutionId() {
+	@Override
+	public Id<LogisticsSolution> getSolutionId() {
 		return solutionId;
 	}
 
-	@Override public double getPickupServiceTime(){
+	@Override
+	public double getPickupServiceTime() {
 		return pickupServiceTime;
 	}
 

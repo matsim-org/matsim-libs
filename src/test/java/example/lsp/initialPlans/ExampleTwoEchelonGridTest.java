@@ -28,20 +28,21 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.junit.Assert.fail;
 
 public class ExampleTwoEchelonGridTest {
-	private static final Logger log = Logger.getLogger( ExampleTwoEchelonGridTest.class );
-	@Rule public final MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = Logger.getLogger(ExampleTwoEchelonGridTest.class);
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testForRuntimeExceptions(){
-		try{
-			ExampleTwoEchelonGrid.main( new String []{
+	public void testForRuntimeExceptions() {
+		try {
+			ExampleTwoEchelonGrid.main(new String[]{
 					"--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=2"
-			} );
+			});
 
-		} catch ( Exception ee ) {
-			log.fatal(ee) ;
-			fail() ;
+		} catch (Exception ee) {
+			log.fatal(ee);
+			fail();
 		}
 	}
 

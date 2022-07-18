@@ -44,19 +44,16 @@ import java.util.List;
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 							  ReplanningListener, IterationStartsListener{
 	private static final Logger log = Logger.getLogger( LSPControlerListener.class );
-
-	private CarrierAgentTracker carrierResourceTracker;
 	private final Carriers carriers;
 	private final Scenario scenario;
 	private final Collection<LSPEventCreator> creators;
-
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
+	private CarrierAgentTracker carrierResourceTracker;
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
 
-	@Inject LSPControlerListener( Scenario scenario,
-				      Collection<LSPEventCreator> creators ) {
+	@Inject LSPControlerListener(Scenario scenario, Collection<LSPEventCreator> creators ) {
 		this.scenario = scenario;
 		this.creators = creators;
 		this.carriers = getCarriers();
@@ -64,51 +61,52 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
+		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
-		carrierResourceTracker = new CarrierAgentTracker(carriers, creators, eventsManager );
+		carrierResourceTracker = new CarrierAgentTracker(carriers, creators, eventsManager);
 		eventsManager.addHandler(carrierResourceTracker);
 
-		for(LSP lsp : lsps.getLSPs().values()) {
+		for (LSP lsp : lsps.getLSPs().values()) {
 
 			// simulation trackers of lsp:
-			registerEventHandlers( lsp );
+			registerEventHandlers(lsp);
 
 			// simulation trackers of shipments:
-			for(LSPShipment shipment : lsp.getShipments()) {
-				registerEventHandlers( shipment );
+			for (LSPShipment shipment : lsp.getShipments()) {
+				registerEventHandlers(shipment);
 			}
 
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
 
 			// simulation trackers of solutions:
-			for(LogisticsSolution solution : selectedPlan.getSolutions()) {
-				registerEventHandlers( solution );
+			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
+				registerEventHandlers(solution);
 
 				// simulation trackers of solution elements:
-				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					registerEventHandlers( element );
+				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+					registerEventHandlers(element);
 
 					// simulation trackers of resources:
-					registerEventHandlers( element.getResource() );
+					registerEventHandlers(element.getResource());
 
 				}
 			}
 		}
 	}
-	private void registerEventHandlers( HasSimulationTrackers<?> lsp ){
+
+	private void registerEventHandlers(HasSimulationTrackers<?> lsp) {
 		// get all simulation trackers ...
-		for( LSPSimulationTracker<?> simulationTracker : lsp.getSimulationTrackers() ){
+		for (LSPSimulationTracker<?> simulationTracker : lsp.getSimulationTrackers()) {
 			// ... register themselves ...
-			if ( !registeredHandlers.contains( simulationTracker ) ){
-				log.warn("adding eventsHandler: " + simulationTracker );
-				eventsManager.addHandler( simulationTracker );
-				registeredHandlers.add( simulationTracker );
-				matsimServices.addControlerListener( simulationTracker );
+			if (!registeredHandlers.contains(simulationTracker)) {
+				log.warn("adding eventsHandler: " + simulationTracker);
+				eventsManager.addHandler(simulationTracker);
+				registeredHandlers.add(simulationTracker);
+				matsimServices.addControlerListener(simulationTracker);
 			} else {
-				log.warn("not adding eventsHandler since already added: " + simulationTracker );
+				log.warn("not adding eventsHandler since already added: " + simulationTracker);
 			}
 		}
 	}
@@ -119,15 +117,15 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	// das geht jetzt nicht mehr.  kai, jun'22
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		for(LSP lsp : LSPUtils.getLSPs( scenario ).getLSPs().values()) {
-			lsp.replan( event );
+		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
+			lsp.replan(event);
 		}
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		for(LSP lsp : LSPUtils.getLSPs( scenario ).getLSPs().values()) {
-			lsp.scoreSelectedPlan( event );
+		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
+			lsp.scoreSelectedPlan(event);
 		}
 		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
 	}
@@ -139,18 +137,18 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 
 	private Carriers getCarriers() {
-		LSPs lsps = LSPUtils.getLSPs( scenario );
+		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		Carriers carriers = new Carriers();
-		for(LSP lsp : lsps.getLSPs().values()) {
+		for (LSP lsp : lsps.getLSPs().values()) {
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for(LogisticsSolution solution : selectedPlan.getSolutions()) {
-				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					if(element.getResource() instanceof LSPCarrierResource) {
+			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
+				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+					if (element.getResource() instanceof LSPCarrierResource) {
 
 						LSPCarrierResource carrierResource = (LSPCarrierResource) element.getResource();
 						Carrier carrier = carrierResource.getCarrier();
-						if(!carriers.getCarriers().containsKey(carrier.getId())) {
+						if (!carriers.getCarriers().containsKey(carrier.getId())) {
 							carriers.addCarrier(carrier);
 						}
 					}

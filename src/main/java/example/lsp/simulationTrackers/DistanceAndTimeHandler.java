@@ -40,26 +40,26 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 
-/*package-private*/ class DistanceAndTimeHandler implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler{
-	private static final Logger log = Logger.getLogger( DistanceAndTimeHandler.class );
+/*package-private*/ class DistanceAndTimeHandler implements LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, LinkLeaveEventHandler {
+	private static final Logger log = Logger.getLogger(DistanceAndTimeHandler.class);
 
-	private final Map<Id<Vehicle>,LinkEnterEvent> events;
+	private final Map<Id<Vehicle>, LinkEnterEvent> events;
 	private final Vehicles allVehicles;
+	private final Network network;
 	private double distanceCosts;
 	private double timeCosts;
-	private final Network network;
-	
-	DistanceAndTimeHandler( Scenario scenario  ) {
+
+	DistanceAndTimeHandler(Scenario scenario) {
 		this.network = scenario.getNetwork();
 		this.events = new LinkedHashMap<>();
-		this.allVehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
+		this.allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
 	}
-	
-	
+
+
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		events.put(event.getVehicleId(),event);
-		
+		events.put(event.getVehicleId(), event);
+
 	}
 
 	@Override
@@ -69,21 +69,23 @@ import org.matsim.vehicles.Vehicles;
 
 
 	@Override
-	public void handleEvent( VehicleLeavesTrafficEvent leaveEvent ) {
-		processLeaveEvent( leaveEvent.getVehicleId(), leaveEvent.getTime() );
+	public void handleEvent(VehicleLeavesTrafficEvent leaveEvent) {
+		processLeaveEvent(leaveEvent.getVehicleId(), leaveEvent.getTime());
 	}
-	@Override
-	public void handleEvent( LinkLeaveEvent leaveEvent ) {
-		processLeaveEvent( leaveEvent.getVehicleId(), leaveEvent.getTime() );
-	}
-	private void processLeaveEvent( Id<Vehicle> vehicleId, double time ){
 
-		LinkEnterEvent enterEvent = events.remove( vehicleId );
-		if ( enterEvent!=null ){
-			Vehicle carrierVehicle = this.allVehicles.getVehicles().get( vehicleId );
+	@Override
+	public void handleEvent(LinkLeaveEvent leaveEvent) {
+		processLeaveEvent(leaveEvent.getVehicleId(), leaveEvent.getTime());
+	}
+
+	private void processLeaveEvent(Id<Vehicle> vehicleId, double time) {
+
+		LinkEnterEvent enterEvent = events.remove(vehicleId);
+		if (enterEvent != null) {
+			Vehicle carrierVehicle = this.allVehicles.getVehicles().get(vehicleId);
 			double linkDuration = time - enterEvent.getTime();
 			timeCosts += linkDuration * carrierVehicle.getType().getCostInformation().getCostsPerSecond();
-			double linkLength = network.getLinks().get( enterEvent.getLinkId() ).getLength();
+			double linkLength = network.getLinks().get(enterEvent.getLinkId()).getLength();
 			distanceCosts += linkLength * carrierVehicle.getType().getCostInformation().getCostsPerMeter();
 
 		}
@@ -98,5 +100,5 @@ import org.matsim.vehicles.Vehicles;
 	public double getTimeCosts() {
 		return timeCosts;
 	}
-	
+
 }

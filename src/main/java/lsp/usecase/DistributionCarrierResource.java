@@ -44,41 +44,41 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final DistributionCarrierScheduler distributionHandler;
 	private final Network network;
 
-	DistributionCarrierResource( UsecaseUtils.DistributionCarrierAdapterBuilder builder ){
-		super( builder.id );
+	DistributionCarrierResource(UsecaseUtils.DistributionCarrierAdapterBuilder builder) {
+		super(builder.id);
 		Id<Link> locationLinkId = builder.locationLinkId;
 		this.distributionHandler = builder.distributionHandler;
 		this.clientElements = builder.clientElements;
 		this.carrier = builder.carrier;
 		this.network = builder.network;
 	}
-	
+
 	@Override
 	public Id<Link> getStartLinkId() {
 		Id<Link> depotLinkId = null;
-		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()){
-			if(depotLinkId == null || depotLinkId == vehicle.getLocation()){
+		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
 				depotLinkId = vehicle.getLocation();
 			}
-			
+
 		}
-		
+
 		return depotLinkId;
-		
+
 	}
 
 	@Override
 	public Id<Link> getEndLinkId() {
 		Id<Link> depotLinkId = null;
-		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()){
-			if(depotLinkId == null || depotLinkId == vehicle.getLocation()){
+		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			if (depotLinkId == null || depotLinkId == vehicle.getLocation()) {
 				depotLinkId = vehicle.getLocation();
 			}
-			
+
 		}
-		
+
 		return depotLinkId;
-	
+
 	}
 
 	@Override
@@ -89,14 +89,14 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void schedule(int bufferTime) {
 		distributionHandler.scheduleShipments(this, bufferTime);
-		
+
 	}
 
-	public Network getNetwork(){
+	public Network getNetwork() {
 		return network;
 	}
-	
-	public Carrier getCarrier(){
+
+	public Carrier getCarrier() {
 		return carrier;
 	}
 

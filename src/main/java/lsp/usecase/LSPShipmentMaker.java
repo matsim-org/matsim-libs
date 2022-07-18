@@ -36,7 +36,7 @@ import java.util.Random;
 
 class LSPShipmentMaker {
 
-	public static void main (String[]args){
+	public static void main(String[] args) {
 
 		Network network = NetworkUtils.createNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(network);
@@ -44,26 +44,26 @@ class LSPShipmentMaker {
 		Random random = new Random(1);
 		ArrayList<LSPShipment> shipments = new ArrayList<>();
 
-		for(int i = 0; i < 8; i++){
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class ) );
-			builder.setDeliveryServiceTime(180 );
+		for (int i = 0; i < 8; i++) {
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class));
+			builder.setDeliveryServiceTime(180);
 			builder.setCapacityDemand(1);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
 			builder.setStartTimeWindow(startTimeWindow);
 			TimeWindow endTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
 			builder.setEndTimeWindow(endTimeWindow);
-			Id<Link>fromLinkId= null;
-			Id<Link>toLinkId = null;
-			while (fromLinkId == null || toLinkId == null){
+			Id<Link> fromLinkId = null;
+			Id<Link> toLinkId = null;
+			while (fromLinkId == null || toLinkId == null) {
 				List<Link> linkList = new ArrayList<>(network.getLinks().values());
 				Collections.shuffle(linkList);
 				Link link = linkList.get(0);
 
-				if(link.getCoord().getX()<4){
+				if (link.getCoord().getX() < 4) {
 					fromLinkId = link.getId();
 					builder.setFromLinkId(fromLinkId);
 				}
-				if(link.getCoord().getX()>14){
+				if (link.getCoord().getX() > 14) {
 					toLinkId = link.getId();
 					builder.setToLinkId(toLinkId);
 				}
@@ -71,8 +71,8 @@ class LSPShipmentMaker {
 			shipments.add(builder.build());
 		}
 
-		for(LSPShipment shipment : shipments){
-			System.out.println(shipment.getFrom() + " "+ shipment.getTo() );
+		for (LSPShipment shipment : shipments) {
+			System.out.println(shipment.getFrom() + " " + shipment.getTo());
 		}
 	}
 }

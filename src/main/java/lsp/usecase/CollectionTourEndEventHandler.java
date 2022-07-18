@@ -43,19 +43,19 @@ import java.util.Collection;
 /*package-private*/ class CollectionTourEndEventHandler implements AfterMobsimListener, LSPTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private LSPShipment lspShipment;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+	private LSPShipment lspShipment;
 
-	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
+	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
 		this.resource = resource;
 	}
-	
-	
+
+
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -65,19 +65,19 @@ import java.util.Collection;
 	@Override
 	public void handleEvent(LSPTourEndEvent event) {
 		Tour tour = event.getTour();
-		for(TourElement element : tour.getTourElements()){
-			if(element instanceof ServiceActivity){
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) element;
-					if(serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()){
-						logTransport(event, tour);	
-						logUnload(event, tour);		
-					}
+				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
+					logTransport(event, tour);
+					logUnload(event, tour);
+				}
 			}
 		}
 	}
 
-	private void logUnload(LSPTourEndEvent event, Tour tour){
-		ShipmentUtils.LoggedShipmentUnloadBuilder builder  =  ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+	private void logUnload(LSPTourEndEvent event, Tour tour) {
+		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + getTotalUnloadingTime(tour));
 		builder.setLogisticsSolutionElement(solutionElement);
@@ -89,26 +89,26 @@ import java.util.Collection;
 		lspShipment.getLog().addPlanElement(unloadId, unload);
 	}
 
-	private void logTransport(LSPTourEndEvent event, Tour tour){
+	private void logTransport(LSPTourEndEvent event, Tour tour) {
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if(abstractPlanElement instanceof ShipmentLeg) {
+		if (abstractPlanElement instanceof ShipmentLeg) {
 			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
 			//Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
 //			transport.setEndTime(event.getTime());
 //			transport.setToLinkId(tour.getEndLinkId());
-		}		
+		}
 	}
 
-	private double getTotalUnloadingTime(Tour tour){
+	private double getTotalUnloadingTime(Tour tour) {
 		double totalTime = 0;
-		for(TourElement element : tour.getTourElements()){
-			if(element instanceof ServiceActivity){
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) element;
 				totalTime = totalTime + serviceActivity.getDuration();
 			}
-		}	
+		}
 		return totalTime;
 	}
 
@@ -133,11 +133,13 @@ import java.util.Collection;
 	}
 
 
-	@Override public void setEmbeddingContainer( LSPShipment pointer ){
+	@Override
+	public void setEmbeddingContainer(LSPShipment pointer) {
 		this.lspShipment = pointer;
 	}
 
-	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
 	}
 }
 

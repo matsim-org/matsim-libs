@@ -38,22 +38,22 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler, LSPSimulationTracker<LSPShipment>{
+/*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private LSPShipment lspShipment;
 	private final LogisticsSolutionElement element;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+	private LSPShipment lspShipment;
 
-	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
+	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.element = element;
 		this.resource = resource;
 	}
-	
-	
+
+
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -61,10 +61,10 @@ import java.util.Collection;
 
 	@Override
 	public void handleEvent(LSPTourStartEvent event) {
-		for(TourElement tourElement : event.getTour().getTourElements()){
-			if(tourElement instanceof ServiceActivity){
+		for (TourElement tourElement : event.getTour().getTourElements()) {
+			if (tourElement instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-				if(serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()){
+				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logLoad(event);
 					logTransport(event);
 				}
@@ -72,7 +72,7 @@ import java.util.Collection;
 		}
 	}
 
-	private void logLoad(LSPTourStartEvent event){
+	private void logLoad(LSPTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getTour().getStartLinkId());
@@ -85,8 +85,8 @@ import java.util.Collection;
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
-	
-	private void logTransport(LSPTourStartEvent event){
+
+	private void logTransport(LSPTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getTour().getStartLinkId());
@@ -99,11 +99,11 @@ import java.util.Collection;
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().addPlanElement(transportId, transport);
 	}
-  
-	private double getCumulatedLoadingTime(Tour tour){
+
+	private double getCumulatedLoadingTime(Tour tour) {
 		double cumulatedLoadingTime = 0;
-		for(TourElement tourElement : tour.getTourElements()){
-			if(tourElement instanceof ServiceActivity){
+		for (TourElement tourElement : tour.getTourElements()) {
+			if (tourElement instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
 				cumulatedLoadingTime = cumulatedLoadingTime + serviceActivity.getDuration();
 			}

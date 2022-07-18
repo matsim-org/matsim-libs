@@ -32,49 +32,64 @@ import lsp.shipment.LSPShipment;
 import org.matsim.core.controler.events.ScoringEvent;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
-	private static final Logger log = Logger.getLogger( LSPImpl.class );
+	private static final Logger log = Logger.getLogger(LSPImpl.class);
 
 	private final Collection<LSPShipment> shipments;
 	private final ArrayList<LSPPlan> plans;
 	private final SolutionScheduler solutionScheduler;
-	private LSPPlan selectedPlan;
 	private final Collection<LSPResource> resources;
+	private LSPPlan selectedPlan;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
 
 
-	LSPImpl( LSPUtils.LSPBuilder builder ){
-		super( builder.id );
+	LSPImpl(LSPUtils.LSPBuilder builder) {
+		super(builder.id);
 		this.shipments = new ArrayList<>();
-		this.plans= new ArrayList<>();
+		this.plans = new ArrayList<>();
 		this.solutionScheduler = builder.solutionScheduler;
-		this.solutionScheduler.setEmbeddingContainer(this );
-		this.selectedPlan=builder.initialPlan;
-		this.selectedPlan.setLSP(this );
+		this.solutionScheduler.setEmbeddingContainer(this);
+		this.selectedPlan = builder.initialPlan;
+		this.selectedPlan.setLSP(this);
 		this.plans.add(builder.initialPlan);
 		this.resources = builder.resources;
 		this.scorer = builder.scorer;
-		if(this.scorer != null) {
-			this.scorer.setEmbeddingContainer(this );
-			this.addSimulationTracker( this.scorer );
+		if (this.scorer != null) {
+			this.scorer.setEmbeddingContainer(this);
+			this.addSimulationTracker(this.scorer);
 		}
 		this.replanner = builder.replanner;
-		if(this.replanner != null) {
-			this.replanner.setEmbeddingContainer(this );
-		}	
+		if (this.replanner != null) {
+			this.replanner.setEmbeddingContainer(this);
+		}
 	}
-	
+
+	public static LSPPlan copyPlan(LSPPlan plan2copy) {
+		List<LogisticsSolution> copiedSolutions = new ArrayList<>();
+		for (LogisticsSolution solution : plan2copy.getSolutions()) {
+			LogisticsSolution copiedSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(solution.getId()).build();
+			copiedSolution.getSolutionElements().addAll(solution.getSolutionElements());
+			copiedSolutions.add(copiedSolution);
+		}
+		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
+		copiedPlan.setAssigner(plan2copy.getAssigner());
+		copiedPlan.setLSP(plan2copy.getLSP());
+		double initialScoreOfCopiedPlan = plan2copy.getScore();
+		copiedPlan.setScore(initialScoreOfCopiedPlan);
+		copiedPlan.getSolutions().addAll(copiedSolutions);
+		return copiedPlan;
+	}
+
 	@Override
 	public void scheduleSolutions() {
 		solutionScheduler.scheduleSolutions();
 	}
 
-
 	@Override
 	public boolean addPlan(LSPPlan plan) {
-		for(LogisticsSolution solution : plan.getSolutions()) {
-			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-				if(!resources.contains(element.getResource())) {
+		for (LogisticsSolution solution : plan.getSolutions()) {
+			for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+				if (!resources.contains(element.getResource())) {
 					resources.add(element.getResource());
 				}
 			}
@@ -83,73 +98,50 @@ import org.matsim.core.controler.events.ScoringEvent;
 		return plans.add(plan);
 	}
 
-
 	@Override
 	public LSPPlan createCopyOfSelectedPlanAndMakeSelected() {
-		LSPPlan newPlan = LSPImpl.copyPlan(this.selectedPlan) ;
-		this.setSelectedPlan( newPlan ) ;
-		return newPlan ;
+		LSPPlan newPlan = LSPImpl.copyPlan(this.selectedPlan);
+		this.setSelectedPlan(newPlan);
+		return newPlan;
 	}
-
 
 	@Override
 	public ArrayList<LSPPlan> getPlans() {
 		return plans;
 	}
 
-
 	@Override
 	public LSPPlan getSelectedPlan() {
 		return selectedPlan;
 	}
 
-
-	@Override
-	public boolean removePlan(LSPPlan plan) {
-		if(plans.contains(plan)) {
-			plans.remove(plan);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-
 	@Override
 	public void setSelectedPlan(LSPPlan selectedPlan) {
-		if(!plans.contains(selectedPlan)) {
+		if (!plans.contains(selectedPlan)) {
 			plans.add(selectedPlan);
 		}
 		this.selectedPlan = selectedPlan;
-		
+
 	}
 
-	public static LSPPlan copyPlan(LSPPlan plan2copy) {
-		List<LogisticsSolution> copiedSolutions = new ArrayList<>();
-		for (LogisticsSolution solution : plan2copy.getSolutions()) {
-				LogisticsSolution copiedSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(solution.getId() ).build();
-				copiedSolution.getSolutionElements().addAll(solution.getSolutionElements());		
-				copiedSolutions.add(copiedSolution);
+	@Override
+	public boolean removePlan(LSPPlan plan) {
+		if (plans.contains(plan)) {
+			plans.remove(plan);
+			return true;
+		} else {
+			return false;
 		}
-		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
-		copiedPlan.setAssigner(plan2copy.getAssigner());
-		copiedPlan.setLSP(plan2copy.getLSP() );
-		double initialScoreOfCopiedPlan = plan2copy.getScore();
-		copiedPlan.setScore(initialScoreOfCopiedPlan);
-		copiedPlan.getSolutions().addAll(copiedSolutions);
-		return copiedPlan;
 	}
-
 
 	@Override
 	public Collection<LSPResource> getResources() {
 		return resources;
 	}
 
-	public void scoreSelectedPlan( ScoringEvent scoringEvent ) {
-		if(this.scorer != null) {
-			this.selectedPlan.setScore( scorer.computeScoreForCurrentPlan() );
+	public void scoreSelectedPlan(ScoringEvent scoringEvent) {
+		if (this.scorer != null) {
+			this.selectedPlan.setScore(scorer.computeScoreForCurrentPlan());
 		} else {
 			log.fatal("trying to score the current LSP plan, but scorer is not set.");
 		}
@@ -161,24 +153,23 @@ import org.matsim.core.controler.events.ScoringEvent;
 		shipments.add(shipment);
 		selectedPlan.getAssigner().assignToSolution(shipment);
 	}
-	
-	public void replan( final ReplanningEvent arg0 ) {
-		if ( this.replanner!=null ) {
-			this.replanner.replan( arg0 );
+
+	public void replan(final ReplanningEvent arg0) {
+		if (this.replanner != null) {
+			this.replanner.replan(arg0);
 		}
 	}
 
 	@Override
 	public void setReplanner(LSPReplanner replanner) {
-		replanner.setEmbeddingContainer( this );
+		replanner.setEmbeddingContainer(this);
 		this.replanner = replanner;
 	}
 
 
-	
 	@Override
 	public Collection<LSPShipment> getShipments() {
-		return this.shipments ;
+		return this.shipments;
 	}
 
 }

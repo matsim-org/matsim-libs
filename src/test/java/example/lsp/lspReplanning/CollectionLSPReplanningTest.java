@@ -64,8 +64,8 @@ public class CollectionLSPReplanningTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -106,16 +106,16 @@ public class CollectionLSPReplanningTest {
 		LSPResource collectionAdapter = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
+		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
@@ -130,66 +130,65 @@ public class CollectionLSPReplanningTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
-		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 
-
-		for(int i = 1; i < 21; i++) {
+		for (int i = 1; i < 21; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
-			while(true) {
+			while (true) {
 				Collections.shuffle(linkList, random);
 				Link pendingFromLink = linkList.get(0);
-				if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-						   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-						   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-						   pendingFromLink.getToNode().getCoord().getY() <= 4000) {
+				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
 			}
 
 			builder.setToLinkId(collectionLinkId);
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setDeliveryServiceTime(capacityDemand * 60 );
+			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LSPShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
 		collectionLSP.scheduleSolutions();
 
 
-
 		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-		maybeTodayAssigner.setLSP( collectionLSP );
-		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
+		maybeTodayAssigner.setLSP(collectionLSP);
+		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy();
 
 		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-		strategyManager.addStrategy( strategy, null, 1 );
+		strategyManager.addStrategy(strategy, null, 1);
 
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner( strategyManager );
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
 
 
 		collectionLSP.setReplanner(replanner);
 
 
-		LSPUtils.addLSPs( scenario, new LSPs( Collections.singletonList( collectionLSP )) );
+		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(collectionLSP)));
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
 			}
 		});
 
-		config.controler().setFirstIteration( 0 );
+		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 //		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
@@ -197,7 +196,7 @@ public class CollectionLSPReplanningTest {
 	}
 
 	@Test
-	public void testCollectionLSPReplanning(){
+	public void testCollectionLSPReplanning() {
 		System.out.println(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size());
 		assertTrue(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size() < 20);
 	}

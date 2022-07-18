@@ -30,8 +30,8 @@ import lsp.shipment.LSPShipment;
  * is contained in classes implementing the interface {@link ShipmentAssigner}.
  * <br/><br/>
  * Discussion points:<ul>
- *         <li> yyyy Shipments are normally assigned to the selected plan only.  I am not sure if this is what I would
- *         expect from the outside. kai, may'22</li>
+ * <li> yyyy Shipments are normally assigned to the selected plan only.  I am not sure if this is what I would
+ * expect from the outside. kai, may'22</li>
  * </ul>
  */
 public interface ShipmentAssigner extends KnowsLSP {

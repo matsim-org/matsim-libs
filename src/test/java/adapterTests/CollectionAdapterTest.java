@@ -43,7 +43,6 @@ import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 
 
-
 public class CollectionAdapterTest {
 
 	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
@@ -55,13 +54,13 @@ public class CollectionAdapterTest {
 	private LSPCarrierResource carrierResource;
 	private Id<Link> collectionLinkId;
 	private CarrierCapabilities capabilities;
-	
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -71,9 +70,9 @@ public class CollectionAdapterTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		collectionType = vehicleTypeBuilder.build();
-		
+
 		collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionType);
@@ -83,10 +82,10 @@ public class CollectionAdapterTest {
 		capabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
-		collectionCarrier = CarrierUtils.createCarrier( carrierId );
+		collectionCarrier = CarrierUtils.createCarrier(carrierId);
 		collectionCarrier.setCarrierCapabilities(capabilities);
-		
-		
+
+
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
@@ -94,46 +93,46 @@ public class CollectionAdapterTest {
 		builder.setLocationLinkId(collectionLinkId);
 		carrierResource = builder.build();
 	}
-	
-	
+
+
 	@Test
 	public void testCollectionAdapter() {
 		assertNotNull(carrierResource.getClientElements());
 		assertTrue(carrierResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass()));
-		if(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
+		if (LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
 //			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
 			assertSame(carrierResource.getCarrier(), collectionCarrier);
 		}
 		assertSame(carrierResource.getEndLinkId(), collectionLinkId);
 		assertSame(carrierResource.getStartLinkId(), collectionLinkId);
-		assertNotNull(carrierResource.getSimulationTrackers() );
-		assertTrue(carrierResource.getSimulationTrackers().isEmpty() );
-		assertNotNull(carrierResource.getAttributes() );
-		assertTrue(carrierResource.getAttributes().isEmpty() );
+		assertNotNull(carrierResource.getSimulationTrackers());
+		assertTrue(carrierResource.getSimulationTrackers().isEmpty());
+		assertNotNull(carrierResource.getAttributes());
+		assertTrue(carrierResource.getAttributes().isEmpty());
 		assertSame(carrierResource.getStartLinkId(), collectionLinkId);
-		if(carrierResource.getCarrier() == collectionCarrier) {
+		if (carrierResource.getCarrier() == collectionCarrier) {
 			assertSame(collectionCarrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(collectionCarrier.getClass()));
 			assertTrue(collectionCarrier.getPlans().isEmpty());
 			assertNull(collectionCarrier.getSelectedPlan());
 			assertTrue(collectionCarrier.getServices().isEmpty());
 			assertTrue(collectionCarrier.getShipments().isEmpty());
-			if(collectionCarrier.getCarrierCapabilities() == capabilities) {
+			if (collectionCarrier.getCarrierCapabilities() == capabilities) {
 				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
 				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
-				if(types.size() ==1) {
+				if (types.size() == 1) {
 					assertSame(types.get(0), collectionType);
 					assertEquals(10, collectionType.getCapacity().getOther().intValue());
 					assertEquals(0.0004, collectionType.getCostInformation().getPerDistanceUnit(), 0.0);
 					assertEquals(0.38, collectionType.getCostInformation().getPerTimeUnit(), 0.0);
 					assertEquals(49, collectionType.getCostInformation().getFix(), 0.0);
 					assertEquals((50 / 3.6), collectionType.getMaximumVelocity(), 0.0);
-					
+
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
-				if(vehicles.size() == 1) {
+				if (vehicles.size() == 1) {
 					assertSame(vehicles.get(0), collectionCarrierVehicle);
 					assertSame(collectionCarrierVehicle.getType(), collectionType);
 					assertSame(collectionCarrierVehicle.getLocation(), collectionLinkId);

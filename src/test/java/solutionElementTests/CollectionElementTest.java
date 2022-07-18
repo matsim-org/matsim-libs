@@ -45,14 +45,14 @@ public class CollectionElementTest {
 
 	private LogisticsSolutionElement collectionElement;
 	private LSPCarrierResource carrierAdapter;
-	
+
 	@Before
 	public void initialize() {
-		
+
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -62,9 +62,9 @@ public class CollectionElementTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		VehicleType collectionType = vehicleTypeBuilder.build();
-		
+
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
 
@@ -75,28 +75,28 @@ public class CollectionElementTest {
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
 		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
-		
-		
+
+
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(carrier);
 		builder.setLocationLinkId(collectionLinkId);
 		carrierAdapter = builder.build();
-		
+
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 		collectionBuilder.setResource(carrierAdapter);
 		collectionElement = collectionBuilder.build();
 	}
-	
+
 	@Test
 	public void testCollectionElement() {
 		assertNotNull(collectionElement.getIncomingShipments());
 		assertNotNull(collectionElement.getIncomingShipments().getShipments());
 		assertTrue(collectionElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertNotNull(collectionElement.getAttributes() );
-		assertTrue(collectionElement.getAttributes().isEmpty() );
+		assertNotNull(collectionElement.getAttributes());
+		assertTrue(collectionElement.getAttributes().isEmpty());
 //		assertNull(collectionElement.getEmbeddingContainer() );
 		assertNull(collectionElement.getNextElement());
 		assertNotNull(collectionElement.getOutgoingShipments());
@@ -106,5 +106,5 @@ public class CollectionElementTest {
 		assertSame(collectionElement.getResource(), carrierAdapter);
 		assertSame(collectionElement.getResource().getClientElements().iterator().next(), collectionElement);
 	}
-	
+
 }

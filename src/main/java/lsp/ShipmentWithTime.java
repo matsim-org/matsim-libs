@@ -23,7 +23,7 @@ package lsp;
 
 import lsp.shipment.LSPShipment;
 
-public class ShipmentWithTime{
+public class ShipmentWithTime {
 	// yyyyyy find better solution for this.  It is not so good to define an interface, and then immediately define a class that goes beyond it.
 	// Maybe the time should be added to the interface?  However, I don't even know what that time means (delivery time?  current time?).  kai,
 	// jun'22
@@ -31,8 +31,8 @@ public class ShipmentWithTime{
 	private final LSPShipment shipment;
 	private final double time;
 
-	public ShipmentWithTime( double time , LSPShipment shipment ) {
-		this.shipment= shipment;
+	public ShipmentWithTime(double time, LSPShipment shipment) {
+		this.shipment = shipment;
 		this.time = time;
 	}
 

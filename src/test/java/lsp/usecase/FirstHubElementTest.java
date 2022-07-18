@@ -37,7 +37,7 @@ public class FirstHubElementTest {
 
 	@Before
 	public void initialize() {
-		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		schedulerBuilder.setCapacityNeedFixed(10);
 		schedulerBuilder.setCapacityNeedLinear(1);
 
@@ -58,8 +58,8 @@ public class FirstHubElementTest {
 		assertNotNull(reloadingElement.getIncomingShipments());
 		assertNotNull(reloadingElement.getIncomingShipments().getShipments());
 		assertTrue(reloadingElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertNotNull(reloadingElement.getAttributes() );
-		assertTrue(reloadingElement.getAttributes().isEmpty() );
+		assertNotNull(reloadingElement.getAttributes());
+		assertTrue(reloadingElement.getAttributes().isEmpty());
 //		assertNull(reloadingElement.getEmbeddingContainer() );
 		assertNull(reloadingElement.getNextElement());
 		assertNotNull(reloadingElement.getOutgoingShipments());

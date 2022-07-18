@@ -32,19 +32,19 @@ import java.util.Collection;
 
 /**
  * This is, for example, a shipment that DHL moves from A to B.  It may use multiple carriers to achieve that.
- *
+ * <p>
  * Questions/comments:<ul>
- *         <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not link IDs.</li>
+ * <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not link IDs.</li>
  * </ul>
  */
 public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, HasSimulationTrackers<LSPShipment> {
 
 	Id<Link> getFrom(); // same as in CarrierShipment
-	
+
 	Id<Link> getTo(); // same as in CarrierShipment
-	
+
 	TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
-	
+
 	TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
 
 	int getSize(); // same as in CarrierShipment
@@ -54,9 +54,9 @@ public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, Ha
 	double getPickupServiceTime(); // same as in CarrierShipment
 
 	ShipmentPlan getShipmentPlan();
-	
+
 	ShipmentPlan getLog();
-	
+
 	Collection<Requirement> getRequirements();
 
 	Id<LogisticsSolution> getSolutionId();

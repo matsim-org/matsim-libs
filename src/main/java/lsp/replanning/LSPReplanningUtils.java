@@ -25,9 +25,10 @@ import lsp.LSPPlan;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 public final class LSPReplanningUtils {
-	private LSPReplanningUtils(){
+	private LSPReplanningUtils() {
 	}
-	public static LSPReplanner createDefaultLSPReplanner( GenericStrategyManager<LSPPlan, LSP> strategyManager ) {
-		return new LSPReplannerImpl( strategyManager );
+
+	public static LSPReplanner createDefaultLSPReplanner(GenericStrategyManager<LSPPlan, LSP> strategyManager) {
+		return new LSPReplannerImpl(strategyManager);
 	}
 }

@@ -48,14 +48,14 @@ public class CollectionLSPCreationTest {
 	private ShipmentAssigner assigner;
 	private LSPPlan collectionPlan;
 	private LSP collectionLSP;
-	
+
 	@Before
 	public void initialize() {
-		
+
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -65,9 +65,9 @@ public class CollectionLSPCreationTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
-		
+
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, collectionType);
 
@@ -76,32 +76,32 @@ public class CollectionLSPCreationTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarrierUtils.createCarrier( carrierId );
+		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
-		
-		
+
+
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource collectionAdapter = adapterBuilder.build();
-		
+
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
-		
+
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
+		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId);
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
-		
-		assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
+
+		assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
-	
+
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
@@ -119,12 +119,12 @@ public class CollectionLSPCreationTest {
 		assertNotNull(collectionLSP.getResources());
 		LSPPlan selectedPlan = collectionLSP.getSelectedPlan();
 		assertEquals(0, (double) selectedPlan.getScore(), 0.0);
-		assertSame(selectedPlan.getLSP(), collectionLSP );
+		assertSame(selectedPlan.getLSP(), collectionLSP);
 		assertSame(selectedPlan.getAssigner(), assigner);
 		assertSame(selectedPlan.getSolutions().iterator().next(), collectionSolution);
-		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), collectionLSP );
+		assertSame(selectedPlan.getSolutions().iterator().next().getLSP(), collectionLSP);
 //		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
-		assertSame(selectedPlan.getLSP(), collectionLSP );
+		assertSame(selectedPlan.getLSP(), collectionLSP);
 	}
 
 }

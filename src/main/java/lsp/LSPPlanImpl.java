@@ -24,32 +24,36 @@ package lsp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/* package-private */ class LSPPlanImpl implements LSPPlan{
+/* package-private */ class LSPPlanImpl implements LSPPlan {
 
+	private final Collection<LogisticsSolution> solutions;
 	private LSP lsp;
 	private double score;
-	private final Collection<LogisticsSolution> solutions;
 	private ShipmentAssigner assigner;
-	
+
 	LSPPlanImpl() {
 		this.solutions = new ArrayList<>();
 	}
-	
-	@Override public LSPPlan addSolution( LogisticsSolution solution ) {
+
+	@Override
+	public LSPPlan addSolution(LogisticsSolution solution) {
 		this.solutions.add(solution);
-		solution.setLSP(this.lsp );
+		solution.setLSP(this.lsp);
 		return this;
 	}
-	
-	@Override public Collection<LogisticsSolution> getSolutions() {
+
+	@Override
+	public Collection<LogisticsSolution> getSolutions() {
 		return solutions;
 	}
 
-	@Override public ShipmentAssigner getAssigner() {
+	@Override
+	public ShipmentAssigner getAssigner() {
 		return assigner;
 	}
-	
-	@Override public LSPPlan setAssigner( ShipmentAssigner assigner ) {
+
+	@Override
+	public LSPPlan setAssigner(ShipmentAssigner assigner) {
 		this.assigner = assigner;
 		this.assigner.setLSP(this.lsp);
 		return this;
@@ -65,20 +69,22 @@ import java.util.Collection;
 		this.score = score;
 	}
 
-	@Override public void setLSP( LSP lsp ) {
+	@Override
+	public LSP getLSP() {
+		return lsp;
+	}
+
+	@Override
+	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
-		if(assigner != null) {
+		if (assigner != null) {
 			this.assigner.setLSP(lsp);
 			// yy vom Design her wäre es vllt einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte.  Dann
 			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen.  kai, may'22
 		}
-		for(LogisticsSolution solution : solutions) {
-			solution.setLSP(lsp );
+		for (LogisticsSolution solution : solutions) {
+			solution.setLSP(lsp);
 		}
 	}
-	
-	@Override public LSP getLSP() {
-		return lsp;
-	}
-	
+
 }

@@ -28,17 +28,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /* package-private */ class LogisticsSolutionImpl extends LSPDataObject<LogisticsSolution> implements LogisticsSolution {
-	private static final Logger log = Logger.getLogger( LogisticsSolutionImpl.class );
+	private static final Logger log = Logger.getLogger(LogisticsSolutionImpl.class);
 
-	private LSP lsp;
 	private final Collection<LogisticsSolutionElement> solutionElements;
 	private final Collection<LSPShipment> shipments;
+	private LSP lsp;
 
-	LogisticsSolutionImpl( LSPUtils.LogisticsSolutionBuilder builder ){
-		super( builder.id );
+	LogisticsSolutionImpl(LSPUtils.LogisticsSolutionBuilder builder) {
+		super(builder.id);
 		this.solutionElements = builder.elements;
-		for(LogisticsSolutionElement element : this.solutionElements) {
-			element.setEmbeddingContainer(this );
+		for (LogisticsSolutionElement element : this.solutionElements) {
+			element.setEmbeddingContainer(this);
 		}
 		this.shipments = new ArrayList<>();
 	}
@@ -55,7 +55,7 @@ import java.util.Collection;
 
 	@Override
 	public Collection<LogisticsSolutionElement> getSolutionElements() {
-		return  solutionElements;
+		return solutionElements;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ import java.util.Collection;
 
 	@Override
 	public void assignShipment(LSPShipment shipment) {
-		shipments.add(shipment);	
+		shipments.add(shipment);
 	}
-	
+
 }

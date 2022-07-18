@@ -23,7 +23,7 @@ package example.lspAndDemand.requirementsChecking;
 import lsp.LogisticsSolution;
 import lsp.shipment.Requirement;
 
-/*package-private*/ class RedRequirement implements Requirement{
+/*package-private*/ class RedRequirement implements Requirement {
 
 	@Override
 	public boolean checkRequirement(LogisticsSolution solution) {
@@ -32,7 +32,7 @@ import lsp.shipment.Requirement;
 //				return true;
 //			}
 //		}
-		if ( solution.getAttributes().getAttribute( "color" ).equals( "red" ) ) {
+		if (solution.getAttributes().getAttribute("color").equals("red")) {
 			return true;
 		}
 		return false;
