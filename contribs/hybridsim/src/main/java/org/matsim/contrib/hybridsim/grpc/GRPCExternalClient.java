@@ -24,20 +24,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.matsim.contrib.hybridsim.proto.HybridSimulationGrpc;
 
-import io.grpc.internal.ManagedChannelImpl;
+import io.grpc.ManagedChannel;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
-import org.matsim.contrib.hybridsim.proto.HybridSimulationGrpc;
 
 public class GRPCExternalClient {
 
 	private HybridSimulationGrpc.HybridSimulationBlockingStub blockingStub;
-	private final ManagedChannelImpl channel;
+	private final ManagedChannel channel;
 
 	public GRPCExternalClient(String host, int port) {
-
 		this.channel = NettyChannelBuilder.forAddress(host, port).negotiationType(NegotiationType.PLAINTEXT).build();
-	this.blockingStub = HybridSimulationGrpc.newBlockingStub(this.channel);
+		this.blockingStub = HybridSimulationGrpc.newBlockingStub(this.channel);
 	}
 
 	public void shutdown()  {

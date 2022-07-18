@@ -9,6 +9,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.MultimodalLinkChooser;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.SingleModeNetworksCache;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -71,6 +72,9 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 	@Inject
 	TimeInterpretation timeInterpretation;
 
+	@Inject
+	MultimodalLinkChooser multimodalLinkChooser;
+
 	private
 	Network filteredNetwork;
 
@@ -92,7 +96,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						travelTime);
 		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
-					routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation );
+					routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser );
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo);

@@ -8,11 +8,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.speedy.SpeedyMultiSourceALT;
@@ -59,8 +59,8 @@ public class BestDispatchFinder {
 
 	// for immediate requests only
 	// minimize TW
-	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Stream<? extends DvrpVehicle> vehicles) {
-		return findBestVehicle(req, vehicles, TaxiRequest::getFromLink);
+	public Dispatch<DrtRequest> findBestVehicleForRequest(DrtRequest req, Stream<? extends DvrpVehicle> vehicles) {
+		return findBestVehicle(req, vehicles, DrtRequest::getFromLink);
 	}
 
 	// we are moving FORWARDS from vehicles (ALT start nodes) to the destination (ALT end node)
@@ -116,8 +116,8 @@ public class BestDispatchFinder {
 
 	// for immediate requests only
 	// minimize TP
-	public Dispatch<TaxiRequest> findBestRequestForVehicle(DvrpVehicle veh, Stream<TaxiRequest> unplannedRequests) {
-		return findBestDestination(veh, unplannedRequests, TaxiRequest::getFromLink);
+	public Dispatch<DrtRequest> findBestRequestForVehicle(DvrpVehicle veh, Stream<DrtRequest> unplannedRequests) {
+		return findBestDestination(veh, unplannedRequests, DrtRequest::getFromLink);
 	}
 
 	// we are moving BACKWARDS from destinations (ALT start nodes) to the vehicle (ALT end node)

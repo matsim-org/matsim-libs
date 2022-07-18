@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -43,6 +42,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.modal.ModalProviders;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -149,17 +149,16 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			PassengerRequest request, double now) {
-		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(request.getId()),
-				request.getId(), now);
+			Id<Request> requestId, double now) {
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(requestId),
+				requestId, now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
 
 	@Override
-	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(request.getId()), request.getId(),
-				now);
+	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
+		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(requestId), requestId, now);
 	}
 
 	@Override

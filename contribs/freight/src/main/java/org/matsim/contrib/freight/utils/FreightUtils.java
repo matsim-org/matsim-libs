@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
@@ -39,6 +40,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import javax.management.InvalidAttributeValueException;
@@ -55,6 +57,7 @@ import java.util.stream.Collectors;
  */
 public class FreightUtils {
 
+	static final String CARRIER_VEHICLE = "carrierVehicle";
 	/**
 	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .
 	 * This string constant will eventually become private.
@@ -289,7 +292,7 @@ public class FreightUtils {
 			throw new RuntimeException("Carrier " + carrier.getId() + " has NO ScheduledTours. --> CanNOT create a new carrier from solution");
 		}
 		for (ScheduledTour tour : tours) {
-			Id<Link> depotForTour = tour.getVehicle().getLocation();
+			Id<Link> depotForTour = tour.getVehicle().getLinkId();
 			for (TourElement te : tour.getTour().getTourElements()) {
 				if (te instanceof ServiceActivity) {
 					ServiceActivity act = (ServiceActivity) te;
@@ -516,5 +519,11 @@ public class FreightUtils {
 			}
 			attributes.putAttribute(ATTR_SKILLS, skillString.toString());
 		}
+	}
+	public static Vehicle getVehicle( Plan plan ) {
+		return (Vehicle) plan.getAttributes().getAttribute( CARRIER_VEHICLE );
+	}
+	public static void putVehicle( Plan plan, Vehicle vehicle ){
+		plan.getAttributes().putAttribute( CARRIER_VEHICLE, vehicle );
 	}
 }

@@ -61,7 +61,13 @@ public class CarrierCapabilities {
 			this.fleetSize = fleetSize;
 			return this;
 		}
-		
+
+		/**
+		 * @deprecated Since the vehicle type is in the {@link CarrierVehicleTypes}
+		 * container, it should not be duplicated here. It is also not written
+		 * to file when writing {@link CarrierPlanXmlWriterV2}.
+		 */
+		@Deprecated
 		public Builder addType( VehicleType type ){
 			if(!typeIds.contains(type.getId())){
 				vehicleTypes.add(type);

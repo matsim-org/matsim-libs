@@ -155,7 +155,7 @@ public final class ShpOptions {
 				}
 
 				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
-				geometry.union(subArea);
+				geometry = geometry.union(subArea);
 			}
 		}
 		return geometry;

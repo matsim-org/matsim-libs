@@ -36,11 +36,11 @@ import java.util.Map;
 /**
  * Collects Warm- and Cold-Emission-Events by time bin and by link-id
  */
-class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
+public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
     private final TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBins;
 
-    EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
+    public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
 
         this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
     }
@@ -50,7 +50,7 @@ class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmiss
      *
      * @return Collected emissions by time bin and by link id
      */
-    TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> getTimeBins() {
+    public TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> getTimeBins() {
         return timeBins;
     }
 

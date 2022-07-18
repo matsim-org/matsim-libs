@@ -78,9 +78,9 @@ public class CarrierReaderFromCSVTest {
 		Object2IntMap<String> depotSums = new Object2IntOpenHashMap<>();
 		Map<String, List<String>> typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier1.getCarrierCapabilities().getCarrierVehicles().values()) {
-			typesPerDepot.computeIfAbsent(carrierVehicle.getLocation().toString(), (k) -> new ArrayList<>())
+			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
-			depotSums.merge(carrierVehicle.getLocation().toString(), 1, Integer::sum);
+			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
 			Assert.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
@@ -108,9 +108,9 @@ public class CarrierReaderFromCSVTest {
 		depotSums = new Object2IntOpenHashMap<>();
 		typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier2.getCarrierCapabilities().getCarrierVehicles().values()) {
-			typesPerDepot.computeIfAbsent(carrierVehicle.getLocation().toString(), (k) -> new ArrayList<>())
+			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
-			depotSums.merge(carrierVehicle.getLocation().toString(), 1, Integer::sum);
+			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
 			Assert.assertEquals(3600, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals(50000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
@@ -133,9 +133,9 @@ public class CarrierReaderFromCSVTest {
 		depotSums = new Object2IntOpenHashMap<>();
 		typesPerDepot = new HashMap<>();
 		for (CarrierVehicle carrierVehicle : testCarrier3.getCarrierCapabilities().getCarrierVehicles().values()) {
-			typesPerDepot.computeIfAbsent(carrierVehicle.getLocation().toString(), (k) -> new ArrayList<>())
+			typesPerDepot.computeIfAbsent(carrierVehicle.getLinkId().toString(), ( k) -> new ArrayList<>() )
 					.add(carrierVehicle.getVehicleTypeId().toString());
-			depotSums.merge(carrierVehicle.getLocation().toString(), 1, Integer::sum);
+			depotSums.merge(carrierVehicle.getLinkId().toString(), 1, Integer::sum );
 			Assert.assertEquals(50000, carrierVehicle.getEarliestStartTime(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals(80000, carrierVehicle.getLatestEndTime(), MatsimTestUtils.EPSILON);
 		}
@@ -176,11 +176,9 @@ public class CarrierReaderFromCSVTest {
 				Assert.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
 				Assert.assertEquals(3600, carrierInformationElement.getVehicleStartTime());
 				Assert.assertEquals(50000, carrierInformationElement.getVehicleEndTime());
-				Assert.assertEquals(2, carrierInformationElement.getVehicleDepots().length);
-				Assert.assertTrue(carrierInformationElement.getVehicleDepots()[0].equals("i(2,0)")
-						|| carrierInformationElement.getVehicleDepots()[0].equals("j(2,4)R"));
-				Assert.assertFalse(carrierInformationElement.getVehicleDepots()[0]
-						.equals(carrierInformationElement.getVehicleDepots()[1]));
+				Assert.assertEquals(2, carrierInformationElement.getVehicleDepots().size());
+				Assert.assertTrue(carrierInformationElement.getVehicleDepots().contains("i(2,0)")
+						&& carrierInformationElement.getVehicleDepots().contains("j(2,4)R"));
 				Assert.assertEquals(2, carrierInformationElement.getVehicleTypes().length);
 				Assert.assertTrue(carrierInformationElement.getVehicleTypes()[0].equals("testVehicle1")
 						|| carrierInformationElement.getVehicleTypes()[0].equals("testVehicle2"));
@@ -196,8 +194,8 @@ public class CarrierReaderFromCSVTest {
 				Assert.assertEquals(2, carrierInformationElement.getNumberOfDepotsPerType());
 				Assert.assertEquals(50000, carrierInformationElement.getVehicleStartTime());
 				Assert.assertEquals(80000, carrierInformationElement.getVehicleEndTime());
-				Assert.assertEquals(1, carrierInformationElement.getVehicleDepots().length);
-				Assert.assertEquals("j(2,6)R", carrierInformationElement.getVehicleDepots()[0]);
+				Assert.assertEquals(1, carrierInformationElement.getVehicleDepots().size());
+				Assert.assertEquals("j(2,6)R", carrierInformationElement.getVehicleDepots().get(0));
 				Assert.assertEquals(1, carrierInformationElement.getVehicleTypes().length);
 				Assert.assertEquals("testVehicle1", carrierInformationElement.getVehicleTypes()[0]);
 
@@ -209,8 +207,8 @@ public class CarrierReaderFromCSVTest {
 				Assert.assertEquals(3, carrierInformationElement.getNumberOfDepotsPerType());
 				Assert.assertEquals(3600, carrierInformationElement.getVehicleStartTime());
 				Assert.assertEquals(50000, carrierInformationElement.getVehicleEndTime());
-				Assert.assertEquals(1, carrierInformationElement.getVehicleDepots().length);
-				Assert.assertEquals("j(4,3)R", carrierInformationElement.getVehicleDepots()[0]);
+				Assert.assertEquals(1, carrierInformationElement.getVehicleDepots().size());
+				Assert.assertEquals("j(4,3)R", carrierInformationElement.getVehicleDepots().get(0));
 				Assert.assertEquals(1, carrierInformationElement.getVehicleTypes().length);
 				Assert.assertEquals("testVehicle2", carrierInformationElement.getVehicleTypes()[0]);
 			} else {

@@ -28,9 +28,9 @@ public final class LSPEventCreatorUtils {
 
 	public static Collection<LSPEventCreator> getStandardEventCreators(){
 		ArrayList<LSPEventCreator> creators = new ArrayList<>();
-		creators.add(new LSPFreightLinkEnterEventCreator());
-		creators.add(new LSPFreightLinkLeaveEventCreator());
-		creators.add(new LSPFreightVehicleLeavesTrafficEventCreator());
+//		creators.add(new LSPFreightLinkEnterEventCreator());
+//		creators.add(new LSPFreightLinkLeaveEventCreator());
+//		creators.add(new LSPFreightVehicleLeavesTrafficEventCreator());
 		creators.add(new LSPServiceEndEventCreator());
 		creators.add(new LSPServiceStartEventCreator());
 		creators.add(new LSPShipmentDeliveredEventCreator());

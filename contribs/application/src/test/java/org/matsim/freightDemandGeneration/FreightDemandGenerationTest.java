@@ -53,6 +53,7 @@ public class FreightDemandGenerationTest {
 			);
 		} catch (Exception ee) {
 			Logger.getLogger(this.getClass()).fatal("there was an exception: \n" + ee);
+			ee.printStackTrace();
 			// if one catches an exception, then one needs to explicitly fail the test:
 			Assert.fail();
 		}

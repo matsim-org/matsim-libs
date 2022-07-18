@@ -42,8 +42,9 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.GenericStrategyManagerImpl;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -62,7 +63,7 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 
 	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
-	private final CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
+	private final CarrierStrategyManager strategyManager;
 
 	private CarrierAgentTracker carrierAgentTracker;
 
@@ -72,14 +73,16 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject CarrierControlerListener(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-//		log.warn( "calling ctor; scoringFunctionFactory=" + scoringFunctionFactory.getClass() );
-		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
+	@Inject CarrierControlerListener( @Nullable CarrierStrategyManager strategyManager, CarrierScoringFunctionFactory scoringFunctionFactory ) {
+		// The current default is bind( CarrierStrategyManager.class ).toProvider( () -> null );
+		this.strategyManager = strategyManager;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
 
 	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
+		// (means that it is recreated before every mobsim run)
+
 		eventsManager.addHandler(carrierAgentTracker);
 		// (add and remove per mobsim run)
 	}
@@ -97,11 +100,10 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
-		if (carrierPlanStrategyManagerFactory == null) {
-			return;
+		if ( strategyManager==null ) {
+			throw new RuntimeException( "You need to set CarrierStrategyManager to something meaningful to run iterations." );
 		}
-		GenericStrategyManager<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
-		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , null, event.getIteration(), event.getReplanningContext() );
+		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 
 }

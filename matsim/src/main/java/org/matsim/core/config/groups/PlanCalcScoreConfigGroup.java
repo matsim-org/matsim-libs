@@ -1638,6 +1638,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
 		public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+			// should be disabled like in the following.  kai, may'22
+//			if ( usingOldScoringBelowZeroUtilityDuration ) {
+//				throw new RuntimeException( "using old scoringBelowZeroUtility duration is no longer possible.  Use matsim version 14.0 " +
+//									    "or older if you truly need this for backwards compatibility." )
+//			}
 			testForLocked();
 			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 		}

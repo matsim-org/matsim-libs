@@ -21,10 +21,11 @@
 
  package org.matsim.pt.router;
 
-import static org.hamcrest.Matchers.greaterThan;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -173,9 +174,7 @@ public class TransitLeastCostPathTreeTest {
         System.out.println("Time without stop criterion = " + elapsedTimeWithoutStopCreterion);
         System.out.println("Time with stop criterion = " + elapsedTimeWithStopCreterion);
         System.out.println("ratio = " + ratio);
-        Assert.assertThat("Bad ratio",
-                ratio,
-                greaterThan(15));
+        Assertions.assertThat(ratio).isGreaterThan(15);
     }
 
     /**

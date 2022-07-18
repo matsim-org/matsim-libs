@@ -36,6 +36,9 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String MODES = "modes";
 	public final static String CHAINBASEDMODES = "chainBasedModes";
 	public final static String CARAVAIL = "considerCarAvailability";
+	public final static String SINGLE_PROBA = "probaForRandomSingleTripMode";
+	public final static String COORD_DISTANCE = "coordDistance";
+
 	private static final String BEHAVIOR = "behavior";
 	
 	private String[] chainBasedModes = new String[] { TransportMode.car, TransportMode.bike };
@@ -45,6 +48,8 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private SubtourModeChoice.Behavior behavior = SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ;
 	
 	private double probaForRandomSingleTripMode = 0. ; // yyyyyy backwards compatibility setting; should be change. kai, may'18
+
+	private double coordDistance = 0;
 	
 	public SubtourModeChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -100,6 +105,9 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(MODES, "Defines all the modes available, including chain-based modes, seperated by commas" );
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
 		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
+		comments.put(SINGLE_PROBA, "Defines the probability of changing a single trip for a unchained mode instead of subtour.");
+		comments.put(COORD_DISTANCE, "If greater than 0, subtours will also consider coordinates to be at the same location when smaller than set distance.");
+
 		{
 			StringBuilder msg = new StringBuilder("Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: ");
 			for ( SubtourModeChoice.Behavior behavior : SubtourModeChoice.Behavior.values() ) {
@@ -146,13 +154,24 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final SubtourModeChoice.Behavior getBehavior() {
 		return this.behavior ;
 	}
-	
+
+	@StringGetter(SINGLE_PROBA)
 	public double getProbaForRandomSingleTripMode() {
 		return this.probaForRandomSingleTripMode;
 	}
+
+	@StringSetter(SINGLE_PROBA)
 	public void setProbaForRandomSingleTripMode(double probaForRandomSingleTripMode) {
 		this.probaForRandomSingleTripMode = probaForRandomSingleTripMode;
 	}
-	
-	
+
+	@StringGetter(COORD_DISTANCE)
+	public double getCoordDistance() {
+		return coordDistance;
+	}
+
+	@StringSetter(COORD_DISTANCE)
+	public void setCoordDistance(double coordDistance) {
+		this.coordDistance = coordDistance;
+	}
 }
