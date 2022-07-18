@@ -30,12 +30,12 @@ import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /**
-  * In the class SimpleForwardSolutionScheduler two tasks are performed:
- *
+ * In the class SimpleForwardSolutionScheduler two tasks are performed:
+ * <p>
  * 1.) the {@link LSPShipment}s that were assigned to the suitable
  * {@link LogisticsSolution} by the {@link lsp.ShipmentAssigner} in a previous step are handed over to the first
  * {@link LogisticsSolutionElement}.
- *
+ * <p>
  * 2.) all {@link LSPResource}s that were handed over to the SimpleForwardSolutionScheduler
  * exogenously, are now scheduled sequentially in an order that was also specified exogenously.
  * This order ensures that each {@link LogisticsSolution} is traversed from the
@@ -43,28 +43,28 @@ import lsp.shipment.LSPShipment;
  * {@link LSPShipment}s  are taken from the collection of incoming shipments, handled by the
  * {@link LSPResource} in charge and then added to the collection of outgoing shipments of the client
  * {@link LogisticsSolutionElement}.
- *
+ * <p>
  * The SimpleForwardSolutionScheduler needs the sequence in which the Resources are scheduled as exogenous input.
- *
+ * <p>
  * The expression "`forward"' refers to the fact that in both cases the scheduling process starts at the first element
  * of each {@link LogisticsSolution} and from the earliest possible point of time.
  */
 /*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
 
-	private LSP lsp;
 	private final List<LSPResource> resources;
+	private LSP lsp;
 	private int bufferTime;
-	
-	SimpleForwardSolutionScheduler( List<LSPResource> resources ) {
+
+	SimpleForwardSolutionScheduler(List<LSPResource> resources) {
 		this.resources = resources;
 	}
-	
+
 	@Override
 	public void scheduleSolutions() {
 		insertShipmentsAtBeginning();
-		for(LSPResource resource : resources) {
-			for(LSPResource lspResource : lsp.getResources()) {
-				if(lspResource == resource) {
+		for (LSPResource resource : resources) {
+			for (LSPResource lspResource : lsp.getResources()) {
+				if (lspResource == resource) {
 					lspResource.schedule(bufferTime);
 				}
 			}
@@ -72,26 +72,26 @@ import lsp.shipment.LSPShipment;
 	}
 
 	@Override
-	public void setEmbeddingContainer( LSP lsp ) {
+	public void setEmbeddingContainer(LSP lsp) {
 		this.lsp = lsp;
 	}
 
 
 	private void insertShipmentsAtBeginning() {
-		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 			LogisticsSolutionElement firstElement = getFirstElement(solution);
-			for(LSPShipment shipment : solution.getShipments() ) {
-				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment );
+			for (LSPShipment shipment : solution.getShipments()) {
+				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment);
 			}
 		}
 	}
-	
-	private LogisticsSolutionElement getFirstElement(LogisticsSolution solution){
-		for(LogisticsSolutionElement element : solution.getSolutionElements()){
-			if(element.getPreviousElement() == null){
+
+	private LogisticsSolutionElement getFirstElement(LogisticsSolution solution) {
+		for (LogisticsSolutionElement element : solution.getSolutionElements()) {
+			if (element.getPreviousElement() == null) {
 				return element;
 			}
-			
+
 		}
 		return null;
 	}

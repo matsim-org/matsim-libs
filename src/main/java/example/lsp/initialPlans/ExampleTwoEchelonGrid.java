@@ -41,7 +41,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;
@@ -56,16 +55,16 @@ import java.util.*;
 /**
  * This is an academic example for the 2-echelon problem.
  * It uses the 9x9-grid network from the matsim-examples.
- *
+ * <p>
  * The depot is located at the outer border of the network, while the jobs are located in the middle area.
  * The {@link lsp.LSP} has two different {@link lsp.LSPPlan}s:
  * 1) direct delivery from the depot
  * 2) Using a TransshipmentHub: All goods were brought from the depot to the hub, reloaded and then brought from the hub to the customers
- *
+ * <p>
  * The decision which of these plans is chosen should be made via the Score of the plans.
  * We will modify the costs of the vehicles and/or for using(having) the Transshipment hub. Depending on this setting,
  * the plan selection should be done accordingly.
- *
+ * <p>
  * Please note: This example is in part on existing examples, but I start from the scratch for a) see, if this works and b) have a "clean" class :)
  *
  * @author Kai Martins-Turner (kturner)
@@ -93,7 +92,8 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerTimeUnit(0.005)
 			.build();
 
-	private ExampleTwoEchelonGrid(){ } // so it cannot be instantiated
+	private ExampleTwoEchelonGrid() {
+	} // so it cannot be instantiated
 
 	public static void main(String[] args) {
 		log.info("Prepare Config");
@@ -104,11 +104,12 @@ final class ExampleTwoEchelonGrid {
 
 		log.info("Prepare Controler");
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
 			}
-		} );
+		});
 
 		log.info("Run MATSim");
 		controler.run();
@@ -138,8 +139,8 @@ final class ExampleTwoEchelonGrid {
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}
@@ -149,11 +150,11 @@ final class ExampleTwoEchelonGrid {
 
 		//Change speed on all links to 30 km/h (8.33333 m/s) for easier computation --> Freeflow TT per link is 2min
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			link.setFreespeed(30/3.6);
+			link.setFreespeed(30 / 3.6);
 		}
 
 		log.info("Add LSP to the scenario");
-		LSPUtils.addLSPs( scenario, new LSPs( Collections.singletonList( createLSP(scenario.getNetwork()) ) ) );
+		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario.getNetwork()))));
 
 		return scenario;
 	}
@@ -163,7 +164,7 @@ final class ExampleTwoEchelonGrid {
 
 		LSPPlan lspPlan_direct;
 		{
-			log.info( "Create lspPlan for direct delivery" );
+			log.info("Create lspPlan for direct delivery");
 
 			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
@@ -183,7 +184,7 @@ final class ExampleTwoEchelonGrid {
 					.addSolutionElement(directCarrierElement)
 					.build();
 
-			final ShipmentAssigner singlesolutionShipmentAssigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
+			final ShipmentAssigner singlesolutionShipmentAssigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 			lspPlan_direct = LSPUtils.createLSPPlan()
 					.addSolution(solution_direct)
 					.setAssigner(singlesolutionShipmentAssigner);
@@ -191,7 +192,7 @@ final class ExampleTwoEchelonGrid {
 
 		LSPPlan lspPlan_withHub;
 		{
-			log.info( "Create lspPlan with Hub" );
+			log.info("Create lspPlan with Hub");
 
 			Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
@@ -214,12 +215,12 @@ final class ExampleTwoEchelonGrid {
 					.build();
 
 			//The scheduler is added to the Resource and the Resource is created
-			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance( Id.create( "Hub", LSPResource.class ), HUB_LINK_ID )
-					.setTransshipmentHubScheduler( hubScheduler )
+			LSPResource hubResource = UsecaseUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID)
+					.setTransshipmentHubScheduler(hubScheduler)
 					.build();
 
-			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create( "HubLSE", LogisticsSolutionElement.class ))
-					.setResource( hubResource )
+			LogisticsSolutionElement hubLSE = LSPUtils.LogisticsSolutionElementBuilder.newInstance(Id.create("HubLSE", LogisticsSolutionElement.class))
+					.setResource(hubResource)
 					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 
 			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
@@ -249,7 +250,7 @@ final class ExampleTwoEchelonGrid {
 
 			lspPlan_withHub = LSPUtils.createLSPPlan()
 					.addSolution(solution_direct)
-					.setAssigner(UsecaseUtils.createSinglesolutionShipmentAssigner());
+					.setAssigner(UsecaseUtils.createSingleSolutionShipmentAssigner());
 
 		}
 
@@ -272,8 +273,8 @@ final class ExampleTwoEchelonGrid {
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
-		GenericStrategyManager<LSPPlan, LSP> strategyManager  =  new GenericStrategyManagerImpl<>();
-		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()),null, 1);
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
 		replanner.setEmbeddingContainer(lsp);
 
@@ -281,7 +282,7 @@ final class ExampleTwoEchelonGrid {
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
-		for(LSPShipment shipment : createInitialLSPShipments() ) {
+		for (LSPShipment shipment : createInitialLSPShipments()) {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
@@ -298,7 +299,7 @@ final class ExampleTwoEchelonGrid {
 		int i = 1;
 //		for(int i = 1; i < 6; i++) {
 		Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
-		ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+		ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 //		int capacityDemand = rand.nextInt(10);
 		int capacityDemand = rand.nextInt(5);
 		builder.setCapacityDemand(capacityDemand);
@@ -306,9 +307,9 @@ final class ExampleTwoEchelonGrid {
 		builder.setFromLinkId(DEPOT_LINK_ID);
 		builder.setToLinkId(Id.createLinkId("i(5,5)R"));
 
-		builder.setEndTimeWindow(TimeWindow.newInstance(0,(24*3600)));
-		builder.setStartTimeWindow(TimeWindow.newInstance(0,(24*3600)));
-		builder.setDeliveryServiceTime(capacityDemand * 60 );
+		builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
+		builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
+		builder.setDeliveryServiceTime(capacityDemand * 60);
 
 		shipmentList.add(builder.build());
 //		}
@@ -333,7 +334,7 @@ final class ExampleTwoEchelonGrid {
 
 	private static void printScores(Collection<LSP> lsps) {
 		for (LSP lsp : lsps) {
-			log.info("The LSP `` " + lsp.getId()  + " ´´ has the following number of plans: " + lsp.getPlans().size());
+			log.info("The LSP `` " + lsp.getId() + " ´´ has the following number of plans: " + lsp.getPlans().size());
 			log.info("The scores are");
 			for (LSPPlan plan : lsp.getPlans()) {
 				log.info(plan.getScore());

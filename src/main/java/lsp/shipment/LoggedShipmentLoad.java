@@ -34,14 +34,14 @@ import lsp.LSPResource;
 	private final LogisticsSolutionElement element;
 	private final Id<LSPResource> resourceId;
 
-	LoggedShipmentLoad(ShipmentUtils.LoggedShipmentLoadBuilder builder){
+	LoggedShipmentLoad(ShipmentUtils.LoggedShipmentLoadBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
 	}
-	
-	
+
+
 	@Override
 	public String getElementType() {
 		String type = "LOAD";
@@ -68,7 +68,8 @@ import lsp.LSPResource;
 		return resourceId;
 	}
 
-	@Override public Id<Link> getLinkId(){
-		throw new RuntimeException( "not implemented" );
+	@Override
+	public Id<Link> getLinkId() {
+		throw new RuntimeException("not implemented");
 	}
 }

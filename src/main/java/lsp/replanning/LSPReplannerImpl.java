@@ -31,27 +31,27 @@ import lsp.LSP;
 import lsp.LSPPlan;
 
 
-class LSPReplannerImpl implements LSPReplanner{
+class LSPReplannerImpl implements LSPReplanner {
 
-	private LSP lsp;
 	private final GenericStrategyManager<LSPPlan, LSP> strategyManager;
-	
-	LSPReplannerImpl( GenericStrategyManager<LSPPlan, LSP> strategyManager ) {
+	private LSP lsp;
+
+	LSPReplannerImpl(GenericStrategyManager<LSPPlan, LSP> strategyManager) {
 		this.strategyManager = strategyManager;
 	}
-	
+
 //	public LSPReplannerImpl() {
 //	}
-	
+
 	@Override
-	public void setEmbeddingContainer( LSP lsp ) {
+	public void setEmbeddingContainer(LSP lsp) {
 		this.lsp = lsp;
 	}
 
 	@Override
 	public void replan(ReplanningEvent event) {
-		if(strategyManager != null) {
-			strategyManager.run( Collections.singletonList( lsp ), event.getIteration(), event.getReplanningContext() );
+		if (strategyManager != null) {
+			strategyManager.run(Collections.singletonList(lsp), event.getIteration(), event.getReplanningContext());
 		}
 		lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
 		//TODO: Do we need to do it for each plan, if it gets selected???

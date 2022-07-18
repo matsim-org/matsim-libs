@@ -26,53 +26,32 @@ import org.matsim.api.core.v01.Id;
 
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 
-	static class LogElementComparator implements Comparator<ShipmentPlanElement>{
-
-		@Override
-		public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
-			if(o1.getStartTime() > o2.getStartTime()){
-				return 1;
-			}
-			if(o1.getStartTime() < o2.getStartTime()){
-				return -1;
-			}
-			if(o1.getStartTime() == o2.getStartTime()) {
-				if(o1.getEndTime() > o2.getEndTime()) {
-					return 1;
-				}
-				if(o1.getEndTime() < o2.getEndTime()) {
-					return -1;
-				}
-			}
-			return 0;
-		}
-	}
-
-	
 	private final LSPShipment shipment;
-	private final HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> logElements;
-	
-	
-	ShipmentPlanImpl( LSPShipment shipment ){
+	private final HashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> logElements;
+
+	ShipmentPlanImpl(LSPShipment shipment) {
 		this.shipment = shipment;
 		this.logElements = new HashMap<>();
 	}
 
-	@Override public void setEmbeddingContainer( LSPShipment pointer ){
-		throw new RuntimeException( "not implemented" );
+	@Override
+	public void setEmbeddingContainer(LSPShipment pointer) {
+		throw new RuntimeException("not implemented");
 	}
+
 	@Override
 	public LSPShipment getEmbeddingContainer() {
 		return shipment;
 	}
 
-	@Override public void addPlanElement( Id<ShipmentPlanElement> id, ShipmentPlanElement element ) {
+	@Override
+	public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
 		logElements.put(id, element);
 	}
 
 	@Override
 	public Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements() {
-		return Collections.unmodifiableMap( logElements );
+		return Collections.unmodifiableMap(logElements);
 	}
 
 	@Override
@@ -82,7 +61,7 @@ import org.matsim.api.core.v01.Id;
 		// the method here is indeed there to find the plan element that was added most recently, to figure out how the next one can be added.  However, this then
 		// should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
 
-		ArrayList<ShipmentPlanElement> logList = new ArrayList<>( logElements.values() );
+		ArrayList<ShipmentPlanElement> logList = new ArrayList<>(logElements.values());
 		logList.sort(new LogElementComparator());
 		Collections.reverse(logList);
 		return logList.get(0);
@@ -91,5 +70,27 @@ import org.matsim.api.core.v01.Id;
 	@Override
 	public void clear() {
 		logElements.clear();
+	}
+
+	static class LogElementComparator implements Comparator<ShipmentPlanElement> {
+
+		@Override
+		public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
+			if (o1.getStartTime() > o2.getStartTime()) {
+				return 1;
+			}
+			if (o1.getStartTime() < o2.getStartTime()) {
+				return -1;
+			}
+			if (o1.getStartTime() == o2.getStartTime()) {
+				if (o1.getEndTime() > o2.getEndTime()) {
+					return 1;
+				}
+				if (o1.getEndTime() < o2.getEndTime()) {
+					return -1;
+				}
+			}
+			return 0;
+		}
 	}
 }

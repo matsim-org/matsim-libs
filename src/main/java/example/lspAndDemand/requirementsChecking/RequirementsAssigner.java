@@ -29,24 +29,24 @@ import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.Requirement;
 
-class RequirementsAssigner implements  ShipmentAssigner {
+class RequirementsAssigner implements ShipmentAssigner {
 
-	private LSP lsp;
 	private final Collection<LogisticsSolution> feasibleSolutions;
-	
+	private LSP lsp;
+
 	public RequirementsAssigner() {
 		this.feasibleSolutions = new ArrayList<>();
 	}
-	
+
 	@Override
 	public void assignToSolution(LSPShipment shipment) {
 		feasibleSolutions.clear();
-		
+
 		label:
-		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-			for(Requirement requirement : shipment.getRequirements()) {
-				if(!requirement.checkRequirement(solution)) {
-					
+		for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+			for (Requirement requirement : shipment.getRequirements()) {
+				if (!requirement.checkRequirement(solution)) {
+
 					continue label;
 				}
 			}

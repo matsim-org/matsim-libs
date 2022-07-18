@@ -46,14 +46,14 @@ public class DistributionElementTest {
 
 	private LSPCarrierResource adapter;
 	private LogisticsSolutionElement distributionElement;
-	
-	
+
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
@@ -63,9 +63,9 @@ public class DistributionElementTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		VehicleType distributionType = vehicleTypeBuilder.build();
-		
+
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
@@ -77,29 +77,29 @@ public class DistributionElementTest {
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
 		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
-		
-		
+
+
 		Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		builder.setCarrier(carrier);
 		builder.setLocationLinkId(distributionLinkId);
 		adapter = builder.build();
-		
+
 		Id<LogisticsSolutionElement> elementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 		distributionBuilder.setResource(adapter);
 		distributionElement = distributionBuilder.build();
-	
+
 	}
-	
+
 	@Test
 	public void testDistributionElement() {
 		assertNotNull(distributionElement.getIncomingShipments());
 		assertNotNull(distributionElement.getIncomingShipments().getShipments());
 		assertTrue(distributionElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertNotNull(distributionElement.getAttributes() );
-		assertTrue(distributionElement.getAttributes().isEmpty() );
+		assertNotNull(distributionElement.getAttributes());
+		assertTrue(distributionElement.getAttributes().isEmpty());
 //		assertNull(distributionElement.getEmbeddingContainer() );
 		assertNull(distributionElement.getNextElement());
 		assertNotNull(distributionElement.getOutgoingShipments());

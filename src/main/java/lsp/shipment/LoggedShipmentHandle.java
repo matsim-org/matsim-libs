@@ -27,7 +27,6 @@ import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
 
-
 /*package*/ class LoggedShipmentHandle implements ShipmentActivity {
 
 	private final double startTime;
@@ -36,14 +35,14 @@ import lsp.LSPResource;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
 
-	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder){
+	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder) {
 		this.startTime = builder.getStartTime();
 		this.endTime = builder.getEndTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
 		this.linkId = builder.getLinkId();
 	}
-	
+
 	@Override
 	public LogisticsSolutionElement getSolutionElement() {
 		return element;
@@ -70,7 +69,8 @@ import lsp.LSPResource;
 		return endTime;
 	}
 
-	@Override public Id<Link> getLinkId() {
+	@Override
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 

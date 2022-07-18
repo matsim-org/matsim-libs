@@ -41,35 +41,34 @@ import java.util.Collection;
 
 /*package-private*/ class MainRunTourEndEventHandler implements AfterMobsimListener, LSPTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
-	private LSPShipment lspShipment;
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+	private LSPShipment lspShipment;
 
 
-	MainRunTourEndEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, LSPCarrierResource resource){
-		this.lspShipment=lspShipment;
-		this.carrierService=carrierService;
-		this.solutionElement=solutionElement;
-		this.resource=resource;
+	MainRunTourEndEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, LSPCarrierResource resource) {
+		this.lspShipment = lspShipment;
+		this.carrierService = carrierService;
+		this.solutionElement = solutionElement;
+		this.resource = resource;
 	}
-	
-	
+
+
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 
 	}
 
-	
 
 	@Override
 	public void handleEvent(LSPTourEndEvent event) {
-		for(TourElement tourElement : event.getTour().getTourElements()){
-			if(tourElement instanceof ServiceActivity){
+		for (TourElement tourElement : event.getTour().getTourElements()) {
+			if (tourElement instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-				if(serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()){
+				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logUnload(event);
 					logTransport(event);
 				}
@@ -77,8 +76,8 @@ import java.util.Collection;
 		}
 	}
 
-	private void logUnload(LSPTourEndEvent event){
-		ShipmentUtils.LoggedShipmentUnloadBuilder builder  =  ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+	private void logUnload(LSPTourEndEvent event) {
+		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - getTotalUnloadingTime(event.getTour()));
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
@@ -90,25 +89,25 @@ import java.util.Collection;
 		lspShipment.getLog().addPlanElement(unloadId, unload);
 	}
 
-	private void logTransport(LSPTourEndEvent event){
+	private void logTransport(LSPTourEndEvent event) {
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if(abstractPlanElement instanceof ShipmentLeg) {
+		if (abstractPlanElement instanceof ShipmentLeg) {
 			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
-			transport.setEndTime(event.getTime()- getTotalUnloadingTime(event.getTour()));
+			transport.setEndTime(event.getTime() - getTotalUnloadingTime(event.getTour()));
 			transport.setToLinkId(event.getTour().getEndLinkId());
-		}		
+		}
 	}
-	
-	private double getTotalUnloadingTime(Tour tour){
+
+	private double getTotalUnloadingTime(Tour tour) {
 		double totalTime = 0;
-		for(TourElement element : tour.getTourElements()){
-			if(element instanceof ServiceActivity){
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) element;
 				totalTime = totalTime + serviceActivity.getDuration();
 			}
-		}	
+		}
 		return totalTime;
 	}
 

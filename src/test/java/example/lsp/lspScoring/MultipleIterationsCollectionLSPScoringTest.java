@@ -54,8 +54,8 @@ import lsp.shipment.LSPShipment;
 
 public class MultipleIterationsCollectionLSPScoringTest {
 
-	private LSP collectionLSP;
 	private final int numberOfShipments = 25;
+	private LSP collectionLSP;
 
 	@Before
 	public void initialize() {
@@ -63,8 +63,8 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		var freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -116,7 +116,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
 
-		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
@@ -128,14 +128,14 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
-		collectionLSPBuilder.setSolutionScorer( new ExampleLSPScoring.TipScorer() );
+		collectionLSPBuilder.setSolutionScorer(new ExampleLSPScoring.TipScorer());
 		collectionLSP = collectionLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
@@ -157,7 +157,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 			builder.setEndTimeWindow(endTimeWindow);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setDeliveryServiceTime(capacityDemand * 60 );
+			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LSPShipment shipment = builder.build();
 			collectionLSP.assignShipmentToLSP(shipment);
 		}
@@ -170,10 +170,11 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		Controler controler = new Controler(scenario);
 
-		LSPUtils.addLSPs( scenario, lsps );
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() );
+		LSPUtils.addLSPs(scenario, lsps);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
 			}
 		});
 		config.controler().setFirstIteration(0);

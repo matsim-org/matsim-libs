@@ -45,7 +45,7 @@ import lsp.LSPResource;
 public class CollectionSolutionTest {
 
 	private LogisticsSolution collectionSolution;
-	
+
 	@Before
 	public void initialize() {
 		Config config = new Config();
@@ -82,7 +82,7 @@ public class CollectionSolutionTest {
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPCarrierResource carrierAdapter = adapterBuilder.build();
-		
+
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
@@ -99,24 +99,24 @@ public class CollectionSolutionTest {
 
 	@Test
 	public void testCollectionSolution() {
-		assertNotNull(collectionSolution.getSimulationTrackers() );
-		assertTrue(collectionSolution.getSimulationTrackers().isEmpty() );
-		assertNotNull(collectionSolution.getAttributes() );
-		assertTrue(collectionSolution.getAttributes().isEmpty() );
-		assertNull(collectionSolution.getLSP() );
+		assertNotNull(collectionSolution.getSimulationTrackers());
+		assertTrue(collectionSolution.getSimulationTrackers().isEmpty());
+		assertNotNull(collectionSolution.getAttributes());
+		assertTrue(collectionSolution.getAttributes().isEmpty());
+		assertNull(collectionSolution.getLSP());
 		assertNotNull(collectionSolution.getShipments());
 		assertTrue(collectionSolution.getShipments().isEmpty());
 		assertEquals(1, collectionSolution.getSolutionElements().size());
 		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(collectionSolution.getSolutionElements());
-		for(LogisticsSolutionElement element : elements) {
-			if(elements.indexOf(element) == 0) {
+		for (LogisticsSolutionElement element : elements) {
+			if (elements.indexOf(element) == 0) {
 				assertNull(element.getPreviousElement());
 			}
-			if(elements.indexOf(element) == (elements.size() -1)) {
+			if (elements.indexOf(element) == (elements.size() - 1)) {
 				assertNull(element.getNextElement());
 			}
 //			assertSame(element.getEmbeddingContainer(), collectionSolution );
-		}	
+		}
 	}
-	
+
 }

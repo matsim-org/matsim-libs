@@ -37,9 +37,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.
- *
+ * <p>
  * Thus, these activities are entered directly in the Schedule of the LSPShipments that pass through the TranshipmentHub.
- *
+ * <p>
  * An entry is added to the schedule of the shipments that is an instance of
  * {@link lsp.shipment.ScheduledShipmentHandle}. There, the name of the Resource
  * and the client element are entered, so that the way that the {@link lsp.shipment.LSPShipment}
@@ -54,17 +54,17 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final TransshipmentHubScheduler transshipmentHubScheduler;
 	private final List<LogisticsSolutionElement> clientElements;
 
-	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder){
-		super( builder.getId() );
+	TransshipmentHub(UsecaseUtils.TransshipmentHubBuilder builder) {
+		super(builder.getId());
 		this.locationLinkId = builder.getLocationLinkId();
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
 		transshipmentHubScheduler.setTranshipmentHub(this);
 		TranshipmentHubTourEndEventHandler eventHandler = new TranshipmentHubTourEndEventHandler(this);
 		transshipmentHubScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
-		this.addSimulationTracker( eventHandler );
+		this.addSimulationTracker(eventHandler);
 	}
-	
+
 	@Override
 	public Id<Link> getStartLinkId() {
 		return locationLinkId;
@@ -85,11 +85,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		transshipmentHubScheduler.scheduleShipments(this, bufferTime);
 	}
 
-	public double getCapacityNeedFixed(){
+	public double getCapacityNeedFixed() {
 		return transshipmentHubScheduler.getCapacityNeedFixed();
 	}
 
-	public double getCapacityNeedLinear(){
+	public double getCapacityNeedLinear() {
 		return transshipmentHubScheduler.getCapacityNeedLinear();
 	}
 

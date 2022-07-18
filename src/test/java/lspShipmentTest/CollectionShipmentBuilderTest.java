@@ -44,76 +44,76 @@ public class CollectionShipmentBuilderTest {
 
 	private Network network;
 	private ArrayList<LSPShipment> shipments;
-	
-	
+
+
 	@Before
-	public void initialize(){
+	public void initialize() {
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        this.network = scenario.getNetwork();
-        ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
-        Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		this.network = scenario.getNetwork();
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
+		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Link> toLinkId = network.getLinks().get(collectionLinkId).getId();
-        this.shipments = new ArrayList<>();
-        
-        for(int i = 1; i < 11; i++) {
-        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
-        	int capacityDemand = new Random().nextInt(10);
-        	builder.setCapacityDemand(capacityDemand);
-        	
-        	while(true) {
-        		Collections.shuffle(linkList);
-        		Link pendingFromLink = linkList.get(0);
-        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
-        		   builder.setFromLinkId(pendingFromLink.getId());
-        		   break;	
-        		}
-        	
-        	}
-        	
-        	builder.setToLinkId(toLinkId);
-        	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
-        	builder.setEndTimeWindow(endTimeWindow);
-        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
-        	builder.setStartTimeWindow(startTimeWindow);
-        	builder.setDeliveryServiceTime(capacityDemand * 60 );
-        	shipments.add(builder.build());
-        }
+		this.shipments = new ArrayList<>();
+
+		for (int i = 1; i < 11; i++) {
+			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			int capacityDemand = new Random().nextInt(10);
+			builder.setCapacityDemand(capacityDemand);
+
+			while (true) {
+				Collections.shuffle(linkList);
+				Link pendingFromLink = linkList.get(0);
+				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
+					builder.setFromLinkId(pendingFromLink.getId());
+					break;
+				}
+
+			}
+
+			builder.setToLinkId(toLinkId);
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
+			builder.setEndTimeWindow(endTimeWindow);
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
+			builder.setStartTimeWindow(startTimeWindow);
+			builder.setDeliveryServiceTime(capacityDemand * 60);
+			shipments.add(builder.build());
+		}
 	}
-	
+
 	@Test
 	public void testShipments() {
 		assertEquals(10, shipments.size());
-		for(LSPShipment shipment : shipments) {
+		for (LSPShipment shipment : shipments) {
 			assertNotNull(shipment.getId());
-			assertNotNull(shipment.getSize() );
-			assertNotNull(shipment.getDeliveryTimeWindow() );
-			assertNotNull(shipment.getFrom() );
-			assertNotNull(shipment.getDeliveryServiceTime() );
-			assertNotNull(shipment.getTo() );
-			assertNotNull(shipment.getPickupTimeWindow() );
+			assertNotNull(shipment.getSize());
+			assertNotNull(shipment.getDeliveryTimeWindow());
+			assertNotNull(shipment.getFrom());
+			assertNotNull(shipment.getDeliveryServiceTime());
+			assertNotNull(shipment.getTo());
+			assertNotNull(shipment.getPickupTimeWindow());
 			assertNotNull(shipment.getShipmentPlan());
 			assertNotNull(shipment.getLog());
-			assertNotNull(shipment.getSimulationTrackers() );
-			
-			assertTrue(shipment.getSimulationTrackers().isEmpty() );
-			assertEquals(shipment.getLog().getEmbeddingContainer(), shipment );
+			assertNotNull(shipment.getSimulationTrackers());
+
+			assertTrue(shipment.getSimulationTrackers().isEmpty());
+			assertEquals(shipment.getLog().getEmbeddingContainer(), shipment);
 			assertTrue(shipment.getLog().getPlanElements().isEmpty());
-			
-			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment );
+
+			assertEquals(shipment.getShipmentPlan().getEmbeddingContainer(), shipment);
 			assertTrue(shipment.getShipmentPlan().getPlanElements().isEmpty());
-			
-			Link link = network.getLinks().get(shipment.getFrom() );
+
+			Link link = network.getLinks().get(shipment.getFrom());
 			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
 			assertTrue(link.getFromNode().getCoord().getY() <= 4000);
 
 		}
 	}
-	
+
 }

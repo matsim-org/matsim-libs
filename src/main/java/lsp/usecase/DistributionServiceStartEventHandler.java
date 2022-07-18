@@ -36,13 +36,13 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/  class DistributionServiceStartEventHandler implements AfterMobsimListener, LSPServiceStartEventHandler, LSPSimulationTracker<LSPShipment>{
+/*package-private*/  class DistributionServiceStartEventHandler implements AfterMobsimListener, LSPServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private LSPShipment lspShipment;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+	private LSPShipment lspShipment;
 
 	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
@@ -69,10 +69,10 @@ import java.util.Collection;
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if(abstractPlanElement instanceof ShipmentLeg) {
+		if (abstractPlanElement instanceof ShipmentLeg) {
 			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
 			transport.setEndTime(event.getTime());
-		}		
+		}
 	}
 
 	private void logUnload(LSPServiceStartEvent event) {

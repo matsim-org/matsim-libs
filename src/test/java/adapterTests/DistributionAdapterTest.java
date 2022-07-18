@@ -44,102 +44,102 @@ import static org.junit.Assert.*;
 
 
 public class DistributionAdapterTest {
-		
-		//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
-		//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
+
+	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
+	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
 
 	private org.matsim.vehicles.VehicleType distributionType;
-		private CarrierVehicle distributionCarrierVehicle;
-		private CarrierCapabilities capabilities;
-		private Carrier distributionCarrier;
-		private LSPCarrierResource distributionAdapter;
-		private Id<Link> distributionLinkId;
-		
-		@Before
-		public void initialize() {
-			Config config = new Config();
-	        config.addCoreModules();
-	        Scenario scenario = ScenarioUtils.createScenario(config);
-	        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-			Network network = scenario.getNetwork();
+	private CarrierVehicle distributionCarrierVehicle;
+	private CarrierCapabilities capabilities;
+	private Carrier distributionCarrier;
+	private LSPCarrierResource distributionAdapter;
+	private Id<Link> distributionLinkId;
 
-			Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
-			Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-			CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-			vehicleTypeBuilder.setCapacity(10);
-			vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-			vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-			vehicleTypeBuilder.setFixCost(49);
-			vehicleTypeBuilder.setMaxVelocity(50/3.6);
-			distributionType = vehicleTypeBuilder.build();
-			
-			distributionLinkId = Id.createLinkId("(4 2) (4 3)");
-			Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-			distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+	@Before
+	public void initialize() {
+		Config config = new Config();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		Network network = scenario.getNetwork();
 
-			CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-			capabilitiesBuilder.addType(distributionType);
-			capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
-			capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-			capabilities = capabilitiesBuilder.build();
-			distributionCarrier = CarrierUtils.createCarrier( carrierId );
-			distributionCarrier.setCarrierCapabilities(capabilities);
-			
-			
-			Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-			UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
-			builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-			builder.setCarrier(distributionCarrier);
-			builder.setLocationLinkId(distributionLinkId);
-			distributionAdapter = builder.build();
-		}
+		Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
+		Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
+		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
+		vehicleTypeBuilder.setCapacity(10);
+		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
+		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		vehicleTypeBuilder.setFixCost(49);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
+		distributionType = vehicleTypeBuilder.build();
+
+		distributionLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
+		distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId, distributionType);
+
+		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
+		capabilitiesBuilder.addType(distributionType);
+		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
+		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
+		capabilities = capabilitiesBuilder.build();
+		distributionCarrier = CarrierUtils.createCarrier(carrierId);
+		distributionCarrier.setCarrierCapabilities(capabilities);
 
 
-		@Test
-		public void testCollectionAdapter() {
-			assertNotNull(distributionAdapter.getClientElements());
-			assertTrue(distributionAdapter.getClientElements().isEmpty());
-			assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
-			if(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
+		Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
+		UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
+		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
+		builder.setCarrier(distributionCarrier);
+		builder.setLocationLinkId(distributionLinkId);
+		distributionAdapter = builder.build();
+	}
+
+
+	@Test
+	public void testCollectionAdapter() {
+		assertNotNull(distributionAdapter.getClientElements());
+		assertTrue(distributionAdapter.getClientElements().isEmpty());
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
+		if (LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
 //				assertTrue(Carrier.class.isAssignableFrom(distributionAdapter.getClassOfResource()));
-				assertSame(distributionAdapter.getCarrier(), distributionCarrier);
-			}
-			assertSame(distributionAdapter.getEndLinkId(), distributionLinkId);
-			assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
-			assertNotNull(distributionAdapter.getSimulationTrackers() );
-			assertTrue(distributionAdapter.getSimulationTrackers().isEmpty() );
-			assertNotNull(distributionAdapter.getAttributes() );
-			assertTrue(distributionAdapter.getAttributes().isEmpty() );
-			assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
-			if(distributionAdapter.getCarrier() == distributionCarrier) {
-				assertSame(distributionCarrier.getCarrierCapabilities(), capabilities);
-				assertTrue(Carrier.class.isAssignableFrom(distributionCarrier.getClass()));
-				assertTrue(distributionCarrier.getPlans().isEmpty());
-				assertNull(distributionCarrier.getSelectedPlan());
-				assertTrue(distributionCarrier.getServices().isEmpty());
-				assertTrue(distributionCarrier.getShipments().isEmpty());
-				if(distributionCarrier.getCarrierCapabilities() == capabilities) {
-					assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
-					assertFalse(capabilities.getVehicleTypes().isEmpty());
-					ArrayList<VehicleType> types = new ArrayList<>( capabilities.getVehicleTypes() );
-					if(types.size() ==1) {
-						assertSame(types.get(0), distributionType);
-						assertEquals(10, distributionType.getCapacity().getOther().intValue());
-						assertEquals(0.0004, distributionType.getCostInformation().getPerDistanceUnit(), 0.0);
-						assertEquals(0.38, distributionType.getCostInformation().getPerTimeUnit(), 0.0);
-						assertEquals(49, distributionType.getCostInformation().getFix(), 0.0);
-						assertEquals((50 / 3.6), distributionType.getMaximumVelocity(), 0.0);
-						
-					}
-					ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
-					if(vehicles.size() == 1) {
-						assertSame(vehicles.get(0), distributionCarrierVehicle);
-						assertSame(distributionCarrierVehicle.getType(), distributionType);
-						assertSame(distributionCarrierVehicle.getLocation(), distributionLinkId);
-					}
+			assertSame(distributionAdapter.getCarrier(), distributionCarrier);
+		}
+		assertSame(distributionAdapter.getEndLinkId(), distributionLinkId);
+		assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
+		assertNotNull(distributionAdapter.getSimulationTrackers());
+		assertTrue(distributionAdapter.getSimulationTrackers().isEmpty());
+		assertNotNull(distributionAdapter.getAttributes());
+		assertTrue(distributionAdapter.getAttributes().isEmpty());
+		assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
+		if (distributionAdapter.getCarrier() == distributionCarrier) {
+			assertSame(distributionCarrier.getCarrierCapabilities(), capabilities);
+			assertTrue(Carrier.class.isAssignableFrom(distributionCarrier.getClass()));
+			assertTrue(distributionCarrier.getPlans().isEmpty());
+			assertNull(distributionCarrier.getSelectedPlan());
+			assertTrue(distributionCarrier.getServices().isEmpty());
+			assertTrue(distributionCarrier.getShipments().isEmpty());
+			if (distributionCarrier.getCarrierCapabilities() == capabilities) {
+				assertSame(capabilities.getFleetSize(), FleetSize.INFINITE);
+				assertFalse(capabilities.getVehicleTypes().isEmpty());
+				ArrayList<VehicleType> types = new ArrayList<>(capabilities.getVehicleTypes());
+				if (types.size() == 1) {
+					assertSame(types.get(0), distributionType);
+					assertEquals(10, distributionType.getCapacity().getOther().intValue());
+					assertEquals(0.0004, distributionType.getCostInformation().getPerDistanceUnit(), 0.0);
+					assertEquals(0.38, distributionType.getCostInformation().getPerTimeUnit(), 0.0);
+					assertEquals(49, distributionType.getCostInformation().getFix(), 0.0);
+					assertEquals((50 / 3.6), distributionType.getMaximumVelocity(), 0.0);
+
+				}
+				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());
+				if (vehicles.size() == 1) {
+					assertSame(vehicles.get(0), distributionCarrierVehicle);
+					assertSame(distributionCarrierVehicle.getType(), distributionType);
+					assertSame(distributionCarrierVehicle.getLocation(), distributionLinkId);
 				}
 			}
 		}
+	}
 
 
 }

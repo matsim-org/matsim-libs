@@ -31,10 +31,10 @@ public interface ShipmentPlan extends HasBackpointer<LSPShipment> {
 
 	Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
 
-	void addPlanElement( Id<ShipmentPlanElement> id, ShipmentPlanElement element );
-	
+	void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element);
+
 	ShipmentPlanElement getMostRecentEntry();
-	
+
 	void clear();
-	
+
 }

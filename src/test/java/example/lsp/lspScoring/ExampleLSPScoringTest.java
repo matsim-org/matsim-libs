@@ -11,24 +11,25 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ExampleLSPScoringTest{
-	private static final Logger log = Logger.getLogger( ExampleLSPScoringTest.class );
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+public class ExampleLSPScoringTest {
+	private static final Logger log = Logger.getLogger(ExampleLSPScoringTest.class);
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testMain(){
+	public void testMain() {
 
 		Config config = ExampleLSPScoring.prepareConfig();
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
-		Scenario scenario = ExampleLSPScoring.prepareScenario( config );
+		Scenario scenario = ExampleLSPScoring.prepareScenario(config);
 
-		Controler controler = ExampleLSPScoring.prepareControler( scenario );
+		Controler controler = ExampleLSPScoring.prepareControler(scenario);
 
 		controler.run();
 
-		for( LSP lsp : LSPUtils.getLSPs( scenario ).getLSPs().values() ){
-			Assert.assertEquals( 13.245734044444207, lsp.getSelectedPlan().getScore(), Double.MIN_VALUE ) ;
+		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
+			Assert.assertEquals(13.245734044444207, lsp.getSelectedPlan().getScore(), Double.MIN_VALUE);
 		}
 
 	}
