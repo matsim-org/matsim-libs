@@ -70,7 +70,8 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
      */
     private static final String MAXIMUM_DISTANCE_TO_CHARGER ="maxDistanceToCharger";
 
-    private static boolean pluginBeforeStartingThePlan = true;
+    //TODO: the setting of this to true currently leads to inconsistency between the planning and the qsim, due to the non-reflection of plugin trip at the start of the day. needs further investigation!
+    private static boolean pluginBeforeStartingThePlan = false;
 
     /**
      * determines the plug in act before the start of the plan to simulate charging between last act of the plan and first
