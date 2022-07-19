@@ -24,9 +24,13 @@ public class ScenarioTest {
 		Config config = TestScenario.loadConfig(utils);
 
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-		controler = MATSimApplication.prepare(TestScenario.class, config);
+		controler = MATSimApplication.prepare(TestScenario.class, config, getArgs());
 		injector = controler.getInjector();
 
+	}
+
+	protected String[] getArgs() {
+		return new String[0];
 	}
 
 }

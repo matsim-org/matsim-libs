@@ -22,18 +22,11 @@ public class InformedModeChoiceStrategyProvider implements Provider<PlanStrategy
 	@Inject
 	private Scenario scenario;
 	@Inject
-	private Provider<TopKChoicesGenerator> generator;
-	@Inject
-	private Provider<TripRouter> tripRouter;
+	private Provider<GeneratorContext> generator;
 	@Inject
 	private OutputDirectoryHierarchy controlerIO;
-	@Inject
-	private ActivityFacilities facilities;
-	@Inject
-	private TimeInterpretation timeInterpretation;
-
 	@Override
 	public PlanStrategy get() {
-		return new InformedModeChoicePlanStrategy(config, scenario, controlerIO, generator, tripRouter, facilities, timeInterpretation);
+		return new InformedModeChoicePlanStrategy(config, scenario, controlerIO, generator);
 	}
 }

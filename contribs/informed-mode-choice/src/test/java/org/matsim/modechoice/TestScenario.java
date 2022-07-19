@@ -3,6 +3,7 @@ package org.matsim.modechoice;
 import com.google.common.collect.Sets;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -13,10 +14,12 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.modechoice.constraints.RelaxedMassConservationConstraint;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.PtTripEstimator;
 import org.matsim.testcases.MatsimTestUtils;
+import picocli.CommandLine;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -29,6 +32,9 @@ import java.util.Set;
  * A test scenario based on kelheim example.
  */
 public class TestScenario extends MATSimApplication {
+
+	@CommandLine.Option(names = "--mc", description = "Mass-conservation constraint", defaultValue = "false")
+	private boolean mc;
 
 	/**
 	 * Hand-picked agents that have trajectories fully within scenario area.
@@ -101,6 +107,13 @@ public class TestScenario extends MATSimApplication {
 
 		config.planCalcScore().setExplainScores(true);
 
+		if (mc){
+			config.subtourModeChoice().setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
+			config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
+		}
+		else
+			config.subtourModeChoice().setChainBasedModes(new String[0]);
+
 		return config;
 	}
 
@@ -135,6 +148,9 @@ public class TestScenario extends MATSimApplication {
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.AlwaysAvailable.class, "ride", "bike", "walk")
 				.withLegEstimator(DefaultLegScoreEstimator.class, ModeOptions.ConsiderIfCarAvailable.class, "car")
 				.withTripEstimator(PtTripEstimator.class, ModeOptions.AlwaysAvailable.class, "pt");
+
+		if (mc)
+			builder.withConstraint(RelaxedMassConservationConstraint.class);
 
 		controler.addOverridingModule(builder.build());
 

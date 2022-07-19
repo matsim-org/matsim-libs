@@ -14,9 +14,9 @@ import java.util.Collection;
 public class SelectFromGeneratorStrategy implements PlanAlgorithm {
 
 	private final CandidateGenerator generator;
-	private final Selector<PlanCandidate> selector;
+	private final PlanSelector selector;
 
-	public SelectFromGeneratorStrategy(CandidateGenerator generator, Selector<PlanCandidate> selector) {
+	public SelectFromGeneratorStrategy(CandidateGenerator generator, PlanSelector selector) {
 		this.generator = generator;
 		this.selector = selector;
 	}

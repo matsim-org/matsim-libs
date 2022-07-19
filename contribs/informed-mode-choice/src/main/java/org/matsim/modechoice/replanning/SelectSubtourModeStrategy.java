@@ -1,0 +1,141 @@
+package org.matsim.modechoice.replanning;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.modechoice.InformedModeChoiceConfigGroup;
+import org.matsim.modechoice.PlanCandidate;
+import org.matsim.modechoice.PlanModel;
+
+import javax.inject.Provider;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * The main strategy for informed mode choice.
+ */
+public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
+
+	private static final Logger log = LogManager.getLogger(SelectSubtourModeStrategy.class);
+
+	private final InformedModeChoiceConfigGroup config;
+	private final SubtourModeChoiceConfigGroup smc;
+	private final Provider<GeneratorContext> generator;
+	private final IdMap<Person, PlanModel> models;
+
+	private final Set<String> nonChainBasedModes;
+
+	public SelectSubtourModeStrategy(Config config, Scenario scenario, Provider<GeneratorContext> generator) {
+		super(config.global());
+
+		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+		this.smc = ConfigUtils.addOrGetModule(config, SubtourModeChoiceConfigGroup.class);
+		this.generator = generator;
+
+		this.nonChainBasedModes = this.config.getModes().stream()
+				.filter(m -> !ArrayUtils.contains(smc.getChainBasedModes(), m))
+				.collect(Collectors.toSet());
+
+
+		this.models = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
+
+		for (Person value : scenario.getPopulation().getPersons().values()) {
+			this.models.put(value.getId(), PlanModel.newInstance(value.getSelectedPlan()));
+		}
+	}
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+
+		GeneratorContext context = generator.get();
+		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, nonChainBasedModes));
+	}
+
+	private final class Algorithm implements PlanAlgorithm {
+
+		private final GeneratorContext ctx;
+		private final SelectSingleTripModeStrategy.Algorithm singleTrip;
+		private final Random rnd;
+
+		public Algorithm(GeneratorContext ctx, SelectSingleTripModeStrategy.Algorithm singleTrip) {
+			this.ctx = ctx;
+			this.singleTrip = singleTrip;
+			this.rnd = MatsimRandom.getLocalInstance();
+		}
+
+		@Override
+		public void run(Plan plan) {
+
+			PlanModel model = models.get(plan.getPerson().getId());
+			model.setPlan(plan);
+
+			if (model.trips() == 0)
+				return;
+
+			// Force re-estimation
+			if (rnd.nextDouble() < 0.1)
+				model.reset();
+
+			// Do change single trip on non-chain based modes with certain probability
+			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model)) {
+				singleTrip.run(plan, model);
+				return;
+			}
+
+			List<TripStructureUtils.Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan, smc.getCoordDistance()));
+
+			// Add whole trip if not already present
+			if (subtours.stream().noneMatch(s -> s.getTrips().size() == model.trips())) {
+				subtours.add(0, TripStructureUtils.getUnclosedRootSubtour(plan));
+			}
+
+			while (!subtours.isEmpty()) {
+
+				TripStructureUtils.Subtour st = subtours.remove(rnd.nextInt(subtours.size()));
+				boolean[] mask = new boolean[model.trips()];
+				for (int i = 0; i < model.trips(); i++) {
+					if (st.getTrips().contains(model.getTrip(i)))
+						mask[i] = true;
+
+				}
+
+				Collection<PlanCandidate> candidates = ctx.generator.generate(model, null, mask);
+				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModes()));
+
+				if (!candidates.isEmpty()) {
+
+					PlanCandidate select = ctx.selector.select(candidates);
+					if (select != null) {
+						select.applyTo(plan);
+						break;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Checks if change single trip mode would have an option to choose from. That is the case, when not all trips are chain based.
+		 */
+		private boolean hasSingleTripChoice(PlanModel model) {
+
+			for (int i = 0; i < model.trips(); i++) {
+				if (nonChainBasedModes.contains(model.getTripMode(i)))
+					return true;
+			}
+
+			return false;
+		}
+
+	}
+}

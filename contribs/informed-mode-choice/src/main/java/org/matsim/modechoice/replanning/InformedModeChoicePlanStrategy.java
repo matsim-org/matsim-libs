@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,11 +16,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -50,8 +53,8 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 	private final InformedModeChoiceConfigGroup config;
 	private final Config globalConfig;
-
-	private final ThreadContext[] threadContexts;
+	private final GeneratorContext[] threadContexts;
+	private final SelectSingleTripModeStrategy.Algorithm[] singleTrip;
 	private final Scenario scenario;
 	private final OutputDirectoryHierarchy controlerIO;
 
@@ -67,17 +70,26 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private final IdMap<Person, PlanHistory> history;
 
 	public InformedModeChoicePlanStrategy(Config config, Scenario scenario, OutputDirectoryHierarchy controlerIO,
-	                                      Provider<TopKChoicesGenerator> generator, Provider<TripRouter> tripRouterProvider, ActivityFacilities facilities,
-	                                      TimeInterpretation timeInterpretation) {
+	                                      Provider<GeneratorContext> generator) {
 		this.globalConfig = config;
 		this.config = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
 
-		this.threadContexts = new ThreadContext[config.global().getNumberOfThreads()];
+
+		SubtourModeChoiceConfigGroup smc = ConfigUtils.addOrGetModule(config, SubtourModeChoiceConfigGroup.class);
+
+		List<String> nonChainBasedModes = this.config.getModes().stream()
+				.filter(m -> !ArrayUtils.contains(smc.getChainBasedModes(), m))
+				.collect(Collectors.toList());
+
+		this.threadContexts = new GeneratorContext[config.global().getNumberOfThreads()];
+		this.singleTrip = new SelectSingleTripModeStrategy.Algorithm[config.global().getNumberOfThreads()];
 
 		for (int i = 0; i < this.threadContexts.length; i++) {
-			this.threadContexts[i] = new ThreadContext(generator.get(), new PlanRouter(tripRouterProvider.get(), facilities, timeInterpretation), MatsimRandom.getLocalInstance());
+			GeneratorContext context = generator.get();
+			this.threadContexts[i] = context;
+			this.singleTrip[i] = SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, nonChainBasedModes);
 		}
 
 		history = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
@@ -257,8 +269,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 				plan.getAttributes().removeAttribute(ScoringFunction.SCORE_EXPLANATION);
 
-				// If this plan is new, it needs to be routed
-				threadContexts[assignment.get()].planRouter.run(plan);
+				// TODO: If this plan is new, it needs to be routed
 			}
 		}
 	}
@@ -285,9 +296,11 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private final class ReplanningTask implements Runnable {
 
 		private final HasPlansAndId<Plan, Person> person;
+		private final Random rnd;
 
 		private ReplanningTask(HasPlansAndId<Plan, Person> person) {
 			this.person = person;
+			this.rnd = MatsimRandom.getLocalInstance();
 		}
 
 		@Override
@@ -319,7 +332,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 			person.setSelectedPlan(best);
 
-			ThreadContext tc = threadContexts[assignment.get()];
+			GeneratorContext tc = threadContexts[assignment.get()];
 
 			PlanModel model = PlanModel.newInstance(best);
 
@@ -342,23 +355,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			}
 
 
-			person.setSelectedPlan(person.getPlans().get(tc.rnd.nextInt(person.getPlans().size())));
-		}
-	}
-
-	/**
-	 * Context for each separate thread.
-	 */
-	private static final class ThreadContext {
-
-		private final TopKChoicesGenerator generator;
-		private final PlanRouter planRouter;
-		private final Random rnd;
-
-		public ThreadContext(TopKChoicesGenerator generator, PlanRouter planRouter, Random rnd) {
-			this.generator = generator;
-			this.planRouter = planRouter;
-			this.rnd = rnd;
+			person.setSelectedPlan(person.getPlans().get(rnd.nextInt(person.getPlans().size())));
 		}
 	}
 

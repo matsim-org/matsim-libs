@@ -32,22 +32,19 @@ public class SelectBestKPlanModesStrategyProvider implements Provider<PlanStrate
 	private TimeInterpretation timeInterpretation;
 	@Inject
 	private Provider<TopKChoicesGenerator> generator;
+
 	@Inject
-	private ModeChoiceWeightScheduler weights;
+	private Provider<PlanSelector> selector;
 
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SimplePlanSelectionStrategyModule(globalConfigGroup, generator, this::createSelector));
+		builder.addStrategyModule(new SimplePlanSelectionStrategyModule(globalConfigGroup, generator, selector));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
 		return builder.build();
-	}
-
-	private Selector<PlanCandidate> createSelector() {
-		return new MultinomialLogitSelector(weights.getInvBeta(), MatsimRandom.getLocalInstance());
 	}
 
 }

@@ -22,7 +22,7 @@ import java.util.*;
  * @author sebhoerl
  * @author rakow
  */
-public class MultinomialLogitSelector implements Selector<PlanCandidate> {
+public class MultinomialLogitSelector implements PlanSelector {
 
 
 	private final static Logger log = LogManager.getLogger(MultinomialLogitSelector.class);

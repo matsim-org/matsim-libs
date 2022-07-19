@@ -88,9 +88,9 @@ public class PtTripFareEstimatorTest {
 
 		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
 
-		PlanModel model = new PlanModel(plan);
+		PlanModel model = PlanModel.newInstance(plan);
 
-		router.routeModes(plan, model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
 
 		List<MinMaxEstimate> ests = new ArrayList<>();
 
@@ -142,9 +142,9 @@ public class PtTripFareEstimatorTest {
 
 		EstimatorContext context = new EstimatorContext(plan.getPerson(), params.getScoringParameters(plan.getPerson()));
 
-		PlanModel model = new PlanModel(plan);
+		PlanModel model = PlanModel.newInstance(plan);
 
-		router.routeModes(plan, model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
 
 		List<MinMaxEstimate> singleTrips = estimateAgent(TestScenario.Agents.get(2));
 

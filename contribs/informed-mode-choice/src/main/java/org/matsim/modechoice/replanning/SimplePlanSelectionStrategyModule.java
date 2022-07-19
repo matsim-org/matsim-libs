@@ -4,7 +4,6 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.modechoice.CandidateGenerator;
-import org.matsim.modechoice.PlanCandidate;
 
 import javax.inject.Provider;
 
@@ -14,9 +13,9 @@ import javax.inject.Provider;
 public class SimplePlanSelectionStrategyModule extends AbstractMultithreadedModule {
 
 	private final Provider<? extends CandidateGenerator> generator;
-	private final Provider<Selector<PlanCandidate>> selector;
+	private final Provider<PlanSelector> selector;
 
-	public SimplePlanSelectionStrategyModule(GlobalConfigGroup globalConfigGroup, Provider<? extends CandidateGenerator> generator, Provider<Selector<PlanCandidate>> selector) {
+	public SimplePlanSelectionStrategyModule(GlobalConfigGroup globalConfigGroup, Provider<? extends CandidateGenerator> generator, Provider<PlanSelector> selector) {
 		super(globalConfigGroup);
 		this.generator = generator;
 		this.selector = selector;

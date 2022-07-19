@@ -40,7 +40,7 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	/**
 	 * Original plan.
 	 */
-	private final Plan plan;
+	private Plan plan;
 
 	/**
 	 * Create a new plan model instance from an existing plan.
@@ -91,9 +91,27 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	}
 
 	/**
+	 * Update current plan an underlying modes.
+	 */
+	public void setPlan(Plan plan) {
+		this.plan = plan;
+
+		List<TripStructureUtils.Trip> newTrips = TripStructureUtils.getTrips(plan);
+
+		if (newTrips.size() != this.trips.length)
+			throw new IllegalArgumentException("New length of trip must be equal to previous trips.");
+
+		for (int i = 0; i < trips.length; i++) {
+			trips[i] = newTrips.get(i);
+		}
+
+		setCurrentModes(newTrips);
+	}
+
+	/**
 	 * Update the current modes from an updated plan.
 	 */
-	public void setCurrentModes(List<TripStructureUtils.Trip> trips) {
+	private void setCurrentModes(List<TripStructureUtils.Trip> trips) {
 
 		if (trips.size() != this.trips.length)
 			throw new IllegalArgumentException("The given plan has a different number of trips");
@@ -107,6 +125,13 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 
 			currentModes[i] = routingMode != null ? routingMode.intern() : null;
 		}
+	}
+
+	/**
+	 * Get the mode of the ith trip.
+	 */
+	public String getTripMode(int i) {
+		return currentModes[i];
 	}
 
 	/**
@@ -130,13 +155,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 */
 	public TripStructureUtils.Trip getTrip(int i) {
 		return trips[i];
-	}
-
-	/**
-	 * Get the mode of the ith trip.
-	 */
-	public String getTripMode(int i) {
-		return TripStructureUtils.getRoutingMode(trips[i].getLegsOnly().get(0));
 	}
 
 	void setLegs(String mode, List<Leg>[] legs) {
@@ -206,6 +224,14 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 			return null;
 
 		return legs[i];
+	}
+
+	/**
+	 * Delete stored routes and estimates.
+	 */
+	public void reset() {
+		legs.clear();
+		estimates.clear();
 	}
 
 	@Override

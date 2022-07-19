@@ -9,9 +9,7 @@ import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
-import org.matsim.modechoice.replanning.SelectBestKPlanModesStrategyProvider;
-import org.matsim.modechoice.replanning.InformedModeChoiceStrategyProvider;
-import org.matsim.modechoice.replanning.SelectSingleTripModeStrategyProvider;
+import org.matsim.modechoice.replanning.*;
 import org.matsim.modechoice.search.BestChoiceGenerator;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
@@ -32,7 +30,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 	public static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
 
-	// TODO
 	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
 
 	public static String INFORMED_MODE_CHOICE = "InformedModeChoice";
@@ -63,6 +60,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bind(TopKChoicesGenerator.class);
 		bind(BestChoiceGenerator.class);
 		bind(SingleTripChoicesGenerator.class);
+		bind(GeneratorContext.class);
 
 		bind(PlanModelService.class).in(Singleton.class);
 
@@ -72,13 +70,14 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		addPlanStrategyBinding(SELECT_BEST_K_PLAN_MODES_STRATEGY).toProvider(SelectBestKPlanModesStrategyProvider.class);
 		addPlanStrategyBinding(SELECT_SINGLE_TRIP_MODE_STRATEGY).toProvider(SelectSingleTripModeStrategyProvider.class);
+		addPlanStrategyBinding(SELECT_SUBTOUR_MODE_STRATEGY).toProvider(SelectSubtourModeStrategyProvider.class);
 		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// Ensure that only one instance exists
 		bind(ModeChoiceWeightScheduler.class).in(Singleton.class);
 		addControlerListenerBinding().to(ModeChoiceWeightScheduler.class).in(Singleton.class);
 
-		// TODO: SubTour best choice + best k selection
+		bind(PlanSelector.class).toProvider(MultinomialLogitSelectorProvider.class);
 	}
 
 	/**

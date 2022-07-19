@@ -46,7 +46,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
-		if (mask.length != planModel.trips())
+		if (mask != null && mask.length != planModel.trips())
 			throw new IllegalArgumentException("Mask must be same length as trips.");
 
 		prepareModel(planModel, context);
