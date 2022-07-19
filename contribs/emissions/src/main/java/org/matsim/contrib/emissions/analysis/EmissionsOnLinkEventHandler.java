@@ -34,11 +34,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Collects Warm- and Cold-Emission-Events by time bin and by link-id
+ * Collects Warm- and Cold-Emission-Events and returns them either
+ * by time bin and link-id, or only by link-id.
  */
 public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
     private final TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBins;
+    private final Map<Id<Link>, Map<Pollutant, Double>> link2pollutants = new HashMap<>();
+
 
     public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
 
@@ -53,18 +56,22 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
     public TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> getTimeBins() {
         return timeBins;
     }
+    /**
+     * Yields summed link emissions
+     *
+     * @return Total emissions per pollutant by link id
+     */
+    public Map<Id<Link>, Map<Pollutant, Double>> getLink2pollutants() { return link2pollutants; }
 
     @Override
     public void reset(int iteration) {
         timeBins.clear();
+        link2pollutants.clear();
     }
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
-        Map<Pollutant,Double> map = new HashMap<>() ;
-        for( Map.Entry<Pollutant, Double> entry : event.getWarmEmissions().entrySet() ){
-            map.put( entry.getKey(), entry.getValue() ) ;
-        }
+        Map<Pollutant, Double> map = new HashMap<>(event.getWarmEmissions());
         handleEmissionEvent(event.getTime(), event.getLinkId(), map );
     }
 
@@ -85,6 +92,14 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
             currentBin.getValue().put( linkId, new EmissionsByPollutant( new HashMap<>( emissions ) ) );
         } else{
             currentBin.getValue().get( linkId ).addEmissions( emissions );
+        }
+
+        if (link2pollutants.get(linkId) == null) {
+            link2pollutants.put(linkId, emissions);
+        } else {
+            for (Pollutant pollutant : emissions.keySet()) {
+                link2pollutants.get(linkId).merge(pollutant, emissions.get(pollutant), Double::sum);
+            }
         }
     }
 }
