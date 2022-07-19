@@ -110,6 +110,8 @@ public final class EstimateRouter {
 
 			model.setLegs(mode, legs);
 		}
+
+		model.setFullyRouted(true);
 	}
 
 	/**

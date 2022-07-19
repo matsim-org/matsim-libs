@@ -38,6 +38,11 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	private final Map<String, List<ModeEstimate>> estimates;
 
 	/**
+	 * Flag to indicate all routes have been computed;
+	 */
+	private boolean fullyRouted;
+
+	/**
 	 * Original plan.
 	 */
 	private Plan plan;
@@ -176,6 +181,10 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		}
 	}
 
+	void setFullyRouted(boolean value) {
+		this.fullyRouted = value;
+	}
+
 	void putEstimate(String mode, List<ModeEstimate> options) {
 		this.estimates.put(mode, options);
 	}
@@ -202,6 +211,10 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 */
 	public boolean hasEstimates() {
 		return !this.estimates.isEmpty();
+	}
+
+	public boolean isFullyRouted() {
+		return fullyRouted;
 	}
 
 	/**
@@ -232,6 +245,7 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	public void reset() {
 		legs.clear();
 		estimates.clear();
+		fullyRouted = false;
 	}
 
 	@Override

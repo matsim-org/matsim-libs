@@ -60,9 +60,12 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 	protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
-		if (!planModel.hasEstimates()) {
 
+		if (!planModel.hasEstimates()) {
 			service.initEstimates(context, planModel);
+		}
+
+		if (!planModel.isFullyRouted()) {
 			router.routeModes(planModel, planModel.filterModes(ModeEstimate::isUsable));
 			service.calculateEstimates(context, planModel);
 		}
