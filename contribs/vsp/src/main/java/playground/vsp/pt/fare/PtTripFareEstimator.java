@@ -78,7 +78,11 @@ public class PtTripFareEstimator extends PtTripEstimator {
 
 				List<Leg> legs = plan.getLegs(mode, i);
 
-				assert legs != null : "Legs must be not null at this point";
+				// Legs can be null if there is a predefined pt trip
+				if (legs == null)
+					continue;
+
+				//assert legs != null : "Legs must be not null at this point";
 
 				DoubleDoublePair p = estimateTrip(context, legs);
 
@@ -91,7 +95,6 @@ public class PtTripFareEstimator extends PtTripEstimator {
 		double maxFare = fares.doubleStream().min().orElseThrow();
 		double sumFares = fares.doubleStream().sum();
 
-		//
 		return utility + Math.max(maxFare * config.getUpperBoundFactor(), sumFares);
 	}
 
