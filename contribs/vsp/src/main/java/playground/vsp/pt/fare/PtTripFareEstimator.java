@@ -92,7 +92,7 @@ public class PtTripFareEstimator extends PtTripEstimator {
 		}
 
 		// fares are negative, so the minimum is used
-		double maxFare = fares.doubleStream().min().orElseThrow();
+		double maxFare = fares.doubleStream().min().orElse(0);
 		double sumFares = fares.doubleStream().sum();
 
 		return utility + Math.max(maxFare * config.getUpperBoundFactor(), sumFares);
