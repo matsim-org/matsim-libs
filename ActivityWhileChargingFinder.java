@@ -68,27 +68,41 @@ public class ActivityWhileChargingFinder {
 			precedentActsWhileCharging.add(EditPlans.findRealActAfter(mobsimAgent, index));
 		}
 
-		List<Activity> activities = TripStructureUtils.getActivities(planElementsBeforeLeg, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
-		List<Tuple<Leg, Activity>> evLegsWithFollowingActs = activities.stream()
-				.filter(activity -> activityTypes.contains(activity.getType()))
-				.map(activity -> planElementsBeforeLeg.indexOf(activity))
-				.filter(idx -> idx > 0)
-				.map(idx -> new Tuple<>(getPrecedentLegOfRoutingModeBeforeActivity(planElementsBeforeLeg, (Activity) planElementsBeforeLeg.get(idx), evRoutingMode), (Activity) planElementsBeforeLeg.get(idx)))
+//		List<Activity> activities = TripStructureUtils.getActivities(planElementsBeforeLeg, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+//
+//		//get ev legs that can be diverted (i.e. where we can incorporate charging) and the corresponding, following activities (during which charging will take place)
+//		List<Tuple<Leg, Activity>> evLegsWithFollowingActs = activities.stream()
+//				.filter(activity -> activityTypes.contains(activity.getType()) && !precedentActsWhileCharging.contains(activity)) //look for the correct types and do no attempt to charge twice during one act
+//				.map(activity -> planElementsBeforeLeg.indexOf(activity))
+//				.filter(idx -> idx > 0)
+////				.map(idx -> new Tuple<>(getPrecedentLegOfRoutingModeBeforeActivity(planElementsBeforeLeg, (Activity) planElementsBeforeLeg.get(idx), evRoutingMode), (Activity) planElementsBeforeLeg.get(idx)))
+//				.map(idx -> new Tuple<>((Leg) planElementsBeforeLeg.get(idx - 1), (Activity) planElementsBeforeLeg.get(idx)))
 //				.filter(tuple -> TripStructureUtils.getRoutingMode(tuple.getFirst()).equals(evRoutingMode))
+//				.filter(tuple -> tuple.getFirst() != null)
+//				.collect(Collectors.toList());
+//
+//		if(evLegsWithFollowingActs.isEmpty()) return null;
+
+		List<Leg> evLegs = TripStructureUtils.getLegs(planElementsBeforeLeg).stream()
+				.filter(ll -> ll.getMode().equals(leg.getMode())) //only legs of ev considered (not even access or egress legs, as we wanna use arrival times later)
+				.collect(Collectors.toList());
+		if(evLegs.isEmpty()) return null; // no ev leg previous to critical leg
+
+		List<Tuple<Leg, Activity>> evLegsWithFollowingRealActs = evLegs.stream()
+				.map(ll -> new Tuple<>(ll, EditPlans.findRealActAfter(mobsimAgent, planElementsBeforeLeg.indexOf(ll))))
 				.collect(Collectors.toList());
 
-		if(evLegsWithFollowingActs.isEmpty()) return null;
-		evLegsWithFollowingActs.removeIf(legActivityTuple -> legActivityTuple.getFirst() == null);
-		evLegsWithFollowingActs.sort(Comparator.comparingDouble(tuple -> tuple.getFirst().getDepartureTime().seconds()));
+		evLegsWithFollowingRealActs.sort(Comparator.comparingDouble(tuple -> tuple.getFirst().getDepartureTime().seconds()));
 
-		for (int i = evLegsWithFollowingActs.size() - 1; i >= 0; i--) {
-			Tuple<Leg, Activity> tuple = evLegsWithFollowingActs.get(i);
+		for (int i = evLegsWithFollowingRealActs.size() - 1; i >= 0; i--) {
+			Tuple<Leg, Activity> tuple = evLegsWithFollowingRealActs.get(i);
 			//all legs should be routed at this time so we do not expect leg.getRoute().getTravelTime() to be undefined
 			double begin = tuple.getFirst().getDepartureTime().seconds() + tuple.getFirst().getRoute().getTravelTime().seconds();
-			Leg nextEVLeg = getNextLegOfRoutingModeAfterActivity(plan.getPlanElements(), tuple.getSecond(), evRoutingMode);
-			Preconditions.checkNotNull(nextEVLeg, "should not happen");
-			double end = nextEVLeg.getDepartureTime().seconds();
-			if(end - begin >= minimumActDuration && !precedentActsWhileCharging.contains(tuple.getSecond())) return tuple.getSecond();
+			//the reason we do not the activity duration is that there could be a subtour in between the activity before which we start charging (i.e. tuple.getSecond()) and the next ev leg
+			Leg nextEVRoutingModeLeg = getNextLegOfRoutingModeAfterActivity(plan.getPlanElements(), tuple.getSecond(), evRoutingMode);
+			Preconditions.checkNotNull(nextEVRoutingModeLeg, "should not happen");
+			double end = nextEVRoutingModeLeg.getDepartureTime().seconds();
+			if(end - begin >= minimumActDuration) return tuple.getSecond();
 		}
 		return null ;
 	}
@@ -120,6 +134,13 @@ public class ActivityWhileChargingFinder {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param planElements
+	 * @param activity
+	 * @param routingMode
+	 * @return returns the leg with the highest index within {@code planElements}, that has the {@code routingMode}
+	 */
 	@Nullable
 	Leg getPrecedentLegOfRoutingModeBeforeActivity(List<PlanElement> planElements, Activity activity, String routingMode){
 		int actIndex = planElements.indexOf(activity);
@@ -133,8 +154,7 @@ public class ActivityWhileChargingFinder {
 		}
 		for (int ii = actIndex -1 ; ii >= 0 ; ii--){
 			PlanElement element = planElements.get(ii);
-			if(element instanceof Leg)
-				if(((Leg) element).getMode().equals(routingMode)){
+			if(element instanceof Leg && TripStructureUtils.getRoutingMode((Leg) element).equals(routingMode)){
 					return (Leg) element;
 			}
 		}

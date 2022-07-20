@@ -535,7 +535,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	}
 
 
-	//TODO possibly put behind interface
+	//possibly put behind interface
 	@Nullable
 	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network) {
 
