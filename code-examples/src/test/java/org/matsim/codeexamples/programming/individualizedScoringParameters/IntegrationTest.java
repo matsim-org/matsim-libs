@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import org.matsim.codeexamples.scoring.individualizedScoringParameters.RunExampleIndividualizedScoring;
+import org.matsim.codeexamples.scoring.individualizedScoringParameters.RunIndividualizedScoringExample;
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ public class IntegrationTest {
 			// and did not remove the directory afterwards.)
 		} catch ( UncheckedIOException ee ) {
 		}
-		RunExampleIndividualizedScoring.main();
+		RunIndividualizedScoringExample.main();
 
 		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 		// (here, the directory should have been there)

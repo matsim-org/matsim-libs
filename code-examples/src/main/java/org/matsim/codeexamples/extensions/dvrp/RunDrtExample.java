@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -24,6 +25,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 class RunDrtExample{
@@ -44,15 +47,10 @@ class RunDrtExample{
 	public static void main( String[] args ){
 
 		Config config;
-		String configFile;
 		if ( args!=null && args.length>=1 ) {
 			config = ConfigUtils.loadConfig( args );
 		} else {
-			configFile = "scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
-			// (we need a config file so that we have a relative path to other input files)
-
-			config = ConfigUtils.loadConfig( configFile );
-			config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");
+			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "dvrp-grid" ), "multi_mode_one_shared_taxi_config.xml" ) );
 			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		}
 		
@@ -64,6 +62,7 @@ class RunDrtExample{
 
 		@SuppressWarnings("unused")
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+		// (config group needs to be "materialized")
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
@@ -73,7 +72,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -82,7 +81,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -91,7 +90,7 @@ class RunDrtExample{
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			multiModeDrtCfg.addDrtConfig(drtConfig);
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
@@ -101,7 +100,7 @@ class RunDrtExample{
 			// clear strategy settings from config file:
 			config.strategy().clearStrategySettings();
 
-			// configure mode choice so that travellers start using drt:
+			// configure mode innovation so that travellers start using drt:
 			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.ChangeSingleTripMode ).setWeight( 0.1 ) );
 			config.changeMode().setModes( new String[]{TransportMode.car, DRT_A, DRT_B, DRT_C} );
 
@@ -130,7 +129,7 @@ class RunDrtExample{
 		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
 		otfVisConfigGroup.setLinkWidth( 5 );
 		otfVisConfigGroup.setDrawNonMovingItems( true );
-//		controler.addOverridingModule( new OTFVisLiveModule() );
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 	}

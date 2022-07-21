@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.scoring.example16customscoring;
+package org.matsim.codeexamples.scoring.aaAddToScoring;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -8,7 +8,7 @@ final class RainScoring implements SumScoringFunction.ArbitraryEventScoring {
 
 	@Override
 	public void handleEvent(Event event) {
-		if (event instanceof RainOnPersonEvent) {
+		if (event instanceof RainOnPersonEvent ) {
 			score -= 1000.0;
 		}
 	}

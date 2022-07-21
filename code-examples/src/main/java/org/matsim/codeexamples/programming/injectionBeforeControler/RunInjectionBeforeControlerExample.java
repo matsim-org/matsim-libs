@@ -27,16 +27,9 @@ public class RunInjectionBeforeControlerExample {
 		Config config = ConfigUtils.createConfig() ;
 		config.controler().setLastIteration(1);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
-			@Override
-			public void install() {
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-			}
-		});
-		
+
+		com.google.inject.Injector injector = RunInjectionWithoutControlerExample.createMinimalMatsimInjector( config, scenario );
+
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		// So the trick is, other then with config and scenario, not to pass the injector into the controler.  But to get the controler out of the injector.
 		//

@@ -1,14 +1,13 @@
-package org.matsim.codeexamples;
+package org.matsim.codeexamples.scoring.customscoring;
 
-import com.jogamp.common.util.SyncedRingbuffer;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.codeexamples.RunAbcSimpleExample;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -16,19 +15,19 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-public class RunAbcSimpleExampleTest{
-	private static final Logger log = Logger.getLogger(RunAbcSimpleExampleTest.class) ;
+public class RunCustomScoringExampleTest{
+	private static final Logger log = Logger.getLogger( RunCustomScoringExampleTest.class ) ;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public void testMain(){
 		try{
-			RunAbcSimpleExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
+			RunCustomScoringExample.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ).toString()
 				  , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-				  , "--config:controler.lastIteration=2"
+				  , "--config:controler.lastIteration=0"
 			} );
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
@@ -46,6 +45,7 @@ public class RunAbcSimpleExampleTest{
 					Person actualPerson = actual.getPersons().get( Id.createPersonId( expectedPerson.getId() ) );
 					Assert.assertEquals( expectedPerson.getSelectedPlan().getScore(), actualPerson.getSelectedPlan().getScore() );
 				}
+
 			}
 
 

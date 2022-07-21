@@ -27,10 +27,15 @@ class RunOwnMoneyScoringExample {
 	
 	static final String NET_INCOME_PER_MONTH="netIncomePerMonth" ;
 
-	public static void main(String... args) {
-		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setOutputDirectory( "output/ownMoneyScoring/");
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+	public static void main(String [] args) {
+		final Config config;
+		if ( args==null || args.length==0 || args[0]==null ){
+			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
+			config.controler().setOutputDirectory( "output/ownMoneyScoring/" );
+			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		} else {
+			config = ConfigUtils.loadConfig( args );
+		}
 
 		// ---
 
