@@ -85,17 +85,12 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> currentBin = timeBins.getTimeBin(time);
 
-        if (!currentBin.hasValue()){
-            currentBin.setValue( new HashMap<>() );
-        }
+        if (!currentBin.hasValue()){ currentBin.setValue( new HashMap<>() ); }
         if (!currentBin.getValue().containsKey(linkId)){
             currentBin.getValue().put( linkId, new EmissionsByPollutant( new HashMap<>( emissions ) ) );
-        } else{
-            currentBin.getValue().get( linkId ).addEmissions( emissions );
-        }
+        } else { currentBin.getValue().get( linkId ).addEmissions( emissions ); }
 
-        if (link2pollutants.get(linkId) == null) {
-            link2pollutants.put(linkId, emissions);
+        if (link2pollutants.get(linkId) == null) { link2pollutants.put(linkId, emissions);
         } else {
             for (Pollutant pollutant : emissions.keySet()) {
                 link2pollutants.get(linkId).merge(pollutant, emissions.get(pollutant), Double::sum);
