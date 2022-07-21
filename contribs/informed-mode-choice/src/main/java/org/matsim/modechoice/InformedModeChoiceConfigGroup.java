@@ -19,10 +19,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_TOP_K = "topK";
+
 	public final static String CONFIG_PARAM_INV_BETA = "invBeta";
+
+	public final static String CONFIG_PARAM_AVOID_K = "avoidK";
 
 	public final static String CONFIG_PARAM_ANNEAL = "anneal";
 
+	public final static String CONFIG_PARAM_PROBA_ESTIMATE = "probaEstimate";
 
 	/**
 	 * The setter ensures, that this class always contains internal string representations.
@@ -35,6 +39,11 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private int k = 5;
 
 	/**
+	 * Avoid retrying a recently used combination.
+	 */
+	private int avoidK = 10;
+
+	/**
 	 * Scale parameter for MNL.
 	 */
 	private double invBeta = 1;
@@ -43,6 +52,11 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 * Annealing schedule.
 	 */
 	private Schedule anneal = Schedule.off;
+
+	/**
+	 * Probability to re-estimate an existing plan model.
+	 */
+	private double probaEstimate = 0.1;
 
 	public InformedModeChoiceConfigGroup() {
 		super(NAME);
@@ -75,6 +89,16 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return k;
 	}
 
+	@StringGetter(CONFIG_PARAM_AVOID_K)
+	public int getAvoidK() {
+		return avoidK;
+	}
+
+	@StringSetter(CONFIG_PARAM_AVOID_K)
+	public void setAvoidK(int avoidK) {
+		this.avoidK = avoidK;
+	}
+
 	@StringGetter(CONFIG_PARAM_INV_BETA)
 	public double getInvBeta() {
 		return invBeta;
@@ -95,6 +119,16 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		this.anneal = anneal;
 	}
 
+	@StringGetter(CONFIG_PARAM_PROBA_ESTIMATE)
+	public double getProbaEstimate() {
+		return probaEstimate;
+	}
+
+	@StringSetter(CONFIG_PARAM_PROBA_ESTIMATE)
+	public void setProbaEstimate(double probaEstimate) {
+		this.probaEstimate = probaEstimate;
+	}
+
 	public List<String> getModes() {
 		return modes;
 	}
@@ -106,6 +140,8 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(CONFIG_PARAM_TOP_K, "Defines how many top k best trips of each category should be generated.");
 		comments.put(CONFIG_PARAM_INV_BETA, "1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice.");
 		comments.put(CONFIG_PARAM_ANNEAL, "Annealing for the invBeta parameter.");
+		comments.put(CONFIG_PARAM_AVOID_K, "Avoid using recently used mode combinations.");
+		comments.put(CONFIG_PARAM_PROBA_ESTIMATE, "Probability to re-estimate an existing plan model.");
 
 		return comments;
 	}

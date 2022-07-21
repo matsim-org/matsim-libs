@@ -62,6 +62,19 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, nonChainBasedModes));
 	}
 
+	/**
+	 * Checks if change single trip mode would have an option to choose from. That is the case, when not all trips are chain based.
+	 */
+	public static boolean hasSingleTripChoice(PlanModel model, Collection<String> nonChainBasedModes) {
+
+		for (int i = 0; i < model.trips(); i++) {
+			if (nonChainBasedModes.contains(model.getTripMode(i)))
+				return true;
+		}
+
+		return false;
+	}
+
 	private final class Algorithm implements PlanAlgorithm {
 
 		private final GeneratorContext ctx;
@@ -84,12 +97,15 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				return;
 
 			// Force re-estimation
-			if (rnd.nextDouble() < 0.1)
+			if (rnd.nextDouble() < config.getProbaEstimate())
 				model.reset();
 
 			// Do change single trip on non-chain based modes with certain probability
-			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model)) {
-				singleTrip.run(plan, model);
+			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model, nonChainBasedModes)) {
+				PlanCandidate c = singleTrip.chooseCandidate(model, null);
+				if (c != null) {
+					c.applyTo(plan);
+				}
 				return;
 			}
 
@@ -123,19 +139,5 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				}
 			}
 		}
-
-		/**
-		 * Checks if change single trip mode would have an option to choose from. That is the case, when not all trips are chain based.
-		 */
-		private boolean hasSingleTripChoice(PlanModel model) {
-
-			for (int i = 0; i < model.trips(); i++) {
-				if (nonChainBasedModes.contains(model.getTripMode(i)))
-					return true;
-			}
-
-			return false;
-		}
-
 	}
 }

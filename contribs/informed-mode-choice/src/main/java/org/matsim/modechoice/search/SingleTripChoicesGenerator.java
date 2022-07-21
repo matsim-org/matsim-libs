@@ -61,7 +61,7 @@ public class SingleTripChoicesGenerator extends AbstractCandidateGenerator {
 
 			ModeEstimate est = opt.get();
 
-			String[] modes = new String[planModel.trips()];
+			String[] modes = planModel.getCurrentModes();
 			modes[idx] = est.getMode();
 
 			double estimate = est.getEstimates()[idx];

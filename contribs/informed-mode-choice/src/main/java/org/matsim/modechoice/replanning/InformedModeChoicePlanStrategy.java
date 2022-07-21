@@ -22,18 +22,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
-import org.matsim.modechoice.search.TopKChoicesGenerator;
 
 import javax.inject.Provider;
 import java.io.IOException;
@@ -52,9 +47,14 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private final RandomUnscoredPlanSelector<Plan, Person> unscored = new RandomUnscoredPlanSelector<>();
 
 	private final InformedModeChoiceConfigGroup config;
+
+	private final SubtourModeChoiceConfigGroup smc;
 	private final Config globalConfig;
 	private final GeneratorContext[] threadContexts;
 	private final SelectSingleTripModeStrategy.Algorithm[] singleTrip;
+
+	private final Set<String> nonChainBasedModes;
+
 	private final Scenario scenario;
 	private final OutputDirectoryHierarchy controlerIO;
 
@@ -77,11 +77,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		this.controlerIO = controlerIO;
 
 
-		SubtourModeChoiceConfigGroup smc = ConfigUtils.addOrGetModule(config, SubtourModeChoiceConfigGroup.class);
-
-		List<String> nonChainBasedModes = this.config.getModes().stream()
+		smc = ConfigUtils.addOrGetModule(config, SubtourModeChoiceConfigGroup.class);
+		nonChainBasedModes = this.config.getModes().stream()
 				.filter(m -> !ArrayUtils.contains(smc.getChainBasedModes(), m))
-				.collect(Collectors.toList());
+				.collect(Collectors.toSet());
 
 		this.threadContexts = new GeneratorContext[config.global().getNumberOfThreads()];
 		this.singleTrip = new SelectSingleTripModeStrategy.Algorithm[config.global().getNumberOfThreads()];
@@ -113,14 +112,19 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 
-			PlanHistory hist = history.computeIfAbsent(person.getId(), PlanHistory::new);
-			hist.add(plan);
+			PlanHistory hist = history.computeIfAbsent(person.getId(), k -> new PlanHistory(k, PlanModel.newInstance(plan)));
+			if (plan.getType() == null){
+				plan.setType(PlanModel.guessPlanType(plan, config.getModes()));
+			}
+
+			String type = plan.getType();
+			hist.add(plan, type);
 		}
 
 		// Thread local stores which thread uses which generator
 		this.counter.set(0);
 		this.assignment = ThreadLocal.withInitial(counter::getAndIncrement);
-		this.executor = Executors.newWorkStealingPool(globalConfig.global().getNumberOfThreads());
+		this.executor = Executors.newFixedThreadPool(globalConfig.global().getNumberOfThreads());
 	}
 
 	private void writeEstimates(int iteration) {
@@ -210,68 +214,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			return;
 		}
 
-/*
-		Plan best = person.getPlans().stream()
-				.filter(p -> p.getAttributes().getAttribute(PlanCandidate.MAX_ESTIMATE) != null)
-				.max(Comparator.comparingDouble(Plan::getScore)).orElse(null);
-
-		if (best != null) {
-
-
-			double bestEstimate = (double) best.getAttributes().getAttribute(PlanCandidate.MAX_ESTIMATE);
-			double[] baseLine = PlanCandidate.occurrences(config.getModes(), best.getType());
-
-			// Collect for each plan the differences and the present of modes and differences to best
-
-			// TODO: one agents plan might deviate stronger than the mean
-
-			for (Plan plan : person.getPlans()) {
-
-				Double maxEstimate = (Double) plan.getAttributes().getAttribute(PlanCandidate.MAX_ESTIMATE);
-				if (maxEstimate == null || plan == best)
-					continue;
-
-				double[] row = PlanCandidate.occurrences(config.getModes(), plan.getType());
-
-				// Difference in execution should ideally be the same as difference in estimation
-				double y = (best.getScore() - plan.getScore()) - (bestEstimate - maxEstimate);
-				// if y is negative the score was underestimated
-
-				for (int i = 0; i < baseLine.length; i++) {
-					reg[i].addData(row[i] - baseLine[i], y);
-				}
-			}
-
-		}
- */
-
-		//Plan best = person.getPlans().stream().max(Comparator.comparingDouble(Plan::getScore)).orElseThrow();
-		executor.submit(new ReplanningTask(person));
-	}
-
-	private void applyCandidates(HasPlansAndId<Plan, Person> person, Collection<PlanCandidate> candidates) {
-
-		for (PlanCandidate c : candidates) {
-
-			List<? extends Plan> same = person.getPlans().stream()
-					.filter(p -> c.getPlanType().equals(p.getType()))
-					.collect(Collectors.toList());
-
-			// if this type exists, overwrite estimates
-			if (!same.isEmpty()) {
-				same.forEach(c::applyAttributes);
-
-			} else {
-
-				Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
-				c.applyTo(plan);
-				plan.setType(c.getPlanType());
-
-				plan.getAttributes().removeAttribute(ScoringFunction.SCORE_EXPLANATION);
-
-				// TODO: If this plan is new, it needs to be routed
-			}
-		}
+		executor.submit(new ReplanningTask(person, history.get(person.getId())));
 	}
 
 	@Override
@@ -296,10 +239,12 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 	private final class ReplanningTask implements Runnable {
 
 		private final HasPlansAndId<Plan, Person> person;
+		private final PlanHistory planHistory;
 		private final Random rnd;
 
-		private ReplanningTask(HasPlansAndId<Plan, Person> person) {
+		private ReplanningTask(HasPlansAndId<Plan, Person> person, PlanHistory planHistory) {
 			this.person = person;
+			this.planHistory = planHistory;
 			this.rnd = MatsimRandom.getLocalInstance();
 		}
 
@@ -317,65 +262,94 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 		private void plan() {
 
-			Set<String> missing = new HashSet<>();
-			// First fill missing plan types
-			for (Plan plan : person.getPlans())
-				if (plan.getAttributes().getAttribute(PlanCandidate.TYPE_ATTR) == null) {
-					String guess = PlanCandidate.guessPlanType(plan, config.getModes());
+			GeneratorContext ctx = threadContexts[assignment.get()];
+			SelectSingleTripModeStrategy.Algorithm sst = singleTrip[assignment.get()];
 
-					missing.add(guess);
-					plan.setType(guess);
+			PlanModel model = planHistory.model;
+
+			Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
+			model.setPlan(plan);
+
+			if (rnd.nextDouble() < config.getProbaEstimate())
+				model.reset();
+
+			// Reduce avoid list as necessary
+			while (config.getAvoidK() > 0 && planHistory.avoidList.size() > config.getAvoidK())
+				planHistory.avoidList.poll();
+
+			// Do change single trip on non-chain based modes with certain probability
+			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && SelectSubtourModeStrategy.hasSingleTripChoice(model, nonChainBasedModes)) {
+				// return here if plan was modified
+				PlanCandidate c = sst.chooseCandidate(model, planHistory.avoidList);
+
+				if (c != null) {
+					// TODO: only single trip estimates that are not accurate
+					c.applyTo(plan);
+					plan.setType(c.getPlanType());
+					return;
+				}
+			}
+
+			List<TripStructureUtils.Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan, smc.getCoordDistance()));
+
+			// Add whole trip if not already present
+			if (subtours.stream().noneMatch(s -> s.getTrips().size() == model.trips())) {
+				subtours.add(0, TripStructureUtils.getUnclosedRootSubtour(plan));
+			}
+
+			while (!subtours.isEmpty()) {
+
+				TripStructureUtils.Subtour st = subtours.remove(rnd.nextInt(subtours.size()));
+				boolean[] mask = new boolean[model.trips()];
+				for (int i = 0; i < model.trips(); i++) {
+					if (st.getTrips().contains(model.getTrip(i)))
+						mask[i] = true;
+
 				}
 
-			Plan best = person.getPlans().stream()
-					.max(Comparator.comparingDouble(Plan::getScore)).orElse(null);
+				Collection<PlanCandidate> candidates = ctx.generator.generate(model, null,
+						mask, config.getTopK() + planHistory.avoidList.size(), 0);
 
-			person.setSelectedPlan(best);
+				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModes()) || planHistory.avoidList.contains(c.getModes()));
+				if (!candidates.isEmpty()) {
 
-			GeneratorContext tc = threadContexts[assignment.get()];
-
-			PlanModel model = PlanModel.newInstance(best);
-
-			Collection<PlanCandidate> results = tc.generator.generate(model, null, null, config.getTopK(), 0);
-
-			for (PlanCandidate c : results) {
-				missing.remove(c.getPlanType());
+					PlanCandidate select = ctx.selector.select(candidates);
+					if (select != null) {
+						select.applyTo(plan);
+						plan.setType(select.getPlanType());
+						break;
+					}
+				}
 			}
 
-			// TODO: should replace old plans with same type
-			// TODO: should remove and not regenerate unpromising plan types
-
-			applyCandidates(person, results);
-
-			// Estimate missing scores for already exising plans
-			if (!missing.isEmpty()) {
-
-				List<PlanCandidate> predefined = tc.generator.generatePredefined(model, missing.stream().map(PlanCandidate::createModeArray).collect(Collectors.toList()));
-				applyCandidates(person, predefined);
-			}
-
-
-			person.setSelectedPlan(person.getPlans().get(rnd.nextInt(person.getPlans().size())));
+			// TODO: handle if all options have been exhausted
 		}
 	}
 
 	private static final class PlanHistory {
 
+		private final PlanModel model;
 		private final Map<String, DoubleList> scores = new HashMap<>();
 		private final Map<String, DoubleList> estimates = new HashMap<>();
 
-		public PlanHistory(Id<Person> id) {
+		private final Queue<String[]> avoidList = new LinkedList<>();
+
+		public PlanHistory(Id<Person> id, PlanModel model) {
+			this.model = model;
 		}
 
-		public void add(Plan plan) {
+		public void add(Plan plan, String type) {
 
 			Object estimate = plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR);
 
-			if (plan.getType() == null || estimate == null || plan.getScore() == null)
+			if (plan.getScore() == null)
 				return;
 
-			scores.computeIfAbsent(plan.getType(), k -> new DoubleArrayList()).add((double) plan.getScore());
-			estimates.computeIfAbsent(plan.getType(), k -> new DoubleArrayList()).add((double) estimate);
+			scores.computeIfAbsent(type, k -> new DoubleArrayList()).add((double) plan.getScore());
+			if (estimate != null)
+				estimates.computeIfAbsent(type, k -> new DoubleArrayList()).add((double) estimate);
+
+			avoidList.add(PlanCandidate.createModeArray(type));
 		}
 
 		public Set<String> types() {
@@ -387,7 +361,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		}
 
 		public DoubleList getEstimates(String type) {
-			return estimates.get(type);
+			return estimates.getOrDefault(type, DoubleList.of());
 		}
 	}
 }

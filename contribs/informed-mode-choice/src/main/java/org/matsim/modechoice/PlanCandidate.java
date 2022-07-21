@@ -117,29 +117,7 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 				b.append("-");
 		}
 
-		return b.toString();
-	}
-
-	/**
-	 * Infer plan type from routing modes.
-	 */
-	public static String guessPlanType(Plan plan, List<String> modes) {
-
-		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
-
-		StringBuilder b = new StringBuilder();
-		for (int i = 0; i < trips.size(); i++) {
-
-			String routingMode = TripStructureUtils.getRoutingMode(trips.get(i).getLegsOnly().get(0));
-			if (!modes.contains(routingMode))
-				routingMode = null;
-
-			b.append(routingMode);
-			if (i != trips.size() - 1)
-				b.append("-");
-		}
-
-		return b.toString();
+		return b.toString().intern();
 	}
 
 	/**

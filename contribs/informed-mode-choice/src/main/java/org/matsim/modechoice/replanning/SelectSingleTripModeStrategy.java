@@ -2,6 +2,7 @@ package org.matsim.modechoice.replanning;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
@@ -13,6 +14,7 @@ import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
+import javax.annotation.Nullable;
 import javax.inject.Provider;
 import java.util.*;
 
@@ -67,14 +69,27 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		@Override
 		public void run(Plan plan) {
 			PlanModel model = PlanModel.newInstance(plan);
-			run(plan, model);
+
+
+			PlanCandidate c = chooseCandidate(model, null);
+
+			if (c != null)
+				c.applyTo(plan);
 		}
 
-		public void run(Plan plan, PlanModel model) {
+
+		/**
+		 * Choose one candidate with one single trip changed.
+		 *
+		 * @param avoidList combinations to avoid, can be null
+		 * @return true if a candidate was selected
+		 */
+		@Nullable
+		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList) {
 
 			// empty plan
 			if (model.trips() == 0)
-				return;
+				return null;
 
 			boolean[] mask = new boolean[model.trips()];
 
@@ -82,12 +97,34 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
 			// only select trips that are allowed to change
 			for (int i = 0; i < model.trips(); i++) {
-				if (modes.contains(model.getTripMode(i)))
+				if (modes.contains(model.getTripMode(i))) {
 					options.add(i);
+				}
+			}
+
+			if (avoidList != null) {
+				String[] current = model.getCurrentModes();
+
+				IntListIterator it = options.iterator();
+
+				outer:
+				while (it.hasNext()) {
+					int idx = it.nextInt();
+
+					for (String m : modes) {
+						current[idx] = m;
+						if (!avoidList.contains(current)) {
+							continue outer;
+						}
+					}
+
+					// if at least one option is found, idx is not removed
+					it.remove();
+				}
 			}
 
 			if (options.isEmpty())
-				return;
+				return null;
 
 			int idx = options.getInt(rnd.nextInt(options.size()));
 
@@ -99,13 +136,21 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			// Remove options that are the same as the current mode
 			candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
 
+			// Remove avoided combinations
+			if (avoidList != null) {
+				String[] current = model.getCurrentModes();
+
+				candidates.removeIf(c -> {
+					current[idx] = c.getMode(idx);
+					return avoidList.contains(current);
+				});
+			}
+
 			PlanCandidate selected = selector.select(candidates);
 
 			log.debug("Candidates for person {} at trip {}: {} | selected {}", model.getPerson(), idx, candidates, selected);
 
-			if (selected != null) {
-				selected.applyTo(plan);
-			}
+			return selected;
 		}
 	}
 

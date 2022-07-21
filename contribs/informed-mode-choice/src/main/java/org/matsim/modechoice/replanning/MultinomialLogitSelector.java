@@ -45,6 +45,9 @@ public class MultinomialLogitSelector implements PlanSelector {
 		if (candidates.isEmpty())
 			return null;
 
+		if (candidates.size() == 1)
+			return candidates.iterator().next();
+
 		// if two option are exactly the same this will be incorrect
 		if (scale <= 0) {
 			return candidates.stream().sorted().findFirst().orElse(null);
