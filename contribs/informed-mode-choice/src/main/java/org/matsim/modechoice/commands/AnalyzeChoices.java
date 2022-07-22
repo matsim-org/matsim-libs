@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.modechoice.PlanCandidate;
-import org.matsim.modechoice.replanning.InformedModeChoicePlanStrategy;
+import org.matsim.modechoice.PlanModel;
 import picocli.CommandLine;
 
 import java.nio.file.Files;
@@ -40,7 +40,7 @@ public class AnalyzeChoices implements MATSimAppCommand {
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.MONGODB_TSV)) {
 
-			printer.printRecord("person", "k", "selected", "score", "type");
+			printer.printRecord("person", "k", "selected", "score", "type", "estimate", "dist");
 
 			for (Person person : population.getPersons().values()) {
 
@@ -76,8 +76,11 @@ public class AnalyzeChoices implements MATSimAppCommand {
 				for (int k = 0; k < plans.size(); k++) {
 
 					Plan plan = plans.get(k);
+
+					PlanModel model = PlanModel.newInstance(plan);
+
 					printer.printRecord(person.getId(), k, person.getSelectedPlan() == plan ? 1 : 0, plan.getScore(),
-							plan.getType()
+							plan.getType(), plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR), model.distance()
 					);
 				}
 			}

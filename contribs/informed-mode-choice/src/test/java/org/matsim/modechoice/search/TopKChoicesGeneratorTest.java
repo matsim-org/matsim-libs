@@ -95,7 +95,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-		Collection<PlanCandidate> result = generator.generate(model, null, null, 6, 0);
+		Collection<PlanCandidate> result = generator.generate(model, null, null, 6, 0, Double.NaN);
 
 		PlanCandidate first = result.iterator().next();
 
@@ -119,6 +119,29 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		assertThat(walk.getPlanType()).isEqualTo("walk-walk-walk-walk");
 		assertThat(walk.getUtility()).isLessThan(first.getUtility());
 
+	}
+
+	@Test
+	public void threshold() {
+
+
+		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+
+		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
+
+		PlanModel planModel = PlanModel.newInstance(person.getSelectedPlan());
+
+		Collection<PlanCandidate> candidates = generator.generate(planModel, null, null, 15, 0, Double.NaN);
+
+		assertThat(candidates).hasSize(15);
+
+		candidates = generator.generate(planModel, null, null, 15, 2, Double.NaN);
+
+		assertThat(candidates).hasSize(3);
+
+		candidates = generator.generate(planModel, null, null, 15, 0, -8);
+
+		assertThat(candidates).hasSize(1);
 	}
 
 	/**

@@ -70,8 +70,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		public void run(Plan plan) {
 			PlanModel model = PlanModel.newInstance(plan);
 
-
-			PlanCandidate c = chooseCandidate(model, null);
+			PlanCandidate c = chooseCandidate(model, null, 0, 0);
 
 			if (c != null)
 				c.applyTo(plan);
@@ -85,7 +84,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		 * @return true if a candidate was selected
 		 */
 		@Nullable
-		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList) {
+		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList, double cThreshold, double distThreshold) {
 
 			// empty plan
 			if (model.trips() == 0)
@@ -132,6 +131,16 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			mask[idx] = true;
 
 			Collection<PlanCandidate> candidates = generator.generate(model, modes, mask);
+
+			// Remove based on threshold
+			if (cThreshold > 0 || distThreshold > 0) {
+
+				OptionalDouble max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max();
+				if (max.isPresent()) {
+					double threshold = max.getAsDouble() - cThreshold - distThreshold * model.distance(idx) / 1000;
+					candidates.removeIf(c -> c.getUtility() < threshold);
+				}
+			}
 
 			// Remove options that are the same as the current mode
 			candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));

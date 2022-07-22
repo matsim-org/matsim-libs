@@ -32,17 +32,19 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
-		return generate(planModel, consideredModes, mask, config.getTopK(), 0);
+		return generate(planModel, consideredModes, mask, config.getTopK(), config.calcThreshold(planModel), Double.NaN);
 	}
 
 	/**
 	 * Generate k top choices.
 	 *
-	 * @param planModel plan
-	 * @param topK      use at most top k choices (for each combination)
-	 * @param threshold discard solutions that are worse than best solution
+	 * @param planModel     plan
+	 * @param topK          use at most top k choices (for each combination)
+	 * @param diffThreshold allowed difference to the best solution (if positive)
+	 * @param absThreshold  minimal required estimate score (use NaN or negative infinity if not needed)
 	 */
-	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask, int topK, double threshold) {
+	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask,
+	                                          int topK, double diffThreshold, double absThreshold) {
 
 		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
 
@@ -56,7 +58,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
 
-		return generateCandidate(context, planModel, mask, topK, threshold, consideredModes, consolidateModes, constraints);
+		return generateCandidate(context, planModel, mask, topK, diffThreshold, absThreshold, consideredModes, consolidateModes, constraints);
 	}
 
 	protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
@@ -72,7 +74,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 
-	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double threshold,
+	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double diffThreshold, double absThreshold,
 	                                                    Set<String> consideredModes, Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
 
 		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
@@ -168,11 +170,11 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				if (estimate > best)
 					best = estimate;
 
-				if (threshold > 0 && best - estimate > threshold)
+				if (diffThreshold > 0 && best - estimate > diffThreshold)
 					break;
 
-					// relative threshold, only works if estimate is negative
-				else if (threshold < 0 && best < 0 && estimate < (1 - threshold) * best)
+				// absolute threshold
+				if (!Double.isNaN(absThreshold) && estimate < absThreshold)
 					break;
 
 				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
@@ -193,16 +195,11 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
 
 		// threshold need to be rechecked again on the global best
-		if (threshold != 0) {
-
+		if (diffThreshold > 0) {
 			double best = result.get(0).getUtility();
 
-			if (threshold < 0)
-				// relative threshold
-				result.removeIf(c -> c.getUtility() < (1 - threshold) * best);
-			else
-				// absolute threshold
-				result.removeIf(c -> c.getUtility() < best - threshold);
+			// absolute threshold
+			result.removeIf(c -> c.getUtility() < best - diffThreshold);
 		}
 
 		return result;

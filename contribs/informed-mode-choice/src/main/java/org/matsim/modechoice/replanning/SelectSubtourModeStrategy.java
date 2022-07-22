@@ -102,7 +102,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model, nonChainBasedModes)) {
-				PlanCandidate c = singleTrip.chooseCandidate(model, null);
+				PlanCandidate c = singleTrip.chooseCandidate(model, null, config.getCThreshold(), config.getDistThreshold());
 				if (c != null) {
 					c.applyTo(plan);
 				}

@@ -113,7 +113,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			Plan plan = person.getSelectedPlan();
 
 			PlanHistory hist = history.computeIfAbsent(person.getId(), k -> new PlanHistory(k, PlanModel.newInstance(plan)));
-			if (plan.getType() == null){
+			if (plan.getType() == null) {
 				plan.setType(PlanModel.guessPlanType(plan, config.getModes()));
 			}
 
@@ -280,10 +280,16 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && SelectSubtourModeStrategy.hasSingleTripChoice(model, nonChainBasedModes)) {
 				// return here if plan was modified
-				PlanCandidate c = sst.chooseCandidate(model, planHistory.avoidList);
+				PlanCandidate c = sst.chooseCandidate(model, planHistory.avoidList, config.getCThreshold(), config.getDistThreshold());
 
 				if (c != null) {
-					// TODO: only single trip estimates that are not accurate
+
+					ArrayList<String[]> l = new ArrayList<>();
+					l.add(c.getModes());
+
+					// re-estimate as full plan
+					c = ctx.generator.generatePredefined(model, l).get(0);
+
 					c.applyTo(plan);
 					plan.setType(c.getPlanType());
 					return;
@@ -297,6 +303,19 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 				subtours.add(0, TripStructureUtils.getUnclosedRootSubtour(plan));
 			}
 
+			double threshold = Double.NaN;
+
+			if (config.getCThreshold() > 0 || config.getDistThreshold() > 0) {
+
+				Optional<? extends Plan> best = person.getPlans().stream()
+						.filter(p -> p.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR) != null)
+						.max(Comparator.comparingDouble(Plan::getScore));
+
+				if (best.isPresent()) {
+					threshold = (double) best.get().getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR) - config.calcThreshold(model);
+				}
+			}
+
 			while (!subtours.isEmpty()) {
 
 				TripStructureUtils.Subtour st = subtours.remove(rnd.nextInt(subtours.size()));
@@ -308,7 +327,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 				}
 
 				Collection<PlanCandidate> candidates = ctx.generator.generate(model, null,
-						mask, config.getTopK() + planHistory.avoidList.size(), 0);
+						mask, config.getTopK() + planHistory.avoidList.size(), 0, threshold);
 
 				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModes()) || planHistory.avoidList.contains(c.getModes()));
 				if (!candidates.isEmpty()) {
@@ -317,7 +336,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 					if (select != null) {
 						select.applyTo(plan);
 						plan.setType(select.getPlanType());
-						break;
+						return;
 					}
 				}
 			}
@@ -349,7 +368,10 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			if (estimate != null)
 				estimates.computeIfAbsent(type, k -> new DoubleArrayList()).add((double) estimate);
 
-			avoidList.add(PlanCandidate.createModeArray(type));
+			String[] modes = PlanCandidate.createModeArray(type);
+
+			if (!avoidList.contains(modes))
+				avoidList.add(modes);
 		}
 
 		public Set<String> types() {

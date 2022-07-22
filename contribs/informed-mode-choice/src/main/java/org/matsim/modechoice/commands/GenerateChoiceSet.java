@@ -57,8 +57,11 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--top-k", description = "Use top k estimates", defaultValue = "5")
 	private int topK;
 
-	@CommandLine.Option(names = "--threshold", description = "Cut-off plans below certain score scaled by distance.", defaultValue = "0")
-	private double threshold;
+	@CommandLine.Option(names = "--c-threshold", description = "Allowed threshold to best estimate per trip.", defaultValue = "0")
+	private double cThreshold;
+
+	@CommandLine.Option(names = "--dist-threshold", description = "Cut-off plans below certain score scaled by distance.", defaultValue = "0")
+	private double distThreshold;
 
 	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", defaultValue = "car,walk,bike,pt,ride", split = ",")
 	private Set<String> modes;
@@ -90,7 +93,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
-		log.info("Using k={}, threshold={}", topK, threshold);
+		log.info("Using k={}, threshold={},{}", topK, cThreshold, distThreshold);
 
 		imc.setTopK(topK);
 		imc.setModes(modes);
@@ -159,17 +162,17 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		Plan plan = person.getPlans().stream().filter(p -> "source".equals(p.getType())).findFirst().orElseThrow();
 
-		double threshold = this.threshold;
+		double threshold = 0;
 
 		PlanModel model = PlanModel.newInstance(plan);
 
 		// the absolute threshold is scaled to distance
-		if (this.threshold > 0) {
-			threshold = model.distance() * this.threshold;
+		if (this.cThreshold > 0 || distThreshold > 0) {
+			threshold = this.cThreshold * model.trips() + model.distance() * this.distThreshold / 1000d;
 		}
 
 		TopKChoicesGenerator generator = generatorCache.get();
-		Collection<PlanCandidate> candidates = generator.generate(model, null, null, topK, threshold);
+		Collection<PlanCandidate> candidates = generator.generate(model, null, null, topK, threshold, Double.NaN);
 
 		// remove all other plans
 		Set<Plan> plans = new HashSet<>(person.getPlans());

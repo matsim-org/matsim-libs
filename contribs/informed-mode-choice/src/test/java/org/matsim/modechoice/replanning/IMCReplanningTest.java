@@ -34,25 +34,4 @@ public class IMCReplanningTest {
 		controler.run();
 
 	}
-
-	@Test
-	public void selectSingleTrip() {
-
-		Config config = TestScenario.loadConfig(utils);
-
-		config.controler().setLastIteration(10);
-		config.strategy().addStrategySettings(new StrategyConfigGroup.StrategySettings()
-				.setStrategyName(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY)
-				.setSubpopulation("person")
-				.setWeight(0.5)
-		);
-
-		ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class)
-				.setAnneal(InformedModeChoiceConfigGroup.Schedule.linear);
-
-		Controler controler = MATSimApplication.prepare(TestScenario.class, config);
-
-		controler.run();
-
-	}
 }

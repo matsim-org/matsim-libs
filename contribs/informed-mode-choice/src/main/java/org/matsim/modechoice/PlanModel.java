@@ -173,12 +173,23 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		double dist = 0;
 		for (TripStructureUtils.Trip trip : trips) {
 			if (trip.getOriginActivity().getCoord() == null || trip.getDestinationActivity().getCoord() == null)
-				throw new IllegalStateException("No coordinates given");
+				continue;
 
 			dist += CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
 		}
 
 		return dist;
+	}
+
+	/**
+	 * Estimated beeline distance of one trip. If no estimate is possible this will return 0.
+	 */
+	public double distance(int idx) {
+		TripStructureUtils.Trip trip = trips[idx];
+		if (trip.getOriginActivity().getCoord() == null || trip.getDestinationActivity().getCoord() == null)
+			return 0;
+
+		return CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
 	}
 
 	/**
