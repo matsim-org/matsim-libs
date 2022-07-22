@@ -44,7 +44,6 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
 
 
     public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
-
         this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
     }
 
@@ -84,16 +83,15 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
     private void handleEmissionEvent(double time, Id<Link> linkId, Map<Pollutant, Double> emissions) {
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> currentBin = timeBins.getTimeBin(time);
-
         if (!currentBin.hasValue()){ currentBin.setValue( new HashMap<>() ); }
         if (!currentBin.getValue().containsKey(linkId)){
             currentBin.getValue().put( linkId, new EmissionsByPollutant( new HashMap<>( emissions ) ) );
         } else { currentBin.getValue().get( linkId ).addEmissions( emissions ); }
 
-        if (link2pollutants.get(linkId) == null) { link2pollutants.put(linkId, emissions);
-        } else {
-            for (Pollutant pollutant : emissions.keySet()) {
-                link2pollutants.get(linkId).merge(pollutant, emissions.get(pollutant), Double::sum);
+        if (link2pollutants.get(linkId) == null) { link2pollutants.put(linkId, emissions); }
+        else {
+            for (Pollutant key : emissions.keySet()) {
+                link2pollutants.get(linkId).merge(key, emissions.get(key), Double::sum);
             }
         }
     }
