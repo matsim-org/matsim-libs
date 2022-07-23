@@ -26,9 +26,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public final static String CONFIG_PARAM_ANNEAL = "anneal";
 
-	public final static String CONFIG_PARAM_C_THRESHOLD = "cThreshold";
-
-	public final static String CONFIG_PARAM_DIST_THRESHOLD = "distThreshold";
+	public final static String CONFIG_PARAM_PRUNING = "pruning";
 
 	public final static String CONFIG_PARAM_PROBA_ESTIMATE = "probaEstimate";
 
@@ -52,15 +50,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	 */
 	private double invBeta = 1;
 
-	/**
-	 * Allowed threshold per trip
-	 */
-	private double cThreshold = 0;
-
-	/**
-	 * Allowed threshold per dist
-	 */
-	private double distThreshold = 0;
+	private String pruning = null;
 
 	/**
 	 * Annealing schedule.
@@ -123,34 +113,15 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		this.invBeta = invBeta;
 	}
 
-	@StringGetter(CONFIG_PARAM_C_THRESHOLD)
-	public double getCThreshold() {
-		return cThreshold;
+
+	@StringGetter(CONFIG_PARAM_PRUNING)
+	public String getPruning() {
+		return pruning;
 	}
 
-	/**
-	 * Calculate allowed threshold.
-	 */
-	public double calcThreshold(PlanModel planModel) {
-		if (cThreshold> 0 || distThreshold > 0) {
-			return planModel.trips() * cThreshold + planModel.distance() * distThreshold / 1000;
-		}
-		return 0;
-	}
-
-	@StringSetter(CONFIG_PARAM_C_THRESHOLD)
-	public void setCThreshold(double cThreshold) {
-		this.cThreshold = cThreshold;
-	}
-
-	@StringGetter(CONFIG_PARAM_DIST_THRESHOLD)
-	public double getDistThreshold() {
-		return distThreshold;
-	}
-
-	@StringSetter(CONFIG_PARAM_DIST_THRESHOLD)
-	public void setDistThreshold(double distThreshold) {
-		this.distThreshold = distThreshold;
+	@StringSetter(CONFIG_PARAM_PRUNING)
+	public void setPruning(String pruning) {
+		this.pruning = pruning;
 	}
 
 	@StringGetter(CONFIG_PARAM_ANNEAL)
@@ -183,8 +154,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
 		comments.put(CONFIG_PARAM_TOP_K, "Defines how many top k best trips of each category should be generated.");
 		comments.put(CONFIG_PARAM_INV_BETA, "1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice.");
-		comments.put(CONFIG_PARAM_C_THRESHOLD, "Allowed deviation from best estimate per trip for accepting candidates.");
-		comments.put(CONFIG_PARAM_DIST_THRESHOLD, "Allowed deviation per kilometer from best estimate for accepting candidates.");
+		comments.put(CONFIG_PARAM_PRUNING, "Name of the candidate pruner to apply, needs to be bound with guice.");
 		comments.put(CONFIG_PARAM_ANNEAL, "Annealing for the invBeta parameter.");
 		comments.put(CONFIG_PARAM_AVOID_K, "Avoid using recently used mode combinations.");
 		comments.put(CONFIG_PARAM_PROBA_ESTIMATE, "Probability to re-estimate an existing plan model.");

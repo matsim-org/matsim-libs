@@ -1,5 +1,6 @@
 package org.matsim.modechoice;
 
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
@@ -9,6 +10,7 @@ import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.replanning.*;
 import org.matsim.modechoice.search.BestChoiceGenerator;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
@@ -52,9 +54,6 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		bindAllModes(builder.options, new TypeLiteral<>() {
 		});
 
-		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
-		});
-
 		// Not singleton, they should be able to be created per thread if necessary.
 		bind(EstimateRouter.class);
 		bind(TopKChoicesGenerator.class);
@@ -64,8 +63,15 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		bind(PlanModelService.class).in(Singleton.class);
 
+		Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
+		});
 		for (Class<? extends TripConstraint<?>> c : builder.constraints) {
 			tcBinder.addBinding().to(c).in(Singleton.class);
+		}
+
+		MapBinder<String, CandidatePruner> pBinder = MapBinder.newMapBinder(binder(), String.class, CandidatePruner.class);
+		for (Map.Entry<String, CandidatePruner> e : builder.pruner.entrySet()) {
+			pBinder.addBinding(e.getKey()).toInstance(e.getValue());
 		}
 
 		addPlanStrategyBinding(SELECT_BEST_K_PLAN_MODES_STRATEGY).toProvider(SelectBestKPlanModesStrategyProvider.class);
@@ -78,6 +84,20 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		addControlerListenerBinding().to(ModeChoiceWeightScheduler.class).in(Singleton.class);
 
 		bind(PlanSelector.class).toProvider(MultinomialLogitSelectorProvider.class);
+	}
+
+	@Provides
+	public CandidatePruner pruner(Map<String, CandidatePruner> pruners, InformedModeChoiceConfigGroup config) {
+
+		if (config.getPruning() == null)
+			return null;
+
+		CandidatePruner pruner = pruners.get(config.getPruning());
+
+		if (pruner == null)
+			throw new IllegalStateException(String.format("Requested pruner %s in config, but it is not bound in the module", config.getPruning()));
+
+		return pruner;
 	}
 
 	/**
@@ -109,6 +129,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		private final Map<String, Class<? extends ModeOptions<?>>> options = new HashMap<>();
 
 		private final Set<Class<? extends TripConstraint<?>>> constraints = new LinkedHashSet<>();
+
+		private final Map<String, CandidatePruner> pruner = new HashMap<>();
 
 		/**
 		 * Adds a fixed cost to one or more modes.
@@ -166,6 +188,14 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		 */
 		public Builder withConstraint(Class<? extends TripConstraint<?>> constraint) {
 			constraints.add(constraint);
+			return this;
+		}
+
+		/**
+		 * Add candidate pruner with specific name. Has to be set in the config in order to be activated.
+		 */
+		public Builder withPruner(String name, CandidatePruner pruner) {
+			this.pruner.put(name, pruner);
 			return this;
 		}
 

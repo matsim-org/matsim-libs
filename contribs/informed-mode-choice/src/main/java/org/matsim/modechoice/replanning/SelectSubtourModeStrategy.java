@@ -59,7 +59,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		GeneratorContext context = generator.get();
-		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, nonChainBasedModes));
+		return new Algorithm(context, SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes));
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && hasSingleTripChoice(model, nonChainBasedModes)) {
-				PlanCandidate c = singleTrip.chooseCandidate(model, null, config.getCThreshold(), config.getDistThreshold());
+				PlanCandidate c = singleTrip.chooseCandidate(model, null);
 				if (c != null) {
 					c.applyTo(plan);
 				}

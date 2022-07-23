@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.pruning.CandidatePruner;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +33,14 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	}
 
 	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
-		return generate(planModel, consideredModes, mask, config.getTopK(), config.calcThreshold(planModel), Double.NaN);
+
+		CandidatePruner p = pruner.get();
+		double threshold = -1;
+		if (p != null) {
+			threshold = p.planThreshold(planModel);
+		}
+
+		return generate(planModel, consideredModes, mask, config.getTopK(), threshold, Double.NaN);
 	}
 
 	/**
@@ -170,7 +178,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				if (estimate > best)
 					best = estimate;
 
-				if (diffThreshold > 0 && best - estimate > diffThreshold)
+				if (diffThreshold >= 0 && best - estimate > diffThreshold)
 					break;
 
 				// absolute threshold
@@ -195,7 +203,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
 
 		// threshold need to be rechecked again on the global best
-		if (diffThreshold > 0) {
+		if (diffThreshold >= 0) {
 			double best = result.get(0).getUtility();
 
 			// absolute threshold

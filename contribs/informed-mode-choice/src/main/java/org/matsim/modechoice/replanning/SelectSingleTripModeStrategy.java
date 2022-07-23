@@ -12,6 +12,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
+import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
 import javax.annotation.Nullable;
@@ -31,37 +32,42 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 	private final Provider<PlanSelector> selector;
 
 	private final List<String> modes;
+	private final Provider<CandidatePruner> pruner;
 
 	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
 	                                    List<String> modes,
 	                                    Provider<SingleTripChoicesGenerator> generator,
-	                                    Provider<PlanSelector> selector) {
+	                                    Provider<PlanSelector> selector,
+	                                    Provider<CandidatePruner> pruner) {
 		super(globalConfigGroup);
 		this.generator = generator;
 		this.selector = selector;
 		this.modes = modes;
+		this.pruner = pruner;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new Algorithm(generator.get(), selector.get(), modes);
+		return new Algorithm(generator.get(), selector.get(), pruner.get(), modes);
 	}
 
 
-	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, Collection<String> modes) {
-		return new Algorithm(generator, selector, modes);
+	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes) {
+		return new Algorithm(generator, selector, pruner, modes);
 	}
 
 	public static final class Algorithm implements PlanAlgorithm {
 
 		private final SingleTripChoicesGenerator generator;
 		private final PlanSelector selector;
+		private final CandidatePruner pruner;
 		private final Set<String> modes;
 		private final Random rnd;
 
-		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, Collection<String> modes) {
+		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes) {
 			this.generator = generator;
 			this.selector = selector;
+			this.pruner = pruner;
 			this.modes = new HashSet<>(modes);
 			this.rnd = MatsimRandom.getLocalInstance();
 		}
@@ -70,7 +76,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		public void run(Plan plan) {
 			PlanModel model = PlanModel.newInstance(plan);
 
-			PlanCandidate c = chooseCandidate(model, null, 0, 0);
+			PlanCandidate c = chooseCandidate(model, null);
 
 			if (c != null)
 				c.applyTo(plan);
@@ -84,7 +90,7 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 		 * @return true if a candidate was selected
 		 */
 		@Nullable
-		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList, double cThreshold, double distThreshold) {
+		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList) {
 
 			// empty plan
 			if (model.trips() == 0)
@@ -133,11 +139,13 @@ public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 			Collection<PlanCandidate> candidates = generator.generate(model, modes, mask);
 
 			// Remove based on threshold
-			if (cThreshold > 0 || distThreshold > 0) {
+			if (pruner != null) {
 
 				OptionalDouble max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max();
-				if (max.isPresent()) {
-					double threshold = max.getAsDouble() - cThreshold - distThreshold * model.distance(idx) / 1000;
+				double t = pruner.tripThreshold(model, idx);
+
+				if (max.isPresent() && t >= 0) {
+					double threshold = max.getAsDouble() - t;
 					candidates.removeIf(c -> c.getUtility() < threshold);
 				}
 			}

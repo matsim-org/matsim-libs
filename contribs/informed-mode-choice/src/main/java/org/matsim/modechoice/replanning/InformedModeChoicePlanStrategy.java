@@ -88,7 +88,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 		for (int i = 0; i < this.threadContexts.length; i++) {
 			GeneratorContext context = generator.get();
 			this.threadContexts[i] = context;
-			this.singleTrip[i] = SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, nonChainBasedModes);
+			this.singleTrip[i] = SelectSingleTripModeStrategy.newAlgorithm(context.singleGenerator, context.selector, context.pruner, nonChainBasedModes);
 		}
 
 		history = new IdMap<>(Person.class, scenario.getPopulation().getPersons().size());
@@ -280,7 +280,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 			// Do change single trip on non-chain based modes with certain probability
 			if (rnd.nextDouble() < smc.getProbaForRandomSingleTripMode() && SelectSubtourModeStrategy.hasSingleTripChoice(model, nonChainBasedModes)) {
 				// return here if plan was modified
-				PlanCandidate c = sst.chooseCandidate(model, planHistory.avoidList, config.getCThreshold(), config.getDistThreshold());
+				PlanCandidate c = sst.chooseCandidate(model, planHistory.avoidList);
 
 				if (c != null) {
 
@@ -305,14 +305,14 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 			double threshold = Double.NaN;
 
-			if (config.getCThreshold() > 0 || config.getDistThreshold() > 0) {
+			if (ctx.pruner != null) {
 
 				Optional<? extends Plan> best = person.getPlans().stream()
 						.filter(p -> p.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR) != null)
 						.max(Comparator.comparingDouble(Plan::getScore));
 
 				if (best.isPresent()) {
-					threshold = (double) best.get().getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR) - config.calcThreshold(model);
+					threshold = (double) best.get().getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR) - ctx.pruner.planThreshold(model);
 				}
 			}
 

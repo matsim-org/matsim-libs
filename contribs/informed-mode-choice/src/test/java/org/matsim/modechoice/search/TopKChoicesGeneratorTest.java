@@ -131,7 +131,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		PlanModel planModel = PlanModel.newInstance(person.getSelectedPlan());
 
-		Collection<PlanCandidate> candidates = generator.generate(planModel, null, null, 15, 0, Double.NaN);
+		Collection<PlanCandidate> candidates = generator.generate(planModel, null, null, 15, -1, Double.NaN);
 
 		assertThat(candidates).hasSize(15);
 
@@ -139,7 +139,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		assertThat(candidates).hasSize(3);
 
-		candidates = generator.generate(planModel, null, null, 15, 0, -8);
+		candidates = generator.generate(planModel, null, null, 15, -1, -8);
 
 		assertThat(candidates).hasSize(1);
 	}
