@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.contrib.freight.events.eventsCreator;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
