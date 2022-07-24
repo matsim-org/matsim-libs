@@ -90,18 +90,18 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
-		log.info("Using k={}, pruning={}", topK, pruning);
-
-		imc.setTopK(topK);
-		imc.setModes(modes);
-		imc.setPruning(pruning);
-
 		Controler controler;
 
 		if (scenarioArgs == null || scenarioArgs.isBlank())
 			controler = MATSimApplication.prepare(scenario, config);
 		else
 			controler = MATSimApplication.prepare(scenario, config, scenarioArgs);
+
+		log.info("Using k={}, pruning={}", topK, pruning);
+
+		imc.setTopK(topK);
+		imc.setModes(modes);
+		imc.setPruning(pruning);
 
 		Injector injector = controler.getInjector();
 

@@ -3,6 +3,8 @@ package org.matsim.modechoice;
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 
 import java.util.Arrays;
@@ -75,6 +77,8 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 
 		applyAttributes(plan);
 
+		final List<PlanElement> planElements = plan.getPlanElements();
+
 		int k = 0;
 		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
 
@@ -85,12 +89,16 @@ public final class PlanCandidate implements Comparable<PlanCandidate> {
 			if (mode == null)
 				continue;
 
-			for (Leg leg : trip.getLegsOnly()) {
+			// Replaces all trip elements and inserts single leg
+			final List<PlanElement> fullTrip =
+					planElements.subList(
+							planElements.indexOf(trip.getOriginActivity()) + 1,
+							planElements.indexOf(trip.getDestinationActivity()));
 
-				leg.setRoute(null);
-				leg.setMode(mode);
-				TripStructureUtils.setRoutingMode(leg, mode);
-			}
+			fullTrip.clear();
+			Leg leg = PopulationUtils.createLeg(mode);
+			TripStructureUtils.setRoutingMode(leg, mode);
+			fullTrip.add(leg);
 		}
 	}
 

@@ -159,7 +159,7 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				double estimate = preDeterminedEstimate + it.nextDouble();
 
 				if (n++ > MAX_ITER) {
-					log.warn("Maximum number of iterations reached for {}", context.person.getId());
+					log.warn("Maximum number of iterations reached for person {}", context.person.getId());
 					break;
 				}
 
