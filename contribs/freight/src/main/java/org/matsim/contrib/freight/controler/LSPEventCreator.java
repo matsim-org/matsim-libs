@@ -19,25 +19,21 @@
  *
  */
 
-package org.matsim.contrib.freight.events.eventsCreator;
+package org.matsim.contrib.freight.controler;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 
-public final class LSPEventCreatorUtils {
+public interface LSPEventCreator {
 
-	public static Collection<LSPEventCreator> getStandardEventCreators(){
-		ArrayList<LSPEventCreator> creators = new ArrayList<>();
-//		creators.add(new LSPFreightLinkEnterEventCreator());
-//		creators.add(new LSPFreightLinkLeaveEventCreator());
-//		creators.add(new LSPFreightVehicleLeavesTrafficEventCreator());
-		creators.add(new LSPServiceEndEventCreator());
-		creators.add(new LSPServiceStartEventCreator());
-		creators.add(new LSPShipmentDeliveredEventCreator());
-		creators.add(new LSPShipmentPickedUpEventCreator());
-		creators.add(new LSPTourEndEventCreator());
-		creators.add(new LSPTourStartEventCreator());
-		return creators;
-	}
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter);
 	
 }
