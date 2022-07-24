@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
@@ -72,6 +73,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	private Writer distWriter;
 
 	private ThreadLocal<TopKChoicesGenerator> generatorCache;
+	private AtomicInteger counter = new AtomicInteger();
 
 	public static void main(String[] args) {
 		new GenerateChoiceSet().execute(args);
@@ -107,6 +109,8 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 		generatorCache = ThreadLocal.withInitial(() -> injector.getInstance(TopKChoicesGenerator.class));
 
+		int persons = 0;
+
 		// copy the original plan, so no modifications are made
 		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			String subpop = PopulationUtils.getSubpopulation(person);
@@ -120,6 +124,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			copy.setType("source");
 
 			person.setSelectedPlan(selected);
+			persons++;
 		}
 
 
@@ -141,12 +146,16 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			distWriter.write("person\testimates\n");
 		}
 
+		counter.set(0);
+
 		ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), config.global().getNumberOfThreads(), this);
 
 		PopulationUtils.writePopulation(controler.getScenario().getPopulation(), output.toString());
 
 		if (distWriter != null)
 			distWriter.close();
+
+		log.info("Generated {} plans for {} persons, (avg. {})", counter.get(), persons, counter.get() / (double) persons);
 
 		return 0;
 	}
@@ -171,6 +180,8 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		plans.forEach(person::removePlan);
 
 		for (PlanCandidate c : candidates) {
+
+			counter.incrementAndGet();
 
 			if (plan == null)
 				plan = person.createCopyOfSelectedPlanAndMakeSelected();
