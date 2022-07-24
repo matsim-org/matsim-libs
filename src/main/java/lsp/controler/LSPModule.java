@@ -29,19 +29,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightAgentSource;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -93,11 +87,6 @@ public class LSPModule extends AbstractModule {
 
 		bind( LSPScoringFunctionFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 
-	}
-
-	@Provides Collection<LSPEventCreator> provideEventCreators(){
-		return LSPEventCreatorUtils.getStandardEventCreators();
-		// (if you do not like them, you will have to override the binding.  kai, may'22)
 	}
 
 	@Provides CarrierAgentTracker provideCarrierResourceTracker( LSPControlerListener lspControlerListener ) {
