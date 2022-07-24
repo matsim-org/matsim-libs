@@ -105,8 +105,8 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				PlanCandidate c = singleTrip.chooseCandidate(model, null);
 				if (c != null) {
 					c.applyTo(plan);
+					return;
 				}
-				return;
 			}
 
 			List<TripStructureUtils.Subtour> subtours = new ArrayList<>(TripStructureUtils.getSubtours(plan, smc.getCoordDistance()));
