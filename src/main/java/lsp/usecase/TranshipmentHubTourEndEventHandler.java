@@ -44,88 +44,80 @@ import org.matsim.core.events.handler.EventHandler;
 
 /*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
 
-	@Override public void setEmbeddingContainer( LSPResource pointer ){
-	}
-	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
-	}
-	static class TransshipmentHubEventHandlerPair {
-		public final LSPShipment shipment;
-		public final LogisticsSolutionElement element;
-				
-		public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element){
-			this.shipment = shipment;
-			this.element = element;
-		}	
-	}
-
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
 	private final Id<LSPResource> resourceId;
 	private final Id<Link> linkId;
-	
-	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub){
+
+	TranshipmentHubTourEndEventHandler(TransshipmentHub transshipmentHub) {
 		this.transshipmentHub = transshipmentHub;
 		this.linkId = transshipmentHub.getEndLinkId();
 		this.resourceId = transshipmentHub.getId();
 		this.servicesWaitedFor = new HashMap<>();
 	}
-	
+
+	@Override
+	public void setEmbeddingContainer(LSPResource pointer) {
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	}
+
 	@Override
 	public void reset(int iteration) {
 		servicesWaitedFor.clear();
 	}
 
-	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement){
+	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement) {
 		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
-		
-		for(ShipmentPlanElement planElement: shipment.getShipmentPlan().getPlanElements().values()){
-			if(planElement instanceof ShipmentLeg){
+
+		for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
+			if (planElement instanceof ShipmentLeg) {
 				ShipmentLeg transport = (ShipmentLeg) planElement;
-				if(transport.getSolutionElement().getNextElement() == solutionElement){
+				if (transport.getSolutionElement().getNextElement() == solutionElement) {
 					servicesWaitedFor.put(transport.getCarrierService(), pair);
 				}
 			}
 		}
-	}	
-	
+	}
+
 	@Override
 	public void handleEvent(LSPTourEndEvent event) {
-		if((event.getTour().getEndLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))){
-			
-			for(TourElement tourElement : event.getTour().getTourElements()){
-				if(tourElement instanceof ServiceActivity){
+		if ((event.getTour().getEndLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))) {
+
+			for (TourElement tourElement : event.getTour().getTourElements()) {
+				if (tourElement instanceof ServiceActivity) {
 					ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-					if(serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
+					if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
 							&& allServicesAreInOnePoint(event.getTour())
 							&& (event.getTour().getStartLinkId() != transshipmentHub.getStartLinkId())) {
 						logReloadAfterMainRun(serviceActivity.getService(), event);
-					}
-					else {
+					} else {
 						logReloadAfterCollection(serviceActivity.getService(), event);
 					}
 				}
-				
+
 			}
 		}
-		
-		
+
 
 	}
 
-	private boolean shipmentsOfTourEndInPoint(Tour tour){
+	private boolean shipmentsOfTourEndInPoint(Tour tour) {
 		boolean shipmentsEndInPoint = true;
-		for(TourElement tourElement : tour.getTourElements()){
-			if(tourElement instanceof ServiceActivity){
+		for (TourElement tourElement : tour.getTourElements()) {
+			if (tourElement instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
-				if(!servicesWaitedFor.containsKey(serviceActivity.getService())){
-					return false;				
+				if (!servicesWaitedFor.containsKey(serviceActivity.getService())) {
+					return false;
 				}
 			}
 		}
 		return shipmentsEndInPoint;
 	}
 
-	private void logReloadAfterCollection(CarrierService carrierService, LSPTourEndEvent event){
+	private void logReloadAfterCollection(CarrierService carrierService, LSPTourEndEvent event) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
@@ -138,25 +130,25 @@ import org.matsim.core.events.handler.EventHandler;
 		ShipmentPlanElement loggedShipmentHandle = builder.build();
 		String idString = loggedShipmentHandle.getResourceId() + "" + loggedShipmentHandle.getSolutionElement().getId() + "" + loggedShipmentHandle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
+		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().addPlanElement(loadId, loggedShipmentHandle);
-		}	
+		}
 	}
-	
-	private double getUnloadEndTime(Tour tour){
+
+	private double getUnloadEndTime(Tour tour) {
 		double unloadEndTime = 0;
-		for(TourElement element: tour.getTourElements()){
-			if(element instanceof Tour.ServiceActivity){
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof Tour.ServiceActivity) {
 				Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
 				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
 			}
 		}
-	
-		
+
+
 		return unloadEndTime;
 	}
 
-	private void logReloadAfterMainRun(CarrierService carrierService, LSPTourEndEvent event){
+	private void logReloadAfterMainRun(CarrierService carrierService, LSPTourEndEvent event) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
@@ -169,24 +161,23 @@ import org.matsim.core.events.handler.EventHandler;
 		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
+		if (!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().addPlanElement(loadId, handle);
-		}	
+		}
 	}
 
 	private boolean allServicesAreInOnePoint(Tour tour) {
-		for(TourElement element : tour.getTourElements()) {
-			if(element instanceof ServiceActivity) {
+		for (TourElement element : tour.getTourElements()) {
+			if (element instanceof ServiceActivity) {
 				ServiceActivity activity = (ServiceActivity) element;
-				if(activity.getLocation() != tour.getEndLinkId()) {
+				if (activity.getLocation() != tour.getEndLinkId()) {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
-	
-	
+
 	public Map<CarrierService, TransshipmentHubEventHandlerPair> getServicesWaitedFor() {
 		return servicesWaitedFor;
 	}
@@ -202,7 +193,16 @@ import org.matsim.core.events.handler.EventHandler;
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
-	
-	
-	
+
+	static class TransshipmentHubEventHandlerPair {
+		public final LSPShipment shipment;
+		public final LogisticsSolutionElement element;
+
+		public TransshipmentHubEventHandlerPair(LSPShipment shipment, LogisticsSolutionElement element) {
+			this.shipment = shipment;
+			this.element = element;
+		}
+	}
+
+
 }

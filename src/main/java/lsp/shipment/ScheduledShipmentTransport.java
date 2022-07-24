@@ -39,7 +39,7 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
 	private final Id<Link> toLinkId;
 	private final CarrierService carrierService;
 
-	ScheduledShipmentTransport( ShipmentUtils.ScheduledShipmentTransportBuilder builder ){
+	ScheduledShipmentTransport(ShipmentUtils.ScheduledShipmentTransportBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
@@ -49,8 +49,7 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
 		this.toLinkId = builder.toLinkId;
 		this.carrierService = builder.carrierService;
 	}
-	
-	
+
 
 	@Override
 	public String getElementType() {

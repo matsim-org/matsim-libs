@@ -30,12 +30,11 @@ import org.matsim.api.core.v01.population.BasicPlan;
  * <li> As a {@link BasicPlan} it has a score, so it can be used for evolutionary learning.  kai, may'22 </li>
  * <li> An {@link LSPShipment} is added via lspPlan#getAssigner().assignToSolution(shipment).  The {@link ShipmentAssigner} assigns it deterministically to a {@link LogisticsSolution}. </li>
  * </ul>
- *
  */
 public interface LSPPlan extends BasicPlan, KnowsLSP {
 
-	LSPPlan addSolution( LogisticsSolution solution );
-	
+	LSPPlan addSolution(LogisticsSolution solution);
+
 	Collection<LogisticsSolution> getSolutions();
 
 	/**
@@ -43,6 +42,6 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
 	 */
 	ShipmentAssigner getAssigner();
 
-	LSPPlan setAssigner( ShipmentAssigner assigner );
+	LSPPlan setAssigner(ShipmentAssigner assigner);
 
 }

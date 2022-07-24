@@ -58,7 +58,7 @@ import java.util.Random;
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
@@ -71,7 +71,7 @@ import java.util.Random;
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
 
-		Carrier collectionCarrier = CarrierUtils.createCarrier( collectionCarrierId );
+		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 		//The collection adapter i.e. the Resource is created
@@ -86,7 +86,7 @@ import java.util.Random;
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
+		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
@@ -97,7 +97,7 @@ import java.util.Random;
 		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
 
 		//The scheduler for the first reloading point is created
-		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
 		firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
@@ -107,7 +107,7 @@ import java.util.Random;
 
 		//The SolutionElement for the first reloading point is created
 		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FirstHubElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId );
+		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId);
 		firstHubElementBuilder.setResource(firstTranshipmentHubAdapter);
 		LogisticsSolutionElement firstHubElement = firstHubElementBuilder.build();
 
@@ -120,7 +120,7 @@ import java.util.Random;
 		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
 		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		mainRunVehicleTypeBuilder.setFixCost(120);
-		mainRunVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		mainRunVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType mainRunType = mainRunVehicleTypeBuilder.build();
 
 
@@ -133,7 +133,7 @@ import java.util.Random;
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
-		Carrier mainRunCarrier = CarrierUtils.createCarrier( mainRunCarrierId );
+		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
@@ -149,7 +149,7 @@ import java.util.Random;
 
 		//The LogisticsSolutionElement for the main run Resource is created
 		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId );
+		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 
@@ -160,7 +160,7 @@ import java.util.Random;
 		UsecaseUtils.TransshipmentHubBuilder secondTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(secondTransshipmentHubId, secondTransshipmentHub_LinkId);
 
 		//The scheduler for the second reloading point is created
-		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
 		secondSchedulerBuilder.setCapacityNeedLinear(1);
 
@@ -170,7 +170,7 @@ import java.util.Random;
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondHubElementId );
+		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondHubElementId);
 		secondHubElementBuilder.setResource(secondTranshipmentHubAdapter);
 		LogisticsSolutionElement secondHubElement = secondHubElementBuilder.build();
 
@@ -183,7 +183,7 @@ import java.util.Random;
 		dsitributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		dsitributionVehicleTypeBuilder.setFixCost(49);
-		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		dsitributionVehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
@@ -195,7 +195,7 @@ import java.util.Random;
 		distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
-		Carrier distributionCarrier = CarrierUtils.createCarrier( distributionCarrierId );
+		Carrier distributionCarrier = CarrierUtils.createCarrier(distributionCarrierId);
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		//The distribution adapter i.e. the Resource is created
@@ -210,9 +210,9 @@ import java.util.Random;
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId );
+		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId);
 		distributionBuilder.setResource(distributionAdapter);
-		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
+		LogisticsSolutionElement distributionElement = distributionBuilder.build();
 
 		//The Order of the logisticsSolutionElements is now specified
 		collectionElement.connectWithNextElement(firstHubElement);
@@ -223,7 +223,7 @@ import java.util.Random;
 
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
+		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId);
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstHubElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
@@ -234,7 +234,7 @@ import java.util.Random;
 
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
-		ShipmentAssigner assigner = UsecaseUtils.createSinglesolutionShipmentAssigner();
+		ShipmentAssigner assigner = UsecaseUtils.createSingleSolutionShipmentAssigner();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 
@@ -255,49 +255,49 @@ import java.util.Random;
 
 	}
 
-	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
+	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
 		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
-		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 		Random rand = new Random(1);
-		for(int i = 1; i < 6; i++) {
+		for (int i = 1; i < 6; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			int capacityDemand = rand.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);
 
-			while(true) {
+			while (true) {
 				Collections.shuffle(linkList, rand);
 				Link pendingToLink = linkList.get(0);
-				if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
-						    pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
-						    pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
-						    pendingToLink.getToNode().getCoord().getX() <= 18000 &&
-						    pendingToLink.getToNode().getCoord().getY() <= 4000  &&
-						    pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
+				if ((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
+						pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingToLink.getFromNode().getCoord().getX() >= 14000 &&
+						pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+						pendingToLink.getToNode().getCoord().getY() <= 4000 &&
+						pendingToLink.getToNode().getCoord().getX() >= 14000)) {
 					builder.setToLinkId(pendingToLink.getId());
 					break;
 				}
 
 			}
 
-			while(true) {
+			while (true) {
 				Collections.shuffle(linkList, rand);
 				Link pendingFromLink = linkList.get(0);
-				if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-						   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-						   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-						   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
+				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
 					builder.setFromLinkId(pendingFromLink.getId());
 					break;
 				}
 
 			}
 
-			TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setEndTimeWindow(endTimeWindow);
-			TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setDeliveryServiceTime(capacityDemand * 60 );
+			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LSPShipment shipment = builder.build();
 			shipmentList.add(builder.build());
 		}
@@ -305,7 +305,7 @@ import java.util.Random;
 	}
 
 
-	public static void main (String[]args) {
+	public static void main(String[] args) {
 		//Set up required MATSim classes
 		Config config = new Config();
 		config.addCoreModules();
@@ -315,10 +315,10 @@ import java.util.Random;
 
 		//Create LSP and shipments
 		LSP lsp = createInitialLSP(network);
-		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
+		Collection<LSPShipment> shipments = createInitialLSPShipments(network);
 
 		//assign the shipments to the LSP
-		for(LSPShipment shipment : shipments) {
+		for (LSPShipment shipment : shipments) {
 			lsp.assignShipmentToLSP(shipment);
 		}
 
@@ -329,33 +329,34 @@ import java.util.Random;
 		ArrayList<LSP> lspList = new ArrayList<>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
-		LSPUtils.addLSPs( scenario, lsps );
+		LSPUtils.addLSPs(scenario, lsps);
 
 		Controler controler = new Controler(config);
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				install( new LSPModule() ); // this is the better syntax, having everything in one module. kai, may'22
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule()); // this is the better syntax, having everything in one module. kai, may'22
 			}
-		} );
+		});
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 
-		for(LSPShipment shipment : lsp.getShipments()) {
+		for (LSPShipment shipment : lsp.getShipments()) {
 			System.out.println("Shipment: " + shipment.getId());
 			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			scheduleElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
+			scheduleElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 			ArrayList<ShipmentPlanElement> logElements = new ArrayList<>(shipment.getLog().getPlanElements().values());
-			logElements.sort( ShipmentUtils.createShipmentPlanElementComparator() );
+			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
-			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
+			for (int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
+				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
 			}
 			System.out.println();
-			for(int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
-				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() +"  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
+			for (int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
+				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() + "  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
 			}
 			System.out.println();
 		}

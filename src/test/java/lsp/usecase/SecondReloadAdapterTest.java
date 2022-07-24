@@ -37,18 +37,18 @@ public class SecondReloadAdapterTest {
 	private Id<Link> reloadingLinkId;
 
 	@Before
-	public void initialize(){
-		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder =  UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
-        schedulerBuilder.setCapacityNeedFixed(10);
-        schedulerBuilder.setCapacityNeedLinear(1);
+	public void initialize() {
+		UsecaseUtils.TranshipmentHubSchedulerBuilder schedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
+		schedulerBuilder.setCapacityNeedFixed(10);
+		schedulerBuilder.setCapacityNeedLinear(1);
 
 		Id<LSPResource> reloadingId = Id.create("TranshipmentHub2", LSPResource.class);
-        reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
-        
-        UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId);
-        transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
-        transshipmentHub = transshipmentHubBuilder.build();
-        
+		reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
+
+		UsecaseUtils.TransshipmentHubBuilder transshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(reloadingId, reloadingLinkId);
+		transshipmentHubBuilder.setTransshipmentHubScheduler(schedulerBuilder.build());
+		transshipmentHub = transshipmentHubBuilder.build();
+
 	}
 
 	@Test
@@ -61,11 +61,11 @@ public class SecondReloadAdapterTest {
 		assertTrue(transshipmentHub.getClientElements().isEmpty());
 		assertSame(transshipmentHub.getEndLinkId(), reloadingLinkId);
 		assertSame(transshipmentHub.getStartLinkId(), reloadingLinkId);
-		assertNotNull(transshipmentHub.getSimulationTrackers() );
-		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty() );
-		assertEquals(1, transshipmentHub.getSimulationTrackers().size() );
-		assertNotNull(transshipmentHub.getAttributes() );
-		assertTrue(transshipmentHub.getAttributes().isEmpty() );
+		assertNotNull(transshipmentHub.getSimulationTrackers());
+		assertFalse(transshipmentHub.getSimulationTrackers().isEmpty());
+		assertEquals(1, transshipmentHub.getSimulationTrackers().size());
+		assertNotNull(transshipmentHub.getAttributes());
+		assertTrue(transshipmentHub.getAttributes().isEmpty());
 	}
 
 }

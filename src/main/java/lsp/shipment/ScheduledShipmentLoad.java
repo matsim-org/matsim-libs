@@ -29,7 +29,6 @@ import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 
 
-
 class ScheduledShipmentLoad implements ShipmentActivity {
 
 	private final double startTime;
@@ -40,7 +39,7 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 	private final Id<Link> linkId;
 	private final CarrierService carrierService;
 
-	ScheduledShipmentLoad( ShipmentUtils.ScheduledShipmentLoadBuilder builder ){
+	ScheduledShipmentLoad(ShipmentUtils.ScheduledShipmentLoadBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
@@ -49,8 +48,8 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 		this.carrierId = builder.carrierId;
 		this.carrierService = builder.carrierService;
 	}
-	
-	
+
+
 	@Override
 	public String getElementType() {
 		String type = "LOAD";
@@ -89,5 +88,5 @@ class ScheduledShipmentLoad implements ShipmentActivity {
 		return carrierService;
 	}
 
-	
+
 }

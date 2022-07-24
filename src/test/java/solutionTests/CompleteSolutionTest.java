@@ -50,7 +50,7 @@ public class CompleteSolutionTest {
 	private LogisticsSolutionElement secondHubElement;
 	private LogisticsSolutionElement distributionElement;
 	private LogisticsSolution solution;
-	
+
 	@Before
 	public void initialize() {
 
@@ -80,7 +80,7 @@ public class CompleteSolutionTest {
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
-		Carrier collectionCarrier = CarrierUtils.createCarrier( collectionCarrierId );
+		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
@@ -135,7 +135,7 @@ public class CompleteSolutionTest {
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = collectionCapabilitiesBuilder.build();
-		Carrier mainRunCarrier = CarrierUtils.createCarrier( collectionCarrierId );
+		Carrier mainRunCarrier = CarrierUtils.createCarrier(collectionCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
@@ -190,7 +190,7 @@ public class CompleteSolutionTest {
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarrierUtils.createCarrier( distributionCarrierId );
+		Carrier carrier = CarrierUtils.createCarrier(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
@@ -213,7 +213,7 @@ public class CompleteSolutionTest {
 		secondHubElement.connectWithNextElement(distributionElement);
 
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
+		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId);
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstHubElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
@@ -225,24 +225,24 @@ public class CompleteSolutionTest {
 
 	@Test
 	public void testCompleteSolution() {
-		assertNotNull(solution.getSimulationTrackers() );
-		assertTrue(solution.getSimulationTrackers().isEmpty() );
-		assertNotNull(solution.getAttributes() );
-		assertTrue(solution.getAttributes().isEmpty() );
-		assertNull(solution.getLSP() );
+		assertNotNull(solution.getSimulationTrackers());
+		assertTrue(solution.getSimulationTrackers().isEmpty());
+		assertNotNull(solution.getAttributes());
+		assertTrue(solution.getAttributes().isEmpty());
+		assertNull(solution.getLSP());
 		assertNotNull(solution.getShipments());
 		assertTrue(solution.getShipments().isEmpty());
 		assertEquals(5, solution.getSolutionElements().size());
 		ArrayList<LogisticsSolutionElement> elements = new ArrayList<>(solution.getSolutionElements());
-		 	for(LogisticsSolutionElement element : elements) {
-				if(elements.indexOf(element) == 0) {
-					assertNull(element.getPreviousElement());
-				}
-				if(elements.indexOf(element) == (elements.size() -1)) {
-					assertNull(element.getNextElement());
-				}
-//				assertSame(element.getEmbeddingContainer(), solution );
+		for (LogisticsSolutionElement element : elements) {
+			if (elements.indexOf(element) == 0) {
+				assertNull(element.getPreviousElement());
 			}
+			if (elements.indexOf(element) == (elements.size() - 1)) {
+				assertNull(element.getNextElement());
+			}
+//				assertSame(element.getEmbeddingContainer(), solution );
+		}
 		assertNull(collectionElement.getPreviousElement());
 		assertSame(collectionElement.getNextElement(), firstHubElement);
 		assertSame(firstHubElement.getPreviousElement(), collectionElement);
@@ -254,6 +254,6 @@ public class CompleteSolutionTest {
 		assertSame(distributionElement.getPreviousElement(), secondHubElement);
 		assertNull(distributionElement.getNextElement());
 	}
-		
-	
+
+
 }

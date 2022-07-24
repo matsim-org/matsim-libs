@@ -52,11 +52,11 @@ public class AssignerRequirementsTest {
 
 	@Before
 	public void initialize() {
-		
+
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
@@ -66,9 +66,9 @@ public class AssignerRequirementsTest {
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
-		
+
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
 		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionType);
@@ -78,27 +78,27 @@ public class AssignerRequirementsTest {
 		redCapabilitiesBuilder.addVehicle(redVehicle);
 		redCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities redCapabilities = redCapabilitiesBuilder.build();
-		Carrier redCarrier = CarrierUtils.createCarrier( redCarrierId );
+		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
-				
+
 		Id<LSPResource> redAdapterId = Id.create("RedCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(redAdapterId, network);
 		redAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		redAdapterBuilder.setCarrier(redCarrier);
 		redAdapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource redCollectionAdapter = redAdapterBuilder.build();
-		
+
 		Id<LogisticsSolutionElement> redElementId = Id.create("RedCollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder redCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId );
+		LSPUtils.LogisticsSolutionElementBuilder redCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId);
 		redCollectionElementBuilder.setResource(redCollectionAdapter);
 		LogisticsSolutionElement redCollectionElement = redCollectionElementBuilder.build();
-		
+
 		Id<LogisticsSolution> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder redCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(redCollectionSolutionId );
+		LSPUtils.LogisticsSolutionBuilder redCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(redCollectionSolutionId);
 		redCollectionSolutionBuilder.addSolutionElement(redCollectionElement);
 		redSolution = redCollectionSolutionBuilder.build();
 //		redSolution.getAttributes().add(new RedInfo() );
-		redSolution.getAttributes().putAttribute( "color", "red");
+		redSolution.getAttributes().putAttribute("color", "red");
 
 		ShipmentAssigner assigner = new RequirementsAssigner();
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
@@ -114,88 +114,87 @@ public class AssignerRequirementsTest {
 		blueCapabilitiesBuilder.addVehicle(blueVehicle);
 		blueCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities blueCapabilities = blueCapabilitiesBuilder.build();
-		Carrier blueCarrier = CarrierUtils.createCarrier( blueCarrierId );
+		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
-				
+
 		Id<LSPResource> blueAdapterId = Id.create("BlueCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(blueAdapterId, network);
 		blueAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		blueAdapterBuilder.setCarrier(blueCarrier);
 		blueAdapterBuilder.setLocationLinkId(collectionLinkId);
 		LSPResource blueCollectionAdapter = blueAdapterBuilder.build();
-		
+
 		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId );
+		LSPUtils.LogisticsSolutionElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId);
 		blueCollectionElementBuilder.setResource(blueCollectionAdapter);
 		LogisticsSolutionElement blueCollectionElement = blueCollectionElementBuilder.build();
-		
+
 		Id<LogisticsSolution> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(blueCollectionSolutionId );
+		LSPUtils.LogisticsSolutionBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(blueCollectionSolutionId);
 		blueCollectionSolutionBuilder.addSolutionElement(blueCollectionElement);
 		blueSolution = blueCollectionSolutionBuilder.build();
 //		blueSolution.getAttributes().add(new BlueInfo() );
-		blueSolution.getAttributes().putAttribute( "color", "blue" );
+		blueSolution.getAttributes().putAttribute("color", "blue");
 		collectionPlan.addSolution(blueSolution);
-		
+
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(redCollectionAdapter);
 		resourcesList.add(blueCollectionAdapter);
-			
+
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		LSP collectionLSP = collectionLSPBuilder.build();
-	
-		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
+
+		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		Random rand = new Random(1);
-	    
-	    for(int i = 1; i < 11; i++) {
-        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
-        	int capacityDemand = rand.nextInt(10);
-        	builder.setCapacityDemand(capacityDemand);
-        	
-        	while(true) {
-        		Collections.shuffle(linkList);
-        		Link pendingFromLink = linkList.get(0);
-        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
-        		   builder.setFromLinkId(pendingFromLink.getId());
-        		   break;	
-        		}	
-        	}
-        	
-        	builder.setToLinkId(collectionLinkId);
-        	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
-        	builder.setEndTimeWindow(endTimeWindow);
-        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
-        	builder.setStartTimeWindow(startTimeWindow);
-        	builder.setDeliveryServiceTime(capacityDemand * 60 );
-        	boolean blue = rand.nextBoolean();
-        	if (blue) {
-        		builder.addRequirement(new BlueRequirement() );
-        	}
-        	else {
-        		builder.addRequirement(new RedRequirement() );
-        	}
-        	
-        	LSPShipment shipment = builder.build();
-        	collectionLSP.assignShipmentToLSP(shipment);
-	    }	
+
+		for (int i = 1; i < 11; i++) {
+			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
+			int capacityDemand = rand.nextInt(10);
+			builder.setCapacityDemand(capacityDemand);
+
+			while (true) {
+				Collections.shuffle(linkList);
+				Link pendingFromLink = linkList.get(0);
+				if (pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
+					builder.setFromLinkId(pendingFromLink.getId());
+					break;
+				}
+			}
+
+			builder.setToLinkId(collectionLinkId);
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
+			builder.setEndTimeWindow(endTimeWindow);
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0, (24 * 3600));
+			builder.setStartTimeWindow(startTimeWindow);
+			builder.setDeliveryServiceTime(capacityDemand * 60);
+			boolean blue = rand.nextBoolean();
+			if (blue) {
+				builder.addRequirement(new BlueRequirement());
+			} else {
+				builder.addRequirement(new RedRequirement());
+			}
+
+			LSPShipment shipment = builder.build();
+			collectionLSP.assignShipmentToLSP(shipment);
+		}
 	}
-	
+
 	@Test
 	public void testAssignerRequirements() {
-		for(LSPShipment shipment : blueSolution.getShipments()) {
+		for (LSPShipment shipment : blueSolution.getShipments()) {
 			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
 		}
-		for(LSPShipment shipment : redSolution.getShipments()) {
+		for (LSPShipment shipment : redSolution.getShipments()) {
 			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
 		}
 	}
-	
+
 }

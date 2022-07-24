@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 
-public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasSimulationTrackers<LogisticsSolutionElement>, Attributable{
+public interface LogisticsSolutionElement extends Identifiable<LogisticsSolutionElement>, HasBackpointer<LogisticsSolution>, HasSimulationTrackers<LogisticsSolutionElement>, Attributable {
 
 	void connectWithNextElement(LogisticsSolutionElement element);
 
@@ -42,14 +42,14 @@ public interface LogisticsSolutionElement extends Identifiable<LogisticsSolution
 
 	/**
 	 * This collections stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
-	 *  charge of the actual physical handling.
+	 * charge of the actual physical handling.
 	 *
 	 * @return WaitingShipments
 	 */
 	WaitingShipments getIncomingShipments();
 
 	/**
-	 *  Shipments that have already been treated.
+	 * Shipments that have already been treated.
 	 */
 	WaitingShipments getOutgoingShipments();
 

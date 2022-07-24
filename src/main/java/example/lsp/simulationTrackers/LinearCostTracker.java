@@ -41,27 +41,24 @@ import java.util.Collection;
 import java.util.List;
 
 /*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
-								       LinkEnterEventHandler,
-								       VehicleLeavesTrafficEventHandler,
-								       LSPTourStartEventHandler,
-								       LSPServiceStartEventHandler,
-								       LSPServiceEndEventHandler,
-								       LinkLeaveEventHandler
-{
+		LinkEnterEventHandler,
+		VehicleLeavesTrafficEventHandler,
+		LSPTourStartEventHandler,
+		LSPServiceStartEventHandler,
+		LSPServiceEndEventHandler,
+		LinkLeaveEventHandler {
 
 	private final Collection<EventHandler> eventHandlers;
-//	private final Collection<LSPInfo> infos;
+	private final double shareOfFixedCosts;
+	//	private final Collection<LSPInfo> infos;
 	private double distanceCosts;
 	private double timeCosts;
 	private double loadingCosts;
 	private double vehicleFixedCosts;
 	private int totalNumberOfShipments;
 	private int totalWeightOfShipments;
-	
 	private double fixedUnitCosts;
 	private double linearUnitCosts;
-	
-	private final double shareOfFixedCosts;
 	private LogisticsSolution logisticsSolution;
 
 	public LinearCostTracker(double shareOfFixedCosts) {
@@ -71,25 +68,25 @@ import java.util.List;
 //		infos.add(costInfo);
 		this.eventHandlers = new ArrayList<>();
 	}
-	
-	
+
+
 	public final Collection<EventHandler> getEventHandlers() {
 		return eventHandlers;
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		for(EventHandler handler : eventHandlers) {
-			if(handler instanceof TourStartHandler) {
+		for (EventHandler handler : eventHandlers) {
+			if (handler instanceof TourStartHandler) {
 				TourStartHandler startHandler = (TourStartHandler) handler;
 				this.vehicleFixedCosts = startHandler.getVehicleFixedCosts();
 			}
-			if(handler instanceof DistanceAndTimeHandler) {
+			if (handler instanceof DistanceAndTimeHandler) {
 				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
 				this.distanceCosts = distanceHandler.getDistanceCosts();
 				this.timeCosts = distanceHandler.getTimeCosts();
 			}
-			if(handler instanceof CollectionServiceHandler) {
+			if (handler instanceof CollectionServiceHandler) {
 				CollectionServiceHandler collectionHandler = (CollectionServiceHandler) handler;
 				totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
 				System.out.println(totalNumberOfShipments);
@@ -97,11 +94,11 @@ import java.util.List;
 				loadingCosts = collectionHandler.getTotalLoadingCosts();
 			}
 		}
-		
+
 		double totalCosts = distanceCosts + timeCosts + loadingCosts + vehicleFixedCosts;
-		fixedUnitCosts = (totalCosts * shareOfFixedCosts)/totalNumberOfShipments;
-		linearUnitCosts = (totalCosts * (1-shareOfFixedCosts))/totalWeightOfShipments;
-		
+		fixedUnitCosts = (totalCosts * shareOfFixedCosts) / totalNumberOfShipments;
+		linearUnitCosts = (totalCosts * (1 - shareOfFixedCosts)) / totalWeightOfShipments;
+
 //		CostInfo info = (CostInfo) infos.iterator().next();
 //		for(LSPInfoFunctionValue value : info.getFunction().getValues()) {
 //			if(value instanceof example.lsp.simulationTrackers.FixedCostFunctionValue) {
@@ -113,15 +110,15 @@ import java.util.List;
 //		}
 //		info.setFixedCost( fixedUnitCosts );
 //		info.setVariableCost( linearUnitCosts );
-		LSPUtils.setFixedCost( this.logisticsSolution, fixedUnitCosts );
-		LSPUtils.setVariableCost( this.logisticsSolution, linearUnitCosts );
-		
-		
+		LSPUtils.setFixedCost(this.logisticsSolution, fixedUnitCosts);
+		LSPUtils.setVariableCost(this.logisticsSolution, linearUnitCosts);
+
+
 	}
 
 
 	@Override
-	public void reset( int iteration) {
+	public void reset(int iteration) {
 		distanceCosts = 0;
 		timeCosts = 0;
 		loadingCosts = 0;
@@ -130,7 +127,7 @@ import java.util.List;
 		totalWeightOfShipments = 0;
 		fixedUnitCosts = 0;
 		linearUnitCosts = 0;
-		
+
 	}
 
 

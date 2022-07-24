@@ -49,23 +49,23 @@ public class MainRunElementTest {
 	@Before
 	public void initialize() {
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
-	
-       
-        Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
+
+
+		Id<Carrier> carrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(30);
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(120);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
+		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
 		org.matsim.vehicles.VehicleType mainRunType = vehicleTypeBuilder.build();
-				
-		
+
+
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("MainRunVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId, mainRunType);
@@ -81,18 +81,18 @@ public class MainRunElementTest {
 
 
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-        UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
-        mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-        mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-        mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-        mainRunAdapterBuilder.setCarrier(carrier);
-        mainRunAdapter = mainRunAdapterBuilder.build();
-	
-        Id<LogisticsSolutionElement> elementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
-		mainRunBuilder.setResource( mainRunAdapter);
+		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
+		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunAdapterBuilder.setCarrier(carrier);
+		mainRunAdapter = mainRunAdapterBuilder.build();
+
+		Id<LogisticsSolutionElement> elementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
+		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
+		mainRunBuilder.setResource(mainRunAdapter);
 		mainRunElement = mainRunBuilder.build();
-	
+
 	}
 
 	@Test
@@ -100,8 +100,8 @@ public class MainRunElementTest {
 		assertNotNull(mainRunElement.getIncomingShipments());
 		assertNotNull(mainRunElement.getIncomingShipments().getShipments());
 		assertTrue(mainRunElement.getIncomingShipments().getSortedShipments().isEmpty());
-		assertNotNull(mainRunElement.getAttributes() );
-		assertTrue(mainRunElement.getAttributes().isEmpty() );
+		assertNotNull(mainRunElement.getAttributes());
+		assertTrue(mainRunElement.getAttributes().isEmpty());
 //		assertNull(mainRunElement.getEmbeddingContainer() );
 		assertNull(mainRunElement.getNextElement());
 		assertNotNull(mainRunElement.getOutgoingShipments());

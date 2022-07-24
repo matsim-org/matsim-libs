@@ -33,17 +33,17 @@ import lsp.LSPPlan;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 
-/*package-private*/ class TomorrowShipmentAssignerStrategyFactory  {
-	
+/*package-private*/ class TomorrowShipmentAssignerStrategyFactory {
+
 	private final ShipmentAssigner assigner;
 
 	/*package-private*/ TomorrowShipmentAssignerStrategyFactory(ShipmentAssigner assigner) {
 		this.assigner = assigner;
 	}
 
-	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy(){
+	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new BestPlanSelector<>());
-		
+
 		GenericPlanStrategyModule<LSPPlan> tomorrowModule = new GenericPlanStrategyModule<>() {
 
 			@Override
@@ -70,9 +70,9 @@ import lsp.shipment.LSPShipment;
 			}
 
 		};
-		
+
 		strategy.addStrategyModule(tomorrowModule);
 		return strategy;
 	}
-	
+
 }

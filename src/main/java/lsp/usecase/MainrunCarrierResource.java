@@ -46,16 +46,16 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final MainRunCarrierScheduler mainRunScheduler;
 	private final Network network;
 
-	MainRunCarrierResource( UsecaseUtils.MainRunCarrierAdapterBuilder builder ){
-			super( builder.getId() );
-			this.carrier = builder.getCarrier();
-			this.fromLinkId = builder.getFromLinkId();
-			this.toLinkId = builder.getToLinkId();
-			this.clientElements = builder.getClientElements();
-			this.mainRunScheduler = builder.getMainRunScheduler();
-			this.network = builder.getNetwork();
-		}
-	
+	MainRunCarrierResource(UsecaseUtils.MainRunCarrierAdapterBuilder builder) {
+		super(builder.getId());
+		this.carrier = builder.getCarrier();
+		this.fromLinkId = builder.getFromLinkId();
+		this.toLinkId = builder.getToLinkId();
+		this.clientElements = builder.getClientElements();
+		this.mainRunScheduler = builder.getMainRunScheduler();
+		this.network = builder.getNetwork();
+	}
+
 	@Override
 	public Id<Link> getStartLinkId() {
 		return fromLinkId;
@@ -76,11 +76,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		mainRunScheduler.scheduleShipments(this, bufferTime);
 	}
 
-	public Carrier getCarrier(){
+	public Carrier getCarrier() {
 		return carrier;
 	}
-	
-	public Network getNetwork(){
+
+	public Network getNetwork() {
 		return network;
 	}
 

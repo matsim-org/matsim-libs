@@ -34,14 +34,14 @@ class LoggedShipmentUnload implements ShipmentActivity {
 	private final LogisticsSolutionElement element;
 	private final Id<LSPResource> resourceId;
 
-	LoggedShipmentUnload( ShipmentUtils.LoggedShipmentUnloadBuilder builder ){
+	LoggedShipmentUnload(ShipmentUtils.LoggedShipmentUnloadBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
 	}
-	
-	
+
+
 	@Override
 	public LogisticsSolutionElement getSolutionElement() {
 		return element;
@@ -68,7 +68,8 @@ class LoggedShipmentUnload implements ShipmentActivity {
 		return endTime;
 	}
 
-	@Override public Id<Link> getLinkId(){
-		throw new RuntimeException( "not implemented" );
+	@Override
+	public Id<Link> getLinkId() {
+		throw new RuntimeException("not implemented");
 	}
 }

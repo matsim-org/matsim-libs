@@ -38,7 +38,7 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 	private final Id<Link> linkId;
 	private final CarrierService carrierService;
 
-	ScheduledShipmentUnload( ShipmentUtils.ScheduledShipmentUnloadBuilder builder ){
+	ScheduledShipmentUnload(ShipmentUtils.ScheduledShipmentUnloadBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
@@ -46,9 +46,9 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 		this.carrierId = builder.carrierId;
 		this.linkId = builder.linkId;
 		this.carrierService = builder.carrierService;
-	}	
-	
-	
+	}
+
+
 	@Override
 	public String getElementType() {
 		String type = "UNLOAD";
@@ -65,7 +65,7 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 		return endTime;
 	}
 
-	
+
 	@Override
 	public LogisticsSolutionElement getSolutionElement() {
 		return element;
@@ -87,6 +87,6 @@ class ScheduledShipmentUnload implements ShipmentActivity {
 	public CarrierService getCarrierService() {
 		return carrierService;
 	}
-	
+
 }
 

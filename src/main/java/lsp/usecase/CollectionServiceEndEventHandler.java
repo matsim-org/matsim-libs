@@ -40,19 +40,19 @@ import java.util.Collection;
 class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
-	private LSPShipment lspShipment;
 	private final LogisticsSolutionElement solutionElement;
 	private final LSPCarrierResource resource;
 	private final Collection<EventHandler> eventHandlers = new ArrayList<>();
+	private LSPShipment lspShipment;
 
-	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
+	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
 		this.resource = resource;
 	}
-	
-	
+
+
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -61,14 +61,14 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 
 	@Override
 	public void handleEvent(LSPServiceEndEvent event) {
-		if(event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()){
+		if (event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logTransport(event);
 			logLoad(event);
-		}	
+		}
 	}
 
-	private void logLoad(LSPServiceEndEvent event){
-		ShipmentUtils.LoggedShipmentLoadBuilder builder  =  ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
+	private void logLoad(LSPServiceEndEvent event) {
+		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - event.getService().getServiceDuration());
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
@@ -81,8 +81,8 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
-	private void logTransport(LSPServiceEndEvent event){
-		ShipmentUtils.LoggedShipmentTransportBuilder builder  =  ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
+	private void logTransport(LSPServiceEndEvent event) {
+		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
@@ -115,10 +115,12 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 	}
 
 
-	@Override public void setEmbeddingContainer( LSPShipment pointer ){
+	@Override
+	public void setEmbeddingContainer(LSPShipment pointer) {
 		this.lspShipment = pointer;
 	}
 
-	@Override public void notifyAfterMobsim( AfterMobsimEvent event ){
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
 	}
 }

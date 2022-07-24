@@ -34,13 +34,13 @@ class ScheduledShipmentHandle implements ShipmentActivity {
 	private final Id<LSPResource> resourceId;
 	private Id<Link> linkId;
 
-	ScheduledShipmentHandle( ShipmentUtils.ScheduledShipmentHandleBuilder builder ){
+	ScheduledShipmentHandle(ShipmentUtils.ScheduledShipmentHandleBuilder builder) {
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;
 		this.resourceId = builder.resourceId;
 	}
-	
+
 	@Override
 	public String getElementType() {
 		String type = "HANDLE";
