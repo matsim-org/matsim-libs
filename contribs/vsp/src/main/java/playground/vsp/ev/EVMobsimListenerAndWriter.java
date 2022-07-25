@@ -1,11 +1,8 @@
-package org.matsim.urbanEV.analysis;
+package playground.vsp.ev;
 
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.ev.discharging.DriveDischargingHandler;
-import org.matsim.contrib.ev.stats.ChargerPowerCollector;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -16,16 +13,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class EVMobsimListenerAndWriter implements MobsimBeforeCleanupListener {
-
-
+class EVMobsimListenerAndWriter implements MobsimBeforeCleanupListener {
 
         @Inject
-        ChargerToXY chargerToXY;
+        private ChargerToXY chargerToXY;
         @Inject
-        OutputDirectoryHierarchy controlerIO;
+        private OutputDirectoryHierarchy controlerIO;
         @Inject
-        IterationCounter iterationCounter;
+        private IterationCounter iterationCounter;
 
 
         @Override

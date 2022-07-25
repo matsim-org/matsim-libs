@@ -1,38 +1,26 @@
-package org.matsim.urbanEV.analysis;
+package playground.vsp.ev;
 
 
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.jcodec.common.Tuple;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargingEndEvent;
 import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
 import org.matsim.contrib.ev.charging.ChargingStartEvent;
 import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.*;
-import org.matsim.contrib.ev.stats.ChargerOccupancyXYDataProvider;
-import org.matsim.contrib.ev.stats.ChargerPowerCollector;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.VehicleType;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -40,11 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 
-public class ChargerToXY implements ChargingEndEventHandler, ChargingStartEventHandler, MobsimBeforeCleanupListener
+class ChargerToXY implements ChargingEndEventHandler, ChargingStartEventHandler, MobsimBeforeCleanupListener
 {
 
     @Inject

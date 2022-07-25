@@ -51,7 +51,7 @@ import java.util.*;
  *
  * @author tschlenther
  */
-public class UrbanVehicleChargingHandler
+class UrbanVehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
 		ChargingEndEventHandler, ChargingStartEventHandler, MobsimScopeEventHandler {
 

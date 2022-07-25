@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ActivityWhileChargingFinder {
+class ActivityWhileChargingFinder {
 
 	private final Collection<String> activityTypes;
 	private final double minimumActDuration;

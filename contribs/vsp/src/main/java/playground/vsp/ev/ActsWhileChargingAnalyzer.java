@@ -1,4 +1,4 @@
-package org.matsim.urbanEV.analysis;
+package playground.vsp.ev;
 
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
@@ -10,12 +10,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.ev.charging.ChargingEndEvent;
-import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
 import org.matsim.contrib.ev.charging.ChargingStartEvent;
 import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -24,14 +19,9 @@ import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.urbanEV.UrbanVehicleChargingHandler;
-import org.matsim.withinday.utils.EditPlans;
+import playground.vsp.ev.UrbanVehicleChargingHandler;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, ChargingStartEventHandler, IterationEndsListener {
+class ActsWhileChargingAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, ChargingStartEventHandler, IterationEndsListener {
 
     @Inject
     OutputDirectoryHierarchy controlerIO;
