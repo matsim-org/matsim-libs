@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.urbanEV;
+package playground.vsp.ev;
 
 import com.google.common.base.Preconditions;
 import org.apache.log4j.Logger;

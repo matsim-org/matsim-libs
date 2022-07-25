@@ -1,4 +1,4 @@
-package org.matsim.urbanEV;
+package playground.vsp.ev;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;

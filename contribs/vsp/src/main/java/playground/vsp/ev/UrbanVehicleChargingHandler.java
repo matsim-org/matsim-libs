@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.urbanEV;
+package playground.vsp.ev;
 
 import com.google.common.collect.ImmutableListMultimap;
 import org.matsim.api.core.v01.Id;

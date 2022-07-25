@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.urbanEV;
+package playground.vsp.ev;
 
 import java.util.HashSet;
 import java.util.Set;
