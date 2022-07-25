@@ -40,6 +40,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -61,8 +62,6 @@ class CarrierAgent
 
 	private final Id<Carrier> id;
 
-	private CarrierAgentTracker lspTracker;
-
 	private final Carrier carrier;
 
 	private final Collection<Id<Person>> driverIds = new ArrayList<>();
@@ -72,21 +71,24 @@ class CarrierAgent
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
 	private ScoringFunction scoringFunction;
+	private final EventsManager events;
+	private final Collection<LSPEventCreator> lspEventCreators;
 
-	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction ) {
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<LSPEventCreator> lspEventCreators ) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
+		this.events = events;
+		this.lspEventCreators = lspEventCreators;
 
 		Gbl.assertNotNull(carrierScoringFunction);
 	}
 
-	CarrierAgent( CarrierAgentTracker lspCarrierTracker, Carrier carrier ){
-		lspTracker = lspCarrierTracker;
+	CarrierAgent( Carrier carrier, EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
 		this.carrier = carrier;
 		this.id = carrier.getId();
-
-		Gbl.assertNotNull( lspTracker );
+		this.events = events;
+		this.lspEventCreators = lspEventCreators;
 	}
 
 
@@ -117,7 +119,7 @@ class CarrierAgent
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
-			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, lspTracker, carrier );
+			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, lspEventCreators );
 			Plan plan = PopulationUtils.createPlan();
 			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());

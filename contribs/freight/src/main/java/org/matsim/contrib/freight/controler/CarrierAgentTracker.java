@@ -30,12 +30,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -58,27 +55,25 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler = new Vehicle2DriverEventHandler();
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<>();
 	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<>();
-	private final EventsManager events;
-	private Collection<LSPEventCreator> lspEventCreators;
+	private final Collection<LSPEventCreator> lspEventCreators;
 
 	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
-		this.events = events;
 		this.carriers = carriers;
+		this.lspEventCreators=null;
 
 		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier ) ) );
+			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier ), events, lspEventCreators ) );
 			// (since the tracker is recreated for every iteration, the agent and the scoring function are also recreated every iteration)
 		}
 	}
-	public CarrierAgentTracker( Carriers carriers, Collection<LSPEventCreator> creators, EventsManager events ) {
+	public CarrierAgentTracker( Carriers carriers, EventsManager events ) {
 		// yyyy needs to be public because of LSP. kai, sep'20
 
 		this.carriers = carriers;
-		this.lspEventCreators = creators;
-		this.events = events;
+		this.lspEventCreators = LSPEventCreatorUtils.getStandardEventCreators();
 
 		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( this, carrier ) );
+			carrierAgents.add( new CarrierAgent( carrier, events, lspEventCreators ) );
 		}
 
 		Gbl.assertNotNull( this.lspEventCreators );
@@ -100,14 +95,6 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 		vehicle2DriverEventHandler.reset(iteration );
 	}
 
-	void notifyEventHappened( Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
-		for( org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator lspEventCreator : lspEventCreators ) {
-			Event customEvent = lspEventCreator.createEvent(event, carrier, activity, scheduledTour, driverId, activityCounter);
-			if(customEvent != null) {
-				events.processEvent(customEvent);
-			}
-		}
-	}
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		final Id<Person> driverId = event.getPersonId();
