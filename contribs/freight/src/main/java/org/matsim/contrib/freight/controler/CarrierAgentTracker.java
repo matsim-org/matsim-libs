@@ -21,11 +21,9 @@
 
 package org.matsim.contrib.freight.controler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -47,23 +45,33 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 						     LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 						     PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler 
 {
-	// yyyy not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
+	// not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
+
+	// need to use this via injection, since LSP is using it from another package, and thus has to be public.  With injection, can at least
+	// protect the constructor.  With injection, can either use this with global scope, or with mobsim scope.  Mobsim scope is too narrow since it
+	// handles scoring.  This only leaves global scope.  In consequence, needs to be moved from its original design where the tracker was
+	// destroyed and recreated in every iteration, to something that is persistent.  Indeed, original matsim design always was like that (so that
+	// observers could collect information over multiple iterations without additional programming).  kai, jul'22
 
 	private static final Logger log = Logger.getLogger( CarrierAgentTracker.class ) ;
 
 	private final Carriers carriers;
+	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
+	private final EventsManager events;
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler = new Vehicle2DriverEventHandler();
-	private final Collection<CarrierAgent> carrierAgents = new ArrayList<>();
-	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<>();
+	private final List<CarrierAgent> carrierAgents = new ArrayList<>();
+	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new LinkedHashMap<>();
 	private final Collection<LSPEventCreator> lspEventCreators;
 
-	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
+	@Inject CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
 		this.carriers = carriers;
+		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
+		this.events = events;
 		this.lspEventCreators=null;
 
 		for (Carrier carrier : this.carriers.getCarriers().values()) {
 			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier ), events, lspEventCreators ) );
-			// (since the tracker is recreated for every iteration, the agent and the scoring function are also recreated every iteration)
+			// (the agent and the scoring function are recreated every iteration)
 		}
 	}
 	public CarrierAgentTracker( Carriers carriers, EventsManager events ) {
@@ -77,22 +85,28 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 		}
 
 		Gbl.assertNotNull( this.lspEventCreators );
+		carrierScoringFunctionFactory = null;
+		this.events = events;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		vehicle2DriverEventHandler.reset(iteration );
+		driverAgentMap.clear();
+		carrierAgents.clear();
+		for (Carrier carrier : this.carriers.getCarriers().values()) {
+			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier), events, lspEventCreators ) );
+		}
 	}
 
 	/**
 	 * Request all carrier agents to score their plans.
-	 * 
 	 */
 	void scoreSelectedPlans() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = getCarrierAgentFromCarrier(carrier.getId() );
 			agent.scoreSelectedPlan();
 		}
-	}
-
-	@Override
-	public void reset(int iteration) {
-		vehicle2DriverEventHandler.reset(iteration );
 	}
 
 	@Override

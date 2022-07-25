@@ -57,6 +57,8 @@ public final class CarrierModule extends AbstractModule {
 		bind(CarrierControlerListener.class).in( Singleton.class ); // (this is a binding separate from the binding as controler listener)
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
+		bind(CarrierAgentTracker.class).in( Singleton.class );
+
 		{
 			// this switches on certain qsim components:
 			QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
@@ -108,9 +110,9 @@ public final class CarrierModule extends AbstractModule {
 	// yyyy this feels rather scary.  kai, oct'19
 	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
 	// Is this maybe already resolved now?  kai, jul'22
-	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
-		return carrierControlerListener.getCarrierAgentTracker();
-	}
+//	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
+//		return carrierControlerListener.getCarrierAgentTracker();
+//	}
 
 	private static class CarrierScoringFunctionFactoryDummyImpl implements CarrierScoringFunctionFactory {
 		@Override public ScoringFunction createScoringFunction( Carrier carrier ){

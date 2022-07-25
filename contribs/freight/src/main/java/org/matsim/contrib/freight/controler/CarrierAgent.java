@@ -200,7 +200,9 @@ class CarrierAgent
 			return;
 		}
 		scoringFunction.finish();
-		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
+		final double score = scoringFunction.getScore();
+		log.warn("score=" + score);
+		carrier.getSelectedPlan().setScore( score );
 	}
 	void handleEvent( Event event, Id<Person> driverId ) {
 		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier
