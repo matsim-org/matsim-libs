@@ -98,8 +98,8 @@ class FreightAnalysisServiceTracking {
 	}
 	public void handleEndEvent(LSPServiceEndEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
-			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getService().getId())){
-				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getService().getId());
+			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
+				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
 				service.endTime = event.getTime();
 			}
 		}
@@ -114,8 +114,7 @@ class FreightAnalysisServiceTracking {
 					if (tourElement instanceof Tour.Leg) {
 						calculatedArrivalTime = ((Tour.Leg) tourElement).getExpectedDepartureTime() + ((Tour.Leg) tourElement).getExpectedTransportTime();
 					}
-					if (tourElement instanceof Tour.ServiceActivity) {
-						Tour.ServiceActivity serviceAct = (Tour.ServiceActivity) tourElement;
+					if (tourElement instanceof Tour.ServiceActivity serviceAct) {
 						Id<CarrierService> serviceId = serviceAct.getService().getId();
 						setExpectedArrival(carrier.getId(),serviceId, serviceAct.getExpectedArrival());
 						if (calculatedArrivalTime > 0.0) {

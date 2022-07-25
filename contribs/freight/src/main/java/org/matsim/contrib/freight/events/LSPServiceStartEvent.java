@@ -74,7 +74,7 @@ public final class LSPServiceStartEvent extends Event{
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(FreightEventAttributes.ATTRIBUTE_DRIVER, this.driverId.toString());
+		attr.put(FreightEventAttributes.ATTRIBUTE_PERSON, this.driverId.toString());
 		if (service.getLocationLinkId() != null) {
 			attr.put(FreightEventAttributes.ATTRIBUTE_LINK, service.getLocationLinkId().toString());
 		}

@@ -26,46 +26,33 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.vehicles.Vehicle;
+
+import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 public final class LSPServiceEndEvent extends Event {
 
-	public static final String ATTRIBUTE_PERSON = "driver";
 	public static final String EVENT_TYPE = "LspServiceEnds";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_ACTTYPE = "actType";
-	public static final String ATTRIBUTE_SERVICE = "service";
-	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE;
-	public static final String ATTRIBUTE_CARRIER = "carrier";
-	
-	private final CarrierService service;
+	private final Id<CarrierService> serviceId;
+	private final Id<Link> linkId;
 	private final Id<Carrier> carrierId;
 	private final Id<Person> driverId;
-	private final CarrierVehicle vehicle;
-	private final ActivityEndEvent event;
-	
-	public LSPServiceEndEvent(ActivityEndEvent event, Id<Carrier> carrierId, Id<Person> driverId, CarrierService service, double time, CarrierVehicle vehicle) {
+	private final Id<Vehicle> vehicleId;
+	private final double serviceDuration;
+
+	public LSPServiceEndEvent(Id<Carrier> carrierId, Id<Person> driverId, CarrierService service, double time, CarrierVehicle vehicle) {
 		super(time);
-		this.service = service;
+		this.serviceId = service.getId();
+		this.linkId = service.getLocationLinkId();
 		this.driverId = driverId;
 		this.carrierId = carrierId;
-		this.vehicle = vehicle;
-		this.event = event;
-	}
-
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	public Id<Person> getDriverId() {
-		return driverId;
-	}
-
-	public CarrierService getService() {
-		return service;
+		this.vehicleId = vehicle.getId();
+		this.serviceDuration = service.getServiceDuration();
 	}
 
 	@Override
@@ -73,21 +60,40 @@ public final class LSPServiceEndEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	public CarrierVehicle getVehicle() {
-		return vehicle;
+	public Id<Carrier> getCarrierId() {
+		return carrierId;
+	}
+
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+
+	public Id<Person> getDriverId() {
+		return driverId;
+	}
+
+	public Id<CarrierService> getServiceId() {
+		return serviceId;
+	}
+
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
 	}
 	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.driverId.toString());
-		if (service.getLocationLinkId() != null) {
-			attr.put(ATTRIBUTE_LINK, service.getLocationLinkId().toString());
-		}
-		attr.put(ATTRIBUTE_ACTTYPE, event.getActType());
-		attr.put(ATTRIBUTE_SERVICE, service.getId().toString());
-		attr.put(ATTRIBUTE_VEHICLE, vehicle.getId().toString() );
+		attr.put(ATTRIBUTE_PERSON, driverId.toString());
+		attr.put(ATTRIBUTE_LINK, linkId.toString());
+		attr.put(ATTRIBUTE_SERVICE, serviceId.toString());
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
 		attr.put(ATTRIBUTE_CARRIER, carrierId.toString());
+		attr.put(ATTRIBUTE_SERVICEDURATION, String.valueOf(serviceDuration));
 		return attr;
+	}
+
+	public double getServiceDuration() {
+
+		return serviceDuration;
 	}
 }

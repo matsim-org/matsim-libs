@@ -32,18 +32,18 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 
+import java.util.Objects;
+
 /*package-private*/  final class LSPServiceEndEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
 							 Id<Person> driverId, int activityCounter) {
-		if(event instanceof ActivityEndEvent){
-			ActivityEndEvent endEvent = (ActivityEndEvent) event;
-			if(endEvent.getActType() == "service") {
+		if(event instanceof ActivityEndEvent endEvent){
+			if(Objects.equals(endEvent.getActType(), "service")) {
 				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if(element instanceof ServiceActivity) {
-					ServiceActivity serviceActivity = (ServiceActivity) element;
-					return new LSPServiceEndEvent(endEvent, carrier.getId(), driverId, serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
+				if(element instanceof ServiceActivity serviceActivity) {
+					return new LSPServiceEndEvent(carrier.getId(), driverId, serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
 				}
 			}	
 		}
