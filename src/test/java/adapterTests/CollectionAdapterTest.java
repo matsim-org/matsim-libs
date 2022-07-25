@@ -125,9 +125,9 @@ public class CollectionAdapterTest {
 				if (types.size() == 1) {
 					assertSame(types.get(0), collectionType);
 					assertEquals(10, collectionType.getCapacity().getOther().intValue());
-					assertEquals(0.0004, collectionType.getCostInformation().getPerDistanceUnit(), 0.0);
-					assertEquals(0.38, collectionType.getCostInformation().getPerTimeUnit(), 0.0);
-					assertEquals(49, collectionType.getCostInformation().getFix(), 0.0);
+					assertEquals(0.0004, collectionType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, collectionType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(49, collectionType.getCostInformation().getFixedCosts(), 0.0);
 					assertEquals((50 / 3.6), collectionType.getMaximumVelocity(), 0.0);
 
 				}

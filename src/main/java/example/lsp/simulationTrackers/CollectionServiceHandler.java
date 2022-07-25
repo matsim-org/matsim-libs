@@ -59,7 +59,7 @@ import org.matsim.vehicles.Vehicle;
 		for (ServiceTuple tuple : tuples) {
 			if (tuple.getServiceId() == event.getServiceId()) {
 				double serviceDuration = event.getTime() - tuple.getStartTime();
-				loadingCosts = serviceDuration * ((Vehicle) event.getVehicleId()).getType().getCostInformation().getPerTimeUnit();
+				loadingCosts = serviceDuration * ((Vehicle) event.getVehicleId()).getType().getCostInformation().getCostsPerSecond();
 				totalLoadingCosts = totalLoadingCosts + loadingCosts;
 				tuples.remove(tuple);
 				break;

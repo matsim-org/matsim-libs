@@ -125,9 +125,9 @@ public class DistributionAdapterTest {
 				if (types.size() == 1) {
 					assertSame(types.get(0), distributionType);
 					assertEquals(10, distributionType.getCapacity().getOther().intValue());
-					assertEquals(0.0004, distributionType.getCostInformation().getPerDistanceUnit(), 0.0);
-					assertEquals(0.38, distributionType.getCostInformation().getPerTimeUnit(), 0.0);
-					assertEquals(49, distributionType.getCostInformation().getFix(), 0.0);
+					assertEquals(0.0004, distributionType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, distributionType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(49, distributionType.getCostInformation().getFixedCosts(), 0.0);
 					assertEquals((50 / 3.6), distributionType.getMaximumVelocity(), 0.0);
 
 				}

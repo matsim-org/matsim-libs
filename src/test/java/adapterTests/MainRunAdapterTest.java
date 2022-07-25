@@ -126,9 +126,9 @@ public class MainRunAdapterTest {
 				if (types.size() == 1) {
 					assertSame(types.get(0), mainRunType);
 					assertEquals(30, mainRunType.getCapacity().getOther().intValue());
-					assertEquals(0.0008, mainRunType.getCostInformation().getPerDistanceUnit(), 0.0);
-					assertEquals(0.38, mainRunType.getCostInformation().getPerTimeUnit(), 0.0);
-					assertEquals(120, mainRunType.getCostInformation().getFix(), 0.0);
+					assertEquals(0.0008, mainRunType.getCostInformation().getCostsPerMeter(), 0.0);
+					assertEquals(0.38, mainRunType.getCostInformation().getCostsPerSecond(), 0.0);
+					assertEquals(120, mainRunType.getCostInformation().getFixedCosts(), 0.0);
 					assertEquals((50 / 3.6), mainRunType.getMaximumVelocity(), 0.0);
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<>(capabilities.getCarrierVehicles().values());

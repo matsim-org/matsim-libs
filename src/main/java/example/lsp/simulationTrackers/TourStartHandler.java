@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
 	@Override
 	public void handleEvent(LSPTourStartEvent event) {
 		log.warn("handling tour start event=" + event);
-		vehicleFixedCosts = vehicleFixedCosts + ((Vehicle) event.getVehicle()).getType().getCostInformation().getFix();
+		vehicleFixedCosts = vehicleFixedCosts + ((Vehicle) event.getVehicle()).getType().getCostInformation().getFixedCosts();
 	}
 
 	public double getVehicleFixedCosts() {
