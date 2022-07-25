@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 
@@ -43,7 +45,7 @@ import org.matsim.core.gbl.Gbl;
  */
 public final class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 						     LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
-						     PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler 
+						     PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler
 {
 	// not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
 
@@ -68,11 +70,7 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
 		this.events = events;
 		this.lspEventCreators=null;
-
-		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier ), events, lspEventCreators ) );
-			// (the agent and the scoring function are recreated every iteration)
-		}
+		this.reset(-1);
 	}
 	public CarrierAgentTracker( Carriers carriers, EventsManager events ) {
 		// yyyy needs to be public because of LSP. kai, sep'20
@@ -84,7 +82,6 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 			carrierAgents.add( new CarrierAgent( carrier, events, lspEventCreators ) );
 		}
 
-		Gbl.assertNotNull( this.lspEventCreators );
 		carrierScoringFunctionFactory = null;
 		this.events = events;
 	}

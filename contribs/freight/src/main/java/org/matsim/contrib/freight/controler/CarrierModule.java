@@ -54,10 +54,11 @@ public final class CarrierModule extends AbstractModule {
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
 
-		bind(CarrierControlerListener.class).in( Singleton.class ); // (this is a binding separate from the binding as controler listener)
+		bind(CarrierControlerListener.class).in( Singleton.class );
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
 		bind(CarrierAgentTracker.class).in( Singleton.class );
+		addEventHandlerBinding().to( CarrierAgentTracker.class );
 
 		{
 			// this switches on certain qsim components:

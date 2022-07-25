@@ -58,52 +58,28 @@ import javax.inject.Inject;
  * @author sschroeder, mzilske
  */
 
-class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener {
+class CarrierControlerListener implements ScoringListener, ReplanningListener {
 	private static final Logger log = Logger.getLogger( CarrierControlerListener.class ) ;
 
-//	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
-
 	private final CarrierStrategyManager strategyManager;
-
 	private final CarrierAgentTracker carrierAgentTracker;
 
-//	@Inject EventsManager eventsManager;
 	@Inject Scenario scenario;
 
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject CarrierControlerListener( @Nullable CarrierStrategyManager strategyManager, CarrierScoringFunctionFactory scoringFunctionFactory
-					, Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker ) {
+	@Inject CarrierControlerListener( @Nullable CarrierStrategyManager strategyManager, CarrierAgentTracker carrierAgentTracker ) {
 		// The current default is bind( CarrierStrategyManager.class ).toProvider( () -> null );
 		this.strategyManager = strategyManager;
-//		this.carrierScoringFunctionFactory = scoringFunctionFactory;
-
-//		carrierAgentTracker = new CarrierAgentTracker( FreightUtils.getCarriers( scenario ), carrierScoringFunctionFactory, eventsManager );
-		// (means that it is recreated before every mobsim run)
-
-		eventsManager.addHandler( carrierAgentTracker ); // yy might be better to register at Module level
 		this.carrierAgentTracker = carrierAgentTracker;
 	}
 
-	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
-//		eventsManager.addHandler( carrierAgentTracker );
-		// (add and remove per mobsim run)
-
-	}
-
-	@Override public void notifyAfterMobsim(AfterMobsimEvent event) {
-//		eventsManager.removeHandler(carrierAgentTracker);
-	}
-
 	@Override public void notifyScoring(ScoringEvent event) {
-		carrierAgentTracker.scoreSelectedPlans(); // yy might be better to become a scoring listener
+		carrierAgentTracker.scoreSelectedPlans();
+		// (could also make CarrierAgentTracker directly a ScoringListener.  Not sure what is the better design: current design separates
+		// ControlerListener and EventHandler functionality.  Other design would make AgentTracker more self-contained.  kai, jul'22)
 	}
-
-//	public CarrierAgentTracker getCarrierAgentTracker() {
-//		return carrierAgentTracker;
-//	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
 		if ( strategyManager==null ) {
