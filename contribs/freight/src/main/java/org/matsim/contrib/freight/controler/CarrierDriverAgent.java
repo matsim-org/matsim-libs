@@ -9,12 +9,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,13 +41,16 @@ final class CarrierDriverAgent{
 
 	private int activityCounter = 0;
 	private final ScoringFunction scoringFunction;
-	private final CarrierAgentTracker lspTracker;
 	private final Carrier carrier;
+	private final EventsManager events;
+	private final Collection<LSPEventCreator> lspEventCreators;
 
-	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, CarrierAgentTracker lspTracker, Carrier carrier ){
+	CarrierDriverAgent( Id<Person> driverId, ScheduledTour tour, ScoringFunction scoringFunction, Carrier carrier,
+			    EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
 		this.scoringFunction = scoringFunction;
-		this.lspTracker = lspTracker;
 		this.carrier = carrier;
+		this.events = events;
+		this.lspEventCreators = lspEventCreators;
 		log.debug( "creating CarrierDriverAgent with driverId=" + driverId );
 		this.driverId = driverId;
 		this.scheduledTour = tour;
@@ -166,7 +171,15 @@ final class CarrierDriverAgent{
 	 */
 	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
 		if( scoringFunction == null ){
-			lspTracker.notifyEventHappened( event, carrier, activity, scheduledTour, driverId, activityCounter );
+			// this is called from the agent.  Reason why this is needed is that the more informative objects such as ScheduledTour cannot be
+			// filled from just listening to events.  kai, jul'22
+
+			for( LSPEventCreator lspEventCreator : lspEventCreators ) {
+				Event customEvent = lspEventCreator.createEvent( event, carrier, activity, scheduledTour, driverId, activityCounter );
+				if(customEvent != null) {
+					this.events.processEvent(customEvent );
+				}
+			}
 		}
 	}
 
