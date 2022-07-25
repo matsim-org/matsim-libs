@@ -1,4 +1,4 @@
-package org.matsim.urbanEV;
+package playground.vsp.ev;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,7 +29,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.urbanEV.EVUtils;
+import playground.vsp.ev.EVUtils;
 
 
 import org.matsim.vehicles.*;
