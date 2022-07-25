@@ -61,7 +61,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 
 	@Override
 	public void handleEvent(LSPServiceEndEvent event) {
-		if (event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
+		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logTransport(event);
 			logLoad(event);
 		}
@@ -69,11 +69,11 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 
 	private void logLoad(LSPServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
-		builder.setStartTime(event.getTime() - event.getService().getServiceDuration());
+		builder.setStartTime(event.getTime() - event.getServiceDuration());
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
-		builder.setLinkId(event.getService().getLocationLinkId());
+		builder.setLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
 		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
@@ -86,7 +86,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
-		builder.setFromLinkId(event.getService().getLocationLinkId());
+		builder.setFromLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentLeg transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
