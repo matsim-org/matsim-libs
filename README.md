@@ -15,5 +15,6 @@ Please refer to VSP (Tilmann Schlenther) for any question.
 While the UrbanEVTripsPlanner actually is equipped to detect that and to plan charging from the beginning of the day/qsim, in case there is a home charger, this is strangely not reflected in the qsim. Meaning,
    the planner builds in an additional 0m trip to and from the home charger at the beginning of the qsim, but the plugin activity is never executed in the qsim. This seems like a fixeable bug, but currently persists in the code. (July 2022)
 1. The code has not been tested with 'open plans and/or subtours'. This means plans where people do not return to their first activity of the day. There might evolve artefacts when simulating such plans.
+1. if an agent does not find a possibility to charge prior to a leg for which the SoC is to fall under the threshold but stay over 0, it will not explore whether it would be possible to charge _after_ the critical leg (i.e. after the threshold is crossed).
 
    

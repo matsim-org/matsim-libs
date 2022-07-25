@@ -227,6 +227,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 					planPlugoutTrip(modifiablePlan, routingMode, electricVehicleSpecification, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
 
+					throw new RuntimeException("currently, plugging in at qsim start does not work. needs debugging. was trying tat for agent " + mobsimagent.getId());
 				}
 				
 
