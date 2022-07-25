@@ -20,7 +20,6 @@
 
 package playground.vsp.ev;
 
-import com.google.inject.Inject;
 import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,7 +34,6 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -47,12 +45,15 @@ public class FinalSoc2VehicleTypeTest {
 	private static Scenario scenario;
 	private static SOCHandler handler;
 
+	@Rule
+	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+
 	@BeforeClass
 	public static void runSim(){
 		scenario = CreateUrbanEVTestScenario.createTestScenario();
 
 		scenario.getConfig().controler().setLastIteration(2);
-		scenario.getConfig().controler().setOutputDirectory("test/output/urbanEV/FinalSoc2VehicleTypeTest");
+		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
 		//modify population
@@ -60,7 +61,7 @@ public class FinalSoc2VehicleTypeTest {
 
 		//insert vehicles
 		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-		CreateUrbanEVTestScenario.createAndRegisterPersonalCarAndBikeVehicles(scenario);
+		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 
 		handler = new SOCHandler(scenario.getVehicles().getVehicleTypes().get(Id.create("person", VehicleType.class))); //car vehicle type currently is set to the same name as the person id
 		//controler
@@ -117,14 +118,14 @@ public class FinalSoc2VehicleTypeTest {
 
 	@Test
 	public void testInitialEnergyInIter0(){
-		Assert.assertTrue(handler.iterationInitialSOC.get(0).equals(CreateUrbanEVTestScenario.CAR_INITIAL_ENERGY));
+		Assert.assertTrue(handler.iterationInitialSOC.get(0).equals(RunUrbanEVExample.CAR_INITIAL_ENERGY));
 	}
 
 	@Test
 	public void testSOCIsDumpedIntoVehicleType(){
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create("person", VehicleType.class));
-		Assert.assertNotEquals(EVUtils.getInitialEnergy(carType.getEngineInformation()), CreateUrbanEVTestScenario.CAR_INITIAL_ENERGY);
+		Assert.assertNotEquals(EVUtils.getInitialEnergy(carType.getEngineInformation()), RunUrbanEVExample.CAR_INITIAL_ENERGY);
 		Assert.assertEquals(7.274046298718533, EVUtils.getInitialEnergy(carType.getEngineInformation()), MatsimTestUtils.EPSILON);
 	}
 

@@ -90,6 +90,7 @@ class ActivityWhileChargingFinder {
 
 		List<Tuple<Leg, Activity>> evLegsWithFollowingRealActs = evLegs.stream()
 				.map(ll -> new Tuple<>(ll, EditPlans.findRealActAfter(mobsimAgent, planElementsBeforeLeg.indexOf(ll))))
+				.filter(tuple -> !precedentActsWhileCharging.contains(tuple.getSecond())) // we need to make sure not trying to charge twice during the same activity
 				.collect(Collectors.toList());
 
 		evLegsWithFollowingRealActs.sort(Comparator.comparingDouble(tuple -> tuple.getFirst().getDepartureTime().seconds()));

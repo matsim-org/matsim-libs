@@ -1,13 +1,11 @@
 package playground.vsp.ev;
 
-import com.sun.xml.bind.v2.TODO;
 import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
@@ -22,11 +20,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,15 +51,13 @@ import java.util.stream.Collectors;
 **/
 public class UrbanEVTests {
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 	private static UrbanEVTestHandler handler;
 	private static Map<Id<Person>, List<Activity>> plannedActivitiesPerPerson;
 
 	@BeforeClass
 	public static void run(){
 		Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
-		scenario.getConfig().controler().setOutputDirectory("test/output/urbanEV/UrbanEVAgentBehaviorTest");
+		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/UrbanEVTests/");
 
 		scenario.getConfig().controler().setLastIteration(0);
 
@@ -80,11 +73,11 @@ public class UrbanEVTests {
 			scenario.getVehicles().removeVehicle(vehicleId);
 			scenario.getVehicles().removeVehicleType(type);
 		});
-		CreateUrbanEVTestScenario.createAndRegisterPersonalCarAndBikeVehicles(scenario);
+		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 
 		//this guy shall start with more energy than the others.
-		EVUtils.setInitialEnergy(scenario.getVehicles().getVehicleTypes().get(Id.create("Not enough time so charging early", VehicleType.class)).getEngineInformation(),
-				5.0);
+//		EVUtils.setInitialEnergy(scenario.getVehicles().getVehicleTypes().get(Id.create("Not enough time so charging early", VehicleType.class)).getEngineInformation(),
+//				5.0);
 
 		///controler with Urban EV module
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -137,29 +130,29 @@ public class UrbanEVTests {
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Triple Charger"));
 		Assert.assertEquals(plugins.size(), 3., 0);
 		ActivityStartEvent pluginActStart = plugins.get(0);
-		Assert.assertEquals("wrong charging start time",  2982d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start time",  1490d, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart.getLinkId().toString());
 
 		ActivityStartEvent pluginActStart2 = plugins.get(1);
-		Assert.assertEquals("wrong charging start time",  8719d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON );
+		Assert.assertEquals("wrong charging start time",  12836d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart2.getLinkId().toString());
 
 		ActivityStartEvent pluginActStart3 = plugins.get(2);
-		Assert.assertEquals("wrong charging start time",  14456d, pluginActStart3.getTime(), MatsimTestUtils.EPSILON );
+		Assert.assertEquals("wrong charging start time",  23962d, pluginActStart3.getTime(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart3.getLinkId().toString());
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Triple Charger"));
 		Assert.assertEquals(plugouts.size(), 3, 0);
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
-		Assert.assertEquals("wrong charging end time",  4069d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging end time",  3179d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging end location", "90", plugoutActStart.getLinkId().toString());
 
 		ActivityEndEvent plugoutActStart2 = plugouts.get(1);
-		Assert.assertEquals("wrong charging end time",  9805d, plugoutActStart2.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging end time",  14305d, plugoutActStart2.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging end location", "90", plugoutActStart2.getLinkId().toString());
 
 		ActivityEndEvent plugoutActStart3 = plugouts.get(2);
-		Assert.assertEquals("wrong charging end time",  15542d, plugoutActStart3.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging end time",  25430d, plugoutActStart3.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging end location", "90", plugoutActStart3.getLinkId().toString());
 	}
 
@@ -226,8 +219,9 @@ public class UrbanEVTests {
 		Assert.assertEquals("wrong charging start time",  6*3600 + 17 * 99, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart.getLinkId().toString());
 
+		//starts at 12 noon and travels 17 links à 99s
 		ActivityStartEvent pluginActStart2 = plugins.get(1);
-		Assert.assertEquals("wrong charging start time",  39396d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start time",  12*3600 + 17 * 99d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart2.getLinkId().toString());
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.get(Id.createPersonId("Double Charger"));
@@ -237,12 +231,13 @@ public class UrbanEVTests {
 		Assert.assertEquals("wrong charging end location", "90", plugoutActStart.getLinkId().toString());
 
 		ActivityEndEvent plugoutActStart2 = plugouts.get(1);
-		Assert.assertEquals("wrong charging end time",  44668d, plugoutActStart2.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging end time",  50383, plugoutActStart2.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging end location", "90", plugoutActStart2.getLinkId().toString());
 	}
 
 	@Test
 	public void testNotEnoughTimeCharger(){
+		//TODO this test succeeds if the corresponding agents is deleted
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("Not enough time so no charge"));
 		Assert.assertNull(plugins);
 
@@ -285,6 +280,7 @@ public class UrbanEVTests {
 
 	@Test
 	public void testNoRoundTripSoNoHomeCharge(){
+		//TODO this test succeeds if the corresponding agents is deleted
 		List<ActivityStartEvent> plugins = this.handler.plugInCntPerPerson.get(Id.createPersonId("No Round Trip So No Home Charge"));
 
 		Assert.assertNull(plugins);
@@ -302,8 +298,9 @@ public class UrbanEVTests {
 		Assert.assertEquals("wrong charging start time", 5*3600 + 13*99, pluginActStart.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "95", pluginActStart.getLinkId().toString());
 
+		//drives back home at 17 pm and travels 18 links
 		ActivityStartEvent pluginActStart2 = plugins.get(1);
-		Assert.assertEquals("wrong charging start time", pluginActStart2.getTime(), 13*3600 + 9*60 + 8, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong charging start time", 17*3600 + 18*99 , pluginActStart2.getTime(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong charging start location", "90", pluginActStart2.getLinkId().toString());
 
 
@@ -485,102 +482,102 @@ public class UrbanEVTests {
 
 			Plan plan5 = factory.createPlan();
 
-			Activity home51 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
-			home51.setMaximumDuration(1*1200);
+			Activity home51 = factory.createActivityFromLinkId("home", Id.createLinkId("95"));
+			home51.setEndTime(5);
 			plan5.addActivity(home51);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work51 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work51.setMaximumDuration(1*1200);
+			work51.setMaximumDuration(1*1800);
 			plan5.addActivity(work51);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity work52 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			work52.setMaximumDuration(1*1200);
+			Activity work52 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			work52.setMaximumDuration(1*1800);
 			plan5.addActivity(work52);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work53 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work53.setMaximumDuration(1*1200);
+			work53.setMaximumDuration(1*1800);
 			plan5.addActivity(work53);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity home52 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			home52.setMaximumDuration(1*1200);
+			Activity home52 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			home52.setMaximumDuration(1*1800);
 			plan5.addActivity(home52);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work54 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work54.setMaximumDuration(1*1200);
+			work54.setMaximumDuration(1*1800);
 			plan5.addActivity(work54);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity work55 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			work55.setMaximumDuration(1*1200);
+			Activity work55 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			work55.setMaximumDuration(1*1800);
 			plan5.addActivity(work55);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work56 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work56.setMaximumDuration(1*1200);
+			work56.setMaximumDuration(1*1800);
 			plan5.addActivity(work56);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity home53 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			home53.setMaximumDuration(1*1200);
+			Activity home53 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			home53.setMaximumDuration(1*1800);
 			plan5.addActivity(home53);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work57 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work57.setMaximumDuration(1*1200);
+			work57.setMaximumDuration(1*1800);
 			plan5.addActivity(work57);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity work58 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			work58.setMaximumDuration(1*1200);
+			Activity work58 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			work58.setMaximumDuration(1*1800);
 			plan5.addActivity(work58);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work59 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work59.setMaximumDuration(1*1200);
+			work59.setMaximumDuration(1*1800);
 			plan5.addActivity(work59);
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity home54 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			home54.setMaximumDuration(1*1200);
+			Activity home54 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			home54.setMaximumDuration(1*1800);
 			plan5.addActivity(home54);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work510 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work510.setMaximumDuration(1*1200);
+			work510.setMaximumDuration(1*1800);
 			plan5.addActivity(work510);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity work511 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			work511.setMaximumDuration(1*1200);
+			Activity work511 = factory.createActivityFromLinkId("work", Id.createLinkId("95"));
+			work511.setMaximumDuration(1*1800);
 			plan5.addActivity(work511);
 
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work512 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-			work512.setMaximumDuration(1*1200);
+			work512.setMaximumDuration(1*1800);
 			plan5.addActivity(work512);
 			plan5.addLeg(factory.createLeg(TransportMode.car));
 
-			Activity home55 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
-			home55.setMaximumDuration(1*1200);
+			Activity home55 = factory.createActivityFromLinkId("home", Id.createLinkId("95"));
+			home55.setMaximumDuration(1*1800);
 			plan5.addActivity(home55);
 
 
@@ -620,7 +617,7 @@ public class UrbanEVTests {
 			plan6.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work64 = factory.createActivityFromLinkId("work", Id.createLinkId("2"));
-			work64.setMaximumDuration(1200);
+			work64.setEndTime(12*3600);
 			plan6.addActivity(work64);
 
 			plan6.addLeg(factory.createLeg(TransportMode.car));
@@ -859,13 +856,13 @@ public class UrbanEVTests {
 			plan9.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity work96= factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-			work96.setMaximumDuration(1*1200);
+			work96.setEndTime(17*3600);
 			plan9.addActivity(work96);
 
 			plan9.addLeg(factory.createLeg(TransportMode.car));
 
 			Activity home92 = factory.createActivityFromLinkId("home", Id.createLinkId("90"));
-			home92.setEndTime(1200);
+			home92.setEndTime(18*3600);
 			plan9.addActivity(home92);
 
 
