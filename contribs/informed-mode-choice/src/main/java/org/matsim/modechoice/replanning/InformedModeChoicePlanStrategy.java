@@ -329,7 +329,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 				Collection<PlanCandidate> candidates = ctx.generator.generate(model, null,
 						mask, config.getTopK() + planHistory.avoidList.size(), 0, threshold);
 
-				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModes()) || planHistory.avoidList.contains(c.getModes()));
+				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModesMutable()) || planHistory.avoidList.contains(c.getModes()));
 				if (!candidates.isEmpty()) {
 
 					PlanCandidate select = ctx.selector.select(candidates);

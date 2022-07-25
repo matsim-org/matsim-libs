@@ -127,7 +127,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				}
 
 				Collection<PlanCandidate> candidates = ctx.generator.generate(model, null, mask);
-				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModes()));
+				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModesMutable()));
 
 				if (!candidates.isEmpty()) {
 

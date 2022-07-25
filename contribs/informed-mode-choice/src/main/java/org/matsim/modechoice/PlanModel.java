@@ -89,10 +89,19 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	}
 
 	/**
-	 * The current used modes of the original plan.
+	 * The current used modes of the original plan. Returns a copy, so it should be used sparingly.
+	 *
+	 * @see #getCurrentModesMutable()
 	 */
 	public String[] getCurrentModes() {
 		return Arrays.copyOf(currentModes, currentModes.length);
+	}
+
+	/**
+	 * Mutable view on the current used modes.
+	 */
+	public String[] getCurrentModesMutable() {
+		return currentModes;
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package org.matsim.modechoice.commands;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.population.Person;
@@ -25,6 +28,11 @@ public class AnalyzeChoices implements MATSimAppCommand {
 	@CommandLine.Parameters(paramLabel = "INPUT", arity = "1")
 	private List<Path> input;
 
+	@CommandLine.Option(names = "--modes", description = "Modes to include for distance estimate", defaultValue = "car,walk,bike,pt,ride", split = ",")
+	private Set<String> modes;
+
+	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
+	private String subpopulation;
 	@CommandLine.Option(names = "--output", description = "Output tsv", required = true)
 	private Path output;
 
@@ -40,11 +48,19 @@ public class AnalyzeChoices implements MATSimAppCommand {
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output), CSVFormat.MONGODB_TSV)) {
 
-			printer.printRecord("person", "k", "selected", "score", "type", "estimate", "dist");
+			List<String> header = ObjectArrayList.of("person", "k", "selected", "score", "type", "estimate");
+
+			for (String mode : modes) {
+				header.add(mode + "_dist");
+			}
+
+			printer.printRecord(header);
+
+			Object2DoubleMap<String> dists = new Object2DoubleArrayMap<>();
 
 			for (Person person : population.getPersons().values()) {
 
-				if (!"person".equals(PopulationUtils.getSubpopulation(person)))
+				if (!subpopulation.isEmpty() && !subpopulation.equals(PopulationUtils.getSubpopulation(person)))
 					continue;
 
 				List<Plan> plans = person.getPlans().stream()
@@ -73,15 +89,31 @@ public class AnalyzeChoices implements MATSimAppCommand {
 
 				plans.removeAll(toRemove);
 
+				dists.clear();
+
 				for (int k = 0; k < plans.size(); k++) {
 
 					Plan plan = plans.get(k);
 
 					PlanModel model = PlanModel.newInstance(plan);
 
-					printer.printRecord(person.getId(), k, person.getSelectedPlan() == plan ? 1 : 0, plan.getScore(),
-							plan.getType(), plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR), model.distance()
-					);
+					// Distance stats over all modes
+					for (String m : modes) {
+						double dist = 0;
+						String[] planModes = model.getCurrentModesMutable();
+						for (int i = 0; i < planModes.length; i++) {
+							if (m.equals(planModes[i]))
+								dist += model.distance(i);
+						}
+						dists.put(m, dist);
+					}
+
+					ObjectArrayList<Object> record = ObjectArrayList.of(person.getId(), k, person.getSelectedPlan() == plan ? 1 : 0, plan.getScore(),
+							plan.getType(), plan.getAttributes().getAttribute(PlanCandidate.ESTIMATE_ATTR));
+
+					record.addAll(dists.values());
+
+					printer.printRecord(record);
 				}
 			}
 		}
