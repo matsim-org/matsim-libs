@@ -125,7 +125,7 @@ public class FinalSoc2VehicleTypeTest {
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create("person", VehicleType.class));
 		Assert.assertNotEquals(EVUtils.getInitialEnergy(carType.getEngineInformation()), CreateUrbanEVTestScenario.CAR_INITIAL_ENERGY);
-		Assert.assertEquals(4.04297917065838, EVUtils.getInitialEnergy(carType.getEngineInformation()), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(7.274046298718533, EVUtils.getInitialEnergy(carType.getEngineInformation()), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
