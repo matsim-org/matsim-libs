@@ -141,7 +141,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	}
 
 	static double calcVehicleSlackTime(DvrpVehicle vehicle, double now) {
-		DefaultStayTask lastTask = (DefaultStayTask)Schedules.getLastTask(vehicle.getSchedule());
+		var lastTask = Schedules.getLastTask(vehicle.getSchedule());
 		//if the last task is started, take 'now', otherwise take the planned begin time
 		double availableFromTime = Math.max(lastTask.getBeginTime(), now);
 		//for an already delayed vehicle, assume slack is 0 (instead of a negative number)
