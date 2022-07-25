@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
@@ -41,21 +40,20 @@ import java.util.Collection;
 import java.util.List;
 
 
-class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-		ReplanningListener, IterationStartsListener {
-	private static final Logger log = Logger.getLogger(LSPControlerListenerImpl.class);
+class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+							  ReplanningListener, IterationStartsListener{
+	private static final Logger log = Logger.getLogger( LSPControlerListener.class );
 	private final Carriers carriers;
 	private final Scenario scenario;
-	private final Collection<LSPEventCreator> creators;
+
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
 	private CarrierAgentTracker carrierResourceTracker;
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
 
-	@Inject LSPControlerListenerImpl( Scenario scenario, Collection<LSPEventCreator> creators ) {
+	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
-		this.creators = creators;
 		this.carriers = getCarriers();
 	}
 
@@ -65,7 +63,7 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
-		carrierResourceTracker = new CarrierAgentTracker(carriers, creators, eventsManager);
+		carrierResourceTracker = new CarrierAgentTracker(carriers, eventsManager );
 		eventsManager.addHandler(carrierResourceTracker);
 
 		for (LSP lsp : lsps.getLSPs().values()) {
@@ -144,9 +142,7 @@ class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListe
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
 			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
 				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
-					if (element.getResource() instanceof LSPCarrierResource) {
-
-						LSPCarrierResource carrierResource = (LSPCarrierResource) element.getResource();
+					if( element.getResource() instanceof LSPCarrierResource carrierResource ) {
 						Carrier carrier = carrierResource.getCarrier();
 						if (!carriers.getCarriers().containsKey(carrier.getId())) {
 							carriers.addCarrier(carrier);
