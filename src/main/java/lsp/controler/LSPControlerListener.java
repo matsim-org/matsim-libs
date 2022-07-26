@@ -49,7 +49,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	private final Scenario scenario;
 
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
-	private CarrierAgentTracker carrierResourceTracker;
+//	private CarrierAgentTracker carrierResourceTracker;
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
@@ -66,8 +66,8 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
-		carrierResourceTracker = new CarrierAgentTracker(carriers, carrierScoringFunctionFactory, eventsManager );
-		eventsManager.addHandler(carrierResourceTracker);
+//		carrierResourceTracker = new CarrierAgentTracker(carriers, carrierScoringFunctionFactory, eventsManager );
+//		eventsManager.addHandler(carrierResourceTracker);
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 
@@ -137,8 +137,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	}
 
 
-	@Provides
-	private Carriers getCarriers() {
+	Carriers getCarriers() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		Carriers carriers = new Carriers();
@@ -158,9 +157,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		return carriers;
 	}
 
-	public CarrierAgentTracker getCarrierResourceTracker() {
-		return carrierResourceTracker;
-	}
+//	public CarrierAgentTracker getCarrierResourceTracker() {
+//		return carrierResourceTracker;
+//	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightAgentSource;
@@ -51,6 +52,9 @@ public class LSPModule extends AbstractModule {
 
 		bind(LSPControlerListener.class).in(Singleton.class);
 		addControlerListenerBinding().to(LSPControlerListener.class);
+
+		bind( CarrierAgentTracker.class ).in( Singleton.class );
+		addEventHandlerBinding().to( CarrierAgentTracker.class );
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule(getConfig(), QSimComponentsConfigGroup.class);
@@ -92,8 +96,11 @@ public class LSPModule extends AbstractModule {
 
 	}
 
-	@Provides CarrierAgentTracker provideCarrierResourceTracker(LSPControlerListener lspControlerListener) {
-		return lspControlerListener.getCarrierResourceTracker();
+//	@Provides CarrierAgentTracker provideCarrierResourceTracker(LSPControlerListener lspControlerListener) {
+//		return lspControlerListener.getCarrierResourceTracker();
+//	}
+	@Provides Carriers provideCarriers( LSPControlerListener lspControlerListener ) {
+		return lspControlerListener.getCarriers();
 	}
 
 	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScoringFunctionFactory {
