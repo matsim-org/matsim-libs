@@ -28,12 +28,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
+	@Inject @Nullable private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
@@ -62,7 +65,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
-		carrierResourceTracker = new CarrierAgentTracker(carriers, null, eventsManager );
+		carrierResourceTracker = new CarrierAgentTracker(carriers, carrierScoringFunctionFactory, eventsManager );
 		eventsManager.addHandler(carrierResourceTracker);
 
 		for (LSP lsp : lsps.getLSPs().values()) {
