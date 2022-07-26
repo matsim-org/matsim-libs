@@ -2,6 +2,9 @@ package org.matsim.modechoice;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.modechoice.estimators.ActivityEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
@@ -20,6 +23,12 @@ public final class PlanModelService {
 
 	@Inject
 	private Map<String, TripEstimator<?>> tripEstimator;
+
+	@Inject
+	private ActivityEstimator actEstimator;
+
+	@Inject
+	private TimeInterpretation timeInterpretation;
 
 	private final InformedModeChoiceConfigGroup config;
 	private final Map<String, ModeOptions<?>> options;
@@ -76,9 +85,6 @@ public final class PlanModelService {
 	 */
 	public void calculateEstimates(EstimatorContext context, PlanModel planModel) {
 
-		// estimates only consider the leg score by using a certain mode
-		// early or late arrival can also have an effect on the activity scores which is not considered here
-
 		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
 
 			for (ModeEstimate c : e.getValue()) {
@@ -117,8 +123,12 @@ public final class PlanModelService {
 						estimate += tripEstimate;
 					}
 
+					double tt = 0;
+
 					for (Leg leg : legs) {
 						String legMode = leg.getMode();
+
+						tt += timeInterpretation.decideOnLegTravelTime(leg).orElse(0);
 
 						// Already scored with the trip estimator
 						if (tripEst != null && legMode.equals(c.getMode()))
@@ -131,6 +141,11 @@ public final class PlanModelService {
 
 						estimate += legEst.estimate(context, legMode, leg, c.getOption());
 					}
+
+					TripStructureUtils.Trip trip = planModel.getTrip(i);
+
+					// early or late arrival can also have an effect on the activity scores which is potentially considered here
+					estimate += actEstimator.estimate(context, planModel.getStartTimes()[i] + tt, trip.getDestinationActivity());
 
 					values[i] = estimate;
 				}

@@ -28,6 +28,12 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	private final String[] currentModes;
 
 	/**
+	 * Stored trip start times. Depends on the current modes.
+	 * This will only be re-estimated during routing.
+	 */
+	private final double[] startTimes;
+
+	/**
 	 * Routed trips for each mode and all legs.
 	 */
 	private final Map<String, List<Leg>[]> legs;
@@ -64,6 +70,7 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		this.legs = new HashMap<>();
 		this.estimates = new HashMap<>();
 		this.currentModes = new String[trips.length];
+		this.startTimes = new double[trips.length];
 
 		setCurrentModes(tripList);
 	}
@@ -102,6 +109,13 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 */
 	public String[] getCurrentModesMutable() {
 		return currentModes;
+	}
+
+	/**
+	 * Return view on cached trip start times.
+	 */
+	public double[] getStartTimes() {
+		return startTimes;
 	}
 
 	/**

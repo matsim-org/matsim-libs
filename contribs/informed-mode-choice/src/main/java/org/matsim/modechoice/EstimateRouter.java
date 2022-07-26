@@ -3,11 +3,9 @@ package org.matsim.modechoice;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.facilities.ActivityFacilities;
@@ -40,15 +38,10 @@ public final class EstimateRouter {
 	 */
 	public void routeModes(PlanModel model, Collection<String> modes) {
 
-		double[] startTimes = new double[model.trips()];
+		double[] startTimes = model.getStartTimes();
 
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
-
-		for (int i = 0; i < model.trips() - 1; i++) {
-			TripStructureUtils.Trip oldTrip = model.getTrip(i);
-
-			startTimes[i + 1] = advanceTimetracker(timeTracker, oldTrip, model);
-		}
+		calcStartTimes(model, timeTracker, startTimes, model.trips());
 
 		for (String mode : modes) {
 
@@ -61,7 +54,6 @@ public final class EstimateRouter {
 				final String routingMode = TripStructureUtils.identifyMainMode(oldTrip.getTripElements());
 
 				timeTracker.setTime(startTimes[i]);
-				timeTracker.addActivity(oldTrip.getOriginActivity());
 
 				// Ignored mode
 				if (!modes.contains(routingMode)) {
@@ -119,25 +111,20 @@ public final class EstimateRouter {
 	 */
 	public void routeSingleTrip(PlanModel model, Collection<String> modes, int idx) {
 
+		double[] startTimes = model.getStartTimes();
 		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
-		for (int i = 0; i < idx; i++) {
-			TripStructureUtils.Trip oldTrip = model.getTrip(i);
-			advanceTimetracker(timeTracker, oldTrip, model);
-		}
+		// Plus one so that start time idx is calculated
+		calcStartTimes(model, timeTracker, startTimes, idx + 1);
 
 		TripStructureUtils.Trip oldTrip = model.getTrip(idx);
 
 		Facility from = FacilitiesUtils.toFacility(oldTrip.getOriginActivity(), facilities);
 		Facility to = FacilitiesUtils.toFacility(oldTrip.getDestinationActivity(), facilities);
 
-		// store time before this trip starts
-		OptionalTime t = timeTracker.getTime();
-
 		for (String mode : modes) {
 
-			timeTracker.setTime(t.seconds());
-			timeTracker.addActivity(oldTrip.getOriginActivity());
+			timeTracker.setTime(startTimes[idx]);
 
 			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(
 					mode, from, to,
@@ -165,11 +152,26 @@ public final class EstimateRouter {
 	}
 
 	/**
+	 * Calculate the starting times for each trip.
+	 */
+	private void calcStartTimes(PlanModel model, TimeTracker timeTracker, double[] startTimes, int until) {
+
+		if (model.trips() == 0)
+			return;
+
+		timeTracker.addActivity(model.getTrip(0).getOriginActivity());
+		startTimes[0] = timeTracker.getTime().seconds();
+
+		for (int i = 0; i < until - 1; i++) {
+			TripStructureUtils.Trip oldTrip = model.getTrip(i);
+			startTimes[i + 1] = advanceTimetracker(timeTracker, oldTrip, model);
+		}
+	}
+
+	/**
 	 * Use time information of existing routes or compute routes if necessary.
 	 */
 	private double advanceTimetracker(TimeTracker timeTracker, TripStructureUtils.Trip oldTrip, PlanModel plan) {
-		timeTracker.addActivity(oldTrip.getOriginActivity());
-
 		List<Leg> oldLegs = oldTrip.getLegsOnly();
 		boolean undefined = oldLegs.stream().anyMatch(l -> timeInterpretation.decideOnLegTravelTime(l).isUndefined());
 
@@ -181,6 +183,8 @@ public final class EstimateRouter {
 
 		} else
 			timeTracker.addElements(oldLegs);
+
+		timeTracker.addActivity(oldTrip.getDestinationActivity());
 
 		return timeTracker.getTime().seconds();
 	}

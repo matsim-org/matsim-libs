@@ -7,6 +7,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.modechoice.constraints.TripConstraint;
+import org.matsim.modechoice.estimators.ActivityEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
@@ -53,6 +54,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		});
 		bindAllModes(builder.options, new TypeLiteral<>() {
 		});
+
+		bind(ActivityEstimator.class).to(builder.activityEstimator).in(Singleton.class);
 
 		// Not singleton, they should be able to be created per thread if necessary.
 		bind(EstimateRouter.class);
@@ -132,6 +135,8 @@ public final class InformedModeChoiceModule extends AbstractModule {
 
 		private final Map<String, CandidatePruner> pruner = new HashMap<>();
 
+		private Class<? extends ActivityEstimator> activityEstimator = ActivityEstimator.None.class;
+
 		/**
 		 * Adds a fixed cost to one or more modes.
 		 */
@@ -196,6 +201,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		 */
 		public Builder withPruner(String name, CandidatePruner pruner) {
 			this.pruner.put(name, pruner);
+			return this;
+		}
+
+		public Builder withActivityEstimator(Class<? extends ActivityEstimator> activityEstimator) {
+			this.activityEstimator = activityEstimator;
 			return this;
 		}
 

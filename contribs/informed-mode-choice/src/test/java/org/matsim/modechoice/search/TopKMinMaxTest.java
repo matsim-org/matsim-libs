@@ -1,13 +1,9 @@
 package org.matsim.modechoice.search;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.TypeLiteral;
+import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.assertj.core.api.InstanceOfAssertFactory;
 import org.assertj.core.data.Offset;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,14 +21,11 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.constraints.TripConstraint;
-import org.matsim.modechoice.estimators.FixedCostsEstimator;
-import org.matsim.modechoice.estimators.LegEstimator;
-import org.matsim.modechoice.estimators.MinMaxEstimate;
-import org.matsim.modechoice.estimators.TripEstimator;
+import org.matsim.modechoice.estimators.*;
+import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.testcases.MatsimTestUtils;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -179,6 +172,8 @@ public class TopKMinMaxTest {
 
 			PopulationFactory f = PopulationUtils.getFactory();
 
+			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
+
 			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then(new Answer<List<PlanElement>>() {
 				@Override
 				public List<PlanElement> answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -234,7 +229,13 @@ public class TopKMinMaxTest {
 
 			bind(ScoringParametersForPerson.class).toInstance(person -> scoring.build());
 			bind(InformedModeChoiceConfigGroup.class).toInstance(ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class));
+			bind(ActivityEstimator.class).to(ActivityEstimator.None.class);
 
+		}
+
+		@Provides
+		protected CandidatePruner pruner() {
+			return null;
 		}
 	}
 
