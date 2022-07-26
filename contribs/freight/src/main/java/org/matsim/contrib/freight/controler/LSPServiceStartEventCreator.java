@@ -39,7 +39,7 @@ import org.matsim.contrib.freight.events.LSPServiceStartEvent;
 			if( startEvent.getActType().equals(FreightConstants.SERVICE) ) {
 				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
 				if( element instanceof ServiceActivity serviceActivity ) {
-					return new LSPServiceStartEvent(startEvent, carrier.getId(), serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
+					return new LSPServiceStartEvent(carrier.getId(), serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle().getId());
 				}
 			}	
 		}

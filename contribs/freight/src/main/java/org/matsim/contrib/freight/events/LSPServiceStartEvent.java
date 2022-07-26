@@ -22,30 +22,37 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
+
+import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 public final class LSPServiceStartEvent extends Event{
 
 	public static final String EVENT_TYPE = "LspServiceStarts";
 
-	private final CarrierService service;
+	private final Id<CarrierService> serviceId;
+
+	private final Id<Link> linkId;
+
 	private final Id<Carrier> carrierId;
-	private final CarrierVehicle vehicle;
-	private final ActivityStartEvent event;
-	
-	public LSPServiceStartEvent(ActivityStartEvent event, Id<Carrier> carrierId, CarrierService service, double time, CarrierVehicle vehicle) {
+	private final Id<Vehicle> vehicleId;
+	private final double serviceDuration;
+	private final int capacityDemand;
+
+	public LSPServiceStartEvent(Id<Carrier> carrierId, CarrierService service, double time, Id<Vehicle> vehicleId) {
 		super(time);
+		this.serviceId = service.getId();
+		this.linkId = service.getLocationLinkId();
 		this.carrierId = carrierId;
-		this.service = service;
-		this.vehicle = vehicle;
-		this.event = event;
+		this.vehicleId = vehicleId;
+		this.serviceDuration = service.getServiceDuration();
+		this.capacityDemand = service.getCapacityDemand();
 	}
 
 	@Override
@@ -53,29 +60,39 @@ public final class LSPServiceStartEvent extends Event{
 		return EVENT_TYPE;
 	}
 
-	public CarrierService getService() {
-		return service;
+	public Id<CarrierService> getServiceId() {
+		return serviceId;
+	}
+
+	public Id<Link> getLinkId() {
+		return linkId;
 	}
 
 	public Id<Carrier> getCarrierId() {
 		return carrierId;
 	}
 
-	public CarrierVehicle getVehicle() {
-		return vehicle;
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+
+	public double getServiceDuration() {
+		return serviceDuration;
+	}
+
+	public int getCapacityDemand() {
+		return this.capacityDemand;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		if (service.getLocationLinkId() != null) {
-			attr.put(FreightEventAttributes.ATTRIBUTE_LINK, service.getLocationLinkId().toString());
-		}
-		attr.put(FreightEventAttributes.ATTRIBUTE_ACTTYPE, event.getActType());
-		attr.put(FreightEventAttributes.ATTRIBUTE_SERVICE, service.getId().toString());
-		attr.put(FreightEventAttributes.ATTRIBUTE_VEHICLE, vehicle.getId().toString() );
-		attr.put(FreightEventAttributes.ATTRIBUTE_CARRIER, carrierId.toString());
+		attr.put(ATTRIBUTE_SERVICE, serviceId.toString());
+		attr.put(ATTRIBUTE_LINK, linkId.toString());
+		attr.put(ATTRIBUTE_CARRIER, carrierId.toString());
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
+		attr.put(ATTRIBUTE_SERVICEDURATION, String.valueOf(serviceDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
 	}
-	
 }

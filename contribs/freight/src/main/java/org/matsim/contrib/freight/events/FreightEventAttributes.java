@@ -31,4 +31,5 @@ public class FreightEventAttributes {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_TOUR = "tour";
 	public static final String ATTRIBUTE_SERVICEDURATION = "serviceDuration";
+	public static final String ATTRIBUTE_CAPACITYDEMAND = "capacityDemand";
 }

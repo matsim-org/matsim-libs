@@ -162,9 +162,11 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	public void handleEvent(ShipmentPickedUpEvent event) {
 		shipmentTracking.trackPickedUpEvent(event);
 		// as we know the driver of the shipment now, we can assign the shipment's carrier to the driver's vehicle.
-		if (shipmentTracking.getShipments().containsKey(event.getShipment().getId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
-			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), shipmentTracking.getShipments().get(event.getShipment()).carrierId);
-		}
+		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
+		log.error("Need a fix, since we are not having the drivers in here any more");
+//		if (shipmentTracking.getShipments().containsKey(event.getShipment().getId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
+//			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), shipmentTracking.getShipments().get(event.getShipment()).carrierId);
+//		}
 	}
 
 	@Override
@@ -176,9 +178,11 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	public void handleEvent(LSPServiceStartEvent event) {
 		serviceTracking.handleStartEvent(event);
 		// as we know the driver of a service now, we can assign the shipment's carrier to the driver's vehicle.
-		if (serviceTracking.getCarrierServiceTrackers().containsKey(event.getService().getId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
-			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), serviceTracking.getCarrierServiceTrackers().get(event.getService()).carrierId);
-		}
+		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
+		log.error("Need a fix, since we are not having the drivers in here any more");
+//		if (serviceTracking.getCarrierServiceTrackers().containsKey(event.getServiceId()) && vehicleTracking.getDriver2VehicleId(event.getDriverId())!=null){
+//			vehicleTracking.addCarrier2Vehicle(vehicleTracking.getDriver2VehicleId(event.getDriverId()), serviceTracking.getCarrierServiceTrackers().get(event.getServiceId()).carrierId);
+//		}
 	}
 
 

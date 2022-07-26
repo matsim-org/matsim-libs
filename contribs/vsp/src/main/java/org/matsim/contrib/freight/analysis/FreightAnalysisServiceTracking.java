@@ -89,9 +89,9 @@ class FreightAnalysisServiceTracking {
 	// UNTESTED handling of LSP Service events that provided reliable info about driver and timestamps.
 	public void handleStartEvent(LSPServiceStartEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
-			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getService().getId())){
-				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getService().getId());
-				service.driverId = event.getDriverId();
+			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
+				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
+//				service.driverId = event.getDriverId();
 				service.startTime = event.getTime();
 			}
 		}
