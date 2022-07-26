@@ -70,8 +70,8 @@ import org.matsim.vehicles.Vehicle;
 	@Override
 	public void handleEvent(LSPServiceStartEvent event) {
 		totalNumberOfShipments++;
-		totalWeightOfShipments = totalWeightOfShipments + event.getService().getCapacityDemand();
-		tuples.add(new ServiceTuple(event.getService().getId(), event.getTime()));
+		totalWeightOfShipments = totalWeightOfShipments + event.getCapacityDemand();
+		tuples.add(new ServiceTuple(event.getServiceId(), event.getTime()));
 	}
 
 	public double getTotalLoadingCosts() {
