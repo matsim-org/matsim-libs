@@ -62,7 +62,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
-		carrierResourceTracker = new CarrierAgentTracker(carriers, eventsManager );
+		carrierResourceTracker = new CarrierAgentTracker(carriers, null, eventsManager );
 		eventsManager.addHandler(carrierResourceTracker);
 
 		for (LSP lsp : lsps.getLSPs().values()) {
