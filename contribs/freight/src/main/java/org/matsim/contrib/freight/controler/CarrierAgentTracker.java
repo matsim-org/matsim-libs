@@ -64,26 +64,20 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 	private final List<CarrierAgent> carrierAgents = new ArrayList<>();
 	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new LinkedHashMap<>();
 	private final Collection<LSPEventCreator> lspEventCreators;
+	enum RunningFrom { Carriers, Lsp };
+	private final RunningFrom runningFrom;
 
-	@Inject CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
+	@Inject public CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
+		if ( carrierScoringFunctionFactory==null ) {
+			this.runningFrom = RunningFrom.Lsp;
+		} else{
+			this.runningFrom = RunningFrom.Carriers;
+		}
 		this.carriers = carriers;
 		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
 		this.events = events;
-		this.lspEventCreators=null;
+		this.lspEventCreators=LSPEventCreatorUtils.getStandardEventCreators();
 		this.reset(-1);
-	}
-	public CarrierAgentTracker( Carriers carriers, EventsManager events ) {
-		// yyyy needs to be public because of LSP. kai, sep'20
-
-		this.carriers = carriers;
-		this.lspEventCreators = LSPEventCreatorUtils.getStandardEventCreators();
-
-		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( carrier, events, lspEventCreators ) );
-		}
-
-		carrierScoringFunctionFactory = null;
-		this.events = events;
 	}
 
 	@Override
@@ -92,7 +86,15 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 		driverAgentMap.clear();
 		carrierAgents.clear();
 		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction(carrier), events, lspEventCreators ) );
+			switch( runningFrom ) {
+				case Carriers -> {
+					carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction( carrier ), events, lspEventCreators ) );
+				}
+				case Lsp -> {
+					carrierAgents.add( new CarrierAgent( carrier, null, events, lspEventCreators ) );
+				}
+				default -> throw new IllegalStateException( "Unexpected value: " + runningFrom );
+			}
 		}
 	}
 

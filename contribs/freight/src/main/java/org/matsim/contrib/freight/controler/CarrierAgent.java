@@ -70,26 +70,30 @@ class CarrierAgent
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-	private ScoringFunction scoringFunction;
+	private final ScoringFunction scoringFunction;
 	private final EventsManager events;
 	private final Collection<LSPEventCreator> lspEventCreators;
+	private final CarrierAgentTracker.RunningFrom runningFrom;
 
 	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<LSPEventCreator> lspEventCreators ) {
+		if ( carrierScoringFunction==null ) {
+			runningFrom = CarrierAgentTracker.RunningFrom.Lsp;
+		} else {
+			runningFrom = CarrierAgentTracker.RunningFrom.Carriers;
+		}
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
 		this.events = events;
 		this.lspEventCreators = lspEventCreators;
-
-		Gbl.assertNotNull(carrierScoringFunction);
 	}
 
-	CarrierAgent( Carrier carrier, EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
-		this.carrier = carrier;
-		this.id = carrier.getId();
-		this.events = events;
-		this.lspEventCreators = lspEventCreators;
-	}
+//	CarrierAgent( Carrier carrier, EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
+//		this.carrier = carrier;
+//		this.id = carrier.getId();
+//		this.events = events;
+//		this.lspEventCreators = lspEventCreators;
+//	}
 
 
 	public Id<Carrier> getId() {
