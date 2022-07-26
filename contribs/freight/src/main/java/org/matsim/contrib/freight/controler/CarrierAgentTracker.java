@@ -37,6 +37,8 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 
+import javax.annotation.Nullable;
+
 /**
  * This keeps track of all carrierAgents during simulation.
  * 
@@ -67,7 +69,7 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 	enum RunningFrom { Carriers, Lsp };
 	private final RunningFrom runningFrom;
 
-	@Inject public CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
+	@Inject CarrierAgentTracker( Carriers carriers, @Nullable CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
 		if ( carrierScoringFunctionFactory==null ) {
 			this.runningFrom = RunningFrom.Lsp;
 		} else{
