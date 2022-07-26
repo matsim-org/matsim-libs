@@ -36,7 +36,6 @@ public final class LSPTourEndEvent extends Event{
 	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE;
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
-	public static final String ATTRIBUTE_DRIVER = "driver";
 	public static final String ATTRIBUTE_TOUR = "tour";	
 	
 	

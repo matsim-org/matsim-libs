@@ -27,6 +27,7 @@ public abstract class FreightConstants {
 	public static final String DELIVERY = "delivery";
 	public static final String START = "start";
 	public static final String END = "end";
+	public static final String SERVICE = "service";
 	
 //	public static final String 
 
