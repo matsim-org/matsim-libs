@@ -24,6 +24,7 @@ import lsp.replanning.LSPReplanner;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -49,6 +50,7 @@ public final class LSPUtils {
 	}
 
 	public static void addLSPs(Scenario scenario, LSPs lsps) {
+		FreightUtils.addOrGetCarriers( scenario );
 		scenario.addScenarioElement(lspsString, lsps);
 	}
 

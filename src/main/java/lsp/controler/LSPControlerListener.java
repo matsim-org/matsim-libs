@@ -21,6 +21,7 @@
 package lsp.controler;
 
 
+import com.google.inject.Provides;
 import lsp.*;
 import lsp.shipment.LSPShipment;
 import org.apache.log4j.Logger;
@@ -136,6 +137,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	}
 
 
+	@Provides
 	private Carriers getCarriers() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
