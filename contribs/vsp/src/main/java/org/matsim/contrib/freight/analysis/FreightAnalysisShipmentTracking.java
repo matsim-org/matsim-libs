@@ -82,7 +82,8 @@ class FreightAnalysisShipmentTracking {
 		if (shipments.containsKey(event.getShipment().getId())) {
 			CarrierShipment shipment = event.getShipment();
 			shipments.get(shipment.getId()).pickUpTime = event.getTime();
-			shipments.get(shipment.getId()).driverId = event.getDriverId();
+			//FixMe: Driver is no longer part of the events... kmt jul22
+//			shipments.get(shipment.getId()).driverId = event.getDriverId();
 		}
 	}
 
