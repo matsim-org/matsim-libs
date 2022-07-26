@@ -130,9 +130,9 @@ class CarrierAgent
 					Route route = tourLeg.getRoute();
 
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
-					// yy At least in EquilWithoutCarrierWithPassIT, it runs through even without the above line ... but it looks
-					// like the simulation is not generating kilometers.  Presumably, there is no equivalent to "prepareForSim"
-					// for carriers.  Did not check any further.  kai, jul'22
+					// yy At least in EquilWithoutCarrierWithPassIT and routes removed, it runs through even without the above
+					// line ... but it looks like the simulation is not generating kilometers.  Presumably, there is no equivalent
+					// to "prepareForSim" for carriers.  Did not check any further.  kai, jul'22
 
 					//this returns TransportMode.car if the attribute is null
 					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));

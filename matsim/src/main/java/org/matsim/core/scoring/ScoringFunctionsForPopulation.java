@@ -106,8 +106,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	private void init() {
 		for (Person person : this.population.getPersons().values()) {
-			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
-			this.agentScorers.put(person.getId(), data);
+			this.agentScorers.put(person.getId(), this.scoringFunctionFactory.createNewScoringFunction(person ) );
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
 			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
