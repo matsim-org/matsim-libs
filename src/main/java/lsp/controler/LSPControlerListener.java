@@ -129,7 +129,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		eventsManager.removeHandler(carrierResourceTracker);
+//		eventsManager.removeHandler(carrierResourceTracker);
 	}
 
 
