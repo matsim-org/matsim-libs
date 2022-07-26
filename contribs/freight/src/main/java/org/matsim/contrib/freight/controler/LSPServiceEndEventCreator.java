@@ -21,11 +21,9 @@
 
 package org.matsim.contrib.freight.controler;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
@@ -38,12 +36,12 @@ import java.util.Objects;
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-							 Id<Person> driverId, int activityCounter) {
+							 int activityCounter) {
 		if(event instanceof ActivityEndEvent endEvent){
 			if(Objects.equals(endEvent.getActType(), "service")) {
 				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
 				if(element instanceof ServiceActivity serviceActivity) {
-					return new LSPServiceEndEvent(carrier.getId(), driverId, serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
+					return new LSPServiceEndEvent(carrier.getId(), serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
 				}
 			}	
 		}

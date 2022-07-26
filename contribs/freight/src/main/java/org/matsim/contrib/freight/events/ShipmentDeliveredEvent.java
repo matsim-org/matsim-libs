@@ -35,23 +35,17 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
  */
 public class ShipmentDeliveredEvent extends Event {
 
-	private CarrierShipment shipment;
-	private Id<Carrier> carrierId;
-	private Id<Person> driverId;
+	private final CarrierShipment shipment;
+	private final Id<Carrier> carrierId;
 	
-	public ShipmentDeliveredEvent(Id<Carrier> carrierId, Id<Person> driverId, CarrierShipment shipment, double time) {
+	public ShipmentDeliveredEvent(Id<Carrier> carrierId, CarrierShipment shipment, double time) {
 		super(time);
 		this.shipment = shipment;
-		this.driverId = driverId;
 		this.carrierId = carrierId;
 	}
 
 	public Id<Carrier> getCarrierId() {
 		return carrierId;
-	}
-
-	public Id<Person> getDriverId() {
-		return driverId;
 	}
 
 	public CarrierShipment getShipment() {

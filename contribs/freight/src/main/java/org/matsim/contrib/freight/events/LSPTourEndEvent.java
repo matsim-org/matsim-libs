@@ -41,14 +41,12 @@ public final class LSPTourEndEvent extends Event{
 	
 	
 	private final Id<Carrier> carrierId;
-	private final Id<Person> driverId;
 	private final Tour tour;
 	private final CarrierVehicle vehicle;
 	
-	public LSPTourEndEvent(Id<Carrier>  carrierId, Id<Person> driverId, Tour tour, double time, CarrierVehicle vehicle) {
+	public LSPTourEndEvent(Id<Carrier>  carrierId, Tour tour, double time, CarrierVehicle vehicle) {
 		super(time);
 		this.carrierId = carrierId;
-		this.driverId = driverId;
 		this.tour = tour;
 		this.vehicle = vehicle;
 	}
@@ -60,10 +58,6 @@ public final class LSPTourEndEvent extends Event{
 
 	public Id<Carrier> getCarrierId() {
 		return carrierId;
-	}
-
-	public Id<Person> getDriverId() {
-		return driverId;
 	}
 
 	public Tour getTour() {
@@ -80,7 +74,6 @@ public final class LSPTourEndEvent extends Event{
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicle.getId().toString() );
 		attr.put(ATTRIBUTE_LINK, this.tour.getStartLinkId().toString());
 		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
-		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());
 		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
 		return attr;
 	}

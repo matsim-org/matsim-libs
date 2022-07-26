@@ -24,10 +24,8 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
@@ -41,15 +39,15 @@ public final class LSPServiceEndEvent extends Event {
 	private final Id<CarrierService> serviceId;
 	private final Id<Link> linkId;
 	private final Id<Carrier> carrierId;
-	private final Id<Person> driverId;
+//	private final Id<Person> driverId;
 	private final Id<Vehicle> vehicleId;
 	private final double serviceDuration;
 
-	public LSPServiceEndEvent(Id<Carrier> carrierId, Id<Person> driverId, CarrierService service, double time, CarrierVehicle vehicle) {
+	public LSPServiceEndEvent(Id<Carrier> carrierId, CarrierService service, double time, CarrierVehicle vehicle) {
 		super(time);
 		this.serviceId = service.getId();
 		this.linkId = service.getLocationLinkId();
-		this.driverId = driverId;
+//		this.driverId = driverId;
 		this.carrierId = carrierId;
 		this.vehicleId = vehicle.getId();
 		this.serviceDuration = service.getServiceDuration();
@@ -68,9 +66,9 @@ public final class LSPServiceEndEvent extends Event {
 		return linkId;
 	}
 
-	public Id<Person> getDriverId() {
-		return driverId;
-	}
+//	public Id<Person> getDriverId() {
+//		return driverId;
+//	}
 
 	public Id<CarrierService> getServiceId() {
 		return serviceId;
@@ -83,7 +81,7 @@ public final class LSPServiceEndEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, driverId.toString());
+//		attr.put(ATTRIBUTE_PERSON, driverId.toString());
 		attr.put(ATTRIBUTE_LINK, linkId.toString());
 		attr.put(ATTRIBUTE_SERVICE, serviceId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());

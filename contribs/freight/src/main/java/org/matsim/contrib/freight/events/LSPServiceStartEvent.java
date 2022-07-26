@@ -37,15 +37,13 @@ public final class LSPServiceStartEvent extends Event{
 
 	private final CarrierService service;
 	private final Id<Carrier> carrierId;
-	private final Id<Person> driverId;
 	private final CarrierVehicle vehicle;
 	private final ActivityStartEvent event;
 	
-	public LSPServiceStartEvent(ActivityStartEvent event, Id<Carrier> carrierId, Id<Person> driverId, CarrierService service, double time, CarrierVehicle vehicle) {
+	public LSPServiceStartEvent(ActivityStartEvent event, Id<Carrier> carrierId, CarrierService service, double time, CarrierVehicle vehicle) {
 		super(time);
 		this.carrierId = carrierId;
 		this.service = service;
-		this.driverId = driverId;
 		this.vehicle = vehicle;
 		this.event = event;
 	}
@@ -63,10 +61,6 @@ public final class LSPServiceStartEvent extends Event{
 		return carrierId;
 	}
 
-	public Id<Person> getDriverId() {
-		return driverId;
-	}
-
 	public CarrierVehicle getVehicle() {
 		return vehicle;
 	}
@@ -74,7 +68,6 @@ public final class LSPServiceStartEvent extends Event{
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(FreightEventAttributes.ATTRIBUTE_PERSON, this.driverId.toString());
 		if (service.getLocationLinkId() != null) {
 			attr.put(FreightEventAttributes.ATTRIBUTE_LINK, service.getLocationLinkId().toString());
 		}
