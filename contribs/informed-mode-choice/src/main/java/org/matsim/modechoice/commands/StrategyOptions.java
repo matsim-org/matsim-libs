@@ -27,55 +27,23 @@ import java.util.stream.Collectors;
  * Command line parameters that can be included in any {@link org.matsim.application.MATSimApplication} to configurable mode-choice strategies.
  *
  * <code>
- *      {@code @CommandLine.ArgGroup(exclusive} = false, multiplicity = "0..1", heading = "Strategy Options\n")
+ *      {@code @Mixin
  *      StrategyOptions strategy = new StrategyOptions();
  * </code>
  */
 public final class StrategyOptions {
+	private final ModeChoice defaultModeChoice;
+	private final String defaultSubpopulation;
+	@CommandLine.ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Strategy Options%n")
+	private Group group = new Group();
 
-	@CommandLine.Option(names = {"--mode-choice", "--mc"}, description = "Mode choice strategy: ${COMPLETION-CANDIDATES}")
-	private ModeChoice modeChoice;
-	private final String subpopulation;
-
-	@CommandLine.Option(names = "--weight", defaultValue = "0.10", description = "Mode-choice strategy weight")
-	private double weight;
-
-	@CommandLine.Option(names = "--top-k", defaultValue = "5", description = "Top k options for some of the strategies")
-	private int k;
-
-	@CommandLine.Option(names = "--avoid-k", defaultValue = "10", description = "Avoid using recent mode types again")
-	private int avoidK;
-
-	// picocli has strange behaviour regarding default values of these boolean options
-	// Like this the default will be true
-	@CommandLine.Option(names = "--no-time-mutation", defaultValue = "true", description = "Enable time mutation strategy", negatable = true)
-	private boolean timeMutation;
-
-	@CommandLine.Option(names = "--mass-conservation", defaultValue = "false", description = "Enable mass conservation constraint", negatable = true)
-	private boolean massConservation;
-
-	@CommandLine.Option(names = "--act-est", defaultValue = "false", description = "Enable activity estimation", negatable = true)
-	private boolean actEst;
-
-	@CommandLine.Option(names = "--force-innovation", defaultValue = "10", description = "Force innovative strategy with %% of agents")
-	private int forceInnovation;
-
-	@CommandLine.Option(names = "--inv-beta", defaultValue = "1", description = "Inv beta parameter (0 = best choice)")
-	private double invBeta;
-
-	@CommandLine.Option(names = "--prune", description = "Name of pruner to enable")
-	private String prune;
-
-	@CommandLine.Option(names = "--anneal", defaultValue = "off", description = "Parameter annealing")
-	private InformedModeChoiceConfigGroup.Schedule anneal = InformedModeChoiceConfigGroup.Schedule.off;
-
-	public StrategyOptions(ModeChoice modeChoice, String subpopulation) {
-		this.modeChoice = modeChoice;
-		this.subpopulation = subpopulation;
+	public StrategyOptions(ModeChoice defaultModeChoice, String defaultSubpopulation) {
+		this.defaultModeChoice = defaultModeChoice;
+		this.defaultSubpopulation = defaultSubpopulation;
 	}
 
 	public ModeChoice getModeChoice() {
-		return modeChoice;
+		return group.modeChoice != null ? group.modeChoice : defaultModeChoice;
 	}
 
 	/**
@@ -86,51 +54,50 @@ public final class StrategyOptions {
 	public void applyConfig(Config config, TriConsumer<Config, String, Object> log) {
 
 		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
-		imc.setTopK(k);
-		imc.setAvoidK(avoidK);
-		imc.setInvBeta(invBeta);
-		imc.setAnneal(anneal);
-		imc.setPruning(prune);
+		imc.setTopK(group.k);
+		imc.setAvoidK(group.avoidK);
+		imc.setInvBeta(group.invBeta);
+		imc.setAnneal(group.anneal);
+		imc.setPruning(group.prune);
 
-		log.accept(config, "mc", modeChoice);
+		log.accept(config, "mc", getModeChoice());
 
-		if (modeChoice == ModeChoice.selectBestKPlanModes || modeChoice == ModeChoice.informedModeChoice) {
-			log.accept(config, "k", k);
+		if (getModeChoice() == ModeChoice.selectBestKPlanModes || getModeChoice() == ModeChoice.informedModeChoice) {
+			log.accept(config, "k", group.k);
 		}
 
-		if (avoidK != 10) {
-			log.accept(config, "ak", avoidK);
+		if (group.avoidK != 10) {
+			log.accept(config, "ak", group.avoidK);
 		}
 
-		if (prune != null) {
-			log.accept(config, "prune", prune);
+		if (group.prune != null) {
+			log.accept(config, "prune", group.prune);
 		}
 
-		if (massConservation) {
+		if (group.massConservation) {
 			log.accept(config, "mass-conv", "");
 		} else
 			config.subtourModeChoice().setChainBasedModes(new String[0]);
 
-		if (actEst)
+		if (group.actEst)
 			log.accept(config, "act-est", "");
 
-		if (!timeMutation)
+		if (!group.timeMutation)
 			log.accept(config, "no-tm", "");
 
+		if (group.anneal != InformedModeChoiceConfigGroup.Schedule.off)
+			log.accept(config, "anneal", group.anneal);
 
-		if (anneal != InformedModeChoiceConfigGroup.Schedule.off)
-			log.accept(config, "anneal", anneal);
+		if (group.invBeta != 1)
+			log.accept(config, "invBeta", group.invBeta);
 
-		if (invBeta != 1)
-			log.accept(config, "invBeta", invBeta);
-
-		if (forceInnovation != 10)
-			log.accept(config, "f-inv", forceInnovation);
+		if (group.forceInnovation != 10)
+			log.accept(config, "f-inv", group.forceInnovation);
 
 
 		// Depends on number of pre generated plans
-		if (modeChoice == ModeChoice.none || modeChoice == ModeChoice.informedModeChoice)
-			config.strategy().setMaxAgentPlanMemorySize(Math.max(config.strategy().getMaxAgentPlanMemorySize(), k) + 5);
+		if (getModeChoice() == ModeChoice.none)
+			config.strategy().setMaxAgentPlanMemorySize(Math.max(config.strategy().getMaxAgentPlanMemorySize(), group.k) + 5);
 
 	}
 
@@ -150,20 +117,20 @@ public final class StrategyOptions {
 				).collect(Collectors.toList());
 
 
-		if (timeMutation) {
+		if (group.timeMutation) {
 			strategies.add(new StrategyConfigGroup.StrategySettings()
 					.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator)
-					.setSubpopulation(subpopulation)
+					.setSubpopulation(defaultSubpopulation)
 					.setWeight(0.025)
 			);
 		}
 
-		if (modeChoice != ModeChoice.none) {
+		if (getModeChoice() != ModeChoice.none) {
 
 			strategies.add(new StrategyConfigGroup.StrategySettings()
-					.setStrategyName(modeChoice.name)
-					.setSubpopulation(subpopulation)
-					.setWeight(weight)
+					.setStrategyName(getModeChoice().getName())
+					.setSubpopulation(defaultSubpopulation)
+					.setWeight(group.weight)
 			);
 		}
 
@@ -171,19 +138,19 @@ public final class StrategyOptions {
 		config.strategy().clearStrategySettings();
 		strategies.forEach(s -> config.strategy().addStrategySettings(s));
 
-		if (forceInnovation > 0)
+		if (group.forceInnovation > 0)
 			binder.bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {
-			}).toInstance(new ForceInnovationStrategyChooser<>(forceInnovation, ForceInnovationStrategyChooser.Permute.yes));
+			}).toInstance(new ForceInnovationStrategyChooser<>(group.forceInnovation, ForceInnovationStrategyChooser.Permute.yes));
 
 
 		InformedModeChoiceModule.Builder builder = InformedModeChoiceModule.newBuilder();
 
 		setup.accept(builder);
 
-		if (massConservation)
+		if (group.massConservation)
 			builder.withConstraint(RelaxedMassConservationConstraint.class);
 
-		if (!actEst)
+		if (!group.actEst)
 			builder.withActivityEstimator(ActivityEstimator.None.class);
 
 		return builder.build();
@@ -209,6 +176,44 @@ public final class StrategyOptions {
 		public String getName() {
 			return name;
 		}
+	}
+
+	public final static class Group {
+
+		@CommandLine.Option(names = {"--mode-choice", "--mc"}, description = "Mode choice strategy: ${COMPLETION-CANDIDATES}")
+		private ModeChoice modeChoice;
+
+		@CommandLine.Option(names = "--weight", defaultValue = "0.10", description = "Mode-choice strategy weight")
+		private double weight;
+
+		@CommandLine.Option(names = "--top-k", defaultValue = "5", description = "Top k options for some of the strategies")
+		private int k;
+
+		@CommandLine.Option(names = "--avoid-k", defaultValue = "10", description = "Avoid using recent mode types again")
+		private int avoidK;
+
+		// picocli has strange behaviour regarding default values of these boolean options
+		// Like this the default will be true
+		@CommandLine.Option(names = "--no-time-mutation", defaultValue = "true", description = "Enable time mutation strategy", negatable = true)
+		private boolean timeMutation;
+
+		@CommandLine.Option(names = "--mass-conservation", defaultValue = "false", description = "Enable mass conservation constraint", negatable = true)
+		private boolean massConservation;
+
+		@CommandLine.Option(names = "--act-est", defaultValue = "false", description = "Enable activity estimation", negatable = true)
+		private boolean actEst;
+
+		@CommandLine.Option(names = "--force-innovation", defaultValue = "10", description = "Force innovative strategy with %% of agents")
+		private int forceInnovation;
+
+		@CommandLine.Option(names = "--inv-beta", defaultValue = "1", description = "Inv beta parameter (0 = best choice)")
+		private double invBeta;
+
+		@CommandLine.Option(names = "--prune", description = "Name of pruner to enable")
+		private String prune;
+
+		@CommandLine.Option(names = "--anneal", defaultValue = "off", description = "Parameter annealing")
+		private InformedModeChoiceConfigGroup.Schedule anneal = InformedModeChoiceConfigGroup.Schedule.off;
 	}
 
 }
