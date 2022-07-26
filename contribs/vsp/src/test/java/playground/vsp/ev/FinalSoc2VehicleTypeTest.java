@@ -44,6 +44,7 @@ public class FinalSoc2VehicleTypeTest {
 
 	private static Scenario scenario;
 	private static SOCHandler handler;
+	private static final Integer LAST_ITERATION = 2;
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -52,7 +53,7 @@ public class FinalSoc2VehicleTypeTest {
 	public static void runSim(){
 		scenario = CreateUrbanEVTestScenario.createTestScenario();
 
-		scenario.getConfig().controler().setLastIteration(2);
+		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
@@ -60,7 +61,11 @@ public class FinalSoc2VehicleTypeTest {
 		overridePopulation(scenario);
 
 		//insert vehicles
-		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
+		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> {
+			Id<VehicleType> type = scenario.getVehicles().getVehicles().get(vehicleId).getType().getId();
+			scenario.getVehicles().removeVehicle(vehicleId);
+			scenario.getVehicles().removeVehicleType(type);
+		});
 		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 
 		handler = new SOCHandler(scenario.getVehicles().getVehicleTypes().get(Id.create("person", VehicleType.class))); //car vehicle type currently is set to the same name as the person id
@@ -131,7 +136,7 @@ public class FinalSoc2VehicleTypeTest {
 
 	@Test
 	public void testSOCisTransferredToNextIteration(){
-		for(int i = 0; i <= 1; i++){
+		for(int i = 0; i <= LAST_ITERATION - 1; i++){
 			Assert.assertTrue(handler.iterationEndSOC.get(i).equals(handler.iterationInitialSOC.get(i+1)));
 		}
 	}

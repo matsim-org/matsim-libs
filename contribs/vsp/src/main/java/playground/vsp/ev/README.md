@@ -1,12 +1,26 @@
-This package represents an ongoing project on modeling charging behavior for private motorized transport in ubran transport.
+#UrbanEV
+This package represents an ongoing project on modeling charging behavior for private motorized transport in urban environments.
 The code is in experimental state.
 Please refer to VSP (Tilmann Schlenther) for any question.
 
-***TODO*** put in some information on what the code does and the general idea and assumptions
+##Description of the model
+The model lets agents plan their charging in advance, meaning that they do not show reactive behavior to the SoC over the course of the day.
+At the beginning of the qsim (after the official replanning phase), all selected plans are processed. For each selected plan that contains legs of a network mode using an EV,
+the energy consumption is estimated. If, during leg _Y_, the estimated SoC falls under a configurable threshold, the agent tries to incorporate charging into it's plan, prior to _Y_.<br>
+Charging is assumed to take place during normal activities, only. Therefore, the agents needs to find an activity _A_ prior to _Y_,
+that is long enough, of a corresponding type and within a maximum distance of a suitable charger (all constraints are configurable)
+and represents the destination of a leg with the same EV. If, in the meantime (i.e. after _A_ but before _Y_), the agent performs another subtour with another vehicle, the agent considers the duration of the subtour as a possible period for charging.<br> 
+If a suitable activity _A_ is found, the agent diverts the EV leg to the corresponding activity, drives to a charger first and walks from there to the destination of the preceding EV leg.
+Before starting it's next EV leg (which is not necessarily _Y_), it needs to walk to the corresponding charger, first.<br>
+If no suitable while-charging-activity _A_ can be found, a warning message is dumped into the logfile. The EV will most likely run empty in the simulation, later.
+This is not prevented but included in analysis.<br>
+If an agent estimates to run beyond the energy threshold on it's way back home (more precisely: back to the location from where it entered the corresponding EV for the first time),
+and if there is a charger on the home link, it does not search for a suitable activity prior to this leg but just plugs in the EV at home.<br>
+The final SoC at the end of the iteration is maintained and transferred as the initial SoC to the next iteration. 
 
+For this to work, vehicles that represent an EV need to be attached to a vehicle type that is tagged as EV by providing a specific attribute (see *MATSimVehicleWrappingEVSpecificationProvider.class*).
 
-**A few notes to the current state of this package (and it's issues and TODOs):**
-
+##A few notes to the current state of this package (and it's issues and TODOs)
 1. The code generally was tested only with the Open Berlin Scenario v5.5.x 
 1. The initial SoC (as well as other important attributes) is read/written from/to the vehicle _type_ instead of the (single) vehicle. This is, because the corresponding code was written before MATSim-PR1605. So, the code could use adoption to PR1605. Now, if you want to have individual initial SoCs, you need to have one vehicle type for each person/value.
 1. Overnight charging currently only takes place on the overnight (home) activity. Instead, nearby chargers should be considered.
