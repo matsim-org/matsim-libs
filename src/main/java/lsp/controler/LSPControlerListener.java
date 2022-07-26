@@ -36,7 +36,6 @@ import org.matsim.core.events.handler.EventHandler;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -121,9 +120,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	}
 
 	@Override
-	public void notifyScoring(ScoringEvent event) {
+	public void notifyScoring(ScoringEvent scoringEvent) {
 		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-			lsp.scoreSelectedPlan(event);
+			lsp.scoreSelectedPlan(scoringEvent);
 		}
 		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
 	}
