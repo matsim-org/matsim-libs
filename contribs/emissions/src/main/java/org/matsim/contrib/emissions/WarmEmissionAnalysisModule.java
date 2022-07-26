@@ -281,16 +281,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			if (ecg.handlesHighAverageSpeeds()) {
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
-			} else { // todo: kmt ideas?
+			} else {
 				// we find that emission events for vehicleLeavesTrafficEvent make it appear
 				// as if the vehicle drove faster than the allowed freespeed (freeVelocity_ms).
-				// Is this because it has not "really" traversed the ENTIRE link upon vehicleLeavesTrafficEvents? ~rjg
-
-				// trying to hard code a fix by adding this and removing the runtime exception...
-//				averageSpeed_kmh = freeVelocity_ms * 3.6;
-				// the problems found THEN are (1) 'Not able to lookup emission factor' for some vehicles and
-				// (2) traffic situation (like 'FREEFLOW') that is not specified for some vehicles, breaking a lot of tests.
-				// These errors seem so unrelated to the fact that we calculate emissions on different events than before...
+				// This is because vehicleLeavesTrafficEvent is thrown one second earlier (design decision)
+				// discuss this with kn ~rjg
+				// --- FIX could be to add the one second in the vehicleLeavesTrafficEvent emissions calculation.
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 		}
