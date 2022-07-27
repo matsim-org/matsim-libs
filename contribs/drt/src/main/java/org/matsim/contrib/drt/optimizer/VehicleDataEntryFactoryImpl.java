@@ -83,7 +83,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 					break;
 
 				case STAY:
-					DrtStayTask stayTask = (DrtStayTask)startTask;
+					DefaultStayTask stayTask = (DefaultStayTask) startTask;
 					start = new LinkTimePair(stayTask.getLink(), currentTime);
 					break;
 
