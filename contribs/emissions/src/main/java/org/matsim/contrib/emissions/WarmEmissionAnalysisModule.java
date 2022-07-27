@@ -285,7 +285,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				// we find that emission events for vehicleLeavesTrafficEvent make it appear
 				// as if the vehicle drove faster than the allowed freespeed (freeVelocity_ms).
 				// This is because vehicleLeavesTrafficEvent is thrown one second earlier (design decision)
-				// discuss this with kn ~rjg
 				// --- FIX could be to add the one second in the vehicleLeavesTrafficEvent emissions calculation.
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
 			}

@@ -116,12 +116,14 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		if (vehicle != null) {
 			// execute emissions calculation method
-			emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime);
+			emissionsCalculation(vehicleId, vehicle, link, leaveTime, travelTime + 1.0 );
+			// this extra second added to travel time is because the vehicleLeavesTrafficEvent is thrown one second earlier (by design)
+
+			this.vehicleEntersTrafficMap.remove(vehicleId);
+			this.linkEnterMap.remove(vehicleId);
 			// this is "so that no second emission event is computed for travel from parking to link leave" (kn)
 			// because after this vehicleLeavesTrafficEvent there can/will be another enterTraffic, linkEnter
 			// (and then later leaveTraffic as well)...
-			this.vehicleEntersTrafficMap.remove(vehicleId);
-			this.linkEnterMap.remove(vehicleId);
 		} else {
 			handleNullVehicle(vehicleId);
 		}
