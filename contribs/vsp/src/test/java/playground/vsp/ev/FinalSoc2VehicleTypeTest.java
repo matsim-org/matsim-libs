@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -42,8 +41,8 @@ import java.util.Map;
 
 public class FinalSoc2VehicleTypeTest {
 
-	private static Scenario scenario;
-	private static SOCHandler handler;
+	private static final Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
+	private static final SOCHandler handler = new SOCHandler(scenario);
 	private static final Integer LAST_ITERATION = 2;
 	private static final double INITIAL_ENERGY = 9.5;
 
@@ -52,8 +51,6 @@ public class FinalSoc2VehicleTypeTest {
 
 	@BeforeClass
 	public static void runSim(){
-		scenario = CreateUrbanEVTestScenario.createTestScenario();
-
 		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
@@ -71,7 +68,6 @@ public class FinalSoc2VehicleTypeTest {
 		VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create("Triple Charger", VehicleType.class));
 		EVUtils.setInitialEnergy(vehicleType.getEngineInformation(), INITIAL_ENERGY);
 
-		handler = new SOCHandler(vehicleType); //car vehicle type currently is set to the same name as the person id
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
 		controler.addControlerListener(handler);
@@ -152,8 +148,8 @@ public class FinalSoc2VehicleTypeTest {
 
 		VehicleType carType;
 
-		SOCHandler(VehicleType carVehicleType) {
-			this.carType = carVehicleType;
+		SOCHandler(Scenario scenario) {
+			this.carType = (scenario.getVehicles().getVehicleTypes().get(Id.create("Triple Charger", VehicleType.class)));
 		}
 
 		@Override
