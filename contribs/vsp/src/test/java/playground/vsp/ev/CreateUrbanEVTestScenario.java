@@ -21,7 +21,6 @@
 package playground.vsp.ev;
 
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.Config;
