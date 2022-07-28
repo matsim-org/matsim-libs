@@ -47,7 +47,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
-	@Inject private LSPScoringFunctionFactory lspScoringFunctionFactory;
+	@Inject private LSPScorerFactory lspScoringFunctionFactory;
 
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;

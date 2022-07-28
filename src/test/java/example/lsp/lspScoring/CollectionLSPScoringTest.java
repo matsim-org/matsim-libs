@@ -25,7 +25,6 @@ import lsp.LSPModule;
 import lsp.shipment.ShipmentUtils;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -148,7 +147,7 @@ public class CollectionLSPScoringTest {
 		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new ExampleLSPScoring.TipScorer() );
 			}
 		});
 

@@ -174,7 +174,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new ExampleLSPScoring.TipScorer() );
 			}
 		});
 		config.controler().setFirstIteration(0);

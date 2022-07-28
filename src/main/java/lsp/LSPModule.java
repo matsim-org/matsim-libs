@@ -91,7 +91,7 @@ public class LSPModule extends AbstractModule {
 			}
 		});
 
-		bind( LSPScoringFunctionFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
+		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 //		bind( CarrierScoringFunctionFactory.class ).toProvider( () -> null );
 		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
 
@@ -101,10 +101,10 @@ public class LSPModule extends AbstractModule {
 		return lspControlerListener.getCarriers();
 	}
 
-	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScoringFunctionFactory {
+	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory{
 		@Override public LSPScorer createScoringFunction( LSP lsp ){
 			return new LSPScorer(){
-				@Override public double computeScoreForCurrentPlan(){
+				@Override public double getScoreForCurrentPlan(){
 					return Double.NEGATIVE_INFINITY;
 				}
 				@Override public void setEmbeddingContainer( LSP pointer ){

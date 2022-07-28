@@ -161,7 +161,7 @@ import java.util.*;
 		controler.addOverridingModule(new LSPModule());
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new TipScorer() );
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new TipScorer() );
 			}
 		} );
 		return controler;
@@ -214,7 +214,7 @@ import java.util.*;
 			tipSum = 0;
 		}
 
-		@Override public double computeScoreForCurrentPlan() {
+		@Override public double getScoreForCurrentPlan() {
 			return tipSum;
 		}
 

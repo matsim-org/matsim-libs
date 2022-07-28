@@ -138,7 +138,7 @@ import java.util.*;
 		});
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new MyLSPScorer() );
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new MyLSPScorer() );
 			}
 		} );
 
@@ -509,7 +509,7 @@ import java.util.*;
 		private double score = 0.;
 
 		@Override
-		public double computeScoreForCurrentPlan() {
+		public double getScoreForCurrentPlan() {
 			return score;
 		}
 

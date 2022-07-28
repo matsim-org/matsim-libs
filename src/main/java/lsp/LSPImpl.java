@@ -62,7 +62,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 		}
 	}
 	/**
-	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScoringFunctionFactory}.
+	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScorerFactory}.
 	 */
 	/* package-private */ void setScorer(LSPScorer scorer){
 
@@ -147,7 +147,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 
 	public void scoreSelectedPlan(ScoringEvent scoringEvent) {
 		if (this.scorer != null) {
-			this.selectedPlan.setScore(scorer.computeScoreForCurrentPlan());
+			this.selectedPlan.setScore(scorer.getScoreForCurrentPlan() );
 		} else {
 			log.fatal("trying to score the current LSP plan, but scorer is not set.");
 		}
