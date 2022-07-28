@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -53,10 +54,7 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent
-//		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-//					      LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
-//					      PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler
+final class CarrierAgent implements Identifiable<Carrier>
 {
 	private static final Logger log = Logger.getLogger( CarrierAgent.class );
 
@@ -73,14 +71,8 @@ class CarrierAgent
 	private final ScoringFunction scoringFunction;
 	private final EventsManager events;
 	private final Collection<LSPEventCreator> lspEventCreators;
-	private final CarrierAgentTracker.RunningFrom runningFrom;
 
 	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<LSPEventCreator> lspEventCreators ) {
-		if ( carrierScoringFunction==null ) {
-			runningFrom = CarrierAgentTracker.RunningFrom.Lsp;
-		} else {
-			runningFrom = CarrierAgentTracker.RunningFrom.Carriers;
-		}
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
@@ -88,15 +80,7 @@ class CarrierAgent
 		this.lspEventCreators = lspEventCreators;
 	}
 
-//	CarrierAgent( Carrier carrier, EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
-//		this.carrier = carrier;
-//		this.id = carrier.getId();
-//		this.events = events;
-//		this.lspEventCreators = lspEventCreators;
-//	}
-
-
-	public Id<Carrier> getId() {
+	@Override public Id<Carrier> getId() {
 		return id;
 	}
 
@@ -129,8 +113,7 @@ class CarrierAgent
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
-				if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
-					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
+				if ( tourElement instanceof Tour.Leg tourLeg ) {
 					Route route = tourLeg.getRoute();
 
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());

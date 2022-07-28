@@ -21,23 +21,19 @@
 
 package org.matsim.contrib.freight.controler;
 
-import java.util.*;
-
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.api.core.v01.events.HasPersonId;
-import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * This keeps track of all carrierAgents during simulation.
@@ -64,15 +60,8 @@ public final class CarrierAgentTracker implements BasicEventHandler
 	private final List<CarrierAgent> carrierAgents = new ArrayList<>();
 	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new LinkedHashMap<>();
 	private final Collection<LSPEventCreator> lspEventCreators;
-	enum RunningFrom { Carriers, Lsp };
-	private final RunningFrom runningFrom;
 
-	@Inject CarrierAgentTracker( Carriers carriers, @Nullable CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
-		if ( carrierScoringFunctionFactory==null ) {
-			this.runningFrom = RunningFrom.Lsp;
-		} else{
-			this.runningFrom = RunningFrom.Carriers;
-		}
+	@Inject CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
 		this.carriers = carriers;
 		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
 		this.events = events;
@@ -86,15 +75,7 @@ public final class CarrierAgentTracker implements BasicEventHandler
 		driverAgentMap.clear();
 		carrierAgents.clear();
 		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			switch( runningFrom ) {
-				case Carriers -> {
-					carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction( carrier ), events, lspEventCreators ) );
-				}
-				case Lsp -> {
-					carrierAgents.add( new CarrierAgent( carrier, null, events, lspEventCreators ) );
-				}
-				default -> throw new IllegalStateException( "Unexpected value: " + runningFrom );
-			}
+			carrierAgents.add( new CarrierAgent( carrier, carrierScoringFunctionFactory.createScoringFunction( carrier ), events, lspEventCreators ) );
 		}
 	}
 

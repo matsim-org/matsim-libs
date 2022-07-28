@@ -168,7 +168,7 @@ final class CarrierDriverAgent{
 	}
 
 	private void createAdditionalEvents( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
-		if( scoringFunction == null ){
+//		if( scoringFunction == null ){
 			// (means "called from LSP".  kai, jul'22)
 
 			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
@@ -179,7 +179,7 @@ final class CarrierDriverAgent{
 					this.events.processEvent(customEvent );
 				}
 			}
-		}
+//		}
 	}
 
 	private Tour.TourActivity getTourActivity(){
