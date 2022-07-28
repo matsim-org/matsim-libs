@@ -22,9 +22,6 @@ package example.lsp.lspReplanning;
 
 import com.google.inject.Provider;
 import lsp.*;
-import lsp.LSPModule;
-import lsp.replanning.LSPReplanner;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -44,8 +41,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.GenericStrategyManager;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 

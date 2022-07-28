@@ -20,16 +20,13 @@
 
 package lsp;
 
+import lsp.shipment.LSPShipment;
+import org.apache.log4j.Logger;
+import org.matsim.core.controler.events.ScoringEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.events.ReplanningEvent;
-
-import lsp.replanning.LSPReplanner;
-import lsp.shipment.LSPShipment;
-import org.matsim.core.controler.events.ScoringEvent;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger(LSPImpl.class);

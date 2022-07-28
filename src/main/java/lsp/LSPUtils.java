@@ -20,7 +20,6 @@
 
 package lsp;
 
-import lsp.replanning.LSPReplanner;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.utils.FreightUtils;
@@ -95,7 +94,7 @@ public final class LSPUtils {
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
 //		LSPScorer scorer;
-		LSPReplanner replanner;
+//		LSPReplanner replanner;
 
 
 		private LSPBuilder(Id<LSP> id) {

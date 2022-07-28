@@ -20,14 +20,11 @@
 
 package lsp;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.population.HasPlansAndId;
-
-import lsp.replanning.LSPReplanner;
 import lsp.shipment.LSPShipment;
-import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.controler.events.ScoringEvent;
+
+import java.util.Collection;
 
 /**
  * In the class library, the interface LSP has the following tasks:
