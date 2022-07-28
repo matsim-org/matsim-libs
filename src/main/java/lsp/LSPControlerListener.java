@@ -26,14 +26,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -48,6 +51,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
 	@Inject private LSPScorerFactory lspScoringFunctionFactory;
+	@Inject @Nullable private LSPStrategyManager strategyManager;
 
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
@@ -107,8 +111,15 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	// das geht jetzt nicht mehr.  kai, jun'22
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-			lsp.replan(event);
+		if ( strategyManager==null ) {
+			throw new RuntimeException( "You need to set LSPStrategyManager to something meaningful to run iterations." );
+		}
+		final Collection<LSP> lsps = LSPUtils.getLSPs( scenario ).getLSPs().values();
+		strategyManager.run( lsps, event.getIteration(), event.getReplanningContext() );
+		for( LSP lsp : lsps ){
+			lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
+			//TODO: Do we need to do it for each plan, if it gets selected???
+			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
 		}
 	}
 

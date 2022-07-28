@@ -175,6 +175,8 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
 				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new ExampleLSPScoring.TipScorer() );
+				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
+				// yyyyyy It is NOT clear to me why one does not have to set CarrierStrategyManager.  kai, jul'22
 			}
 		});
 		config.controler().setFirstIteration(0);

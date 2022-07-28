@@ -20,6 +20,7 @@
 
 package example.lsp.initialPlans;
 
+import com.google.inject.Provider;
 import lsp.*;
 import lsp.LSPModule;
 import lsp.replanning.LSPReplanner;
@@ -110,6 +111,17 @@ final class ExampleTwoEchelonGrid {
 				install(new LSPModule());
 			}
 		});
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
+					@Override public LSPStrategyManager get(){
+						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+						strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+						return strategyManager;
+					}
+				} );
+			}
+		} );
 
 		log.info("Run MATSim");
 		controler.run();
@@ -274,12 +286,12 @@ final class ExampleTwoEchelonGrid {
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-		replanner.setEmbeddingContainer(lsp);
+//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+//		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
+//		replanner.setEmbeddingContainer(lsp);
 
-		lsp.setReplanner(replanner);
+//		lsp.setReplanner(replanner);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
@@ -294,7 +306,7 @@ final class ExampleTwoEchelonGrid {
 	}
 
 	private static Collection<LSPShipment> createInitialLSPShipments() {
-		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		List<LSPShipment> shipmentList = new ArrayList<>();
 
 		Random rand = MatsimRandom.getRandom();
 		int i = 1;

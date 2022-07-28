@@ -40,7 +40,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 	private final Collection<LSPResource> resources;
 	private LSPPlan selectedPlan;
 	private LSPScorer scorer;
-	private LSPReplanner replanner;
+//	private LSPReplanner replanner;
 
 
 	LSPImpl(LSPUtils.LSPBuilder builder) {
@@ -56,10 +56,10 @@ import org.matsim.core.controler.events.ScoringEvent;
 //		if (builder.scorer != null) {
 //			setScorer( builder.scorer);
 //		}
-		this.replanner = builder.replanner;
-		if (this.replanner != null) {
-			this.replanner.setEmbeddingContainer(this);
-		}
+//		this.replanner = builder.replanner;
+//		if (this.replanner != null) {
+//			this.replanner.setEmbeddingContainer(this);
+//		}
 	}
 	/**
 	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScorerFactory}.
@@ -160,17 +160,17 @@ import org.matsim.core.controler.events.ScoringEvent;
 		selectedPlan.getAssigner().assignToSolution(shipment);
 	}
 
-	public void replan(final ReplanningEvent arg0) {
-		if (this.replanner != null) {
-			this.replanner.replan(arg0);
-		}
-	}
-
-	@Override
-	public void setReplanner(LSPReplanner replanner) {
-		replanner.setEmbeddingContainer(this);
-		this.replanner = replanner;
-	}
+//	public void replan(final ReplanningEvent arg0) {
+//		if (this.replanner != null) {
+//			this.replanner.replan(arg0);
+//		}
+//	}
+//
+//	@Override
+//	public void setReplanner(LSPReplanner replanner) {
+//		replanner.setEmbeddingContainer(this);
+//		this.replanner = replanner;
+//	}
 
 
 	@Override

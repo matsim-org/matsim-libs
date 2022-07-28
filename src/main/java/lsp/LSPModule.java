@@ -25,17 +25,23 @@ import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierStrategyManager;
 import org.matsim.contrib.freight.controler.FreightAgentSource;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 
 import java.util.List;
@@ -91,10 +97,13 @@ public class LSPModule extends AbstractModule {
 			}
 		});
 
-		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
-//		bind( CarrierScoringFunctionFactory.class ).toProvider( () -> null );
+		// the scorers are necessary to run a zeroth iteration to the end:
 		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
+		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 
+		// for iterations, one needs to replace the following with something meaningful.  If nothing else, there are "empty implementations" that do nothing.  kai, jul'22
+		bind( CarrierStrategyManager.class ).toProvider( ()->null );
+		bind( LSPStrategyManager.class ).toProvider( ()->null );
 	}
 
 	@Provides Carriers provideCarriers( LSPControlerListener lspControlerListener ) {
@@ -110,25 +119,6 @@ public class LSPModule extends AbstractModule {
 				@Override public void setEmbeddingContainer( LSP pointer ){
 				}
 			};
-//			return new ScoringFunction(){
-//				@Override public void handleActivity( Activity activity ){
-//				}
-//				@Override public void handleLeg( Leg leg ){
-//				}
-//				@Override public void agentStuck( double time ){
-//				}
-//				@Override public void addMoney( double amount ){
-//				}
-//				@Override public void addScore( double amount ){
-//				}
-//				@Override public void finish(){
-//				}
-//				@Override public double getScore(){
-//					return Double.NEGATIVE_INFINITY;
-//				}
-//				@Override public void handleEvent( Event event ){
-//				}
-//			};
 		}
 	}
 	private static class CarrierScoringFactoryDummyImpl implements CarrierScoringFunctionFactory {
@@ -152,6 +142,30 @@ public class LSPModule extends AbstractModule {
 				@Override public void handleEvent( Event event ){
 				}
 			};
+		}
+	}
+	public static final class LSPStrategyManagerEmptyImpl implements LSPStrategyManager {
+
+		@Override public void addStrategy( GenericPlanStrategy<LSPPlan, LSP> strategy, String subpopulation, double weight ){
+			throw new RuntimeException( "not implemented" );
+		}
+		@Override public void run( Iterable<? extends HasPlansAndId<LSPPlan, LSP>> persons, int iteration, ReplanningContext replanningContext ){
+			// "run" is possible, but will not do anything. kai, jul'22
+		}
+		@Override public void setMaxPlansPerAgent( int maxPlansPerAgent ){
+			throw new RuntimeException( "not implemented" );
+		}
+		@Override public void addChangeRequest( int iteration, GenericPlanStrategy<LSPPlan, LSP> strategy, String subpopulation, double newWeight ){
+			throw new RuntimeException( "not implemented" );
+		}
+		@Override public void setPlanSelectorForRemoval( PlanSelector<LSPPlan, LSP> planSelector ){
+			throw new RuntimeException( "not implemented" );
+		}
+		@Override public List<GenericPlanStrategy<LSPPlan, LSP>> getStrategies( String subpopulation ){
+			throw new RuntimeException( "not implemented" );
+		}
+		@Override public List<Double> getWeights( String subpopulation ){
+			throw new RuntimeException( "not implemented" );
 		}
 	}
 }

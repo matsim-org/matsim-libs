@@ -261,12 +261,12 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		Controler controler = new Controler(scenario);
 
 		LSPUtils.addLSPs(scenario, lsps);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
+		controler.addOverridingModule(new LSPModule());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 			}
-		});
+		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(4);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

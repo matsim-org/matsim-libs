@@ -168,6 +168,11 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 				install(new LSPModule());
 			}
 		});
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
+			}
+		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

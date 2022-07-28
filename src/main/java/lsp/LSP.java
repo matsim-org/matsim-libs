@@ -68,14 +68,13 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
 	 */
 	void assignShipmentToLSP(LSPShipment shipment);
 
-	void replan(ReplanningEvent arg0);
-
-	/**
-	 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
-	 * 		we cannot use injection ... since we cannot inject as many replanners as we have agents.  (At least this is what I think.)  yyyyyy So
-	 * 		this needs to be changed.  kai, jul'22 yyyy Need to understand how this is done in core matsim. kai, jul'22
-	 */
-	void setReplanner(LSPReplanner replanner);
-
+//	void replan(ReplanningEvent arg0);
+//
+//	/**
+//	 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
+//	 * 		we cannot use injection ... since we cannot inject as many replanners as we have agents.  (At least this is what I think.)  yyyyyy So
+//	 * 		this needs to be changed.  kai, jul'22 yyyy Need to understand how this is done in core matsim. kai, jul'22
+//	 */
+//	void setReplanner(LSPReplanner replanner);
 
 }    
