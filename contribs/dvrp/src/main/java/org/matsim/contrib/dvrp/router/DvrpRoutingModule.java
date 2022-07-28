@@ -113,7 +113,6 @@ public class DvrpRoutingModule implements RoutingModule {
 
 			// interaction activity:
 			trip.add(createDrtStageActivity(accessFacility, now));
-			now++;
 		}
 
 		// dvrp proper leg:
