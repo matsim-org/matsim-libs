@@ -25,14 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -68,28 +67,17 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			startTask = schedule.getCurrentTask();
-			switch (getBaseTypeOrElseThrow(startTask)) {
-				case DRIVE:
-					DrtDriveTask driveTask = (DrtDriveTask)startTask;
-					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
-					start = diversionPoint != null ? diversionPoint : //diversion possible
+			start = switch (getBaseTypeOrElseThrow(startTask)) {
+				case DRIVE -> {
+					var driveTask = (DriveTask)startTask;
+					var diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
+					yield diversionPoint != null ? diversionPoint : //diversion possible
 							new LinkTimePair(driveTask.getPath().getToLink(),
 									driveTask.getEndTime());// too late for diversion
-					break;
-
-				case STOP:
-					DrtStopTask stopTask = (DrtStopTask)startTask;
-					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
-					break;
-
-				case STAY:
-					DefaultStayTask stayTask = (DefaultStayTask) startTask;
-					start = new LinkTimePair(stayTask.getLink(), currentTime);
-					break;
-
-				default:
-					throw new RuntimeException();
-			}
+				}
+				case STOP -> new LinkTimePair(((DrtStopTask)startTask).getLink(), startTask.getEndTime());
+				case STAY -> new LinkTimePair(((StayTask)startTask).getLink(), currentTime);
+			};
 
 			nextTaskIdx = startTask.getTaskIdx() + 1;
 		} else { // PLANNED
