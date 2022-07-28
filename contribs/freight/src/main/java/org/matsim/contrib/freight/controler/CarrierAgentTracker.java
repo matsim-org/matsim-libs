@@ -32,7 +32,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 /**
