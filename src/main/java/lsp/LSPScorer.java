@@ -20,9 +20,6 @@
 
 package lsp;
 
-import lsp.LSP;
-import lsp.controler.LSPSimulationTracker;
-
 /**
  * LSPScorer uses the capabilities of {@link LSPSimulationTracker} to come up with a score for the current plan.
  */

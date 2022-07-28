@@ -48,7 +48,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 
@@ -128,7 +128,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
-		collectionLSPBuilder.setSolutionScorer(new ExampleLSPScoring.TipScorer());
+//		collectionLSPBuilder.setSolutionScorer(new ExampleLSPScoring.TipScorer());
 		collectionLSP = collectionLSPBuilder.build();
 
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
@@ -171,10 +171,10 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		Controler controler = new Controler(scenario);
 
 		LSPUtils.addLSPs(scenario, lsps);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
+		controler.addOverridingModule( new LSPModule() );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new ExampleLSPScoring.TipScorer() );
 			}
 		});
 		config.controler().setFirstIteration(0);

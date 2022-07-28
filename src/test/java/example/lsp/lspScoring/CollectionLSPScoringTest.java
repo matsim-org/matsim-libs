@@ -21,10 +21,11 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.shipment.ShipmentUtils;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -89,7 +90,7 @@ public class CollectionLSPScoringTest {
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(LSPUtils.createLSPPlan().setAssigner(createSingleSolutionShipmentAssigner()).addSolution(collectionSolution))
 				.setSolutionScheduler(createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(collectionAdapter)))
-				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
+//				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
 				.build();
 
 //		TipEventHandler handler = new TipEventHandler();
@@ -144,11 +145,13 @@ public class CollectionLSPScoringTest {
 
 		Controler controler = new Controler(scenario);
 
+		controler.addOverridingModule( new LSPModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				install( new LSPModule() );
+				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new ExampleLSPScoring.TipScorer() );
 			}
 		});
+
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

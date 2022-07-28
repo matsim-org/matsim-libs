@@ -18,10 +18,9 @@
  *  * ***********************************************************************
  */
 
-package lsp.controler;
+package lsp;
 
 
-import lsp.*;
 import lsp.shipment.LSPShipment;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -48,6 +47,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
+	@Inject private LSPScoringFunctionFactory lspScoringFunctionFactory;
 
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
@@ -60,6 +60,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
 		for (LSP lsp : lsps.getLSPs().values()) {
+			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction( lsp ) );
 
 			// simulation trackers of lsp:
 			registerSimulationTrackers(lsp );
@@ -69,10 +70,8 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 				registerSimulationTrackers(shipment );
 			}
 
-			LSPPlan selectedPlan = lsp.getSelectedPlan();
-
 			// simulation trackers of solutions:
-			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
+			for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 				registerSimulationTrackers(solution );
 
 				// simulation trackers of solution elements:

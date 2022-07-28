@@ -21,7 +21,7 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
@@ -136,6 +136,11 @@ import java.util.*;
 				install(new LSPModule());
 			}
 		});
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPScoringFunctionFactory.class ).toInstance( (lsp) -> new MyLSPScorer() );
+			}
+		} );
 
 		log.info("Run MATSim");
 		controler.run();
@@ -165,7 +170,7 @@ import java.util.*;
 				throw new IllegalStateException("Unexpected value: " + solutionType);
 		}
 
-		lspBuilder.setSolutionScorer(new MyLSPScorer());
+//		lspBuilder.setSolutionScorer(new MyLSPScorer());
 
 		final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)"); //TODO: Hochziehen aber non-static.
 		final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");

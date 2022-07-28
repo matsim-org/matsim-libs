@@ -21,7 +21,7 @@
 package example.lsp.initialPlans;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;
@@ -264,7 +264,8 @@ final class ExampleTwoEchelonGrid {
 				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
-				.setSolutionScorer(new MyLSPScorer());
+//				.setSolutionScorer(new MyLSPScorer())
+				;
 
 
 		LSP lsp = lspBuilder.build();

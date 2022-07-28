@@ -22,7 +22,7 @@ package example.lsp.simulationTrackers;
 
 import lsp.LSPUtils;
 import lsp.LogisticsSolution;
-import lsp.controler.LSPSimulationTracker;
+import lsp.LSPSimulationTracker;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -34,11 +34,9 @@ import org.matsim.contrib.freight.events.eventhandler.*;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
 		LinkEnterEventHandler,

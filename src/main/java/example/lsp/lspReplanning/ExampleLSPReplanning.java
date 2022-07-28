@@ -21,7 +21,7 @@
 package example.lsp.lspReplanning;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;

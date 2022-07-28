@@ -1,7 +1,5 @@
 package lsp;
 
-import lsp.controler.LSPSimulationTracker;
-
 import java.util.Collection;
 
 // One could say that the simulation trackers are the decorators that convert the data objects into behavioral objects.  In core matsim, we instead

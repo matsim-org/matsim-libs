@@ -21,11 +21,9 @@
 package lsp;
 
 import lsp.replanning.LSPReplanner;
-import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.utils.FreightUtils;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.ArrayList;
@@ -96,7 +94,7 @@ public final class LSPUtils {
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
-		LSPScorer scorer;
+//		LSPScorer scorer;
 		LSPReplanner replanner;
 
 
@@ -120,10 +118,10 @@ public final class LSPUtils {
 		 * 		that the approach in matsim core and in carriers to have XxxScoringFunctionFactory is better for what we are doing here.  yyyyyy So
 		 * 		this needs to be changed.  kai, jul'22
 		 */
-		public LSPBuilder setSolutionScorer(LSPScorer scorer) {
-			this.scorer = scorer;
-			return this;
-		}
+//		public LSPBuilder setSolutionScorer(LSPScorer scorer) {
+//			this.scorer = scorer;
+//			return this;
+//		}
 
 		public LSPBuilder setReplanner(LSPReplanner replanner) {
 			this.replanner = replanner;

@@ -18,11 +18,10 @@
  *  * ***********************************************************************
  */
 
-package lsp.controler;
+package lsp;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import lsp.LSP;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
@@ -103,26 +102,33 @@ public class LSPModule extends AbstractModule {
 	}
 
 	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScoringFunctionFactory {
-		@Override public ScoringFunction createScoringFunction( LSP lsp ){
-			return new ScoringFunction(){
-				@Override public void handleActivity( Activity activity ){
-				}
-				@Override public void handleLeg( Leg leg ){
-				}
-				@Override public void agentStuck( double time ){
-				}
-				@Override public void addMoney( double amount ){
-				}
-				@Override public void addScore( double amount ){
-				}
-				@Override public void finish(){
-				}
-				@Override public double getScore(){
+		@Override public LSPScorer createScoringFunction( LSP lsp ){
+			return new LSPScorer(){
+				@Override public double computeScoreForCurrentPlan(){
 					return Double.NEGATIVE_INFINITY;
 				}
-				@Override public void handleEvent( Event event ){
+				@Override public void setEmbeddingContainer( LSP pointer ){
 				}
 			};
+//			return new ScoringFunction(){
+//				@Override public void handleActivity( Activity activity ){
+//				}
+//				@Override public void handleLeg( Leg leg ){
+//				}
+//				@Override public void agentStuck( double time ){
+//				}
+//				@Override public void addMoney( double amount ){
+//				}
+//				@Override public void addScore( double amount ){
+//				}
+//				@Override public void finish(){
+//				}
+//				@Override public double getScore(){
+//					return Double.NEGATIVE_INFINITY;
+//				}
+//				@Override public void handleEvent( Event event ){
+//				}
+//			};
 		}
 	}
 	private static class CarrierScoringFactoryDummyImpl implements CarrierScoringFunctionFactory {

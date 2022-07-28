@@ -53,15 +53,22 @@ import org.matsim.core.controler.events.ScoringEvent;
 		this.selectedPlan.setLSP(this);
 		this.plans.add(builder.initialPlan);
 		this.resources = builder.resources;
-		this.scorer = builder.scorer;
-		if (this.scorer != null) {
-			this.scorer.setEmbeddingContainer(this);
-			this.addSimulationTracker(this.scorer);
-		}
+//		if (builder.scorer != null) {
+//			setScorer( builder.scorer);
+//		}
 		this.replanner = builder.replanner;
 		if (this.replanner != null) {
 			this.replanner.setEmbeddingContainer(this);
 		}
+	}
+	/**
+	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScoringFunctionFactory}.
+	 */
+	/* package-private */ void setScorer(LSPScorer scorer){
+
+		this.scorer = scorer;
+		scorer.setEmbeddingContainer(this);
+		this.addSimulationTracker(scorer);
 	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
@@ -74,8 +81,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
 		copiedPlan.setLSP(plan2copy.getLSP());
-		double initialScoreOfCopiedPlan = plan2copy.getScore();
-		copiedPlan.setScore(initialScoreOfCopiedPlan);
+		copiedPlan.setScore( plan2copy.getScore() );
 		copiedPlan.getSolutions().addAll(copiedSolutions);
 		return copiedPlan;
 	}
