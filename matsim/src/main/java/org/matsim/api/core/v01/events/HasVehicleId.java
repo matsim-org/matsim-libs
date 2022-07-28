@@ -20,17 +20,18 @@
 /**
  * 
  */
-package org.matsim.core.api.internal;
+package org.matsim.api.core.v01.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
  *
  */
-public interface HasPersonId {
-	String ATTRIBUTE_PERSON = "person";
+public interface HasVehicleId{
+	String ATTRIBUTE_VEHICLE = "vehicle";
 
-	Id<Person> getPersonId() ;
+	Id<Vehicle> getVehicleId() ;
 }
