@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingStation;
 import org.matsim.contrib.shared_mobility.service.SharingVehicle;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 
 public abstract class AbstractSharingEvent extends Event implements HasPersonId, HasLinkId {
 	private final Id<SharingService> serviceId;

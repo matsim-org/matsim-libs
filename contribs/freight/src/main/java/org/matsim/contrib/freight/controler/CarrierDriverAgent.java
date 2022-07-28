@@ -39,7 +39,7 @@ final class CarrierDriverAgent{
 
 	private final ScheduledTour scheduledTour;
 
-	private int activityCounter = 0;
+	private int planElementCounter = 0;
 	private final ScoringFunction scoringFunction;
 	private final Carrier carrier;
 	private final EventsManager events;
@@ -59,6 +59,8 @@ final class CarrierDriverAgent{
 	void handleAnEvent( Event event ){
 		// the event comes to here from CarrierAgent#handleEvent only for events concerning this driver
 
+		int previousPlanElementCounter = this.planElementCounter;
+
 		if( event instanceof PersonArrivalEvent ){
 			handleEvent( (PersonArrivalEvent) event );
 		} else if( event instanceof PersonDepartureEvent ){
@@ -70,7 +72,7 @@ final class CarrierDriverAgent{
 		} else if( event instanceof ActivityStartEvent ){
 			handleEvent( (ActivityStartEvent) event );
 		} else{
-			notifyEventHappened( event, null, scheduledTour, driverId, activityCounter );
+			createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 		}
 	}
 
@@ -99,7 +101,7 @@ final class CarrierDriverAgent{
 		if( scoringFunction != null ){
 			scoringFunction.handleLeg( currentLeg );
 		}
-		notifyEventHappened( event, null, scheduledTour, driverId, activityCounter );
+		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( PersonDepartureEvent event ){
@@ -107,7 +109,7 @@ final class CarrierDriverAgent{
 		leg.setDepartureTime( event.getTime() );
 		currentLeg = leg;
 		currentRoute = new ArrayList<>();
-		notifyEventHappened( event, null, scheduledTour, driverId, activityCounter );
+		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( LinkEnterEvent event ){
@@ -115,7 +117,7 @@ final class CarrierDriverAgent{
 			scoringFunction.handleEvent( new LinkEnterEvent( event.getTime(), getVehicle().getId(), event.getLinkId() ) );
 		}
 		currentRoute.add( event.getLinkId() );
-		notifyEventHappened( event, null, scheduledTour, driverId, activityCounter );
+		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( ActivityEndEvent event ){
@@ -129,20 +131,20 @@ final class CarrierDriverAgent{
 			scoringFunction.handleActivity( currentActivity );
 		}
 
-		notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
+		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
 
 		log.debug( "handling activity end event=" + event );
 		if( FreightConstants.START.equals( event.getActType() ) ){
-			activityCounter += 1;
+			planElementCounter += 1;
 			return;
 		}
 		if( FreightConstants.END.equals( event.getActType() ) ) return;
 		if( FreightConstants.PICKUP.equals( event.getActType() ) ){
-			activityCounter += 2;
+			planElementCounter += 2;
 		} else if( FreightConstants.DELIVERY.equals( event.getActType() ) ){
-			activityCounter += 2;
+			planElementCounter += 2;
 		} else{
-			activityCounter += 2;
+			planElementCounter += 2;
 		}
 	}
 
@@ -161,30 +163,27 @@ final class CarrierDriverAgent{
 				throw new AssertionError( "linkId of activity is not equal to linkId of tourActivity. This must not be." );
 			currentActivity = new FreightActivity( activity, tourActivity.getTimeWindow() );
 		}
-		notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
+		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
+		// yyyyyy uses the previous activity, not the current (end) activity.  Bug or feature?  Only used by LSP, not by carrier.  kai, jul'22
 	}
 
-	/**
-	 * {@link CarrierAgentTracker} is an event handler, and it passes events related to individual carriers (but only those) to them.
-	 * Here, they are send back to the tracker. The main (only) reason why this is necessary is some fields such as "activity" or
-	 * "scheduledTour" are not filled in from the event itself, and one needs the agent to figure it out.
-	 */
-	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
-		if( scoringFunction == null ){
-			// this is called from the agent.  Reason why this is needed is that the more informative objects such as ScheduledTour cannot be
-			// filled from just listening to events.  kai, jul'22
+	private void createAdditionalEvents( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
+//		if( scoringFunction == null ){
+			// (means "called from LSP".  kai, jul'22)
 
+			// Reason why this here is needed is that the more informative objects such as ScheduledTour cannot be
+			// filled from just listening to events.  kai, jul'22
 			for( LSPEventCreator lspEventCreator : lspEventCreators ) {
 				Event customEvent = lspEventCreator.createEvent( event, carrier, activity, scheduledTour, activityCounter );
 				if(customEvent != null) {
 					this.events.processEvent(customEvent );
 				}
 			}
-		}
+//		}
 	}
 
 	private Tour.TourActivity getTourActivity(){
-		return (Tour.TourActivity) this.scheduledTour.getTour().getTourElements().get( activityCounter );
+		return (Tour.TourActivity) this.scheduledTour.getTour().getTourElements().get( planElementCounter );
 	}
 
 	CarrierVehicle getVehicle(){

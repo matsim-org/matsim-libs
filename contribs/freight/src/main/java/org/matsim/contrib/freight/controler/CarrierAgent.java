@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -53,10 +54,7 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent
-//		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-//					      LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
-//					      PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler
+final class CarrierAgent implements Identifiable<Carrier>
 {
 	private static final Logger log = Logger.getLogger( CarrierAgent.class );
 
@@ -70,7 +68,7 @@ class CarrierAgent
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-	private ScoringFunction scoringFunction;
+	private final ScoringFunction scoringFunction;
 	private final EventsManager events;
 	private final Collection<LSPEventCreator> lspEventCreators;
 
@@ -80,19 +78,9 @@ class CarrierAgent
 		this.scoringFunction = carrierScoringFunction;
 		this.events = events;
 		this.lspEventCreators = lspEventCreators;
-
-		Gbl.assertNotNull(carrierScoringFunction);
 	}
 
-	CarrierAgent( Carrier carrier, EventsManager events, Collection<LSPEventCreator> lspEventCreators ){
-		this.carrier = carrier;
-		this.id = carrier.getId();
-		this.events = events;
-		this.lspEventCreators = lspEventCreators;
-	}
-
-
-	public Id<Carrier> getId() {
+	@Override public Id<Carrier> getId() {
 		return id;
 	}
 
@@ -125,14 +113,13 @@ class CarrierAgent
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
-				if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
-					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
+				if ( tourElement instanceof Tour.Leg tourLeg ) {
 					Route route = tourLeg.getRoute();
 
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
-					// yy At least in EquilWithoutCarrierWithPassIT, it runs through even without the above line ... but it looks
-					// like the simulation is not generating kilometers.  Presumably, there is no equivalent to "prepareForSim"
-					// for carriers.  Did not check any further.  kai, jul'22
+					// yy At least in EquilWithoutCarrierWithPassIT and routes removed, it runs through even without the above
+					// line ... but it looks like the simulation is not generating kilometers.  Presumably, there is no equivalent
+					// to "prepareForSim" for carriers.  Did not check any further.  kai, jul'22
 
 					//this returns TransportMode.car if the attribute is null
 					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
@@ -200,10 +187,13 @@ class CarrierAgent
 			return;
 		}
 		scoringFunction.finish();
-		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
+		final double score = scoringFunction.getScore();
+		log.warn("score=" + score);
+		carrier.getSelectedPlan().setScore( score );
 	}
 	void handleEvent( Event event, Id<Person> driverId ) {
-		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier
+		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier.  The driver IDs are also
+		// passed on "as a service", which means that here we can distribute the events to the drivers.
 		getDriver( driverId ).handleAnEvent( event );
 	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){

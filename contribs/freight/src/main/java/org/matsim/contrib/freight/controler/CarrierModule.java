@@ -24,7 +24,6 @@ package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -32,7 +31,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -55,41 +53,44 @@ public final class CarrierModule extends AbstractModule {
 		// this is probably ok
 
 		bind(CarrierControlerListener.class).in( Singleton.class );
-		// (this is a binding separate from the binding as controler listener)
-
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
-		// this switches on certain qsim components:
-		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
-		List<String> components = qsimComponents.getActiveComponents();
-		components.add( FreightAgentSource.COMPONENT_NAME ) ;
-		switch ( freightConfig.getTimeWindowHandling() ) {
-			case ignore:
-				break;
-			case enforceBeginnings:
-				components.add( WithinDayActivityReScheduling.COMPONENT_NAME );
-				break;
-			default:
-				throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
-		}
-		qsimComponents.setActiveComponents( components );
+		bind(CarrierAgentTracker.class).in( Singleton.class );
+		addEventHandlerBinding().to( CarrierAgentTracker.class );
 
-		// this installs qsim components, which are switched on (or not) via the above syntax:
-		this.installQSimModule( new AbstractQSimModule(){
-			@Override protected void configureQSim(){
-				this.bind( FreightAgentSource.class ).in( Singleton.class );
-				this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
-				switch( freightConfig.getTimeWindowHandling() ) {
-					case ignore:
-						break;
-					case enforceBeginnings:
-						this.addQSimComponentBinding(WithinDayActivityReScheduling.COMPONENT_NAME).to( WithinDayActivityReScheduling.class );
-						break;
-					default:
-						throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
-				}
+		{
+			// this switches on certain qsim components:
+			QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
+			List<String> components = qsimComponents.getActiveComponents();
+			components.add( FreightAgentSource.COMPONENT_NAME );
+			switch( freightConfig.getTimeWindowHandling() ){
+				case ignore:
+					break;
+				case enforceBeginnings:
+					components.add( WithinDayActivityReScheduling.COMPONENT_NAME );
+					break;
+				default:
+					throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
 			}
-		} );
+			qsimComponents.setActiveComponents( components );
+
+			// this installs qsim components, which are switched on (or not) via the above syntax:
+			this.installQSimModule( new AbstractQSimModule(){
+				@Override protected void configureQSim(){
+					this.bind( FreightAgentSource.class ).in( Singleton.class );
+					this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
+					switch( freightConfig.getTimeWindowHandling() ){
+						case ignore:
+							break;
+						case enforceBeginnings:
+							this.addQSimComponentBinding( WithinDayActivityReScheduling.COMPONENT_NAME ).to( WithinDayActivityReScheduling.class );
+							break;
+						default:
+							throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+					}
+				}
+			} );
+		}
 
 		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryDummyImpl.class ) ;
 
@@ -108,9 +109,9 @@ public final class CarrierModule extends AbstractModule {
 	// yyyy this feels rather scary.  kai, oct'19
 	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
 	// Is this maybe already resolved now?  kai, jul'22
-	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
-		return carrierControlerListener.getCarrierAgentTracker();
-	}
+//	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
+//		return carrierControlerListener.getCarrierAgentTracker();
+//	}
 
 	private static class CarrierScoringFunctionFactoryDummyImpl implements CarrierScoringFunctionFactory {
 		@Override public ScoringFunction createScoringFunction( Carrier carrier ){
