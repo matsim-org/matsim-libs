@@ -30,19 +30,11 @@ package org.matsim.contrib.freight.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.utils.FreightUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
