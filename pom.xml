@@ -31,7 +31,7 @@
         <argLine></argLine>
 
         <log4j.version>2.18.0</log4j.version>
-        <geotools.version>27.0</geotools.version>
+        <geotools.version>27.1</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>5.1.0</guice.version>
         <jackson.version>2.13.3</jackson.version>
@@ -381,12 +381,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
