@@ -20,7 +20,12 @@
 
 package playground.vsp.ev;
 
-import org.junit.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,7 +33,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -37,41 +41,36 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class FinalSoc2VehicleTypeTest {
 
-	private static Scenario scenario;
-	private static SOCHandler handler;
+	private final Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
+	private final SOCHandler handler = new SOCHandler(scenario);
 	private static final Integer LAST_ITERATION = 2;
 	private static final double INITIAL_ENERGY = 9.5;
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-	@BeforeClass
-	public static void runSim(){
-		scenario = CreateUrbanEVTestScenario.createTestScenario();
-
+	private void runSim() {
 		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
 		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		//modify population
-//		overridePopulation(scenario);
+		//		overridePopulation(scenario);
 
-//		//insert vehicles
-//		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> {
-//			Id<VehicleType> type = scenario.getVehicles().getVehicles().get(vehicleId).getType().getId();
-//			scenario.getVehicles().removeVehicle(vehicleId);
-//			scenario.getVehicles().removeVehicleType(type);
-//		});
-//		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
+		//		//insert vehicles
+		//		scenario.getVehicles().getVehicles().keySet().forEach(vehicleId -> {
+		//			Id<VehicleType> type = scenario.getVehicles().getVehicles().get(vehicleId).getType().getId();
+		//			scenario.getVehicles().removeVehicle(vehicleId);
+		//			scenario.getVehicles().removeVehicleType(type);
+		//		});
+		//		RunUrbanEVExample.createAndRegisterPersonalCarAndBikeVehicles(scenario);
 
-		VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create("Triple Charger", VehicleType.class));
+		VehicleType vehicleType = scenario.getVehicles()
+				.getVehicleTypes()
+				.get(Id.create("Triple Charger", VehicleType.class));
 		EVUtils.setInitialEnergy(vehicleType.getEngineInformation(), INITIAL_ENERGY);
 
-		handler = new SOCHandler(vehicleType); //car vehicle type currently is set to the same name as the person id
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
 		controler.addControlerListener(handler);
@@ -125,35 +124,36 @@ public class FinalSoc2VehicleTypeTest {
 	}
 
 	@Test
-	public void testInitialEnergyInIter0(){
+	public void test() {
+		runSim();
+
+		// testInitialEnergyInIter0
 		Assert.assertTrue(handler.iterationInitialSOC.get(0).equals(INITIAL_ENERGY));
-	}
 
-	@Test
-	public void testSOCIsDumpedIntoVehicleType(){
+		// testSOCIsDumpedIntoVehicleType
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
-		VehicleType carType = scenario.getVehicles().getVehicleTypes().get(Id.create("Triple Charger", VehicleType.class));
+		VehicleType carType = scenario.getVehicles()
+				.getVehicleTypes()
+				.get(Id.create("Triple Charger", VehicleType.class));
 		Assert.assertNotEquals(EVUtils.getInitialEnergy(carType.getEngineInformation()), INITIAL_ENERGY);
-		Assert.assertEquals(10, EVUtils.getInitialEnergy(carType.getEngineInformation()), MatsimTestUtils.EPSILON); //should be fully charged
-	}
+		Assert.assertEquals(10, EVUtils.getInitialEnergy(carType.getEngineInformation()),
+				MatsimTestUtils.EPSILON); //should be fully charged
 
-	@Test
-	public void testSOCisTransferredToNextIteration(){
-		for(int i = 0; i <= LAST_ITERATION - 1; i++){
-			Assert.assertTrue(handler.iterationEndSOC.get(i).equals(handler.iterationInitialSOC.get(i+1)));
+		// testSOCisTransferredToNextIteration
+		for (int i = 0; i <= LAST_ITERATION - 1; i++) {
+			Assert.assertEquals(handler.iterationEndSOC.get(i), handler.iterationInitialSOC.get(i + 1));
 		}
 	}
 
+	private static class SOCHandler implements BeforeMobsimListener, AfterMobsimListener {
+		private final Map<Integer, Double> iterationInitialSOC = new HashMap<>();
+		private final Map<Integer, Double> iterationEndSOC = new HashMap<>();
+		private final VehicleType carType;
 
-	private static class SOCHandler implements BeforeMobsimListener, AfterMobsimListener{
-
-		Map<Integer,Double> iterationInitialSOC = new HashMap<>();
-		Map<Integer,Double> iterationEndSOC = new HashMap<>();
-
-		VehicleType carType;
-
-		SOCHandler(VehicleType carVehicleType) {
-			this.carType = carVehicleType;
+		SOCHandler(Scenario scenario) {
+			this.carType = (scenario.getVehicles()
+					.getVehicleTypes()
+					.get(Id.create("Triple Charger", VehicleType.class)));
 		}
 
 		@Override
@@ -163,10 +163,8 @@ public class FinalSoc2VehicleTypeTest {
 
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			this.iterationInitialSOC.put(event.getIteration(), EVUtils.getInitialEnergy(carType.getEngineInformation()));
+			this.iterationInitialSOC.put(event.getIteration(),
+					EVUtils.getInitialEnergy(carType.getEngineInformation()));
 		}
 	}
-
-
-
 }
