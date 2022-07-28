@@ -72,7 +72,7 @@ final class CarrierDriverAgent{
 		} else if( event instanceof ActivityStartEvent ){
 			handleEvent( (ActivityStartEvent) event );
 		} else{
-			notifyEventHappened( event, null, scheduledTour, driverId, planElementCounter );
+			createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 		}
 	}
 
@@ -101,7 +101,7 @@ final class CarrierDriverAgent{
 		if( scoringFunction != null ){
 			scoringFunction.handleLeg( currentLeg );
 		}
-		notifyEventHappened( event, null, scheduledTour, driverId, planElementCounter );
+		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( PersonDepartureEvent event ){
@@ -109,7 +109,7 @@ final class CarrierDriverAgent{
 		leg.setDepartureTime( event.getTime() );
 		currentLeg = leg;
 		currentRoute = new ArrayList<>();
-		notifyEventHappened( event, null, scheduledTour, driverId, planElementCounter );
+		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( LinkEnterEvent event ){
@@ -117,7 +117,7 @@ final class CarrierDriverAgent{
 			scoringFunction.handleEvent( new LinkEnterEvent( event.getTime(), getVehicle().getId(), event.getLinkId() ) );
 		}
 		currentRoute.add( event.getLinkId() );
-		notifyEventHappened( event, null, scheduledTour, driverId, planElementCounter );
+		createAdditionalEvents( event, null, scheduledTour, driverId, planElementCounter );
 	}
 
 	private void handleEvent( ActivityEndEvent event ){
@@ -131,7 +131,7 @@ final class CarrierDriverAgent{
 			scoringFunction.handleActivity( currentActivity );
 		}
 
-		notifyEventHappened( event, currentActivity, scheduledTour, driverId, planElementCounter );
+		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
 
 		log.debug( "handling activity end event=" + event );
 		if( FreightConstants.START.equals( event.getActType() ) ){
@@ -163,11 +163,11 @@ final class CarrierDriverAgent{
 				throw new AssertionError( "linkId of activity is not equal to linkId of tourActivity. This must not be." );
 			currentActivity = new FreightActivity( activity, tourActivity.getTimeWindow() );
 		}
-		notifyEventHappened( event, currentActivity, scheduledTour, driverId, planElementCounter );
+		createAdditionalEvents( event, currentActivity, scheduledTour, driverId, planElementCounter );
 		// yyyyyy uses the previous activity, not the current (end) activity.  Bug or feature?  Only used by LSP, not by carrier.  kai, jul'22
 	}
 
-	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
+	private void createAdditionalEvents( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ){
 		if( scoringFunction == null ){
 			// (means "called from LSP".  kai, jul'22)
 

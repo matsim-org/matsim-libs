@@ -209,7 +209,8 @@ class CarrierAgent
 		carrier.getSelectedPlan().setScore( score );
 	}
 	void handleEvent( Event event, Id<Person> driverId ) {
-		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier
+		// the event comes to here from CarrierAgentTracker only for those drivers that belong to this carrier.  The driver IDs are also
+		// passed on "as a service", which means that here we can distribute the events to the drivers.
 		getDriver( driverId ).handleAnEvent( event );
 	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){

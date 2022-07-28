@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.api.core.v01.events.HasPersonId;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 import javax.annotation.Nullable;
 
@@ -45,17 +45,15 @@ import javax.annotation.Nullable;
  * @author mzilske, sschroeder
  *
  */
-public final class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-						     LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
-						     PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler
+public final class CarrierAgentTracker implements BasicEventHandler
 {
 	// not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
 
 	// need to use this via injection, since LSP is using it from another package, and thus has to be public.  With injection, can at least
-	// protect the constructor.  With injection, can either use this with global scope, or with mobsim scope.  Mobsim scope is too narrow since it
-	// handles scoring.  This only leaves global scope.  In consequence, needs to be moved from its original design where the tracker was
-	// destroyed and recreated in every iteration, to something that is persistent.  Indeed, original matsim design always was like that (so that
-	// observers could collect information over multiple iterations without additional programming).  kai, jul'22
+	// protect the constructor.  With injection, can either use this with global scope, or with mobsim scope.  Mobsim scope is too narrow since
+	// this class also handles scoring.  This only leaves global scope.  In consequence, needs to be moved from its original design where the
+	// tracker was destroyed and recreated in every iteration, to something that is persistent.  Indeed, original matsim design always was like
+	// that (so that observers could collect information over multiple iterations without additional programming).  kai, jul'22
 
 	private static final Logger log = Logger.getLogger( CarrierAgentTracker.class ) ;
 
@@ -110,88 +108,29 @@ public final class CarrierAgentTracker implements ActivityStartEventHandler, Act
 		}
 	}
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		final Id<Person> driverId = event.getPersonId();
+	@Override public void handleEvent( Event event ) {
+		// receives the events and distributes them to the carriers
+
+		if ( event instanceof VehicleEntersTrafficEvent ) {
+			vehicle2DriverEventHandler.handleEvent( (VehicleEntersTrafficEvent) event );
+		} else if ( event instanceof VehicleLeavesTrafficEvent ) {
+			vehicle2DriverEventHandler.handleEvent( (VehicleLeavesTrafficEvent) event );
+		}
+		Id<Person> driverId;
+		if ( event instanceof HasPersonId ) {
+			driverId = ((HasPersonId) event).getPersonId();
+		} else if ( event instanceof LinkEnterEvent || event instanceof LinkLeaveEvent ){
+			// (we could say that we rather use the specific handleEvent methods.  But this here hedges against someone make Link
+			// Enter/Leave Event implement HasPersonId.  kai, jul'22)
+			driverId = vehicle2DriverEventHandler.getDriverOfVehicle( ((HasVehicleId) event).getVehicleId() );
+		} else {
+			return;
+		}
 		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event, driverId );
 	}
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		final Id<Person> driverId = vehicle2DriverEventHandler.getDriverOfVehicle( event.getVehicleId() );
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		vehicle2DriverEventHandler.handleEvent(event );
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		vehicle2DriverEventHandler.handleEvent(event );
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		final Id<Person> driverId = vehicle2DriverEventHandler.getDriverOfVehicle( event.getVehicleId() );
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
-
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		final Id<Person> driverId = event.getPersonId();
-		CarrierAgent carrierAgent = getCarrierAgentFromDriver( driverId );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event, driverId );
-	}
 	// ---
 	private CarrierAgent getCarrierAgentFromDriver( Id<Person> driverId ) {
 		CarrierAgent carrier = driverAgentMap.get(driverId);
