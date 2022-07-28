@@ -1,8 +1,10 @@
 package org.matsim.modechoice.constraints;
 
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.modechoice.EstimatorContext;
+import org.matsim.modechoice.ModeEstimate;
 import org.matsim.modechoice.PlanModel;
+
+import javax.annotation.Nullable;
 
 /**
  * Interface to determine whether a solution is valid.
@@ -25,5 +27,16 @@ public interface TripConstraint<T> {
 	 * @return whether this is valid mode combination
 	 */
 	boolean isValid(T context, String[] modes);
+
+	/**
+	 * Determine if a mode can be used at all. This allows to filter many invalid combinations beforehand without the need to search through all of them.
+	 *
+	 * @param currentModes current trip modes that will be modified
+	 * @param mode         the moe in question
+	 * @param mask         if not null, mask of trips that will be modified.
+	 */
+	default boolean isValidMode(T context, String[] currentModes, ModeEstimate mode, @Nullable boolean[] mask) {
+		return true;
+	}
 
 }

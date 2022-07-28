@@ -67,6 +67,11 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 		public boolean test(String[] modes) {
 			return constraint.isValid(context, modes);
 		}
+
+		public boolean testMode(String[] currentModes, ModeEstimate mode, boolean[] mask) {
+			return constraint.isValidMode(context, currentModes, mode, mask);
+		}
+
 	}
 
 }

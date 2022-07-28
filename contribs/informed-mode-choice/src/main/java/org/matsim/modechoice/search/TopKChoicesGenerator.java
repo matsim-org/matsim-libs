@@ -97,14 +97,24 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 			search.clear();
 
+			m:
 			for (ModeEstimate mode : options) {
 
 				// check if a mode can be use at all
 				if (!mode.isUsable() || (consideredModes != null && !consideredModes.contains(mode.getMode())))
-					continue;
+					continue m;
+
+				for (ConstraintHolder<?> c : constraints) {
+
+					if (!c.testMode(planModel.getCurrentModesMutable(), mode, mask))
+						continue m;
+				}
 
 				search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
 			}
+
+			if (search.isEmpty())
+				continue comb;
 
 			// results will be updated here
 			String[] result = planModel.getCurrentModes();

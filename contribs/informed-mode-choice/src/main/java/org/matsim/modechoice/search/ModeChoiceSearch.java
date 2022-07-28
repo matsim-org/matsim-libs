@@ -112,6 +112,13 @@ final class ModeChoiceSearch {
 		inv.clear();
 	}
 
+	/**
+	 * Check if any estimates are present-
+	 */
+	public boolean isEmpty() {
+		return mapping.isEmpty();
+	}
+
 	@Override
 	public String toString() {
 
