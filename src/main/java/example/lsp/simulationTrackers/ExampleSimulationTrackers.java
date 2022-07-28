@@ -39,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
 

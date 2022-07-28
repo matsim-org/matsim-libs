@@ -20,15 +20,6 @@
 
 package lsp;
 
-import lsp.controler.LSPSimulationTracker;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 
 /* package-private */ class LogisticsSolutionElementImpl extends LSPDataObject<LogisticsSolutionElement> implements LogisticsSolutionElement {
 

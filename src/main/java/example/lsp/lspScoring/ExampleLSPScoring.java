@@ -21,9 +21,9 @@
 package example.lsp.lspScoring;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.LSPResource;
-import lsp.controler.LSPSimulationTracker;
+import lsp.LSPSimulationTracker;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
@@ -39,6 +39,7 @@ import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -95,7 +96,7 @@ import java.util.*;
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(lspPlan)
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(lspResource)))
-				.setSolutionScorer(new TipScorer())
+//				.setSolutionScorer(new TipScorer())
 				.build();
 
 		return lsp;
@@ -158,6 +159,11 @@ import java.util.*;
 		//Start the Mobsim one iteration is sufficient for scoring
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new LSPModule());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new TipScorer() );
+			}
+		} );
 		return controler;
 	}
 
@@ -208,7 +214,7 @@ import java.util.*;
 			tipSum = 0;
 		}
 
-		@Override public double computeScoreForCurrentPlan() {
+		@Override public double getScoreForCurrentPlan() {
 			return tipSum;
 		}
 

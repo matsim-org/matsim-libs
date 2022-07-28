@@ -21,7 +21,7 @@
 package lspMobsimTests;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
@@ -199,12 +199,12 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		Controler controler = new Controler(scenario);
 
 		LSPUtils.addLSPs(scenario, lsps);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
+		controler.addOverridingModule(new LSPModule());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 			}
-		});
+		} );
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

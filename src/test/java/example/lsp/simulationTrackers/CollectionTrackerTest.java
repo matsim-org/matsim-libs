@@ -21,14 +21,14 @@
 package example.lsp.simulationTrackers;
 
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.shipment.ShipmentUtils;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import lsp.LSPResource;
 import lsp.shipment.LSPShipment;
-import lsp.controler.LSPSimulationTracker;
+import lsp.LSPSimulationTracker;
 import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;

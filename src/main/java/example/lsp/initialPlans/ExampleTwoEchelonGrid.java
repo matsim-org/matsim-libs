@@ -20,10 +20,8 @@
 
 package example.lsp.initialPlans;
 
+import com.google.inject.Provider;
 import lsp.*;
-import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanner;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -42,8 +40,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.GenericStrategyManager;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -110,6 +106,17 @@ final class ExampleTwoEchelonGrid {
 				install(new LSPModule());
 			}
 		});
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
+					@Override public LSPStrategyManager get(){
+						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+						strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+						return strategyManager;
+					}
+				} );
+			}
+		} );
 
 		log.info("Run MATSim");
 		controler.run();
@@ -264,7 +271,8 @@ final class ExampleTwoEchelonGrid {
 				.setInitialPlan(lspPlan_withHub)
 //				.setSolutionScheduler(LSPUtils.createForwardSolutionScheduler())  //Does not work, because of "null" pointer in predecessor.. TODO: Have a look into it later... kmt jul22
 				.setSolutionScheduler(UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(createResourcesListFromLSPPlans(lspPlans))) //Hier müssen irgendwie die Ressourcen beider Pläne rein, oder? - Habe ich jetzt gemacht. kmt ' jul22
-				.setSolutionScorer(new MyLSPScorer());
+//				.setSolutionScorer(new MyLSPScorer())
+				;
 
 
 		LSP lsp = lspBuilder.build();
@@ -273,12 +281,12 @@ final class ExampleTwoEchelonGrid {
 
 		//Todo: ZZZZZZZZZ Trying to enable choosing of other plan... first try: use a RandomPlanSelector, KMT Jul22
 //		GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new RandomPlanSelector<>());
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-		replanner.setEmbeddingContainer(lsp);
+//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+//		strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
+//		replanner.setEmbeddingContainer(lsp);
 
-		lsp.setReplanner(replanner);
+//		lsp.setReplanner(replanner);
 
 		log.info("create initial LSPShipments");
 		log.info("assign the shipments to the LSP");
@@ -293,7 +301,7 @@ final class ExampleTwoEchelonGrid {
 	}
 
 	private static Collection<LSPShipment> createInitialLSPShipments() {
-		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		List<LSPShipment> shipmentList = new ArrayList<>();
 
 		Random rand = MatsimRandom.getRandom();
 		int i = 1;

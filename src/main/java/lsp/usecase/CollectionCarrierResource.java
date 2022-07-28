@@ -24,18 +24,13 @@ import lsp.LSPCarrierResource;
 import lsp.LSPDataObject;
 import lsp.LSPResource;
 import lsp.LogisticsSolutionElement;
-import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {

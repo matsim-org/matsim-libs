@@ -20,11 +20,9 @@
 
 package lsp;
 
-import lsp.replanning.LSPReplanner;
-import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.ArrayList;
@@ -49,6 +47,7 @@ public final class LSPUtils {
 	}
 
 	public static void addLSPs(Scenario scenario, LSPs lsps) {
+		FreightUtils.addOrGetCarriers( scenario );
 		scenario.addScenarioElement(lspsString, lsps);
 	}
 
@@ -94,8 +93,8 @@ public final class LSPUtils {
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
-		LSPScorer scorer;
-		LSPReplanner replanner;
+//		LSPScorer scorer;
+//		LSPReplanner replanner;
 
 
 		private LSPBuilder(Id<LSP> id) {
@@ -112,21 +111,27 @@ public final class LSPUtils {
 			return this;
 		}
 
-		/**
-		 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
-		 * 		we cannot use injection ... since we cannot inject as many scorers as we have agents.  (At least this is what I think.) Which means
-		 * 		that the approach in matsim core and in carriers to have XxxScoringFunctionFactory is better for what we are doing here.  yyyyyy So
-		 * 		this needs to be changed.  kai, jul'22
-		 */
-		public LSPBuilder setSolutionScorer(LSPScorer scorer) {
-			this.scorer = scorer;
-			return this;
-		}
+//		/**
+//		 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
+//		 * 		we cannot use injection ... since we cannot inject as many scorers as we have agents.  (At least this is what I think.) Which means
+//		 * 		that the approach in matsim core and in carriers to have XxxScoringFunctionFactory is better for what we are doing here.  yyyyyy So
+//		 * 		this needs to be changed.  kai, jul'22
+//		 */
+//		public LSPBuilder setSolutionScorer(LSPScorer scorer) {
+//			this.scorer = scorer;
+//			return this;
+//		}
 
-		public LSPBuilder setReplanner(LSPReplanner replanner) {
-			this.replanner = replanner;
-			return this;
-		}
+//		/**
+//		 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
+//		 * 		we cannot use injection ... since we cannot inject as many replanners as we have agents.  (At least this is what I think.)  yyyyyy So
+//		 * 		this needs to be changed.  kai, jul'22
+//		 */
+//		public LSPBuilder setReplanner(LSPReplanner replanner) {
+//			this.replanner = replanner;
+//			return this;
+//		}
+		// never used.  Thus disabling it.  kai, jul'22
 
 
 		public LSPBuilder setInitialPlan(LSPPlan plan) {

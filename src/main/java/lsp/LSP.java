@@ -20,14 +20,11 @@
 
 package lsp;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.population.HasPlansAndId;
-
-import lsp.replanning.LSPReplanner;
 import lsp.shipment.LSPShipment;
-import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.controler.events.ScoringEvent;
+
+import java.util.Collection;
 
 /**
  * In the class library, the interface LSP has the following tasks:
@@ -39,7 +36,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<LSP> {
 
 	/**
-	 * @return yyyy does this have to be exposed?
+	 * yyyy does this have to be exposed?
 	 */
 	Collection<LSPShipment> getShipments();
 
@@ -50,7 +47,7 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
 
 
 	/**
-	 * @return yyyy does this have to be exposed?
+	 * yyyy does this have to be exposed?
 	 */
 	Collection<LSPResource> getResources();
 
@@ -68,12 +65,13 @@ public interface LSP extends HasPlansAndId<LSPPlan, LSP>, HasSimulationTrackers<
 	 */
 	void assignShipmentToLSP(LSPShipment shipment);
 
-	void replan(ReplanningEvent arg0);
-
-	/**
-	 * @param replanner yyyy does it make sense to expose this (implies that replanner can be changed during iterations)?
-	 */
-	void setReplanner(LSPReplanner replanner);
-
+//	void replan(ReplanningEvent arg0);
+//
+//	/**
+//	 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage with this approach, however, is that
+//	 * 		we cannot use injection ... since we cannot inject as many replanners as we have agents.  (At least this is what I think.)  yyyyyy So
+//	 * 		this needs to be changed.  kai, jul'22 yyyy Need to understand how this is done in core matsim. kai, jul'22
+//	 */
+//	void setReplanner(LSPReplanner replanner);
 
 }    

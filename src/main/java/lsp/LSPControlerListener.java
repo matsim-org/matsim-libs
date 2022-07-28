@@ -18,22 +18,22 @@
  *  * ***********************************************************************
  */
 
-package lsp.controler;
+package lsp;
 
 
-import lsp.*;
 import lsp.shipment.LSPShipment;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierAgentTracker;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,18 +43,18 @@ import java.util.List;
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 							  ReplanningListener, IterationStartsListener{
 	private static final Logger log = Logger.getLogger( LSPControlerListener.class );
-	private final Carriers carriers;
 	private final Scenario scenario;
 
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
-	private CarrierAgentTracker carrierResourceTracker;
+//	private CarrierAgentTracker carrierResourceTracker;
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
+	@Inject private LSPScorerFactory lspScoringFunctionFactory;
+	@Inject @Nullable private LSPStrategyManager strategyManager;
 
 	@Inject LSPControlerListener( Scenario scenario ) {
 		this.scenario = scenario;
-		this.carriers = getCarriers();
 	}
 
 	@Override
@@ -63,41 +63,37 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 
 		LSPRescheduler.notifyBeforeMobsim(lsps, event);
 
-		carrierResourceTracker = new CarrierAgentTracker(carriers, eventsManager );
-		eventsManager.addHandler(carrierResourceTracker);
-
 		for (LSP lsp : lsps.getLSPs().values()) {
+			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction( lsp ) );
 
 			// simulation trackers of lsp:
-			registerEventHandlers(lsp);
+			registerSimulationTrackers(lsp );
 
 			// simulation trackers of shipments:
 			for (LSPShipment shipment : lsp.getShipments()) {
-				registerEventHandlers(shipment);
+				registerSimulationTrackers(shipment );
 			}
 
-			LSPPlan selectedPlan = lsp.getSelectedPlan();
-
 			// simulation trackers of solutions:
-			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
-				registerEventHandlers(solution);
+			for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+				registerSimulationTrackers(solution );
 
 				// simulation trackers of solution elements:
 				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
-					registerEventHandlers(element);
+					registerSimulationTrackers(element );
 
 					// simulation trackers of resources:
-					registerEventHandlers(element.getResource());
+					registerSimulationTrackers(element.getResource() );
 
 				}
 			}
 		}
 	}
 
-	private void registerEventHandlers(HasSimulationTrackers<?> lsp) {
+	private void registerSimulationTrackers( HasSimulationTrackers<?> lsp ) {
 		// get all simulation trackers ...
 		for (LSPSimulationTracker<?> simulationTracker : lsp.getSimulationTrackers()) {
-			// ... register themselves ...
+			// ... register them ...
 			if (!registeredHandlers.contains(simulationTracker)) {
 				log.warn("adding eventsHandler: " + simulationTracker);
 				eventsManager.addHandler(simulationTracker);
@@ -115,26 +111,33 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	// das geht jetzt nicht mehr.  kai, jun'22
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-			lsp.replan(event);
+		if ( strategyManager==null ) {
+			throw new RuntimeException( "You need to set LSPStrategyManager to something meaningful to run iterations." );
+		}
+		final Collection<LSP> lsps = LSPUtils.getLSPs( scenario ).getLSPs().values();
+		strategyManager.run( lsps, event.getIteration(), event.getReplanningContext() );
+		for( LSP lsp : lsps ){
+			lsp.getSelectedPlan().getAssigner().setLSP(lsp);//TODO: Feels weird, but getting NullPointer because of missing lsp inside the assigner
+			//TODO: Do we need to do it for each plan, if it gets selected???
+			// yyyyyy Means IMO that something is incomplete with the plans copying.  kai, jul'22
 		}
 	}
 
 	@Override
-	public void notifyScoring(ScoringEvent event) {
+	public void notifyScoring(ScoringEvent scoringEvent) {
 		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-			lsp.scoreSelectedPlan(event);
+			lsp.scoreSelectedPlan(scoringEvent);
 		}
 		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		eventsManager.removeHandler(carrierResourceTracker);
+//		eventsManager.removeHandler(carrierResourceTracker);
 	}
 
 
-	private Carriers getCarriers() {
+	Carriers getCarriers() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		Carriers carriers = new Carriers();
@@ -154,9 +157,9 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		return carriers;
 	}
 
-	public CarrierAgentTracker getCarrierResourceTracker() {
-		return carrierResourceTracker;
-	}
+//	public CarrierAgentTracker getCarrierResourceTracker() {
+//		return carrierResourceTracker;
+//	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {

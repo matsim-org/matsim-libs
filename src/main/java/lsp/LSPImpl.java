@@ -20,16 +20,13 @@
 
 package lsp;
 
+import lsp.shipment.LSPShipment;
+import org.apache.log4j.Logger;
+import org.matsim.core.controler.events.ScoringEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.events.ReplanningEvent;
-
-import lsp.replanning.LSPReplanner;
-import lsp.shipment.LSPShipment;
-import org.matsim.core.controler.events.ScoringEvent;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = Logger.getLogger(LSPImpl.class);
@@ -40,7 +37,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 	private final Collection<LSPResource> resources;
 	private LSPPlan selectedPlan;
 	private LSPScorer scorer;
-	private LSPReplanner replanner;
+//	private LSPReplanner replanner;
 
 
 	LSPImpl(LSPUtils.LSPBuilder builder) {
@@ -53,15 +50,22 @@ import org.matsim.core.controler.events.ScoringEvent;
 		this.selectedPlan.setLSP(this);
 		this.plans.add(builder.initialPlan);
 		this.resources = builder.resources;
-		this.scorer = builder.scorer;
-		if (this.scorer != null) {
-			this.scorer.setEmbeddingContainer(this);
-			this.addSimulationTracker(this.scorer);
-		}
-		this.replanner = builder.replanner;
-		if (this.replanner != null) {
-			this.replanner.setEmbeddingContainer(this);
-		}
+//		if (builder.scorer != null) {
+//			setScorer( builder.scorer);
+//		}
+//		this.replanner = builder.replanner;
+//		if (this.replanner != null) {
+//			this.replanner.setEmbeddingContainer(this);
+//		}
+	}
+	/**
+	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScorerFactory}.
+	 */
+	/* package-private */ void setScorer(LSPScorer scorer){
+
+		this.scorer = scorer;
+		scorer.setEmbeddingContainer(this);
+		this.addSimulationTracker(scorer);
 	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
@@ -74,8 +78,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
 		copiedPlan.setLSP(plan2copy.getLSP());
-		double initialScoreOfCopiedPlan = plan2copy.getScore();
-		copiedPlan.setScore(initialScoreOfCopiedPlan);
+		copiedPlan.setScore( plan2copy.getScore() );
 		copiedPlan.getSolutions().addAll(copiedSolutions);
 		return copiedPlan;
 	}
@@ -141,7 +144,7 @@ import org.matsim.core.controler.events.ScoringEvent;
 
 	public void scoreSelectedPlan(ScoringEvent scoringEvent) {
 		if (this.scorer != null) {
-			this.selectedPlan.setScore(scorer.computeScoreForCurrentPlan());
+			this.selectedPlan.setScore(scorer.getScoreForCurrentPlan() );
 		} else {
 			log.fatal("trying to score the current LSP plan, but scorer is not set.");
 		}
@@ -154,17 +157,17 @@ import org.matsim.core.controler.events.ScoringEvent;
 		selectedPlan.getAssigner().assignToSolution(shipment);
 	}
 
-	public void replan(final ReplanningEvent arg0) {
-		if (this.replanner != null) {
-			this.replanner.replan(arg0);
-		}
-	}
-
-	@Override
-	public void setReplanner(LSPReplanner replanner) {
-		replanner.setEmbeddingContainer(this);
-		this.replanner = replanner;
-	}
+//	public void replan(final ReplanningEvent arg0) {
+//		if (this.replanner != null) {
+//			this.replanner.replan(arg0);
+//		}
+//	}
+//
+//	@Override
+//	public void setReplanner(LSPReplanner replanner) {
+//		replanner.setEmbeddingContainer(this);
+//		this.replanner = replanner;
+//	}
 
 
 	@Override

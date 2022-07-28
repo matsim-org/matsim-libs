@@ -20,10 +20,8 @@
 
 package example.lsp.lspReplanning;
 
+import com.google.inject.Provider;
 import lsp.*;
-import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanner;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -34,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -43,10 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 /*package-private*/ class ExampleLSPReplanning {
 
@@ -120,18 +116,17 @@ import java.util.Random;
 		// once in the system.  Does it really make sense to now have one per agent?  Maybe just program directly
 		// what you want and need.  ??
 
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-
-		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-		maybeTodayAssigner.setLSP(lsp);
-
-		strategyManager.addStrategy(
-				new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);
-
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-
+//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+//
+//		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+//		maybeTodayAssigner.setLSP(lsp);
+//
+//		strategyManager.addStrategy( new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);
+//
+//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
+//
 //				replanner.setStrategyManager(manager);
-		lsp.setReplanner(replanner);
+//		lsp.setReplanner(replanner);
 //		collectionLSPBuilder.setReplanner( replanner ) ;
 		// yyyy set replanner in builder. kai, sep'18
 
@@ -139,7 +134,7 @@ import java.util.Random;
 	}
 
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network) {
-		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		List<LSPShipment> shipmentList = new ArrayList<>();
 		ArrayList<Link> linkList = new ArrayList<>(network.getLinks().values());
 
 		//Create five LSPShipments that are located in the left half of the network.
@@ -201,6 +196,28 @@ import java.util.Random;
 		//Start the Mobsim two iterations are necessary for replanning
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new LSPModule());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
+					@Override public LSPStrategyManager get(){
+						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+						{
+							ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+							maybeTodayAssigner.setLSP( lsp );
+							strategyManager.addStrategy( new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy(), null, 1 );
+						}
+						return strategyManager;
+					}
+				} );
+			}
+		} );
+		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+
+		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+		maybeTodayAssigner.setLSP(lsp);
+
+		strategyManager.addStrategy( new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);
+
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(4);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

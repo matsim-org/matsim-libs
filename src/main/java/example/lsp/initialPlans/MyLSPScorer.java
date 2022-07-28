@@ -21,7 +21,7 @@ class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEve
 	private double score = 0.;
 
 	@Override
-	public double computeScoreForCurrentPlan() {
+	public double getScoreForCurrentPlan() {
 		return score;
 	}
 

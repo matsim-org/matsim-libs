@@ -20,8 +20,9 @@
 
 package example.lsp.initialPlans;
 
+import com.google.inject.Provider;
 import lsp.*;
-import lsp.controler.LSPModule;
+import lsp.LSPModule;
 import lsp.LSPScorer;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
@@ -44,6 +45,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -130,12 +135,26 @@ import java.util.*;
 		// Injection setzen.
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
+		controler.addOverridingModule(new LSPModule() );
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new MyLSPScorer() );
+
+//				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
+				// The above means there will be no replanning.  The below needs at least one strategy to be happy.  kai, jul'22
+				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
+					@Override public LSPStrategyManager get(){
+						LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+						{
+							PlanSelector<LSPPlan, LSP> planSelector = new RandomPlanSelector<>();
+							GenericPlanStrategy<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<LSPPlan, LSP>( planSelector );
+							strategyManager.addStrategy( strategy, null, 1. );
+						}
+						return strategyManager;
+					}
+				} );
 			}
-		});
+		} );
 
 		log.info("Run MATSim");
 		controler.run();
@@ -165,7 +184,7 @@ import java.util.*;
 				throw new IllegalStateException("Unexpected value: " + solutionType);
 		}
 
-		lspBuilder.setSolutionScorer(new MyLSPScorer());
+//		lspBuilder.setSolutionScorer(new MyLSPScorer());
 
 		final Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)"); //TODO: Hochziehen aber non-static.
 		final Id<Link> hubLinkId = Id.createLinkId("(14 2) (14 3)");
@@ -504,7 +523,7 @@ import java.util.*;
 		private double score = 0.;
 
 		@Override
-		public double computeScoreForCurrentPlan() {
+		public double getScoreForCurrentPlan() {
 			return score;
 		}
 
