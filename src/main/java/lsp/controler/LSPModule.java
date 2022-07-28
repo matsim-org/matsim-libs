@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
@@ -92,19 +93,40 @@ public class LSPModule extends AbstractModule {
 		});
 
 		bind( LSPScoringFunctionFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
-		bind( CarrierScoringFunctionFactory.class ).toProvider( () -> null );
+//		bind( CarrierScoringFunctionFactory.class ).toProvider( () -> null );
+		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
 
 	}
 
-//	@Provides CarrierAgentTracker provideCarrierResourceTracker(LSPControlerListener lspControlerListener) {
-//		return lspControlerListener.getCarrierResourceTracker();
-//	}
 	@Provides Carriers provideCarriers( LSPControlerListener lspControlerListener ) {
 		return lspControlerListener.getCarriers();
 	}
 
 	private static class LSPScoringFunctionFactoryDummyImpl implements LSPScoringFunctionFactory {
 		@Override public ScoringFunction createScoringFunction( LSP lsp ){
+			return new ScoringFunction(){
+				@Override public void handleActivity( Activity activity ){
+				}
+				@Override public void handleLeg( Leg leg ){
+				}
+				@Override public void agentStuck( double time ){
+				}
+				@Override public void addMoney( double amount ){
+				}
+				@Override public void addScore( double amount ){
+				}
+				@Override public void finish(){
+				}
+				@Override public double getScore(){
+					return Double.NEGATIVE_INFINITY;
+				}
+				@Override public void handleEvent( Event event ){
+				}
+			};
+		}
+	}
+	private static class CarrierScoringFactoryDummyImpl implements CarrierScoringFunctionFactory {
+		@Override public ScoringFunction createScoringFunction( Carrier carrier ){
 			return new ScoringFunction(){
 				@Override public void handleActivity( Activity activity ){
 				}
