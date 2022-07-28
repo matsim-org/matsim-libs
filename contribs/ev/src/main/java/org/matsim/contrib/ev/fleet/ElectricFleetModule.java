@@ -20,6 +20,10 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.INITIAL_ENERGY_kWh;
+
+import java.util.Optional;
+
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.EvUnits;
@@ -31,17 +35,12 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import java.util.Iterator;
-import java.util.Optional;
-
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationWithMatsimVehicle.INITIAL_ENERGY_kWh;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -97,8 +96,8 @@ public class ElectricFleetModule extends AbstractModule {
 					}
 				}).asEagerSingleton();
 
-				if(evCfg.getTransferFinalSoCToNextIteration()){
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(new Provider<MobsimListener>() {
+				if (evCfg.getTransferFinalSoCToNextIteration()) {
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
 						@Inject
 						private ElectricFleetSpecification electricFleetSpecification;
 
@@ -106,29 +105,29 @@ public class ElectricFleetModule extends AbstractModule {
 						private ElectricFleet electricFleet;
 
 						@Override
-						public MobsimListener get() {
-							return new MobsimBeforeCleanupListener() {
-								@Override
-								public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-									Iterator<ElectricVehicleSpecification> it = electricFleetSpecification.getVehicleSpecifications().values().iterator();
-									while (it.hasNext()){
-										ElectricVehicleSpecification oldSpecification = it.next();
-										Optional<Vehicle> matsimVehicle = oldSpecification.getMatsimVehicle();
-										double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpecification.getId()).getBattery().getSoc();
+						public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
+								Optional<Vehicle> matsimVehicle = oldSpec.getMatsimVehicle();
+								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles()
+										.get(oldSpec.getId())
+										.getBattery()
+										.getSoc();
 
-										if(matsimVehicle.isPresent()){
-											//should (and need to) overwrite the matsimVehicle attribute. careful: this attribute is in kWh, the SoC is in J
-											matsimVehicle.get().getAttributes().putAttribute(INITIAL_ENERGY_kWh, EvUnits.J_to_kWh(socAtEndOfCurrentIteration));
-											electricFleetSpecification.replaceVehicleSpecification(new ElectricVehicleSpecificationWithMatsimVehicle(matsimVehicle.get()));
-										} else {
-											electricFleetSpecification.replaceVehicleSpecification(ImmutableElectricVehicleSpecification
-													.newBuilder(oldSpecification)
+								if (matsimVehicle.isPresent()) {
+									//should (and need to) overwrite the matsimVehicle attribute. careful: this attribute is in kWh, the SoC is in J
+									matsimVehicle.get()
+											.getAttributes()
+											.putAttribute(INITIAL_ENERGY_kWh,
+													EvUnits.J_to_kWh(socAtEndOfCurrentIteration));
+									electricFleetSpecification.replaceVehicleSpecification(
+											new ElectricVehicleSpecificationWithMatsimVehicle(matsimVehicle.get()));
+								} else {
+									electricFleetSpecification.replaceVehicleSpecification(
+											ImmutableElectricVehicleSpecification.newBuilder(oldSpec)
 													.initialSoc(socAtEndOfCurrentIteration)
 													.build());
-										}
-									}
 								}
-							};
+							}
 						}
 					});
 				}
