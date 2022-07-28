@@ -58,6 +58,10 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String TIME_PROFILES = "timeProfiles";
 	static final String TIME_PROFILES_EXP = "If true, SOC time profile plots will be created";
 
+	private static final String TRANSFER_FINAL_SOC_TO_NEXT_ITERATION_EXP = "determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC in iteration X+1 for each EV." +
+			" If set to true, bear in mind that EV might start with 0% battery charge.";
+	private static final String TRANSFER_FINAL_SOC_TO_NEXT_ITERATION = "transferFinalSoCToNextIteration";
+
 	// no need to simulate with 1-second time step
 	@Positive
 	private int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
@@ -75,6 +79,8 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	private String vehiclesFile = null;
 
 	private boolean timeProfiles = false;
+
+	private boolean transferFinalSoCToNextIteration = false;
 
 	public EvConfigGroup() {
 		super(GROUP_NAME);
@@ -150,6 +156,16 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(MINCHARGETIME)
 	public int getMinimumChargeTime() {
 		return minimumChargeTime;
+	}
+
+	@StringSetter(TRANSFER_FINAL_SOC_TO_NEXT_ITERATION)
+	public void setTransferFinalSoCToNextIteration(boolean transferFinalSoCToNextIteration) {
+		this.transferFinalSoCToNextIteration = transferFinalSoCToNextIteration;
+	}
+
+	@StringGetter(TRANSFER_FINAL_SOC_TO_NEXT_ITERATION)
+	public boolean getTransferFinalSoCToNextIteration() {
+		return transferFinalSoCToNextIteration;
 	}
 }
 
