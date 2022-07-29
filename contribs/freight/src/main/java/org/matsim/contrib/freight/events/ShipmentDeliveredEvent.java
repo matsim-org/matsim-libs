@@ -33,12 +33,12 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 /**
  * This informs the world that a shipment has been delivered.
  * 
- * @author sschroeder
+ * @author sschroeder, kturner
  *
  */
 public class ShipmentDeliveredEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "Shipment delivered";
+	public static final String EVENT_TYPE = "Freight shipment delivered";
 
 	private final Id<CarrierShipment> shipmentId;
 	private final double deliveryDuration;

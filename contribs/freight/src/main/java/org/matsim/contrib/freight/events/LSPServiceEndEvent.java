@@ -32,7 +32,7 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 public final class LSPServiceEndEvent extends AbstractFreightEvent{
 
-	public static final String EVENT_TYPE = "LspServiceEnds";
+	public static final String EVENT_TYPE = "Freight service ends";
 	private final Id<CarrierService> serviceId;
 	private final double serviceDuration;
 

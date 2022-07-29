@@ -34,11 +34,10 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
  * This informs the world that a shipment has been picked up.
  * 
  * @author sschroeder, kturner
- *
  */
 public class ShipmentPickedUpEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "Shipment picked up";
+	public static final String EVENT_TYPE = "Freight shipment picked up";
 
 	private final Id<CarrierShipment> shipmentId;
 	private final double pickupDuration;
