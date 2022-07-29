@@ -65,8 +65,7 @@ import java.util.Collection;
 	@Override
 	public void handleEvent(FreightTourStartEvent event) {
 		for (TourElement tourElement : event.getTour().getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logLoad(event);
 					logTransport(event);
@@ -79,7 +78,7 @@ import java.util.Collection;
 	private void logLoad(FreightTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
-		builder.setLinkId(event.getTour().getStartLinkId());
+		builder.setLinkId(event.getLinkId());
 		double startTime = event.getTime() - getCumulatedLoadingTime(event.getTour());
 		builder.setStartTime(startTime);
 		builder.setEndTime(event.getTime());
@@ -94,8 +93,7 @@ import java.util.Collection;
 	private double getCumulatedLoadingTime(Tour tour) {
 		double cumulatedLoadingTime = 0;
 		for (TourElement tourElement : tour.getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+			if (tourElement instanceof ServiceActivity serviceActivity) {
 				cumulatedLoadingTime = cumulatedLoadingTime + serviceActivity.getDuration();
 			}
 		}
@@ -105,7 +103,7 @@ import java.util.Collection;
 	private void logTransport(FreightTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
-		builder.setFromLinkId(event.getTour().getStartLinkId());
+		builder.setFromLinkId(event.getLinkId());
 		builder.setToLinkId(event.getTour().getEndLinkId());
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);

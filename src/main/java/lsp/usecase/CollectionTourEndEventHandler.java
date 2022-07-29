@@ -66,8 +66,7 @@ import java.util.Collection;
 	public void handleEvent(FreightTourEndEvent event) {
 		Tour tour = event.getTour();
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logTransport(event, tour);
 					logUnload(event, tour);
@@ -93,8 +92,7 @@ import java.util.Collection;
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if (abstractPlanElement instanceof ShipmentLeg) {
-			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
+		if (abstractPlanElement instanceof ShipmentLeg transport) {
 			//Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
 //			transport.setEndTime(event.getTime());
 //			transport.setToLinkId(tour.getEndLinkId());
@@ -104,8 +102,7 @@ import java.util.Collection;
 	private double getTotalUnloadingTime(Tour tour) {
 		double totalTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				totalTime = totalTime + serviceActivity.getDuration();
 			}
 		}

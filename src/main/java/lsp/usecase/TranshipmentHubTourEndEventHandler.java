@@ -70,8 +70,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 		TransshipmentHubEventHandlerPair pair = new TransshipmentHubEventHandlerPair(shipment, solutionElement);
 
 		for (ShipmentPlanElement planElement : shipment.getShipmentPlan().getPlanElements().values()) {
-			if (planElement instanceof ShipmentLeg) {
-				ShipmentLeg transport = (ShipmentLeg) planElement;
+			if (planElement instanceof ShipmentLeg transport) {
 				if (transport.getSolutionElement().getNextElement() == solutionElement) {
 					servicesWaitedFor.put(transport.getCarrierService(), pair);
 				}
@@ -81,11 +80,10 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		if ((event.getTour().getEndLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))) {
+		if ((event.getLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))) {
 
 			for (TourElement tourElement : event.getTour().getTourElements()) {
-				if (tourElement instanceof ServiceActivity) {
-					ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+				if (tourElement instanceof ServiceActivity serviceActivity) {
 					if (serviceActivity.getLocation() == transshipmentHub.getStartLinkId()
 							&& allServicesAreInOnePoint(event.getTour())
 							&& (event.getTour().getStartLinkId() != transshipmentHub.getStartLinkId())) {
@@ -104,8 +102,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	private boolean shipmentsOfTourEndInPoint(Tour tour) {
 		boolean shipmentsEndInPoint = true;
 		for (TourElement tourElement : tour.getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (!servicesWaitedFor.containsKey(serviceActivity.getService())) {
 					return false;
 				}
@@ -135,8 +132,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 	private double getUnloadEndTime(Tour tour) {
 		double unloadEndTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof Tour.ServiceActivity) {
-				Tour.ServiceActivity serviceActivity = (Tour.ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				unloadEndTime = unloadEndTime + serviceActivity.getDuration();
 			}
 		}
@@ -165,8 +161,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 	private boolean allServicesAreInOnePoint(Tour tour) {
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity activity = (ServiceActivity) element;
+			if (element instanceof ServiceActivity activity) {
 				if (activity.getLocation() != tour.getEndLinkId()) {
 					return false;
 				}

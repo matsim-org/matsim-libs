@@ -66,8 +66,7 @@ import java.util.Collection;
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
 		for (TourElement tourElement : event.getTour().getTourElements()) {
-			if (tourElement instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
+			if (tourElement instanceof ServiceActivity serviceActivity) {
 				if (serviceActivity.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 					logUnload(event);
 					logTransport(event);
@@ -93,18 +92,16 @@ import java.util.Collection;
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
-		if (abstractPlanElement instanceof ShipmentLeg) {
-			ShipmentLeg transport = (ShipmentLeg) abstractPlanElement;
+		if (abstractPlanElement instanceof ShipmentLeg transport) {
 			transport.setEndTime(event.getTime() - getTotalUnloadingTime(event.getTour()));
-			transport.setToLinkId(event.getTour().getEndLinkId());
+			transport.setToLinkId(event.getLinkId());
 		}
 	}
 
 	private double getTotalUnloadingTime(Tour tour) {
 		double totalTime = 0;
 		for (TourElement element : tour.getTourElements()) {
-			if (element instanceof ServiceActivity) {
-				ServiceActivity serviceActivity = (ServiceActivity) element;
+			if (element instanceof ServiceActivity serviceActivity) {
 				totalTime = totalTime + serviceActivity.getDuration();
 			}
 		}
