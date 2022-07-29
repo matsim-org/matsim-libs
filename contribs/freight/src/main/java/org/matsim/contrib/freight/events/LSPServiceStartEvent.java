@@ -34,24 +34,18 @@ import java.util.Map;
 
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
-public final class LSPServiceStartEvent extends Event implements HasLinkId, HasVehicleId, HasCarrierId {
+public final class LSPServiceStartEvent extends AbstractFreightEvent {
 
 	public static final String EVENT_TYPE = "LspServiceStarts";
 
 	private final Id<CarrierService> serviceId;
 
-	private final Id<Link> linkId;
-	private final Id<Carrier> carrierId;
-	private final Id<Vehicle> vehicleId;
 	private final double serviceDuration;
 	private final int capacityDemand;
 
 	public LSPServiceStartEvent(Id<Carrier> carrierId, CarrierService service, double time, Id<Vehicle> vehicleId) {
-		super(time);
+		super(time, carrierId, service.getLocationLinkId(), vehicleId);
 		this.serviceId = service.getId();
-		this.linkId = service.getLocationLinkId();
-		this.carrierId = carrierId;
-		this.vehicleId = vehicleId;
 		this.serviceDuration = service.getServiceDuration();
 		this.capacityDemand = service.getCapacityDemand();
 	}
@@ -65,17 +59,6 @@ public final class LSPServiceStartEvent extends Event implements HasLinkId, HasV
 		return serviceId;
 	}
 
-	@Override public Id<Link> getLinkId() {
-		return linkId;
-	}
-
-	@Override public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	@Override public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
 
 	public double getServiceDuration() {
 		return serviceDuration;
@@ -89,7 +72,6 @@ public final class LSPServiceStartEvent extends Event implements HasLinkId, HasV
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
-		attr.put(ATTRIBUTE_CARRIER_ID, carrierId.toString());
 		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;

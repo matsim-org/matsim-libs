@@ -42,7 +42,7 @@ import java.util.Objects;
 			if(Objects.equals(endEvent.getActType(), FreightConstants.SERVICE)) {
 				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
 				if(element instanceof ServiceActivity serviceActivity) {
-					return new LSPServiceEndEvent(carrier.getId(), serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle());
+					return new LSPServiceEndEvent(carrier.getId(), serviceActivity.getService(), event.getTime(), scheduledTour.getVehicle().getId());
 				}
 			}	
 		}
