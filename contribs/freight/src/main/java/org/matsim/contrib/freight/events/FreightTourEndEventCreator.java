@@ -19,17 +19,29 @@
  *
  */
 
-package org.matsim.contrib.freight.events.eventhandler;
+package org.matsim.contrib.freight.events;
 
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 
-/**
- * Interface to listen to shipmentPickedUpEvents.
- * 
- * @author sschroeder
- *
- */
-public interface ShipmentPickedUpEventHandler extends EventHandler {
-	public void handleEvent(ShipmentPickedUpEvent event);
+import java.util.Objects;
+
+/*package-private*/ final class FreightTourEndEventCreator implements FreightEventCreator {
+
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if(event instanceof ActivityStartEvent startEvent) {
+			if(Objects.equals(startEvent.getActType(), FreightConstants.END)) {
+				return new FreightTourEndEvent(startEvent.getTime(), carrier.getId(), scheduledTour.getTour().getEndLinkId(), scheduledTour.getVehicle().getId());
+			}
+		}	
+		return null;
+	}
+
+	
+
 }

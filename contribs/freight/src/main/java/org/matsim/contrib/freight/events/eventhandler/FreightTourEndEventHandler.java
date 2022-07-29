@@ -19,31 +19,14 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events.eventhandler;
 
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.*;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-import java.util.Objects;
 
-/*package-private*/  final class LSPShipmentPickedUpEventCreator implements LSPEventCreator {
+public interface FreightTourEndEventHandler extends EventHandler {
 
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
-		if(event instanceof ActivityEndEvent endEvent) {
-			if(Objects.equals((endEvent).getActType(), FreightConstants.PICKUP)) {
-				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-				if (element instanceof Pickup pickupActivity) {
-					return new ShipmentPickedUpEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), scheduledTour.getVehicle().getId() );
-				}
-			}
-		}
-		return null;
-	}
+	public void handleEvent( FreightTourEndEvent event );
+
 }

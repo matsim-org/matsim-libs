@@ -31,24 +31,26 @@ import java.util.Map;
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
- * This informs the world that a shipment has been delivered.
+ * This informs the world that a shipment has been picked up.
  * 
  * @author sschroeder, kturner
- *
  */
-public class ShipmentDeliveredEvent extends AbstractFreightEvent {
+public class FreightShipmentPickupEndsEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "Freight shipment delivered";
+	public static final String EVENT_TYPE = "Freight shipment picked up";
 
 	private final Id<CarrierShipment> shipmentId;
-	private final double deliveryDuration;
+	private final double pickupDuration;
 	private final int capacityDemand;
-	public ShipmentDeliveredEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
-		super(time, carrierId, shipment.getTo(), vehicleId);
+
+	
+	public FreightShipmentPickupEndsEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getFrom(), vehicleId);
 		this.shipmentId = shipment.getId();
-		this.deliveryDuration = shipment.getDeliveryServiceTime();
+		this.pickupDuration = shipment.getPickupServiceTime();
 		this.capacityDemand = shipment.getSize();
 	}
+
 
 	@Override
 	public String getEventType() {
@@ -59,20 +61,12 @@ public class ShipmentDeliveredEvent extends AbstractFreightEvent {
 		return shipmentId;
 	}
 
-	public double getDeliveryDuration() {
-		return deliveryDuration;
-	}
-
-	public int getCapacityDemand() {
-		return capacityDemand;
-	}
 
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
-		attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
+		attr.put(ATTRIBUTE_PICKUP_DURATION, String.valueOf(this.pickupDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
 	}
-
 }

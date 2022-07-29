@@ -22,8 +22,8 @@ package org.matsim.contrib.freight.events.eventhandler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.LSPTourStartEvent;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.FreightTourStartEvent;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author kturner
  */
-public final class Vehicle2CarrierEventHandler implements LSPTourStartEventHandler, LSPTourEndEventHandler {
+public final class Vehicle2CarrierEventHandler implements FreightTourStartEventHandler, FreightTourEndEventHandler {
 
 	private final Map<Id<Vehicle>, Id<Carrier>> carrierVehicles = new ConcurrentHashMap<>();
 	
@@ -46,12 +46,12 @@ public final class Vehicle2CarrierEventHandler implements LSPTourStartEventHandl
 	}
 
 	@Override
-	public void handleEvent(LSPTourStartEvent event) {
+	public void handleEvent(FreightTourStartEvent event) {
 		carrierVehicles.put(event.getVehicleId(), event.getCarrierId());
 	}
 
 	@Override
-	public void handleEvent(LSPTourEndEvent event) {
+	public void handleEvent(FreightTourEndEvent event) {
 		carrierVehicles.remove(event.getVehicle().getId());
 	}
 

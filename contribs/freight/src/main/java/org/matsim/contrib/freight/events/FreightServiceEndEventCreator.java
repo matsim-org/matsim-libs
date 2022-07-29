@@ -19,18 +19,31 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-public interface LSPEventCreator {
+import java.util.Objects;
 
-	Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter);
-	// activityCounter is currently needed to get the correct "service" or "pickup" / "delivery" activity out auf the scheduled plan.
-	// It is well integrated in the {@link CarrierEventTracker}.
-	// Maybe it can be replaced by the correct freight-activity here --> move the getTourElement ... up
-	// kmt, Jun22
+/*package-private*/  final class FreightServiceEndEventCreator implements FreightEventCreator {
+
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if(event instanceof ActivityEndEvent endEvent){
+			if(Objects.equals(endEvent.getActType(), FreightConstants.SERVICE)) {
+				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+				if(element instanceof ServiceActivity serviceActivity) {
+					return new FreightServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
+				}
+			}	
+		}
+		return null;
+	}
 }

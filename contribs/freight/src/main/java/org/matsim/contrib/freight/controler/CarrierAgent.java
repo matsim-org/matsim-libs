@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.events.FreightEventCreator;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -70,14 +71,14 @@ final class CarrierAgent implements Identifiable<Carrier>
 
 	private final ScoringFunction scoringFunction;
 	private final EventsManager events;
-	private final Collection<LSPEventCreator> lspEventCreators;
+	private final Collection<FreightEventCreator> freightEventCreators;
 
-	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<LSPEventCreator> lspEventCreators ) {
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, EventsManager events, Collection<FreightEventCreator> freightEventCreators) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
 		this.events = events;
-		this.lspEventCreators = lspEventCreators;
+		this.freightEventCreators = freightEventCreators;
 	}
 
 	@Override public Id<Carrier> getId() {
@@ -107,7 +108,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
-			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, lspEventCreators );
+			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour, scoringFunction, carrier, events, freightEventCreators);
 			Plan plan = PopulationUtils.createPlan();
 			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLinkId() );
 			startActivity.setEndTime(scheduledTour.getDeparture());

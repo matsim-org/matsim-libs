@@ -21,12 +21,17 @@
 
 package org.matsim.contrib.freight.events.eventhandler;
 
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
 import org.matsim.core.events.handler.EventHandler;
 
+/**
+ * Interface to listen to shipmentDeliveredEvents.
+ * 
+ * @author sschroeder
+ *
+ */
+public interface FreightShipmentDeliveryEventHandler extends EventHandler {
 
-public interface LSPServiceStartEventHandler extends EventHandler {
-
-	public void handleEvent( LSPServiceStartEvent event );
+	public void handleEvent(FreightShipmentDeliveryEndsEvent event);
 
 }

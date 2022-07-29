@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
 
 import java.util.LinkedHashMap;
 
@@ -87,7 +87,7 @@ class FreightAnalysisServiceTracking {
 	}
 
 	// UNTESTED handling of LSP Service events that provided reliable info about driver and timestamps.
-	public void handleStartEvent(LSPServiceStartEvent event) {
+	public void handleStartEvent(FreightServiceStartEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
 			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
 				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());
@@ -96,7 +96,7 @@ class FreightAnalysisServiceTracking {
 			}
 		}
 	}
-	public void handleEndEvent(LSPServiceEndEvent event) {
+	public void handleEndEvent(FreightServiceEndEvent event) {
 		if (carrierServiceTrackers.containsKey(event.getCarrierId())){
 			if (carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.containsKey(event.getServiceId())){
 				ServiceTracker service = carrierServiceTrackers.get(event.getCarrierId()).serviceTrackers.get(event.getServiceId());

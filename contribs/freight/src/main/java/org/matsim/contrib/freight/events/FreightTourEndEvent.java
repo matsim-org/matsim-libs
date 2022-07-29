@@ -24,41 +24,25 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.vehicles.Vehicle;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
+public final class FreightTourEndEvent extends AbstractFreightEvent {
 
-public final class LSPServiceEndEvent extends AbstractFreightEvent{
+	public static final String EVENT_TYPE = "Freight tour ends";
 
-	public static final String EVENT_TYPE = "Freight service ends";
-	private final Id<CarrierService> serviceId;
-	private final double serviceDuration;
-
-	public LSPServiceEndEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
-		super(time, carrierId, service.getLocationLinkId(), vehicleId);
-		this.serviceId = service.getId();
-		this.serviceDuration = service.getServiceDuration();
+	public FreightTourEndEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
+		super(time, carrierId, linkId, vehicleId);
 	}
 
-	@Override public String getEventType() {
+	@Override
+	public String getEventType() {
 		return EVENT_TYPE;
-	}
-
-	public Id<CarrierService> getServiceId() {
-		return serviceId;
-	}
-
-	public double getServiceDuration() {
-		return serviceDuration;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
-		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
-		return attr;
+		return super.getAttributes();
 	}
 }

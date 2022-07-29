@@ -31,14 +31,14 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.ShipmentDeliveredEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.ShipmentPickedUpEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndsEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
@@ -57,7 +57,7 @@ import java.util.LinkedHashSet;
  * @author Jakob Harnisch (MATSim advanced class 2020/21)
  * */
 
-class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, LSPServiceStartEventHandler, LSPServiceEndEventHandler {
+class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
 	private final static Logger log = Logger.getLogger(FreightAnalysisEventHandler.class);
 	private final Vehicles vehicles;
 	private final Network network;
@@ -154,12 +154,12 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 
 	// LSP Events for Shipments and Services, those are UNTESTED
 	@Override
-	public void handleEvent(ShipmentDeliveredEvent event) {
+	public void handleEvent(FreightShipmentDeliveryEndsEvent event) {
 		shipmentTracking.trackDeliveryEvent(event);
 	}
 
 	@Override
-	public void handleEvent(ShipmentPickedUpEvent event) {
+	public void handleEvent(FreightShipmentPickupEndsEvent event) {
 		shipmentTracking.trackPickedUpEvent(event);
 		// as we know the driver of the shipment now, we can assign the shipment's carrier to the driver's vehicle.
 		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)
@@ -170,12 +170,12 @@ class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnt
 	}
 
 	@Override
-	public void handleEvent(LSPServiceEndEvent event) {
+	public void handleEvent(FreightServiceEndEvent event) {
 		serviceTracking.handleEndEvent(event);
 	}
 
 	@Override
-	public void handleEvent(LSPServiceStartEvent event) {
+	public void handleEvent(FreightServiceStartEvent event) {
 		serviceTracking.handleStartEvent(event);
 		// as we know the driver of a service now, we can assign the shipment's carrier to the driver's vehicle.
 		//FIXME: We do not have the driver in the events anymore. Need to collect them from other places (if we still need them)

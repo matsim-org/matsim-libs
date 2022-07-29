@@ -19,28 +19,29 @@
  *
  */
 
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-final class LSPEventCreatorUtils {
+/*package-private*/  final class FreightServiceStartEventCreator implements FreightEventCreator {
 
-	private LSPEventCreatorUtils(){
+	@Override
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
+		if( event instanceof ActivityStartEvent startEvent ){
+			if( startEvent.getActType().equals(FreightConstants.SERVICE) ) {
+				TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+				if( element instanceof ServiceActivity serviceActivity ) {
+					return new FreightServiceStartEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), scheduledTour.getVehicle().getId());
+				}
+			}	
+		}
+		return null;
 	}
-	static Collection<LSPEventCreator> getStandardEventCreators(){
-		List<LSPEventCreator> creators = new ArrayList<>();
-//		creators.add(new LSPFreightLinkEnterEventCreator());
-//		creators.add(new LSPFreightLinkLeaveEventCreator());
-//		creators.add(new LSPFreightVehicleLeavesTrafficEventCreator());
-		creators.add(new LSPServiceEndEventCreator());
-		creators.add(new LSPServiceStartEventCreator());
-		creators.add(new LSPShipmentDeliveredEventCreator());
-		creators.add(new LSPShipmentPickedUpEventCreator());
-		creators.add(new LSPTourEndEventCreator());
-		creators.add(new LSPTourStartEventCreator());
-		return creators;
-	}
-	
-}
+}	

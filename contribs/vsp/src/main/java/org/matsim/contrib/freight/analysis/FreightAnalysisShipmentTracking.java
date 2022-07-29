@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndsEvent;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -78,7 +78,7 @@ class FreightAnalysisShipmentTracking {
 		}
 	}
 // untested LSP Event handling for precise Shipment Tracking
-	public void trackPickedUpEvent(ShipmentPickedUpEvent event) {
+	public void trackPickedUpEvent(FreightShipmentPickupEndsEvent event) {
 		if (shipments.containsKey(event.getShipmentId())) {
 			shipments.get(event.getShipmentId()).pickUpTime = event.getTime();
 			//FixMe: Driver is no longer part of the events... kmt jul22
@@ -87,7 +87,7 @@ class FreightAnalysisShipmentTracking {
 	}
 
 
-	public void trackDeliveryEvent(ShipmentDeliveredEvent event) {
+	public void trackDeliveryEvent(FreightShipmentDeliveryEndsEvent event) {
 		if (shipments.containsKey(event.getShipment().getId())){
 			ShipmentTracker shipmentTracker = shipments.get(event.getShipment().getId());
 			shipmentTracker.deliveryTime=event.getTime();

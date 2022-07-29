@@ -22,19 +22,27 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
+import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
-public final class LSPTourStartEvent extends AbstractFreightEvent {
+public final class FreightServiceStartEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "Freight tour starts";
+	public static final String EVENT_TYPE = "Freight service starts";
 
-	public LSPTourStartEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
-		super(time, carrierId, linkId, vehicleId);
+	private final Id<CarrierService> serviceId;
+	private final double serviceDuration;
+	private final int capacityDemand;
+
+	public FreightServiceStartEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
+		super(time, carrierId, service.getLocationLinkId(), vehicleId);
+		this.serviceId = service.getId();
+		this.serviceDuration = service.getServiceDuration();
+		this.capacityDemand = service.getCapacityDemand();
 	}
 
 	@Override
@@ -42,8 +50,25 @@ public final class LSPTourStartEvent extends AbstractFreightEvent {
 		return EVENT_TYPE;
 	}
 
+	public Id<CarrierService> getServiceId() {
+		return serviceId;
+	}
+
+
+	public double getServiceDuration() {
+		return serviceDuration;
+	}
+
+	public int getCapacityDemand() {
+		return this.capacityDemand;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
-		return super.getAttributes();
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
+		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
+		return attr;
 	}
 }

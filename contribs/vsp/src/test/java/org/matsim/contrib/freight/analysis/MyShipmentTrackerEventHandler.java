@@ -4,16 +4,15 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
-import org.matsim.contrib.freight.events.eventhandler.ShipmentDeliveredEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.ShipmentPickedUpEventHandler;
+import org.matsim.contrib.freight.events.FreightShipmentDeliveryEndsEvent;
+import org.matsim.contrib.freight.events.FreightShipmentPickupEndsEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.vehicles.Vehicles;
 
-public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler, ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler {
+public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler {
 
     private final Vehicles vehicles;
     private final Network network;
@@ -38,18 +37,18 @@ public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler,
     }
 
     @Override
-    public void handleEvent(ShipmentDeliveredEvent event) {
+    public void handleEvent(FreightShipmentDeliveryEndsEvent event) {
         shipmentTracking.trackDeliveryEvent(event);
     }
 
     @Override
-    public void handleEvent(ShipmentPickedUpEvent event) {
+    public void handleEvent(FreightShipmentPickupEndsEvent event) {
         shipmentTracking.trackPickedUpEvent(event);
     }
 
     @Override
     public void reset(int iteration) {
-        ShipmentPickedUpEventHandler.super.reset(iteration);
+        FreightShipmentPickupEventHandler.super.reset(iteration);
     }
 
     @Override
