@@ -1,11 +1,16 @@
 package org.matsim.modechoice;
 
+import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.ActivityEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
@@ -101,6 +106,11 @@ public final class InformedModeChoiceModule extends AbstractModule {
 			throw new IllegalStateException(String.format("Requested pruner %s in config, but it is not bound in the module", config.getPruning()));
 
 		return pruner;
+	}
+
+	@Provides
+	public PlanRouter planRouter(Provider<TripRouter> tripRouter, ActivityFacilities facilities, TimeInterpretation time) {
+		return new PlanRouter(tripRouter.get(), facilities, time);
 	}
 
 	/**

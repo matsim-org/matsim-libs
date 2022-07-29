@@ -292,6 +292,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 
 					c.applyTo(plan);
 					plan.setType(c.getPlanType());
+					ctx.planRouter.run(plan);
 					return;
 				}
 			}
@@ -336,6 +337,7 @@ public class InformedModeChoicePlanStrategy implements PlanStrategy {
 					if (select != null) {
 						select.applyTo(plan);
 						plan.setType(select.getPlanType());
+						ctx.planRouter.run(plan);
 						return;
 					}
 				}
