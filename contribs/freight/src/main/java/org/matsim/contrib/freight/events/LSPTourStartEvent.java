@@ -24,20 +24,14 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.api.internal.HasVehicleId;
 import org.matsim.vehicles.Vehicle;
 
-import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
-public final class LSPTourStartEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId {
+public final class LSPTourStartEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId, HasCarrierId {
 
 	public static final String EVENT_TYPE = "LspFreightTourStarts";
 
@@ -63,7 +57,7 @@ public final class LSPTourStartEvent extends Event implements HasPersonId, HasLi
 		return EVENT_TYPE;
 	}
 
-	public Id<Carrier> getCarrierId() {
+	@Override public Id<Carrier> getCarrierId() {
 		return carrierId;
 	}
 
@@ -90,7 +84,7 @@ public final class LSPTourStartEvent extends Event implements HasPersonId, HasLi
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		// person, link, vehicle done by superclass
-		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
+		attr.put(ATTRIBUTE_CARRIER_ID, this.carrierId.toString());
 //		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
 		return attr;
 	}

@@ -25,15 +25,16 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Tour;
 
-public final class LSPTourEndEvent extends Event{
+public final class LSPTourEndEvent extends Event {
 
 	public static final String EVENT_TYPE = "LspFreightTourEnded";
-	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE;
+	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE_ID;
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	public static final String ATTRIBUTE_TOUR = "tour";	

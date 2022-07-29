@@ -23,6 +23,8 @@ package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
@@ -32,14 +34,13 @@ import java.util.Map;
 
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
-public final class LSPServiceStartEvent extends Event{
+public final class LSPServiceStartEvent extends Event implements HasLinkId, HasVehicleId, HasCarrierId {
 
 	public static final String EVENT_TYPE = "LspServiceStarts";
 
 	private final Id<CarrierService> serviceId;
 
 	private final Id<Link> linkId;
-
 	private final Id<Carrier> carrierId;
 	private final Id<Vehicle> vehicleId;
 	private final double serviceDuration;
@@ -64,15 +65,15 @@ public final class LSPServiceStartEvent extends Event{
 		return serviceId;
 	}
 
-	public Id<Link> getLinkId() {
+	@Override public Id<Link> getLinkId() {
 		return linkId;
 	}
 
-	public Id<Carrier> getCarrierId() {
+	@Override public Id<Carrier> getCarrierId() {
 		return carrierId;
 	}
 
-	public Id<Vehicle> getVehicleId() {
+	@Override public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
 
@@ -87,11 +88,9 @@ public final class LSPServiceStartEvent extends Event{
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_SERVICE, serviceId.toString());
-		attr.put(ATTRIBUTE_LINK, linkId.toString());
-		attr.put(ATTRIBUTE_CARRIER, carrierId.toString());
-		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
-		attr.put(ATTRIBUTE_SERVICEDURATION, String.valueOf(serviceDuration));
+		attr.put(ATTRIBUTE_SERVICE_ID, serviceId.toString());
+		attr.put(ATTRIBUTE_CARRIER_ID, carrierId.toString());
+		attr.put(ATTRIBUTE_SERVICE_DURATION, String.valueOf(serviceDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;
 	}

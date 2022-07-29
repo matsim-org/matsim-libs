@@ -30,15 +30,18 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 
+import java.util.Objects;
+
 /*package-private*/  final class LSPShipmentPickedUpEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
 							 int activityCounter) {
-		if(event instanceof ActivityEndEvent) {
-			if(event.getEventType().equals(FreightConstants.PICKUP)) {
-				Pickup pickup = (Pickup) activity;
-				return new ShipmentPickedUpEvent(carrier.getId(), pickup.getShipment(), event.getTime());
+		if(event instanceof ActivityEndEvent endEvent) {
+			if(Objects.equals((endEvent).getActType(), FreightConstants.PICKUP)) {
+				if (activity instanceof Pickup pickup) {
+					return new ShipmentPickedUpEvent(carrier.getId(), pickup.getShipment(), event.getTime(), scheduledTour.getVehicle() );
+				}
 			}
 		}
 		return null;

@@ -79,9 +79,8 @@ class FreightAnalysisShipmentTracking {
 	}
 // untested LSP Event handling for precise Shipment Tracking
 	public void trackPickedUpEvent(ShipmentPickedUpEvent event) {
-		if (shipments.containsKey(event.getShipment().getId())) {
-			CarrierShipment shipment = event.getShipment();
-			shipments.get(shipment.getId()).pickUpTime = event.getTime();
+		if (shipments.containsKey(event.getShipmentId())) {
+			shipments.get(event.getShipmentId()).pickUpTime = event.getTime();
 			//FixMe: Driver is no longer part of the events... kmt jul22
 //			shipments.get(shipment.getId()).driverId = event.getDriverId();
 		}
