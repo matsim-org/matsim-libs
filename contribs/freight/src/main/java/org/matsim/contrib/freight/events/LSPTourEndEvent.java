@@ -24,31 +24,16 @@ package org.matsim.contrib.freight.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
-import org.matsim.api.core.v01.events.HasVehicleId;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.vehicles.Vehicle;
 
-public final class LSPTourEndEvent extends Event {
+public final class LSPTourEndEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "LspFreightTourEnded";
-	public static final String ATTRIBUTE_VEHICLE = FreightEventAttributes.ATTRIBUTE_VEHICLE_ID;
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_CARRIER = "carrier";
-	public static final String ATTRIBUTE_TOUR = "tour";	
-	
-	
-	private final Id<Carrier> carrierId;
-	private final Tour tour;
-	private final CarrierVehicle vehicle;
-	
-	public LSPTourEndEvent(Id<Carrier>  carrierId, Tour tour, double time, CarrierVehicle vehicle) {
-		super(time);
-		this.carrierId = carrierId;
-		this.tour = tour;
-		this.vehicle = vehicle;
+	public static final String EVENT_TYPE = "Freight tour ends";
+
+	public LSPTourEndEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
+		super(time, carrierId, linkId, vehicleId);
 	}
 
 	@Override
@@ -56,25 +41,8 @@ public final class LSPTourEndEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	public Tour getTour() {
-		return tour;
-	}
-	
-	public CarrierVehicle getVehicle() {
-		return vehicle;
-	}
-
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicle.getId().toString() );
-		attr.put(ATTRIBUTE_LINK, this.tour.getStartLinkId().toString());
-		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
-		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
-		return attr;
+		return super.getAttributes();
 	}
 }

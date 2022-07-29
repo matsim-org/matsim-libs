@@ -36,7 +36,7 @@ public final class LSPServiceEndEvent extends AbstractFreightEvent{
 	private final Id<CarrierService> serviceId;
 	private final double serviceDuration;
 
-	public LSPServiceEndEvent(Id<Carrier> carrierId, CarrierService service, double time, Id<Vehicle> vehicleId) {
+	public LSPServiceEndEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
 		super(time, carrierId, service.getLocationLinkId(), vehicleId);
 		this.serviceId = service.getId();
 		this.serviceDuration = service.getServiceDuration();

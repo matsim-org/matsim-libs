@@ -29,13 +29,15 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.events.LSPTourStartEvent;
 
+import java.util.Objects;
+
 /*package-private*/  final class LSPTourStartEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
 		if((event instanceof ActivityEndEvent endEvent)) {
-			if(endEvent.getActType().equals(FreightConstants.START)) {
-				return new LSPTourStartEvent(endEvent, carrier.getId(), scheduledTour.getVehicle().getId());
+			if(Objects.equals(endEvent.getActType(), FreightConstants.START)) {
+				return new LSPTourStartEvent(endEvent.getTime(), carrier.getId(), scheduledTour.getTour().getStartLinkId(), scheduledTour.getVehicle().getId());
 			}	
 		}
 		return null;	

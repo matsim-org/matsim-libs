@@ -22,10 +22,6 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
-import org.matsim.api.core.v01.events.HasVehicleId;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.vehicles.Vehicle;
@@ -39,11 +35,10 @@ public final class LSPServiceStartEvent extends AbstractFreightEvent {
 	public static final String EVENT_TYPE = "LspServiceStarts";
 
 	private final Id<CarrierService> serviceId;
-
 	private final double serviceDuration;
 	private final int capacityDemand;
 
-	public LSPServiceStartEvent(Id<Carrier> carrierId, CarrierService service, double time, Id<Vehicle> vehicleId) {
+	public LSPServiceStartEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
 		super(time, carrierId, service.getLocationLinkId(), vehicleId);
 		this.serviceId = service.getId();
 		this.serviceDuration = service.getServiceDuration();

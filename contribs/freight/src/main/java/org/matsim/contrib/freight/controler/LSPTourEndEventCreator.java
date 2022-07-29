@@ -34,11 +34,10 @@ import java.util.Objects;
 /*package-private*/ final class LSPTourEndEventCreator implements LSPEventCreator {
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-							 int activityCounter) {
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {
 		if(event instanceof ActivityStartEvent startEvent) {
 			if(Objects.equals(startEvent.getActType(), FreightConstants.END)) {
-				return new LSPTourEndEvent(carrier.getId(), scheduledTour.getTour(), startEvent.getTime(), scheduledTour.getVehicle());
+				return new LSPTourEndEvent(startEvent.getTime(), carrier.getId(), scheduledTour.getTour().getEndLinkId(), scheduledTour.getVehicle().getId());
 			}
 		}	
 		return null;

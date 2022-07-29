@@ -22,10 +22,13 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
+
+import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
 /**
  * This informs the world that a shipment has been delivered.
@@ -33,29 +36,43 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
  * @author sschroeder
  *
  */
-public class ShipmentDeliveredEvent extends Event {
+public class ShipmentDeliveredEvent extends AbstractFreightEvent {
 
-	private final CarrierShipment shipment;
-	private final Id<Carrier> carrierId;
-	
-	public ShipmentDeliveredEvent(Id<Carrier> carrierId, CarrierShipment shipment, double time) {
-		super(time);
-		this.shipment = shipment;
-		this.carrierId = carrierId;
-	}
+	public static final String EVENT_TYPE = "Shipment delivered";
 
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	public CarrierShipment getShipment() {
-		return shipment;
+	private final Id<CarrierShipment> shipmentId;
+	private final double deliveryDuration;
+	private final int capacityDemand;
+	public ShipmentDeliveredEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getTo(), vehicleId);
+		this.shipmentId = shipment.getId();
+		this.deliveryDuration = shipment.getDeliveryServiceTime();
+		this.capacityDemand = shipment.getSize();
 	}
 
 	@Override
 	public String getEventType() {
-		// TODO Auto-generated method stub
-		return null;
+		return EVENT_TYPE;
 	}
-	
+
+	public Id<CarrierShipment> getShipmentId() {
+		return shipmentId;
+	}
+
+	public double getDeliveryDuration() {
+		return deliveryDuration;
+	}
+
+	public int getCapacityDemand() {
+		return capacityDemand;
+	}
+
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
+		attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
+		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
+		return attr;
+	}
+
 }

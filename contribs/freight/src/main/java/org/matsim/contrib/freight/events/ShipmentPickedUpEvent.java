@@ -22,13 +22,8 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
-import org.matsim.api.core.v01.events.HasVehicleId;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -41,23 +36,18 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
  * @author sschroeder, kturner
  *
  */
-public class ShipmentPickedUpEvent extends Event implements HasLinkId, HasVehicleId, HasCarrierId {
+public class ShipmentPickedUpEvent extends AbstractFreightEvent {
 
 	public static final String EVENT_TYPE = "Shipment picked up";
+
 	private final Id<CarrierShipment> shipmentId;
-	private final Id<Link> linkId;
-	private final Id<Carrier> carrierId;
-	private final Id<Vehicle> vehicleId;
 	private final double pickupDuration;
 	private final int capacityDemand;
 
 	
-	public ShipmentPickedUpEvent(Id<Carrier> carrierId, CarrierShipment shipment, double time, CarrierVehicle vehicle) {
-		super(time);
+	public ShipmentPickedUpEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+		super(time, carrierId, shipment.getFrom(), vehicleId);
 		this.shipmentId = shipment.getId();
-		this.linkId = shipment.getFrom();
-		this.carrierId = carrierId;
-		this.vehicleId = vehicle.getId();
 		this.pickupDuration = shipment.getPickupServiceTime();
 		this.capacityDemand = shipment.getSize();
 	}
@@ -72,23 +62,10 @@ public class ShipmentPickedUpEvent extends Event implements HasLinkId, HasVehicl
 		return shipmentId;
 	}
 
-	@Override public Id<Link> getLinkId() {
-		return this.linkId;
-	}
-
-	@Override public Id<Vehicle> getVehicleId() {
-		return this.vehicleId;
-	}
-
-	@Override public Id<Carrier> getCarrierId() {
-		return null;
-	}
 
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		// person, link, vehicle done by superclass
 		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
-		attr.put(ATTRIBUTE_CARRIER_ID, this.carrierId.toString());
 		attr.put(ATTRIBUTE_PICKUP_DURATION, String.valueOf(this.pickupDuration));
 		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
 		return attr;

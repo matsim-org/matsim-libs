@@ -31,25 +31,12 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.vehicles.Vehicle;
 
 
-public final class LSPTourStartEvent extends Event implements HasPersonId, HasLinkId, HasVehicleId, HasCarrierId {
+public final class LSPTourStartEvent extends AbstractFreightEvent {
 
-	public static final String EVENT_TYPE = "LspFreightTourStarts";
+	public static final String EVENT_TYPE = "Freight tour starts";
 
-	private final Id<Link> linkId;
-	private final Id<Carrier> carrierId;
-	private final Id<Person> personId;
-//	private final Tour tour;
-	private final Id<Vehicle> vehicleId;
-
-	//TODO: Public constructor or usage via creator? kmt' jun'22
-//	public LSPTourStartEvent(ActivityEndEvent event, Id<Carrier>  carrierId, Id<Vehicle> vehicleId, Tour tour) {
-	public LSPTourStartEvent(ActivityEndEvent event, Id<Carrier>  carrierId, Id<Vehicle> vehicleId) {
-		super(event.getTime());
-		this.linkId = event.getLinkId();
-		this.carrierId = carrierId;
-		this.personId = event.getPersonId();
-//		this.tour = tour; 		//TODO: Wo we need the "Tour"-Object here? kmt, jun'22
-		this.vehicleId = vehicleId;
+	public LSPTourStartEvent(double time, Id<Carrier>  carrierId, Id<Link> linkId, Id<Vehicle> vehicleId) {
+		super(time, carrierId, linkId, vehicleId);
 	}
 
 	@Override
@@ -57,35 +44,8 @@ public final class LSPTourStartEvent extends Event implements HasPersonId, HasLi
 		return EVENT_TYPE;
 	}
 
-	@Override public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-//	public Tour getTour() {
-//		return tour;
-//	}
-
-	@Override
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
-
-	@Override
-	public Id<Person> getPersonId() {
-		return this.personId;
-	}
-
-	@Override
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
-
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		// person, link, vehicle done by superclass
-		attr.put(ATTRIBUTE_CARRIER_ID, this.carrierId.toString());
-//		attr.put(ATTRIBUTE_TOUR, this.tour.toString());
-		return attr;
+		return super.getAttributes();
 	}
 }
