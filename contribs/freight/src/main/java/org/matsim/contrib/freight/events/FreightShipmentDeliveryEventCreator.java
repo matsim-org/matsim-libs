@@ -31,7 +31,7 @@ import org.matsim.contrib.freight.carrier.Tour.*;
 
 import java.util.Objects;
 
-/*package-private*/  final class FreightShipmentDeliveredEventCreator implements FreightEventCreator {
+/*package-private*/  final class FreightShipmentDeliveryEventCreator implements FreightEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter) {

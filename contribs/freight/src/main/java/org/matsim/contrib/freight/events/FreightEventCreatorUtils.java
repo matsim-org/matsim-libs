@@ -33,8 +33,8 @@ public final class FreightEventCreatorUtils {
 		List<FreightEventCreator> creators = new ArrayList<>();
 		creators.add(new FreightServiceEndEventCreator());
 		creators.add(new FreightServiceStartEventCreator());
-		creators.add(new FreightShipmentDeliveredEventCreator());
-		creators.add(new FreightShipmentPickedUpEventCreator());
+		creators.add(new FreightShipmentDeliveryEventCreator());
+		creators.add(new FreightShipmentPickupEventCreator());
 		creators.add(new FreightTourEndEventCreator());
 		creators.add(new FreightTourStartEventCreator());
 		return creators;
