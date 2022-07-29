@@ -282,10 +282,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
 			} else {
-				// we find that emission events for vehicleLeavesTrafficEvent make it appear
-				// as if the vehicle drove faster than the allowed freespeed (freeVelocity_ms).
-				// This is because vehicleLeavesTrafficEvent is thrown one second earlier (design decision)
-				// --- FIX could be to add the one second in the vehicleLeavesTrafficEvent emissions calculation.
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 		}
@@ -332,7 +328,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				ef_gpkm = (fractionFreeFlow * efFreeFlow_gpkm) + (fractionStopGo * efStopGo_gpkm);
 
 			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-				ef_gpkm = getEf(vehicleInformationTuple, efkey).getFactor(); // this produces errors if we hard-fix the avg speed error that currently causes tests to fail... ~rjg
+				ef_gpkm = getEf(vehicleInformationTuple, efkey).getFactor(); // this produces errors for vehicle leaves traffic events... ~rjg
 			} else {
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}
