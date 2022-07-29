@@ -88,8 +88,8 @@ class FreightAnalysisShipmentTracking {
 
 
 	public void trackDeliveryEvent(FreightShipmentDeliveryEndsEvent event) {
-		if (shipments.containsKey(event.getShipment().getId())){
-			ShipmentTracker shipmentTracker = shipments.get(event.getShipment().getId());
+		if (shipments.containsKey(event.getShipmentId())){
+			ShipmentTracker shipmentTracker = shipments.get(event.getShipmentId());
 			shipmentTracker.deliveryTime=event.getTime();
 			shipmentTracker.deliveryDuration +=  (event.getTime() - shipmentTracker.pickUpTime);
 		}

@@ -52,7 +52,7 @@ public final class Vehicle2CarrierEventHandler implements FreightTourStartEventH
 
 	@Override
 	public void handleEvent(FreightTourEndEvent event) {
-		carrierVehicles.remove(event.getVehicle().getId());
+		carrierVehicles.remove(event.getVehicleId());
 	}
 
 	/**
