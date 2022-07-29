@@ -11,6 +11,14 @@ import org.matsim.vehicles.Vehicle;
 import java.util.Map;
 
 /**
+ * A general freight event contains the information (= {@link Id}) of the
+ * 	- {@link Carrier}
+ * 	- {@link Vehicle}
+ * 	- the location (= {@link Link})
+ * 	belonging to it.
+ *
+ * 	Instead of adding it to all different freight events, this is consolidated in this abstract class
+ *
  * @author Kai Martins-Turner (kturner)
  */
 public abstract class AbstractFreightEvent extends Event implements HasCarrierId, HasLinkId, HasVehicleId {

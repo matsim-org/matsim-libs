@@ -25,10 +25,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Utils for {@link FreightEventCreator}s
+ *
+ * @author kturner
+ */
 public final class FreightEventCreatorUtils {
 
 	private FreightEventCreatorUtils(){
 	}
+
+	/**
+	 * @return a collection of the standard freightEvent creators
+	 */
 	public static Collection<FreightEventCreator> getStandardEventCreators(){
 		List<FreightEventCreator> creators = new ArrayList<>();
 		creators.add(new FreightServiceEndEventCreator());

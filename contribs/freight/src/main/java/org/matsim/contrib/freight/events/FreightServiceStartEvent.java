@@ -30,6 +30,12 @@ import java.util.Map;
 
 import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 
+/**
+ * An event, that informs when a Freight {@link CarrierService} activity has started.
+ *
+ * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
+ * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
+ */
 public final class FreightServiceStartEvent extends AbstractFreightEvent {
 
 	public static final String EVENT_TYPE = "Freight service starts";

@@ -21,6 +21,11 @@
 
 package org.matsim.contrib.freight.events;
 
+/**
+ *  Some constants, that are used for the Attributes of different FreightEvents.
+ *
+ *  @author Kai Martins-Turner (kturner)
+ */
 public class FreightEventAttributes {
 	public static final String ATTRIBUTE_SERVICE_ID = "serviceId";
 	public static final String ATTRIBUTE_SHIPMENT_ID = "shipmentId";

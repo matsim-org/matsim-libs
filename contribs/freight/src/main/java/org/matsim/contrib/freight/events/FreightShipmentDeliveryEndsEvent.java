@@ -33,7 +33,8 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 /**
  * This informs the world that a shipment has been delivered.
  * 
- * @author sschroeder, kturner
+ * @author sschroeder
+ * @author kturner
  *
  */
 public class FreightShipmentDeliveryEndsEvent extends AbstractFreightEvent {

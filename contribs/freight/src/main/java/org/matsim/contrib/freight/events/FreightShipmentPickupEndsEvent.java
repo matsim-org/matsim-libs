@@ -33,7 +33,8 @@ import static org.matsim.contrib.freight.events.FreightEventAttributes.*;
 /**
  * This informs the world that a shipment has been picked up.
  * 
- * @author sschroeder, kturner
+ * @author sschroeder
+ * @author kturner
  */
 public class FreightShipmentPickupEndsEvent extends AbstractFreightEvent {
 

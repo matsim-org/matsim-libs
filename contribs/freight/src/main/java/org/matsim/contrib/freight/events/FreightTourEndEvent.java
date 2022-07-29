@@ -26,8 +26,16 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * An event, that informs when a Freight {@link Tour} has ended.
+ * There are NO specific information of the tour given, because the {@link Tour} is determined by the {@link Vehicle} and its {@link Carrier}.
+ *
+ * @author Tilman Matteis  - creating it for the use in Logistics / LogisticServiceProviders (LSP)s
+ * @author Kai Martins-Turner (kturner) - integrating and adapting it into/for the MATSim freight contrib
+ */
 public final class FreightTourEndEvent extends AbstractFreightEvent {
 
 	public static final String EVENT_TYPE = "Freight tour ends";
