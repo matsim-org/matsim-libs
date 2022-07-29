@@ -24,16 +24,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import org.matsim.vehicles.Vehicle;
 
 
-/*package-private*/ class CollectionServiceHandler implements LSPServiceStartEventHandler, LSPServiceEndEventHandler {
+/*package-private*/ class CollectionServiceHandler implements FreightServiceStartEventHandler, FreightServiceEndEventHandler {
 
 
 	private final Collection<ServiceTuple> tuples;
@@ -53,7 +53,7 @@ import org.matsim.vehicles.Vehicle;
 	}
 
 	@Override
-	public void handleEvent(LSPServiceEndEvent event) {
+	public void handleEvent(FreightServiceEndEvent event) {
 		System.out.println("Service Ends");
 		double loadingCosts;
 		for (ServiceTuple tuple : tuples) {
@@ -68,7 +68,7 @@ import org.matsim.vehicles.Vehicle;
 	}
 
 	@Override
-	public void handleEvent(LSPServiceStartEvent event) {
+	public void handleEvent(FreightServiceStartEvent event) {
 		totalNumberOfShipments++;
 		totalWeightOfShipments = totalWeightOfShipments + event.getCapacityDemand();
 		tuples.add(new ServiceTuple(event.getServiceId(), event.getTime()));

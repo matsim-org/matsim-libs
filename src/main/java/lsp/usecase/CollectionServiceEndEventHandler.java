@@ -21,12 +21,12 @@
 package lsp.usecase;
 
 import lsp.controler.LSPSimulationTracker;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import lsp.LSPResource;
@@ -37,7 +37,7 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
+class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
@@ -60,14 +60,14 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 	}
 
 	@Override
-	public void handleEvent(LSPServiceEndEvent event) {
+	public void handleEvent(FreightServiceEndEvent event) {
 		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logTransport(event);
 			logLoad(event);
 		}
 	}
 
-	private void logLoad(LSPServiceEndEvent event) {
+	private void logLoad(FreightServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - event.getServiceDuration());
 		builder.setEndTime(event.getTime());
@@ -81,7 +81,7 @@ class CollectionServiceEndEventHandler implements AfterMobsimListener, LSPServic
 		lspShipment.getLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
 
-	private void logTransport(LSPServiceEndEvent event) {
+	private void logTransport(FreightServiceEndEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);

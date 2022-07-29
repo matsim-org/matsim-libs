@@ -20,8 +20,6 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,15 +32,14 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
 
-/*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, LSPTourEndEventHandler {
+/*package-private*/  class TranshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
 
 	private final HashMap<CarrierService, TransshipmentHubEventHandlerPair> servicesWaitedFor;
 	private final TransshipmentHub transshipmentHub;
@@ -83,7 +80,7 @@ import org.matsim.core.events.handler.EventHandler;
 	}
 
 	@Override
-	public void handleEvent(LSPTourEndEvent event) {
+	public void handleEvent(FreightTourEndEvent event) {
 		if ((event.getTour().getEndLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))) {
 
 			for (TourElement tourElement : event.getTour().getTourElements()) {
@@ -117,7 +114,7 @@ import org.matsim.core.events.handler.EventHandler;
 		return shipmentsEndInPoint;
 	}
 
-	private void logReloadAfterCollection(CarrierService carrierService, LSPTourEndEvent event) {
+	private void logReloadAfterCollection(CarrierService carrierService, FreightTourEndEvent event) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
@@ -148,7 +145,7 @@ import org.matsim.core.events.handler.EventHandler;
 		return unloadEndTime;
 	}
 
-	private void logReloadAfterMainRun(CarrierService carrierService, LSPTourEndEvent event) {
+	private void logReloadAfterMainRun(CarrierService carrierService, FreightTourEndEvent event) {
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);

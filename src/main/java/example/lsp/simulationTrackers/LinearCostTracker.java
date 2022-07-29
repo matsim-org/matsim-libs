@@ -34,18 +34,16 @@ import org.matsim.contrib.freight.events.eventhandler.*;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticsSolution>,
 		LinkEnterEventHandler,
 		VehicleLeavesTrafficEventHandler,
-		LSPTourStartEventHandler,
-		LSPServiceStartEventHandler,
-		LSPServiceEndEventHandler,
+		FreightTourStartEventHandler,
+		FreightServiceStartEventHandler,
+		FreightServiceEndEventHandler,
 		LinkLeaveEventHandler {
 
 	private final Collection<EventHandler> eventHandlers;
@@ -151,24 +149,24 @@ import java.util.List;
 			}
 		}
 	}
-	@Override public void handleEvent( LSPTourStartEvent event ){
+	@Override public void handleEvent( FreightTourStartEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof LSPTourStartEventHandler ) {
-				((LSPTourStartEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof FreightTourStartEventHandler) {
+				((FreightTourStartEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
-	@Override public void handleEvent( LSPServiceEndEvent event ){
+	@Override public void handleEvent( FreightServiceEndEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof LSPServiceEndEventHandler ) {
-				((LSPServiceEndEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof FreightServiceEndEventHandler) {
+				((FreightServiceEndEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
-	@Override public void handleEvent( LSPServiceStartEvent event ){
+	@Override public void handleEvent( FreightServiceStartEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof LSPServiceStartEventHandler ) {
-				((LSPServiceStartEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof FreightServiceStartEventHandler) {
+				((FreightServiceStartEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}

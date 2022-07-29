@@ -25,8 +25,8 @@ import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -36,7 +36,7 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/  class DistributionServiceStartEventHandler implements AfterMobsimListener, LSPServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
+/*package-private*/  class DistributionServiceStartEventHandler implements AfterMobsimListener, FreightServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
@@ -58,14 +58,14 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void handleEvent(LSPServiceStartEvent event) {
+	public void handleEvent(FreightServiceStartEvent event) {
 		if (event.getServiceId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logTransport(event);
 			logUnload(event);
 		}
 	}
 
-	private void logTransport(LSPServiceStartEvent event) {
+	private void logTransport(FreightServiceStartEvent event) {
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
@@ -74,7 +74,7 @@ import java.util.Collection;
 		}
 	}
 
-	private void logUnload(LSPServiceStartEvent event) {
+	private void logUnload(FreightServiceStartEvent event) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getLinkId());

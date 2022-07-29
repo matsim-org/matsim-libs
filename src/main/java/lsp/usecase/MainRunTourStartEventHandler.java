@@ -28,8 +28,8 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import org.matsim.contrib.freight.events.LSPTourStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
+import org.matsim.contrib.freight.events.FreightTourStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.LSPCarrierResource;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -39,7 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/*package-private*/ class MainRunTourStartEventHandler implements AfterMobsimListener, LSPTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
+/*package-private*/ class MainRunTourStartEventHandler implements AfterMobsimListener, FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 
 	private final CarrierService carrierService;
 	private final LogisticsSolutionElement solutionElement;
@@ -63,7 +63,7 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void handleEvent(LSPTourStartEvent event) {
+	public void handleEvent(FreightTourStartEvent event) {
 		for (TourElement tourElement : event.getTour().getTourElements()) {
 			if (tourElement instanceof ServiceActivity) {
 				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
@@ -76,7 +76,7 @@ import java.util.Collection;
 
 	}
 
-	private void logLoad(LSPTourStartEvent event) {
+	private void logLoad(FreightTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getTour().getStartLinkId());
@@ -102,7 +102,7 @@ import java.util.Collection;
 		return cumulatedLoadingTime;
 	}
 
-	private void logTransport(LSPTourStartEvent event) {
+	private void logTransport(FreightTourStartEvent event) {
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getTour().getStartLinkId());

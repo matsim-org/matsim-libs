@@ -34,10 +34,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.LSPServiceEndEvent;
-import org.matsim.contrib.freight.events.LSPTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
+import org.matsim.contrib.freight.events.FreightServiceEndEvent;
+import org.matsim.contrib.freight.events.FreightTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -500,7 +500,7 @@ import java.util.*;
 
 	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub}
 
-	private static class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {
+	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
 		private double score = 0.;
 
 		@Override
@@ -513,7 +513,7 @@ import java.util.*;
 		}
 
 		@Override
-		public void handleEvent(LSPTourEndEvent event) {
+		public void handleEvent(FreightTourEndEvent event) {
 			score++;
 			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}
@@ -524,7 +524,7 @@ import java.util.*;
 		}
 
 		@Override
-		public void handleEvent(LSPServiceEndEvent event) {
+		public void handleEvent(FreightServiceEndEvent event) {
 			score++;
 			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}
