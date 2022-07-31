@@ -13,10 +13,9 @@ public class DistanceBasedPruner implements CandidatePruner {
 	/**
 	 * Constructor.
 	 * @param c constant
-	 * @param trip trip factor
 	 * @param dist distance factor
 	 */
-	public DistanceBasedPruner(double c, double trip, double dist) {
+	public DistanceBasedPruner(double c, double dist) {
 		this.c = c;
 		this.dist = dist;
 	}
