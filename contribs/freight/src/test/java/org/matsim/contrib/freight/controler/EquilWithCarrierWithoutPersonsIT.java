@@ -39,17 +39,15 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class EquilWithCarrierWithoutPassIT {
-	// "pass" stands for  "passengers" but means "persons".  Please rename if you feel like it, but you will also have to rename the test input
-	// directory.  kai, jul'22
+public class EquilWithCarrierWithoutPersonsIT {
 
 	private Controler controler;
 	
 	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	public void setUp() {
-		Config config = EquilWithCarrierWithPassIT.commonConfig( testUtils );
-		Scenario scenario = EquilWithCarrierWithPassIT.commonScenario( config, testUtils );
+		Config config = EquilWithCarrierWithPersonsIT.commonConfig( testUtils );
+		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario( config, testUtils );
 		controler = new Controler(scenario);
 	}
 
@@ -69,8 +67,8 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test(expected = IllegalStateException.class )
 	public void testWithoutCarrierRoutes() {
-		Config config = EquilWithCarrierWithPassIT.commonConfig( testUtils );
-		Scenario scenario = EquilWithCarrierWithPassIT.commonScenario( config, testUtils );
+		Config config = EquilWithCarrierWithPersonsIT.commonConfig( testUtils );
+		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario( config, testUtils );
 
 		// set the routes to null:
 		for( Carrier carrier : FreightUtils.getCarriers( scenario ).getCarriers().values() ){
