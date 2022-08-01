@@ -31,7 +31,7 @@ public class MultinomialLogitSelectorTest {
 		);
 
 
-		double[] sample = sample(1000, candidates);
+		double[] sample = selector.sample(1000, candidates);
 
 		assertThat(sample)
 				.containsExactly(0.51, 0.306, 0.184);
@@ -42,7 +42,7 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"walk"}, -70)
 		);
 
-		sample = sample(1000, candidates);
+		sample = selector.sample(1000, candidates);
 
 		assertThat(sample)
 				.containsExactly(0.491, 0.323, 0.186);
@@ -54,7 +54,7 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"walk"}, 5)
 		);
 
-		sample = sample(N, candidates);
+		sample = selector.sample(N, candidates);
 
 		assertThat(sample)
 				.containsExactly(0.42304, 0.42012, 0.15684);
@@ -71,7 +71,7 @@ public class MultinomialLogitSelectorTest {
 		);
 
 
-		double[] sample1 = sample(N, candidates);
+		double[] sample1 = selector.sample(N, candidates);
 
 		candidates = List.of(
 				new PlanCandidate(new String[]{"car"}, -10),
@@ -79,7 +79,7 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"walk"}, -30)
 		);
 
-		double[] sample2 = sample(N, candidates);
+		double[] sample2 = selector.sample(N, candidates);
 
 		candidates = List.of(
 				new PlanCandidate(new String[]{"car"}, 10),
@@ -87,7 +87,7 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"walk"}, -10)
 		);
 
-		double[] sample3 = sample(N, candidates);
+		double[] sample3 = selector.sample(N, candidates);
 
 		assertThat(sample1)
 				.containsExactly(0.50819, 0.30373, 0.18808);
@@ -109,7 +109,7 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"walk"}, 1.05)
 		);
 
-		double[] sample = sample(N, candidates);
+		double[] sample = selector.sample(N, candidates);
 
 		assertThat(sample).containsExactly(0, 1, 0);
 
@@ -125,7 +125,7 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"walk"}, 1.)
 		);
 
-		double[] sample = sample(N, candidates);
+		double[] sample = selector.sample(N, candidates);
 
 		assertThat(sample[0]).isCloseTo(0.5, Offset.offset(0.01));
 		assertThat(sample[1]).isCloseTo(0.5, Offset.offset(0.01));
@@ -141,28 +141,9 @@ public class MultinomialLogitSelectorTest {
 				new PlanCandidate(new String[]{"car"}, 1.)
 		);
 
-		double[] sample = sample(N, candidates);
+		double[] sample = selector.sample(N, candidates);
 
 		assertThat(sample[0]).isEqualTo(1);
 
 	}
-
-	/**
-	 * Sample n times and return relative frequency of how often a candidate was selected.
-	 */
-	private double[] sample(int n, List<PlanCandidate> candidates) {
-
-		double[] res = new double[candidates.size()];
-
-		for (int i = 0; i < n; i++) {
-			res[candidates.indexOf(selector.select(candidates))]++;
-		}
-
-		for (int i = 0; i < res.length; i++) {
-			res[i] /= n;
-		}
-
-		return res;
-	}
-
 }

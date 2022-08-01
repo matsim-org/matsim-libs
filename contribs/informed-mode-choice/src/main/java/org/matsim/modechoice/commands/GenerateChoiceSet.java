@@ -97,7 +97,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		if (scenarioArgs == null || scenarioArgs.isBlank())
 			controler = MATSimApplication.prepare(scenario, config);
 		else
-			controler = MATSimApplication.prepare(scenario, config, scenarioArgs);
+			controler = MATSimApplication.prepare(scenario, config, scenarioArgs.split(" "));
 
 		log.info("Using k={}, pruning={}", topK, pruning);
 

@@ -1,13 +1,23 @@
 package org.matsim.modechoice.replanning;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-import it.unimi.dsi.fastutil.doubles.DoubleList;;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.modechoice.PlanCandidate;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+
+;
 
 /**
  * The MultinomialLogitSelector collects a set of candidates with given
@@ -30,7 +40,6 @@ public class MultinomialLogitSelector implements PlanSelector {
 	private final Random rnd;
 
 	/**
-	 *
 	 * @param scale if scale is 0, always the best option will be picked.
 	 */
 	public MultinomialLogitSelector(double scale, Random rnd) {
@@ -83,6 +92,52 @@ public class MultinomialLogitSelector implements PlanSelector {
 
 		int selection = (int) cumulativeDensity.doubleStream().filter(f -> f < pointer).count();
 		return pcs.get(selection);
+	}
+
+
+	/**
+	 * Write debug information regarding choice probability.
+	 */
+	public static void main(String[] args) throws IOException {
+
+		if (args.length < 2) {
+			System.out.println("Provide at least two choices.");
+			return;
+		}
+
+		List<PlanCandidate> candidates = new ArrayList<>();
+
+		for (String arg : args) {
+			candidates.add(new PlanCandidate(null, Double.parseDouble(arg)));
+		}
+
+		CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(Path.of("choices-sample.tsv")), CSVFormat.MONGODB_TSV);
+
+		printer.print("weight");
+		for (int i = 0; i < candidates.size(); i++)
+			printer.print(String.format("choice %d = %.2f", i, candidates.get(i).getUtility()));
+
+		printer.println();
+
+		double start = 100;
+
+		for (int i = 0; i <= 100; i++) {
+
+			double weight = start - i * start / 100;
+
+			System.out.println("Sampling weight " + weight + " ...");
+
+			MultinomialLogitSelector selector = new MultinomialLogitSelector(weight, new Random());
+			double[] prob = selector.sample(100_000, candidates);
+
+			printer.print(weight);
+			for (double v : prob) {
+				printer.print(v);
+			}
+			printer.println();
+		}
+
+		printer.close();
 	}
 
 }
