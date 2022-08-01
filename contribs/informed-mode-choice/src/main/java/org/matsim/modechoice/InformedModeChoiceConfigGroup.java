@@ -48,7 +48,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * Scale parameter for MNL.
 	 */
-	private double invBeta = 1;
+	private double invBeta = Math.E;
 
 	private String pruning = null;
 
@@ -164,6 +164,10 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public enum Schedule {
 		off,
-		linear
+		linear,
+		quadratic,
+		cubic,
+		exponential,
+		trigonometric
 	}
 }

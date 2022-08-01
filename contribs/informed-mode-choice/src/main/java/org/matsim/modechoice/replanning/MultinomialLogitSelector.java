@@ -6,16 +6,14 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.modechoice.ModeChoiceWeightScheduler;
 import org.matsim.modechoice.PlanCandidate;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 ;
 
@@ -58,7 +56,8 @@ public class MultinomialLogitSelector implements PlanSelector {
 			return candidates.iterator().next();
 
 		// if two option are exactly the same this will be incorrect
-		if (scale <= 0) {
+		// for very small scales, exp overflows, this function needs to return best solution at this point
+		if (scale <= 1 / 700d) {
 			return candidates.stream().sorted().findFirst().orElse(null);
 		}
 
@@ -108,24 +107,25 @@ public class MultinomialLogitSelector implements PlanSelector {
 		List<PlanCandidate> candidates = new ArrayList<>();
 
 		for (String arg : args) {
-			candidates.add(new PlanCandidate(null, Double.parseDouble(arg)));
+			candidates.add(new PlanCandidate(new String[]{arg}, Double.parseDouble(arg)));
 		}
 
 		CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(Path.of("choices-sample.tsv")), CSVFormat.MONGODB_TSV);
 
 		printer.print("weight");
 		for (int i = 0; i < candidates.size(); i++)
-			printer.print(String.format("choice %d = %.2f", i, candidates.get(i).getUtility()));
+			printer.print(String.format(Locale.US, "choice %d = %.2f", i, candidates.get(i).getUtility()));
 
 		printer.println();
 
-		double start = 100;
+		double start = Math.E;
+		int n = 100;
 
-		for (int i = 0; i <= 100; i++) {
+		for (int i = 0; i <= n; i++) {
 
-			double weight = start - i * start / 100;
+			double weight = ModeChoiceWeightScheduler.quadratic(start, n, i);
 
-			System.out.println("Sampling weight " + weight + " ...");
+			System.out.println("Sampling weight " + weight + " @ iteration " + i);
 
 			MultinomialLogitSelector selector = new MultinomialLogitSelector(weight, new Random());
 			double[] prob = selector.sample(100_000, candidates);

@@ -88,7 +88,7 @@ public final class StrategyOptions {
 		if (group.anneal != InformedModeChoiceConfigGroup.Schedule.off)
 			log.accept(config, "anneal", group.anneal);
 
-		if (group.invBeta != 1)
+		if (group.invBeta != Math.E)
 			log.accept(config, "invBeta", group.invBeta);
 
 		if (group.forceInnovation != 10)
@@ -206,13 +206,13 @@ public final class StrategyOptions {
 		@CommandLine.Option(names = "--force-innovation", defaultValue = "10", description = "Force innovative strategy with %% of agents")
 		private int forceInnovation;
 
-		@CommandLine.Option(names = "--inv-beta", defaultValue = "1", description = "Inv beta parameter (0 = best choice)")
-		private double invBeta;
+		@CommandLine.Option(names = "--inv-beta", description = "Inv beta parameter (0 = best choice)")
+		private double invBeta = Math.E;
 
 		@CommandLine.Option(names = "--prune", description = "Name of pruner to enable")
 		private String prune;
 
-		@CommandLine.Option(names = "--anneal", defaultValue = "off", description = "Parameter annealing")
+		@CommandLine.Option(names = "--anneal", defaultValue = "off", description = "Parameter annealing: ${COMPLETION-CANDIDATES}")
 		private InformedModeChoiceConfigGroup.Schedule anneal = InformedModeChoiceConfigGroup.Schedule.off;
 	}
 

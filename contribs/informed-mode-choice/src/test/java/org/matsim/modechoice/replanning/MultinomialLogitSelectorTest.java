@@ -146,4 +146,21 @@ public class MultinomialLogitSelectorTest {
 		assertThat(sample[0]).isEqualTo(1);
 
 	}
+
+	@Test
+	public void precision() {
+
+		selector = new MultinomialLogitSelector(0.01, new Random(0));
+
+		List<PlanCandidate> candidates = List.of(
+				new PlanCandidate(new String[]{"car1"}, 2),
+				new PlanCandidate(new String[]{"car2"}, 10000),
+				new PlanCandidate(new String[]{"car3"}, 1)
+		);
+
+		double[] sample = selector.sample(N, candidates);
+
+		assertThat(sample[1]).isEqualTo(1);
+
+	}
 }
