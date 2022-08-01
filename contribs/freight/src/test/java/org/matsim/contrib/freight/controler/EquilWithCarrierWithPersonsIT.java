@@ -39,9 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class EquilWithCarrierWithPassIT {
-	// "pass" stands for  "passengers" but means "persons".  Please rename if you feel like it, but you would also have to rename the test input
-	// directory.  kai, jul'22
+public class EquilWithCarrierWithPersonsIT {
 
 	private Controler controler;
 
