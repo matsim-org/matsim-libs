@@ -57,8 +57,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
 
-    @CommandLine.Option(names = "--output", description = "Output folder", required = true)
-    private Path outputFolder;
+    @CommandLine.Option(names = "--output", description = "Output path", required = true)
+    private Path outputPath;
 
     @CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
     private boolean cutOnBoundary;
@@ -287,14 +287,14 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
         // Write population
         log.info("Writing population file...");
-        if (!Files.exists(outputFolder)) {
-            Files.createDirectory(outputFolder);
+        if (!Files.exists(outputPath.getParent())) {
+            Files.createDirectory(outputPath.getParent());
         }
-        String extractedPopulationPath = outputFolder.toString() + "/extracted-population.xml.gz";
-        PopulationWriter pw = new PopulationWriter(outputPlans);
-        pw.write(extractedPopulationPath);
 
-        String resultSummaryPath = outputFolder.toString() + "/extracted-freight-trips-locations-summary.tsv";
+        PopulationWriter pw = new PopulationWriter(outputPlans);
+        pw.write(outputPath.toString());
+
+        String resultSummaryPath = outputPath.toString().replace(".gz", "").replace(".xml", "") + "-locations-summary.tsv";
         CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(resultSummaryPath), CSVFormat.TDF);
         tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
         for (int i = 0; i < fromCoords.size(); i++) {

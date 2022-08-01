@@ -73,11 +73,20 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 	@CommandLine.Option(names = "--include-stops", description = "Fully qualified class name to a Predicate<Stop> for filtering certain stops")
 	private Class<?> includeStops;
 
+	@CommandLine.Option(names = "--merge-stops", description = "Whether stops should be merged by coordinate")
+	private boolean mergeStops;
+
+	@CommandLine.Option(names = "--prefix", description = "Prefixes to add to the gtfs ids. Required if multiple inputs are used and ids are not unique.", split = ",")
+	private List<String> prefixes;
+
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions("EPSG:4326");
 
-	@CommandLine.Mixin
-	private ShpOptions shp = new ShpOptions();
+	@CommandLine.Option(names = "--shp", description = "Path to shape file for filtering stops. Can be multiple if different filters on each input file should be used.", arity = "0..*")
+	private List<Path> shpFiles;
+
+	@CommandLine.Option(names = "--shp-crs", description = "Overwrite coordinate system of the shape file")
+	private String shpCrs;
 
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateTransitScheduleFromGtfs()).execute(args));
@@ -95,16 +104,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Predicate<Stop> filter = (stop) -> true;
-		if (shp.getShapeFile() != null) {
-			// default input is set to lat lon
-			ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "_");
-			filter = (stop) -> index.contains(new Coord(stop.stop_lon, stop.stop_lat));
-		}
-
-		if (includeStops != null) {
-			filter = filter.and((Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance());
-		}
+		log.info("Using shp files: {}", shpFiles);
 
 		int i = 0;
 		for (Path gtfsFile : gtfsFiles) {
@@ -113,17 +113,22 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 			log.info("Converting {} at date {}", gtfsFile, date);
 
-			GtfsConverter converter = GtfsConverter.newBuilder()
+			GtfsConverter.Builder converter = GtfsConverter.newBuilder()
 					.setScenario(scenario)
 					.setTransform(ct)
 					.setDate(date) // use first date for all sets
 					.setFeed(gtfsFile)
 					//.setIncludeAgency(agency -> agency.equals("rbg-70"))
-					.setIncludeStop(filter)
-					.setMergeStops(true)
-					.build();
+					.setIncludeStop(createFilter(i))
+					.setMergeStops(mergeStops);
 
-			converter.convert();
+			if (prefixes.size() > 0) {
+				String prefix = prefixes.get(i);
+				converter.setPrefix(prefix);
+				log.info("Using prefix: {}", prefix);
+			}
+
+			converter.build().convert();
 			i++;
 		}
 
@@ -156,6 +161,26 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		return 0;
 	}
 
+	private Predicate<Stop> createFilter(int i) throws Exception {
+
+		Predicate<Stop> filter = (stop) -> true;
+		if (shpFiles != null && !shpFiles.isEmpty()) {
+			ShpOptions shp = new ShpOptions(shpFiles.size() == 1 ? shpFiles.get(0) : shpFiles.get(i), shpCrs, null);
+
+			log.info("Using shp file {} for input {}", shp.getShapeFile(), i);
+
+			// default input is set to lat lon
+			ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "_");
+			filter = (stop) -> index.contains(new Coord(stop.stop_lon, stop.stop_lat));
+		}
+
+		if (includeStops != null) {
+			filter = filter.and((Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance());
+		}
+
+		return filter;
+	}
+
 	/**
 	 * Creates the pt scenario and network.
 	 */
@@ -176,87 +201,87 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 		// and this would be beyond scope here). - gleich sep'19
 		VehiclesFactory vehicleFactory = scenario.getVehicles().getFactory();
 
-		VehicleType reRbVehicleType = vehicleFactory.createVehicleType( Id.create( "RE_RB_veh_type", VehicleType.class ) );
+		VehicleType reRbVehicleType = vehicleFactory.createVehicleType(Id.create("RE_RB_veh_type", VehicleType.class));
 		{
 			VehicleCapacity capacity = reRbVehicleType.getCapacity();
-			capacity.setSeats( 500 );
-			capacity.setStandingRoom( 600 );
+			capacity.setSeats(500);
+			capacity.setStandingRoom(600);
 			VehicleUtils.setDoorOperationMode(reRbVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(reRbVehicleType, 1.0 / 10.0); // 1s per boarding agent, distributed on 10 doors
 			VehicleUtils.setEgressTime(reRbVehicleType, 1.0 / 10.0); // 1s per alighting agent, distributed on 10 doors
-			scenario.getTransitVehicles().addVehicleType( reRbVehicleType );
+			scenario.getTransitVehicles().addVehicleType(reRbVehicleType);
 		}
-		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType( Id.create( "S-Bahn_veh_type", VehicleType.class ) );
+		VehicleType sBahnVehicleType = vehicleFactory.createVehicleType(Id.create("S-Bahn_veh_type", VehicleType.class));
 		{
 			VehicleCapacity capacity = sBahnVehicleType.getCapacity();
-			capacity.setSeats( 400 );
-			capacity.setStandingRoom( 800 );
+			capacity.setSeats(400);
+			capacity.setStandingRoom(800);
 			VehicleUtils.setDoorOperationMode(sBahnVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(sBahnVehicleType, 1.0 / 24.0); // 1s per boarding agent, distributed on 8*3 doors
 			VehicleUtils.setEgressTime(sBahnVehicleType, 1.0 / 24.0); // 1s per alighting agent, distributed on 8*3 doors
-			scenario.getTransitVehicles().addVehicleType( sBahnVehicleType );
+			scenario.getTransitVehicles().addVehicleType(sBahnVehicleType);
 		}
-		VehicleType uBahnVehicleType = vehicleFactory.createVehicleType( Id.create( "U-Bahn_veh_type", VehicleType.class ) );
+		VehicleType uBahnVehicleType = vehicleFactory.createVehicleType(Id.create("U-Bahn_veh_type", VehicleType.class));
 		{
-			VehicleCapacity capacity = uBahnVehicleType.getCapacity() ;
-			capacity.setSeats( 300 );
-			capacity.setStandingRoom( 600 );
+			VehicleCapacity capacity = uBahnVehicleType.getCapacity();
+			capacity.setSeats(300);
+			capacity.setStandingRoom(600);
 			VehicleUtils.setDoorOperationMode(uBahnVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(uBahnVehicleType, 1.0 / 18.0); // 1s per boarding agent, distributed on 6*3 doors
 			VehicleUtils.setEgressTime(uBahnVehicleType, 1.0 / 18.0); // 1s per alighting agent, distributed on 6*3 doors
-			scenario.getTransitVehicles().addVehicleType( uBahnVehicleType );
+			scenario.getTransitVehicles().addVehicleType(uBahnVehicleType);
 		}
-		VehicleType tramVehicleType = vehicleFactory.createVehicleType( Id.create( "Tram_veh_type", VehicleType.class ) );
+		VehicleType tramVehicleType = vehicleFactory.createVehicleType(Id.create("Tram_veh_type", VehicleType.class));
 		{
-			VehicleCapacity capacity = tramVehicleType.getCapacity() ;
-			capacity.setSeats( 80 );
-			capacity.setStandingRoom( 170 );
+			VehicleCapacity capacity = tramVehicleType.getCapacity();
+			capacity.setSeats(80);
+			capacity.setStandingRoom(170);
 			VehicleUtils.setDoorOperationMode(tramVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(tramVehicleType, 1.0 / 5.0); // 1s per boarding agent, distributed on 5 doors
 			VehicleUtils.setEgressTime(tramVehicleType, 1.0 / 5.0); // 1s per alighting agent, distributed on 5 doors
-			scenario.getTransitVehicles().addVehicleType( tramVehicleType );
+			scenario.getTransitVehicles().addVehicleType(tramVehicleType);
 		}
-		VehicleType busVehicleType = vehicleFactory.createVehicleType( Id.create( "Bus_veh_type", VehicleType.class ) );
+		VehicleType busVehicleType = vehicleFactory.createVehicleType(Id.create("Bus_veh_type", VehicleType.class));
 		{
-			VehicleCapacity capacity = busVehicleType.getCapacity() ;
-			capacity.setSeats( 50 );
-			capacity.setStandingRoom( 100 );
+			VehicleCapacity capacity = busVehicleType.getCapacity();
+			capacity.setSeats(50);
+			capacity.setStandingRoom(100);
 			VehicleUtils.setDoorOperationMode(busVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(busVehicleType, 1.0 / 3.0); // 1s per boarding agent, distributed on 3 doors
 			VehicleUtils.setEgressTime(busVehicleType, 1.0 / 3.0); // 1s per alighting agent, distributed on 3 doors
-			scenario.getTransitVehicles().addVehicleType( busVehicleType );
+			scenario.getTransitVehicles().addVehicleType(busVehicleType);
 		}
-		VehicleType ferryVehicleType = vehicleFactory.createVehicleType( Id.create( "Ferry_veh_type", VehicleType.class ) );
+		VehicleType ferryVehicleType = vehicleFactory.createVehicleType(Id.create("Ferry_veh_type", VehicleType.class));
 		{
-			VehicleCapacity capacity = ferryVehicleType.getCapacity() ;
-			capacity.setSeats( 100 );
-			capacity.setStandingRoom( 100 );
+			VehicleCapacity capacity = ferryVehicleType.getCapacity();
+			capacity.setSeats(100);
+			capacity.setStandingRoom(100);
 			VehicleUtils.setDoorOperationMode(ferryVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(ferryVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ferryVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
-			scenario.getTransitVehicles().addVehicleType( ferryVehicleType );
+			scenario.getTransitVehicles().addVehicleType(ferryVehicleType);
 		}
 
-		VehicleType ptVehicleType = vehicleFactory.createVehicleType( Id.create( "Pt_veh_type", VehicleType.class ) );
+		VehicleType ptVehicleType = vehicleFactory.createVehicleType(Id.create("Pt_veh_type", VehicleType.class));
 		{
-			VehicleCapacity capacity = ptVehicleType.getCapacity() ;
-			capacity.setSeats( 100 );
-			capacity.setStandingRoom( 100 );
+			VehicleCapacity capacity = ptVehicleType.getCapacity();
+			capacity.setSeats(100);
+			capacity.setStandingRoom(100);
 			VehicleUtils.setDoorOperationMode(ptVehicleType, VehicleType.DoorOperationMode.serial); // first finish boarding, then start alighting
 			VehicleUtils.setAccessTime(ptVehicleType, 1.0 / 1.0); // 1s per boarding agent, distributed on 1 door
 			VehicleUtils.setEgressTime(ptVehicleType, 1.0 / 1.0); // 1s per alighting agent, distributed on 1 door
-			scenario.getTransitVehicles().addVehicleType( ptVehicleType );
+			scenario.getTransitVehicles().addVehicleType(ptVehicleType);
 		}
 
 		// set link speeds and create vehicles according to pt mode
-		for (TransitLine line: scenario.getTransitSchedule().getTransitLines().values()) {
+		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
 			VehicleType lineVehicleType;
 			String stopFilter = "";
 
 			// identify veh type / mode using gtfs route type (3-digit code, also found at the end of the line id (gtfs: route_id))
 			int gtfsTransitType;
 			try {
-				gtfsTransitType = Integer.parseInt( (String) line.getAttributes().getAttribute("gtfs_route_type"));
+				gtfsTransitType = Integer.parseInt((String) line.getAttributes().getAttribute("gtfs_route_type"));
 			} catch (NumberFormatException e) {
 				log.error("unknown transit mode! Line id was " + line.getId().toString() +
 						"; gtfs route type was " + line.getAttributes().getAttribute("gtfs_route_type"));
@@ -332,7 +357,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 			Set<TransitRoute> toRemove = new HashSet<>();
 
-			for (TransitRoute route: line.getRoutes().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
 				int routeVehId = 0; // simple counter for vehicle id _per_ TransitRoute
 
 				// increase speed if current freespeed is lower.
@@ -344,7 +369,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 				}
 
 				// create vehicles for Departures
-				for (Departure departure: route.getDepartures().values()) {
+				for (Departure departure : route.getDepartures().values()) {
 					Vehicle veh = vehicleFactory.createVehicle(Id.create("pt_" + route.getId().toString() + "_" + Long.toString(routeVehId++), Vehicle.class), lineVehicleType);
 					scenario.getTransitVehicles().addVehicle(veh);
 					departure.setVehicleId(veh.getId());
@@ -367,7 +392,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 					// with arrival time the pt vehicle would have been always delayed
 					// Math.max to avoid negative values of travelTime
 					double travelTime = Math.max(1, routeStop.getArrivalOffset().seconds() - lastDepartureOffset - 1.0 -
-							(stopDuration >= minStopTime ? 0 : (minStopTime - stopDuration))) ;
+							(stopDuration >= minStopTime ? 0 : (minStopTime - stopDuration)));
 					Link link = network.getLinks().get(routeStop.getStopFacility().getLinkId());
 					increaseLinkFreespeedIfLower(link, link.getLength() / travelTime);
 					lastDepartureOffset = routeStop.getDepartureOffset().seconds();
@@ -375,7 +400,7 @@ public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
 				// tag RE, RB, S- and U-Bahn stations for Drt stop filter attribute
 				if (!stopFilter.isEmpty()) {
-					for (TransitRouteStop routeStop: route.getStops()) {
+					for (TransitRouteStop routeStop : route.getStops()) {
 						routeStop.getStopFacility().getAttributes().putAttribute("stopFilter", stopFilter);
 					}
 				}
