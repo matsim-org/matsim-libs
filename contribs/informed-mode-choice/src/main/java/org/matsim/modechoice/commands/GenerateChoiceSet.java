@@ -143,7 +143,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 			log.info("Writing output distribution to {}", out);
 
 			distWriter = Files.newBufferedWriter(out);
-			distWriter.write("person\testimates\n");
+			distWriter.write("person\tn\testimates\n");
 		}
 
 		counter.set(0);
@@ -195,7 +195,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 
 			// the writer is synchronized
 			try {
-				distWriter.write(person.getId() + "\t" +
+				distWriter.write(person.getId() + "\t" + candidates.size() + "\t" +
 						candidates.stream()
 								.map(PlanCandidate::getUtility).map(String::valueOf)
 								.collect(Collectors.joining(";")) +

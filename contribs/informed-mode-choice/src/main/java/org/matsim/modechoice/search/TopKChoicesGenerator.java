@@ -61,6 +61,9 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 		prepareModel(planModel, context);
 
+		if (planModel.trips() == 0)
+			return new ArrayList<>();
+
 		// modes that need to be re-estimated with the full plan
 		Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
 
