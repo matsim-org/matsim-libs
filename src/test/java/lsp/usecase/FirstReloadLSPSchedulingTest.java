@@ -86,7 +86,7 @@ public class FirstReloadLSPSchedulingTest {
 
 
 		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(collectionAdapterId, network);
+		UsecaseUtils.CollectionCarrierResourceBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
 		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);

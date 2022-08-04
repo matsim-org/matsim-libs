@@ -74,7 +74,7 @@ import lsp.shipment.LSPShipment;
 
 		//The Adapter i.e. the Resource is created
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork());
+		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());

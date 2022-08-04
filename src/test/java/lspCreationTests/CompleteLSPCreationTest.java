@@ -81,7 +81,7 @@ public class CompleteLSPCreationTest {
 
 
 		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(collectionAdapterId, network);
+		UsecaseUtils.CollectionCarrierResourceBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
 		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
@@ -135,7 +135,7 @@ public class CompleteLSPCreationTest {
 
 
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
 		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
 		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
@@ -188,7 +188,7 @@ public class CompleteLSPCreationTest {
 
 
 		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
+		UsecaseUtils.DistributionCarrierResourceBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		distributionAdapterBuilder.setCarrier(carrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);

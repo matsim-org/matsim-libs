@@ -88,7 +88,7 @@ public class MainRunAdapterTest {
 
 
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
 		mainRunBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
 		mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
 		mainRunBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));

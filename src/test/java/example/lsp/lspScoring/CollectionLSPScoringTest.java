@@ -77,7 +77,7 @@ public class CollectionLSPScoringTest {
 		Carrier carrier = CarrierUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
 		carrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType).addVehicle(carrierVehicle).setFleetSize(FleetSize.INFINITE).build());
 
-		LSPResource collectionAdapter = CollectionCarrierAdapterBuilder.newInstance(Id.create("CollectionCarrierAdapter", LSPResource.class), network)
+		LSPResource collectionAdapter = CollectionCarrierResourceBuilder.newInstance(Id.create("CollectionCarrierAdapter", LSPResource.class), network)
 				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setCarrier(carrier).setLocationLinkId(collectionLink.getId()).build();
 
 		LogisticsSolutionElement collectionElement = LSPUtils.LogisticsSolutionElementBuilder

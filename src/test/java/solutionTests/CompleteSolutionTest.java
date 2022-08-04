@@ -84,7 +84,7 @@ public class CompleteSolutionTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder
+		UsecaseUtils.CollectionCarrierResourceBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder
 				.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
@@ -139,7 +139,7 @@ public class CompleteSolutionTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId,
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId,
 				network);
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
 		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
@@ -194,7 +194,7 @@ public class CompleteSolutionTest {
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder
+		UsecaseUtils.DistributionCarrierResourceBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierResourceBuilder
 				.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		distributionAdapterBuilder.setCarrier(carrier);

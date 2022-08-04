@@ -87,7 +87,7 @@ public class DistributionAdapterTest {
 
 
 		Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
+		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(adapterId, network);
 		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		builder.setCarrier(distributionCarrier);
 		builder.setLocationLinkId(distributionLinkId);

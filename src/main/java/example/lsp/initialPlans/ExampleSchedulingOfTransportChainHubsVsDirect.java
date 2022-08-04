@@ -239,7 +239,7 @@ import java.util.*;
 							.build());
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(
+			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(
 							Id.create("MainRunAdapter", LSPResource.class), network)
 					.setFromLinkId(depotLinkId)
 					.setToLinkId(hubLinkId)
@@ -292,7 +292,7 @@ import java.util.*;
 							.build());
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource distributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
+			LSPResource distributionAdapter = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(
 							Id.create("DistributionCarrierAdapter", LSPResource.class), network)
 					.setCarrier(distributionCarrier).setLocationLinkId(hubLinkId)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
@@ -327,7 +327,7 @@ import java.util.*;
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource directDistributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
+			LSPResource directDistributionAdapter = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(
 							Id.create("DirectDistributionCarrierAdapter", LSPResource.class), network)
 					.setCarrier(directDistributionCarrier).setLocationLinkId(depotLinkId)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())

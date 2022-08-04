@@ -76,7 +76,7 @@ import lsp.LSPResource;
 
 		//The collection adapter i.e. the Resource is created
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
@@ -138,7 +138,7 @@ import lsp.LSPResource;
 
 		//The adapter i.e. the main run resource is created
 		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
 		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
 		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
 		mainRunAdapterBuilder.setCarrier(mainRunCarrier);
@@ -200,7 +200,7 @@ import lsp.LSPResource;
 
 		//The distribution adapter i.e. the Resource is created
 		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
+		UsecaseUtils.DistributionCarrierResourceBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setCarrier(distributionCarrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 

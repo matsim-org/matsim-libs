@@ -82,7 +82,7 @@ public class AssignerRequirementsTest {
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
 		Id<LSPResource> redAdapterId = Id.create("RedCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(redAdapterId, network);
+		UsecaseUtils.CollectionCarrierResourceBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redAdapterId, network);
 		redAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		redAdapterBuilder.setCarrier(redCarrier);
 		redAdapterBuilder.setLocationLinkId(collectionLinkId);
@@ -118,7 +118,7 @@ public class AssignerRequirementsTest {
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
 		Id<LSPResource> blueAdapterId = Id.create("BlueCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(blueAdapterId, network);
+		UsecaseUtils.CollectionCarrierResourceBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueAdapterId, network);
 		blueAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		blueAdapterBuilder.setCarrier(blueCarrier);
 		blueAdapterBuilder.setLocationLinkId(collectionLinkId);

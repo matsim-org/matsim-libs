@@ -107,7 +107,7 @@ public class CollectionLSPMobsimTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		CollectionCarrierAdapterBuilder adapterBuilder = CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork());
+		CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
 		adapterBuilder.setCollectionScheduler(createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);

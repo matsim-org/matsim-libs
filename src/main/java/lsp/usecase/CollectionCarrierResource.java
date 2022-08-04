@@ -40,7 +40,7 @@ import java.util.List;
 	private final CollectionCarrierScheduler collectionScheduler;
 	private final Network network;
 
-	CollectionCarrierResource(UsecaseUtils.CollectionCarrierAdapterBuilder builder) {
+	CollectionCarrierResource(UsecaseUtils.CollectionCarrierResourceBuilder builder) {
 		super(builder.id);
 		this.collectionScheduler = builder.collectionScheduler;
 		this.clientElements = builder.clientElements;

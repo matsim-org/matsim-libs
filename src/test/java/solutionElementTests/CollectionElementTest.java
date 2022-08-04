@@ -78,7 +78,7 @@ public class CollectionElementTest {
 
 
 		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierResourceBuilder builder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(carrier);
 		builder.setLocationLinkId(collectionLinkId);

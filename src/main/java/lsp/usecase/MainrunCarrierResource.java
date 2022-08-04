@@ -41,7 +41,7 @@ import lsp.LSPResource;
 	private final MainRunCarrierScheduler mainRunScheduler;
 	private final Network network;
 
-	MainRunCarrierResource(UsecaseUtils.MainRunCarrierAdapterBuilder builder) {
+	MainRunCarrierResource(UsecaseUtils.MainRunCarrierResourceBuilder builder) {
 		super(builder.getId());
 		this.carrier = builder.getCarrier();
 		this.fromLinkId = builder.getFromLinkId();
