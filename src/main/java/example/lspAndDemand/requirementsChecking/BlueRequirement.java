@@ -23,19 +23,15 @@ package example.lspAndDemand.requirementsChecking;
 import lsp.LogisticsSolution;
 import lsp.shipment.Requirement;
 
+import static example.lspAndDemand.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
+
 /*package-private*/ class BlueRequirement implements Requirement {
+
+	static final String BLUE = "blue";
 
 	@Override
 	public boolean checkRequirement(LogisticsSolution solution) {
-//		for(LSPInfo info : solution.getAttributes()) {
-//			if(info instanceof BlueInfo) {
-//				return true;
-//			}
-//		}
-		if (solution.getAttributes().getAttribute("color").equals("blue")) {
-			return true;
-		}
-		return false;
+		return solution.getAttributes().getAttribute(ATTRIBUTE_COLOR).equals(BLUE);
 	}
 
 }

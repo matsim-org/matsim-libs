@@ -44,6 +44,8 @@ import java.util.Random;
 
 class ExampleCheckRequirementsOfAssigner {
 
+	static final String ATTRIBUTE_COLOR = "color";
+
 	public static LSP createLSPWithProperties(Network network) {
 
 		//Create red LogisticsSolution which has the corresponding info
@@ -88,7 +90,7 @@ class ExampleCheckRequirementsOfAssigner {
 
 		//Add info that shows the world the color of the solution
 //		redSolution.getAttributes().add(new RedInfo() );
-		redSolution.getAttributes().putAttribute("color", "red");
+		redSolution.getAttributes().putAttribute(ATTRIBUTE_COLOR, RedRequirement.RED);
 
 
 		//Create blue LogisticsSolution which has the corresponding info
@@ -123,7 +125,7 @@ class ExampleCheckRequirementsOfAssigner {
 
 		//Add info that shows the world the color of the solution
 //		blueSolution.getAttributes().add(new BlueInfo() );
-		blueSolution.getAttributes().putAttribute("color", "blue");
+		blueSolution.getAttributes().putAttribute(ATTRIBUTE_COLOR, BlueRequirement.BLUE);
 
 		//Create the initial plan, add assigner that checks requirements of the shipments when assigning and add both solutions (red and blue) to the 
 		//plan.
