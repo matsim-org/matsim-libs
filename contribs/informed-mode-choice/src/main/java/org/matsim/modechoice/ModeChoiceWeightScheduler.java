@@ -56,14 +56,7 @@ public final class ModeChoiceWeightScheduler implements StartupListener, Iterati
 			return;
 
 		// anneal target is 0, iterations are offset by 1 because first iteration does not do replanning
-		switch (anneal) {
-			case linear -> currentBeta = linear(startBeta, n, event.getIteration() - 1);
-			case quadratic -> currentBeta = quadratic(startBeta, n, event.getIteration() - 1);
-			case cubic -> currentBeta = cubic(startBeta, n, event.getIteration() - 1);
-			case exponential -> currentBeta = exponential(startBeta, n, event.getIteration() - 1);
-			case trigonometric -> currentBeta = trigonometric(startBeta, n, event.getIteration() - 1);
-			default -> throw new IllegalStateException("Unknown annealing schedule");
-		}
+		currentBeta = anneal(anneal, startBeta, n, event.getIteration() - 1);
 
 		// Never fall below 0
 		currentBeta = currentBeta < 0 ? 0 : currentBeta;
@@ -77,27 +70,41 @@ public final class ModeChoiceWeightScheduler implements StartupListener, Iterati
 
 	// https://nathanrooy.github.io/posts/2020-05-14/simulated-annealing-with-python/
 
-	public static double linear(double t_0, double n, double k) {
+	/**
+	 * Anneal temperature t_0.
+	 */
+	public static double anneal(InformedModeChoiceConfigGroup.Schedule schedule, double t_0, double n, double k) {
+		return switch (schedule) {
+			case linear -> linear(t_0, n, k);
+			case quadratic ->  quadratic(t_0, n, k);
+			case cubic -> cubic(t_0, n, k);
+			case exponential -> exponential(t_0, n, k);
+			case trigonometric -> trigonometric(t_0, n, k);
+			default -> throw new IllegalStateException("Unknown annealing schedule");
+		};
+	}
+
+	private static double linear(double t_0, double n, double k) {
 		return t_0 * ((n - k) / n);
 	}
 
-	public static double quadratic(double t_0, double n, double k) {
+	private static double quadratic(double t_0, double n, double k) {
 		return t_0 * Math.pow((n - k) / n, 2);
 	}
 
-	public static double cubic(double t_0, double n, double k) {
+	private static double cubic(double t_0, double n, double k) {
 		return t_0 * Math.pow((n - k) / n, 3);
 	}
 
-	public static double exponential(double t_0, double n, double k) {
+	private static double exponential(double t_0, double n, double k) {
 		return t_0 * Math.pow(0.95, k);
 	}
 
-	public static double fast(double t_0, double n, double k) {
+	private static double fast(double t_0, double n, double k) {
 		return t_0 / (k + 1);
 	}
 
-	public static double trigonometric(double t_0, double n, double k) {
+	private static double trigonometric(double t_0, double n, double k) {
 		return 0.5 * t_0 * (1 + Math.cos(k * Math.PI / n));
 	}
 

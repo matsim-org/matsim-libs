@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.ModeChoiceWeightScheduler;
 import org.matsim.modechoice.PlanCandidate;
 
@@ -104,40 +105,50 @@ public class MultinomialLogitSelector implements PlanSelector {
 			return;
 		}
 
-		List<PlanCandidate> candidates = new ArrayList<>();
+		for (InformedModeChoiceConfigGroup.Schedule schedule : List.of(InformedModeChoiceConfigGroup.Schedule.linear, InformedModeChoiceConfigGroup.Schedule.quadratic, InformedModeChoiceConfigGroup.Schedule.cubic,
+				InformedModeChoiceConfigGroup.Schedule.exponential, InformedModeChoiceConfigGroup.Schedule.trigonometric)) {
 
-		for (String arg : args) {
-			candidates.add(new PlanCandidate(new String[]{arg}, Double.parseDouble(arg)));
-		}
+			List<PlanCandidate> candidates = new ArrayList<>();
 
-		CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(Path.of("choices-sample.tsv")), CSVFormat.MONGODB_TSV);
-
-		printer.print("weight");
-		for (int i = 0; i < candidates.size(); i++)
-			printer.print(String.format(Locale.US, "choice %d = %.2f", i, candidates.get(i).getUtility()));
-
-		printer.println();
-
-		double start = Math.E;
-		int n = 100;
-
-		for (int i = 0; i <= n; i++) {
-
-			double weight = ModeChoiceWeightScheduler.quadratic(start, n, i);
-
-			System.out.println("Sampling weight " + weight + " @ iteration " + i);
-
-			MultinomialLogitSelector selector = new MultinomialLogitSelector(weight, new Random());
-			double[] prob = selector.sample(100_000, candidates);
-
-			printer.print(weight);
-			for (double v : prob) {
-				printer.print(v);
+			for (String arg : args) {
+				candidates.add(new PlanCandidate(new String[]{arg}, Double.parseDouble(arg)));
 			}
-			printer.println();
-		}
 
-		printer.close();
+			Path p = Path.of("choices-" + args.length + "-" + schedule + ".tsv");
+
+			System.out.println("Writing to " + p);
+
+			CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(p), CSVFormat.MONGODB_TSV);
+
+			printer.print("x");
+			printer.print("weight");
+			for (int i = 0; i < candidates.size(); i++)
+				printer.print(String.format(Locale.US, "choice %d = %.2f", i, candidates.get(i).getUtility()));
+
+			printer.println();
+
+			double start = Math.E;
+			int n = 100;
+
+			for (int i = 0; i <= n; i++) {
+
+				double weight = ModeChoiceWeightScheduler.anneal(schedule, start, n, i);
+
+				System.out.println("Sampling weight " + weight + " @ iteration " + i);
+
+				MultinomialLogitSelector selector = new MultinomialLogitSelector(weight, new Random());
+				double[] prob = selector.sample(100_000, candidates);
+
+				printer.print(i);
+				printer.print(weight);
+				for (double v : prob) {
+					printer.print(v);
+				}
+				printer.println();
+			}
+
+			printer.close();
+		}
 	}
 
 }

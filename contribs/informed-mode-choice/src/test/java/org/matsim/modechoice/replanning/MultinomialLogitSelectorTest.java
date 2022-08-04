@@ -118,7 +118,7 @@ public class MultinomialLogitSelectorTest {
 	@Test
 	public void sameScore() {
 
-		selector = new MultinomialLogitSelector(0.001, new Random(0));
+		selector = new MultinomialLogitSelector(0.01, new Random(0));
 
 		List<PlanCandidate> candidates = List.of(
 				new PlanCandidate(new String[]{"car"}, 1.),
