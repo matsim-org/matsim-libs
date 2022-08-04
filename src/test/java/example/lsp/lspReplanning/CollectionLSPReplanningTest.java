@@ -20,10 +20,8 @@
 
 package example.lsp.lspReplanning;
 
+import com.google.inject.Provider;
 import lsp.*;
-import lsp.controler.LSPModule;
-import lsp.replanning.LSPReplanner;
-import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
@@ -43,8 +41,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.GenericStrategyManager;
-import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -164,29 +160,42 @@ public class CollectionLSPReplanningTest {
 		collectionLSP.scheduleSolutions();
 
 
-		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-		maybeTodayAssigner.setLSP(collectionLSP);
-		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy();
-
-		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-		strategyManager.addStrategy(strategy, null, 1);
-
-		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-
-
-		collectionLSP.setReplanner(replanner);
+//		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+//		maybeTodayAssigner.setLSP(collectionLSP);
+//		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy();
+//
+//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
+//		strategyManager.addStrategy(strategy, null, 1);
+//
+//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
+//
+//
+//		collectionLSP.setReplanner(replanner);
 
 
 		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(collectionLSP)));
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
+		controler.addOverridingModule(new LSPModule() );
+
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toProvider( new Provider<LSPStrategyManager>(){
+					@Override public LSPStrategyManager get(){
+						LSPStrategyManager manager = new LSPStrategyManagerImpl();
+						{
+							ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
+							maybeTodayAssigner.setLSP( collectionLSP );
+							final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory( maybeTodayAssigner ).createStrategy();
+							// (a factory makes sense if it is passed around; in this case it feels like overkill.  kai, jul'22)
+							manager.addStrategy( strategy, null, 1 );
+						}
+						return manager;
+					}
+				} );
 			}
-		});
+		} );
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);

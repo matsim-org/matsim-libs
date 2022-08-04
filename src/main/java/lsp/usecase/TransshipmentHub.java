@@ -20,20 +20,15 @@
 
 package lsp.usecase;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import lsp.LSPDataObject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LogisticsSolutionElement;
 import lsp.LSPResource;
-import lsp.controler.LSPSimulationTracker;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.

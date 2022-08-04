@@ -22,18 +22,14 @@ package lsp.shipment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import lsp.LSPDataObject;
-import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LogisticsSolution;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment {
 
