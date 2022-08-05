@@ -91,16 +91,16 @@ public class MultipleShipmentsMainRunLSPMobsimTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionAdapterId, network);
-		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionAdapterBuilder.setCarrier(collectionCarrier);
-		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionAdapter = collectionAdapterBuilder.build();
+		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
+		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		collectionResourceBuilder.setCarrier(collectionCarrier);
+		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
+		LSPResource collectionResource = collectionResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionAdapter);
+		collectionBuilder.setResource(collectionResource);
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
@@ -113,11 +113,11 @@ public class MultipleShipmentsMainRunLSPMobsimTest {
 
 		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
-		LSPResource firstTranshipmentHubAdapter = firstTransshipmentHubBuilder.build();
+		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
 		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FirstHubElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId);
-		firstHubElementBuilder.setResource(firstTranshipmentHubAdapter);
+		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
 		LogisticsSolutionElement firstHubElement = firstHubElementBuilder.build();
 
 		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
@@ -144,17 +144,17 @@ public class MultipleShipmentsMainRunLSPMobsimTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunAdapterBuilder.setCarrier(mainRunCarrier);
-		LSPResource mainRunAdapter = mainRunAdapterBuilder.build();
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
+		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunResourceBuilder.setCarrier(mainRunCarrier);
+		LSPResource mainRunResource = mainRunResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunAdapter);
+		mainRunBuilder.setResource(mainRunResource);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
@@ -175,9 +175,9 @@ public class MultipleShipmentsMainRunLSPMobsimTest {
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(collectionAdapter);
-		resourcesList.add(firstTranshipmentHubAdapter);
-		resourcesList.add(mainRunAdapter);
+		resourcesList.add(collectionResource);
+		resourcesList.add(firstTranshipmentHubResource);
+		resourcesList.add(mainRunResource);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);

@@ -76,7 +76,7 @@ public class CollectionLSPPlanTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
 		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);

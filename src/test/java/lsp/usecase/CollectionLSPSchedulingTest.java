@@ -47,7 +47,7 @@ import lsp.LSPResource;
 public class CollectionLSPSchedulingTest {
 
 	private LSP collectionLSP;
-	private LSPResource collectionAdapter;
+	private LSPResource collectionResource;
 	private LogisticsSolutionElement collectionElement;
 
 	@Before
@@ -81,16 +81,16 @@ public class CollectionLSPSchedulingTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
 		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = adapterBuilder.build();
+		collectionResource = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionAdapter);
+		collectionElementBuilder.setResource(collectionResource);
 		collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
@@ -106,7 +106,7 @@ public class CollectionLSPSchedulingTest {
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(collectionAdapter);
+		resourcesList.add(collectionResource);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
@@ -170,7 +170,7 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
 			assertTrue(planElements.get(2).getStartTime() >= (0));
 			assertTrue(planElements.get(2).getStartTime() <= (24*3600));
-			assertSame(planElements.get(2).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(2).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(2).getSolutionElement(), collectionElement);
 			assertEquals("TRANSPORT", planElements.get(1).getElementType());
 			assertTrue(planElements.get(1).getEndTime() >= (0));
@@ -179,7 +179,7 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(planElements.get(1).getStartTime() <= planElements.get(1).getEndTime());
 			assertTrue(planElements.get(1).getStartTime() >= (0));
 			assertTrue(planElements.get(1).getStartTime() <= (24*3600));
-			assertSame(planElements.get(1).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(1).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(1).getSolutionElement(), collectionElement);
 			assertEquals("LOAD", planElements.get(0).getElementType());
 			assertTrue(planElements.get(0).getEndTime() >= (0));
@@ -188,7 +188,7 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(planElements.get(0).getStartTime() <= planElements.get(0).getEndTime());
 			assertTrue(planElements.get(0).getStartTime() >= (0));
 			assertTrue(planElements.get(0).getStartTime() <= (24*3600));
-			assertSame(planElements.get(0).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(0).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 
 			assertEquals(2, shipment.getSimulationTrackers().size());

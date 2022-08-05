@@ -78,16 +78,16 @@ public class CompleteLSPPlanTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionAdapterId, network);
-		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionAdapterBuilder.setCarrier(collectionCarrier);
-		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
+		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
+		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		collectionResourceBuilder.setCarrier(collectionCarrier);
+		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
 
 
 		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionAdapterBuilder.build());
+		collectionBuilder.setResource(collectionResourceBuilder.build());
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
@@ -132,17 +132,17 @@ public class CompleteLSPPlanTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunAdapterBuilder.setCarrier(collectionCarrier);
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
+		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunResourceBuilder.setCarrier(collectionCarrier);
 
 
 		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunAdapterBuilder.build());
+		mainRunBuilder.setResource(mainRunResourceBuilder.build());
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder secondSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
@@ -185,16 +185,16 @@ public class CompleteLSPPlanTest {
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
 
-		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierResourceBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionAdapterId, network);
-		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		distributionAdapterBuilder.setCarrier(carrier);
-		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
+		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
+		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionResourceId, network);
+		distributionResourceBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
+		distributionResourceBuilder.setCarrier(carrier);
+		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
 
 
 		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId);
-		distributionBuilder.setResource(distributionAdapterBuilder.build());
+		distributionBuilder.setResource(distributionResourceBuilder.build());
 		LogisticsSolutionElement distributionElement = distributionBuilder.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);

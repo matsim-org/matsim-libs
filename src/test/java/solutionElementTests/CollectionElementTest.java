@@ -44,7 +44,7 @@ import lsp.LSPResource;
 public class CollectionElementTest {
 
 	private LogisticsSolutionElement collectionElement;
-	private LSPCarrierResource carrierAdapter;
+	private LSPCarrierResource carrierResource;
 
 	@Before
 	public void initialize() {
@@ -77,16 +77,16 @@ public class CollectionElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
 		UsecaseUtils.CollectionCarrierResourceBuilder builder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(carrier);
 		builder.setLocationLinkId(collectionLinkId);
-		carrierAdapter = builder.build();
+		carrierResource = builder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		collectionBuilder.setResource(carrierAdapter);
+		collectionBuilder.setResource(carrierResource);
 		collectionElement = collectionBuilder.build();
 	}
 
@@ -103,7 +103,7 @@ public class CollectionElementTest {
 		assertNotNull(collectionElement.getOutgoingShipments().getShipments());
 		assertTrue(collectionElement.getOutgoingShipments().getSortedShipments().isEmpty());
 		assertNull(collectionElement.getPreviousElement());
-		assertSame(collectionElement.getResource(), carrierAdapter);
+		assertSame(collectionElement.getResource(), carrierResource);
 		assertSame(collectionElement.getResource().getClientElements().iterator().next(), collectionElement);
 	}
 

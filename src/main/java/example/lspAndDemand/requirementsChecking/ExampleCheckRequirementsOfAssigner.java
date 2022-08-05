@@ -71,16 +71,16 @@ class ExampleCheckRequirementsOfAssigner {
 		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
-		Id<LSPResource> redAdapterId = Id.create("RedCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redAdapterId, network);
-		redAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		redAdapterBuilder.setCarrier(redCarrier);
-		redAdapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource redAdapter = redAdapterBuilder.build();
+		Id<LSPResource> redResourceId = Id.create("RedCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder redResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(redResourceId, network);
+		redResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		redResourceBuilder.setCarrier(redCarrier);
+		redResourceBuilder.setLocationLinkId(collectionLinkId);
+		LSPResource redResource = redResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> redElementId = Id.create("RedElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder redElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId);
-		redElementBuilder.setResource(redAdapter);
+		redElementBuilder.setResource(redResource);
 		LogisticsSolutionElement redElement = redElementBuilder.build();
 
 		Id<LogisticsSolution> redSolutionId = Id.create("RedSolution", LogisticsSolution.class);
@@ -106,16 +106,16 @@ class ExampleCheckRequirementsOfAssigner {
 		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
-		Id<LSPResource> blueAdapterId = Id.create("BlueCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierResourceBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueAdapterId, network);
-		blueAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		blueAdapterBuilder.setCarrier(blueCarrier);
-		blueAdapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource blueAdapter = blueAdapterBuilder.build();
+		Id<LSPResource> blueResourceId = Id.create("BlueCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder blueResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(blueResourceId, network);
+		blueResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		blueResourceBuilder.setCarrier(blueCarrier);
+		blueResourceBuilder.setLocationLinkId(collectionLinkId);
+		LSPResource blueResource = blueResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder blueElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId);
-		blueElementBuilder.setResource(blueAdapter);
+		blueElementBuilder.setResource(blueResource);
 		LogisticsSolutionElement blueElement = blueElementBuilder.build();
 
 		Id<LogisticsSolution> blueSolutionId = Id.create("BlueSolution", LogisticsSolution.class);
@@ -138,8 +138,8 @@ class ExampleCheckRequirementsOfAssigner {
 		LSPUtils.LSPBuilder lspBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		lspBuilder.setInitialPlan(plan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(redAdapter);
-		resourcesList.add(blueAdapter);
+		resourcesList.add(redResource);
+		resourcesList.add(blueResource);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		lspBuilder.setSolutionScheduler(simpleScheduler);

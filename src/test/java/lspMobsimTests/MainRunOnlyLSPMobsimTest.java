@@ -92,17 +92,17 @@ public class MainRunOnlyLSPMobsimTest {
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierResourceBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
-		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunAdapterBuilder.setCarrier(mainRunCarrier);
-		LSPResource mainRunAdapter = mainRunAdapterBuilder.build();
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
+		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunResourceBuilder.setCarrier(mainRunCarrier);
+		LSPResource mainRunResource = mainRunResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunAdapter);
+		mainRunBuilder.setResource(mainRunResource);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 
 
@@ -121,7 +121,7 @@ public class MainRunOnlyLSPMobsimTest {
 		completeLSPBuilder.setInitialPlan(completePlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 
-		resourcesList.add(mainRunAdapter);
+		resourcesList.add(mainRunResource);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);

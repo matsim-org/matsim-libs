@@ -77,18 +77,18 @@ public class CollectionLSPScoringTest {
 		Carrier carrier = CarrierUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
 		carrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().addType(collectionVehicleType).addVehicle(carrierVehicle).setFleetSize(FleetSize.INFINITE).build());
 
-		LSPResource collectionAdapter = CollectionCarrierResourceBuilder.newInstance(Id.create("CollectionCarrierAdapter", LSPResource.class), network)
+		LSPResource collectionResource = CollectionCarrierResourceBuilder.newInstance(Id.create("CollectionCarrierResource", LSPResource.class), network)
 				.setCollectionScheduler(createDefaultCollectionCarrierScheduler()).setCarrier(carrier).setLocationLinkId(collectionLink.getId()).build();
 
 		LogisticsSolutionElement collectionElement = LSPUtils.LogisticsSolutionElementBuilder
-				.newInstance(Id.create("CollectionElement", LogisticsSolutionElement.class)).setResource(collectionAdapter).build();
+				.newInstance(Id.create("CollectionElement", LogisticsSolutionElement.class)).setResource(collectionResource).build();
 
 		LogisticsSolution collectionSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(Id.create("CollectionSolution", LogisticsSolution.class))
 				.addSolutionElement(collectionElement).build();
 
 		collectionLSP = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class))
 				.setInitialPlan(LSPUtils.createLSPPlan().setAssigner(createSingleSolutionShipmentAssigner()).addSolution(collectionSolution))
-				.setSolutionScheduler(createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(collectionAdapter)))
+				.setSolutionScheduler(createDefaultSimpleForwardSolutionScheduler(Collections.singletonList(collectionResource)))
 //				.setSolutionScorer(new ExampleLSPScoring.TipScorer())
 				.build();
 
@@ -98,7 +98,7 @@ public class CollectionLSPScoringTest {
 //		function.getAttributes().add(value );
 //		TipInfo info = new TipInfo();
 //		TipScorer.TipSimulationTracker tipTracker = new TipScorer.TipSimulationTracker();
-//		collectionAdapter.addSimulationTracker(tipTracker);
+//		collectionResource.addSimulationTracker(tipTracker);
 //		TipScorer tipScorer = new TipScorer();
 //		collectionLSP.addSimulationTracker( tipScorer );
 //		collectionLSP.setScorer(tipScorer);

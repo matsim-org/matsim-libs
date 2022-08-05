@@ -74,10 +74,10 @@ import java.util.*;
 		Carrier carrier = CarrierUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
 		carrier.setCarrierCapabilities(capabilities);
 
-		//The Adapter i.e. the Resource is created
+		//The Resource i.e. the Resource is created
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		LSPResource lspResource = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(
-						Id.create("CollectionCarrierAdapter", LSPResource.class), network)
+						Id.create("CollectionCarrierResource", LSPResource.class), network)
 				.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler())
 				.setCarrier(carrier).setLocationLinkId(collectionLinkId).build();
 

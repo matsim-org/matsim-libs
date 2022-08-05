@@ -96,18 +96,18 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
 		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId,
 				network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionResource = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionAdapter);
+		collectionElementBuilder.setResource(collectionResource);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
@@ -124,7 +124,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		List<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(collectionAdapter);
+		resourcesList.add(collectionResource);
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
