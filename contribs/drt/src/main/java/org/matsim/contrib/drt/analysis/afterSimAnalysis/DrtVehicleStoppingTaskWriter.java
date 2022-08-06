@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.drt.util.DrtEventsReaders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -46,7 +47,7 @@ public class DrtVehicleStoppingTaskWriter {
 		drtVehicleStoppingTaskWriter.run();
 	}
 
-	public void run() throws IOException {
+	public void run(DrtTaskType... nonStandardTaskTypes) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Network network = scenario.getNetwork();
@@ -56,7 +57,7 @@ public class DrtVehicleStoppingTaskWriter {
 		eventManager.addHandler(stoppingTaskRecorder);
 		eventManager.initProcessing();
 
-		MatsimEventsReader matsimEventsReader = DrtEventsReaders.createEventsReader(eventManager);
+		MatsimEventsReader matsimEventsReader = DrtEventsReaders.createEventsReader(eventManager, nonStandardTaskTypes);
 		matsimEventsReader.readFile(eventsFile);
 		eventManager.finishProcessing();
 
