@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
@@ -63,6 +64,9 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@CommandLine.Option(names = {"--capacities"}, description = "CSV file with lane capacities", required = false)
 	private Path capacities;
 
+	@CommandLine.Option(names = "--free-speed-factor", description = "Free-speed reduction for urban links")
+	private double freeSpeedFactor = LinkProperties.DEFAULT_FREESPEED_FACTOR;
+
 	public static void main(String[] args) {
 		System.exit(new CommandLine(new CreateNetworkFromSumo()).execute(args));
 	}
@@ -70,7 +74,7 @@ public final class CreateNetworkFromSumo implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, shp.getShapeFile(), crs.getInputCRS(), crs.getTargetCRS());
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, shp.getShapeFile(), crs.getInputCRS(), crs.getTargetCRS(), freeSpeedFactor);
 
 		Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
