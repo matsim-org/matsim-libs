@@ -3,8 +3,10 @@ package org.matsim.application.analysis.travelTimeValidation;
 import com.google.common.base.Joiner;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -20,6 +22,7 @@ import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsLayer;
+import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
@@ -226,6 +229,17 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			HereMapsLayer attrLayer = new HereMapsLayer("LINK_ATTRIBUTE", appId, appCode);
 			HereMapsLayer.Result attrs = attrLayer.fetchAll(bbox, fc);
 
+			/*
+			HereMapsLayer attr2Layer = new HereMapsLayer("LINK_ATTRIBUTE2", appId, appCode);
+			HereMapsLayer.Result attrs2 = attr2Layer.fetchAll(bbox, fc);
+
+			HereMapsLayer speedLayer = new HereMapsLayer("SPEED_LIMITS", appId, appCode);
+			HereMapsLayer.Result speed = speedLayer.fetchAll(bbox, fc);
+
+			HereMapsLayer signLayer = new HereMapsLayer("TRAFFIC_SIGN", appId, appCode);
+			HereMapsLayer.Result sign = speedLayer.fetchAll(bbox, fc);
+			 */
+
 			Set<String> written = new HashSet<>();
 
 			for (CSVRecord record : attrs.getRecords()) {
@@ -244,6 +258,8 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 				Node ref = addOrGetNode(network, linkRecord.get("REF_NODE_ID"), ct.transform(new Coord(lon[0], lat[0])));
 				Node nonRef = addOrGetNode(network, linkRecord.get("NONREF_NODE_ID"), ct.transform(new Coord(lon[1], lat[1])));
+
+				double allowedSpeed = parseSpeedCategory(record.get("SPEED_CATEGORY"));
 
 				Set<String> modes = HereMapsLayer.VehicleType.parse(Integer.parseInt(record.get("VEHICLE_TYPES"))).stream()
 						.map(Object::toString).collect(Collectors.toSet());
@@ -266,6 +282,9 @@ public class TravelTimePatterns implements MATSimAppCommand {
 					linkF.setAllowedModes(modes);
 					linkT.setAllowedModes(modes);
 
+					linkF.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+					linkT.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+
 					changeEvents.addAll(createChangeEvents(linkF, fSpeeds.getOrDefault(id, null)));
 					changeEvents.addAll(createChangeEvents(linkT, tSpeeds.getOrDefault(id, null)));
 
@@ -281,6 +300,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 					link.setAllowedModes(modes);
+					link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
 
 					changeEvents.addAll(createChangeEvents(link, fSpeeds.getOrDefault(id, null)));
 
@@ -292,6 +312,7 @@ public class TravelTimePatterns implements MATSimAppCommand {
 
 					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
 					link.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
+					link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
 
 					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 					link.setAllowedModes(modes);
@@ -449,6 +470,20 @@ public class TravelTimePatterns implements MATSimAppCommand {
 			return Double.NaN;
 
 		return Integer.parseInt(s) / 3.6;
+	}
+
+	private static double parseSpeedCategory(String s) {
+		return switch (Integer.parseInt(s)) {
+			case 1 -> 999;
+			case 2 -> 130/3.6;
+			case 3 -> 100/3.6;
+			case 4 -> 90/3.6;
+			case 5 -> 70/3.6;
+			case 6 -> 50/3.6;
+			case 7 -> 30/3.6;
+			case 8 -> 11/3.6;
+			default -> -1;
+		};
 	}
 
 }
