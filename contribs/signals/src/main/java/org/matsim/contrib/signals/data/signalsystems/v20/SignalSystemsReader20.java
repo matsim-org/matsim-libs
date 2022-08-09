@@ -22,9 +22,9 @@ package org.matsim.contrib.signals.data.signalsystems.v20;
 import java.io.InputStream;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
 import org.matsim.api.core.v01.Id;

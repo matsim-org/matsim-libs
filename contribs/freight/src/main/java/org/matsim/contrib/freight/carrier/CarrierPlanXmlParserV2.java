@@ -238,7 +238,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				}
 
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class), vehicleType);
-				vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
 				String startTime = atts.getValue(VEHICLE_EARLIEST_START);
 				if (startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
 				String endTime = atts.getValue(VEHICLE_LATEST_END);
@@ -285,8 +284,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						if (actEndTime == null)
 							throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 						currentStartTime = parseTimeToDouble(actEndTime);
-						previousActLoc = currentVehicle.getLocation();
-						currentTourBuilder.scheduleStart(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+						previousActLoc = currentVehicle.getLinkId();
+						currentTourBuilder.scheduleStart(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 
 						break;
 					case "pickup": {
@@ -318,8 +317,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						break;
 					}
 					case "end":
-						finishLeg(currentVehicle.getLocation());
-						currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
+						finishLeg(currentVehicle.getLinkId() );
+						currentTourBuilder.scheduleEnd(currentVehicle.getLinkId(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 				}
 				break;
@@ -342,6 +341,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			case ATTRIBUTE:
 				attributesReader.startTag(name, atts, context, currAttributes);
 				break;
+			case "route":
+				// do nothing
+				break ;
 			default:
 				logger.warn("Unexpected value while reading in. This field will be ignored: " + name);
 		}

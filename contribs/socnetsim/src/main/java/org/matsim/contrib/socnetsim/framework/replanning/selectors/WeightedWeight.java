@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationUtils;
 
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
@@ -51,7 +50,7 @@ public class WeightedWeight implements WeightCalculator {
 //			personAttributes.getAttribute(
 //				indivPlan.getPerson().getId().toString(),
 //				weightAttribute );
-							PopulationUtils.getPersonAttribute( indivPlan.getPerson(), weightAttribute) ;
+						      indivPlan.getPerson().getAttributes().getAttribute( weightAttribute );
 		return (weight == null ? 1 : weight.doubleValue()) * delegate.getWeight( indivPlan , replanningGroup );
 	}
 }

@@ -34,13 +34,12 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.BestInsertionFinder;
-import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolTestRule;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
+import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -54,7 +53,7 @@ public class SelectiveInsertionProviderTest {
 	@Test
 	public void getInsertions_noInsertionsGenerated() {
 		var insertionProvider = new SelectiveInsertionProvider(initialInsertionFinder,
-				new InsertionGenerator(120, null), rule.forkJoinPool);
+				new InsertionGenerator(new DefaultIncrementalStopDurationEstimator(120), null), rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertion(null, List.of())).isEmpty();
 	}
 

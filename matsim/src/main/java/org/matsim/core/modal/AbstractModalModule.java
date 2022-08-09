@@ -67,6 +67,10 @@ public abstract class AbstractModalModule<M extends Annotation> extends Abstract
 		return MapBinder.newMapBinder(binder(), keyType, valueType, modalAnnotationCreator.mode(getMode()));
 	}
 
+	protected <K, V> MapBinder<K, V> modalMapBinder(TypeLiteral<K> keyType, TypeLiteral<V> valueType) {
+		return MapBinder.newMapBinder(binder(), keyType, valueType, modalAnnotationCreator.mode(getMode()));
+	}
+
 	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter<M>, T> delegate) {
 		return ModalProviders.createProvider(mode, modalAnnotationCreator, delegate);
 	}

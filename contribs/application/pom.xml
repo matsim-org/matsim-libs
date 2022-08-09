@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>com.github.matsim-org</groupId>
 			<artifactId>gtfs2matsim</artifactId>
-			<version>12.2</version>
+			<version>14.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.geotools</groupId>
@@ -78,12 +78,12 @@
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.6.1</version>
+			<version>4.6.3</version>
 		</dependency>
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil</artifactId>
-			<version>8.5.1</version>
+			<version>8.5.8</version>
 		</dependency>
 
 		<dependency>
@@ -99,15 +99,14 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.18.1</version>
 			<scope>test</scope>
 		</dependency>
 		
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.12.0</version>
-        </dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
+		</dependency>
 
 	</dependencies>
 </project>

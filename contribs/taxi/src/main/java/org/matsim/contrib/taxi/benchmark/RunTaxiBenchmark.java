@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
+
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
@@ -61,7 +63,9 @@ public class RunTaxiBenchmark {
 		config.controler().setCreateGraphs(false);
 		DvrpBenchmarks.adjustConfig(config);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
+
 		Controler controler = new Controler(scenario);
 		DvrpBenchmarks.initController(controler);
 

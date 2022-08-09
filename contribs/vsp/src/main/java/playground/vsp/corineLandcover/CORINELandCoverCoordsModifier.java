@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -188,7 +187,7 @@ public class CORINELandCoverCoordsModifier {
                                     homeLocationCoord = coord;
                                     homeActivityName = activityType;
                                 } else {
-                                    Log.warn("First activity is not a home activity...");
+                                    LOG.warn("First activity is not a home activity...");
                                     coord = getRandomCoord(LandCoverUtils.LandCoverActivityType.other, zoneId);
                                 }
                             } else if (activityType.equals(homeActivityName) && sameHomeActivity) {

@@ -15,13 +15,13 @@ public class RunChessboardIT {
     @Test
     public void runChessboard() {
         try{
-            RunChessboard abc = new RunChessboard();
+            RunChessboard runChessboard = new RunChessboard();
             // ---
-            Config config = abc.prepareConfig();
+            Config config = runChessboard.prepareConfig();
             config.controler().setLastIteration( 1 );
             config.controler().setOutputDirectory( utils.getOutputDirectory() );
             // ---
-            abc.run();
+            runChessboard.run();
         } catch (Exception ee ) {
             ee.printStackTrace();
             Assert.fail("something went wrong");

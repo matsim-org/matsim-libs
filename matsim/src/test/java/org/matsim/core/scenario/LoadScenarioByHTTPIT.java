@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -25,9 +27,6 @@ import org.matsim.core.config.ConfigUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author michaz
@@ -40,9 +39,9 @@ public class LoadScenarioByHTTPIT {
 //		Config config = ConfigUtils.loadConfig(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/tutorial/lesson-3/config.xml"));
 		Config config = ConfigUtils.loadConfig(new URL("https://github.com/matsim-org/matsim/raw/master/examples/scenarios/lesson-3/config.xml"));
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		assertThat("Network has expected size.", scenario.getNetwork().getLinks().size(), equalTo(12940));
-		assertThat("Population has expected size.", scenario.getPopulation().getPersons().size(), equalTo(8760));
-		assertThat("There are the expected number of activity facilities.", scenario.getActivityFacilities().getFacilities().size(), equalTo(10281));
+		assertThat(scenario.getNetwork().getLinks()).hasSize(12940);
+		assertThat(scenario.getPopulation().getPersons()).hasSize(8760);
+		assertThat(scenario.getActivityFacilities().getFacilities()).hasSize(10281);
 	}
 
 }

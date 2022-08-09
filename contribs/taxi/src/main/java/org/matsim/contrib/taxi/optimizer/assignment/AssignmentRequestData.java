@@ -19,20 +19,20 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.collect.ImmutableList;
 
-class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
+class AssignmentRequestData extends AssignmentDestinationData<DrtRequest> {
 
 	static AssignmentRequestData create(double currentTime, double planningHorizon,
-			Iterable<TaxiRequest> unplannedRequests) {
+			Iterable<DrtRequest> unplannedRequests) {
 		double maxEarliestStart = currentTime + planningHorizon;
-		ImmutableList.Builder<DestEntry<TaxiRequest>> builder = ImmutableList.builder();
+		ImmutableList.Builder<DestEntry<DrtRequest>> builder = ImmutableList.builder();
 
 		int idx = 0;
 		int urgentReqCount = 0;
-		for (TaxiRequest r : unplannedRequests) {
+		for (DrtRequest r : unplannedRequests) {
 			double earliestStart = r.getEarliestStartTime();
 			if (earliestStart > maxEarliestStart) {// beyond the planning horizon
 				continue;
@@ -48,7 +48,7 @@ class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
 
 	private final int urgentReqCount;
 
-	private AssignmentRequestData(ImmutableList<DestEntry<TaxiRequest>> entries, int urgentReqCount) {
+	private AssignmentRequestData(ImmutableList<DestEntry<DrtRequest>> entries, int urgentReqCount) {
 		super(entries);
 		this.urgentReqCount = urgentReqCount;
 	}

@@ -42,7 +42,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest.OneTaxiRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;

@@ -265,7 +265,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 			manager.setMaxPlansPerAgent(5);
 
 			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<Plan, Person>(config.planCalcScore()));
-			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
+			manager.addStrategy( strategy1, null, 0.80 );
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
@@ -275,13 +275,13 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 //			boolean affectingDuration = false ;
 //			strategy2.addStrategyModule( new TimeAllocationMutator(config, mutationRange, affectingDuration));
 			// ... but the test result looks different. kai, sep'15
-			
-			manager.addStrategyForDefaultSubpopulation(strategy2, 0.80);
+
+			manager.addStrategy( strategy2, null, 0.80 );
 
 			// reduce the replanning probabilities over the iterations
-			manager.addChangeRequestForDefaultSubpopulation(50, strategy2, 0.30);
-			manager.addChangeRequestForDefaultSubpopulation(75, strategy2, 0.10);
-			manager.addChangeRequestForDefaultSubpopulation(95, strategy2, 0.00);
+			manager.addChangeRequest( 50, strategy2, null, 0.30 );
+			manager.addChangeRequest( 75, strategy2, null, 0.10 );
+			manager.addChangeRequest( 95, strategy2, null, 0.00 );
 
 			return manager;
 		}

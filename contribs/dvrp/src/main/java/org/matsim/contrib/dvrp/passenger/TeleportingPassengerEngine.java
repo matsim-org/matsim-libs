@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -48,6 +48,7 @@ import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.modal.ModalProviders;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -184,12 +185,12 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 	@Override
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			PassengerRequest request, double now) {
+			Id<Request> requestId, double now) {
 		throw new UnsupportedOperationException("No picking-up when teleporting");
 	}
 
 	@Override
-	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
+	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
 		throw new UnsupportedOperationException("No dropping-off when teleporting");
 	}
 

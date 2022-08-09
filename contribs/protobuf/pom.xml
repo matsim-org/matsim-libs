@@ -11,7 +11,7 @@
     <name>protobuf</name>
 
     <properties>
-        <protobuf.version>3.16.1</protobuf.version>
+        <protobuf.version>3.21.4</protobuf.version>
     </properties>
 
     <dependencies>
@@ -25,8 +25,6 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.15.0</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>

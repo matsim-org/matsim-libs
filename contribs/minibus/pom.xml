@@ -51,7 +51,6 @@
       <!-- only needed for external jar, no code dependency -->
     <groupId>commons-codec</groupId>
     <artifactId>commons-codec</artifactId>
-    <version>1.4</version>
-  </dependency>
+	</dependency>
   </dependencies>
 </project>

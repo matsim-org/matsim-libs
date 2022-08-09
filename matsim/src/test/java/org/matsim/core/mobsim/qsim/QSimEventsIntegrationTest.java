@@ -60,8 +60,25 @@ public class QSimEventsIntegrationTest {
 	}
 
 	@Test
-	public void controlerHandlesExceptionCorrectly() {
+	public void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.parallelEventHandling().setNumberOfThreads(1);
+		config.parallelEventHandling().setSynchronizeOnSimSteps(true);
+
+		Controler controler = new Controler(config);
+		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
+			throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
+		});
+
+		// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
+		Assertions.assertThatThrownBy(controler::run).hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
+	}
+
+	@Test
+	public void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
+		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.parallelEventHandling().setNumberOfThreads(1);
+		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {

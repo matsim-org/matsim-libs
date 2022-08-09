@@ -26,6 +26,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nagel
@@ -35,11 +36,11 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 
 	private PlanSelector<T, I> planSelector = null;
 	private GenericPlanStrategyModule<T> firstModule = null;
-	private final ArrayList<GenericPlanStrategyModule<T>> modules = new ArrayList<>();
-	private final ArrayList<T> plans = new ArrayList<>();
+	private final List<GenericPlanStrategyModule<T>> modules = new ArrayList<>();
+	private final List<T> plans = new ArrayList<>();
 	private long counter = 0;
 	private ReplanningContext replanningContext;
-	private final static Logger log = Logger.getLogger(PlanStrategyImpl.class);
+	private final static Logger log = Logger.getLogger(GenericPlanStrategyImpl.class);
 
 	/**
 	 * Creates a new strategy using the specified planSelector.

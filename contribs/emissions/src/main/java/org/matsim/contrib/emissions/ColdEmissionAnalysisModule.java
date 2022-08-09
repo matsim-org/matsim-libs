@@ -319,7 +319,19 @@ final class ColdEmissionAnalysisModule {
 					logger.info(Gbl.FUTURE_SUPPRESSED);
 					detailedReadingInfoCnt++;
 				}
-				if (this.detailedHbefaColdTable.get(efkey) != null) {
+				/* The `this.detailedHbefaColdTable.get(efkey)` call may result in a NullPointerException
+				 * if the vehicle size class was not set. The following check tries to at least throw a
+				 * useful error message. A more complete solution would be to fix the key. (JWJ, June 2022)*/
+				HbefaColdEmissionFactor coldEmissionFactor = null;
+				try{
+					coldEmissionFactor = this.detailedHbefaColdTable.get(efkey);
+				} catch(NullPointerException e){
+					e.printStackTrace();
+					logger.error("Cannot find an emissions factor. One possible cause might be " +
+							"that the HbefaSizeClass is not set, in which case it defaults to null " +
+							"instead of 'not specified' (for HBEFA 4,1).");
+				}
+				if (coldEmissionFactor != null) {
 					HbefaColdEmissionFactor ef = this.detailedHbefaColdTable.get(efkey);
 					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
 					return ef;

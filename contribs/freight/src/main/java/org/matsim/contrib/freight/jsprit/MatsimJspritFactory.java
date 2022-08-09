@@ -217,7 +217,7 @@ public final class MatsimJspritFactory {
 	 */
 	static com.graphhopper.jsprit.core.problem.vehicle.Vehicle createVehicle(org.matsim.contrib.freight.carrier.CarrierVehicle carrierVehicle, Coord locationCoord) {
 		Location.Builder vehicleLocationBuilder = Location.Builder.newInstance();
-		vehicleLocationBuilder.setId(carrierVehicle.getLocation().toString());
+		vehicleLocationBuilder.setId(carrierVehicle.getLinkId().toString() );
 		if (locationCoord != null) {
 			vehicleLocationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
@@ -238,7 +238,7 @@ public final class MatsimJspritFactory {
 			throw new AssertionError("carrierVeh must have the same earliestDep as vrpVeh");
 		if (carrierVehicle.getLatestEndTime() != vehicle.getLatestArrival())
 			throw new AssertionError("carrierVeh must have the same latestArr as vrpVeh");
-		if (!carrierVehicle.getLocation().toString().equals(vehicle.getStartLocation().getId()))
+		if (!carrierVehicle.getLinkId().toString().equals(vehicle.getStartLocation().getId() ))
 			throw new AssertionError("locations must be equal");
 		return vehicle;
 	}
@@ -280,7 +280,7 @@ public final class MatsimJspritFactory {
 			throw new AssertionError("vehicles must have the same earliestStartTime");
 		if (jspritVehicle.getLatestArrival() != carrierVehicle.getLatestEndTime())
 			throw new AssertionError("vehicles must have the same latestEndTime");
-		if (!jspritVehicle.getStartLocation().getId().equals(carrierVehicle.getLocation().toString()))
+		if (!jspritVehicle.getStartLocation().getId().equals(carrierVehicle.getLinkId().toString() ))
 			throw new AssertionError("locs must be the same");
 		return carrierVehicle;
 	}
@@ -505,10 +505,10 @@ public final class MatsimJspritFactory {
 		for (CarrierVehicle carrierVehicle : carrierCapabilities.getCarrierVehicles().values()) {
 			Coord coordinate = null;
 			if (network != null) {
-				Link link = network.getLinks().get(carrierVehicle.getLocation());
+				Link link = network.getLinks().get(carrierVehicle.getLinkId() );
 				if (link == null)
 					throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId="
-							+ carrierVehicle.getId() + "][locationId=" + carrierVehicle.getLocation() + "]");
+							+ carrierVehicle.getId() + "][locationId=" + carrierVehicle.getLinkId() + "]");
 				coordinate = link.getCoord();
 			} else
 				log.warn("cannot find linkId " + carrierVehicle.getId());
@@ -608,10 +608,10 @@ public final class MatsimJspritFactory {
 		for (CarrierVehicle carrierVehicle : carrierCapabilities.getCarrierVehicles().values()) {
 			Coord coordinate = null;
 			if (network != null) {
-				Link link = network.getLinks().get(carrierVehicle.getLocation());
+				Link link = network.getLinks().get(carrierVehicle.getLinkId() );
 				if (link == null)
 					throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId="
-							+ carrierVehicle.getId() + "][locationId=" + carrierVehicle.getLocation() + "]");
+							+ carrierVehicle.getId() + "][locationId=" + carrierVehicle.getLinkId() + "]");
 				coordinate = link.getCoord();
 			} else
 				log.warn("cannot find linkId " + carrierVehicle.getId());
