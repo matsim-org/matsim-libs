@@ -52,7 +52,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 
 		offlineExample.run();
@@ -123,8 +123,8 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
-		emissionsConfig.setAverageWarmEmissionFactorsFile("../sample_41_EFA_HOT_vehcat_2020average.txt");
+		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+		emissionsConfig.setAverageWarmEmissionFactorsFile("../sample_41_EFA_HOT_vehcat_2020average.csv");
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
 
 		offlineExample.run();

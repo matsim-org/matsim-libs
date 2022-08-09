@@ -32,8 +32,8 @@ public class EmissionModuleTest {
 
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
-        emissionConfig.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_ColdStart_SubSegm_2020detailed.txt").toString());
-        emissionConfig.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_HOT_vehcat_2020average.txt").toString());
+        emissionConfig.setAverageColdEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_ColdStart_SubSegm_2020detailed.csv").toString());
+        emissionConfig.setAverageWarmEmissionFactorsFile(IOUtils.extendUrl(scenarioURL, "sample_41_EFA_HOT_vehcat_2020average.csv").toString());
         emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable);
 
         var config = ConfigUtils.createConfig(emissionConfig);
