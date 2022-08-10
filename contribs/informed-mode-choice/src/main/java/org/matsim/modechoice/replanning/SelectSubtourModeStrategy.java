@@ -123,11 +123,57 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				for (int i = 0; i < model.trips(); i++) {
 					if (st.getTrips().contains(model.getTrip(i)))
 						mask[i] = true;
-
 				}
 
-				Collection<PlanCandidate> candidates = ctx.generator.generate(model, null, mask);
+				List<String[]> options = new ArrayList<>();
+
+				// current mode for comparison
+				options.add(model.getCurrentModesMutable());
+
+				// generate all single mode options
+				for (String m : config.getModes()) {
+					String[] option = model.getCurrentModes();
+
+					// Fill with single mode
+					for (int i = 0; i < mask.length; i++) {
+						if (mask[i])
+							option[i] = m;
+					}
+
+					// Current option is not added twice
+					if (!Arrays.equals(model.getCurrentModesMutable(), option))
+						options.add(option);
+				}
+
+				List<PlanCandidate> singleModeCandidates = ctx.generator.generatePredefined(model, options);
+				singleModeCandidates.removeIf(p -> p.getUtility() == Double.NEGATIVE_INFINITY);
+
+				// if none of the single mode options are valid, no further search is needed
+				// this work in conjunction with subtour constraints, with other constraints it might be too strict
+				if (singleModeCandidates.size() <= 1) {
+					continue;
+				}
+
+				Set<PlanCandidate> candidates = new HashSet<>();
+
+				// Single modes are also added
+				candidates.addAll(singleModeCandidates);
+
+				// one could either allow all modes here or only non chain based
+
+				// execute best k modes
+				candidates.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
+
 				candidates.removeIf(c -> Arrays.equals(c.getModes(), model.getCurrentModesMutable()));
+
+				// Pruning is applied based on current plan estimate
+				// best k generator applied pruning already, but the single trip options need to be checked again
+				if (ctx.pruner != null) {
+					double threshold = ctx.pruner.planThreshold(model);
+					if (threshold > 0) {
+						candidates.removeIf(c -> c.getUtility() < singleModeCandidates.get(0).getUtility() - threshold);
+					}
+				}
 
 				if (!candidates.isEmpty()) {
 

@@ -45,7 +45,8 @@ public class TestScenario extends MATSimApplication {
 			Id.createPersonId("37842"),
 			Id.createPersonId("40079"),
 			Id.createPersonId("11074"),
-			Id.createPersonId("13864")
+			Id.createPersonId("13864"),
+			Id.createPersonId("909")
 	);
 
 	public TestScenario(@Nullable Config config) {
@@ -108,6 +109,7 @@ public class TestScenario extends MATSimApplication {
 		config.planCalcScore().setExplainScores(true);
 
 		if (mc){
+			config.subtourModeChoice().setCoordDistance(50);
 			config.subtourModeChoice().setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
 			config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
 		}

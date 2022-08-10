@@ -279,7 +279,8 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 	 * Compute candidates from predefined given modes.
 	 *
 	 * @param modes list of mode combinations to estimate
-	 * @return one candidate for each requested mode combination
+	 * @return one candidate for each requested mode combination, A candidate violating a constraint will receive a utility of {@link Double#NEGATIVE_INFINITY}.
+	 *
 	 */
 	public List<PlanCandidate> generatePredefined(PlanModel planModel, List<String[]> modes) {
 
@@ -302,6 +303,10 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 			}
 		}
 
+		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
+
+		Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
+		Set<String> usableModes = planModel.filterModes(ModeEstimate::isUsable);
 
 		// Same Logic as the top k estimator
 		for (String[] result : modes) {
@@ -322,8 +327,15 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 				String mode = result[i];
 
 				ModeEstimate opt = singleOptions.get(mode);
-				if (opt == null)
-					continue;
+				if (opt == null) {
+
+					// Violates constraints by using a non-allowed mode
+					if (allModes.contains(mode) && !usableModes.contains(mode)) {
+						estimate = Double.NEGATIVE_INFINITY;
+						break;
+					} else
+						continue;
+				}
 
 				estimate += opt.getEstimates()[i];
 
@@ -331,9 +343,12 @@ public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
 			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>(result);
 
-			Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
-
 			estimate += computePlanEstimate(context, planModel, result, usedModes, consolidateModes, singleOptions.values());
+
+			for (ConstraintHolder<?> c : constraints) {
+				if (!c.test(result))
+					estimate = Double.NEGATIVE_INFINITY;
+			}
 
 			PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 

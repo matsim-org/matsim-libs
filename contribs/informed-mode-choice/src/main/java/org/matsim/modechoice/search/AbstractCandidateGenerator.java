@@ -9,10 +9,7 @@ import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.modechoice.pruning.CandidatePruner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -42,9 +39,11 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 	protected Provider<CandidatePruner> pruner;
 
 	protected final InformedModeChoiceConfigGroup config;
+	protected final Set<String> allModes;
 
 	protected AbstractCandidateGenerator(InformedModeChoiceConfigGroup config) {
 		this.config = config;
+		this.allModes = new HashSet<>(config.getModes());
 	}
 
 	@SuppressWarnings("unchecked")
