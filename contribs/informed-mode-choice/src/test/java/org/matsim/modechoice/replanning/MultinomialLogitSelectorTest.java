@@ -163,4 +163,23 @@ public class MultinomialLogitSelectorTest {
 		assertThat(sample[1]).isEqualTo(1);
 
 	}
+
+	@Test
+	public void inf() {
+
+		selector = new MultinomialLogitSelector(10000, new Random(0));
+
+		List<PlanCandidate> candidates = List.of(
+				new PlanCandidate(new String[]{"car1"}, 2),
+				new PlanCandidate(new String[]{"car2"}, 10000),
+				new PlanCandidate(new String[]{"car3"}, 1)
+		);
+
+		double[] sample = selector.sample(N, candidates);
+
+		assertThat(sample[0]).isEqualTo(0.333, Offset.offset(0.001));
+		assertThat(sample[1]).isEqualTo(0.333, Offset.offset(0.001));
+		assertThat(sample[2]).isEqualTo(0.333, Offset.offset(0.001));
+
+	}
 }

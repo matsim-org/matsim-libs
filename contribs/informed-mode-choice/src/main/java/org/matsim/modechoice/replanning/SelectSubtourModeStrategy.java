@@ -149,7 +149,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				singleModeCandidates.removeIf(p -> p.getUtility() == Double.NEGATIVE_INFINITY);
 
 				// if none of the single mode options are valid, no further search is needed
-				// this work in conjunction with subtour constraints, with other constraints it might be too strict
+				// this works in conjunction with subtour constraints, with other constraints it might be too strict
 				if (singleModeCandidates.size() <= 1) {
 					continue;
 				}
@@ -160,6 +160,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				candidates.addAll(singleModeCandidates);
 
 				// one could either allow all modes here or only non chain based
+				// config switch might be useful to investigate which option is better
 
 				// execute best k modes
 				candidates.addAll(ctx.generator.generate(model, nonChainBasedModes, mask));
