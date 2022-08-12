@@ -147,6 +147,8 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				// mode strings might be registered multiple times (these are not sets).  kai, may'18
 
 				this.tripsToLegs = new TripsToLegsAlgorithm(this.mainModeIdentifier);
+
+				// change single leg would not respect car availability, if car is not a chain based mode -- cr, aug'22
 				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng, true);
 			}
 		}
