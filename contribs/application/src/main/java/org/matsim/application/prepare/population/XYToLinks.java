@@ -36,7 +36,10 @@ public class XYToLinks implements MATSimAppCommand {
 
 		if (carOnly) {
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			filter.filter(network, Set.of(TransportMode.car));
+
+			Network carOnlyNetwork = NetworkUtils.createNetwork();
+			filter.filter(carOnlyNetwork, Set.of(TransportMode.car));
+			network = carOnlyNetwork;
 		}
 
 		XY2Links algo = new XY2Links(network, FacilitiesUtils.createActivityFacilities());
