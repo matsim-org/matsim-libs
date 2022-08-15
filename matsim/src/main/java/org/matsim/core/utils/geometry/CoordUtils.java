@@ -374,6 +374,7 @@ public abstract class CoordUtils {
 
 
 		private static final int maxWarnCount = 10;
+		private boolean logWarning = true;
 		private final AtomicInteger warnCounter = new AtomicInteger(0);
 
 		private double calculateDistance(Coord coord, Coord other) {
@@ -400,16 +401,16 @@ public abstract class CoordUtils {
 			} else{
 				// there used to be a warning here, but it would clutter our log file
 				// hence we silently calculate the distance on a 2D pane now. janek mai'21
-				if (warnCounter.incrementAndGet() <= maxWarnCount) {
+				if (logWarning) {
 					LOG.warn("Mixed use of elevation in coordinates: " + coord +
 							"; " + other);
 					LOG.warn("Returning projected coordinate distance (using x and y components only)");
 
-					if (warnCounter.get() == maxWarnCount) {
+					if (warnCounter.incrementAndGet() == maxWarnCount) {
 						LOG.warn("Future occurences of this logging statement are suppressed.");
+						logWarning = false;
 					}
 				}
-
 				return calcProjectedEuclideanDistance(coord, other);
 			}
 		}
