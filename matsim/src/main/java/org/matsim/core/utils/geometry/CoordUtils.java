@@ -25,7 +25,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
@@ -374,7 +374,7 @@ public abstract class CoordUtils {
 
 
 		private static final int maxWarnCount = 10;
-		private final AtomicInteger warnCounter = new AtomicInteger(0);
+		private final AtomicLong warnCounter = new AtomicLong(0);
 
 		private double calculateDistance(Coord coord, Coord other) {
 			/* Depending on the coordinate system that is used, determining the
