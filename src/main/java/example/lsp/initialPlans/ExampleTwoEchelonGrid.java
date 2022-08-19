@@ -32,6 +32,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.events.LSPTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -115,6 +119,8 @@ final class ExampleTwoEchelonGrid {
 						return strategyManager;
 					}
 				} );
+				bind( LSPScorerFactory.class ).toInstance( ( lsp) -> new MyLSPScorer() );
+
 			}
 		} );
 
@@ -349,6 +355,37 @@ final class ExampleTwoEchelonGrid {
 			}
 			log.info("The selected plan has the score: " + lsp.getSelectedPlan().getScore());
 			log.info("###");
+		}
+	}
+
+
+	private static class MyLSPScorer implements LSPScorer, LSPTourEndEventHandler, LSPServiceEndEventHandler {
+		private double score = 0.;
+
+		@Override
+		public double getScoreForCurrentPlan() {
+			return score;
+		}
+
+		@Override
+		public void setEmbeddingContainer(LSP pointer) {
+		}
+
+		@Override
+		public void handleEvent(LSPTourEndEvent event) {
+			score++;
+			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
+		}
+
+		@Override
+		public void reset(int iteration) {
+			score = 0.;
+		}
+
+		@Override
+		public void handleEvent(LSPServiceEndEvent event) {
+			score++;
+			// use event handlers to compute score.  In this case, score is incremented by one every time a service and a tour ends.
 		}
 	}
 }
