@@ -47,7 +47,7 @@ import lsp.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * In the case of the MainRunAdapter, the incoming LSPShipments are bundled
+ * In the case of the MainRunResource, the incoming LSPShipments are bundled
  * together until their total weight exceeds the capacity of the deployed vehicle
  * type. Then, this bundle of LSPShipments is converted to a scheduled tour
  * from the freight contrib of MATSim. The start of this tour is located at

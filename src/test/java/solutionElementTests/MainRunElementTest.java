@@ -43,7 +43,7 @@ import lsp.LSPResource;
 
 public class MainRunElementTest {
 
-	private LSPResource mainRunAdapter;
+	private LSPResource mainRunResource;
 	private LogisticsSolutionElement mainRunElement;
 
 	@Before
@@ -80,17 +80,17 @@ public class MainRunElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
-		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunAdapterBuilder.setCarrier(carrier);
-		mainRunAdapter = mainRunAdapterBuilder.build();
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
+		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunResourceBuilder.setCarrier(carrier);
+		mainRunResource = mainRunResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		mainRunBuilder.setResource(mainRunAdapter);
+		mainRunBuilder.setResource(mainRunResource);
 		mainRunElement = mainRunBuilder.build();
 
 	}
@@ -108,7 +108,7 @@ public class MainRunElementTest {
 		assertNotNull(mainRunElement.getOutgoingShipments().getShipments());
 		assertTrue(mainRunElement.getOutgoingShipments().getSortedShipments().isEmpty());
 		assertNull(mainRunElement.getPreviousElement());
-		assertSame(mainRunElement.getResource(), mainRunAdapter);
+		assertSame(mainRunElement.getResource(), mainRunResource);
 		assertSame(mainRunElement.getResource().getClientElements().iterator().next(), mainRunElement);
 	}
 

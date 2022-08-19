@@ -40,7 +40,7 @@ import lsp.LSPResource;
 	private final DistributionCarrierScheduler distributionHandler;
 	private final Network network;
 
-	DistributionCarrierResource(UsecaseUtils.DistributionCarrierAdapterBuilder builder) {
+	DistributionCarrierResource(UsecaseUtils.DistributionCarrierResourceBuilder builder) {
 		super(builder.id);
 		Id<Link> locationLinkId = builder.locationLinkId;
 		this.distributionHandler = builder.distributionHandler;

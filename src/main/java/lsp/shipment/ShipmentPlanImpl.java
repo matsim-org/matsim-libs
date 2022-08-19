@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.Id;
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 
 	private final LSPShipment shipment;
-	private final HashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> logElements;
+	private final LinkedHashMap<Id<ShipmentPlanElement>, ShipmentPlanElement> logElements;
 
 	ShipmentPlanImpl(LSPShipment shipment) {
 		this.shipment = shipment;
-		this.logElements = new HashMap<>();
+		this.logElements = new LinkedHashMap<>();
 	}
 
 	@Override

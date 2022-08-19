@@ -72,20 +72,20 @@ import lsp.shipment.LSPShipment;
 		Carrier carrier = CarrierUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		//The Adapter i.e. the Resource is created
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork());
+		//The Resource i.e. the Resource is created
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionResource = adapterBuilder.build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionAdapter);
+		collectionElementBuilder.setResource(collectionResource);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
@@ -113,7 +113,7 @@ import lsp.shipment.LSPShipment;
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(collectionAdapter);
+		resourcesList.add(collectionResource);
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 

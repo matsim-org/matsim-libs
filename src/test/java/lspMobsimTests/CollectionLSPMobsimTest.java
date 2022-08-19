@@ -61,7 +61,7 @@ public class CollectionLSPMobsimTest {
 
 	private LSP collectionLSP;
 	private Carrier carrier;
-	private LSPResource collectionAdapter;
+	private LSPResource collectionResource;
 
 	@Before
 	public void initialize() {
@@ -106,18 +106,18 @@ public class CollectionLSPMobsimTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		CollectionCarrierAdapterBuilder adapterBuilder = CollectionCarrierAdapterBuilder.newInstance(adapterId, scenario.getNetwork());
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
+		CollectionCarrierResourceBuilder adapterBuilder = CollectionCarrierResourceBuilder.newInstance(adapterId, scenario.getNetwork());
 		adapterBuilder.setCollectionScheduler(createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = adapterBuilder.build();
+		collectionResource = adapterBuilder.build();
 
 		final LogisticsSolutionElement collectionElement;
 		{
 			Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 			LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-			collectionElementBuilder.setResource(collectionAdapter);
+			collectionElementBuilder.setResource(collectionResource);
 			collectionElement = collectionElementBuilder.build();
 		}
 		final LogisticsSolution collectionSolution;
@@ -139,7 +139,7 @@ public class CollectionLSPMobsimTest {
 			ArrayList<LSPResource> resourcesList = new ArrayList<>();
 			collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 			collectionLSPBuilder.setInitialPlan(collectionPlan);
-			resourcesList.add(collectionAdapter);
+			resourcesList.add(collectionResource);
 			SolutionScheduler simpleScheduler = createDefaultSimpleForwardSolutionScheduler(resourcesList);
 			simpleScheduler.setBufferTime(300);
 			collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
@@ -226,8 +226,8 @@ public class CollectionLSPMobsimTest {
 			logElements.sort(ShipmentUtils.createShipmentPlanElementComparator());
 
 			//Das muss besser in den SchedulingTest rein
-			assertSame(collectionLSP.getResources().iterator().next(), collectionAdapter);
-			LSPCarrierResource carrierResource = (LSPCarrierResource) collectionAdapter;
+			assertSame(collectionLSP.getResources().iterator().next(), collectionResource);
+			LSPCarrierResource carrierResource = (LSPCarrierResource) collectionResource;
 			assertSame(carrierResource.getCarrier(), carrier);
 			assertEquals(1, carrier.getServices().size());
 
