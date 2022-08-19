@@ -43,7 +43,7 @@ import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 
 
-public class CollectionAdapterTest {
+public class CollectionResourceTest {
 
 	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
@@ -86,8 +86,8 @@ public class CollectionAdapterTest {
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder builder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(collectionCarrier);
 		builder.setLocationLinkId(collectionLinkId);
@@ -96,7 +96,7 @@ public class CollectionAdapterTest {
 
 
 	@Test
-	public void testCollectionAdapter() {
+	public void testCollectionResource() {
 		assertNotNull(carrierResource.getClientElements());
 		assertTrue(carrierResource.getClientElements().isEmpty());
 		assertTrue(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass()));

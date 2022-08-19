@@ -75,19 +75,19 @@ import lsp.LSPResource;
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 		//The collection adapter i.e. the Resource is created
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder adapterBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(adapterId, network);
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(collectionCarrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionResource = adapterBuilder.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId);
-		collectionElementBuilder.setResource(collectionAdapter);
+		collectionElementBuilder.setResource(collectionResource);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
 
 
@@ -103,12 +103,12 @@ import lsp.LSPResource;
 
 		//The scheduler is added to the Resource and the Resource is created
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
-		LSPResource firstTranshipmentHubAdapter = firstTransshipmentHubBuilder.build();
+		LSPResource firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
 		//The SolutionElement for the first reloading point is created
 		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FirstHubElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId);
-		firstHubElementBuilder.setResource(firstTranshipmentHubAdapter);
+		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
 		LogisticsSolutionElement firstHubElement = firstHubElementBuilder.build();
 
 
@@ -137,20 +137,20 @@ import lsp.LSPResource;
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
-		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
-		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
-		mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
-		mainRunAdapterBuilder.setCarrier(mainRunCarrier);
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunResourceBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
+		mainRunResourceBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+		mainRunResourceBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+		mainRunResourceBuilder.setCarrier(mainRunCarrier);
 
 		//The scheduler for the main run Rescource is created and added to the Resource
-		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-		LSPResource mainRunAdapter = mainRunAdapterBuilder.build();
+		mainRunResourceBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
+		LSPResource mainRunResource = mainRunResourceBuilder.build();
 
 		//The LogisticsSolutionElement for the main run Resource is created
 		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId);
-		mainRunBuilder.setResource(mainRunAdapter);
+		mainRunBuilder.setResource(mainRunResource);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 
 
@@ -166,12 +166,12 @@ import lsp.LSPResource;
 
 		//The scheduler is added to the Resource and the Resource is created
 		secondTransshipmentHubBuilder.setTransshipmentHubScheduler(secondSchedulerBuilder.build());
-		LSPResource secondTranshipmentHubAdapter = secondTransshipmentHubBuilder.build();
+		LSPResource secondTranshipmentHubResource = secondTransshipmentHubBuilder.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> secondHubElementId = Id.create("SecondHubElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder secondHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondHubElementId);
-		secondHubElementBuilder.setResource(secondTranshipmentHubAdapter);
+		secondHubElementBuilder.setResource(secondTranshipmentHubResource);
 		LogisticsSolutionElement secondHubElement = secondHubElementBuilder.build();
 
 
@@ -199,19 +199,19 @@ import lsp.LSPResource;
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		//The distribution adapter i.e. the Resource is created
-		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
-		distributionAdapterBuilder.setCarrier(distributionCarrier);
-		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
+		Id<LSPResource> distributionResourceId = Id.create("DistributionCarrierResource", LSPResource.class);
+		UsecaseUtils.DistributionCarrierResourceBuilder distributionResourceBuilder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(distributionResourceId, network);
+		distributionResourceBuilder.setCarrier(distributionCarrier);
+		distributionResourceBuilder.setLocationLinkId(distributionLinkId);
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		LSPResource distributionAdapter = distributionAdapterBuilder.build();
+		distributionResourceBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
+		LSPResource distributionResource = distributionResourceBuilder.build();
 
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId);
-		distributionBuilder.setResource(distributionAdapter);
+		distributionBuilder.setResource(distributionResource);
 		LogisticsSolutionElement distributionElement = distributionBuilder.build();
 
 		//The Order of the logisticsSolutionElements is now specified
@@ -243,11 +243,11 @@ import lsp.LSPResource;
 
 		//The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(collectionAdapter);
-		resourcesList.add(firstTranshipmentHubAdapter);
-		resourcesList.add(mainRunAdapter);
-		resourcesList.add(secondTranshipmentHubAdapter);
-		resourcesList.add(distributionAdapter);
+		resourcesList.add(collectionResource);
+		resourcesList.add(firstTranshipmentHubResource);
+		resourcesList.add(mainRunResource);
+		resourcesList.add(secondTranshipmentHubResource);
+		resourcesList.add(distributionResource);
 
 //		SolutionScheduler forwardSolutionScheduler = LSPUtils.createForwardSolutionScheduler(); //Ist der "nicht einfache" Scheduler. TODO braucht der keine RessourcenLsite oder ähnliches? --> Offenbar ja, weil Null Pointer. argh!
 //		completeLSPBuilder.setSolutionScheduler(forwardSolutionScheduler);

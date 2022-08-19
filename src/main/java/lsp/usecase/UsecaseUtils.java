@@ -103,7 +103,7 @@ public class UsecaseUtils {
 		}
 	}
 
-	public static class CollectionCarrierAdapterBuilder {
+	public static class CollectionCarrierResourceBuilder {
 
 		final Id<LSPResource> id;
 		final ArrayList<LogisticsSolutionElement> clientElements;
@@ -112,28 +112,28 @@ public class UsecaseUtils {
 		Id<Link> locationLinkId;
 		CollectionCarrierScheduler collectionScheduler;
 
-		private CollectionCarrierAdapterBuilder(Id<LSPResource> id, Network network) {
+		private CollectionCarrierResourceBuilder(Id<LSPResource> id, Network network) {
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static CollectionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new CollectionCarrierAdapterBuilder(id, network);
+		public static CollectionCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
+			return new CollectionCarrierResourceBuilder(id, network);
 		}
 
-		public CollectionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId) {
+		public CollectionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
 			this.locationLinkId = locationLinkId;
 			return this;
 		}
 
-		public CollectionCarrierAdapterBuilder setCarrier(Carrier carrier) {
+		public CollectionCarrierResourceBuilder setCarrier(Carrier carrier) {
 			this.carrier = carrier;
 			return this;
 		}
 
 
-		public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler) {
+		public CollectionCarrierResourceBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler) {
 			this.collectionScheduler = collectionCarrierScheduler;
 			return this;
 		}
@@ -145,7 +145,7 @@ public class UsecaseUtils {
 	}
 
 
-	public static class DistributionCarrierAdapterBuilder {
+	public static class DistributionCarrierResourceBuilder {
 
 		final Id<LSPResource> id;
 		final ArrayList<LogisticsSolutionElement> clientElements;
@@ -154,28 +154,28 @@ public class UsecaseUtils {
 		Id<Link> locationLinkId;
 		DistributionCarrierScheduler distributionHandler;
 
-		private DistributionCarrierAdapterBuilder(Id<LSPResource> id, Network network) {
+		private DistributionCarrierResourceBuilder(Id<LSPResource> id, Network network) {
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static DistributionCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new DistributionCarrierAdapterBuilder(id, network);
+		public static DistributionCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
+			return new DistributionCarrierResourceBuilder(id, network);
 		}
 
-		public DistributionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId) {
+		public DistributionCarrierResourceBuilder setLocationLinkId(Id<Link> locationLinkId) {
 			this.locationLinkId = locationLinkId;
 			return this;
 		}
 
-		public DistributionCarrierAdapterBuilder setCarrier(Carrier carrier) {
+		public DistributionCarrierResourceBuilder setCarrier(Carrier carrier) {
 			this.carrier = carrier;
 			return this;
 		}
 
 
-		public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler) {
+		public DistributionCarrierResourceBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler) {
 			this.distributionHandler = distributionCarrierScheduler;
 			return this;
 		}
@@ -186,7 +186,7 @@ public class UsecaseUtils {
 
 	}
 
-	public static class MainRunCarrierAdapterBuilder {
+	public static class MainRunCarrierResourceBuilder {
 
 		private final Id<LSPResource> id;
 		private final ArrayList<LogisticsSolutionElement> clientElements;
@@ -196,31 +196,31 @@ public class UsecaseUtils {
 		private Id<Link> toLinkId;
 		private MainRunCarrierScheduler mainRunScheduler;
 
-		private MainRunCarrierAdapterBuilder(Id<LSPResource> id, Network network) {
+		private MainRunCarrierResourceBuilder(Id<LSPResource> id, Network network) {
 			this.id = id;
 			this.clientElements = new ArrayList<>();
 			this.network = network;
 		}
 
-		public static MainRunCarrierAdapterBuilder newInstance(Id<LSPResource> id, Network network) {
-			return new MainRunCarrierAdapterBuilder(id, network);
+		public static MainRunCarrierResourceBuilder newInstance(Id<LSPResource> id, Network network) {
+			return new MainRunCarrierResourceBuilder(id, network);
 		}
 
-		public MainRunCarrierAdapterBuilder setCarrier(Carrier carrier) {
+		public MainRunCarrierResourceBuilder setCarrier(Carrier carrier) {
 			this.carrier = carrier;
 			return this;
 		}
 
-		public MainRunCarrierAdapterBuilder setFromLinkId(Id<Link> fromLinkId) {
+		public MainRunCarrierResourceBuilder setFromLinkId(Id<Link> fromLinkId) {
 			this.fromLinkId = fromLinkId;
 			return this;
 		}
 
-		public MainRunCarrierAdapterBuilder setToLinkId(Id<Link> toLinkId) {
+		public MainRunCarrierResourceBuilder setToLinkId(Id<Link> toLinkId) {
 			this.toLinkId = toLinkId;
 			return this;
 		}
-		public MainRunCarrierAdapterBuilder setMainRunCarrierScheduler(MainRunCarrierScheduler mainRunScheduler) {
+		public MainRunCarrierResourceBuilder setMainRunCarrierScheduler(MainRunCarrierScheduler mainRunScheduler) {
 			this.mainRunScheduler = mainRunScheduler;
 			return this;
 		}

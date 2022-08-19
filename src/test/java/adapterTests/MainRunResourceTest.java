@@ -43,7 +43,7 @@ import lsp.LSPCarrierResource;
 import lsp.LSPResource;
 
 
-public class MainRunAdapterTest {
+public class MainRunResourceTest {
 
 	private org.matsim.vehicles.VehicleType mainRunType;
 	private Id<Link> fromLinkId;
@@ -51,7 +51,7 @@ public class MainRunAdapterTest {
 	private CarrierVehicle carrierVehicle;
 	private CarrierCapabilities capabilities;
 	private Carrier carrier;
-	private LSPCarrierResource mainRunAdapter;
+	private LSPCarrierResource mainRunResource;
 
 	@Before
 	public void initialize() {
@@ -87,32 +87,32 @@ public class MainRunAdapterTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
-		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
+		Id<LSPResource> mainRunId = Id.create("MainRunResource", LSPResource.class);
+		UsecaseUtils.MainRunCarrierResourceBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(mainRunId, network);
 		mainRunBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
 		mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
 		mainRunBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
 		mainRunBuilder.setCarrier(carrier);
-		mainRunAdapter = mainRunBuilder.build();
+		mainRunResource = mainRunBuilder.build();
 
 	}
 
 	@Test
-	public void testMainRunAdapter() {
-		assertNotNull(mainRunAdapter.getClientElements());
-		assertTrue(mainRunAdapter.getClientElements().isEmpty());
-		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass())) {
-//			assertTrue(Carrier.class.isAssignableFrom(mainRunAdapter.getClassOfResource()));
-			assertSame(mainRunAdapter.getCarrier(), carrier);
+	public void testMainRunResource() {
+		assertNotNull(mainRunResource.getClientElements());
+		assertTrue(mainRunResource.getClientElements().isEmpty());
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunResource.getClass()));
+		if (LSPCarrierResource.class.isAssignableFrom(mainRunResource.getClass())) {
+//			assertTrue(Carrier.class.isAssignableFrom(mainRunResource.getClassOfResource()));
+			assertSame(mainRunResource.getCarrier(), carrier);
 		}
-		assertSame(mainRunAdapter.getEndLinkId(), toLinkId);
-		assertSame(mainRunAdapter.getStartLinkId(), fromLinkId);
-		assertNotNull(mainRunAdapter.getSimulationTrackers());
-		assertTrue(mainRunAdapter.getSimulationTrackers().isEmpty());
-		assertNotNull(mainRunAdapter.getAttributes());
-		assertTrue(mainRunAdapter.getAttributes().isEmpty());
-		if (mainRunAdapter.getCarrier() == carrier) {
+		assertSame(mainRunResource.getEndLinkId(), toLinkId);
+		assertSame(mainRunResource.getStartLinkId(), fromLinkId);
+		assertNotNull(mainRunResource.getSimulationTrackers());
+		assertTrue(mainRunResource.getSimulationTrackers().isEmpty());
+		assertNotNull(mainRunResource.getAttributes());
+		assertTrue(mainRunResource.getAttributes().isEmpty());
+		if (mainRunResource.getCarrier() == carrier) {
 			assertSame(carrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(carrier.getClass()));
 			assertTrue(carrier.getPlans().isEmpty());

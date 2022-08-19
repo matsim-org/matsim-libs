@@ -239,8 +239,8 @@ import java.util.*;
 							.build());
 
 			//The scheduler for the main run Resource is created and added to the Resource
-			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(
-							Id.create("MainRunAdapter", LSPResource.class), network)
+			LSPResource mainRunResource = UsecaseUtils.MainRunCarrierResourceBuilder.newInstance(
+							Id.create("MainRunResource", LSPResource.class), network)
 					.setFromLinkId(depotLinkId)
 					.setToLinkId(hubLinkId)
 					.setCarrier(mainRunCarrier)
@@ -292,8 +292,8 @@ import java.util.*;
 							.build());
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource distributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-							Id.create("DistributionCarrierAdapter", LSPResource.class), network)
+			LSPResource distributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(
+							Id.create("DistributionCarrierResource", LSPResource.class), network)
 					.setCarrier(distributionCarrier).setLocationLinkId(hubLinkId)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -303,7 +303,7 @@ import java.util.*;
 
 			distributionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
 							Id.create("DistributionElement", LogisticsSolutionElement.class))
-					.setResource(distributionAdapter)
+					.setResource(distributionResource)
 					.build();
 		}
 
@@ -327,8 +327,8 @@ import java.util.*;
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created
-			LSPResource directDistributionAdapter = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(
-							Id.create("DirectDistributionCarrierAdapter", LSPResource.class), network)
+			LSPResource directDistributionResource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(
+							Id.create("DirectDistributionCarrierResource", LSPResource.class), network)
 					.setCarrier(directDistributionCarrier).setLocationLinkId(depotLinkId)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -337,7 +337,7 @@ import java.util.*;
 			//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 			directDistributionElement = LSPUtils.LogisticsSolutionElementBuilder.newInstance(
 							Id.create("DirectDistributionElement", LogisticsSolutionElement.class))
-					.setResource(directDistributionAdapter)
+					.setResource(directDistributionResource)
 					.build();
 		}
 		//### end new

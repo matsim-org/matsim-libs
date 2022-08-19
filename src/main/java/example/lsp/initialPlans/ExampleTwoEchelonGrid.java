@@ -183,7 +183,7 @@ final class ExampleTwoEchelonGrid {
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
-			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
+			LSPResource directCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("directCarrierRes", LSPResource.class), network)
 					.setCarrier(directCarrier)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -212,7 +212,7 @@ final class ExampleTwoEchelonGrid {
 
 			//TODO: Funktioniert mit DistributionCarrier ... aber nicht mit main Carrier. --> Ansehen! --> Main benötigt eventuell vorher ein Depot?
 			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_10));
-			LSPResource mainCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
+			LSPResource mainCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("mainCarrierRes", LSPResource.class), network)
 					.setCarrier(mainCarrier)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -240,7 +240,7 @@ final class ExampleTwoEchelonGrid {
 			distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_02));
-			LSPResource distributionCarrierRessource = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(Id.create("distributionCarrierRes", LSPResource.class), network)
+			LSPResource distributionCarrierRessource = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(Id.create("distributionCarrierRes", LSPResource.class), network)
 					.setCarrier(distributionCarrier)
 					.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler())
 					.build();

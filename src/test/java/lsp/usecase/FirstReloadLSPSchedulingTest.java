@@ -48,10 +48,10 @@ import static org.junit.Assert.*;
 
 public class FirstReloadLSPSchedulingTest {
 	private LSP lsp;
-	private LSPResource firstTranshipmentHubAdapter;
+	private LSPResource firstTranshipmentHubResource;
 	private LogisticsSolutionElement firstHubElement;
 	private LogisticsSolutionElement collectionElement;
-	private LSPResource collectionAdapter;
+	private LSPResource collectionResource;
 
 	@Before
 	public void initialize() {
@@ -85,16 +85,16 @@ public class FirstReloadLSPSchedulingTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 
-		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(collectionAdapterId, network);
-		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		collectionAdapterBuilder.setCarrier(collectionCarrier);
-		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = collectionAdapterBuilder.build();
+		Id<LSPResource> collectionResourceId = Id.create("CollectionCarrierResource", LSPResource.class);
+		UsecaseUtils.CollectionCarrierResourceBuilder collectionResourceBuilder = UsecaseUtils.CollectionCarrierResourceBuilder.newInstance(collectionResourceId, network);
+		collectionResourceBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
+		collectionResourceBuilder.setCarrier(collectionCarrier);
+		collectionResourceBuilder.setLocationLinkId(collectionLinkId);
+		collectionResource = collectionResourceBuilder.build();
 
 		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(collectionElementId);
-		collectionBuilder.setResource(collectionAdapter);
+		collectionBuilder.setResource(collectionResource);
 		collectionElement = collectionBuilder.build();
 
 		UsecaseUtils.TranshipmentHubSchedulerBuilder firstReloadingSchedulerBuilder = UsecaseUtils.TranshipmentHubSchedulerBuilder.newInstance();
@@ -107,11 +107,11 @@ public class FirstReloadLSPSchedulingTest {
 
 		UsecaseUtils.TransshipmentHubBuilder firstTransshipmentHubBuilder = UsecaseUtils.TransshipmentHubBuilder.newInstance(firstTransshipmentHubId, firstTransshipmentHub_LinkId);
 		firstTransshipmentHubBuilder.setTransshipmentHubScheduler(firstReloadingSchedulerBuilder.build());
-		firstTranshipmentHubAdapter = firstTransshipmentHubBuilder.build();
+		firstTranshipmentHubResource = firstTransshipmentHubBuilder.build();
 
 		Id<LogisticsSolutionElement> firstHubElementId = Id.create("FirstHubElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder firstHubElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstHubElementId);
-		firstHubElementBuilder.setResource(firstTranshipmentHubAdapter);
+		firstHubElementBuilder.setResource(firstTranshipmentHubResource);
 		firstHubElement = firstHubElementBuilder.build();
 
 		collectionElement.connectWithNextElement(firstHubElement);
@@ -131,8 +131,8 @@ public class FirstReloadLSPSchedulingTest {
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(collectionAdapter);
-		resourcesList.add(firstTranshipmentHubAdapter);
+		resourcesList.add(collectionResource);
+		resourcesList.add(firstTranshipmentHubResource);
 
 
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -214,7 +214,7 @@ public class FirstReloadLSPSchedulingTest {
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
 			assertTrue(planElements.get(3).getStartTime() >= (0));
 			assertTrue(planElements.get(3).getStartTime() <= (24*3600));
-			assertSame(planElements.get(3).getResourceId(), firstTranshipmentHubAdapter.getId());
+			assertSame(planElements.get(3).getResourceId(), firstTranshipmentHubResource.getId());
 			assertSame(planElements.get(3).getSolutionElement(), firstHubElement);
 
 			assertEquals(planElements.get(3).getStartTime(), (planElements.get(2).getEndTime() + 300), 0.0);
@@ -225,7 +225,7 @@ public class FirstReloadLSPSchedulingTest {
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
 			assertTrue(planElements.get(2).getStartTime() >= (0));
 			assertTrue(planElements.get(2).getStartTime() <= (24*3600));
-			assertSame(planElements.get(2).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(2).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(2).getSolutionElement(), collectionElement);
 
 			assertEquals(planElements.get(2).getStartTime(), planElements.get(1).getEndTime(), 0.0);
@@ -236,7 +236,7 @@ public class FirstReloadLSPSchedulingTest {
 			assertTrue(planElements.get(1).getStartTime() <= planElements.get(1).getEndTime());
 			assertTrue(planElements.get(1).getStartTime() >= (0));
 			assertTrue(planElements.get(1).getStartTime() <= (24*3600));
-			assertSame(planElements.get(1).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(1).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(1).getSolutionElement(), collectionElement);
 
 			assertEquals(planElements.get(1).getStartTime(), planElements.get(0).getEndTime(), 0.0);
@@ -247,13 +247,13 @@ public class FirstReloadLSPSchedulingTest {
 			assertTrue(planElements.get(0).getStartTime() <= planElements.get(0).getEndTime());
 			assertTrue(planElements.get(0).getStartTime() >= (0));
 			assertTrue(planElements.get(0).getStartTime() <= (24*3600));
-			assertSame(planElements.get(0).getResourceId(), collectionAdapter.getId());
+			assertSame(planElements.get(0).getResourceId(), collectionResource.getId());
 			assertSame(planElements.get(0).getSolutionElement(), collectionElement);
 
 		}
 
-		assertEquals(1, firstTranshipmentHubAdapter.getSimulationTrackers().size());
-		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubAdapter.getSimulationTrackers());
+		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
+		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
 		assertTrue(eventHandlers.iterator().next() instanceof TranshipmentHubTourEndEventHandler);
 		TranshipmentHubTourEndEventHandler reloadEventHandler = (TranshipmentHubTourEndEventHandler) eventHandlers.iterator().next();
 

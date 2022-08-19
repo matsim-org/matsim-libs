@@ -43,7 +43,7 @@ import lsp.LSPResource;
 import static org.junit.Assert.*;
 
 
-public class DistributionAdapterTest {
+public class DistributionResourceTest {
 
 	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
 	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
@@ -52,7 +52,7 @@ public class DistributionAdapterTest {
 	private CarrierVehicle distributionCarrierVehicle;
 	private CarrierCapabilities capabilities;
 	private Carrier distributionCarrier;
-	private LSPCarrierResource distributionAdapter;
+	private LSPCarrierResource distributionResource;
 	private Id<Link> distributionLinkId;
 
 	@Before
@@ -86,32 +86,32 @@ public class DistributionAdapterTest {
 		distributionCarrier.setCarrierCapabilities(capabilities);
 
 
-		Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
+		Id<LSPResource> adapterId = Id.create("DistributionCarrierResource", LSPResource.class);
+		UsecaseUtils.DistributionCarrierResourceBuilder builder = UsecaseUtils.DistributionCarrierResourceBuilder.newInstance(adapterId, network);
 		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		builder.setCarrier(distributionCarrier);
 		builder.setLocationLinkId(distributionLinkId);
-		distributionAdapter = builder.build();
+		distributionResource = builder.build();
 	}
 
 
 	@Test
-	public void testCollectionAdapter() {
-		assertNotNull(distributionAdapter.getClientElements());
-		assertTrue(distributionAdapter.getClientElements().isEmpty());
-		assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
-		if (LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
-//				assertTrue(Carrier.class.isAssignableFrom(distributionAdapter.getClassOfResource()));
-			assertSame(distributionAdapter.getCarrier(), distributionCarrier);
+	public void testCollectionResource() {
+		assertNotNull(distributionResource.getClientElements());
+		assertTrue(distributionResource.getClientElements().isEmpty());
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass()));
+		if (LSPCarrierResource.class.isAssignableFrom(distributionResource.getClass())) {
+//				assertTrue(Carrier.class.isAssignableFrom(distributionResource.getClassOfResource()));
+			assertSame(distributionResource.getCarrier(), distributionCarrier);
 		}
-		assertSame(distributionAdapter.getEndLinkId(), distributionLinkId);
-		assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
-		assertNotNull(distributionAdapter.getSimulationTrackers());
-		assertTrue(distributionAdapter.getSimulationTrackers().isEmpty());
-		assertNotNull(distributionAdapter.getAttributes());
-		assertTrue(distributionAdapter.getAttributes().isEmpty());
-		assertSame(distributionAdapter.getStartLinkId(), distributionLinkId);
-		if (distributionAdapter.getCarrier() == distributionCarrier) {
+		assertSame(distributionResource.getEndLinkId(), distributionLinkId);
+		assertSame(distributionResource.getStartLinkId(), distributionLinkId);
+		assertNotNull(distributionResource.getSimulationTrackers());
+		assertTrue(distributionResource.getSimulationTrackers().isEmpty());
+		assertNotNull(distributionResource.getAttributes());
+		assertTrue(distributionResource.getAttributes().isEmpty());
+		assertSame(distributionResource.getStartLinkId(), distributionLinkId);
+		if (distributionResource.getCarrier() == distributionCarrier) {
 			assertSame(distributionCarrier.getCarrierCapabilities(), capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(distributionCarrier.getClass()));
 			assertTrue(distributionCarrier.getPlans().isEmpty());
