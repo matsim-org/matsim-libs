@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -61,7 +62,7 @@ import java.util.function.BiPredicate;
  */
 public final class NetworkSimplifier {
 
-	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
+	private static final Logger LOG = LogManager.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinksWithDifferentAttributes = false;
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
@@ -133,11 +134,11 @@ public final class NetworkSimplifier {
 	private void run(final Network network, double thresholdLength, ThresholdExceeded type,
 			final BiPredicate<Link, Link> isMergeable, final BiConsumer<Tuple<Link, Link>, Link> transferAttributes) {
 
-		if(this.nodeTopoToMerge.size() == 0){
+		if(this.nodeTopoToMerge.isEmpty()){
 			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
 
-		log.info("running " + this.getClass().getName() + " algorithm...");
+		LOG.info("running {} algorithm...", this.getClass().getName());
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
@@ -258,9 +259,9 @@ public final class NetworkSimplifier {
 			}
 		}
 
-		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +
-				network.getLinks().size() + " links.");
-		log.info("done.");
+		LOG.info("  resulting network contains {} nodes and {} links.", network.getNodes().size(),
+				network.getLinks().size());
+		LOG.info("done.");
 
 		// writes stats as a side effect
 		nodeTopo = new NetworkCalcTopoType();
@@ -375,6 +376,10 @@ public final class NetworkSimplifier {
 	}
 
 	public static void main(String[] args) {
+		if (args.length < 2) {
+			LOG.error("Required arguments: inNetworkFile outNetworkFile");
+			return;
+		}
 		final String inNetworkFile = args[ 0 ];
 		final String outNetworkFile = args[ 1 ];
 
