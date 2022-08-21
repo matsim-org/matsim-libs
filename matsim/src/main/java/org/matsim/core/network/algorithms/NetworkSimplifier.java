@@ -360,7 +360,7 @@ public final class NetworkSimplifier {
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
+	public static boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB) {
 
 		boolean bothLinksHaveSameLinkStats = true;
 
