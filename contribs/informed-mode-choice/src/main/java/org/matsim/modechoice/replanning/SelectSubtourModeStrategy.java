@@ -171,7 +171,7 @@ public class SelectSubtourModeStrategy extends AbstractMultithreadedModule {
 				// best k generator applied pruning already, but the single trip options need to be checked again
 				if (ctx.pruner != null) {
 					double threshold = ctx.pruner.planThreshold(model);
-					if (threshold > 0) {
+					if (!Double.isNaN(threshold) && threshold > 0) {
 						candidates.removeIf(c -> c.getUtility() < singleModeCandidates.get(0).getUtility() - threshold);
 					}
 				}
