@@ -48,7 +48,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * Scale parameter for MNL.
 	 */
-	private double invBeta = Math.E;
+	private double invBeta = 2.5;
 
 	private String pruning = null;
 
