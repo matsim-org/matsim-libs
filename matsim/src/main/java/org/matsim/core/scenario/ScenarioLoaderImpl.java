@@ -248,7 +248,9 @@ class ScenarioLoaderImpl {
 		if ( (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 			URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
 			log.info("loading households from " + householdsFile);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
+			HouseholdsReaderV10 reader = new HouseholdsReaderV10(this.scenario.getHouseholds());
+			reader.putAttributeConverters(this.attributeConverters);
+			reader.parse(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
