@@ -130,7 +130,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private final List<AgentSource> agentSources = new ArrayList<>();
 
 	// for detailed run time analysis
-	public static boolean analyzeRunTimes = false;
+	public static boolean analyzeRunTimes = true;
 	private long startClockTime = 0;
 	private long qSimInternalTime = 0;
 	private final Map<MobsimEngine, AtomicLong> mobsimEngineRunTimes;
