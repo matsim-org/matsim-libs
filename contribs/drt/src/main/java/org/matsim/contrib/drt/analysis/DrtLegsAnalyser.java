@@ -180,7 +180,7 @@ public class DrtLegsAnalyser {
 	}
 
 	public static void analyseDetours(Network network, List<DrtLeg> legs, Map<Id<Request>, Double> travelDistances,
-			DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
+			DrtConfigGroup drtCfg, String fileName, boolean createGraphs, String delimiter) {
 		if (legs == null)
 			return;
 
@@ -204,7 +204,7 @@ public class DrtLegsAnalyser {
 
 			double distanceDetour = travelDistance / leg.unsharedDistanceEstimate_m;
 			double timeDetour = travelTime / leg.unsharedTimeEstimate_m;
-			detours.add(String.join(";", leg.person + "",//
+			detours.add(String.join(delimiter, leg.person + "",//
 					travelDistance + "",//
 					leg.unsharedDistanceEstimate_m + "",//
 					distanceDetour + "",//
@@ -214,7 +214,15 @@ public class DrtLegsAnalyser {
 		}
 
 		collection2Text(detours, fileName + ".csv",
-				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour", String::toString);
+				String.join(delimiter,
+						"person",
+						"distance",
+						"unsharedDistance",
+						"distanceDetour",
+						"time",
+						"unsharedTime",
+						"timeDetour"),
+				String::toString);
 
 		if (createGraphs) {
 			final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
@@ -233,7 +241,7 @@ public class DrtLegsAnalyser {
 		}
 	}
 
-	public static void analyseWaitTimes(String fileName, List<DrtLeg> legs, int binsize_s, boolean createGraphs) {
+	public static void analyseWaitTimes(String fileName, List<DrtLeg> legs, int binsize_s, boolean createGraphs, String delimiter) {
 		if (legs.size() == 0)
 			return;
 		int startTime = ((int)(legs.get(0).departureTime / binsize_s)) * binsize_s;
@@ -258,7 +266,15 @@ public class DrtLegsAnalyser {
 		TimeSeries requests = new TimeSeries("Ride requests");
 
 		try {
-			bw.write("timebin;legs;average_wait;min;p_5;p_25;median;p_75;p_95;max");
+			bw.write(String.join(delimiter,
+					"timebin",
+					"legs",
+					"average_wait",
+					"min",
+					"p_5",
+					"p_25",
+					"median","p_75","p_95","max")
+			);
 			for (Entry<Double, List<DrtLeg>> e : splitLegs.entrySet()) {
 				long rides = 0;
 				double averageWait = 0;
@@ -293,7 +309,7 @@ public class DrtLegsAnalyser {
 				p_95Wait.addOrUpdate(h, Double.valueOf(p_95));
 				requests.addOrUpdate(h, rides * 3600. / binsize_s);// normalised [req/h]
 				bw.newLine();
-				bw.write(String.join(";", Time.writeTime(e.getKey()) + "",//
+				bw.write(String.join(delimiter, Time.writeTime(e.getKey()) + "",//
 						rides + "",//
 						format.format(averageWait) + "",//
 						format.format(min) + "",//
@@ -374,8 +390,14 @@ public class DrtLegsAnalyser {
 	 * @param iterationFilename
 	 */
 	public static void writeVehicleDistances(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
-			String iterationFilename) {
-		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;passengerDistanceTraveled_pm";
+			String iterationFilename, String delimiter) {
+		String header = String.join(delimiter,
+				"vehicleId",
+				"drivenDistance_m",
+				"occupiedDistance_m",
+				"emptyDistance_m",
+				"passengerDistanceTraveled_pm"
+		);
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -388,10 +410,10 @@ public class DrtLegsAnalyser {
 			for (Entry<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> e : vehicleDistances.entrySet()) {
 				var vehicleId = e.getKey();
 				var vehicleState = e.getValue();
-				bw.write(vehicleId + ";"//
-						+ format.format(vehicleState.totalDistance) + ";"//
-						+ format.format(vehicleState.totalOccupiedDistance) + ";"//
-						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + ";"//
+				bw.write(vehicleId + delimiter//
+						+ format.format(vehicleState.totalDistance) + delimiter//
+						+ format.format(vehicleState.totalOccupiedDistance) + delimiter//
+						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + delimiter//
 						+ format.format(vehicleState.totalPassengerTraveledDistance));
 				bw.newLine();
 			}
@@ -477,7 +499,7 @@ public class DrtLegsAnalyser {
 		}
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i <= maxcap; i++) {
-			result.append(";").append(format.format(sum[i]));
+			result.append(del).append(format.format(sum[i]));
 		}
 
 		return result.toString();

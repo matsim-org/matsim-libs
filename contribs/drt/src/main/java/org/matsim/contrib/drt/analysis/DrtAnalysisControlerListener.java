@@ -55,7 +55,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * TODO: replace hard coded ; with delimiter variable
  *
  * @author jbischoff
  */
@@ -75,6 +74,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final int maxcap;
 	private static final String notAvailableString = "NA";
 
+	private final String delimiter;
+
 	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
 			DrtVehicleDistanceStats drtVehicleStats, MatsimServices matsimServices, Network network,
 			DrtEventSequenceCollector drtEventSequenceCollector,
@@ -93,6 +94,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
+
+		this.delimiter = config.global().getDefaultDelimiter();
 	}
 
 	@Override
@@ -113,11 +116,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 		DrtLegsAnalyser.collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(),
 				filename(event, "drt_rejections", ".csv"),
-				String.join(";", "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
+				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getToNode().getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getToNode().getCoord();
-					return String.join(";", submission.getTime() + "",//
+					return String.join(delimiter, submission.getTime() + "",//
 							submission.getPersonId() + "",//
 							submission.getFromLinkId() + "",//
 							submission.getToLinkId() + "",//
@@ -130,12 +133,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		double rejectionRate = (double)drtEventSequenceCollector.getRejectedRequestSequences().size()
 				/ drtEventSequenceCollector.getRequestSubmissions().size();
 		String legsSummarize = DrtLegsAnalyser.summarizeLegs(legs, drtVehicleStats.getTravelDistances(),
-				drtEventSequenceCollector.getDrtFarePersonMoneyEvents(), ";");
+				drtEventSequenceCollector.getDrtFarePersonMoneyEvents(), delimiter);
 		double directDistanceMean = DrtLegsAnalyser.getDirectDistanceMean(legs);
 		writeIterationPassengerStats(legsSummarize
-				+ ";"
+				+ delimiter
 				+ drtEventSequenceCollector.getRejectedRequestSequences().size()
-				+ ";"
+				+ delimiter
 				+ format.format(rejectionRate), event.getIteration());
 		double l_d = DrtLegsAnalyser.getTotalDistance(drtVehicleStats.getVehicleStates()) / (legs.size()
 				* directDistanceMean);
@@ -144,18 +147,18 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				.getOrDefault(new DrtTaskType(DrtTaskBaseType.STAY), new double[0]);
 		var minStayTaskVehicleCountOverDay = Arrays.stream(stayTaskProfile).min();
 
-		String vehStats = DrtLegsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), ";")
-				+ ";"
+		String vehStats = DrtLegsAnalyser.summarizeVehicles(drtVehicleStats.getVehicleStates(), delimiter)
+				+ delimiter
 				+ format.format(l_d)
-				+ ";"
+				+ delimiter
 				+ (minStayTaskVehicleCountOverDay.isPresent() ?
 				format.format(minStayTaskVehicleCountOverDay.getAsDouble()) :
 				notAvailableString);
-		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), ";",
+		String occStats = DrtLegsAnalyser.summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter,
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
 		if (drtCfg.isPlotDetailedCustomerStats()) {
-			String header = String.join(";", "departureTime",//
+			String header = String.join(delimiter, "departureTime",//
 					"personId",//
 					"vehicleId",//
 					"fromLinkId",//
@@ -173,7 +176,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					"latestDepartureTime", //
 					"latestArrivalTime");
 
-			DrtLegsAnalyser.collection2Text(legs, filename(event, "drt_legs", ".csv"), header, leg -> String.join(";",//
+			DrtLegsAnalyser.collection2Text(legs, filename(event, "drt_legs", ".csv"), header, leg -> String.join(delimiter,//
 					(Double)leg.departureTime + "",//
 					leg.person + "",//
 					leg.vehicle + "",//
@@ -193,10 +196,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 					format.format(leg.latestArrivalTime)));
 		}
 		DrtLegsAnalyser.writeVehicleDistances(drtVehicleStats.getVehicleStates(),
-				filename(event, "vehicleDistanceStats", ".csv"));
+				filename(event, "vehicleDistanceStats", ".csv"), delimiter);
 		DrtLegsAnalyser.analyseDetours(network, legs, drtVehicleStats.getTravelDistances(), drtCfg,
-				filename(event, "drt_detours"), createGraphs);
-		DrtLegsAnalyser.analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs);
+				filename(event, "drt_detours"), createGraphs, delimiter);
+		DrtLegsAnalyser.analyseWaitTimes(filename(event, "waitStats"), legs, 1800, createGraphs, delimiter);
 		DrtLegsAnalyser.analyseConstraints(filename(event, "constraints"), legs, createGraphs);
 
 		double endTime = qSimCfg.getEndTime()
@@ -204,7 +207,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 						qSimCfg.getStartTime().orElse(0) :
 						legs.get(legs.size() - 1).departureTime);
 
-		DrtLegsAnalyser.analyzeBoardingsAndDeboardings(legs, ";", qSimCfg.getStartTime().orElse(0), endTime, 3600,
+		DrtLegsAnalyser.analyzeBoardingsAndDeboardings(legs, delimiter, qSimCfg.getStartTime().orElse(0), endTime, 3600,
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
 	}
 
@@ -230,7 +233,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 						"distance_m_mean", "directDistance_m_mean", "totalTravelTime_mean", "fareAllReferences_mean",
 						"rejections", "rejectionRate"));
 			}
-			bw.write(runId + ";" + it + ";" + summarizeLegs);
+			bw.write(runId + delimiter + it + delimiter + summarizeLegs);
 			bw.newLine();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -258,11 +261,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				vheaderWritten = true;
 				bw.write("runId;iteration");
 				for (int i = 0; i <= maxcap; i++) {
-					bw.write(";" + i + " pax distance_m");
+					bw.write(delimiter + i + " pax distance_m");
 				}
 				bw.newLine();
 			}
-			bw.write(runId + ";" + it + vehOcc);
+			bw.write(runId + delimiter + it + vehOcc);
 			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -298,8 +301,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		}
 	}
 
-	private static String line(Object... cells) {
-		return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(";", "", "\n"));
+	private String line(Object... cells) {
+		return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(delimiter, "", "\n"));
 	}
 
 	private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
