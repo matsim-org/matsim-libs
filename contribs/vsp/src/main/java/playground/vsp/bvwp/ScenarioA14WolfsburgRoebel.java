@@ -1,7 +1,9 @@
 package playground.vsp.bvwp;
 
 import static playground.vsp.bvwp.Key.makeKey;
-import junit.framework.Assert;
+
+import java.util.Objects;
+
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
@@ -104,7 +106,7 @@ class ScenarioA14WolfsburgRoebel {
 		// Wolfsburg--Roebel:
 		{
 			Values planfallValuesForOD = planfall.getByODRelation(WolfsburgRoebel) ;
-			Assert.assertNotNull(planfallValuesForOD) ;
+			Objects.requireNonNull(planfallValuesForOD) ;
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
 				planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), 545. ) ; // Menge Straße im Planfall.

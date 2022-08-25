@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.testcases.MatsimTestUtils;
@@ -53,7 +54,7 @@ public class FacilitiesParserWriterTest {
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 
 		String outputFilename = this.utils.getOutputDirectory() + "output_facilities.xml";
-		TriangleScenario.writeFacilities(facilities, outputFilename);
+		new FacilitiesWriterV1(new IdentityTransformation(), facilities).write(outputFilename);
 
 		long checksum_ref = CRCChecksum.getCRCFromFile(config.facilities().getInputFile());
 		long checksum_run = CRCChecksum.getCRCFromFile(outputFilename);
@@ -61,7 +62,7 @@ public class FacilitiesParserWriterTest {
 	}
 
 	@Test
-	public void testWriteReadV1_withActivities() {
+	public void testWriteReadV2_withActivities() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 
@@ -102,7 +103,7 @@ public class FacilitiesParserWriterTest {
 	}
 
 	@Test
-	public void testWriteReadV1_withAttributes() {
+	public void testWriteReadV2_withAttributes() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 
@@ -139,7 +140,7 @@ public class FacilitiesParserWriterTest {
 	}
 
 	@Test
-	public void testWriteReadV1_withActivitiesAndAttributes() { // MATSIM-859
+	public void testWriteReadV2_withActivitiesAndAttributes() { // MATSIM-859
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 

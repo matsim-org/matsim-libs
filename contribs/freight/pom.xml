@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>14.0-SNAPSHOT</version>
+		<version>15.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -12,23 +12,6 @@
 	<properties>
 		<jsprit.version>1.8</jsprit.version>
 	</properties>
-
-
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.graphstream</groupId>
-				<artifactId>gs-ui</artifactId>
-				<version>1.3</version>
-			</dependency>
-			<dependency>
-				<groupId>org.graphstream</groupId>
-				<artifactId>gs-core</artifactId>
-				<version>1.3</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -42,6 +25,12 @@
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-core</artifactId>
 			<version>${jsprit.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.3</version>
 		</dependency>
 
 		<dependency>
@@ -62,48 +51,38 @@
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-analysis</artifactId>
 			<version>${jsprit.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jfree</groupId>
-					<artifactId>jfreechart</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.3.3</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.21</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.21</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>14.0-SNAPSHOT</version>
+			<version>15.0-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

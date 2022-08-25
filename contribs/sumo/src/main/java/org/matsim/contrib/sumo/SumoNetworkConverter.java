@@ -59,12 +59,16 @@ public class SumoNetworkConverter implements Callable<Integer> {
     @CommandLine.Option(names = "--to-crs", description = "Desired output coordinate system", required = true)
     private String toCRS;
 
-    private SumoNetworkConverter(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS) {
+    @CommandLine.Option(names = "--free-speed-factor", description = "Free-speed reduction for urban links", defaultValue = "0.9")
+    private double freeSpeedFactor = LinkProperties.DEFAULT_FREESPEED_FACTOR;
+
+    private SumoNetworkConverter(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS, double freeSpeedFactor) {
         this.input = input;
         this.output = output;
         this.shapeFile = shapeFile;
         this.fromCRS = fromCRS;
         this.toCRS = toCRS;
+        this.freeSpeedFactor = freeSpeedFactor;
     }
 
     private SumoNetworkConverter() {
@@ -79,7 +83,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
      * @param toCRS   desired coordinate system of network
      */
     public static SumoNetworkConverter newInstance(List<Path> input, Path output, String fromCRS, String toCRS) {
-        return new SumoNetworkConverter(input, output, null, fromCRS, toCRS);
+        return new SumoNetworkConverter(input, output, null, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR);
     }
 
     /**
@@ -89,7 +93,15 @@ public class SumoNetworkConverter implements Callable<Integer> {
      * @see #newInstance(List, Path, String, String)
      */
     public static SumoNetworkConverter newInstance(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS) {
-        return new SumoNetworkConverter(input, output, shapeFile, fromCRS, toCRS);
+        return new SumoNetworkConverter(input, output, shapeFile, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR);
+    }
+
+    /**
+     * Creates a new instance.
+     * @see #newInstance(List, Path, Path, String, String, double)
+     */
+    public static SumoNetworkConverter newInstance(List<Path> input, Path output, Path shapeFile, String inputCRS, String targetCRS, double freeSpeedFactor) {
+        return new SumoNetworkConverter(input, output, shapeFile, inputCRS, targetCRS, freeSpeedFactor);
     }
 
     /**
@@ -164,12 +176,23 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
             for (Map.Entry<String, SumoNetworkHandler.Edge> e : handler.getEdges().entrySet()) {
 
-                if (e.getValue().shape.isEmpty())
-                    continue;
+                SumoNetworkHandler.Edge edge = e.getValue();
+
+                // Create straight line for edges without shape
+                if (edge.shape.isEmpty()) {
+
+                    SumoNetworkHandler.Junction f = handler.getJunctions().get(edge.from);
+                    SumoNetworkHandler.Junction t = handler.getJunctions().get(edge.to);
+                    if (f == null || t == null)
+                        continue;
+
+                    edge.shape.add(f.coord);
+                    edge.shape.add(t.coord);
+                }
 
                 printer.printRecord(
                         e.getKey(),
-                        e.getValue().shape.stream().map(d -> {
+                        edge.shape.stream().map(d -> {
                             Coord p = handler.createCoord(d);
                             return String.format(Locale.US,"(%f,%f)", p.getX(), p.getY());
                         }).collect(Collectors.joining(","))
@@ -281,7 +304,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 continue;
             }
 
-            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(speed, LinkProperties.DEFAULT_FREESPEED_FACTOR));
+            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(speed, freeSpeedFactor));
             link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), prop) * link.getNumberOfLanes());
 
             lanes.addLanesToLinkAssignment(l2l);

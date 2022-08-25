@@ -474,7 +474,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 			if ( payment > maxPayment ) {
 				maxPayment = payment ;
 			}
-			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
+			String subPopType = (String) person.getAttributes().getAttribute( SUBPOPULATION );
 			if (subPopType!=null) subPopTypes.add(subPopType) ;
 		}
 
@@ -489,7 +489,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : pop.getPersons().values() ) {
-			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
+			String subPopType = (String) person.getAttributes().getAttribute( SUBPOPULATION );
 			Double payment = (Double) attribs.getAttribute( person.getId().toString(), PAYMENTS ) ;
 			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;

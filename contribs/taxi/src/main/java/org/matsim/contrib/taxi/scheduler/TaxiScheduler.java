@@ -20,7 +20,8 @@
 package org.matsim.contrib.taxi.scheduler;
 
 import static java.util.stream.Collectors.toList;
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.PICKUP;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.getBaseTypeOrElseThrow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -45,15 +47,12 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
-import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -116,11 +115,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 	// =========================================================================================
 
-	public void scheduleRequest(DvrpVehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath) {
-		if (request.getStatus() != TaxiRequestStatus.UNPLANNED) {
-			throw new IllegalStateException();
-		}
-
+	public void scheduleRequest(DvrpVehicle vehicle, DrtRequest request, VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
 		divertOrAppendDrive(schedule, vrpPath, TaxiEmptyDriveTask.TYPE);
 
@@ -256,7 +251,7 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 		}
 	}
 
-	protected void appendOccupiedDriveAndDropoff(Schedule schedule, TaxiRequest req, VrpPathWithTravelData path) {
+	protected void appendOccupiedDriveAndDropoff(Schedule schedule, DrtRequest req, VrpPathWithTravelData path) {
 		schedule.addTask(new TaxiOccupiedDriveTask(path, req));
 
 		double arrivalTime = path.getArrivalTime();
@@ -282,23 +277,17 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 
 	// =========================================================================================
 
-	private List<TaxiRequest> removedRequests;
+	private List<DrtRequest> removedRequests;
 
 	/**
-	 * Awaiting == unpicked-up, i.e. requests with status PLANNED or TAXI_DISPATCHED See {@link TaxiRequestStatus}
+	 * Awaiting == not picked-up (planned, but taxi may not yet be dispatched)
 	 */
-	public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules() {
+	public List<DrtRequest> removeAwaitingRequestsFromAllSchedules() {
 		removedRequests = new ArrayList<>();
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			removeAwaitingRequestsImpl(veh);
 		}
 
-		return removedRequests;
-	}
-
-	public List<TaxiRequest> removeAwaitingRequests(DvrpVehicle vehicle) {
-		removedRequests = new ArrayList<>();
-		removeAwaitingRequestsImpl(vehicle);
 		return removedRequests;
 	}
 
@@ -371,14 +360,9 @@ public class TaxiScheduler implements MobsimBeforeCleanupListener {
 	}
 
 	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, Task task) {
-		TaxiTaskBaseType baseType = getBaseTypeOrElseThrow(task);
-		if (baseType == PICKUP) {
-			TaxiRequest request = ((TaxiPickupTask)task).getRequest();
-			request.setPickupTask(null);
+		if (PICKUP.isBaseTypeOf(task)) {
+			DrtRequest request = ((TaxiPickupTask)task).getRequest();
 			removedRequests.add(request);
-		} else if (baseType == DROPOFF) {
-			TaxiRequest request = ((TaxiDropoffTask)task).getRequest();
-			request.setDropoffTask(null);
 		}
 	}
 

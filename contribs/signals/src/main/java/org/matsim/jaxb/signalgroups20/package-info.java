@@ -5,5 +5,5 @@
 // Generated on: 2011.09.20 at 07:21:23 PM MESZ 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.matsim.org/files/dtd", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.matsim.org/files/dtd", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.matsim.jaxb.signalgroups20;

@@ -27,8 +27,6 @@ import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultInsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -36,10 +34,12 @@ import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSe
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
+import org.matsim.contrib.drt.schedule.StopDurationEstimator;
 import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
@@ -96,7 +96,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
 						getter.getModal(VehicleEntry.EntryFactory.class), getter.getModal(DrtInsertionSearch.class),
-						getter.getModal(DrtRequestInsertionRetryQueue.class),
+						getter.getModal(DrtRequestInsertionRetryQueue.class), getter.getModal(DrtOfferAcceptor.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
@@ -131,14 +131,17 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-						getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
-								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
+								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class),
+								getter.getModal(StopDurationEstimator.class))))
 				.asEagerSingleton();
+
+		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new DrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
+						new DrtStayTaskEndTimeCalculator(getter.getModal(StopDurationEstimator.class))))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
 				getter -> new DrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),

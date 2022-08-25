@@ -140,9 +140,9 @@ public class InsertionGenerator {
 	private final DetourTimeEstimator detourTimeEstimator;
 	private final InsertionDetourTimeCalculator detourTimeCalculator;
 
-	public InsertionGenerator(double stopDuration, DetourTimeEstimator detourTimeEstimator) {
+	public InsertionGenerator(IncrementalStopDurationEstimator stopDurationEstimator, DetourTimeEstimator detourTimeEstimator) {
 		this.detourTimeEstimator = detourTimeEstimator;
-		detourTimeCalculator = new InsertionDetourTimeCalculator(stopDuration, detourTimeEstimator);
+		detourTimeCalculator = new InsertionDetourTimeCalculator(stopDurationEstimator, detourTimeEstimator);
 	}
 
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
@@ -177,7 +177,7 @@ public class InsertionGenerator {
 				pickupInsertion.nextWaypoint.getLink(),
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
-				fromPickupTT, true);
+				fromPickupTT, true, request);
 
 		int stopCount = vEntry.stops.size();
 		// i == j
@@ -203,7 +203,7 @@ public class InsertionGenerator {
 		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink(),
 				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
 		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
-				false);
+				false, request);
 
 		if (vEntry.getSlackTime(i) < pickupDetourInfo.pickupTimeLoss) {
 			return; // skip all insertions: i -> pickup -> dropoff
@@ -269,7 +269,7 @@ public class InsertionGenerator {
 						toDropoffDepartureTime + toDropoffTT); //TODO stopDuration not included
 
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
-				pickupDetourInfo);
+				pickupDetourInfo, request);
 
 		if (vehicleEntry.getSlackTime(dropoffIdx)
 				< pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss) {

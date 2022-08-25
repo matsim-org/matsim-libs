@@ -117,7 +117,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 			}
 		});
 		final StrategyManager manager = injector.getInstance(StrategyManager.class);
-		manager.run(population, injector.getInstance(ReplanningContext.class));
+		manager.run(population, 0, injector.getInstance(ReplanningContext.class));
 
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());

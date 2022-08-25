@@ -44,7 +44,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;

@@ -208,8 +208,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				switch( attributes.getValue( TYPE ) ){
 					case "start":
 						currentStartTime = getDouble( attributes.getValue( "end_time" ) );
-						previousActLoc = currentVehicle.getLocation();
-						currentTourBuilder.scheduleStart( currentVehicle.getLocation(),
+						previousActLoc = currentVehicle.getLinkId();
+						currentTourBuilder.scheduleStart( currentVehicle.getLinkId(),
 							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 					case "pickup":{
@@ -229,8 +229,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 						break;
 					}
 					case "end":
-						finishLeg( currentVehicle.getLocation() );
-						currentTourBuilder.scheduleEnd( currentVehicle.getLocation(),
+						finishLeg( currentVehicle.getLinkId() );
+						currentTourBuilder.scheduleEnd( currentVehicle.getLinkId(),
 							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
 						break;
 				}

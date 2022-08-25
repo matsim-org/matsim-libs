@@ -6,8 +6,8 @@
 
 <jxb:globalBindings>
    <jxb:javaType name="int"  xmlType="xs:positiveInteger"
-                  parseMethod="javax.xml.bind.DatatypeConverter.parseInt" 
-                  printMethod="javax.xml.bind.DatatypeConverter.printInt"/> 
+                  parseMethod="jakarta.xml.bind.DatatypeConverter.parseInt"
+                  printMethod="jakarta.xml.bind.DatatypeConverter.printInt"/>
 </jxb:globalBindings>
 
 <!--  <annotation>-->

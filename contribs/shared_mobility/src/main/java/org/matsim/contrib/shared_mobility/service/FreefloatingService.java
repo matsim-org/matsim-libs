@@ -116,6 +116,7 @@ public class FreefloatingService implements SharingService {
 	// Remove the vehicle to be not anymore available for other bookings
 	@Override
 	public void reserveVehicle(MobsimAgent agent,SharingVehicle vehicle) {
+		Verify.verify(!reservations.values().contains(vehicle)); // This vehicle should be reserved only once
 		Coord coord = vehicle.getLink().getCoord();
 		availableVehicles.remove(coord.getX(), coord.getY(), vehicle);
 		reservations.put(agent.getId(), vehicle);

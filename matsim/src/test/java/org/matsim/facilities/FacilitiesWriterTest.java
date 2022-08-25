@@ -84,6 +84,44 @@ public class FacilitiesWriterTest {
     }
 
     @Test
+    public void testWrite3DCoord() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        ActivityFacilities facilities = scenario.getActivityFacilities();
+        ActivityFacilitiesFactory factory = facilities.getFactory();
+
+        ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0, 12.3));
+        ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0, -4.2));
+        ActivityFacility fac3 = factory.createActivityFacility(Id.create("3", ActivityFacility.class), new Coord(30.0, 35.0));
+
+        facilities.addActivityFacility(fac1);
+        facilities.addActivityFacility(fac2);
+        facilities.addActivityFacility(fac3);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1000);
+        new FacilitiesWriter(facilities).write(outputStream);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+
+        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        facilities = scenario.getActivityFacilities();
+        MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
+        reader.parse(inputStream);
+
+        Assert.assertEquals(3, facilities.getFacilities().size());
+
+        ActivityFacility fac1b = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
+        Assert.assertTrue(fac1b.getCoord().hasZ());
+        Assert.assertEquals(12.3, fac1b.getCoord().getZ(), Double.MIN_NORMAL);
+
+        ActivityFacility fac2b = facilities.getFacilities().get(Id.create(2, ActivityFacility.class));
+        Assert.assertTrue(fac2b.getCoord().hasZ());
+        Assert.assertEquals(-4.2, fac2b.getCoord().getZ(), Double.MIN_NORMAL);
+
+        ActivityFacility fac3b = facilities.getFacilities().get(Id.create(3, ActivityFacility.class));
+        Assert.assertFalse(fac3b.getCoord().hasZ());
+    }
+
+    @Test
     // the better fix for https://github.com/matsim-org/matsim/pull/505
     public void testFacilityDescription() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

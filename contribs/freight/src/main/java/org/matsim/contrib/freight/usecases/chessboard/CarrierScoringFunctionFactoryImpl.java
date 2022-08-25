@@ -285,10 +285,9 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
         }
     }
 
-    private Network network;
+    private final Network network;
 
-    @Inject
-    public CarrierScoringFunctionFactoryImpl(Network network) {
+    @Inject CarrierScoringFunctionFactoryImpl(Network network) {
         super();
         this.network = network;
     }

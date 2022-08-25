@@ -72,6 +72,12 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
+		testForLocked();
+		// (network is set locked after the (Mutable)Scenario is created ... since it needs to know about the time-dep network before that.  Technically, the network file name
+		// could still be changed later.  But we don't have (and maybe don't want) a separate switch for that.  In general, the rule of thumb
+		// is: The config should be final _before_ the scenario is created.  I don't think we need to accept every possible use case where
+		// this is not strictly necessary.  kai, may'22
+
 		this.inputFile = inputFile;
 	}
 

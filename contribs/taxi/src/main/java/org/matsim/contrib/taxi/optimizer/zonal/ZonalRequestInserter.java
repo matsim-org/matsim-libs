@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -37,7 +38,6 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.contrib.zone.Zone;
@@ -86,7 +86,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 	}
 
 	@Override
-	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
 		initIdleVehiclesInZones();
 		scheduleUnplannedRequestsWithinZones(unplannedRequests);
 
@@ -115,10 +115,10 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 		}
 	}
 
-	private void scheduleUnplannedRequestsWithinZones(Collection<TaxiRequest> unplannedRequests) {
-		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+	private void scheduleUnplannedRequestsWithinZones(Collection<DrtRequest> unplannedRequests) {
+		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
-			TaxiRequest req = reqIter.next();
+			DrtRequest req = reqIter.next();
 
 			Zone zone = linkToZone.get(req.getFromLink().getId());
 			if (zone == null) {
@@ -131,7 +131,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 			}
 
 			Stream<DvrpVehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
-			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
+			BestDispatchFinder.Dispatch<DrtRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
 
 			if (best != null) {
 				scheduler.scheduleRequest(best.vehicle, best.destination, best.path);

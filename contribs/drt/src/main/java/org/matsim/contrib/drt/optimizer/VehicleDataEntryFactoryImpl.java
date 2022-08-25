@@ -25,15 +25,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -43,10 +46,13 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
-		lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
-		if (lookAhead < 0) {
-			throw new IllegalArgumentException(
+		if (drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated()) {
+			lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
+			Preconditions.checkArgument(lookAhead >= 0,
 					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+		} else {
+			// if no rejection due to max wait time, the look ahead is infinite
+			lookAhead = Double.POSITIVE_INFINITY;
 		}
 	}
 
@@ -61,28 +67,17 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			startTask = schedule.getCurrentTask();
-			switch (getBaseTypeOrElseThrow(startTask)) {
-				case DRIVE:
-					DrtDriveTask driveTask = (DrtDriveTask)startTask;
-					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
-					start = diversionPoint != null ? diversionPoint : //diversion possible
+			start = switch (getBaseTypeOrElseThrow(startTask)) {
+				case DRIVE -> {
+					var driveTask = (DriveTask)startTask;
+					var diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
+					yield diversionPoint != null ? diversionPoint : //diversion possible
 							new LinkTimePair(driveTask.getPath().getToLink(),
 									driveTask.getEndTime());// too late for diversion
-					break;
-
-				case STOP:
-					DrtStopTask stopTask = (DrtStopTask)startTask;
-					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
-					break;
-
-				case STAY:
-					DrtStayTask stayTask = (DrtStayTask)startTask;
-					start = new LinkTimePair(stayTask.getLink(), currentTime);
-					break;
-
-				default:
-					throw new RuntimeException();
-			}
+				}
+				case STOP -> new LinkTimePair(((DrtStopTask)startTask).getLink(), startTask.getEndTime());
+				case STAY -> new LinkTimePair(((StayTask)startTask).getLink(), currentTime);
+			};
 
 			nextTaskIdx = startTask.getTaskIdx() + 1;
 		} else { // PLANNED
@@ -134,7 +129,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	}
 
 	static double calcVehicleSlackTime(DvrpVehicle vehicle, double now) {
-		DefaultStayTask lastTask = (DefaultStayTask)Schedules.getLastTask(vehicle.getSchedule());
+		var lastTask = Schedules.getLastTask(vehicle.getSchedule());
 		//if the last task is started, take 'now', otherwise take the planned begin time
 		double availableFromTime = Math.max(lastTask.getBeginTime(), now);
 		//for an already delayed vehicle, assume slack is 0 (instead of a negative number)

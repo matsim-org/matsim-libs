@@ -42,6 +42,10 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 
 	public abstract void addActivity(final Activity act);
 
+
+	/**
+	 * Plan type, which may be used to ensure there is at least one plan of a certain type.
+	 */
 	public abstract String getType();
 
 	public abstract void setType(final String type);

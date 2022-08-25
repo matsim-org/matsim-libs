@@ -19,20 +19,18 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -171,7 +169,11 @@ public final class TripStructureUtils {
 	}
 
 	public static Collection<Subtour> getSubtours( final Plan plan) {
-		return getSubtours( plan.getPlanElements() );
+		return getSubtours( plan.getPlanElements(), 0 );
+	}
+
+	public static Collection<Subtour> getSubtours( final Plan plan, double coordDistance) {
+		return getSubtours( plan.getPlanElements(), coordDistance );
 	}
 
 	/**
@@ -198,19 +200,34 @@ public final class TripStructureUtils {
 	 * in case of successive activities not being located at the same location
 	 * (that is, if the origin of a trip is not the destination of the preceding
 	 * trip), an exception will be thrown.
+	 * <br>
+	 * Note: We (VSP) are not sure what this code does exactly. The correct definition
+	 * of what a subtour is in MATSim needs to be found!
+	 * Theresa, VSP mode choice seminar in jul'22
+	 *
+	 * @param coordDistance if larger 0, also consider coordinates to be at same location if smaller than distance
 	 *
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
-	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements) {
-		return getSubtours(planElements, TripStructureUtils::isStageActivityType );
+	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements, double coordDistance) {
+		return getSubtours(planElements, TripStructureUtils::isStageActivityType, coordDistance );
+	}
+
+	/**
+	 * Returns the top-level tour as {@link Subtour} object even if it is unclosed. This subtour will always
+	 * contain all trips of a plan. Child tours will not be set.
+	 * @see Subtour
+	 */
+	public static Subtour getUnclosedRootSubtour(final Plan plan) {
+		return new Subtour(TripStructureUtils.getTrips(plan), false);
 	}
 
 	// for contrib socnetsim only
 	// I think now that we should actually keep this.  kai, jan'20
 	@Deprecated
 	public static Collection<Subtour> getSubtours( final Plan plan, final Predicate<String> isStageActivity) {
-		return getSubtours( plan.getPlanElements(), isStageActivity );
+		return getSubtours( plan.getPlanElements(), isStageActivity, 0);
 	}
 
 	// for contrib socnetsim only
@@ -218,24 +235,29 @@ public final class TripStructureUtils {
 	@Deprecated
 	public static Collection<Subtour> getSubtours(
 			final List<? extends PlanElement> planElements,
-			final Predicate<String> isStageActivity ) {
+			final Predicate<String> isStageActivity, double coordDistance) {
 		final List<Subtour> subtours = new ArrayList<>();
 
-		Id<?> destinationId = null;
-		final List<Id<?>> originIds = new ArrayList<>();
+		Object destinationId = null;
+
+		// can be either id or coordinate
+		final List<Object> originIds = new ArrayList<>();
 		final List<Trip> trips = getTrips( planElements, isStageActivity );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
+
 		for (Trip trip : trips) {
-			final Id<?> originId;
+			final Object originId;
 			//use facilities if available
-			if (trip.getOriginActivity().getFacilityId()!=null ) {
+			if (trip.getOriginActivity().getFacilityId() != null) {
 				originId = trip.getOriginActivity().getFacilityId();
+			} else if (coordDistance > 0 && trip.getOriginActivity().getCoord() != null) {
+				originId = trip.getOriginActivity().getCoord();
 			} else {
 				originId = trip.getOriginActivity().getLinkId();
 			}
 
 			if ( originId == null ) {
-				throw new NullPointerException( "Both facility id and link id for origin activity "+trip.getOriginActivity()+
+				throw new NullPointerException( "Facility id, link id and coordinates for origin activity "+trip.getOriginActivity()+
 										" are null!" );
 			}
 
@@ -243,22 +265,40 @@ public final class TripStructureUtils {
 				throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
 			}
 
-			if (trip.getDestinationActivity().getFacilityId()!=null ) {
+			if (trip.getDestinationActivity().getFacilityId() != null) {
 				destinationId = trip.getDestinationActivity().getFacilityId();
+			} else if (coordDistance > 0 && trip.getDestinationActivity().getCoord() != null) {
+				destinationId = trip.getDestinationActivity().getCoord();
 			} else {
 				destinationId = trip.getDestinationActivity().getLinkId();
 			}
 
 			if ( destinationId == null ) {
-				throw new NullPointerException( "Both facility id and link id for destination activity "+trip.getDestinationActivity()+
+				throw new NullPointerException( "Facility id, and link id and coordinates for destination activity "+trip.getDestinationActivity()+
 										" are null!" );
 			}
 
 			originIds.add( originId );
 
-			if (originIds.contains( destinationId )) {
+			int lastIdx = originIds.lastIndexOf(destinationId);
+
+			// fuzzy lookup for last idx based on coordinates
+			if (coordDistance > 0 && destinationId instanceof Coord destinationCoord) {
+				for (int i = originIds.size() - 1; i >= 0; i--) {
+
+					Object cmp = originIds.get(i);
+					if (cmp instanceof Coord cmpCoord) {
+						if (CoordUtils.calcEuclideanDistance(destinationCoord, cmpCoord) <= coordDistance) {
+							lastIdx = i;
+							break;
+						}
+					}
+				}
+			}
+
+			if (lastIdx > -1) {
 				// end of a subtour
-				final int subtourStartIndex = originIds.lastIndexOf( destinationId );
+				final int subtourStartIndex = lastIdx;
 				final int subtourEndIndex = originIds.size();
 
 				final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
