@@ -49,8 +49,7 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PopulationUtils;
@@ -93,7 +92,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	@Inject
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 						 Population population, ScoringFunctionFactory scoringFunctionFactory) {
-		controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());
+		controlerListenerManager.addControlerListener((BeforeMobsimListener) event -> init());
 		this.population = population;
 		this.legsDelegate = eventsToLegs;
 		this.actsDelegate = eventsToActivities;

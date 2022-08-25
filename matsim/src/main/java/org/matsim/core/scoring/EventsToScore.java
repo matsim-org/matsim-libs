@@ -110,7 +110,7 @@ public final class EventsToScore {
 	public void beginIteration(int iteration, boolean isLastIteration) {
 		this.iteration = iteration;
 		this.isLastIteration = isLastIteration;
-		this.controlerListenerManager.fireControlerIterationStartsEvent(iteration, isLastIteration);
+		this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
 	}
 
 	/**
