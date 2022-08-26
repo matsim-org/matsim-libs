@@ -21,6 +21,7 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +31,19 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 /**
  * @author mrieser
@@ -180,6 +188,121 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		Assert.assertEquals(2, route1.getLinkIds().size());
 		Assert.assertEquals(3, route2.getLinkIds().size());
+	}
+
+	@Test
+	public void testGetLinks_setLinks_alternative() {
+		Network network = createTestNetwork();
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link22 = network.getLinks().get(Id.create("22", Link.class));
+		Link link12 = network.getLinks().get(Id.create("12", Link.class));
+		Link linkM23 = network.getLinks().get(Id.create("-23", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
+
+		List<Id<Link>> linkIds = new ArrayList<>(5);
+		Collections.addAll(linkIds, link22.getId(), link12.getId(), linkM23.getId(), link3.getId());
+		NetworkRoute route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
+		route.setLinkIds(link1.getId(), linkIds, link4.getId());
+
+		List<Id<Link>> linksId2 = route.getLinkIds();
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+		}
+	}
+
+	@Test
+	public void testGetLinks_setLinks_endLoopLink() {
+		Network network = createTestNetwork();
+
+		final Node node5 = network.getNodes().get(Id.create("5", Node.class));
+		NetworkUtils.createAndAddLink(network,Id.create("loop5", Link.class), node5, node5, 1000.0, 100.0, 3600.0, (double) 1 );
+
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link22 = network.getLinks().get(Id.create("22", Link.class));
+		Link link12 = network.getLinks().get(Id.create("12", Link.class));
+		Link linkM23 = network.getLinks().get(Id.create("-23", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
+		Link linkLoop5 = network.getLinks().get(Id.create("loop5", Link.class));
+
+		List<Id<Link>> linkIds = new ArrayList<>(6);
+		Collections.addAll(linkIds, link22.getId(), link12.getId(), linkM23.getId(), link3.getId(), link4.getId());
+		NetworkRoute route = getNetworkRouteInstance(link1.getId(), linkLoop5.getId(), network);
+		route.setLinkIds(link1.getId(), linkIds, linkLoop5.getId());
+
+		List<Id<Link>> linksId2 = route.getLinkIds();
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+		}
+	}
+
+	@Test
+	public void testGetLinks_setLinks_largeLoop() {
+		Network network = createTestNetwork();
+
+		final Node node13 = network.getNodes().get(Id.create("13", Node.class));
+		final Node node12 = network.getNodes().get(Id.create("12", Node.class));
+		NetworkUtils.createAndAddLink(network,Id.create("-12", Link.class), node13, node12, 1000.0, 100.0, 3600.0, (double) 1 );
+
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link23 = network.getLinks().get(Id.create("23", Link.class));
+		Link linkM12 = network.getLinks().get(Id.create("-12", Link.class));
+		Link linkM22 = network.getLinks().get(Id.create("-22", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
+
+		List<Id<Link>> linkIds = List.of(link2.getId(), link23.getId(), linkM12.getId(), linkM22.getId(), link2.getId(), link3.getId());
+
+		NetworkRoute route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
+		route.setLinkIds(link1.getId(), linkIds, link4.getId());
+
+		List<Id<Link>> linksId2 = route.getLinkIds();
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+		}
+	}
+
+	@Test
+	public void testGetLinks_setLinks_largeLoop_alternative() {
+		Network network = createTestNetwork();
+
+		network.removeLink(Id.create("4", Link.class));
+		network.removeNode(Id.create("5", Node.class));
+		network.removeLink(Id.create("14", Link.class));
+		network.removeLink(Id.create("15", Link.class));
+		network.removeNode(Id.create("15", Node.class));
+		network.removeNode(Id.create("16", Node.class));
+
+		final Node node14 = network.getNodes().get(Id.create("14", Node.class));
+		final Node node13 = network.getNodes().get(Id.create("13", Node.class));
+		final Node node12 = network.getNodes().get(Id.create("12", Node.class));
+		NetworkUtils.createAndAddLink(network,Id.create("-12", Link.class), node13, node12, 1000.0, 100.0, 3600.0, (double) 1 );
+		NetworkUtils.createAndAddLink(network,Id.create("-13", Link.class), node14, node13, 1000.0, 100.0, 3600.0, (double) 1 );
+
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link24 = network.getLinks().get(Id.create("24", Link.class));
+		Link linkM13 = network.getLinks().get(Id.create("-13", Link.class));
+		Link linkM12 = network.getLinks().get(Id.create("-12", Link.class));
+		Link linkM22 = network.getLinks().get(Id.create("-22", Link.class));
+		Link link23 = network.getLinks().get(Id.create("23", Link.class));
+
+		List<Id<Link>> linkIds = List.of(link2.getId(), link3.getId(), link24.getId(), linkM13.getId(), linkM12.getId(), linkM22.getId(), link2.getId());
+
+		NetworkRoute route = getNetworkRouteInstance(link1.getId(), link23.getId(), network);
+		route.setLinkIds(link1.getId(), linkIds, link23.getId());
+
+		List<Id<Link>> linksId2 = route.getLinkIds();
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+		}
 	}
 
 }
