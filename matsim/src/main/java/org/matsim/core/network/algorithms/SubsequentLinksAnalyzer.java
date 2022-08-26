@@ -22,6 +22,7 @@ package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -46,7 +47,7 @@ public final class SubsequentLinksAnalyzer {
 	private final Network network;
 
 	/** Stores the logical subsequent link (value) for a given link (key). */
-	private final TreeMap<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<>();
+	private final Map<Id<Link>, Id<Link>> subsequentLinks = new IdMap<>(Link.class);
 
 	public SubsequentLinksAnalyzer(final Network network) {
 		this.network = network;
@@ -104,7 +105,6 @@ public final class SubsequentLinksAnalyzer {
 	private Link computeSubsequentLink(final Map<Link, Double> thetas) {
 		List<Link> minThetaOutLinks = new ArrayList<>();
 
-		minThetaOutLinks.clear();
 		double absMin = Collections.min(thetas.values());
 		for (Map.Entry<Link, Double> entry : thetas.entrySet()) {
 			if (absMin == entry.getValue()) {
