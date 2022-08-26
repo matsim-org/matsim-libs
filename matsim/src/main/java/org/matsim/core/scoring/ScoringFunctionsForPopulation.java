@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -47,7 +48,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
@@ -81,7 +81,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-
+	
 	private final EventsToLegs legsDelegate;
 	private final EventsToActivities actsDelegate;
 
