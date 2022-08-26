@@ -236,7 +236,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_largeLoop() {
+	public void testGetLinks_setLinks_containsLargeLoop() {
 		Network network = createTestNetwork();
 
 		final Node node13 = network.getNodes().get(Id.create("13", Node.class));
@@ -264,7 +264,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	@Test
-	public void testGetLinks_setLinks_largeLoop_alternative() {
+	public void testGetLinks_setLinks_containsLargeLoop_alternative() {
 		Network network = createTestNetwork();
 
 		network.removeLink(Id.create("4", Link.class));
@@ -293,6 +293,35 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		NetworkRoute route = getNetworkRouteInstance(link1.getId(), link23.getId(), network);
 		route.setLinkIds(link1.getId(), linkIds, link23.getId());
+
+		List<Id<Link>> linksId2 = route.getLinkIds();
+		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());
+		for (int i = 0, n = linkIds.size(); i < n; i++) {
+			Assert.assertEquals("different link at position " + i, linkIds.get(i), linksId2.get(i));
+		}
+	}
+
+	@Test
+	public void testGetLinks_setLinks_isLargeLoop() {
+		Network network = createTestNetwork();
+
+		final Node node14 = network.getNodes().get(Id.create("14", Node.class));
+		final Node node13 = network.getNodes().get(Id.create("13", Node.class));
+		final Node node12 = network.getNodes().get(Id.create("12", Node.class));
+		NetworkUtils.createAndAddLink(network,Id.create("-12", Link.class), node13, node12, 1000.0, 100.0, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create("-13", Link.class), node14, node13, 1000.0, 100.0, 3600.0, 1);
+
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link24 = network.getLinks().get(Id.create("24", Link.class));
+		Link linkM13 = network.getLinks().get(Id.create("-13", Link.class));
+		Link linkM12 = network.getLinks().get(Id.create("-12", Link.class));
+		Link linkM22 = network.getLinks().get(Id.create("-22", Link.class));
+
+		List<Id<Link>> linkIds = List.of(link3.getId(), link24.getId(), linkM13.getId(), linkM12.getId(), linkM22.getId());
+
+		NetworkRoute route = getNetworkRouteInstance(link2.getId(), link2.getId(), network);
+		route.setLinkIds(link2.getId(), linkIds, link2.getId());
 
 		List<Id<Link>> linksId2 = route.getLinkIds();
 		Assert.assertEquals("wrong number of links.", linkIds.size(), linksId2.size());

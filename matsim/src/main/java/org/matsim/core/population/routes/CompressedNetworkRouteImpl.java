@@ -93,7 +93,7 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 		if ((previousLinkId == null) || (endLinkId == null)) {
 			return links;
 		}
-		if (previousLinkId.equals(endLinkId)) {
+		if (previousLinkId.equals(endLinkId) && this.uncompressedLength == 0) {
 			return links;
 		}
 		for (Id<Link> linkId : this.route) {
