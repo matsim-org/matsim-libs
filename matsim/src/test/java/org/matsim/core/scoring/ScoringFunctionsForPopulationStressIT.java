@@ -69,7 +69,8 @@ public class ScoringFunctionsForPopulationStressIT {
 				e2acts,
 				e2legs,
 				scenario.getPopulation(),
-				throwingScoringFunctionFactory
+				throwingScoringFunctionFactory,
+				config
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
@@ -218,7 +219,8 @@ public class ScoringFunctionsForPopulationStressIT {
 				e2acts,
 				e2legs,
 				scenario.getPopulation(),
-				scoringFunctionFactory
+				scoringFunctionFactory,
+				config
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		events.initProcessing();
@@ -365,7 +367,8 @@ public class ScoringFunctionsForPopulationStressIT {
 				new EventsToActivities(controlerListenerManager),
 				new EventsToLegs(scenario.getNetwork()),
 				scenario.getPopulation(),
-				scoringFunctionFactory
+				scoringFunctionFactory,
+				config
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		int MAX = 10;
