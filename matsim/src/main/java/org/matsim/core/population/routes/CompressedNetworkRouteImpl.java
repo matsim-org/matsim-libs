@@ -21,13 +21,16 @@
 package org.matsim.core.population.routes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -176,19 +179,50 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 	@Override
 	public void setLinkIds(final Id<Link> startLinkId, final List<Id<Link>> srcRoute, final Id<Link> endLinkId) {
 		this.route.clear();
+		Set<Id<Node>> visitedNodes = new HashSet<>();
+		Set<Id<Node>> multiplyVisitedNodes = new HashSet<>();
 		setStartLinkId(startLinkId);
 		setEndLinkId(endLinkId);
 		if ((srcRoute == null) || (srcRoute.size() == 0)) {
 			this.uncompressedLength = 0;
 			return;
 		}
+		// compress route
 		Id<Link> previousLinkId = startLinkId;
 		for (Id<Link> linkId : srcRoute) {
+			Link link = this.links.get(linkId);
+			Id<Node> fromNodeId = link.getFromNode().getId();
+			if (!visitedNodes.add(fromNodeId)) {
+				// the node was already visited
+				multiplyVisitedNodes.add(fromNodeId);
+			}
 			if (!this.subsequentLinks.get(previousLinkId).equals(linkId)) {
 				this.route.add(linkId);
 			}
 			previousLinkId = linkId;
 		}
+		Link endLink = this.links.get(endLinkId);
+		Id<Node> fromNodeId = endLink.getFromNode().getId();
+		if (!visitedNodes.add(fromNodeId)) {
+			// the node was already visited
+			multiplyVisitedNodes.add(fromNodeId);
+		}
+
+		if (!multiplyVisitedNodes.isEmpty()) {
+			// the route contains at least one loop, we need to re-encode it and make sure
+			// that no loop is left out when reconstructing the uncompressed route
+			this.route.clear();
+			previousLinkId = startLinkId;
+			for (Id<Link> linkId : srcRoute) {
+				Link link = this.links.get(linkId);
+				fromNodeId = link.getFromNode().getId();
+				if (!this.subsequentLinks.get(previousLinkId).equals(linkId) || multiplyVisitedNodes.contains(fromNodeId)) {
+					this.route.add(linkId);
+				}
+				previousLinkId = linkId;
+			}
+		}
+
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size();
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
