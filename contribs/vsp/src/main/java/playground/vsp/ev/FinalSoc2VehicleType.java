@@ -16,6 +16,10 @@ import org.matsim.vehicles.Vehicles;
 import javax.inject.Provider;
 
 
+/**
+ * the corresponding functionality was moved into the ev contrib, see MATSim-PR-2120
+ */
+@Deprecated
 class FinalSoc2VehicleType implements MobsimBeforeCleanupListener {
     ElectricFleet electricFleet;
     Vehicles vehicles;
@@ -37,6 +41,10 @@ class FinalSoc2VehicleType implements MobsimBeforeCleanupListener {
     }
 }
 
+/**
+ * the corresponding functionality was moved into the ev contrib, see MATSim-PR-2120
+ */
+@Deprecated
 class FinalSoc2VehicleTypeProvider implements Provider<MobsimListener> {
     @Inject
     ElectricFleet electricFleet;
