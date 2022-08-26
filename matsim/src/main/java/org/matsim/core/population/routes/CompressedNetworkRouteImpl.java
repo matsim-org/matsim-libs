@@ -55,19 +55,21 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
-	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>(0);
+	private ArrayList<Id<Link>> route = new ArrayList<>(0);
 	private final Map<Id<Link>, Id<Link>> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
 	private int uncompressedLength = -1;
-	private int modCount = 0;
+	private final int modCount = 0;
 	private int routeModCountState = 0;
 	private Id<Vehicle> vehicleId = null;
 	private final Network network;
+	private final Map<Id<Link>, ? extends Link> links;
 
 	public CompressedNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId, Network network, final Map<Id<Link>, Id<Link>> subsequentLinks) {
 		super(startLinkId, endLinkId);
 		this.network = network;
+		this.links = network.getLinks();
 		this.subsequentLinks = subsequentLinks;
 	}
 
@@ -75,16 +77,16 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 	public CompressedNetworkRouteImpl clone() {
 		CompressedNetworkRouteImpl cloned = (CompressedNetworkRouteImpl) super.clone();
 		ArrayList<Id<Link>> tmpRoute = cloned.route;
-		cloned.route = new ArrayList<Id<Link>>(tmpRoute); // deep copy
+		cloned.route = new ArrayList<>(tmpRoute); // deep copy
 		return cloned;
 	}
 
 	@Override
 	public List<Id<Link>> getLinkIds() {
 		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
-			return new ArrayList<Id<Link>>(0);
+			return new ArrayList<>(0);
 		}
-		ArrayList<Id<Link>> links = new ArrayList<Id<Link>>(this.uncompressedLength);
+		ArrayList<Id<Link>> links = new ArrayList<>(this.uncompressedLength);
 		if (this.modCount != this.routeModCountState) {
 			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
 			return links;
@@ -109,9 +111,9 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 
 	private void getLinksTillLink(final List<Id<Link>> links, final Id<Link> nextLinkId, final Id<Link> startLinkId) {
 		Id<Link> linkId = startLinkId;
-		Link nextLink = this.network.getLinks().get(nextLinkId);
+		Link nextLink = this.links.get(nextLinkId);
 		while (true) { // loop until we hit "return;"
-			Link link = this.network.getLinks().get(linkId);
+			Link link = this.links.get(linkId);
 			if (link.getToNode() == nextLink.getFromNode()) {
 				return;
 			}
@@ -120,22 +122,9 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 		}
 	}
 
-//	@Override
-//	public void setEndLinkId(final Id<Link> linkId) {
-//		this.modCount++;
-//		super.setEndLinkId(linkId);
-//	}
-//
-//	@Override
-//	public void setStartLinkId(final Id<Link> linkId) {
-//		this.modCount++;
-//		super.setStartLinkId(linkId);
-//	}
-	// AbstractRoute is now implements Lockable and I have addressed this via that feature.  kai, sep/17
-
 	@Override
 	public NetworkRoute getSubRoute(Id<Link> fromLinkId, Id<Link> toLinkId) {
-		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>(10);
+		List<Id<Link>> newLinkIds = new ArrayList<>(10);
 		boolean foundFromLink = fromLinkId.equals(this.getStartLinkId());
 		boolean collectLinks = foundFromLink;
 		boolean equalFromTo = fromLinkId.equals(toLinkId);
