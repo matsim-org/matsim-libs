@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.av.intermodal;
 
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
+
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
@@ -81,7 +83,8 @@ public class RunTaxiPTIntermodalExample {
 		config.addModule(otfvis);
 
 		// ---
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
 

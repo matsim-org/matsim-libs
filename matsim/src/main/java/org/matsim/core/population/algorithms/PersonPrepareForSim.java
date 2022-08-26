@@ -94,7 +94,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
 		}
-		
+
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;

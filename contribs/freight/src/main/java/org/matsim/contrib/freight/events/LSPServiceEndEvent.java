@@ -34,18 +34,18 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 public final class LSPServiceEndEvent extends Event {
 
 	public static final String ATTRIBUTE_PERSON = "driver";
-	public static final String EVENT_TYPE = "service ends";
+	public static final String EVENT_TYPE = "LspServiceEnds";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 	public static final String ATTRIBUTE_SERVICE = "service";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_CARRIER = "carrier";
 	
-	private CarrierService service;
-	private Id<Carrier> carrierId;
-	private Id<Person> driverId;
-	private CarrierVehicle vehicle;
-	private ActivityEndEvent event;
+	private final CarrierService service;
+	private final Id<Carrier> carrierId;
+	private final Id<Person> driverId;
+	private final CarrierVehicle vehicle;
+	private final ActivityEndEvent event;
 	
 	public LSPServiceEndEvent(ActivityEndEvent event, Id<Carrier> carrierId, Id<Person> driverId, CarrierService service, double time, CarrierVehicle vehicle) {
 		super(time);

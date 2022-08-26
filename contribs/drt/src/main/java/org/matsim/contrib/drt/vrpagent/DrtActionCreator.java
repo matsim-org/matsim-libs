@@ -21,9 +21,9 @@ package org.matsim.contrib.drt.vrpagent;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
+import org.matsim.contrib.drt.passenger.DrtStopActivity;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.passenger.BusStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -63,7 +63,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 			case STOP:
 				DrtStopTask t = (DrtStopTask)task;
-				return new BusStopActivity(passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
+				return new DrtStopActivity(passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
 						DRT_STOP_NAME);
 
 			case STAY:

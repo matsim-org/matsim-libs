@@ -53,7 +53,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PopulationUtils;
@@ -105,6 +104,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		} else {
 			throw new RuntimeException("Unknown approach when to create the scoring functions for population. Aborting...");
 		}
+
 		this.population = population;
 		this.legsDelegate = eventsToLegs;
 		this.actsDelegate = eventsToActivities;
@@ -117,8 +117,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	private void init() {
 		for (Person person : this.population.getPersons().values()) {
-			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
-			this.agentScorers.put(person.getId(), data);
+			this.agentScorers.put(person.getId(), this.scoringFunctionFactory.createNewScoringFunction(person ) );
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
 			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
@@ -126,11 +125,9 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	@Override
 	public void handleEvent(Event o) {
-		// this is for the stuff that is directly based on events.
-		// note that this passes on _all_ person events, even those which are aggregated into legs and activities.
-		// for the time being, not all PersonEvents may "implement HasPersonId".
-		// link enter/leave events are NOT passed on, for performance reasons.
-		// kai/dominik, dec'12
+		// this is for the stuff that is directly based on events. note that this passes on _all_ person events, even those which are
+		// aggregated into legs and activities. for the time being, not all PersonEvents may "implement HasPersonId". link enter/leave events
+		// are NOT passed on, for performance reasons. kai/dominik, dec'12
 		if (o instanceof HasPersonId) {
 			ScoringFunction scoringFunction = getScoringFunctionForAgent(((HasPersonId) o).getPersonId());
 			if (scoringFunction != null) {
@@ -155,6 +152,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		if (o instanceof VehicleLeavesTrafficEvent) {
 			this.vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
 		}
+
 		// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
 		/*
 		 * (This shouldn't really be more expensive than passing the link events to the router: here, we have a map lookup
@@ -209,13 +207,10 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			activity.setStartTime(event.getTime());
 			plan.addActivity(activity);
 			final List<Trip> trips = TripStructureUtils.getTrips(plan);
-			// yyyyyy should in principle only return one trip.  There are, however, situations where
-			// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
-			// something that has to do with not alternativing between acts and legs.
-			// (To make matters worse, it passes on my local machine, but fails in jenkins.  Possibly,
-			// the byte buffer memory management in the minibus raptor implementation has
-			// issues--???)
-			// kai, sep'18
+			// yyyyyy should in principle only return one trip.  There are, however, situations where it returns two trips, in particular
+			// in conjunction with the minibus raptor.  Possibly something that has to do with not alternating between acts and legs.
+			// (To make matters worse, it passes on my local machine, but fails in jenkins.  Possibly, the byte buffer memory management
+			// in the minibus raptor implementation has issues--???) kai, sep'18
 
 			ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(event.getPersonId());
 			for (Trip trip : trips) {
@@ -224,7 +219,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 				}
 			}
 
-			// ... and clean out the intermediate plan:
+			// ... and clean out the intermediate plan (which will remain in tripRecords).
 			plan.getPlanElements().clear();
 		}
 	}
@@ -270,11 +265,11 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	 *            The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.
 	 */
-	public ScoringFunction getScoringFunctionForAgent(final Id<Person> agentId) {
+	ScoringFunction getScoringFunctionForAgent(final Id<Person> agentId) {
 		return this.agentScorers.get(agentId);
 	}
 
-	public void finishScoringFunctions() {
+	void finishScoringFunctions() {
 		// Rethrow an exception in a scoring function (user code) if there was one.
 		Throwable throwable = this.exception.get();
 		if (throwable != null) {
@@ -292,7 +287,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		}
 	}
 
-	public void writePartialScores(String iterationFilename) {
+	void writePartialScores(String iterationFilename) {
 		try ( BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename) ) {
 			for (Entry<Id<Person>, TDoubleCollection> entry : this.partialScores.entrySet()) {
 				out.write(entry.getKey().toString());

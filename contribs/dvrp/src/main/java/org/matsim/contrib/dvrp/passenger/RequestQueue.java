@@ -32,26 +32,6 @@ import org.matsim.contrib.dvrp.optimizer.Request;
  * @author Michal Maciejewski (michalm)
  */
 public final class RequestQueue<R extends PassengerRequest> {
-	public enum RequestStatus {oldRequest, newRequest, prescheduledRequest}
-
-	public static final class RequestEntry<R extends PassengerRequest> {
-		private final R request;
-		private final RequestStatus status;
-
-		public RequestEntry(R request, RequestStatus status) {
-			this.request = request;
-			this.status = status;
-		}
-
-		public R getRequest() {
-			return request;
-		}
-
-		public RequestStatus getStatus() {
-			return status;
-		}
-	}
-
 	public static <R extends PassengerRequest> RequestQueue<R> withLimitedAdvanceRequestPlanningHorizon(
 			double planningHorizon) {
 		//all immediate and selected advance (i.e. starting within the planning horizon) requests are scheduled
@@ -67,7 +47,7 @@ public final class RequestQueue<R extends PassengerRequest> {
 	}
 
 	private static final Comparator<PassengerRequest> ABSOLUTE_COMPARATOR = Comparator.comparing(
-			PassengerRequest::getEarliestStartTime)
+					PassengerRequest::getEarliestStartTime)
 			.thenComparing(PassengerRequest::getLatestStartTime)
 			.thenComparing(Request::getSubmissionTime)
 			.thenComparing(Request::getId);

@@ -30,20 +30,13 @@ package org.matsim.contrib.freight.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.utils.FreightUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.replanning.GenericStrategyManager;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -57,51 +50,34 @@ import javax.inject.Inject;
  * @author sschroeder, mzilske
  */
 
-class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener {
+class CarrierControlerListener implements ScoringListener, ReplanningListener {
 	private static final Logger log = Logger.getLogger( CarrierControlerListener.class ) ;
 
-	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
+	private final CarrierStrategyManager strategyManager;
+	private final CarrierAgentTracker carrierAgentTracker;
 
-	private final CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
-
-	private CarrierAgentTracker carrierAgentTracker;
-
-	@Inject EventsManager eventsManager;
 	@Inject Scenario scenario;
 
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject CarrierControlerListener(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-//		log.warn( "calling ctor; scoringFunctionFactory=" + scoringFunctionFactory.getClass() );
-		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
-		this.carrierScoringFunctionFactory = scoringFunctionFactory;
-	}
-
-	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
-		eventsManager.addHandler(carrierAgentTracker);
-		// (add and remove per mobsim run)
-	}
-
-	@Override public void notifyAfterMobsim(AfterMobsimEvent event) {
-		eventsManager.removeHandler(carrierAgentTracker);
+	@Inject CarrierControlerListener( @Nullable CarrierStrategyManager strategyManager, CarrierAgentTracker carrierAgentTracker ) {
+		// The current default is bind( CarrierStrategyManager.class ).toProvider( () -> null );
+		this.strategyManager = strategyManager;
+		this.carrierAgentTracker = carrierAgentTracker;
 	}
 
 	@Override public void notifyScoring(ScoringEvent event) {
 		carrierAgentTracker.scoreSelectedPlans();
-	}
-
-	public CarrierAgentTracker getCarrierAgentTracker() {
-		return carrierAgentTracker;
+		// (could also make CarrierAgentTracker directly a ScoringListener.  Not sure what is the better design: current design separates
+		// ControlerListener and EventHandler functionality.  Other design would make AgentTracker more self-contained.  kai, jul'22)
 	}
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
-		if (carrierPlanStrategyManagerFactory == null) {
-			return;
+		if ( strategyManager==null ) {
+			throw new RuntimeException( "You need to set CarrierStrategyManager to something meaningful to run iterations." );
 		}
-		GenericStrategyManager<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
-		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , null, event.getIteration(), event.getReplanningContext() );
+		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 
 }

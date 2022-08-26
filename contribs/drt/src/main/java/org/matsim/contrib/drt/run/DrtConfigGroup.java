@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -56,7 +56,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
-public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
+public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
@@ -662,7 +662,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	 * @return -- {@value #STORE_UNSHARED_PATH_EXP}
 	 */
 	@StringSetter(STORE_UNSHARED_PATH)
-	void setStoreUnsharedPath(boolean storeUnsharedPath) {
+	public void setStoreUnsharedPath(boolean storeUnsharedPath) {
 		this.storeUnsharedPath = storeUnsharedPath;
 	}
 

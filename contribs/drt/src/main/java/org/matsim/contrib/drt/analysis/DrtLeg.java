@@ -42,7 +42,7 @@ final class DrtLeg {
 	final Id<DvrpVehicle> vehicle;
 	final Id<Link> fromLinkId;
 	final Coord fromCoord;
-	final Id<Link> toLink;
+	final Id<Link> toLinkId;
 	final Coord toCoord;
 	final double waitTime;
 	final double unsharedDistanceEstimate_m;
@@ -63,8 +63,8 @@ final class DrtLeg {
 		this.vehicle = pickedUpEvent.getVehicleId();
 		this.fromLinkId = submittedEvent.getFromLinkId();
 		this.fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
-		this.toLink = submittedEvent.getToLinkId();
-		this.toCoord = linkProvider.apply(toLink).getToNode().getCoord();
+		this.toLinkId = submittedEvent.getToLinkId();
+		this.toCoord = linkProvider.apply(toLinkId).getToNode().getCoord();
 		this.waitTime = pickedUpEvent.getTime() - departureEvent.getTime();
 		this.unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();

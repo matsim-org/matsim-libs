@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -29,6 +30,10 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(ResolveGridCoordinates.class);
 
+	/**
+	 * It is important to <b>use a car-network</b> (i.e. a network where car is permitted on each link), as otherwise one probably runs into problems.
+	 * In scenarios that use access/egress routing, things might still work, but older scenarios will most likely break (during qsim).
+	 */
 	@CommandLine.Parameters(paramLabel = "INPUT", arity = "1", description = "Path to population")
 	private Path input;
 
@@ -106,6 +111,12 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 						if (network != null) {
 							Link link = NetworkUtils.getNearestLink(network, act.getCoord());
+							if(! link.getAllowedModes().contains(TransportMode.car)){
+								throw new IllegalArgumentException("About to set linkId for activity" + act + "for person " + p + "to " + link.getId() + ".\n" +
+										"However, car is not permitted on this link.\n" +
+										"This might cause problems when running the scenario, especially if access/egress routing is not enabled.\n" +
+										"Please provide a car-network here (i.e. a network where car is permitted on every link)");
+							}
 							if (link != null)
 								act.setLinkId(link.getId());
 						}

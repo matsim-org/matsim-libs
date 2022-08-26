@@ -24,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.api.internal.HasVehicleId;
 
 public abstract class Event {
 

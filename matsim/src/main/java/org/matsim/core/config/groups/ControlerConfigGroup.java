@@ -136,7 +136,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 				"Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim." + IOUtils.NATIVE_NEWLINE + "\t\t" +
 				"For 'qsim', add a module 'qsim' to the config.");
 		
-		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.");
+		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims' and `otfvis'.");
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
 		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");

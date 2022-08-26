@@ -4,8 +4,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModes;
-import org.matsim.contrib.shared_mobility.run.SharingQSimServiceModule;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
+import org.matsim.contrib.shared_mobility.service.events.SharingReservingEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingDropoffEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedDropoffEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedPickupEvent;
@@ -27,6 +27,10 @@ public class SharingUtils {
 	static public final String MODE_PREFIX = "sharing_";
 
 	static public final double INTERACTION_DURATION = 60.0;
+
+	public enum SHARING_VEHICLE_STATES {
+		RESERVED, BOOKED, IDLE
+	};
 
 	static public void setStationId(Activity activity, Id<SharingStation> stationId) {
 		Verify.verify(activity.getType().equals(PICKUP_ACTIVITY) || activity.getType().equals(DROPOFF_ACTIVITY));
@@ -75,5 +79,6 @@ public class SharingUtils {
 		reader.addCustomEventMapper(SharingFailedPickupEvent.TYPE, SharingFailedPickupEvent::convert);
 		reader.addCustomEventMapper(SharingDropoffEvent.TYPE, SharingDropoffEvent::convert);
 		reader.addCustomEventMapper(SharingFailedDropoffEvent.TYPE, SharingFailedDropoffEvent::convert);
+		reader.addCustomEventMapper(SharingReservingEvent.TYPE, SharingReservingEvent::convert);
 	}
 }
