@@ -60,8 +60,6 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
 	private int uncompressedLength = -1;
-	private final int modCount = 0;
-	private int routeModCountState = 0;
 	private Id<Vehicle> vehicleId = null;
 	private final Network network;
 	private final Map<Id<Link>, ? extends Link> links;
@@ -87,10 +85,6 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 			return new ArrayList<>(0);
 		}
 		ArrayList<Id<Link>> links = new ArrayList<>(this.uncompressedLength);
-		if (this.modCount != this.routeModCountState) {
-			log.error("Route was modified after storing it! modCount=" + this.modCount + " routeModCount=" + this.routeModCountState);
-			return links;
-		}
 		Id<Link> previousLinkId = getStartLinkId();
 		Id<Link> endLinkId = getEndLinkId();
 		if ((previousLinkId == null) || (endLinkId == null)) {
@@ -184,7 +178,6 @@ final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkR
 		this.route.clear();
 		setStartLinkId(startLinkId);
 		setEndLinkId(endLinkId);
-		this.routeModCountState = this.modCount;
 		if ((srcRoute == null) || (srcRoute.size() == 0)) {
 			this.uncompressedLength = 0;
 			return;
