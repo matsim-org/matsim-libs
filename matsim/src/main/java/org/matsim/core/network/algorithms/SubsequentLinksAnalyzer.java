@@ -67,7 +67,17 @@ public final class SubsequentLinksAnalyzer {
 	 * ssLinks.
 	 */
 	private void compute() {
-		Map<Link, Double> absDeltaThetas = new TreeMap<>(new LinkIdComparator());
+		Comparator<LinkData> linkDataComparator = (o1, o2) -> {
+			int cmp = Double.compare(o1.theta, o2.theta); // prefer the one with smaller theta
+			if (cmp == 0) {
+				cmp = Double.compare(o2.link.getCapacity(), o1.link.getCapacity()); // prefer the one with larger capacity
+			}
+			if (cmp == 0) {
+				cmp = o1.link.getId().compareTo(o2.link.getId());
+			}
+			return cmp;
+		};
+		LinkData[] linkData = new LinkData[10];
 		for (Link l : this.network.getLinks().values()) {
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
@@ -77,8 +87,8 @@ public final class SubsequentLinksAnalyzer {
 			double yTo = cTo.getY();
 			double thetaL = Math.atan2(yTo - cFrom.getY(), xTo - cFrom.getX());
 			Collection<? extends Link> outLinks = to.getOutLinks().values();
-			absDeltaThetas.clear();
 			if (outLinks.size() > 1) {
+				int linkCount = 0;
 
 				for (Link out : outLinks) {
 					Coord cOut = out.getToNode().getCoord();
@@ -89,42 +99,38 @@ public final class SubsequentLinksAnalyzer {
 					while (deltaTheta > Math.PI) {
 						deltaTheta -= 2.0 * Math.PI;
 					}
-					absDeltaThetas.put(out, Math.abs(deltaTheta));
+
+					// add to link data
+					if (linkCount == linkData.length) { // we need more space
+						linkData = Arrays.copyOf(linkData, linkData.length * 2);
+					}
+					if (linkData[linkCount] == null) {
+						linkData[linkCount] = new LinkData(out, Math.abs(deltaTheta));
+					} else {
+						LinkData data = linkData[linkCount];
+						data.link = out;
+						data.theta = Math.abs(deltaTheta);
+					}
+					linkCount++;
 				}
-				this.subsequentLinks.put(l.getId(), computeSubsequentLink(absDeltaThetas).getId());
+
+				// find the best subsequent link: the one with the smallest theta, if multiple have this than the one with the biggest capacity
+				Arrays.sort(linkData, 0, linkCount, linkDataComparator);
+				this.subsequentLinks.put(l.getId(), linkData[0].link.getId());
 			} else if (outLinks.size() == 1) {
 				this.subsequentLinks.put(l.getId(), outLinks.iterator().next().getId());
 			}
 		}
 	}
 
-	/**
-	 * @param thetas map of outgoing-link and theta of that link. must include at least one entry, otherwise it won't work!
-	 * @return the link with the smallest theta, if multiple links have the same smallest theta, the one with the biggest capacity is returned.
-	 */
-	private Link computeSubsequentLink(final Map<Link, Double> thetas) {
-		List<Link> minThetaOutLinks = new ArrayList<>();
+	private static class LinkData {
+		Link link;
+		double theta;
 
-		double absMin = Collections.min(thetas.values());
-		for (Map.Entry<Link, Double> entry : thetas.entrySet()) {
-			if (absMin == entry.getValue()) {
-				minThetaOutLinks.add(entry.getKey());
-			}
+		public LinkData(Link link, double theta) {
+			this.link = link;
+			this.theta = theta;
 		}
-		if (minThetaOutLinks.size() == 1) {
-			return minThetaOutLinks.get(0);
-		}
-
-		double maxCapacity = Double.NEGATIVE_INFINITY;
-		Link maxCapLink = null;
-		for (Link link : minThetaOutLinks) {
-			double cap = link.getCapacity();
-			if (cap > maxCapacity)  {
-				maxCapacity = cap;
-				maxCapLink = link;
-			}
-		}
-		return maxCapLink;
 	}
 
 }
