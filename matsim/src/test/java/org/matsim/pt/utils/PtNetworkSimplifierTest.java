@@ -51,15 +51,47 @@ public class PtNetworkSimplifierTest {
 			}
 		}
 		nodeIdsToRemove.stream().forEach(scenario.getNetwork()::removeNode);
-		
-		Assert.assertFalse(scenario.getNetwork().getLinks().keySet().contains(Id.createLinkId("FG")));
-		Assert.assertFalse(scenario.getNetwork().getLinks().keySet().contains(Id.createLinkId("GH")));
-		Assert.assertFalse(scenario.getNetwork().getNodes().keySet().contains(Id.createNodeId("G")));
-		Assert.assertTrue(scenario.getNetwork().getLinks().keySet().contains(Id.createLinkId("FG-GH")));
-		Assert.assertFalse(scenario.getNetwork().getLinks().keySet().contains(Id.createLinkId("CX")));
-		Assert.assertFalse(scenario.getNetwork().getLinks().keySet().contains(Id.createLinkId("XY")));
-		Assert.assertFalse(scenario.getNetwork().getNodes().keySet().contains(Id.createNodeId("X")));
-		Assert.assertTrue(scenario.getNetwork().getLinks().keySet().contains(Id.createLinkId("CX-XY")));
+
+		// check network and transit route changes
+		List<Id<Link>> addedLinkIds = List.of(
+				Id.createLinkId("FG-GH"),
+				Id.createLinkId("CX-XY"));
+		List<Id<Link>> removedLinkIds = List.of(
+				Id.createLinkId("FG"),
+				Id.createLinkId("GH"),
+				Id.createLinkId("CX"),
+				Id.createLinkId("XY"));
+		List<Id<Node>> removedNodeIds = List.of(
+				Id.createNodeId("G"),
+				Id.createNodeId("X"));
+
+		// check network
+		for (Id<Link> linkId : addedLinkIds) {
+			Assert.assertTrue(scenario.getNetwork().getLinks().keySet().contains(linkId));
+		}
+		for (Id<Link> linkId : removedLinkIds) {
+			Assert.assertFalse(scenario.getNetwork().getLinks().keySet().contains(linkId));
+		}
+		for (Id<Node> nodeId : removedNodeIds) {
+			Assert.assertFalse(scenario.getNetwork().getNodes().keySet().contains(nodeId));
+		}
+
+		// check transit routes
+		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Id<Link> linkId : removedLinkIds) {
+					Assert.assertFalse(route.getRoute().getLinkIds().contains(linkId));
+				}
+			}
+		}
+		Assert.assertTrue(
+				scenario.getTransitSchedule().getTransitLines().get(Id.create("ABCDEFGHI", TransitLine.class))
+						.getRoutes().get(Id.create("ABCDEFGHI-route", TransitRoute.class))
+						.getRoute().getLinkIds().contains(Id.createLinkId("FG-GH")));
+		Assert.assertTrue(
+				scenario.getTransitSchedule().getTransitLines().get(Id.create("ABCXYZ", TransitLine.class))
+						.getRoutes().get(Id.create("ABCXYZ-route", TransitRoute.class))
+						.getRoute().getLinkIds().contains(Id.createLinkId("CX-XY")));
 	}
 
 	/**
