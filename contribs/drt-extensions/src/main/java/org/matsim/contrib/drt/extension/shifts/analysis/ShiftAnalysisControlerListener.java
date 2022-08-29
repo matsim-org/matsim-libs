@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.analysis.DensityScatterPlots;
 import org.matsim.contrib.drt.extension.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -28,19 +29,23 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
 
     private final static Logger logger = Logger.getLogger(ShiftAnalysisControlerListener.class);
 
+	private final String delimiter;
+
 	private DrtConfigGroup drtConfigGroup;
 	private final ShiftDurationXY shiftDurationXY;
     private final BreakCorridorXY breakCorridorXY;
     private final MatsimServices matsimServices;
 
     @Inject
-    public ShiftAnalysisControlerListener(DrtConfigGroup drtConfigGroup, ShiftDurationXY shiftDurationXY,
+    public ShiftAnalysisControlerListener(Config config, DrtConfigGroup drtConfigGroup,
+										  ShiftDurationXY shiftDurationXY,
 										  BreakCorridorXY breakCorridorXY,
 										  MatsimServices matsimServices) {
 		this.drtConfigGroup = drtConfigGroup;
 		this.shiftDurationXY = shiftDurationXY;
         this.breakCorridorXY = breakCorridorXY;
         this.matsimServices = matsimServices;
+		this.delimiter = config.global().getDefaultDelimiter();
     }
 
 
@@ -148,7 +153,7 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
     }
 
-	private static String line(Object... cells) {
-        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(";", "", "\n"));
+	private String line(Object... cells) {
+        return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(delimiter, "", "\n"));
     }
 }
