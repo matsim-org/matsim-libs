@@ -41,6 +41,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
+//TODO: remove or better move to EV contrib
 public class FinalSoc2VehicleTypeTest {
 
 	private final Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();

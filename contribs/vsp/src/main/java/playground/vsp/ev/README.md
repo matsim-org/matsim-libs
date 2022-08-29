@@ -23,6 +23,7 @@ For this to work, vehicles that represent an EV need to be attached to a vehicle
 ##A few notes to the current state of this package (and it's issues and TODOs)
 1. The code generally was tested only with the Open Berlin Scenario v5.5.x 
 1. The initial SoC (as well as other important attributes) is read/written from/to the vehicle _type_ instead of the (single) vehicle. This is, because the corresponding code was written before MATSim-PR1605. So, the code could use adoption to PR1605. Now, if you want to have individual initial SoCs, you need to have one vehicle type for each person/value.
+1. With MATSim-PR-2120, the functionality to transfer the final SoC of an EV to the next iteration (as initial SoC) was centralized into the ev contrib. So the corresponding infrastructure should be removed from here. This can easily be addressed in conjunction with the previous point. After that, the UrbanEVConfigGroup should/could require corresponding settings (EVConfigGroup.getTransferFinalSoCToNextIteration()).    
 1. Overnight charging currently only takes place on the overnight (home) activity. Instead, nearby chargers should be considered.
 1. The first leg of the next day is not considered in the planning of the charging. So, if no home charger is available, a vehicle might run out of energy during it's first trip of the next day.
 1. Related to the last point: If a vehicle (is expected to) runs out of energy during it's first leg of the day, this can not be prevented at the moment.
