@@ -165,6 +165,7 @@ public final class StrategyOptions {
 		selectSingleTripMode(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY),
 		selectBestKPlanModes(InformedModeChoiceModule.SELECT_BEST_K_PLAN_MODES_STRATEGY),
 		selectSubtourMode(InformedModeChoiceModule.SELECT_SUBTOUR_MODE_STRATEGY),
+		randomSubtourMode(InformedModeChoiceModule.RANDOM_SUBTOUR_MODE_STRATEGY),
 		informedModeChoice(InformedModeChoiceModule.INFORMED_MODE_CHOICE);
 
 		private final String name;

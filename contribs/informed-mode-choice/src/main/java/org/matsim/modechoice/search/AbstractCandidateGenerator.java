@@ -10,7 +10,8 @@ import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.modechoice.pruning.CandidatePruner;
 
 import java.util.*;
-import java.util.function.Predicate;
+
+import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
 
 /**
  * Holds fields required for injection.
@@ -49,28 +50,15 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 	@SuppressWarnings("unchecked")
 	protected final List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel) {
 
-		List<TopKChoicesGenerator.ConstraintHolder<?>> constraints = new ArrayList<>();
+		List<ConstraintHolder<?>> constraints = new ArrayList<>();
 		for (TripConstraint<?> c : this.constraints) {
-			constraints.add(new TopKChoicesGenerator.ConstraintHolder<>(
+			constraints.add(new ConstraintHolder<>(
 					(TripConstraint<Object>) c,
 					c.getContext(context, planModel)
 			));
 		}
 
 		return constraints;
-	}
-
-	protected record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
-
-		@Override
-		public boolean test(String[] modes) {
-			return constraint.isValid(context, modes);
-		}
-
-		public boolean testMode(String[] currentModes, ModeEstimate mode, boolean[] mask) {
-			return constraint.isValidMode(context, currentModes, mode, mask);
-		}
-
 	}
 
 }

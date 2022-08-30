@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.ActivityEstimator;
 import org.matsim.modechoice.estimators.LegEstimator;
 import org.matsim.modechoice.estimators.MinMaxEstimate;
@@ -12,10 +13,13 @@ import org.matsim.modechoice.estimators.TripEstimator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * A service for working with {@link PlanModel} and creating estimates.
  */
+@SuppressWarnings("unchecked")
 public final class PlanModelService {
 
 	@Inject
@@ -23,6 +27,9 @@ public final class PlanModelService {
 
 	@Inject
 	private Map<String, TripEstimator<?>> tripEstimator;
+
+	@Inject
+	private Set<TripConstraint<?>> constraints;
 
 	@Inject
 	private ActivityEstimator actEstimator;
@@ -78,6 +85,30 @@ public final class PlanModelService {
 
 			planModel.putEstimate(mode, c);
 		}
+	}
+
+	/**
+	 * Allowed modes of a plan.
+	 */
+	public List<String> allowedModes(PlanModel planModel) {
+
+		List<String> modes = new ArrayList<>();
+
+		for (String mode : config.getModes()) {
+
+			ModeOptions<Enum<?>> t = (ModeOptions<Enum<?>>) this.options.get(mode);
+			List<Enum<?>> modeOptions = t.get(planModel.getPerson());
+
+			for (Enum<?> modeOption : modeOptions) {
+				boolean usable = t.allowUsage(modeOption);
+
+				if (usable) {
+					modes.add(mode);
+					break;
+				}
+			}
+		}
+		return modes;
 	}
 
 	/**
@@ -151,6 +182,45 @@ public final class PlanModelService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Check whether all registered constraints are met.
+	 */
+	public boolean isValidOption(PlanModel model, String[] modes) {
+
+		if (constraints.isEmpty())
+			return true;
+
+		// Scoring is null here as it should not be needed
+		EstimatorContext context = new EstimatorContext(model.getPerson(), null);
+
+		for (TripConstraint<?> c : this.constraints) {
+			ConstraintHolder<?> h = new ConstraintHolder<>(
+					(TripConstraint<Object>) c,
+					c.getContext(context, model)
+			);
+
+			if (!h.test(modes))
+				return false;
+
+		}
+
+		return true;
+	}
+
+
+	public record ConstraintHolder<T>(TripConstraint<T> constraint, T context) implements Predicate<String[]> {
+
+		@Override
+		public boolean test(String[] modes) {
+			return constraint.isValid(context, modes);
+		}
+
+		public boolean testMode(String[] currentModes, ModeEstimate mode, boolean[] mask) {
+			return constraint.isValidMode(context, currentModes, mode, mask);
+		}
+
 	}
 
 }

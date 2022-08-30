@@ -39,6 +39,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 	public static String SELECT_SINGLE_TRIP_MODE_STRATEGY = "SelectSingleTripMode";
 
 	public static String SELECT_SUBTOUR_MODE_STRATEGY = "SelectSubtourMode";
+	public static String RANDOM_SUBTOUR_MODE_STRATEGY = "RandomSubtourMode";
 
 	public static String INFORMED_MODE_CHOICE = "InformedModeChoice";
 
@@ -85,6 +86,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		addPlanStrategyBinding(SELECT_BEST_K_PLAN_MODES_STRATEGY).toProvider(SelectBestKPlanModesStrategyProvider.class);
 		addPlanStrategyBinding(SELECT_SINGLE_TRIP_MODE_STRATEGY).toProvider(SelectSingleTripModeStrategyProvider.class);
 		addPlanStrategyBinding(SELECT_SUBTOUR_MODE_STRATEGY).toProvider(SelectSubtourModeStrategyProvider.class);
+		addPlanStrategyBinding(RANDOM_SUBTOUR_MODE_STRATEGY).toProvider(RandomSubtourModeStrategyProvider.class);
 		addPlanStrategyBinding(INFORMED_MODE_CHOICE).toProvider(InformedModeChoiceStrategyProvider.class);
 
 		// Ensure that only one instance exists

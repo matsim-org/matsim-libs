@@ -13,6 +13,8 @@ import org.matsim.modechoice.pruning.CandidatePruner;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
+
 /**
  * Generate top n choices for each possible mode option.
  */
