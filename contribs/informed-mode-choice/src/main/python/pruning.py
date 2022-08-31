@@ -13,7 +13,7 @@ def read_tsv(f):
 
 #%%
 
-df = read_tsv(r"C:\Users\chris\Development\matsim-scenarios\matsim-kelheim\analysis.tsv")
+df = read_tsv(r"C:\Users\chris\Development\matsim-scenarios\matsim-kelheim\analysis-act.tsv")
 df = df[~df.type.isna()]
 
 df["dist"] = df[df.columns[df.columns.str.contains("dist")]].sum(axis=1)
@@ -42,7 +42,7 @@ df_diff = df.groupby("person").apply(p)
 
 #%%
 
-q = 0.99
+q = 0.999
 
 d = df_diff[df_diff["diff"] > 0]
 
@@ -150,7 +150,7 @@ print(res)
 
 # Higher level objective
 hf = opt
-q = 5
+q = 0.1
 x0 = 2
 
 def hopt(s):
