@@ -112,7 +112,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				getter -> new ShiftHistogramListener(drtConfigGroup,
 						getter.get(MatsimServices.class), getter.getModal(ShiftHistogram.class)))).asEagerSingleton();
 		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new ShiftAnalysisControlerListener(drtConfigGroup,
+				getter -> new ShiftAnalysisControlerListener(getConfig(), drtConfigGroup,
 						getter.getModal(ShiftDurationXY.class), getter.getModal(BreakCorridorXY.class),
 						getter.get(MatsimServices.class)))).asEagerSingleton();
 
