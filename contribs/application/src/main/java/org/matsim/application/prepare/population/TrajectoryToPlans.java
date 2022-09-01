@@ -136,7 +136,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
      */
     private void splitActivityTypesBasedOnDuration(Population population) {
 
-        final int maxCategories = maxTypicalDuration / activityBinSize;
+
 
         // Calculate activity durations for the next step
         for (Person p : population.getPersons().values()) {
@@ -147,20 +147,8 @@ public class TrajectoryToPlans implements MATSimAppCommand {
                         continue;
 
                     Activity act = (Activity) el;
-                    double duration = act.getEndTime().orElse(24 * 3600)
-                            - act.getStartTime().orElse(0);
-
-                    int durationCategoryNr = (int) Math.round((duration / activityBinSize));
-
-                    if (durationCategoryNr <= 0) {
-                        durationCategoryNr = 1;
-                    }
-
-                    if (durationCategoryNr >= maxCategories) {
-                        durationCategoryNr = maxCategories;
-                    }
-
-                    String newType = String.format("%s_%d", act.getType(), durationCategoryNr * activityBinSize);
+                    double duration = act.getEndTime().orElse(24 * 3600) - act.getStartTime().orElse(0);
+                    String newType = String.format("%s_%d", act.getType(), roundDuration(duration));
                     act.setType(newType);
 
                 }
@@ -168,6 +156,26 @@ public class TrajectoryToPlans implements MATSimAppCommand {
                 mergeOvernightActivities(plan);
             }
         }
+    }
+
+    /**
+     * Round duration according to bin size.
+     */
+    private int roundDuration(double duration) {
+
+        final int maxCategories = maxTypicalDuration / activityBinSize;
+
+        int durationCategoryNr = (int) Math.round((duration / activityBinSize));
+
+        if (durationCategoryNr <= 0) {
+            durationCategoryNr = 1;
+        }
+
+        if (durationCategoryNr >= maxCategories) {
+            durationCategoryNr = maxCategories;
+        }
+
+        return durationCategoryNr * activityBinSize;
     }
 
     private void mergeOvernightActivities(Plan plan) {
@@ -182,8 +190,10 @@ public class TrajectoryToPlans implements MATSimAppCommand {
             if (firstBaseActivity.equals(lastBaseActivity)) {
                 double mergedDuration = Double.parseDouble(firstActivity.getType().split("_")[1]) + Double.parseDouble(lastActivity.getType().split("_")[1]);
 
-                firstActivity.setType(String.format("%s_%d", firstBaseActivity, (int) mergedDuration));
-                lastActivity.setType(String.format("%s_%d", lastBaseActivity, (int) mergedDuration));
+                int merged = roundDuration(mergedDuration);
+
+                firstActivity.setType(String.format("%s_%d", firstBaseActivity, merged));
+                lastActivity.setType(String.format("%s_%d", lastBaseActivity, merged));
             }
         }  // skipping plans with just one activity
     }
