@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.freight.usecases.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -72,7 +73,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	
 	private Carriers carriers;
 
-	private final static Logger log = Logger.getLogger(CarrierScoreStats.class);
+	private final static Logger log = LogManager.getLogger(CarrierScoreStats.class);
 
 	/**
 	 * Creates a new ScoreStats instance.

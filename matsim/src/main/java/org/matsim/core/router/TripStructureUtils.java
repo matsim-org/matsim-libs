@@ -22,7 +22,8 @@ package org.matsim.core.router;
 import java.util.*;
 import java.util.function.Predicate;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -51,7 +52,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author thibautd
  */
 public final class TripStructureUtils {
-	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
+	private static final Logger log = LogManager.getLogger(TripStructureUtils.class);
 
 	public enum StageActivityHandling {StagesAsNormalActivities, ExcludeStageActivities}
 

@@ -26,7 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -66,7 +67,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class RouteAllModesAsCar extends AbstractPersonFilter {
 	
-	private final static Logger log = Logger.getLogger(RouteAllModesAsCar.class);
+	private final static Logger log = LogManager.getLogger(RouteAllModesAsCar.class);
 
 	private final Scenario sc;
 	private final LeastCostPathCalculator routingAlgo;

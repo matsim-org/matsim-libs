@@ -29,7 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -60,7 +61,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, ReplanningEventHandler,
 		MobsimInitializedListener, MobsimAfterSimStepListener {
 
-	private static final Logger log = Logger.getLogger(ActivityReplanningMap.class);
+	private static final Logger log = LogManager.getLogger(ActivityReplanningMap.class);
 
 	private final MobsimDataProvider mobsimDataProvider;
 	

@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,7 +38,7 @@ import java.util.*;
  * @author laemmel
  */
 public final class NetworkSegmentDoubleLinks implements NetworkRunnable {
-	private static final Logger log = Logger.getLogger(NetworkSegmentDoubleLinks.class);
+	private static final Logger log = LogManager.getLogger(NetworkSegmentDoubleLinks.class);
 
 	private Network network = null;
 

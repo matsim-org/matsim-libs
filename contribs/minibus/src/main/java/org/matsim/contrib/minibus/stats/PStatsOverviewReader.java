@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -37,7 +38,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class PStatsOverviewReader implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(PStatsOverviewReader.class);
+	private static final Logger log = LogManager.getLogger(PStatsOverviewReader.class);
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	private List<PStatsOverviewDataContainer> pStatOverviewData = new ArrayList<>();

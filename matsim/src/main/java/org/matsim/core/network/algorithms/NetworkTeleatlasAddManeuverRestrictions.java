@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -56,7 +57,7 @@ public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRun
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(NetworkTeleatlasAddManeuverRestrictions.class);
+	private final static Logger log = LogManager.getLogger(NetworkTeleatlasAddManeuverRestrictions.class);
 
 	/**
 	 * path and name to the Tele Atlas MultiNet maneuver (mn) Shape file

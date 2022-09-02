@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -29,7 +30,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
-	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
+	private static final Logger log = LogManager.getLogger(EvNetworkRoutingProvider.class);
 
 	private final String routingMode;
 	@Inject

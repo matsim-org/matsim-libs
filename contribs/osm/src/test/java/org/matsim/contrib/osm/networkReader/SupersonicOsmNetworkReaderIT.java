@@ -1,6 +1,7 @@
 package org.matsim.contrib.osm.networkReader;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
@@ -14,7 +15,7 @@ import java.nio.file.Paths;
 public class SupersonicOsmNetworkReaderIT {
 
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
-	private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReaderIT.class);
+	private static final Logger log = LogManager.getLogger(SupersonicOsmNetworkReaderIT.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();

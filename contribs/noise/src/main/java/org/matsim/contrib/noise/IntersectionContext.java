@@ -1,6 +1,7 @@
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -17,7 +18,7 @@ import javax.inject.Inject;
  */
 final class IntersectionContext {
 
-    private final static Logger logger = Logger.getLogger(IntersectionContext.class);
+    private final static Logger logger = LogManager.getLogger(IntersectionContext.class);
     static final String INTERSECTION_TYPE = "IntersectionType";
 
     private final QuadTree<Intersection> intersections;

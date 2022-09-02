@@ -22,7 +22,8 @@ package org.matsim.contrib.decongestion.tollSetting;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -42,7 +43,7 @@ import org.matsim.contrib.decongestion.data.LinkInfo;
  */
 
 public class DecongestionTollingP_MCP implements DecongestionTollSetting, LinkLeaveEventHandler {
-	private static final Logger log = Logger.getLogger(DecongestionTollingP_MCP.class);
+	private static final Logger log = LogManager.getLogger(DecongestionTollingP_MCP.class);
 	
 	@Inject
 	private DecongestionInfo congestionInfo;

@@ -23,7 +23,8 @@ package org.matsim.visum;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Matrix;
 
@@ -34,7 +35,7 @@ public class VisumMatrixReader {
 
 	private Matrix matrix = null;
 
-	/*package*/ static final Logger log = Logger.getLogger(VisumMatrixReader.class);
+	/*package*/ static final Logger log = LogManager.getLogger(VisumMatrixReader.class);
 
 	public VisumMatrixReader(final Matrix matrix) {
 		this.matrix = matrix;

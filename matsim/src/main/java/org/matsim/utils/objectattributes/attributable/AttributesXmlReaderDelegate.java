@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
@@ -43,7 +44,7 @@ import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
  * @author thibautd
  */
 public class AttributesXmlReaderDelegate {
-	private final static Logger log = Logger.getLogger(AttributesXmlReaderDelegate.class);
+	private final static Logger log = LogManager.getLogger(AttributesXmlReaderDelegate.class);
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
 	private Attributes currentAttributes = null;

@@ -32,7 +32,8 @@ import java.util.TreeMap;
 
 import jakarta.validation.Valid;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -54,7 +55,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	private final Map<String, Collection<@Valid ConfigGroup>> parameterSetsPerType = new HashMap<>();
 	private boolean locked = false ;
 
-	private final static Logger log = Logger.getLogger(ConfigGroup.class);
+	private final static Logger log = LogManager.getLogger(ConfigGroup.class);
 
 	public ConfigGroup(final String name) {
 		this.name = name;

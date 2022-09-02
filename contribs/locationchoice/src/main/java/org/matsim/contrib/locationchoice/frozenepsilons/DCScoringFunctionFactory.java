@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -33,7 +34,7 @@ import org.matsim.core.scoring.functions.ScoringParameters;
 
 class DCScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
+	private final static Logger log = LogManager.getLogger(DCScoringFunctionFactory.class);
 	
 	private final Scenario scenario;
 	private final DestinationChoiceContext lcContext;

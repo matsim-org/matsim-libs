@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.analysis.vsp.qgis.GraduatedSymbolRenderer;
@@ -37,7 +38,7 @@ import org.matsim.core.utils.misc.ExeRunner;
  * @author nagel, dziemke
  */
 public class VisualizationUtils {
-	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
+	public static final Logger log = LogManager.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
 	

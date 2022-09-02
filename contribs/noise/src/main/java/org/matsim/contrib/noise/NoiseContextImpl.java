@@ -23,7 +23,8 @@
 package org.matsim.contrib.noise;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +53,7 @@ import java.util.*;
  */
 final class NoiseContextImpl implements NoiseContext {
 	
-	private static final Logger log = Logger.getLogger(NoiseContextImpl.class);
+	private static final Logger log = LogManager.getLogger(NoiseContextImpl.class);
 
 	@Inject
 	private Scenario scenario;

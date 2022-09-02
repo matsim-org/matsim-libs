@@ -23,7 +23,8 @@ package org.matsim.core.network;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -49,7 +50,7 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public final class NetworkUtils {
 
-	private static final Logger log = Logger.getLogger(NetworkUtils.class);
+	private static final Logger log = LogManager.getLogger(NetworkUtils.class);
 
 	/**
 	 * This will create a time invariant network.

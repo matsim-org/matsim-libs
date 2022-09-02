@@ -22,7 +22,8 @@ package org.matsim.vehicles;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +33,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author dgrether
  */
 public class VehicleWriterV2Test extends MatsimTestCase {
-	private static final Logger log = Logger.getLogger(VehicleWriterV2Test.class);
+	private static final Logger log = LogManager.getLogger(VehicleWriterV2Test.class);
 
 	private static final String TESTXML = "testVehicles_v2.xml";
 

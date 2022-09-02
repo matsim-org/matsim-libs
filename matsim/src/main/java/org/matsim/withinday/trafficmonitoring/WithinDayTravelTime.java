@@ -37,7 +37,8 @@ import java.util.concurrent.CyclicBarrier;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -88,7 +89,7 @@ public class WithinDayTravelTime implements TravelTime,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 		MobsimBeforeCleanupListener {
 
-	private static final Logger log = Logger.getLogger(WithinDayTravelTime.class);
+	private static final Logger log = LogManager.getLogger(WithinDayTravelTime.class);
 
 	private Network network;
 

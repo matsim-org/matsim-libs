@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -73,7 +74,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class TransitDriverTest {
 
-	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
+	private static final Logger log = LogManager.getLogger(TransitDriverTest.class);
 
 	public MatsimTestUtils util = new MatsimTestUtils();
 	

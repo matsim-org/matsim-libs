@@ -22,7 +22,8 @@ package org.matsim.contrib.socnetsim.framework.replanning.modules;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -37,7 +38,7 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	private static final Logger log =
-		Logger.getLogger(BlackListedTimeAllocationMutator.class);
+		LogManager.getLogger(BlackListedTimeAllocationMutator.class);
 
 	private final double mutationRange;
 	private final Random random;

@@ -22,8 +22,9 @@ package playground.vsp.analysis.modules.bvgAna.anaLevel1.vehId2PersonEntersLeave
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -38,7 +39,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
  */
 public class VehId2PersonEnterLeaveVehicleHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
-	private final Logger log = Logger.getLogger(VehId2PersonEnterLeaveVehicleHandler.class);
+	private final Logger log = LogManager.getLogger(VehId2PersonEnterLeaveVehicleHandler.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> vehId2PersonEnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();

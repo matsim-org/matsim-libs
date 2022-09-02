@@ -24,7 +24,8 @@ package org.matsim.core.replanning.strategies;
 
 import com.google.inject.*;
 import org.junit.Assert;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +53,7 @@ import java.util.Collections;
  *
  */
 public class InnovationSwitchOffTest {
-	private static final Logger log = Logger.getLogger(InnovationSwitchOffTest.class);
+	private static final Logger log = LogManager.getLogger(InnovationSwitchOffTest.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();

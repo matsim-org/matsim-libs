@@ -30,7 +30,8 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -79,7 +80,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	Map<ScoreItem,Map< Integer, Double>> scoreHistory = new HashMap<>() ;
 	private int minIteration = 0;
 
-	private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
+	private final static Logger log = LogManager.getLogger(ScoreStatsControlerListener.class);
 
 	@Inject
 	ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,

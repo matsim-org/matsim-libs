@@ -27,7 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -46,7 +47,7 @@ import org.matsim.vehicles.Vehicles;
  * @author (of documentation) kai
  */
 public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
-	private static final Logger log = Logger.getLogger(ReconstructingUmlaufBuilder.class);
+	private static final Logger log = LogManager.getLogger(ReconstructingUmlaufBuilder.class);
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
 

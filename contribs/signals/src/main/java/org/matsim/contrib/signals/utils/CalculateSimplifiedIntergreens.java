@@ -29,7 +29,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
@@ -52,7 +53,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  */
 public final class CalculateSimplifiedIntergreens {
 
-	private static final Logger log = Logger.getLogger(CalculateSimplifiedIntergreens.class);
+	private static final Logger log = LogManager.getLogger(CalculateSimplifiedIntergreens.class);
 
 	int signalSystemCycleTime = 0;
 	List<SignalGroupSettingsData> groupSettingsList = new ArrayList<>();

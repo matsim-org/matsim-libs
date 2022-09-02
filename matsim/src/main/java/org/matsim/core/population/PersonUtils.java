@@ -24,7 +24,8 @@ package org.matsim.core.population;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
@@ -39,7 +40,7 @@ public final class PersonUtils {
     private static final String AGE = "age";
     private static final String TRAVEL_CARDS = "travelcards";
     private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
-    private final static Logger log = Logger.getLogger(Person.class);
+    private final static Logger log = LogManager.getLogger(Person.class);
 
     @Deprecated // use methods of interface Person
     public static Plan createAndAddPlan(Person person, final boolean selected) {

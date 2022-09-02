@@ -24,7 +24,8 @@
 //import java.util.List;
 //import java.util.Map.Entry;
 //
-//import org.apache.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 //import org.matsim.api.core.v01.Scenario;
 //import org.matsim.contrib.minibus.PConfigGroup;
 //import org.matsim.contrib.minibus.fare.StageContainerCreator;
@@ -52,7 +53,7 @@
 //
 //public class EventsHandlerSpeedTest {
 //	
-//	private static final Logger log = Logger.getLogger(EventsHandlerSpeedTest.class);
+//	private static final Logger log = LogManager.getLogger(EventsHandlerSpeedTest.class);
 //	
 //	public static void run(String eventsFile, List<EventHandler> eventHandlers){
 //		

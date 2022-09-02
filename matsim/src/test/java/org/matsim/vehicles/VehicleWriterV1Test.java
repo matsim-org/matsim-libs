@@ -24,7 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
@@ -34,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author kturner
  */
 public class VehicleWriterV1Test extends MatsimTestCase {
-	private static final Logger log = Logger.getLogger(VehicleWriterV1Test.class);
+	private static final Logger log = LogManager.getLogger(VehicleWriterV1Test.class);
 
 	private static final String TESTXML = "testVehicles_v1.xml";
 

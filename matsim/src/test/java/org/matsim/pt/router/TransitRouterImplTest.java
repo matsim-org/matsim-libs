@@ -28,7 +28,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +73,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 @RunWith(Parameterized.class)
 public class TransitRouterImplTest {
-	private static final Logger log = Logger.getLogger(TransitRouterImplTest.class) ;
+	private static final Logger log = LogManager.getLogger(TransitRouterImplTest.class) ;
 	
 	private String routerType ;
 

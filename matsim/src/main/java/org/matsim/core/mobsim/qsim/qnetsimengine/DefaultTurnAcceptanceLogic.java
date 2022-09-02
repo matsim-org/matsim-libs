@@ -24,7 +24,8 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -35,7 +36,7 @@ import org.matsim.api.core.v01.network.Link;
  *
  */
 public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
-	private static final Logger log = Logger.getLogger( DefaultTurnAcceptanceLogic.class) ;
+	private static final Logger log = LogManager.getLogger( DefaultTurnAcceptanceLogic.class) ;
 	
 	@Override
 	/** We need qNetwork to get the next QLink, because the link lookup may lead to a NullPointer otherwise */

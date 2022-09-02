@@ -22,7 +22,8 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -53,7 +54,7 @@ public class DrtLegsAnalyser {
 		LinkedList<DrtLeg> allLegs = new LinkedList<>(legs);
 		DrtLeg currentLeg = allLegs.pollFirst();
 		if (currentLeg.departureTime > endTime) {
-			Logger.getLogger(DrtLegsAnalyser.class).error("wrong end / start Times for analysis");
+			LogManager.getLogger(DrtLegsAnalyser.class).error("wrong end / start Times for analysis");
 		}
 		Map<Double, List<DrtLeg>> splitLegs = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {

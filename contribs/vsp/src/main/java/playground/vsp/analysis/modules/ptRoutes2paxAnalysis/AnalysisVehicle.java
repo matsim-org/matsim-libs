@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.ptRoutes2paxAnalysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -30,7 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class AnalysisVehicle {
 
-	private static final Logger log = Logger.getLogger(AnalysisVehicle.class);
+	private static final Logger log = LogManager.getLogger(AnalysisVehicle.class);
 	private double seatsOccupied;
 	private double capacity;
 	private Id locationId;

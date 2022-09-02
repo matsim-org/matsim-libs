@@ -22,7 +22,8 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +38,7 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.*;
 
 class ReadOrComputeMaxDCScore {
 
-	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
+	private final static Logger log = LogManager.getLogger(ReadOrComputeMaxDCScore.class);
 
 	private Scenario scenario;
 	private FrozenTastesConfigGroup dccg;

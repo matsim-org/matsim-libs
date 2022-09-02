@@ -32,7 +32,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -54,7 +55,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author mrieser
  */
 public final class MatsimTestUtils extends TestWatcher {
-	private static final Logger log = Logger.getLogger(MatsimTestUtils.class);
+	private static final Logger log = LogManager.getLogger(MatsimTestUtils.class);
 
 	/**
 	 * A constant for the exactness when comparing doubles.
@@ -261,7 +262,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
 
-			Logger.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
+			LogManager.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
 
 			this.classInputDirectory = "test/input/" +
 											   this.testClass.getCanonicalName().replace('.', '/') + "/";

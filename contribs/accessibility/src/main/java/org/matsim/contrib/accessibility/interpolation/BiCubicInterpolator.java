@@ -5,7 +5,8 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.analysis.BivariateRealFunction;
 import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.accessibility.SpatialGrid;
 
 /**
@@ -20,7 +21,7 @@ import org.matsim.contrib.accessibility.SpatialGrid;
  */
 class BiCubicInterpolator {
 
-	private static final Logger log = Logger.getLogger(BiCubicInterpolator.class);
+	private static final Logger log = LogManager.getLogger(BiCubicInterpolator.class);
 	
 	private BivariateRealFunction interpolatingFunction = null;
 	

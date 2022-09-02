@@ -312,7 +312,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	 */
 	static class VehicleTransportCostsIncludingToll implements TravelDisutility {
 
-//		private static Logger logger = Logger.getLogger(VehicleTransportCostsIncludingToll.class);
+//		private static Logger logger = LogManager.getLogger(VehicleTransportCostsIncludingToll.class);
 
 		private TravelDisutility baseTransportDisutility;
 

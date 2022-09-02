@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -53,7 +54,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 
-	private static final Logger log = Logger.getLogger(TransitVehicleVolumeAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(TransitVehicleVolumeAnalyzer.class);
 	private Scenario sc;
 	private TransitVehicleVolumeHandler handler;
 	private HashMap<String, Map<Id, Double>> mode2Link2Total;

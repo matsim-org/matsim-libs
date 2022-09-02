@@ -21,7 +21,8 @@ package org.matsim.core.controler.corelisteners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -66,7 +67,7 @@ import java.util.Map;
 
 @Singleton
 final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
-	private static final Logger log = Logger.getLogger( DumpDataAtEndImpl.class );
+	private static final Logger log = LogManager.getLogger( DumpDataAtEndImpl.class );
 
 	@Inject
 	private Config config;
@@ -167,7 +168,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					throw new UncheckedIOException(e);
 				}
 			} catch (Exception ee) {
-				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+				LogManager.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
 						+ "generated in the final iteration");
 			}
 
@@ -184,7 +185,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				throw new UncheckedIOException(e);
 			}
 		} catch (Exception ee) {
-			Logger.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
+			LogManager.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
 					+ "generated in the final iteration");
 		}
 	}
@@ -199,7 +200,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
                 throw new UncheckedIOException(e);
             }
         } catch (Exception ee) {
-            Logger.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
+            LogManager.getLogger(this.getClass()).error("writing output trips did not work; probably parameters were such that no trips CSV were "
                     + "generated in the final iteration");
         }
     }
@@ -215,7 +216,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					throw new UncheckedIOException(e);
 				}
 			} catch ( Exception ee ) {
-				Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
+				LogManager.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
 						+ "were not generated in the final iteration", ee);
 			}
 		}

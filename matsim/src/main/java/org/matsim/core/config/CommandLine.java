@@ -33,7 +33,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 
 /**
@@ -122,7 +123,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class CommandLine {
-	final private static Logger logger = Logger.getLogger(CommandLine.class);
+	final private static Logger logger = LogManager.getLogger(CommandLine.class);
 
 	final private static String CONFIG_PREFIX = "config";
 	final private static String FLAG_VALUE = "true";

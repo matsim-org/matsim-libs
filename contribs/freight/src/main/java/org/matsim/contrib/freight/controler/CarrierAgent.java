@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.events.*;
@@ -56,7 +57,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 final class CarrierAgent implements Identifiable<Carrier>
 {
-	private static final Logger log = Logger.getLogger( CarrierAgent.class );
+	private static final Logger log = LogManager.getLogger( CarrierAgent.class );
 
 	private final Id<Carrier> id;
 

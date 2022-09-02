@@ -22,7 +22,8 @@ package playground.vsp.analysis.modules.travelTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -36,7 +37,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  *
  */
 public class TravelTimePerModeEventHandler implements PersonArrivalEventHandler, PersonDepartureEventHandler{
-	private static final Logger logger = Logger.getLogger(TravelTimePerModeEventHandler.class);
+	private static final Logger logger = LogManager.getLogger(TravelTimePerModeEventHandler.class);
 	private PtDriverIdAnalyzer ptDriverIdAna;
 
 	Map<String, Map<Id, Double>> mode2personId2DepartureTime;

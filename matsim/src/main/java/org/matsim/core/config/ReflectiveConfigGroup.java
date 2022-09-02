@@ -32,7 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
@@ -84,7 +85,7 @@ import com.google.common.base.Preconditions;
  */
 public abstract class ReflectiveConfigGroup extends ConfigGroup implements MatsimExtensionPoint {
 	private static final Logger log =
-		Logger.getLogger(ReflectiveConfigGroup.class);
+		LogManager.getLogger(ReflectiveConfigGroup.class);
 
 	private final boolean storeUnknownParameters;
 

@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -16,7 +17,7 @@ import javax.inject.Inject;
  */
 public class ShiftHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-    static private final Logger log = Logger.getLogger(ShiftHistogramListener.class);
+    static private final Logger log = LogManager.getLogger(ShiftHistogramListener.class);
 
 	private DrtConfigGroup drtConfigGroup;
 	private MatsimServices matsimServices;

@@ -26,7 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -43,7 +44,7 @@ import one.util.streamex.EntryStream;
  */
 public class DrtGridUtils {
 
-	static final Logger log = Logger.getLogger(DrtGridUtils.class);
+	static final Logger log = LogManager.getLogger(DrtGridUtils.class);
 
 	public static Map<String, PreparedGeometry> createGridFromNetwork(Network network, double cellsize) {
 		log.info("start creating grid from network");

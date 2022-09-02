@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -29,7 +30,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 
 final class Hermes implements Mobsim {
 
-	final private static Logger log = Logger.getLogger(Hermes.class);
+	final private static Logger log = LogManager.getLogger(Hermes.class);
 	private Realm realm;
 	private Agent[] agents;
 	private ScenarioImporter si;

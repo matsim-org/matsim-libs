@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.shifts.io;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.shifts.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.shifts.shift.*;
@@ -28,7 +29,7 @@ public class DrtShiftsReader extends MatsimXmlParser {
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
     public static final String BREAK_DURATION = "duration";
 
-    private static final Logger log = Logger.getLogger( DrtShiftsReader.class ) ;
+    private static final Logger log = LogManager.getLogger( DrtShiftsReader.class ) ;
 
     private final DrtShiftsSpecification shiftsSpecification;
 
